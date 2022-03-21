@@ -1,0 +1,674 @@
+#
+# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+"""Miscellaneous utility functions of the Sionna package."""
+
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.keras.layers import Layer
+from tensorflow.experimental.numpy import swapaxes
+from tensorflow.experimental.numpy import log10 as _log10
+from tensorflow.experimental.numpy import log2 as _log2
+from sionna.utils.metrics import count_errors, count_block_errors
+from sionna.mapping import Constellation
+import time
+
+def ebnodb2no(ebno_db, num_bits_per_symbol, coderate, resource_grid=None):
+    r"""Compute the noise variance `No` for a given `Eb/No` in dB.
+
+    The function takes into account the number of coded bits per constellation
+    symbol, the coderate, as well as possible additional overheads related to
+    OFDM transmissions, such as the cyclic prefix and pilots.
+
+    The value of `No` is computed according to the following expression
+
+    .. math::
+        N_o = \left(\frac{E_b}{N_o} \frac{r M}{E_s}\right)^{-1}
+
+    where :math:`2^M` is the constellation size, i.e., :math:`M` is the
+    average number of coded bits per constellation symbol,
+    :math:`E_s=1` is the average energy per constellation per symbol,
+    :math:`r\in(0,1]` is the coderate,
+    :math:`E_b` is the energy per information bit,
+    and :math:`N_o` is the noise power spectral density.
+    For OFDM transmissions, :math:`E_s` is scaled
+    according to the ratio between the total number of resource elements in
+    a resource grid with non-zero energy and the number
+    of resource elements used for data transmission. Also the additionally
+    transmitted energy during the cyclic prefix is taken into account, as
+    well as the number of transmitted streams per transmitter.
+
+    Input
+    -----
+    ebno_db : float
+        The `Eb/No` value in dB.
+
+    num_bits_per_symbol : int
+        The number of bits per symbol.
+
+    coderate : float
+        The coderate used.
+
+    resource_grid : ResourceGrid
+        An (optional) instance of :class:`~sionna.ofdm.ResourceGrid`
+        for OFDM transmissions.
+
+    Output
+    ------
+    : float
+        The value of :math:`N_o` in linear scale.
+    """
+
+    if tf.is_tensor(ebno_db):
+        dtype = ebno_db.dtype
+    else:
+        dtype = tf.float32
+
+    ebno = tf.math.pow(tf.cast(10., dtype), ebno_db/10.)
+
+    energy_per_symbol = 1
+    if resource_grid is not None:
+        # Divide energy per symbol by the number of transmitted streams
+        energy_per_symbol /= resource_grid.num_streams_per_tx
+
+        # Number of nonzero energy symbols.
+        # We do not account for the nulled DC and guard carriers.
+        cp_overhead = resource_grid.cyclic_prefix_length \
+                      / resource_grid.fft_size
+        num_syms = resource_grid.num_ofdm_symbols * (1 + cp_overhead) \
+                    * resource_grid.num_effective_subcarriers
+        energy_per_symbol *= num_syms / resource_grid.num_data_symbols
+
+    no = 1/(ebno * coderate * tf.cast(num_bits_per_symbol, dtype) \
+          / tf.cast(energy_per_symbol, dtype))
+
+    return no
+
+def empirical_psd(x, show=True):
+    """Computes the empirical power spectral density.
+
+    Computes the empirical power spectral density (PSD) of ``x``
+    along the last dimension by averaging over all other dimensions.
+    Note that this function
+    simply returns the averaged absolute squared discrete Fourier
+    spectrum of ``x``.
+
+    Input
+    -----
+    x : [...,N],  complex
+        The signal of which to compute the PSD.
+
+    show : bool
+        Indicates if a plot of the PSD should be generated.
+
+    Output
+    ------
+    freqs : [N], float
+        The normalized frequencies at which the PSD was evaluated.
+
+    psd : [N], float
+        The PSD.
+    """
+
+    z = np.abs(np.fft.fft(x, norm="ortho"))**2
+    axis = tuple(range(x.ndim-1))
+    z = np.mean(z, axis=axis)
+    psd = 10*np.log10(np.abs(np.fft.fftshift(z)))
+    freqs = np.linspace(-0.5, 0.5, x.shape[-1])
+    if show:
+        plt.figure()
+        plt.plot(freqs, psd)
+        plt.title("Power Spectral Density")
+        plt.xlabel("Normalized Frequency")
+        plt.xlim([-0.5, 0.5])
+        plt.ylabel(r"$\mathbb{E}\left[|X(f)|^2\right]$ (dB)")
+        plt.ylim([-30,3])
+        plt.grid(True, which="both")
+
+    return (freqs, psd)
+
+def fft(tensor, axis=-1):
+    r"""Computes the normalized DFT along a specified axis.
+
+    This operation computes the normalized one-dimensional discrete Fourier
+    transform (DFT) along the ``axis`` dimension of a ``tensor``.
+    For a vector :math:`\mathbf{x}\in\mathbb{C}^N`, the DFT
+    :math:`\mathbf{X}\in\mathbb{C}^N` is computed as
+
+    .. math::
+        X_m = \frac{1}{\sqrt{N}}\sum_{n=0}^{N-1} x_n \exp \left\{
+            -j2\pi\frac{mn}{N}\right\},\quad m=0,\dots,N-1.
+
+    Input
+    -----
+    tensor : tf.complex
+        Tensor of arbitrary shape.
+    axis : int
+        Indicates the dimension along which the DFT is taken.
+
+    Output
+    ------
+    : tf.complex
+        Tensor of the same dtype and shape as ``tensor``.
+    """
+    fft_size = tf.cast(tf.shape(tensor)[axis], tensor.dtype)
+    scale = 1/tf.sqrt(fft_size)
+
+    if axis not in [-1, tensor.shape.rank]:
+        output =  tf.signal.fft(swapaxes(tensor, axis, -1))
+        output = swapaxes(output, axis, -1)
+    else:
+        output = tf.signal.fft(tensor)
+
+    return scale * output
+
+def ifft(tensor, axis=-1):
+    r"""Computes the normalized IDFT along a specified axis.
+
+    This operation computes the normalized one-dimensional discrete inverse
+    Fourier transform (IDFT) along the ``axis`` dimension of a ``tensor``.
+    For a vector :math:`\mathbf{X}\in\mathbb{C}^N`, the IDFT
+    :math:`\mathbf{x}\in\mathbb{C}^N` is computed as
+
+    .. math::
+        x_n = \frac{1}{\sqrt{N}}\sum_{m=0}^{N-1} X_m \exp \left\{
+            j2\pi\frac{mn}{N}\right\},\quad n=0,\dots,N-1.
+
+    Input
+    -----
+    tensor : tf.complex
+        Tensor of arbitrary shape.
+
+    axis : int
+        Indicates the dimension along which the IDFT is taken.
+
+    Output
+    ------
+    : tf.complex
+        Tensor of the same dtype and shape as ``tensor``.
+    """
+    fft_size = tf.cast(tf.shape(tensor)[axis], tensor.dtype)
+    scale = tf.sqrt(fft_size)
+
+    if axis not in [-1, tensor.shape.rank]:
+        output =  tf.signal.ifft(swapaxes(tensor, axis, -1))
+        output = swapaxes(output, axis, -1)
+    else:
+        output = tf.signal.ifft(tensor)
+
+    return scale * output
+
+def hard_decisions(llr):
+    """Transforms LLRs into hard decisions.
+
+    Positive values are mapped to :math:`1`.
+    Nonpositive values are mapped to :math:`0`.
+
+    Input
+    -----
+    llr : any non-complex tf.DType
+        Tensor of LLRs.
+
+    Output
+    ------
+    : Same shape and dtype as ``llr``
+        The hard decisions.
+    """
+    zero = tf.constant(0, dtype=llr.dtype)
+
+    return tf.cast(tf.math.greater(llr, zero), dtype=llr.dtype)
+
+def log10(x):
+    # pylint: disable=C0301
+    """TensorFlow implementation of NumPy's `log10` function.
+
+    Simple extension to `tf.experimental.numpy.log10`
+    which casts the result to the `dtype` of the input.
+    For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10>`_ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log10.html>`_ documentation.
+    """
+    return tf.cast(_log10(x), x.dtype)
+
+def log2(x):
+    # pylint: disable=C0301
+    """TensorFlow implementation of NumPy's `log2` function.
+
+    Simple extension to `tf.experimental.numpy.log2`
+    which casts the result to the `dtype` of the input.
+    For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log2>`_ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log2.html>`_ documentation.
+    """
+    return tf.cast(_log2(x), x.dtype)
+
+class BinarySource(Layer):
+    """BinarySource(dtype=tf.float32, **kwargs)
+
+    Layer generating random binary tensors.
+
+    Parameters
+    ----------
+    dtype : tf.DType
+        Defines the output datatype of the layer.
+        Defaults to `tf.float32`.
+
+    Input
+    -----
+    shape : 1D tensor/array/list, int
+        The desired shape of the output tensor.
+
+    Output
+    ------
+    : ``shape``, ``dtype``
+        Tensor filled with random binary values.
+    """
+    def __init__(self, dtype=tf.float32, **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
+
+    def call(self, inputs):
+        return tf.cast(tf.random.uniform(inputs, 0, 2, tf.int32),
+                       dtype=super().dtype)
+
+class QAMSource(Layer):
+    """QAMSource(num_bits_per_symbol, seed=None, dtype=tf.complex64, **kwargs)
+
+    Layer generating a tensor of arbitrary shape filled with random QAM symbols.
+
+    Parameters
+    ----------
+    num_bits_per_symbol : int
+        Indicates the number of bits per constellation symbol.
+        It must be a multiple of two.
+
+    seed : int or None
+        Set the seed for the random generator used to generate the QAM symbols.
+        Set to `None` for random initialization of the RNG.
+
+    dtype : One of [tf.complex64, tf.complex128], tf.DType
+        Defines the output datatype of the layer.
+        Defaults to `tf.complex64`.
+
+    Input
+    -----
+    shape : 1D tensor/array/list, int
+        The desired shape of the output tensor.
+
+    Output
+    ------
+    : ``shape``, ``dtype``
+        Tensor filled with random QAM symbols.
+    """
+    def __init__(self,
+                 num_bits_per_symbol,
+                 seed=None,
+                 dtype=tf.complex64,
+                 **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
+        self._num_bits_per_symbol = num_bits_per_symbol
+        if dtype not in (tf.complex64, tf.complex128):
+            raise ValueError("Unsupported dtype.")
+        self._dtype = dtype
+        self._constellation = Constellation("qam",
+                                            num_bits_per_symbol,
+                                            dtype=dtype)
+        if seed is not None:
+            self._rng = tf.random.Generator.from_seed(seed)
+        else:
+            self._rng = tf.random.Generator.from_non_deterministic_state()
+
+    def call(self, inputs):
+        num_points = 2**self._num_bits_per_symbol
+        ind = self._rng.uniform(inputs, 0, num_points, tf.int32)
+        x = tf.gather(self._constellation.points, ind)
+
+        return x
+
+def sim_ber(mc_fun,
+            ebno_dbs,
+            batch_size,
+            max_mc_iter,
+            soft_estimates=False,
+            num_target_bit_errors=None,
+            num_target_block_errors=None,
+            early_stop=True,
+            verbose=True,
+            forward_keyboard_interrupt=True,
+            dtype=tf.complex64):
+    """Simulates until target number of errors is reached and returns BER/BLER.
+
+    The simulation continues with the next SNR point if either
+    ``num_target_bit_errors`` bit errors or ``num_target_block_errors`` block
+    errors is achieved. Further, it continues with the next SNR point after
+    ``max_mc_iter`` batches of size ``batch_size`` have been simulated.
+
+    Input
+    -----
+    mc_fun:
+        Function that yields the transmitted bits `b` and the
+        receiver's estimate `b_hat` for a given ``batch_size`` and
+        ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as
+        logit.
+
+    ebno_dbs: tf.float32
+        A tensor containing SNR points to be evaluated.
+
+    batch_size: tf.int32
+        Batch-size for evaluation.
+
+    max_mc_iter: tf.int32
+        Max. number of Monte-Carlo iterations per SNR point.
+
+    soft_estimates: bool
+        A boolean, defaults to False. If True, `b_hat``
+        is interpreted as logit and an additional hard-decision is applied
+        internally.
+
+    num_target_bit_errors: tf.int32
+        Defaults to None. Target number of bit errors per SNR point until
+        the simulation continues to next SNR point.
+
+    num_target_block_errors: tf.int32
+        Defaults to None. Target number of block errors per SNR point
+        until the simulation continues
+
+    early_stop: bool
+        A boolean defaults to True. If True, the simulation stops after the
+        first error-free SNR point (i.e., no error occurred after
+        ``max_mc_iter`` Monte-Carlo iterations).
+
+    verbose: bool
+        A boolean defaults to True. If True, the current progress will be
+        printed.
+
+    forward_keyboard_interrupt: bool
+        A boolean defaults to True. If False, KeyboardInterrupts will be
+        catched internally and not forwarded (e.g., will not stop outer loops).
+        If False, the simulation ends and returns the intermediate simulation
+        results.
+
+    dtype: tf.complex64
+        Datatype of the model / function to be used (``mc_fun``).
+
+    Output
+    ------
+    (ber, bler) :
+        Tuple:
+
+    ber: tf.float32
+        The bit-error rate.
+
+    bler: tf.float32
+        The block-error rate.
+
+    Raises
+    ------
+    AssertionError
+        If ``soft_estimates`` is not bool.
+
+    AssertionError
+        If ``dtype`` is not `tf.complex`.
+
+    Note
+    ----
+    This function is implemented based on tensors to allow
+    full compatibility with tf.function(). However, to run simulations
+    in graph mode, the provided ``mc_fun`` must use the `@tf.function()`
+    decorator.
+
+    """
+
+    # utility function to print progress
+    def _print_progress(is_final, rt, idx_snr, idx_it, header_text=None):
+        """Print summary of current simulation progress.
+
+        Input
+        -----
+        is_final: bool
+            A boolean. If True, the progress is printed into a new line.
+        rt: float
+            The runtime of the current SNR point in seconds.
+        idx_snr: int
+            Index of current SNR point.
+        idx_it: int
+            Current iteration index.
+        header_text: list of str
+            Elements will be printed instead of current progress, iff not None.
+            Can be used to generate table header.
+        """
+        # set carriage return if not final step
+        if is_final:
+            end_str = "\n"
+        else:
+            end_str = "\r"
+
+        # prepare to print table header
+        if header_text is not None:
+            row_text = header_text
+            end_str = "\n"
+        else:
+            # calculate intermediate ber / bler
+            ber_np = (tf.cast(bit_errors[idx_snr], tf.float64)
+                        / tf.cast(nb_bits[idx_snr], tf.float64)).numpy()
+            ber_np = np.nan_to_num(ber_np) # avoid nan for first point
+            bler_np = (tf.cast(block_errors[idx_snr], tf.float64)
+                        / tf.cast(nb_blocks[idx_snr], tf.float64)).numpy()
+            bler_np = np.nan_to_num(bler_np) # avoid nan for first point
+
+            # load statuslevel
+            # print current iter if simulation is still running
+            if status[idx_snr]==0:
+                status_txt = f"iter: {idx_it:.0f}/{max_mc_iter:.0f}"
+            else:
+                status_txt = status_levels[int(status[idx_snr])]
+
+            # generate list with all elements to be printed
+            row_text = [str(np.round(ebno_dbs[idx_snr].numpy(), 3)),
+                        f"{ber_np:.4e}",
+                        f"{bler_np:.4e}",
+                        np.round(bit_errors[idx_snr].numpy(), 0),
+                        np.round(nb_bits[idx_snr].numpy(), 0),
+                        np.round(block_errors[idx_snr].numpy(), 0),
+                        np.round(nb_blocks[idx_snr].numpy(), 0),
+                        np.round(rt, 1),
+                        status_txt]
+
+        # pylint: disable=line-too-long, consider-using-f-string
+        print("{: >9} |{: >11} |{: >11} |{: >12} |{: >12} |{: >13} |{: >12} |{: >12} |{: >10}".format(*row_text), end=end_str)
+
+
+     # init table headers
+    header_text = ["EbNo [dB]", "BER", "BLER", "bit errors",
+                   "num bits", "block errors", "num blocks",
+                   "runtime [s]", "status"]
+
+    # replace status by text
+    status_levels = ["not simulated", # status=0
+            "reached max iter       ", # status=1; spacing for impr. layout
+            "no errors - early stop", # status=2
+            "reached target bit errors", # status=3
+            "reached target block errors"] # status=4
+
+    # check inputs for consistency
+    assert isinstance(early_stop, bool), "early_stop must be bool."
+    assert isinstance(soft_estimates, bool), "soft_estimates must be bool."
+    assert dtype.is_complex, "dtype must be a complex type."
+    assert isinstance(verbose, bool), "verbose must be bool."
+
+    ebno_dbs = tf.cast(ebno_dbs, dtype.real_dtype)
+    batch_size = tf.cast(batch_size, tf.int32)
+    num_points = tf.shape(ebno_dbs)[0]
+    bit_errors = tf.Variable(   tf.zeros([num_points], dtype=tf.int64),
+                            dtype=tf.int64)
+    block_errors = tf.Variable(  tf.zeros([num_points], dtype=tf.int64),
+                            dtype=tf.int64)
+    nb_bits = tf.Variable(  tf.zeros([num_points], dtype=tf.int64),
+                            dtype=tf.int64)
+    nb_blocks = tf.Variable(  tf.zeros([num_points], dtype=tf.int64),
+                            dtype=tf.int64)
+
+    # track status of simulation (early termination etc.)
+    status = np.zeros(num_points)
+
+    # measure runtime per SNR point
+    runtime = np.zeros(num_points)
+
+    # ensure num_target_errors is a tensor
+    if num_target_bit_errors is not None:
+        num_target_bit_errors = tf.cast(num_target_bit_errors, tf.int64)
+    if num_target_block_errors is not None:
+        num_target_block_errors = tf.cast(num_target_block_errors, tf.int64)
+
+    try:
+        # simulate until a target number of errors is reached
+        for i in tf.range(num_points):
+            runtime[i] = time.perf_counter() # save start time
+            iter_count = -1 # for print in verbose mode
+            for ii in tf.range(max_mc_iter):
+
+                iter_count += 1
+
+                outputs = mc_fun(batch_size=batch_size, ebno_db=ebno_dbs[i])
+
+                # assume first and second return value is b and b_hat
+                # other returns are ignored
+                b = outputs[0]
+                b_hat = outputs[1]
+
+                if soft_estimates:
+                    b_hat = hard_decisions(b_hat)
+
+                # count errors
+                bit_e = count_errors(b, b_hat)
+                block_e = count_block_errors(b, b_hat)
+
+                # count total number of bits
+                bit_n = tf.size(b)
+                block_n = tf.size(b[...,-1])
+
+                # update variables
+                bit_errors = tf.tensor_scatter_nd_add(  bit_errors, [[i]],
+                                                    tf.cast([bit_e], tf.int64))
+                block_errors = tf.tensor_scatter_nd_add(  block_errors, [[i]],
+                                                tf.cast([block_e], tf.int64))
+                nb_bits = tf.tensor_scatter_nd_add( nb_bits, [[i]],
+                                                    tf.cast([bit_n], tf.int64))
+                nb_blocks = tf.tensor_scatter_nd_add( nb_blocks, [[i]],
+                                                tf.cast([block_n], tf.int64))
+
+                # print progress summary
+                if verbose:
+                    # print summary header during first iteration
+                    if i==0 and iter_count==0:
+                        _print_progress(is_final=True,
+                                        rt=0,
+                                        idx_snr=0,
+                                        idx_it=0,
+                                        header_text=header_text)
+                        # print seperator after headline
+                        print('-' * 135)
+
+                    # evaluate current runtime
+                    rt = time.perf_counter() - runtime[i]
+                    # print current progress
+                    _print_progress(is_final=False, idx_snr=i, idx_it=ii, rt=rt)
+
+
+                # bit-error based stopping cond.
+                if num_target_bit_errors is not None:
+                    if tf.greater_equal(bit_errors[i], num_target_bit_errors):
+                        status[i] = 3 # change internal status for summary
+                        # stop runtime timer
+                        runtime[i] = time.perf_counter() - runtime[i]
+                        break # enough errors for SNR point have been simulated
+
+                # block-error based stopping cond.
+                if num_target_block_errors is not None:
+                    if tf.greater_equal(block_errors[i],
+                                        num_target_block_errors):
+                        # stop runtime timer
+                        runtime[i] = time.perf_counter() - runtime[i]
+                        status[i] = 4 # change internal status for summary
+                        break # enough errors for SNR point have been simulated
+
+                # max iter have been reached -> continue with next SNR point
+                if iter_count==max_mc_iter-1: # all iterations are done
+                    # stop runtime timer
+                    runtime[i] = time.perf_counter() - runtime[i]
+                    status[i] = 1 # change internal status for summary
+
+            # print results again AFTER last iteration / early stop (new status)
+            if verbose:
+                _print_progress(is_final=True,
+                                idx_snr=i,
+                                idx_it=iter_count,
+                                rt=runtime[i])
+
+            # early stop if no error occurred
+            if early_stop: # only if early stop is active
+                if block_errors[i]==0:
+                    status[i] = 2 # change internal status for summary
+                    if verbose:
+                        print("\nSimulation stopped as no error occurred " \
+                              f"@ EbNo = {ebno_dbs[i].numpy():.1f} dB.\n")
+                    break
+
+    # Stop if KeyboardInterrupt is detected and set remaining SNR points to -1
+    except KeyboardInterrupt as e:
+
+        # Raise Interrupt again to stop outer loops
+        if forward_keyboard_interrupt:
+            raise e
+
+        print("\nSimulation stopped by the user " \
+              f"@ EbNo = {ebno_dbs[i].numpy()} dB")
+        # overwrite remaining BER / BLER positions with -1
+        for idx in range(i+1, num_points):
+            bit_errors = tf.tensor_scatter_nd_update( bit_errors, [[idx]],
+                                                    tf.cast([-1], tf.int64))
+            block_errors = tf.tensor_scatter_nd_update( block_errors, [[idx]],
+                                                    tf.cast([-1], tf.int64))
+            nb_bits = tf.tensor_scatter_nd_update( nb_bits, [[idx]],
+                                                    tf.cast([1], tf.int64))
+            nb_blocks = tf.tensor_scatter_nd_update( nb_blocks, [[idx]],
+                                                    tf.cast([1], tf.int64))
+
+    # calculate BER / BLER
+    ber = tf.cast(bit_errors, tf.float64) / tf.cast(nb_bits, tf.float64)
+    bler = tf.cast(block_errors, tf.float64) / tf.cast(nb_blocks, tf.float64)
+
+    # replace nans (from early stop)
+    ber = tf.where(tf.math.is_nan(ber), tf.zeros_like(ber), ber)
+    bler = tf.where(tf.math.is_nan(bler), tf.zeros_like(bler), bler)
+
+    return ber, bler
+
+
+def complex_normal(shape, var=1.0, dtype=tf.complex64):
+    r"""Generates a tensor of complex normal random variables.
+
+    Input
+    -----
+    shape : tf.shape, or list
+        The desired shape.
+
+    var : float
+        The total variance., i.e., each complex dimension has
+        variance ``var/2``.
+
+    dtype: tf.complex
+        The desired dtype. Defaults to `tf.complex64`.
+
+    Output
+    ------
+    : ``shape``, ``dtype``
+        Tensor of complex normal random variables.
+    """
+    # Half the variance for each dimension
+    var_dim = tf.cast(var, dtype.real_dtype)/tf.cast(2, dtype.real_dtype)
+    stddev = tf.sqrt(var_dim)
+
+    # Generate complex Gaussian noise with the right variance
+    xr = tf.random.normal(shape, stddev=stddev, dtype=dtype.real_dtype)
+    xi = tf.random.normal(shape, stddev=stddev, dtype=dtype.real_dtype)
+    x = tf.complex(xr, xi)
+
+    return x
