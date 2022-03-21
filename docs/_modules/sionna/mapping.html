@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sionna.mapping &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/sionna.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>sionna.mapping</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sionna.mapping</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Layers for (de)mapping, constellation class, and utility functions&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">import</span> <span class="nn">sionna</span> <span class="k">as</span> <span class="nn">sn</span>
+
+<div class="viewcode-block" id="pam_gray"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.pam_gray">[docs]</a><span class="k">def</span> <span class="nf">pam_gray</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Maps a vector of bits to a PAM constellation points with Gray labeling.</span>
+
+<span class="sd">    This recursive function maps a binary vector to Gray-labelled PAM</span>
+<span class="sd">    constellation points. It can be used to generated QAM constellations.</span>
+<span class="sd">    The constellation is not normalized.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    b : [n], NumPy array</span>
+<span class="sd">        Tensor with with binary entries.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : signed int</span>
+<span class="sd">        The PAM constellation point taking values in</span>
+<span class="sd">        :math:`\{\pm 1,\pm 3,\dots,\pm (2^n-1)\}`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This algorithm is a recursive implementation of the expressions found in</span>
+<span class="sd">    Section 5.1 of [3GPPTS38211]_. It is used in the 5G standard.</span>
+<span class="sd">    &quot;&quot;&quot;</span> <span class="c1"># pylint: disable=C0301</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span> <span class="n">pam_gray</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="qam"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.qam">[docs]</a><span class="k">def</span> <span class="nf">qam</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a QAM constellation.</span>
+
+<span class="sd">    This function generates a complex-valued vector, where each element is</span>
+<span class="sd">    a constellation point of an M-ary QAM constellation. The bit</span>
+<span class="sd">    label of the ``n`` th point is given by the length-``num_bits_per_symbol``</span>
+<span class="sd">    binary represenation of ``n``.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation point.</span>
+<span class="sd">        Must be a multiple of two, e.g., 2, 4, 6, 8, etc.</span>
+
+<span class="sd">    normalize: bool</span>
+<span class="sd">        If `True`, the constellation is normalized to have unit power.</span>
+<span class="sd">        Defaults to `True`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : :math:`[2^{\text{num_bits_per_symbol}}]`, np.complex64</span>
+<span class="sd">        The QAM constellation.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The bit label of the nth constellation point is given by the binary</span>
+<span class="sd">    representation of its position within the array and can be obtained</span>
+<span class="sd">    through ``np.binary_repr(n, num_bits_per_symbol)``.</span>
+
+
+<span class="sd">    The normalization factor of a QAM constellation is given in</span>
+<span class="sd">    closed-form as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \sqrt{\frac{1}{2^{n-2}}\sum_{i=1}^{2^{n-1}}(2i-1)^2}</span>
+
+<span class="sd">    where :math:`n= \text{num_bits_per_symbol}/2` is the number of bits</span>
+<span class="sd">    per dimension.</span>
+
+<span class="sd">    This algorithm is a recursive implementation of the expressions found in</span>
+<span class="sd">    Section 5.1 of [3GPPTS38211]_. It is used in the 5G standard.</span>
+<span class="sd">    &quot;&quot;&quot;</span> <span class="c1"># pylint: disable=C0301</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="c1"># is even</span>
+        <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="o">&gt;</span><span class="mi">0</span> <span class="c1"># is larger than zero</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_bits_per_symbol must be a multiple of 2&quot;</span><span class="p">)</span> \
+        <span class="kn">from</span> <span class="nn">error</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalize</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;normalize must be boolean&quot;</span>
+
+    <span class="c1"># Build constellation by iterating through all points</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">num_bits_per_symbol</span><span class="p">)),</span>
+                     <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+        <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pam_gray</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">pam_gray</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span> <span class="c1"># PAM in each dimension</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span> <span class="c1"># Normalize to unit energy</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">qam_var</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">qam_var</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">c</span></div>
+
+<div class="viewcode-block" id="pam"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.pam">[docs]</a><span class="k">def</span> <span class="nf">pam</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a PAM constellation.</span>
+
+<span class="sd">    This function generates a real-valued vector, where each element is</span>
+<span class="sd">    a constellation point of an M-ary PAM constellation. The bit</span>
+<span class="sd">    label of the ``n`` th point is given by the length-``num_bits_per_symbol``</span>
+<span class="sd">    binary represenation of ``n``.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation point.</span>
+<span class="sd">        Must be positive.</span>
+
+<span class="sd">    normalize: bool</span>
+<span class="sd">        If `True`, the constellation is normalized to have unit power.</span>
+<span class="sd">        Defaults to `True`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : :math:`[2^{\text{num_bits_per_symbol}}]`, np.float32</span>
+<span class="sd">        The PAM constellation.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The bit label of the nth constellation point is given by the binary</span>
+<span class="sd">    representation of its position within the array and can be obtained</span>
+<span class="sd">    through ``np.binary_repr(n, num_bits_per_symbol)``.</span>
+
+
+<span class="sd">    The normalization factor of a PAM constellation is given in</span>
+<span class="sd">    closed-form as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \sqrt{\frac{1}{2^{n-1}}\sum_{i=1}^{2^{n-1}}(2i-1)^2}</span>
+
+<span class="sd">    where :math:`n= \text{num_bits_per_symbol}` is the number of bits</span>
+<span class="sd">    per symbol.</span>
+
+<span class="sd">    This algorithm is a recursive implementation of the expressions found in</span>
+<span class="sd">    Section 5.1 of [3GPPTS38211]_. It is used in the 5G standard.</span>
+<span class="sd">    &quot;&quot;&quot;</span> <span class="c1"># pylint: disable=C0301</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="o">&gt;</span><span class="mi">0</span> <span class="c1"># is larger than zero</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;num_bits_per_symbol must be positive&quot;</span><span class="p">)</span> \
+        <span class="kn">from</span> <span class="nn">error</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalize</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;normalize must be boolean&quot;</span>
+
+    <span class="c1"># Build constellation by iterating through all points</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">num_bits_per_symbol</span><span class="p">)),</span>
+                     <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+        <span class="n">c</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pam_gray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span> <span class="c1"># Normalize to unit energy</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+        <span class="n">pam_var</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pam_var</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">c</span></div>
+
+<div class="viewcode-block" id="Constellation"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Constellation">[docs]</a><span class="k">class</span> <span class="nc">Constellation</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constellation(constellation_type, num_bits_per_symbol, initial_value=None, normalize=True, center=False, trainable=False, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Constellation that can be used by a (de)mapper.</span>
+
+<span class="sd">    This class defines a constellation, i.e., a complex-valued vector of</span>
+<span class="sd">    constellation points. A constellation can be trainable. The binary</span>
+<span class="sd">    representation of the index of an element of this vector corresponds</span>
+<span class="sd">    to the bit label of the constellation point. This implicit bit</span>
+<span class="sd">    labeling is used by the ``Mapper`` and ``Demapper`` classes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, the constellation points are randomly initialized</span>
+<span class="sd">        if no ``initial_value`` is provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+
+<span class="sd">    initial_value : :math:`[2^\text{num_bits_per_symbol}]`, NumPy array or Tensor</span>
+<span class="sd">        Initial values of the constellation points. If ``normalize`` or</span>
+<span class="sd">        ``center`` are `True`, the initial constellation might be changed.</span>
+
+<span class="sd">    normalize : bool</span>
+<span class="sd">        If `True`, the constellation is normalized to have unit power.</span>
+<span class="sd">        Defaults to `True`.</span>
+
+<span class="sd">    center : bool</span>
+<span class="sd">        If `True`, the constellation is ensured to have zero mean.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    trainable : bool</span>
+<span class="sd">        If `True`, the constellation points are trainable variables.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : [tf.complex64, tf.complex128], tf.DType</span>
+<span class="sd">        The dtype of the constellation.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : :math:`[2^\text{num_bits_per_symbol}]`, ``dtype``</span>
+<span class="sd">        The constellation.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    One can create a trainable PAM/QAM constellation. This is</span>
+<span class="sd">    equivalent to creating a custom trainable constellation which is</span>
+<span class="sd">    initialized with PAM/QAM constellation points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pylint: enable=C0301</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                 <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">center</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">trainable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">],</span>\
+            <span class="s2">&quot;dtype must be tf.complex64 or tf.complex128&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+
+        <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">),</span>\
+            <span class="s2">&quot;Wrong constellation type&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation_type</span> <span class="o">=</span> <span class="n">constellation_type</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">normalize</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;normalize must be boolean&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span> <span class="o">=</span> <span class="n">normalize</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;center must be boolean&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="o">=</span> <span class="n">center</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;trainable must be boolean&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">trainable</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>\
+            <span class="s2">&quot;num_bits_per_symbol must be integer&quot;</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation_type</span><span class="o">==</span><span class="s2">&quot;qam&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_bits_per_symbol</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>\
+                <span class="s2">&quot;num_bits_per_symbol must be a mutliple of 2&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="n">initial_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;QAM must not have an initial value&quot;</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">qam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">)</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation_type</span><span class="o">==</span><span class="s2">&quot;pam&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>\
+                <span class="s2">&quot;num_bits_per_symbol must be integer&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="n">initial_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;PAM must not have an initial value&quot;</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">pam</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">)</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation_type</span><span class="o">==</span><span class="s2">&quot;custom&quot;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>\
+                <span class="s2">&quot;num_bits_per_symbol must be integer&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+
+            <span class="c1"># Randomly initialize points if no initial_value is provided</span>
+            <span class="k">if</span> <span class="n">initial_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>  <span class="c1"># pylint: disable=E1123</span>
+                                        <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span><span class="p">],</span>
+                                        <span class="n">minval</span><span class="o">=-</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+                <span class="n">points</span>  <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">initial_value</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="k">assert</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">initial_value</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>\
+                    <span class="s2">&quot;initial_value must have shape [2**num_bits_per_symbol]&quot;</span>
+                <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">initial_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="n">points</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span> <span class="c1">#pylint: disable=unused-argument</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">points</span><span class="p">),</span>
+                           <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">points</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">points</span><span class="p">,</span>
+                                       <span class="n">trainable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_trainable</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">points</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span> <span class="c1">#pylint: disable=unused-argument</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span><span class="p">:</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+            <span class="n">energy_sqrt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="n">energy_sqrt</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates if the constellation is normalized or not.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span>
+
+    <span class="nd">@normalize</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;`normalize` must be boolean&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicates if the constellation is centered.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span>
+
+    <span class="nd">@center</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;`center` must be boolean&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_center</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_bits_per_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The number of bits per constellation symbol.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The (possibly) centered and normalized constellation points.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Constellation.show"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Constellation.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Generate a scatter-plot of the constellation.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        labels : bool</span>
+<span class="sd">            If `True`, the bit labels will be drawn next to each constellation</span>
+<span class="sd">            point. Defaults to `True`.</span>
+
+<span class="sd">        figsize : Two-element Tuple, float</span>
+<span class="sd">            Width and height in inches. Defaults to `(7,7)`.</span>
+
+<span class="sd">        Output</span>
+<span class="sd">        ------</span>
+<span class="sd">        : matplotlib.figure.Figure</span>
+<span class="sd">            A handle to a matplot figure object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">maxval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">))</span><span class="o">*</span><span class="mf">1.05</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="n">maxval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="n">maxval</span><span class="p">,</span> <span class="n">maxval</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="n">adjustable</span><span class="o">=</span><span class="s2">&quot;box&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Real Part&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Imaginary Part&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Constellation Plot&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">numpy</span><span class="p">()):</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div></div>
+
+<div class="viewcode-block" id="Mapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Mapper">[docs]</a><span class="k">class</span> <span class="nc">Mapper</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Maps binary tensors to points of a constellation.</span>
+
+<span class="sd">    This class defines a layer that maps a tensor of binary values</span>
+<span class="sd">    to a tensor of points from a provided constellation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation :  Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or</span>
+<span class="sd">        `None`. In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128], tf.DType</span>
+<span class="sd">        The output dtype. Defaults to tf.complex64.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    : [..., n], tf.float or tf.int</span>
+<span class="sd">        Tensor with with binary entries.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n/Constellation.num_bits_per_symbol], tf.complex</span>
+<span class="sd">        The mapped constellation symbols.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The last input dimension must be an integer multiple of the</span>
+<span class="sd">    number of bits per constellation symbol.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">],</span>\
+            <span class="s2">&quot;dtype must be tf.complex64 or tf.complex128&quot;</span>
+        <span class="c1">#self._dtype = dtype</span>
+        <span class="c1">#print(dtype, self._dtype)</span>
+
+        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
+                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">constellation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
+                <span class="s2">&quot;Wrong constellation type.&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="n">constellation_type</span><span class="p">,</span>
+                                                <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_binary_base</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span>
+                        <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constellation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The Constellation used by the Mapper.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">debugging</span><span class="o">.</span><span class="n">assert_greater_equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The input must have at least rank 2&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Reshape inputs to the desired format</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">inputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span> <span class="o">+</span> \
+           <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">]</span>
+        <span class="n">inputs_reshaped</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="c1"># Convert the last dimension to an integer</span>
+        <span class="n">int_rep</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">inputs_reshaped</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary_base</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Map integers to constellation symbols</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">int_rep</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="DemapperWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.DemapperWithPrior">[docs]</a><span class="k">class</span> <span class="nc">DemapperWithPrior</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DemapperWithPrior(demapping_method, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
+<span class="sd">    for a tensor of received symbols, assuming prior</span>
+<span class="sd">    knowledge on the bits is available.</span>
+
+<span class="sd">    This class defines a layer implementing different demapping</span>
+<span class="sd">    functions. All demapping functions are fully differentiable when soft-decisions</span>
+<span class="sd">    are computed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    demapping_method : One of [&quot;app&quot;, &quot;maxlog&quot;], str</span>
+<span class="sd">        The demapping method used.</span>
+
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the demapper provides hard-decided bits instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)</span>
+<span class="sd">        The dtype of `y`. Defaults to tf.complex64.</span>
+<span class="sd">        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    (y, prior, no) :</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    y : [...,n], tf.complex</span>
+<span class="sd">        The received symbols.</span>
+
+<span class="sd">    prior : [num_bits_per_symbol] or [...,num_bits_per_symbol], tf.float</span>
+<span class="sd">        Prior for every bit as LLRs.</span>
+<span class="sd">        It can be provided either as a tensor of shape `[num_bits_per_symbol]` for the</span>
+<span class="sd">        entire input batch, or as a tensor that is &quot;broadcastable&quot;</span>
+<span class="sd">        to `[..., n, num_bits_per_symbol]`.</span>
+
+<span class="sd">    no : Scalar or [...,n], tf.float</span>
+<span class="sd">        The noise variance estimate. It can be provided either as scalar</span>
+<span class="sd">        for the entire input batch or as a tensor that is &quot;broadcastable&quot; to</span>
+<span class="sd">        ``y``.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n*num_bits_per_symbol], tf.float</span>
+<span class="sd">        LLRs or hard-decisions for every bit.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    With the &quot;app&quot; demapping method, the LLR for the :math:`i\text{th}` bit</span>
+<span class="sd">    is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y,\mathbf{p}\right)}{\Pr\left(b_i=0\lvert y,\mathbf{p}\right)}\right) =\ln\left(\frac{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)</span>
+<span class="sd">                }{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)</span>
+<span class="sd">                }\right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the</span>
+<span class="sd">    sets of constellation points for which the :math:`i\text{th}` bit is</span>
+<span class="sd">    equal to 1 and 0, respectively. :math:`\mathbf{p} = \left[p_0,\dots,p_{K-1}\right]`</span>
+<span class="sd">    is the vector of LLRs that serves as prior knowledge on the :math:`K` bits that are mapped to</span>
+<span class="sd">    a constellation point, and :math:`\Pr(c\lvert\mathbf{p})` is the prior probability on the constellation symbol</span>
+<span class="sd">    :math:`c`:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \Pr\left(c\lvert\mathbf{p}\right) = \prod_{k=0}^{K-1} \text{sigmoid}\left(p_k \ell(c)_k\right)</span>
+
+<span class="sd">    where :math:`\ell(c)_k` is the :math:`k^{th}` bit label of :math:`c`, where 0 is</span>
+<span class="sd">    replaced by -1.</span>
+<span class="sd">    The definition of the LLR has been</span>
+<span class="sd">    chosen such that it is equivalent with that of logits. This is</span>
+<span class="sd">    different from many textbooks in communications, where the LLR is</span>
+<span class="sd">    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.</span>
+
+<span class="sd">    With the &quot;maxlog&quot; demapping method, LLRs for the :math:`i\text{th}` bit</span>
+<span class="sd">    are approximated like</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \begin{align}</span>
+<span class="sd">            LLR(i) &amp;\approx\ln\left(\frac{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                    \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)</span>
+<span class="sd">                }{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                    \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)</span>
+<span class="sd">                }\right)\\</span>
+<span class="sd">                &amp;= \max_{c\in\mathcal{C}_{i,0}}</span>
+<span class="sd">                    \left(\ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right)-\frac{|y-c|^2}{N_o}\right) -</span>
+<span class="sd">                 \max_{c\in\mathcal{C}_{i,1}}\left( \ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right) - \frac{|y-c|^2}{N_o}\right)</span>
+<span class="sd">                .</span>
+<span class="sd">        \end{align}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">demapping_method</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">demapping_method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span><span class="s2">&quot;maxlog&quot;</span><span class="p">),</span> <span class="s2">&quot;Unknown demapping method&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_demapping_method</span> <span class="o">=</span> <span class="n">demapping_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
+
+        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
+                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">constellation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
+                <span class="s2">&quot;Wrong constellation type.&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="n">constellation_type</span><span class="p">,</span>
+                                                <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+
+        <span class="c1"># Array composed of binary representations of all symbols indices</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_points</span><span class="p">):</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">)),</span>
+                              <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+
+        <span class="c1"># Compute symbol indices for which the bits are 0 or 1</span>
+        <span class="n">c0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">num_points</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">num_points</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">c0</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">c1</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Symbols with ith bit=0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Symbols with ith bit=1</span>
+
+        <span class="c1"># Array of labels from {-1, 1} of all symbols</span>
+        <span class="c1"># [num_points, num_bits_per_symbol]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+        <span class="c1"># Determine the reduce function for LLR computation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_demapping_method</span> <span class="o">==</span> <span class="s2">&quot;app&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_logsumexp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constellation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="c1"># Reshape constellation points to [1,...1,num_points]</span>
+        <span class="n">points_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">points_shape</span><span class="p">)</span>
+
+        <span class="c1"># Compute squared distances from y to all points</span>
+        <span class="c1"># shape [...,n,num_points]</span>
+        <span class="n">squared_dist</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">points</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Add a dummy dimension for broadcasting. This is not needed when no</span>
+        <span class="c1"># is a scalar, but also does not do any harm.</span>
+        <span class="n">no</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">no</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Compute exponents</span>
+        <span class="n">exponents</span> <span class="o">=</span> <span class="o">-</span><span class="n">squared_dist</span><span class="o">/</span><span class="n">no</span>
+
+        <span class="c1"># Gather exponents for all bits</span>
+        <span class="c1"># shape [...,n,num_points/2,num_bits_per_symbol]</span>
+        <span class="n">exp0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">exp1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Expanding `prior` such that it is broadcastable with</span>
+        <span class="c1"># shape [..., n or 1, 1, num_bits_per_symbol]</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Expand the symbol labeling to be broadcastable with prior</span>
+        <span class="c1"># shape [..., 1, num_points, num_bits_per_symbol]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">prior</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Compute the prior probabilities on symbols exponents</span>
+        <span class="c1"># shape [..., n or 1, num_points]</span>
+        <span class="n">exp_ps</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log_sigmoid</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">prior</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Gather prior probability symbol for all bits</span>
+        <span class="c1"># shape [..., n or 1, num_points/2, num_bits_per_symbol]</span>
+        <span class="n">exp_ps0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exp_ps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">exp_ps1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exp_ps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Compute LLRs using the definition log( Pr(b=1)/Pr(b=0) )</span>
+        <span class="c1"># shape [..., n, num_bits_per_symbol]</span>
+        <span class="n">llr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp_ps1</span> <span class="o">+</span> <span class="n">exp1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>\
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp_ps0</span> <span class="o">+</span> <span class="n">exp0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Reshape LLRs to [...,n*num_bits_per_symbol]</span>
+        <span class="n">out_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">y</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                               <span class="p">[</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> \
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">]],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">llr_reshaped</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">llr</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">hard_decisions</span><span class="p">(</span><span class="n">llr_reshaped</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">llr_reshaped</span></div>
+
+<div class="viewcode-block" id="Demapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Demapper">[docs]</a><span class="k">class</span> <span class="nc">Demapper</span><span class="p">(</span><span class="n">DemapperWithPrior</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Demapper(demapping_method, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
+<span class="sd">    for a tensor of received symbols.</span>
+
+<span class="sd">    This class defines a layer implementing different demapping</span>
+<span class="sd">    functions. All demapping functions are fully differentiable when soft-decisions</span>
+<span class="sd">    are computed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    demapping_method : One of [&quot;app&quot;, &quot;maxlog&quot;], str</span>
+<span class="sd">        The demapping method used.</span>
+
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the demapper provides hard-decided bits instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)</span>
+<span class="sd">        The dtype of `y`. Defaults to tf.complex64.</span>
+<span class="sd">        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    (y, no) :</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    y : [...,n], tf.complex</span>
+<span class="sd">        The received symbols.</span>
+
+<span class="sd">    no : Scalar or [...,n], tf.float</span>
+<span class="sd">        The noise variance estimate. It can be provided either as scalar</span>
+<span class="sd">        for the entire input batch or as a tensor that is &quot;broadcastable&quot; to</span>
+<span class="sd">        ``y``.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n*num_bits_per_symbol], tf.float</span>
+<span class="sd">        LLRs or hard-decisions for every bit.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    With the &quot;app&quot; demapping method, the LLR for the :math:`i\text{th}` bit</span>
+<span class="sd">    is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y\right)}{\Pr\left(b_i=0\lvert y\right)}\right) =\ln\left(\frac{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,1}} \exp\left(</span>
+<span class="sd">                    -\frac{1}{N_o}\left|y-c\right|^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,0}} \exp\left(</span>
+<span class="sd">                    -\frac{1}{N_o}\left|y-c\right|^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }\right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the</span>
+<span class="sd">    sets of constellation points for which the :math:`i\text{th}` bit is</span>
+<span class="sd">    equal to 1 and 0, respectively. The definition of the LLR has been</span>
+<span class="sd">    chosen such that it is equivalent with that of logits. This is</span>
+<span class="sd">    different from many textbooks in communications, where the LLR is</span>
+<span class="sd">    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.</span>
+
+<span class="sd">    With the &quot;maxlog&quot; demapping method, LLRs for the :math:`i\text{th}` bit</span>
+<span class="sd">    are approximated like</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">            LLR(i) \approx\ln\left(\frac{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,1}} \exp\left(</span>
+<span class="sd">                    -\frac{1}{N_o}\left|y-c\right|^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,0}} \exp\left(</span>
+<span class="sd">                    -\frac{1}{N_o}\left|y-c\right|^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }\right)</span>
+<span class="sd">                = \frac{1}{N_o}\left(\min_{c\in\mathcal{C}_{i,0}}|y-c|^2-</span>
+<span class="sd">                 \min_{c\in\mathcal{C}_{i,1}}|y-c|^2\right)</span>
+<span class="sd">                .</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="c1"># Settings all priors to 0</span>
+        <span class="n">num_bits_per_symbol</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span>
+        <span class="n">null_prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">null_prior</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SymbolDemapperWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolDemapperWithPrior">[docs]</a><span class="k">class</span> <span class="nc">SymbolDemapperWithPrior</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SymbolDemapperWithPrior(constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Computes normalized log-probabilities (logits) or hard-decisions on symbols</span>
+<span class="sd">    for a tensor of received symbols and assuming prior knowldge on the transmitted constellation points is available.</span>
+<span class="sd">    The demapping function is fully differentiable when soft-values are</span>
+<span class="sd">    computed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the demapper provides hard-decided symbols instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)</span>
+<span class="sd">        The dtype of `y`. Defaults to tf.complex64.</span>
+<span class="sd">        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    (y, prior, no) :</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    y : [...,n], tf.complex</span>
+<span class="sd">        The received symbols.</span>
+
+<span class="sd">    prior : [num_points] or [...,num_points], tf.float</span>
+<span class="sd">        Prior for every symbol as log-probabilities (logits).</span>
+<span class="sd">        It can be provided either as a tensor of shape `[num_points]` for the</span>
+<span class="sd">        entire input batch, or as a tensor that is &quot;broadcastable&quot;</span>
+<span class="sd">        to `[..., n, num_points]`.</span>
+
+<span class="sd">    no : Scalar or [...,n], tf.float</span>
+<span class="sd">        The noise variance estimate. It can be provided either as scalar</span>
+<span class="sd">        for the entire input batch or as a tensor that is &quot;broadcastable&quot; to</span>
+<span class="sd">        ``y``.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n, num_points] or [...,n], tf.float</span>
+<span class="sd">        A tensor of shape `[...,n, num_points]` of logits for every constellation</span>
+<span class="sd">        point if `hard_out` is set to `False`.</span>
+<span class="sd">        Otherwise, a tensor of shape `[...,n]` of hard-decisions on the symbols.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The normalized log-probability for the constellation point :math:`c` is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \ln\left(\Pr\left(c \lvert y,\mathbf{p}\right)\right) = \ln\left( \frac{\exp\left(-\frac{|y-c|^2}{N_0} + p_c \right)}{\sum_{c&#39;\in\mathcal{C}} \exp\left(-\frac{|y-c&#39;|^2}{N_0} + p_{c&#39;} \right)} \right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}` is the set of constellation points used for modulation, and :math:`\mathbf{p} = \left\{p_c \lvert c \in \mathcal{C}\right\}` the prior information on constellation points given as log-probabilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
+
+        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
+                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">constellation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
+                <span class="s2">&quot;Wrong constellation type.&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="n">constellation_type</span><span class="p">,</span>
+                                                <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span><span class="p">,</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="o">-</span><span class="n">points</span><span class="p">)</span>
+
+        <span class="n">no</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">no</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="o">-</span><span class="n">d</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">no</span>
+
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">exp</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SymbolDemapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolDemapper">[docs]</a><span class="k">class</span> <span class="nc">SymbolDemapper</span><span class="p">(</span><span class="n">SymbolDemapperWithPrior</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SymbolDemapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Computes normalized log-probabilities (logits) or hard-decisions on symbols</span>
+<span class="sd">    for a tensor of received symbols.</span>
+<span class="sd">    The demapping function is fully differentiable when soft-values are</span>
+<span class="sd">    computed.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the demapper provides hard-decided symbols instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)</span>
+<span class="sd">        The dtype of `y`. Defaults to tf.complex64.</span>
+<span class="sd">        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    (y, no) :</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    y : [...,n], tf.complex</span>
+<span class="sd">        The received symbols.</span>
+
+<span class="sd">    no : Scalar or [...,n], tf.float</span>
+<span class="sd">        The noise variance estimate. It can be provided either as scalar</span>
+<span class="sd">        for the entire input batch or as a tensor that is &quot;broadcastable&quot; to</span>
+<span class="sd">        ``y``.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n, num_points] or [...,n], tf.float</span>
+<span class="sd">        A tensor of shape `[...,n, num_points]` of logits for every constellation</span>
+<span class="sd">        point if `hard_out` is set to `False`.</span>
+<span class="sd">        Otherwise, a tensor of shape `[...,n]` of hard-decisions on the symbols.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    The normalized log-probability for the constellation point :math:`c` is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \ln\left(\Pr\left(c \lvert y\right)\right) = \ln\left( \frac{\exp\left(-\frac{|y-c|^2}{N_0} \right)}{\sum_{c&#39;\in\mathcal{C}} \exp\left(-\frac{|y-c&#39;|^2}{N_0} \right)} \right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}` is the set of constellation points used for modulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="c1"># Settings all priors to 0</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">null_prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">null_prior</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

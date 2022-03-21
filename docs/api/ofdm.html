@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orthogonal Frequency-Division Multiplexing (OFDM) &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Multiple-Input Multiple-Output (MIMO)" href="mimo.html" />
+    <link rel="prev" title="Channel" href="channel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="sionna.html">API Documentation</a> &raquo;</li>
+      <li>Orthogonal Frequency-Division Multiplexing (OFDM)</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="orthogonal-frequency-division-multiplexing-ofdm">
+<h1>Orthogonal Frequency-Division Multiplexing (OFDM)<a class="headerlink" href="#orthogonal-frequency-division-multiplexing-ofdm" title="Permalink to this headline"></a></h1>
+<p>This module provides layers and functions to support
+simulation of OFDM-based systems. The key component is the
+<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a> that defines how data and pilot symbols
+are mapped onto a sequence of OFDM symbols with a given FFT size. The resource
+grid can also define guard and DC carriers which are nulled. In 4G/5G parlance,
+a <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a> would be a slot.
+Once a <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a> is defined, one can use the
+<a class="reference internal" href="#sionna.ofdm.ResourceGridMapper" title="sionna.ofdm.ResourceGridMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGridMapper</span></code></a> to map a tensor of complex-valued
+data symbols onto the resource grid, prior to OFDM modulation using the
+<a class="reference internal" href="#sionna.ofdm.OFDMModulator" title="sionna.ofdm.OFDMModulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">OFDMModulator</span></code></a> or further processing in the
+frequency domain.</p>
+<p>The <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a> allows for a fine-grained configuration
+of how transmitters send pilots for each of their streams or antennas. As the
+management of pilots in multi-cell MIMO setups can quickly become complicated,
+the module provides the <a class="reference internal" href="#sionna.ofdm.KroneckerPilotPattern" title="sionna.ofdm.KroneckerPilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">KroneckerPilotPattern</span></code></a> class
+that automatically generates orthogonal pilot transmissions for all transmitters
+and streams.</p>
+<p>Additionally, the module contains layers for channel estimation, precoding and equalization,
+such as the <a class="reference internal" href="#sionna.ofdm.LSChannelEstimator" title="sionna.ofdm.LSChannelEstimator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LSChannelEstimator</span></code></a>, the
+<a class="reference internal" href="#sionna.ofdm.ZFPrecoder" title="sionna.ofdm.ZFPrecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFPrecoder</span></code></a>, and the <a class="reference internal" href="#sionna.ofdm.LMMSEEqualizer" title="sionna.ofdm.LMMSEEqualizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LMMSEEqualizer</span></code></a>.
+These are good starting points for the development of more advanced algorithms
+and provide robust baselines for benchmarking.</p>
+<div class="section" id="resource-grid">
+<h2>Resource Grid<a class="headerlink" href="#resource-grid" title="Permalink to this headline"></a></h2>
+<p>The following code snippet shows how to setup and visualize an instance of
+<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">rg</span> <span class="o">=</span> <span class="n">ResourceGrid</span><span class="p">(</span><span class="n">num_ofdm_symbols</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
+                  <span class="n">fft_size</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+                  <span class="n">num_tx</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="n">num_streams_per_tx</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                  <span class="n">num_guard_carriers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+                  <span class="n">dc_null</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="n">pilot_pattern</span> <span class="o">=</span> <span class="s2">&quot;kronecker&quot;</span><span class="p">,</span>
+                  <span class="n">pilot_ofdm_symbol_indices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
+<span class="n">rg</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="../_images/resource-grid.png" src="../_images/resource-grid.png" />
+<p>This code creates a resource grid consisting of 14 OFDM symbols with 64
+subcarriers. The first five and last six subcarriers as well as the DC
+subcarriers are nulled. The second and eleventh OFDM symbol are reserved
+for pilot transmissions.</p>
+<p>Subcarriers are numbered from <span class="math notranslate nohighlight">\(0\)</span> to <span class="math notranslate nohighlight">\(N-1\)</span>, where <span class="math notranslate nohighlight">\(N\)</span>
+is the FTT size. The index <span class="math notranslate nohighlight">\(0\)</span> corresponds to the lowest frequency,
+which is <span class="math notranslate nohighlight">\(-\frac{N}{2}\Delta_f\)</span> (for <span class="math notranslate nohighlight">\(N\)</span> even) or
+<span class="math notranslate nohighlight">\(-\frac{N-1}{2}\Delta_f\)</span> (for <span class="math notranslate nohighlight">\(N\)</span> odd), where <span class="math notranslate nohighlight">\(\Delta_f\)</span>
+is the subcarrier spacing which is irrelevant for the resource grid.
+The index <span class="math notranslate nohighlight">\(N-1\)</span> corresponds to the highest frequency,
+which is <span class="math notranslate nohighlight">\((\frac{N}{2}-1)\Delta_f\)</span> (for <span class="math notranslate nohighlight">\(N\)</span> even) or
+<span class="math notranslate nohighlight">\(\frac{N-1}{2}\Delta_f\)</span> (for <span class="math notranslate nohighlight">\(N\)</span> odd).</p>
+<div class="section" id="resourcegrid">
+<h3>ResourceGrid<a class="headerlink" href="#resourcegrid" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">ResourceGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_ofdm_symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcarrier_spacing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_streams_per_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cyclic_prefix_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_guard_carriers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dc_null</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pilot_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pilot_ofdm_symbol_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/resource_grid.html#ResourceGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.ResourceGrid" title="Permalink to this definition"></a></dt>
+<dd><p>Defines a <cite>ResourceGrid</cite> spanning multiple OFDM symbols and subcarriers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_ofdm_symbols</strong> (<em>int</em>) – Number of OFDM symbols.</p></li>
+<li><p><strong>fft_size</strong> (<em>int</em>) – FFT size (, i.e., the number of subcarriers).</p></li>
+<li><p><strong>subcarrier_spacing</strong> (<em>float</em>) – The subcarrier spacing in Hz.</p></li>
+<li><p><strong>num_tx</strong> (<em>int</em>) – Number of transmitters.</p></li>
+<li><p><strong>num_streams_per_tx</strong> (<em>int</em>) – Number of streams per transmitter.</p></li>
+<li><p><strong>cyclic_prefix_length</strong> (<em>int</em>) – Length of the cyclic prefix.</p></li>
+<li><p><strong>num_guard_carriers</strong> (<em>int</em>) – List of two integers defining the number of guardcarriers at the
+left and right side of the resource grid.</p></li>
+<li><p><strong>dc_null</strong> (<em>bool</em>) – Indicates if the DC carrier is nulled or not.</p></li>
+<li><p><strong>pilot_pattern</strong> (<em>One of</em><em> [</em><em>None</em><em>, </em><em>&quot;kronecker&quot;</em><em>, </em><em>&quot;empty&quot;</em><em>, </em><a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><em>PilotPattern</em></a><em>]</em>) – An instance of <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>, a string
+shorthand for the <a class="reference internal" href="#sionna.ofdm.KroneckerPilotPattern" title="sionna.ofdm.KroneckerPilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">KroneckerPilotPattern</span></code></a>
+or <a class="reference internal" href="#sionna.ofdm.EmptyPilotPattern" title="sionna.ofdm.EmptyPilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyPilotPattern</span></code></a>, or <cite>None</cite>.
+Defaults to <cite>None</cite> which is equivalent to <cite>“empty”</cite>.</p></li>
+<li><p><strong>pilot_ofdm_symbol_indices</strong> (<em>List</em><em>, </em><em>int</em>) – List of indices of OFDM symbols reserved for pilot transmissions.
+Only needed if <code class="docutils literal notranslate"><span class="pre">pilot_pattern=&quot;kronecker&quot;</span></code>. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Defines the datatype for internal calculations and the output
+dtype. Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.bandwidth">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">bandwidth</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.bandwidth" title="Permalink to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">fft_size*subcarrier_spacing</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>The occupied bandwidth [Hz]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.build_type_grid">
+<span class="sig-name descname"><span class="pre">build_type_grid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/resource_grid.html#ResourceGrid.build_type_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.ResourceGrid.build_type_grid" title="Permalink to this definition"></a></dt>
+<dd><p>Returns a tensor indicating the type of each resource element.</p>
+<p>Resource elements can be one of</p>
+<ul class="simple">
+<li><p>0 : Data symbol</p></li>
+<li><p>1 : Pilot symbol</p></li>
+<li><p>2 : Guard carrier symbol</p></li>
+<li><p>3 : DC carrier symbol</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size], tf.int32</em> – Tensor indicating for each transmitter and stream the type of
+the resource elements of the corresponding resource grid.
+The type can be one of [0,1,2,3] as explained above.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.cyclic_prefix_length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">cyclic_prefix_length</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.cyclic_prefix_length" title="Permalink to this definition"></a></dt>
+<dd><p>Length of the cyclic prefix.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.dc_ind">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dc_ind</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.dc_ind" title="Permalink to this definition"></a></dt>
+<dd><p>Index of the DC subcarrier.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">fft_size</span></code> is odd, the index is (<code class="docutils literal notranslate"><span class="pre">fft_size</span></code>-1)/2.
+If <code class="docutils literal notranslate"><span class="pre">fft_size</span></code> is even, the index is <code class="docutils literal notranslate"><span class="pre">fft_size</span></code>/2.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.dc_null">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dc_null</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.dc_null" title="Permalink to this definition"></a></dt>
+<dd><p>Indicates if the DC carriers is nulled or not.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.effective_subcarrier_ind">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">effective_subcarrier_ind</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.effective_subcarrier_ind" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the indices of the effective subcarriers.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.fft_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">fft_size</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.fft_size" title="Permalink to this definition"></a></dt>
+<dd><p>The FFT size.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_data_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_data_symbols</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_data_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Number of resource elements used for data transmissions.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_effective_subcarriers">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_effective_subcarriers</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_effective_subcarriers" title="Permalink to this definition"></a></dt>
+<dd><p>Number of subcarriers used for data and pilot transmissions.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_guard_carriers">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_guard_carriers</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_guard_carriers" title="Permalink to this definition"></a></dt>
+<dd><p>Number of left and right guard carriers.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_ofdm_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_ofdm_symbols</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_ofdm_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>The number of OFDM symbols of the resource grid.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_pilot_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_pilot_symbols</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_pilot_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Number of resource elements used for pilot symbols.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_resource_elements">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_resource_elements</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_resource_elements" title="Permalink to this definition"></a></dt>
+<dd><p>Number of resource elements.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_streams_per_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_streams_per_tx</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_streams_per_tx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of streams  per transmitter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_time_samples">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_time_samples</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_time_samples" title="Permalink to this definition"></a></dt>
+<dd><p>The number of time-domain samples occupied by the resource grid.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_tx</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_tx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of transmitters.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.num_zero_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_zero_symbols</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.num_zero_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Number of empty resource elements.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.ofdm_symbol_duration">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ofdm_symbol_duration</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.ofdm_symbol_duration" title="Permalink to this definition"></a></dt>
+<dd><p>Duration of an OFDM symbol with cyclic prefix [s].</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.pilot_pattern">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pilot_pattern</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.pilot_pattern" title="Permalink to this definition"></a></dt>
+<dd><p>The used PilotPattern.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tx_ind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_stream_ind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/resource_grid.html#ResourceGrid.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.ResourceGrid.show" title="Permalink to this definition"></a></dt>
+<dd><p>Visualizes the resource grid for a specific transmitter and antenna.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tx_ind</strong> (<em>int</em>) – Indicates the transmitter index.</p></li>
+<li><p><strong>tx_stream_ind</strong> (<em>int</em>) – Indicates the index of the stream.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><cite>matplotlib.figure</cite> – A handle to a matplot figure object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGrid.subcarrier_spacing">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">subcarrier_spacing</span></span><a class="headerlink" href="#sionna.ofdm.ResourceGrid.subcarrier_spacing" title="Permalink to this definition"></a></dt>
+<dd><p>The subcarrier spacing [Hz].</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="resourcegridmapper">
+<h3>ResourceGridMapper<a class="headerlink" href="#resourcegridmapper" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGridMapper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">ResourceGridMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/resource_grid.html#ResourceGridMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.ResourceGridMapper" title="Permalink to this definition"></a></dt>
+<dd><p>Maps a tensor of modulated data symbols to a ResourceGrid.</p>
+<p>This layer takes as input a tensor of modulated data symbols
+and maps them together with pilot symbols onto an
+OFDM <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>. The output can be
+converted to a time-domain signal with the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Modulator</span></code> or further processed in the
+frequency domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Datatype for internal calculations and the output dtype.
+Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[batch_size, num_tx, num_streams_per_tx, num_data_symbols], tf.complex</em> – The modulated data symbols to be mapped onto the resource grid.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[batch_size, num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size], tf.complex</em> – The full OFDM resource grid in the frequency domain.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="resourcegriddemapper">
+<h3>ResourceGridDemapper<a class="headerlink" href="#resourcegriddemapper" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.ResourceGridDemapper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">ResourceGridDemapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/resource_grid.html#ResourceGridDemapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.ResourceGridDemapper" title="Permalink to this definition"></a></dt>
+<dd><p>Extracts data-carrying resource elements from a resource grid.</p>
+<p>This layer takes as input an OFDM <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a> and
+extracts the data-carrying resource elements. In other words, it implements
+the reverse operation of <a class="reference internal" href="#sionna.ofdm.ResourceGridMapper" title="sionna.ofdm.ResourceGridMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGridMapper</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>stream_management</strong> (<a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><em>StreamManagement</em></a>) – An instance of <a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Datatype for internal calculations and the output dtype.
+Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols, fft_size, data_dim]</em> – The full OFDM resource grid in the frequency domain.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[batch_size, num_rx, num_streams_per_rx, num_data_symbols, data_dim]</em> – The data that were mapped into the resource grid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="removenulledsubcarriers">
+<h3>RemoveNulledSubcarriers<a class="headerlink" href="#removenulledsubcarriers" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.RemoveNulledSubcarriers">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">RemoveNulledSubcarriers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/resource_grid.html#RemoveNulledSubcarriers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.RemoveNulledSubcarriers" title="Permalink to this definition"></a></dt>
+<dd><p>Removes nulled guard and/or DC subcarriers from a resource grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[batch_size, num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size], tf.complex64</em> – Full resource grid.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[batch_size, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex64</em> – Resource grid without nulled subcarriers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="modulation-demodulation">
+<h2>Modulation &amp; Demodulation<a class="headerlink" href="#modulation-demodulation" title="Permalink to this headline"></a></h2>
+<div class="section" id="ofdmmodulator">
+<h3>OFDMModulator<a class="headerlink" href="#ofdmmodulator" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.OFDMModulator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">OFDMModulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cyclic_prefix_length</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/modulator.html#OFDMModulator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.OFDMModulator" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the time-domain representation of an OFDM resource grid
+with (optional) cyclic prefix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cyclic_prefix_length</strong> (<em>int</em>) – Integer indicating the length of the
+cyclic prefix that it prepended to each OFDM symbol. It cannot
+be longer than the FFT size.</p>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[…,num_ofdm_symbols,fft_size], tf.complex</em> – A resource grid in the frequency domain.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,num_ofdm_symbols*(fft_size+cyclic_prefix_length)], tf.complex</em> – Time-domain OFDM signal.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="ofdmdemodulator">
+<h3>OFDMDemodulator<a class="headerlink" href="#ofdmdemodulator" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.OFDMDemodulator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">OFDMDemodulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fft_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cyclic_prefix_length</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/demodulator.html#OFDMDemodulator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.OFDMDemodulator" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the frequency-domain representation of an OFDM waveform
+with cyclic prefix removal.</p>
+<p>The demodulator assumes that the input sequence is generated by the
+<a class="reference internal" href="channel.html#sionna.channel.TimeChannel" title="sionna.channel.TimeChannel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeChannel</span></code></a>. For a single pair of antennas,
+the received signal sequence is given as:</p>
+<div class="math notranslate nohighlight">
+\[y_b = \sum_{\ell =L_\text{min}}^{L_\text{max}} \bar{h}_\ell x_{b-\ell} + w_b, \quad b \in[L_\text{min}, N_B+L_\text{max}-1]\]</div>
+<p>where <span class="math notranslate nohighlight">\(\bar{h}_\ell\)</span> are the discrete-time channel taps,
+<span class="math notranslate nohighlight">\(x_{b}\)</span> is the the transmitted signal,
+and <span class="math notranslate nohighlight">\(w_\ell\)</span> Gaussian noise.</p>
+<p>Starting from the first symbol, the demodulator cuts the input
+sequence into pieces of size <code class="docutils literal notranslate"><span class="pre">cyclic_prefix_length</span> <span class="pre">+</span> <span class="pre">fft_size</span></code>,
+and throws away any trailing symbols. For each piece, the cyclic
+prefix is removed and the <code class="docutils literal notranslate"><span class="pre">fft_size</span></code>-point discrete Fourier
+transform is computed.</p>
+<p>Since the input sequence starts at time <span class="math notranslate nohighlight">\(L_\text{min}\)</span>,
+the FFT-window has a timing offset of <span class="math notranslate nohighlight">\(L_\text{min}\)</span> symbols,
+which leads to a subcarrier-dependent phase shift of
+<span class="math notranslate nohighlight">\(e^{\frac{j2\pi k L_\text{min}}{N}}\)</span>, where <span class="math notranslate nohighlight">\(k\)</span>
+is the subcarrier index, <span class="math notranslate nohighlight">\(N\)</span> is the FFT size,
+and <span class="math notranslate nohighlight">\(L_\text{min} \le 0\)</span> is the largest negative time lag of
+the discrete-time channel impulse response. This phase shift
+is removed in this layer, by explicitly multiplying
+each subcarrier by  <span class="math notranslate nohighlight">\(e^{\frac{-j2\pi k L_\text{min}}{N}}\)</span>.
+This is a very important step to enable channel estimation with
+sparse pilot patterns that needs to interpolate the channel frequency
+response accross subcarriers. It also ensures that the
+channel frequency response <cite>seen</cite> by the time-domain channel
+is close to the <code class="xref py py-class docutils literal notranslate"><span class="pre">OFDMChannel</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fft_size</strong> (<em>int</em>) – FFT size (, i.e., the number of subcarriers).</p></li>
+<li><p><strong>l_min</strong> (<em>int</em>) – The largest negative time lag of the discrete-time channel
+impulse response. It should be the same value as that used by the
+<cite>cir_to_time_channel</cite> function.</p></li>
+<li><p><strong>cyclic_prefix_length</strong> (<em>int</em>) – Integer indicating the length of the cyclic prefix that
+is prepended to each OFDM symbol.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[…,num_ofdm_symbols*(fft_size+cyclic_prefix_length)+n], tf.complex</em> – Tensor containing the time-domain signal along the last dimension.
+<cite>n</cite> is a nonnegative integer.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,num_ofdm_symbols,fft_size], tf.complex</em> – Tensor containing the OFDM resource grid along the last
+two dimension.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="pilot-pattern">
+<h2>Pilot Pattern<a class="headerlink" href="#pilot-pattern" title="Permalink to this headline"></a></h2>
+<p>A <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a> defines how transmitters send pilot
+sequences for each of their antennas or streams over an OFDM resource grid.
+It consists of two components,
+a <code class="docutils literal notranslate"><span class="pre">mask</span></code> and <code class="docutils literal notranslate"><span class="pre">pilots</span></code>. The <code class="docutils literal notranslate"><span class="pre">mask</span></code> indicates which resource elements are
+reserved for pilot transmissions by each transmitter and its respective
+streams. In some cases, the number of streams is equal to the number of
+transmit antennas, but this does not need to be the case, e.g., for precoded
+transmissions. The <code class="docutils literal notranslate"><span class="pre">pilots</span></code> contains the pilot symbols that are transmitted
+at the positions indicated by the <code class="docutils literal notranslate"><span class="pre">mask</span></code>. Separating a pilot pattern into
+<code class="docutils literal notranslate"><span class="pre">mask</span></code> and <code class="docutils literal notranslate"><span class="pre">pilots</span></code> enables the implementation of a wide range of pilot
+configurations, including trainable pilot sequences.</p>
+<p>The following code snippet shows how to define a simple custom
+<a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a> for single transmitter, sending two streams
+Note that <code class="docutils literal notranslate"><span class="pre">num_effective_subcarriers</span></code> is the number of subcarriers that
+can be used for data or pilot transmissions. Due to guard
+carriers or a nulled DC carrier, this number can be smaller than the
+<code class="docutils literal notranslate"><span class="pre">fft_size</span></code> of the <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">num_tx</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">num_streams_per_tx</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">num_ofdm_symbols</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">num_effective_subcarriers</span> <span class="o">=</span> <span class="mi">12</span>
+
+<span class="c1"># Create a pilot mask</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_tx</span><span class="p">,</span>
+                 <span class="n">num_streams_per_tx</span><span class="p">,</span>
+                 <span class="n">num_ofdm_symbols</span><span class="p">,</span>
+                 <span class="n">num_effective_subcarriers</span><span class="p">])</span>
+<span class="n">mask</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">11</span><span class="p">],</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">num_pilot_symbols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># Define pilot sequences</span>
+<span class="n">pilots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_tx</span><span class="p">,</span>
+                   <span class="n">num_streams_per_tx</span><span class="p">,</span>
+                   <span class="n">num_pilot_symbols</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+<span class="n">pilots</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">num_pilot_symbols</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">pilots</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">num_pilot_symbols</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Create a PilotPattern instance</span>
+<span class="n">pp</span> <span class="o">=</span> <span class="n">PilotPattern</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">pilots</span><span class="p">)</span>
+
+<span class="c1"># Visualize non-zero elements of the pilot sequence</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">show_pilot_ind</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+<img alt="../_images/pilot_pattern.png" src="../_images/pilot_pattern.png" />
+<p>As shown in the figure above, the pilots are mapped onto the mask from
+the smallest effective subcarrier and OFDM symbol index to the highest
+effective subcarrier and OFDM symbol index. Here, boths stream have 24
+pilot symbols, out of which only 12 are nonzero. It is important to keep
+this order of mapping in mind when designing more complex pilot sequences.</p>
+<div class="section" id="pilotpattern">
+<h3>PilotPattern<a class="headerlink" href="#pilotpattern" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">PilotPattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pilots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/pilot_pattern.html#PilotPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.PilotPattern" title="Permalink to this definition"></a></dt>
+<dd><p>Class defining a pilot pattern for an OFDM ResourceGrid.</p>
+<p>This class defines a pilot pattern object that is used to configure
+an OFDM <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> (<em>[</em><em>num_tx</em><em>, </em><em>num_streams_per_tx</em><em>, </em><em>num_ofdm_symbols</em><em>, </em><em>num_effective_subcarriers</em><em>]</em><em>, </em><em>bool</em>) – Tensor indicating resource elements that are reserved for pilot transmissions.</p></li>
+<li><p><strong>pilots</strong> (<em>[</em><em>num_tx</em><em>, </em><em>num_txt_ant</em><em>, </em><em>num_pilots</em><em>]</em><em>, </em><em>tf.complex</em>) – The pilot symbols to be mapped onto the <code class="docutils literal notranslate"><span class="pre">mask</span></code>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – Indicates if <code class="docutils literal notranslate"><span class="pre">pilots</span></code> is a trainable <cite>Variable</cite>.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – Indicates if the <code class="docutils literal notranslate"><span class="pre">pilots</span></code> should be normalized to an average
+energy of one across the last dimension. This can be useful to
+ensure that trainable <code class="docutils literal notranslate"><span class="pre">pilots</span></code> have a finite energy.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Defines the datatype for internal calculations and the output
+dtype. Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.mask">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mask</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.mask" title="Permalink to this definition"></a></dt>
+<dd><p>The mask of the pilot pattern.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.normalize" title="Permalink to this definition"></a></dt>
+<dd><p>Indicates if the pilots are normalized or not.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.num_data_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_data_symbols</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.num_data_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Number of data symbols per transmit antenna.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.num_effective_subcarriers">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_effective_subcarriers</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.num_effective_subcarriers" title="Permalink to this definition"></a></dt>
+<dd><p>The number of effectvie subcarriers.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.num_ofdm_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_ofdm_symbols</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.num_ofdm_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>The number of OFDM symbols.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.num_pilot_symbols">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_pilot_symbols</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.num_pilot_symbols" title="Permalink to this definition"></a></dt>
+<dd><p>Number of pilot symbols per transmit antenna.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.num_streams_per_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_streams_per_tx</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.num_streams_per_tx" title="Permalink to this definition"></a></dt>
+<dd><p>The number of streams per transmitter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.num_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_tx</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.num_tx" title="Permalink to this definition"></a></dt>
+<dd><p>The number of transmitters.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.pilots">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">pilots</span></span><a class="headerlink" href="#sionna.ofdm.PilotPattern.pilots" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the possibly normalized tensor of pilot symbols.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.ofdm.PilotPattern.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tx_ind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_ind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_pilot_ind</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/pilot_pattern.html#PilotPattern.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.PilotPattern.show" title="Permalink to this definition"></a></dt>
+<dd><p>Visualizes the non-zero pilots for some transmitters and streams.</p>
+<p>The function only produces correct results for non-overlapping
+pilot sequences. In order to inspect overlapping sequences, one can
+simply call the function with different transmitter and stream indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tx_ind</strong> (<em>list, int</em>) – Indicates the indices of transmitters to be included.
+Defaults to <cite>None</cite>, i.e., all transmitters included.</p></li>
+<li><p><strong>stream_ind</strong> (<em>list, int</em>) – Indicates the indices of streams to be included.
+Defaults to <cite>None</cite>, i.e., all streams included.</p></li>
+<li><p><strong>show_pilot_ind</strong> (<em>bool</em>) – Indicates if the indices of the pilot symbols should be shhown.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>matplotlib.figure.Figure</em> – A handle to a matplot figure object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="emptypilotpattern">
+<h3>EmptyPilotPattern<a class="headerlink" href="#emptypilotpattern" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.EmptyPilotPattern">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">EmptyPilotPattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_tx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_streams_per_tx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ofdm_symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_effective_subcarriers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/pilot_pattern.html#EmptyPilotPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.EmptyPilotPattern" title="Permalink to this definition"></a></dt>
+<dd><p>Creates an empty pilot pattern.</p>
+<p>Generates a instance of <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a> with
+an empty <code class="docutils literal notranslate"><span class="pre">mask</span></code> and <code class="docutils literal notranslate"><span class="pre">pilots</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_tx</strong> (<em>int</em>) – Number of transmitters.</p></li>
+<li><p><strong>num_streams_per_tx</strong> (<em>int</em>) – Number of streams per transmitter.</p></li>
+<li><p><strong>num_ofdm_symbols</strong> (<em>int</em>) – Number of OFDM symbols.</p></li>
+<li><p><strong>num_effective_subcarriers</strong> (<em>int</em>) – Number of effective subcarriers
+that are available for the transmission of data and pilots.
+Note that this number is generally smaller than the <code class="docutils literal notranslate"><span class="pre">fft_size</span></code>
+due to nulled subcarriers.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Defines the datatype for internal calculations and the output
+dtype. Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="kroneckerpilotpattern">
+<h3>KroneckerPilotPattern<a class="headerlink" href="#kroneckerpilotpattern" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.KroneckerPilotPattern">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">KroneckerPilotPattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pilot_ofdm_symbol_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/pilot_pattern.html#KroneckerPilotPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.KroneckerPilotPattern" title="Permalink to this definition"></a></dt>
+<dd><p>Simple orthogonal pilot pattern with Kronecker structure.</p>
+<p>This function generates an instance of <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>
+that allocates non-overlapping pilot sequences for all transmitters and
+streams on specified OFDM symbols. As the same pilot sequences are reused
+across those OFDM symbols, the resulting pilot pattern has a frequency-time
+Kronecker structure. This structure enables a very efficient implementation
+of the LMMSE channel estimator. Each pilot sequence is constructed from
+randomly drawn QPSK constellation points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of a <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>pilot_ofdm_symbol_indices</strong> (<em>list</em><em>, </em><em>int</em>) – List of integers defining the OFDM symbol indices that are reserved
+for pilots.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – Indicates if the <code class="docutils literal notranslate"><span class="pre">pilots</span></code> should be normalized to an average
+energy of one across the last dimension.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Seed for the generation of the pilot sequence. Different seed values
+lead to different sequences. Defaults to 0.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Defines the datatype for internal calculations and the output
+dtype. Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is required that the <code class="docutils literal notranslate"><span class="pre">resource_grid</span></code>’s property
+<code class="docutils literal notranslate"><span class="pre">num_effective_subcarriers</span></code> is an
+integer multiple of <code class="docutils literal notranslate"><span class="pre">num_tx</span> <span class="pre">*</span> <span class="pre">num_streams_per_tx</span></code>. This condition is
+required to ensure that all transmitters and transmit antennas get
+non-overlapping pilot sequences. For a large number of antennas and/or
+transmitters, the pilot pattern becomes very sparse in the frequency
+domain.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rg</span> <span class="o">=</span> <span class="n">ResourceGrid</span><span class="p">(</span><span class="n">num_ofdm_symbols</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">fft_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">num_tx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">num_streams_per_tx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">pilot_pattern</span> <span class="o">=</span> <span class="s2">&quot;kronecker&quot;</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">pilot_ofdm_symbol_indices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rg</span><span class="o">.</span><span class="n">pilot_pattern</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+<img alt="../_images/kronecker_pilot_pattern.png" src="../_images/kronecker_pilot_pattern.png" />
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="channel-estimation">
+<h2>Channel Estimation<a class="headerlink" href="#channel-estimation" title="Permalink to this headline"></a></h2>
+<div class="section" id="lschannelestimator">
+<h3>LSChannelEstimator<a class="headerlink" href="#lschannelestimator" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.LSChannelEstimator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">LSChannelEstimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/channel_estimation.html#LSChannelEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.LSChannelEstimator" title="Permalink to this definition"></a></dt>
+<dd><p>Layer implementing least-squares (LS) channel estimation for OFDM MIMO systems.</p>
+<p>After LS channel estimation at the pilot positions, the channel estimates
+and error variances are interpolated accross the entire resource grid using
+a specified interpolation function.</p>
+<p>For simplicity, we describe the underlying algorithm for a vectorized observation,
+where we have a nonzero pilot for all elements to be estimated.
+The actually implementation works on a full OFDM resource grid with sparse
+pilot patterns. We consider the following model:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{y} = \mathbf{h}\odot\mathbf{p} + \mathbf{n}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{y}\in\mathbb{C}^{M}\)</span> is the received signal vector,
+<span class="math notranslate nohighlight">\(\mathbf{p}\in\mathbb{C}^M\)</span> is the vector of pilot symbols,
+<span class="math notranslate nohighlight">\(\mathbf{H}\in\mathbb{C}^{M}\)</span> is the channel vector to be estimated,
+and <span class="math notranslate nohighlight">\(\mathbf{n}\in\mathbb{C}^M\)</span> is a zero-mean noise vector whose
+elements have variance <span class="math notranslate nohighlight">\(N_0\)</span>. The operator <span class="math notranslate nohighlight">\(\odot\)</span> denotes
+element-wise multiplication.</p>
+<p>The channel estimate <span class="math notranslate nohighlight">\(\hat{\mathbf{h}}\)</span> and error variances
+<span class="math notranslate nohighlight">\(\sigma^2_i\)</span>, <span class="math notranslate nohighlight">\(i=0,\dots,M-1\)</span>, are computed as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\hat{\mathbf{h}} &amp;= \mathbf{y} \odot
+                   \frac{\mathbf{p}^\star}{\left|\mathbf{p}\right|^2}
+                 = \mathbf{h} + \tilde{\mathbf{h}}\\
+     \sigma^2_i &amp;= \mathbb{E}\left[\tilde{h}_i \tilde{h}_i^\star \right]
+                 = \frac{N_0}{\left|p_i\right|^2}.\end{split}\]</div>
+<p>The channel estimates and error variances are then interpolated accross
+the entire resource grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>interpolation_type</strong> (<em>One of</em><em> [</em><em>&quot;nn&quot;</em><em>]</em><em>, </em><em>string</em>) – The interpolation to be used. Currently only the
+<a class="reference internal" href="#sionna.ofdm.NearestNeighborInterpolator" title="sionna.ofdm.NearestNeighborInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">NearestNeighborInterpolator</span></code></a> is supported.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Datatype for internal calculations and the output dtype.
+Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[batch_size, num_rx, num_rx_ant, num_ofdm_symbols,fft_size], tf.complex</em>) – The observed signals.</p></li>
+<li><p><strong>no</strong> (<em>[batch_size, num_rx, num_rx_ant] or only the first n&gt;=0 dims, tf.float</em>) – The variance of the AWGN.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h_ls</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,fft_size], tf.complex</em>) – The channel estimates accross the entire resource grid for all
+transmitters and streams.</p></li>
+<li><p><strong>err_var</strong> (Same shape as <code class="docutils literal notranslate"><span class="pre">h_ls</span></code>, tf.float) – The channel estimation error variance accross the entire resource grid
+for all transmitters and streams.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="nearestneighborinterpolator">
+<h3>NearestNeighborInterpolator<a class="headerlink" href="#nearestneighborinterpolator" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.NearestNeighborInterpolator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">NearestNeighborInterpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pilot_pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/channel_estimation.html#NearestNeighborInterpolator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.NearestNeighborInterpolator" title="Permalink to this definition"></a></dt>
+<dd><p>Nearest-neighbor channel estimate interpolation on a resource grid.</p>
+<p>This class assigns to each element of an OFDM resource grid one of
+<code class="docutils literal notranslate"><span class="pre">num_pilots</span></code> provided measurements, e.g., channel estimates of error
+variances, according to the nearest neighbor method. It is assumed
+that the measurements were taken at the nonzero positions of a
+<a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>.</p>
+<p>The figure below shows how four channel estimates are interpolated
+accross a resource grid. Grey fields indicate measurement positions
+while the colored regions show which resource elements are assigned
+to the same measurement value.</p>
+<img alt="../_images/nearest_neighbor_interpolation.png" src="../_images/nearest_neighbor_interpolation.png" />
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pilot_pattern</strong> (<a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><em>PilotPattern</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>.</p>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[k, l ,m, num_tx, num_streams_per_tx, num_pilots], tf.DType</em> – Tensor of quantities to be interpolated according to
+a <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>. This can be channel estimates
+as well as the related error variances.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[k, l, m, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex</em> – The interpolated input tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="precoding">
+<h2>Precoding<a class="headerlink" href="#precoding" title="Permalink to this headline"></a></h2>
+<div class="section" id="zfprecoder">
+<h3>ZFPrecoder<a class="headerlink" href="#zfprecoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.ZFPrecoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">ZFPrecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_effective_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/precoding.html#ZFPrecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.ZFPrecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Zero-forcing precoding for multi-antenna transmissions.</p>
+<p>This layer precodes a tensor containing OFDM resource grids using
+the <a class="reference internal" href="mimo.html#sionna.mimo.zero_forcing_precoder" title="sionna.mimo.zero_forcing_precoder"><code class="xref py py-meth docutils literal notranslate"><span class="pre">zero_forcing_precoder()</span></code></a>. For every
+transmitter, the channels to all intended receivers are gathered
+into a channel matrix, based on the which the precoding matrix
+is computed and the input tensor is precoded. The layer also outputs
+optionally the effective channel after precoding for each stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>stream_management</strong> (<a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><em>StreamManagement</em></a>) – An instance of <a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a>.</p></li>
+<li><p><strong>return_effective_channel</strong> (<em>bool</em>) – Indicates if the effective channel after precoding should be returned.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Datatype for internal calculations and the output dtype.
+Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(x, h)</strong> – Tuple:</p></li>
+<li><p><strong>x</strong> (<em>[batch_size, num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size], tf.complex</em>) – Tensor containing the resource grid to be precoded.</p></li>
+<li><p><strong>h</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_ofdm, fft_size], tf.complex</em>) – Tensor containing the channel knowledge based on which the precoding
+is computed.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_precoded</strong> (<em>[batch_size, num_tx, num_tx_ant, num_ofdm_symbols, fft_size], tf.complex</em>) – The precoded resource grids.</p></li>
+<li><p><strong>h_eff</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm, num_effective_subcarriers], tf.complex</em>) – Only returned if <code class="docutils literal notranslate"><span class="pre">return_effective_channel=True</span></code>.
+The effectice channels for all streams after precoding. Can be used to
+simulate perfect channel state information (CSI) at the receivers.
+Nulled subcarriers are automatically removed to be compliant with the
+behavior of a channel estimator.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to use this layer in Graph mode with XLA, i.e., within
+a function that is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;tf.function(jit_compile=True)</span></code>,
+you must set <code class="docutils literal notranslate"><span class="pre">sionna.Config.xla_compat=true</span></code>.
+See <a class="reference internal" href="config.html#sionna.Config.xla_compat" title="sionna.Config.xla_compat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xla_compat</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="equalization">
+<h2>Equalization<a class="headerlink" href="#equalization" title="Permalink to this headline"></a></h2>
+<div class="section" id="lmmseequalizer">
+<h3>LMMSEEqualizer<a class="headerlink" href="#lmmseequalizer" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.LMMSEEqualizer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">LMMSEEqualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whiten_interference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/equalization.html#LMMSEEqualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.LMMSEEqualizer" title="Permalink to this definition"></a></dt>
+<dd><p>LMMSE equalization for OFDM MIMO transmissions.</p>
+<p>This layer computes linear minimum mean squared error (LMMSE) estimation
+for OFDM MIMO transmissions. The OFDM and stream configuration are provided
+by a <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a> and
+<a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a> instance, respectively. The
+detection algorithm is the <a class="reference internal" href="mimo.html#sionna.mimo.lmmse_equalizer" title="sionna.mimo.lmmse_equalizer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">lmmse_equalizer()</span></code></a>. The layer
+computes soft-symbol estimates together with effective noise variances
+for all streams which can, e.g., be used by a
+<a class="reference internal" href="mapping.html#sionna.mapping.Demapper" title="sionna.mapping.Demapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Demapper</span></code></a> to obtain LLRs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>stream_management</strong> (<a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><em>StreamManagement</em></a>) – An instance of <a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a>.</p></li>
+<li><p><strong>whiten_interference</strong> (<em>bool</em>) – If <cite>True</cite> (default), the interference is first whitened before equalization.
+In this case, an alternative expression for the receive filter is used which
+can be numerically more stable.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Datatype for internal calculations and the output dtype.
+Defaults to <cite>tf.complex64</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, h_hat, err_var, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex</em>) – The received OFDM resource grid after cyclic prefix removal and FFT.</p></li>
+<li><p><strong>h_hat</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex</em>) – The channel estimates for all streams from all transmitters.</p></li>
+<li><p><strong>err_var</strong> ([Broadcastable to shape of <code class="docutils literal notranslate"><span class="pre">h_hat</span></code>], tf.float) – The variance of the channel estimation error.</p></li>
+<li><p><strong>no</strong> (<em>[batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float</em>) – The variance of the AWGN noise.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_hat</strong> (<em>[batch_size, num_tx, num_streams, num_data_symbols], tf.complex</em>) – The estimated symbols.</p></li>
+<li><p><strong>no_eff</strong> (<em>[batch_size, num_tx, num_streams, num_data_symbols], tf.float</em>) – The effective noise variance for each estimated symbol.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to use this layer in Graph mode with XLA, i.e., within
+a function that is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;tf.function(jit_compile=True)</span></code>,
+you must set <code class="docutils literal notranslate"><span class="pre">sionna.Config.xla_compat=true</span></code>.
+See <a class="reference internal" href="config.html#sionna.Config.xla_compat" title="sionna.Config.xla_compat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xla_compat</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="channel.html" class="btn btn-neutral float-left" title="Channel" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mimo.html" class="btn btn-neutral float-right" title="Multiple-Input Multiple-Output (MIMO)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

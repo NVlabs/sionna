@@ -1,0 +1,1928 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sionna.channel.utils &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>sionna.channel.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sionna.channel.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Utility functions for the channel module&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">sionna</span> <span class="kn">import</span> <span class="n">PI</span>
+<span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">expand_to_rank</span>
+
+
+<div class="viewcode-block" id="subcarrier_frequencies"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.subcarrier_frequencies">[docs]</a><span class="k">def</span> <span class="nf">subcarrier_frequencies</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="p">,</span> <span class="n">subcarrier_spacing</span><span class="p">,</span>
+                           <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the baseband frequencies of ``num_subcarrier`` subcarriers spaced by</span>
+<span class="sd">    ``subcarrier_spacing``, i.e.,</span>
+
+<span class="sd">    &gt;&gt;&gt; # If num_subcarrier is even:</span>
+<span class="sd">    &gt;&gt;&gt; frequencies = [-num_subcarrier/2, ..., 0, ..., num_subcarrier/2-1]*subcarrier_spacing</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; # If num_subcarrier is odd:</span>
+<span class="sd">    &gt;&gt;&gt; frequencies = [-(num_subcarrier-1)/2, ..., 0, ..., (num_subcarrier-1)/2]*subcarrier_spacing</span>
+
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    num_subcarriers : int</span>
+<span class="sd">        Number of subcarriers</span>
+
+<span class="sd">    subcarrier_spacing : float</span>
+<span class="sd">        Subcarrier spacing [Hz]</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+<span class="sd">        If a complex datatype is provided, the corresponding precision of</span>
+<span class="sd">        real components is used.</span>
+<span class="sd">        Defaults to `tf.complex64` (`tf.float32`).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">        frequencies : [num_subcarrier], tf.float</span>
+<span class="sd">            Baseband frequencies of subcarriers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dtype</span><span class="o">.</span><span class="n">is_complex</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+    <span class="k">elif</span> <span class="n">dtype</span><span class="o">.</span><span class="n">if_floating</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;dtype must be a complex or floating datatype&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floormod</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">start</span><span class="o">=-</span><span class="n">num_subcarriers</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">limit</span><span class="o">=</span><span class="n">num_subcarriers</span><span class="o">/</span><span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">start</span><span class="o">=-</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+        <span class="n">limit</span><span class="o">=</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span>
+                            <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">frequencies</span><span class="o">*</span><span class="n">subcarrier_spacing</span>
+    <span class="k">return</span> <span class="n">frequencies</span></div>
+
+<div class="viewcode-block" id="time_lag_discrete_time_channel"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.time_lag_discrete_time_channel">[docs]</a><span class="k">def</span> <span class="nf">time_lag_discrete_time_channel</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">,</span> <span class="n">maximum_delay_spread</span><span class="o">=</span><span class="mf">3e-6</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the smallest and largest time-lag for the descrete complex baseband</span>
+<span class="sd">    channel, i.e., :math:`L_{\text{min}}` and :math:`L_{\text{max}}`.</span>
+
+<span class="sd">    The smallest time-lag (:math:`L_{\text{min}}`) returned is always -6, as this value</span>
+<span class="sd">    was found small enough for all models included in Sionna.</span>
+
+<span class="sd">    The largest time-lag (:math:`L_{\text{max}}`) is computed from the ``bandwidth``</span>
+<span class="sd">    and ``maximum_delay_spread`` as follows:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        L_{\text{max}} = \lceil W \tau_{\text{max}} \rceil + 6</span>
+
+<span class="sd">    where :math:`L_{\text{max}}` is the largest time-lag, :math:`W` the ``bandwidth``,</span>
+<span class="sd">    and :math:`\tau_{\text{max}}` the ``maximum_delay_spread``.</span>
+
+<span class="sd">    The default value for the ``maximum_delay_spread`` is 3us, which was found</span>
+<span class="sd">    to be large enough to include most significant paths with all channel models</span>
+<span class="sd">    included in Sionna assuming a nominal delay spread of 100ns.</span>
+
+<span class="sd">    *Warining:* The values of :math:`L_{\text{min}}` and :math:`L_{\text{max}}` computed</span>
+<span class="sd">    by this function are only recommended values.</span>
+<span class="sd">    :math:`L_{\text{min}}` and :math:`L_{\text{max}}` should be set according to</span>
+<span class="sd">    the considered channel model.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    bandwidth : float</span>
+<span class="sd">        Bandwith (:math:`W`) [Hz]</span>
+
+<span class="sd">    maximum_delay_spread : float</span>
+<span class="sd">        Maximum delay spread [s]. Defaults to 3us.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    l_min : int</span>
+<span class="sd">        Smallest time-lag (:math:`L_{\text{min}}`) for the descrete complex baseband</span>
+<span class="sd">        channel. Set to -6, , as this value was found small enough for all models</span>
+<span class="sd">        included in Sionna.</span>
+
+<span class="sd">    l_max : int</span>
+<span class="sd">        Largest time-lag (:math:`L_{\text{max}}`) for the descrete complex baseband</span>
+<span class="sd">        channel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l_min</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">l_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">maximum_delay_spread</span><span class="o">*</span><span class="n">bandwidth</span><span class="p">)</span> <span class="o">+</span> <span class="mi">6</span>
+    <span class="n">l_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">l_max</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span></div>
+
+<div class="viewcode-block" id="cir_to_ofdm_channel"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.cir_to_ofdm_channel">[docs]</a><span class="k">def</span> <span class="nf">cir_to_ofdm_channel</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the frequency response of the channel at ``frequencies``.</span>
+
+<span class="sd">    Given a channel impulse response</span>
+<span class="sd">    :math:`(a_{m}, \tau_{m}), 0 \leq m \leq M-1` (inputs ``a`` and ``tau``),</span>
+<span class="sd">    the channel frequency response for the frequency :math:`f`</span>
+<span class="sd">    is computed as follows:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \widehat{h}(f) = \sum_{m=0}^{M-1} a_{m} e^{j2\pi f \tau_{m}}</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    frequencies : [fft_size], tf.float</span>
+<span class="sd">        Frequencies at which to compute the channel response</span>
+
+<span class="sd">    a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex</span>
+<span class="sd">        Path coefficients</span>
+
+<span class="sd">    tau : [batch size, num_rx, num_tx, num_paths], tf.float</span>
+<span class="sd">        Path delays</span>
+
+<span class="sd">    normalize : bool</span>
+<span class="sd">        If set to `True`, the channel is normalized over the resource grid</span>
+<span class="sd">        to ensure unit average energy per resource element. Defaults to `False`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    h_f : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_time_steps, fft_size], tf.complex</span>
+<span class="sd">        Channel frequency responses at ``frequencies``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="c1"># Expand dims to broadcast with h. Add the following dimensions:</span>
+    <span class="c1">#  - number of rx antennas (2)</span>
+    <span class="c1">#  - number of tx antennas (4)</span>
+    <span class="c1">#  - number of time samples (6)</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="c1"># Bring all tensors to broadcastable shapes</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1">## Compute the Fourier transforms of all cluster taps</span>
+    <span class="c1"># Exponential component</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+        <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="o">*</span><span class="n">frequencies</span><span class="o">*</span><span class="n">tau</span><span class="p">))</span>
+    <span class="c1"># Broadcast is not supported yet by TF for such high rank tensors.</span>
+    <span class="c1"># We therefore do part of it manually</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">h_f</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">e</span>
+    <span class="c1"># Sum over all clusters to get the channel frequency responses</span>
+    <span class="n">h_f</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">h_f</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="c1"># Normalization is performed such that for each batch example and</span>
+        <span class="c1"># link the energy per resource grid is one.</span>
+        <span class="c1"># Average over TX antennas, RX antennas, OFDM symbols and</span>
+        <span class="c1"># subcarriers.</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span> <span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_f</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span>
+                            <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">h_f</span> <span class="o">=</span> <span class="n">h_f</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">h_f</span></div>
+
+<div class="viewcode-block" id="cir_to_time_channel"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.cir_to_time_channel">[docs]</a><span class="k">def</span> <span class="nf">cir_to_time_channel</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the channel taps forming the discrete complex-baseband</span>
+<span class="sd">    representation of the channel from the channel impulse response</span>
+<span class="sd">    (``a``, ``tau``).</span>
+
+<span class="sd">    This function assumes sinc filter is used for pulse shaping and receive</span>
+<span class="sd">    filtering. Therefore, given a channel impulse response</span>
+<span class="sd">    :math:`(a_{m}(t), \tau_{m}), 0 \leq m \leq M-1`, the channel taps</span>
+<span class="sd">    are computed as follows:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \bar{h}_{b, \ell}</span>
+<span class="sd">        = \sum_{m=0}^{M-1} a_{m}\left(\frac{b}{W}\right)</span>
+<span class="sd">            \text{sinc}\left( \ell - W\tau_{m} \right)</span>
+
+<span class="sd">    for :math:`\ell` ranging from ``l_min`` to ``l_max``, and where :math:`W` is</span>
+<span class="sd">    the ``bandwidth``.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    bandwidth : float</span>
+<span class="sd">        Bandwidth [Hz]</span>
+
+<span class="sd">    a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex</span>
+<span class="sd">        Path coefficients</span>
+
+<span class="sd">    tau : [batch size, num_rx, num_tx, num_paths], tf.float</span>
+<span class="sd">        Path delays [s]</span>
+
+<span class="sd">    l_min : int</span>
+<span class="sd">        Smallest time-lag for the discrete complex baseband channel (:math:`L_{\text{min}}`)</span>
+
+<span class="sd">    l_max : int</span>
+<span class="sd">        Largest time-lag for the discrete complex baseband channel (:math:`L_{\text{max}}`)</span>
+
+<span class="sd">    normalize : bool</span>
+<span class="sd">        If set to `True`, the channel is normalized over the block size</span>
+<span class="sd">        to ensure unit average energy per time step. Defaults to `False`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    hm :  [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_time_steps, l_max - l_min + 1], tf.complex</span>
+<span class="sd">        Channel taps coefficients</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="c1"># Expand dims to broadcast with h. Add the following dimensions:</span>
+    <span class="c1">#  - number of rx antennas (2)</span>
+    <span class="c1">#  - number of tx antennas (4)</span>
+    <span class="c1">#  - number of time samples (6)</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="c1"># Time lags for which to compute the channel taps</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="c1"># Bring tau and l to broadcastable shapes</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># sinc pulse shaping</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">numpy</span><span class="o">.</span><span class="n">sinc</span><span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="n">tau</span><span class="o">*</span><span class="n">bandwidth</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># For every tap, sum the sinc-weighted coefficients</span>
+    <span class="c1"># Broadcast is not supported by TF for such high rank tensors.</span>
+    <span class="c1"># We therefore do part of it manually</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">hm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="c1"># Normalization is performed such that for each batch example and</span>
+        <span class="c1"># link the energy per block is one.</span>
+        <span class="c1"># The total energy of a channel response is the sum of the squared</span>
+        <span class="c1"># norm over the channel taps.</span>
+        <span class="c1"># Average over block size, RX antennas, and TX antennas</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">hm</span><span class="p">)),</span>
+                                         <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                           <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">hm</span> <span class="o">=</span> <span class="n">hm</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+                             <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">hm</span></div>
+
+<div class="viewcode-block" id="deg_2_rad"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.deg_2_rad">[docs]</a><span class="k">def</span> <span class="nf">deg_2_rad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert degree to radian</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">        x : Tensor</span>
+<span class="sd">            Angles in degree</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">        y : Tensor</span>
+<span class="sd">            Angles ``x`` converted to radian</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">PI</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="rad_2_deg"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.rad_2_deg">[docs]</a><span class="k">def</span> <span class="nf">rad_2_deg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert radian to degree</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">        x : Tensor</span>
+<span class="sd">            Angles in radian</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">        y : Tensor</span>
+<span class="sd">            Angles ``x`` converted to degree</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">180.0</span><span class="o">/</span><span class="n">PI</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="wrap_angle_0_360"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.wrap_angle_0_360">[docs]</a><span class="k">def</span> <span class="nf">wrap_angle_0_360</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrap ``angle`` to (0,360)</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">        angle : Tensor</span>
+<span class="sd">            Input to wrap</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">        y : Tensor</span>
+<span class="sd">            ``angle`` wrapped to (0,360)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="mf">360.</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">sample_bernoulli</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sample a tensor with shape ``shape`` from a Bernoulli distribution with</span>
+<span class="sd">    probability ``p``</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    shape : Tensor shape</span>
+<span class="sd">        Shape of the tensor to sample</span>
+
+<span class="sd">    p : Broadcastable with ``shape``, tf.float</span>
+<span class="sd">        Probability</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    --------</span>
+<span class="sd">    : Tensor of shape ``shape``, bool</span>
+<span class="sd">        Binary samples</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">minval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">z</span>
+
+<div class="viewcode-block" id="drop_uts_in_sector"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.drop_uts_in_sector">[docs]</a><span class="k">def</span> <span class="nf">drop_uts_in_sector</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">,</span> <span class="n">min_bs_ut_dist</span><span class="p">,</span> <span class="n">isd</span><span class="p">,</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Uniformly sample UT locations from a sector.</span>
+
+<span class="sd">    The sector from which UTs are sampled is shown in the following figure.</span>
+<span class="sd">    The BS is assumed to be located at the origin (0,0) of the coordinate</span>
+<span class="sd">    system.</span>
+
+<span class="sd">    .. figure:: ../figures/drop_uts_in_sector.png</span>
+<span class="sd">        :align: center</span>
+<span class="sd">        :scale: 30%</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        Batch size</span>
+
+<span class="sd">    num_ut : int</span>
+<span class="sd">        Number of UTs to sample per batch example</span>
+
+<span class="sd">    min_bs_ut_dist : tf.float</span>
+<span class="sd">        Minimum BS-UT distance [m]</span>
+
+<span class="sd">    isd : tf.float</span>
+<span class="sd">        Inter-site distance, i.e., the distance between two adjacent BSs [m]</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+<span class="sd">        If a complex datatype is provided, the corresponding precision of</span>
+<span class="sd">        real components is used.</span>
+<span class="sd">        Defaults to `tf.complex64` (`tf.float32`).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    ut_loc : [batch_size, num_ut, 2], tf.float</span>
+<span class="sd">        UTs locations in the X-Y plan</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dtype</span><span class="o">.</span><span class="n">is_complex</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+    <span class="k">elif</span> <span class="n">dtype</span><span class="o">.</span><span class="n">if_floating</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;dtype must be a complex or floating datatype&quot;</span><span class="p">)</span>
+
+    <span class="n">r_min</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">min_bs_ut_dist</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="n">r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">isd</span><span class="o">*</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="c1"># Angles from (-pi/6 pi/6), covering half of the sector and denoted by</span>
+    <span class="c1"># alpha_half, are randomly sampled for all UTs.</span>
+    <span class="c1"># Then, the maximum distance UTs can be from the BS, denoted by r_max,</span>
+    <span class="c1"># is computed for each angle.</span>
+    <span class="c1"># Distance between UT - BS are then uniformly sampled from the range</span>
+    <span class="c1"># (r_min, r_max)</span>
+    <span class="c1"># Each UT is then randomly and uniformly pushed into a half of the sector</span>
+    <span class="c1"># by adding either PI/6 or PI/2 to the angle alpha_half</span>
+
+    <span class="c1"># Sample angles for half of the sector (which half will be decided randomly)</span>
+    <span class="n">alpha_half</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span>
+                                   <span class="n">minval</span><span class="o">=-</span><span class="n">PI</span><span class="o">/</span><span class="mf">6.</span><span class="p">,</span>
+                                   <span class="n">maxval</span><span class="o">=</span><span class="n">PI</span><span class="o">/</span><span class="mf">6.</span><span class="p">,</span>
+                                   <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="c1"># Maximum distance from BS at this angle to be in the sector</span>
+    <span class="n">r_max</span> <span class="o">=</span> <span class="n">r</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha_half</span><span class="p">)</span>
+
+    <span class="c1"># Randomly sample distance for the UTs</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span>
+                                 <span class="n">minval</span><span class="o">=</span><span class="n">r_min</span><span class="p">,</span>
+                                 <span class="n">maxval</span><span class="o">=</span><span class="n">r_max</span><span class="p">,</span>
+                                 <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="c1"># Randomly assign the UTs to one of the two half of the sector</span>
+    <span class="n">side</span> <span class="o">=</span> <span class="n">sample_bernoulli</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                            <span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">side</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">side</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">side</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="n">side</span><span class="o">+</span><span class="mf">1.</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha_half</span> <span class="o">+</span> <span class="n">side</span><span class="o">*</span><span class="n">PI</span><span class="o">/</span><span class="mf">6.</span>
+
+    <span class="c1"># Set UT location in X-Y coordinate system</span>
+    <span class="n">ut_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">distance</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">),</span>
+                       <span class="n">distance</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ut_loc</span></div>
+
+<div class="viewcode-block" id="set_3gpp_scenario_parameters"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.set_3gpp_scenario_parameters">[docs]</a><span class="k">def</span> <span class="nf">set_3gpp_scenario_parameters</span><span class="p">(</span>   <span class="n">scenario</span><span class="p">,</span>
+                                    <span class="n">min_bs_ut_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">isd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">bs_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">min_ut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">max_ut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">indoor_probability</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">min_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">max_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set valid parameters for a specified 3GPP system level ``scenario``</span>
+<span class="sd">    (RMa, UMi, or UMa).</span>
+
+<span class="sd">    If a parameter is given, then it is returned. If it is set to `None`,</span>
+<span class="sd">    then a parameter valid according to the chosen scenario is returned</span>
+<span class="sd">    (see [TR38901]_).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    scenario : str</span>
+<span class="sd">        System level model scenario. Must be one of &quot;rma&quot;, &quot;umi&quot;, or &quot;uma&quot;.</span>
+
+<span class="sd">    min_bs_ut_dist : None or tf.float</span>
+<span class="sd">        Minimum BS-UT distance [m]</span>
+
+<span class="sd">    isd : None or tf.float</span>
+<span class="sd">        Inter-site distance [m]</span>
+
+<span class="sd">    bs_height : None or tf.float</span>
+<span class="sd">        BS elevation [m]</span>
+
+<span class="sd">    min_ut_height : None or tf.float</span>
+<span class="sd">        Minimum UT elevation [m]</span>
+
+<span class="sd">    max_ut_height : None or tf.float</span>
+<span class="sd">        Maximum UT elevation [m]</span>
+
+<span class="sd">    indoor_probability : None or tf.float</span>
+<span class="sd">        Probability of a UT to be indoor</span>
+
+<span class="sd">    min_ut_velocity : None or tf.float</span>
+<span class="sd">        Minimum UT velocity [m/s]</span>
+
+<span class="sd">    max_ut_velocity : None or tf.float</span>
+<span class="sd">        Maximim UT velocity [m/s]</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+<span class="sd">        If a complex datatype is provided, the corresponding precision of</span>
+<span class="sd">        real components is used.</span>
+<span class="sd">        Defaults to `tf.complex64` (`tf.float32`).</span>
+<span class="sd">    Output</span>
+<span class="sd">    --------</span>
+<span class="sd">    min_bs_ut_dist : tf.float</span>
+<span class="sd">        Minimum BS-UT distance [m]</span>
+
+<span class="sd">    isd : tf.float</span>
+<span class="sd">        Inter-site distance [m]</span>
+
+<span class="sd">    bs_height : tf.float</span>
+<span class="sd">        BS elevation [m]</span>
+
+<span class="sd">    min_ut_height : tf.float</span>
+<span class="sd">        Minimum UT elevation [m]</span>
+
+<span class="sd">    max_ut_height : tf.float</span>
+<span class="sd">        Maximum UT elevation [m]</span>
+
+<span class="sd">    indoor_probability : tf.float</span>
+<span class="sd">        Probability of a UT to be indoor</span>
+
+<span class="sd">    min_ut_velocity : tf.float</span>
+<span class="sd">        Minimum UT velocity [m/s]</span>
+
+<span class="sd">    max_ut_velocity : tf.float</span>
+<span class="sd">        Maximim UT velocity [m/s]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="n">scenario</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;umi&#39;</span><span class="p">,</span> <span class="s1">&#39;uma&#39;</span><span class="p">,</span> <span class="s1">&#39;rma&#39;</span><span class="p">),</span>\
+        <span class="s2">&quot;`scenario` must be one of &#39;umi&#39;, &#39;uma&#39;, &#39;rma&#39;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dtype</span><span class="o">.</span><span class="n">is_complex</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+    <span class="k">elif</span> <span class="n">dtype</span><span class="o">.</span><span class="n">if_floating</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;dtype must be a complex or floating datatype&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Default values for scenario parameters.</span>
+    <span class="c1"># From TR38.901, sections 7.2 and 7.4.</span>
+    <span class="c1"># All distances and heights are in meters</span>
+    <span class="c1"># All velocities are in meters per second.</span>
+    <span class="n">default_scenario_par</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;umi&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s1">&#39;min_bs_ut_dist&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">10.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;isd&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">200.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;bs_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">10.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;min_ut_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;max_ut_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;indoor_probability&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;min_ut_velocity&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;max_ut_velocity&#39;</span> <span class="p">:</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">)</span>
+                            <span class="p">},</span>
+                            <span class="s1">&#39;uma&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s1">&#39;min_bs_ut_dist&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">35.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;isd&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">500.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;bs_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">25.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;min_ut_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;max_ut_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;indoor_probability&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;min_ut_velocity&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;max_ut_velocity&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                            <span class="p">},</span>
+                            <span class="s1">&#39;rma&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s1">&#39;min_bs_ut_dist&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">35.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;isd&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">5000.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;bs_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">35.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;min_ut_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;max_ut_height&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;indoor_probability&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;min_ut_velocity&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="s1">&#39;max_ut_velocity&#39;</span> <span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span>
+                                                                    <span class="n">real_dtype</span><span class="p">)</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+
+    <span class="c1"># Setting the scenario parameters</span>
+    <span class="k">if</span> <span class="n">min_bs_ut_dist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">min_bs_ut_dist</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;min_bs_ut_dist&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">isd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">isd</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;isd&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">bs_height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">bs_height</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;bs_height&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">min_ut_height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">min_ut_height</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;min_ut_height&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">max_ut_height</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">max_ut_height</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;max_ut_height&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">indoor_probability</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">indoor_probability</span> <span class="o">=</span><span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;indoor_probability&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">min_ut_velocity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">min_ut_velocity</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;min_ut_velocity&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">max_ut_velocity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">max_ut_velocity</span> <span class="o">=</span> <span class="n">default_scenario_par</span><span class="p">[</span><span class="n">scenario</span><span class="p">][</span><span class="s1">&#39;max_ut_velocity&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">min_bs_ut_dist</span><span class="p">,</span> <span class="n">isd</span><span class="p">,</span> <span class="n">bs_height</span><span class="p">,</span> <span class="n">min_ut_height</span><span class="p">,</span> <span class="n">max_ut_height</span><span class="p">,</span>\
+            <span class="n">indoor_probability</span><span class="p">,</span> <span class="n">min_ut_velocity</span><span class="p">,</span> <span class="n">max_ut_velocity</span></div>
+
+<div class="viewcode-block" id="relocate_uts"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.relocate_uts">[docs]</a><span class="k">def</span> <span class="nf">relocate_uts</span><span class="p">(</span><span class="n">ut_loc</span><span class="p">,</span> <span class="n">sector_id</span><span class="p">,</span> <span class="n">cell_loc</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Relocate the UTs by rotating them into the sector with index ``sector_id``</span>
+<span class="sd">    and transposing them to the cell centered on ``cell_loc``.</span>
+
+<span class="sd">    ``sector_id`` gives the index of the sector to which the UTs are</span>
+<span class="sd">    rotated to. The picture below shows how the three sectors of a cell are</span>
+<span class="sd">    indexed.</span>
+
+<span class="sd">    .. figure:: ../figures/panel_array_sector_id.png</span>
+<span class="sd">        :align: center</span>
+<span class="sd">        :scale: 30%</span>
+
+<span class="sd">        Indexing of sectors</span>
+
+<span class="sd">    If ``sector_id`` is a scalar, then all UTs are relocated to the same</span>
+<span class="sd">    sector indexed by ``sector_id``.</span>
+<span class="sd">    If ``sector_id`` is a tensor, it should be broadcastable with</span>
+<span class="sd">    [``batch_size``, ``num_ut``], and give the sector in which each UT or</span>
+<span class="sd">    batch example is relocated to.</span>
+
+<span class="sd">    When calling the function, ``ut_loc`` gives the locations of the UTs to</span>
+<span class="sd">    relocate, which are all assumed to be in sector with index 0, and in the</span>
+<span class="sd">    cell centered on the origin (0,0).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    ut_loc : [batch_size, num_ut, 2], tf.float</span>
+<span class="sd">        UTs locations in the X-Y plan</span>
+
+<span class="sd">    sector_id : Tensor broadcastable with [batch_size, num_ut], int</span>
+<span class="sd">        Indexes of the sector to which to relocate the UTs</span>
+
+<span class="sd">    cell_loc : Tensor broadcastable with [batch_size, num_ut], tf.float</span>
+<span class="sd">        Center of the cell to which to transpose the UTs</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    ut_loc : [batch_size, num_ut, 2], tf.float</span>
+<span class="sd">        Relocated UTs locations in the X-Y plan</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Expand the rank of sector_id such that is is broadcastable with</span>
+    <span class="c1"># (batch size, num_ut)</span>
+    <span class="n">sector_id</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">sector_id</span><span class="p">,</span> <span class="n">ut_loc</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">sector_id</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">sector_id</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Expant</span>
+    <span class="n">cell_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">cell_loc</span><span class="p">,</span> <span class="n">ut_loc</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">cell_loc</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">cell_loc</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">ut_loc</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Rotation matrix tensor, broadcastable with [batch size, num uts, 2, 2]</span>
+    <span class="n">rotation_angle</span> <span class="o">=</span> <span class="n">sector_id</span><span class="o">*</span><span class="mf">2.</span><span class="o">*</span><span class="n">PI</span><span class="o">/</span><span class="mf">3.0</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">),</span>
+                                <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">)],</span>
+                               <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">rotation_matrix</span><span class="p">,</span>
+                                 <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">rotation_angle</span><span class="p">),</span>
+                                            <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">rotation_matrix</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">rotation_matrix</span><span class="p">,</span> <span class="n">ut_loc</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># Applying the rotation matrix</span>
+    <span class="n">ut_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">ut_loc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ut_loc_rotated</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">rotation_matrix</span><span class="nd">@ut_loc</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Translate to the BS location</span>
+    <span class="n">ut_loc_rotated_translated</span> <span class="o">=</span> <span class="n">ut_loc_rotated</span> <span class="o">+</span> <span class="n">cell_loc</span>
+
+    <span class="k">return</span> <span class="n">ut_loc_rotated_translated</span></div>
+
+<span class="k">def</span> <span class="nf">generate_uts_topology</span><span class="p">(</span>  <span class="n">batch_size</span><span class="p">,</span>
+                            <span class="n">num_ut</span><span class="p">,</span>
+                            <span class="n">drop_area</span><span class="p">,</span>
+                            <span class="n">cell_loc_xy</span><span class="p">,</span>
+                            <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                            <span class="n">isd</span><span class="p">,</span>
+                            <span class="n">min_ut_height</span><span class="p">,</span>
+                            <span class="n">max_ut_height</span><span class="p">,</span>
+                            <span class="n">indoor_probability</span><span class="p">,</span>
+                            <span class="n">min_ut_velocity</span><span class="p">,</span>
+                            <span class="n">max_ut_velocity</span><span class="p">,</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sample UTs location from a sector or a cell</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        Batch size</span>
+
+<span class="sd">    num_ut : int</span>
+<span class="sd">        Number of UTs to sample per batch example</span>
+
+<span class="sd">    drop_area : str</span>
+<span class="sd">        &#39;sector&#39; or &#39;cell&#39;. If set to &#39;sector&#39;, UTs are sampled from the</span>
+<span class="sd">        sector with index 0 in the figure below</span>
+
+<span class="sd">        .. figure:: ../figures/panel_array_sector_id.png</span>
+<span class="sd">            :align: center</span>
+<span class="sd">            :scale: 30%</span>
+
+<span class="sd">    Indexing of sectors</span>
+
+<span class="sd">    cell_loc_xy : Tensor broadcastable with[batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        Center of the cell(s)</span>
+
+<span class="sd">    min_bs_ut_dist : None or tf.float</span>
+<span class="sd">        Minimum BS-UT distance [m]</span>
+
+<span class="sd">    isd : None or tf.float</span>
+<span class="sd">        Inter-site distance [m]</span>
+
+<span class="sd">    min_ut_height : None or tf.float</span>
+<span class="sd">        Minimum UT elevation [m]</span>
+
+<span class="sd">    max_ut_height : None or tf.float</span>
+<span class="sd">        Maximum UT elevation [m]</span>
+
+<span class="sd">    indoor_probability : None or tf.float</span>
+<span class="sd">        Probability of a UT to be indoor</span>
+
+<span class="sd">    min_ut_velocity : None or tf.float</span>
+<span class="sd">        Minimum UT velocity [m/s]</span>
+
+<span class="sd">    max_ut_velocity : None or tf.float</span>
+<span class="sd">        Maximum UT velocity [m/s]</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+<span class="sd">        If a complex datatype is provided, the corresponding precision of</span>
+<span class="sd">        real components is used.</span>
+<span class="sd">        Defaults to `tf.complex64` (`tf.float32`).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    ut_loc : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs locations</span>
+
+<span class="sd">    ut_orientations : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs orientations [radian]</span>
+
+<span class="sd">    ut_velocities : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs velocities [m/s]</span>
+
+<span class="sd">    in_state : [batch_size, num_ut], tf.float</span>
+<span class="sd">        Indoor/outdoor state of UTs. `True` means indoor, `False` means</span>
+<span class="sd">        outdoor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">assert</span> <span class="n">drop_area</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;cell&#39;</span><span class="p">),</span>\
+        <span class="s2">&quot;Drop area must be either &#39;sector&#39; or &#39;cell&#39;&quot;</span>
+
+    <span class="k">if</span> <span class="n">dtype</span><span class="o">.</span><span class="n">is_complex</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+    <span class="k">elif</span> <span class="n">dtype</span><span class="o">.</span><span class="n">if_floating</span><span class="p">:</span>
+        <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;dtype must be a complex or floating datatype&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Randomly generating the UT locations</span>
+    <span class="n">ut_loc_xy</span> <span class="o">=</span> <span class="n">drop_uts_in_sector</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span>
+                                   <span class="n">num_ut</span><span class="p">,</span>
+                                   <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                                   <span class="n">isd</span><span class="p">,</span>
+                                   <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">drop_area</span> <span class="o">==</span> <span class="s1">&#39;sector&#39;</span><span class="p">:</span>
+        <span class="n">sectors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">drop_area</span> <span class="o">==</span> <span class="s1">&#39;cell&#39;</span><span class="p">:</span>
+        <span class="n">sectors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span>
+                                    <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                    <span class="n">maxval</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">ut_loc_xy</span> <span class="o">=</span> <span class="n">relocate_uts</span><span class="p">(</span><span class="n">ut_loc_xy</span><span class="p">,</span>
+                             <span class="n">sectors</span><span class="p">,</span>
+                             <span class="n">cell_loc_xy</span><span class="p">)</span>
+
+    <span class="n">ut_loc_z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>   <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                    <span class="n">minval</span><span class="o">=</span><span class="n">min_ut_height</span><span class="p">,</span>
+                                    <span class="n">maxval</span><span class="o">=</span><span class="n">max_ut_height</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">ut_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>    <span class="n">ut_loc_xy</span><span class="p">,</span>
+                            <span class="n">ut_loc_z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Randomly generating the UT indoor/outdoor state</span>
+    <span class="n">in_state</span> <span class="o">=</span> <span class="n">sample_bernoulli</span><span class="p">(</span>   <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span> <span class="n">indoor_probability</span><span class="p">,</span>
+                                    <span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="c1"># Randomly generate the UT velocities</span>
+    <span class="n">ut_vel_angle</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>   <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span>
+                                        <span class="n">minval</span><span class="o">=-</span><span class="n">PI</span><span class="p">,</span>
+                                        <span class="n">maxval</span><span class="o">=</span><span class="n">PI</span><span class="p">,</span>
+                                        <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">ut_vel_norm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>    <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span>
+                                        <span class="n">minval</span><span class="o">=</span><span class="n">min_ut_velocity</span><span class="p">,</span>
+                                        <span class="n">maxval</span><span class="o">=</span><span class="n">max_ut_velocity</span><span class="p">,</span>
+                                        <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">ut_velocities</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>  <span class="n">ut_vel_norm</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ut_vel_angle</span><span class="p">),</span>
+                                <span class="n">ut_vel_norm</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ut_vel_angle</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">)],</span>
+                                <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Randomly generate the UT orientations</span>
+    <span class="n">ut_bearing</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span> <span class="n">minval</span><span class="o">=-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span>
+                                    <span class="n">maxval</span><span class="o">=</span><span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">ut_downtilt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>    <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span> <span class="n">minval</span><span class="o">=-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span>
+                                        <span class="n">maxval</span><span class="o">=</span><span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">ut_slant</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>   <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">],</span> <span class="n">minval</span><span class="o">=-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span>
+                                    <span class="n">maxval</span><span class="o">=</span><span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">ut_orientations</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">ut_bearing</span><span class="p">,</span> <span class="n">ut_downtilt</span><span class="p">,</span> <span class="n">ut_slant</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ut_loc</span><span class="p">,</span> <span class="n">ut_orientations</span><span class="p">,</span> <span class="n">ut_velocities</span><span class="p">,</span> <span class="n">in_state</span>
+
+<div class="viewcode-block" id="gen_single_sector_topology"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.gen_single_sector_topology">[docs]</a><span class="k">def</span> <span class="nf">gen_single_sector_topology</span><span class="p">(</span> <span class="n">batch_size</span><span class="p">,</span>
+                                <span class="n">num_ut</span><span class="p">,</span>
+                                <span class="n">scenario</span><span class="p">,</span>
+                                <span class="n">min_bs_ut_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">isd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">bs_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">min_ut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">max_ut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">indoor_probability</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                <span class="n">min_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">max_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a batch of topologies consisting of a single BS located at the</span>
+<span class="sd">    origin and ``num_ut`` UTs randomly and uniformly dropped in a cell sector.</span>
+
+<span class="sd">    The following picture shows the sector from which UTs are sampled.</span>
+
+<span class="sd">    .. figure:: ../figures/drop_uts_in_sector.png</span>
+<span class="sd">        :align: center</span>
+<span class="sd">        :scale: 30%</span>
+
+<span class="sd">    UTs orientations are randomly and uniformly set, whereas the BS orientation</span>
+<span class="sd">    is set such that the it is oriented towards the center of the sector.</span>
+
+<span class="sd">    The drop configuration can be controlled through the optional parameters.</span>
+<span class="sd">    Parameters set to `None` are set to valid values according to the chosen</span>
+<span class="sd">    ``scenario`` (see [TR38901]_).</span>
+
+<span class="sd">    The returned batch of topologies can be used as-is with the</span>
+<span class="sd">    :meth:`set_topology` method of the system level models, i.e.</span>
+<span class="sd">    :class:`~sionna.channel.tr38901.UMi`, :class:`~sionna.channel.tr38901.UMa`,</span>
+<span class="sd">    and :class:`~sionna.channel.tr38901.RMa`.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; # Create antenna arrays</span>
+<span class="sd">    &gt;&gt;&gt; bs_array = PanelArray(num_rows_per_panel = 4,</span>
+<span class="sd">    ...                      num_cols_per_panel = 4,</span>
+<span class="sd">    ...                      polarization = &#39;dual&#39;,</span>
+<span class="sd">    ...                      polarization_type = &#39;VH&#39;,</span>
+<span class="sd">    ...                      antenna_pattern = &#39;38.901&#39;,</span>
+<span class="sd">    ...                      carrier_frequency = 3.5e9)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; ut_array = PanelArray(num_rows_per_panel = 1,</span>
+<span class="sd">    ...                       num_cols_per_panel = 1,</span>
+<span class="sd">    ...                       polarization = &#39;single&#39;,</span>
+<span class="sd">    ...                       polarization_type = &#39;V&#39;,</span>
+<span class="sd">    ...                       antenna_pattern = &#39;omni&#39;,</span>
+<span class="sd">    ...                       carrier_frequency = 3.5e9)</span>
+<span class="sd">    &gt;&gt;&gt; # Create channel model</span>
+<span class="sd">    &gt;&gt;&gt; channel_model = UMi(carrier_frequency = 3.5e9,</span>
+<span class="sd">    ...                     o2i_model = &#39;low&#39;,</span>
+<span class="sd">    ...                     ut_array = ut_array,</span>
+<span class="sd">    ...                     bs_array = bs_array,</span>
+<span class="sd">    ...                     direction = &#39;uplink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; # Generate the topology</span>
+<span class="sd">    &gt;&gt;&gt; topology = gen_single_sector_topology(batch_size = 100,</span>
+<span class="sd">    ...                                       num_ut = 4,</span>
+<span class="sd">    ...                                       scenario = &#39;umi&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; # Set the topology</span>
+<span class="sd">    &gt;&gt;&gt; ut_loc, bs_loc, ut_orientations, bs_orientations, ut_velocities, in_state = topology</span>
+<span class="sd">    &gt;&gt;&gt; channel_model.set_topology(ut_loc,</span>
+<span class="sd">    ...                            bs_loc,</span>
+<span class="sd">    ...                            ut_orientations,</span>
+<span class="sd">    ...                            bs_orientations,</span>
+<span class="sd">    ...                            ut_velocities,</span>
+<span class="sd">    ...                            in_state)</span>
+<span class="sd">    &gt;&gt;&gt; channel_model.show_topology()</span>
+
+<span class="sd">    .. image:: ../figures/drop_uts_in_sector_topology.png</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        Batch size</span>
+
+<span class="sd">    num_ut : int</span>
+<span class="sd">        Number of UTs to sample per batch example</span>
+
+<span class="sd">    scenario : str</span>
+<span class="sd">        System leven model scenario. Must be one of &quot;rma&quot;, &quot;umi&quot;, or &quot;uma&quot;.</span>
+
+<span class="sd">    min_bs_ut_dist : None or tf.float</span>
+<span class="sd">        Minimum BS-UT distance [m]</span>
+
+<span class="sd">    isd : None or tf.float</span>
+<span class="sd">        Inter-site distance [m]</span>
+
+<span class="sd">    bs_height : None or tf.float</span>
+<span class="sd">        BS elevation [m]</span>
+
+<span class="sd">    min_ut_height : None or tf.float</span>
+<span class="sd">        Minimum UT elevation [m]</span>
+
+<span class="sd">    max_ut_height : None or tf.float</span>
+<span class="sd">        Maximum UT elevation [m]</span>
+
+<span class="sd">    indoor_probability : None or tf.float</span>
+<span class="sd">        Probability of a UT to be indoor</span>
+
+<span class="sd">    min_ut_velocity : None or tf.float</span>
+<span class="sd">        Minimum UT velocity [m/s]</span>
+
+<span class="sd">    max_ut_velocity : None or tf.float</span>
+<span class="sd">        Maximim UT velocity [m/s]</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+<span class="sd">        If a complex datatype is provided, the corresponding precision of</span>
+<span class="sd">        real components is used.</span>
+<span class="sd">        Defaults to `tf.complex64` (`tf.float32`).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    ut_loc : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs locations</span>
+
+<span class="sd">    bs_loc : [batch_size, 1, 3], tf.float</span>
+<span class="sd">        BS location. Set to (0,0,0) for all batch examples.</span>
+
+<span class="sd">    ut_orientations : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs orientations [radian]</span>
+
+<span class="sd">    bs_orientations : [batch_size, 1, 3], tf.float</span>
+<span class="sd">        BS orientations [radian]. Oriented towards the center of the sector.</span>
+
+<span class="sd">    ut_velocities : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs velocities [m/s]</span>
+
+<span class="sd">    in_state : [batch_size, num_ut], tf.float</span>
+<span class="sd">        Indoor/outdoor state of UTs. `True` means indoor, `False` means</span>
+<span class="sd">        outdoor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">set_3gpp_scenario_parameters</span><span class="p">(</span>  <span class="n">scenario</span><span class="p">,</span>
+                                            <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                                            <span class="n">isd</span><span class="p">,</span>
+                                            <span class="n">bs_height</span><span class="p">,</span>
+                                            <span class="n">min_ut_height</span><span class="p">,</span>
+                                            <span class="n">max_ut_height</span><span class="p">,</span>
+                                            <span class="n">indoor_probability</span><span class="p">,</span>
+                                            <span class="n">min_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">max_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">min_bs_ut_dist</span><span class="p">,</span> <span class="n">isd</span><span class="p">,</span> <span class="n">bs_height</span><span class="p">,</span> <span class="n">min_ut_height</span><span class="p">,</span> <span class="n">max_ut_height</span><span class="p">,</span>\
+            <span class="n">indoor_probability</span><span class="p">,</span> <span class="n">min_ut_velocity</span><span class="p">,</span> <span class="n">max_ut_velocity</span> <span class="o">=</span> <span class="n">params</span>
+
+    <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+
+    <span class="c1"># Setting BS to (0,0,bs_height)</span>
+    <span class="n">bs_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bs_height</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Setting the BS orientation such that it is downtilted towards the center</span>
+    <span class="c1"># of the sector</span>
+    <span class="n">sector_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_bs_ut_dist</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">isd</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span>
+    <span class="n">bs_downtilt</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">sector_center</span><span class="o">/</span><span class="n">bs_height</span><span class="p">)</span>
+    <span class="n">bs_orientation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bs_downtilt</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Generating the UTs</span>
+    <span class="n">ut_topology</span> <span class="o">=</span> <span class="n">generate_uts_topology</span><span class="p">(</span>    <span class="n">batch_size</span><span class="p">,</span>
+                                            <span class="n">num_ut</span><span class="p">,</span>
+                                            <span class="s1">&#39;sector&#39;</span><span class="p">,</span>
+                                            <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">2</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                            <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                                            <span class="n">isd</span><span class="p">,</span>
+                                            <span class="n">min_ut_height</span><span class="p">,</span>
+                                            <span class="n">max_ut_height</span><span class="p">,</span>
+                                            <span class="n">indoor_probability</span><span class="p">,</span>
+                                            <span class="n">min_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">max_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ut_loc</span><span class="p">,</span> <span class="n">ut_orientations</span><span class="p">,</span> <span class="n">ut_velocities</span><span class="p">,</span> <span class="n">in_state</span> <span class="o">=</span> <span class="n">ut_topology</span>
+
+    <span class="k">return</span> <span class="n">ut_loc</span><span class="p">,</span> <span class="n">bs_loc</span><span class="p">,</span> <span class="n">ut_orientations</span><span class="p">,</span> <span class="n">bs_orientation</span><span class="p">,</span> <span class="n">ut_velocities</span><span class="p">,</span>\
+            <span class="n">in_state</span></div>
+
+<div class="viewcode-block" id="gen_single_sector_topology_interferers"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.gen_single_sector_topology_interferers">[docs]</a><span class="k">def</span> <span class="nf">gen_single_sector_topology_interferers</span><span class="p">(</span> <span class="n">batch_size</span><span class="p">,</span>
+                                            <span class="n">num_ut</span><span class="p">,</span>
+                                            <span class="n">num_interferer</span><span class="p">,</span>
+                                            <span class="n">scenario</span><span class="p">,</span>
+                                            <span class="n">min_bs_ut_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">isd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">bs_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">min_ut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">max_ut_height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">indoor_probability</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">min_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">max_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a batch of topologies consisting of a single BS located at the</span>
+<span class="sd">    origin, ``num_ut`` UTs randomly and uniformly dropped in a cell sector, and</span>
+<span class="sd">    ``num_interferer`` interfering UTs randomly dropped in the adjacent cells.</span>
+
+<span class="sd">    The following picture shows how UTs are sampled</span>
+
+<span class="sd">    .. figure:: ../figures/drop_uts_in_sector_interferers.png</span>
+<span class="sd">        :align: center</span>
+<span class="sd">        :scale: 30%</span>
+
+<span class="sd">    UTs orientations are randomly and uniformly set, whereas the BS orientation</span>
+<span class="sd">    is set such that it is oriented towards the center of the sector it</span>
+<span class="sd">    serves.</span>
+
+<span class="sd">    The drop configuration can be controlled through the optional parameters.</span>
+<span class="sd">    Parameters set to `None` are set to valid values according to the chosen</span>
+<span class="sd">    ``scenario`` (see [TR38901]_).</span>
+
+<span class="sd">    The returned batch of topologies can be used as-is with the</span>
+<span class="sd">    :meth:`set_topology` method of the system level models, i.e.</span>
+<span class="sd">    :class:`~sionna.channel.tr38901.UMi`, :class:`~sionna.channel.tr38901.UMa`,</span>
+<span class="sd">    and :class:`~sionna.channel.tr38901.RMa`.</span>
+
+<span class="sd">    In the returned ``ut_loc``, ``ut_orientations``, ``ut_velocities``, and</span>
+<span class="sd">    ``in_state`` tensors, the first ``num_ut`` items along the axis with index</span>
+<span class="sd">    1 correspond to the served UTs, whereas the remaining ``num_interferer``</span>
+<span class="sd">    items correspond to the interfering UTs.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; # Create antenna arrays</span>
+<span class="sd">    &gt;&gt;&gt; bs_array = PanelArray(num_rows_per_panel = 4,</span>
+<span class="sd">    ...                      num_cols_per_panel = 4,</span>
+<span class="sd">    ...                      polarization = &#39;dual&#39;,</span>
+<span class="sd">    ...                      polarization_type = &#39;VH&#39;,</span>
+<span class="sd">    ...                      antenna_pattern = &#39;38.901&#39;,</span>
+<span class="sd">    ...                      carrier_frequency = 3.5e9)</span>
+<span class="sd">    &gt;&gt;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; ut_array = PanelArray(num_rows_per_panel = 1,</span>
+<span class="sd">    ...                       num_cols_per_panel = 1,</span>
+<span class="sd">    ...                       polarization = &#39;single&#39;,</span>
+<span class="sd">    ...                       polarization_type = &#39;V&#39;,</span>
+<span class="sd">    ...                       antenna_pattern = &#39;omni&#39;,</span>
+<span class="sd">    ...                       carrier_frequency = 3.5e9)</span>
+<span class="sd">    &gt;&gt;&gt; # Create channel model</span>
+<span class="sd">    &gt;&gt;&gt; channel_model = UMi(carrier_frequency = 3.5e9,</span>
+<span class="sd">    ...                     o2i_model = &#39;low&#39;,</span>
+<span class="sd">    ...                     ut_array = ut_array,</span>
+<span class="sd">    ...                     bs_array = bs_array,</span>
+<span class="sd">    ...                     direction = &#39;uplink&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; # Generate the topology</span>
+<span class="sd">    &gt;&gt;&gt; topology = gen_single_sector_topology_interferers(batch_size = 100,</span>
+<span class="sd">    ...                                                   num_ut = 4,</span>
+<span class="sd">    ...                                                   num_interferer = 4,</span>
+<span class="sd">    ...                                                   scenario = &#39;umi&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; # Set the topology</span>
+<span class="sd">    &gt;&gt;&gt; ut_loc, bs_loc, ut_orientations, bs_orientations, ut_velocities, in_state = topology</span>
+<span class="sd">    &gt;&gt;&gt; channel_model.set_topology(ut_loc,</span>
+<span class="sd">    ...                            bs_loc,</span>
+<span class="sd">    ...                            ut_orientations,</span>
+<span class="sd">    ...                            bs_orientations,</span>
+<span class="sd">    ...                            ut_velocities,</span>
+<span class="sd">    ...                            in_state)</span>
+<span class="sd">    &gt;&gt;&gt; channel_model.show_topology()</span>
+
+<span class="sd">    .. image:: ../figures/drop_uts_in_sector_topology_inter.png</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    --------</span>
+<span class="sd">    batch_size : int</span>
+<span class="sd">        Batch size</span>
+
+<span class="sd">    num_ut : int</span>
+<span class="sd">        Number of UTs to sample per batch example</span>
+
+<span class="sd">    num_interferer : int</span>
+<span class="sd">        Number of interfeering UTs per batch example</span>
+
+<span class="sd">    scenario : str</span>
+<span class="sd">        System leven model scenario. Must be one of &quot;rma&quot;, &quot;umi&quot;, or &quot;uma&quot;.</span>
+
+<span class="sd">    min_bs_ut_dist : None or tf.float</span>
+<span class="sd">        Minimum BS-UT distance [m]</span>
+
+<span class="sd">    isd : None or tf.float</span>
+<span class="sd">        Inter-site distance [m]</span>
+
+<span class="sd">    bs_height : None or tf.float</span>
+<span class="sd">        BS elevation [m]</span>
+
+<span class="sd">    min_ut_height : None or tf.float</span>
+<span class="sd">        Minimum UT elevation [m]</span>
+
+<span class="sd">    max_ut_height : None or tf.float</span>
+<span class="sd">        Maximum UT elevation [m]</span>
+
+<span class="sd">    indoor_probability : None or tf.float</span>
+<span class="sd">        Probability of a UT to be indoor</span>
+
+<span class="sd">    min_ut_velocity : None or tf.float</span>
+<span class="sd">        Minimum UT velocity [m/s]</span>
+
+<span class="sd">    max_ut_velocity : None or tf.float</span>
+<span class="sd">        Maximim UT velocity [m/s]</span>
+
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Datatype to use for internal processing and output.</span>
+<span class="sd">        If a complex datatype is provided, the corresponding precision of</span>
+<span class="sd">        real components is used.</span>
+<span class="sd">        Defaults to `tf.complex64` (`tf.float32`).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    ut_loc : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs locations. The first ``num_ut`` items along the axis with index</span>
+<span class="sd">        1 correspond to the served UTs, whereas the remaining</span>
+<span class="sd">        ``num_interferer`` items correspond to the interfeering UTs.</span>
+
+<span class="sd">    bs_loc : [batch_size, 1, 3], tf.float</span>
+<span class="sd">        BS location. Set to (0,0,0) for all batch examples.</span>
+
+<span class="sd">    ut_orientations : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs orientations [radian]. The first ``num_ut`` items along the</span>
+<span class="sd">        axis with index 1 correspond to the served UTs, whereas the</span>
+<span class="sd">        remaining ``num_interferer`` items correspond to the interfeering</span>
+<span class="sd">        UTs.</span>
+
+<span class="sd">    bs_orientations : [batch_size, 1, 3], tf.float</span>
+<span class="sd">        BS orientation [radian]. Oriented towards the center of the sector.</span>
+
+<span class="sd">    ut_velocities : [batch_size, num_ut, 3], tf.float</span>
+<span class="sd">        UTs velocities [m/s]. The first ``num_ut`` items along the axis</span>
+<span class="sd">        with index 1 correspond to the served UTs, whereas the remaining</span>
+<span class="sd">        ``num_interferer`` items correspond to the interfeering UTs.</span>
+
+<span class="sd">    in_state : [batch_size, num_ut], tf.float</span>
+<span class="sd">        Indoor/outdoor state of UTs. `True` means indoor, `False` means</span>
+<span class="sd">        outdoor. The first ``num_ut`` items along the axis with</span>
+<span class="sd">        index 1 correspond to the served UTs, whereas the remaining</span>
+<span class="sd">        ``num_interferer`` items correspond to the interfeering UTs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">set_3gpp_scenario_parameters</span><span class="p">(</span>  <span class="n">scenario</span><span class="p">,</span>
+                                            <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                                            <span class="n">isd</span><span class="p">,</span>
+                                            <span class="n">bs_height</span><span class="p">,</span>
+                                            <span class="n">min_ut_height</span><span class="p">,</span>
+                                            <span class="n">max_ut_height</span><span class="p">,</span>
+                                            <span class="n">indoor_probability</span><span class="p">,</span>
+                                            <span class="n">min_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">max_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">min_bs_ut_dist</span><span class="p">,</span> <span class="n">isd</span><span class="p">,</span> <span class="n">bs_height</span><span class="p">,</span> <span class="n">min_ut_height</span><span class="p">,</span> <span class="n">max_ut_height</span><span class="p">,</span>\
+            <span class="n">indoor_probability</span><span class="p">,</span> <span class="n">min_ut_velocity</span><span class="p">,</span> <span class="n">max_ut_velocity</span> <span class="o">=</span> <span class="n">params</span>
+
+    <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+
+    <span class="c1"># Setting BS to (0,0,bs_height)</span>
+    <span class="n">bs_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bs_height</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Setting the BS orientation such that it is downtilted towards the center</span>
+    <span class="c1"># of the sector</span>
+    <span class="n">sector_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">min_bs_ut_dist</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">isd</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span>
+    <span class="n">bs_downtilt</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">PI</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">sector_center</span><span class="o">/</span><span class="n">bs_height</span><span class="p">)</span>
+    <span class="n">bs_orientation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bs_downtilt</span><span class="p">),</span>
+                                <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Generating the UTs located in the UTs served by the BS</span>
+    <span class="n">ut_topology</span> <span class="o">=</span> <span class="n">generate_uts_topology</span><span class="p">(</span>    <span class="n">batch_size</span><span class="p">,</span>
+                                            <span class="n">num_ut</span><span class="p">,</span>
+                                            <span class="s1">&#39;sector&#39;</span><span class="p">,</span>
+                                            <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">2</span><span class="p">],</span> <span class="n">real_dtype</span><span class="p">),</span>
+                                            <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                                            <span class="n">isd</span><span class="p">,</span>
+                                            <span class="n">min_ut_height</span><span class="p">,</span>
+                                            <span class="n">max_ut_height</span><span class="p">,</span>
+                                            <span class="n">indoor_probability</span><span class="p">,</span>
+                                            <span class="n">min_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">max_ut_velocity</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">ut_loc</span><span class="p">,</span> <span class="n">ut_orientations</span><span class="p">,</span> <span class="n">ut_velocities</span><span class="p">,</span> <span class="n">in_state</span> <span class="o">=</span> <span class="n">ut_topology</span>
+
+
+    <span class="c1">## Generating the UTs located in the adjacent cells</span>
+
+    <span class="c1"># Users are randomly dropped in one of the two adjacent cells</span>
+    <span class="n">inter_cell_center</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">isd</span><span class="p">],</span>
+                                  <span class="p">[</span><span class="n">isd</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">PI</span><span class="o">/</span><span class="mf">6.0</span><span class="p">),</span>
+                                   <span class="n">isd</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">PI</span><span class="o">/</span><span class="mf">6.0</span><span class="p">)]],</span>
+                                 <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">cell_index</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_interferer</span><span class="p">],</span>
+                                  <span class="n">minval</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxval</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">inter_cells</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">inter_cell_center</span><span class="p">,</span> <span class="n">cell_index</span><span class="p">)</span>
+
+    <span class="n">inter_topology</span> <span class="o">=</span> <span class="n">generate_uts_topology</span><span class="p">(</span>     <span class="n">batch_size</span><span class="p">,</span>
+                                                <span class="n">num_interferer</span><span class="p">,</span>
+                                                <span class="s1">&#39;cell&#39;</span><span class="p">,</span>
+                                                <span class="n">inter_cells</span><span class="p">,</span>
+                                                <span class="n">min_bs_ut_dist</span><span class="p">,</span>
+                                                <span class="n">isd</span><span class="p">,</span>
+                                                <span class="n">min_ut_height</span><span class="p">,</span>
+                                                <span class="n">max_ut_height</span><span class="p">,</span>
+                                                <span class="n">indoor_probability</span><span class="p">,</span>
+                                                <span class="n">min_ut_velocity</span><span class="p">,</span>
+                                                <span class="n">max_ut_velocity</span><span class="p">,</span>
+                                                <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">inter_loc</span><span class="p">,</span> <span class="n">inter_orientations</span><span class="p">,</span> <span class="n">inter_velocities</span><span class="p">,</span> <span class="n">inter_in_state</span> \
+        <span class="o">=</span> <span class="n">inter_topology</span>
+
+    <span class="n">ut_loc</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ut_loc</span><span class="p">,</span> <span class="n">inter_loc</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ut_orientations</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ut_orientations</span><span class="p">,</span> <span class="n">inter_orientations</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ut_velocities</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ut_velocities</span><span class="p">,</span> <span class="n">inter_velocities</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">in_state</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">in_state</span><span class="p">,</span> <span class="n">inter_in_state</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ut_loc</span><span class="p">,</span> <span class="n">bs_loc</span><span class="p">,</span> <span class="n">ut_orientations</span><span class="p">,</span> <span class="n">bs_orientation</span><span class="p">,</span> <span class="n">ut_velocities</span><span class="p">,</span>\
+            <span class="n">in_state</span></div>
+
+
+
+<div class="viewcode-block" id="exp_corr_mat"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.exp_corr_mat">[docs]</a><span class="k">def</span> <span class="nf">exp_corr_mat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate exponential correlation matrices.</span>
+
+<span class="sd">    This function computes for every element :math:`a` of a complex-valued</span>
+<span class="sd">    tensor :math:`\mathbf{a}` the corresponding :math:`n\times n` exponential</span>
+<span class="sd">    correlation matrix :math:`\mathbf{R}(a,n)`, defined as (Eq. 1, [MAL2018]_):</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathbf{R}(a,n)_{i,j} = \begin{cases}</span>
+<span class="sd">                    1 &amp; \text{if } i=j\\</span>
+<span class="sd">                    a^{i-j}  &amp; \text{if } i&gt;j\\</span>
+<span class="sd">                    (a^\star)^{j-i}  &amp; \text{if } j&lt;i, j=1,\dots,n\\</span>
+<span class="sd">                  \end{cases}</span>
+
+<span class="sd">    where :math:`|a|&lt;1` and :math:`\mathbf{R}\in\mathbb{C}^{n\times n}`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    a : [n_0, ..., n_k], tf.complex</span>
+<span class="sd">        A tensor of arbitrary rank whose elements</span>
+<span class="sd">        have an absolute value smaller than one.</span>
+
+<span class="sd">    n : int</span>
+<span class="sd">        Number of dimensions of the output correlation matrices.</span>
+
+<span class="sd">    dtype : tf.complex64, tf.complex128</span>
+<span class="sd">        The dtype of the output.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    R : [n_0, ..., n_k, n, n], tf.complex</span>
+<span class="sd">        A tensor of the same dtype as the input tensor :math:`\mathbf{a}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Cast to desired output dtype and expand last dimension for broadcasting</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Check that a is valid</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The absolute value of the elements of `a` must be smaller than one&quot;</span>
+    <span class="n">tf</span><span class="o">.</span><span class="n">debugging</span><span class="o">.</span><span class="n">assert_less</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Vector of exponents, adapt dtype and dimensions for broadcasting</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">exp</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># First column of R</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">exp</span><span class="p">)</span>
+
+    <span class="c1"># For a=0, one needs to remove the resulting nans due to 0**0=nan</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">is_nan</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">col</span><span class="p">),</span> <span class="n">col</span><span class="p">)</span>
+
+    <span class="c1"># First row of R (equal to complex-conjugate of the first column)</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+    <span class="c1"># Create Toeplitz operator</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinearOperatorToeplitz</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+
+    <span class="c1"># Generate dense tensor from operator</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">r</span></div>
+
+<div class="viewcode-block" id="one_ring_corr_mat"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.one_ring_corr_mat">[docs]</a><span class="k">def</span> <span class="nf">one_ring_corr_mat</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">,</span> <span class="n">num_ant</span><span class="p">,</span> <span class="n">d_h</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sigma_phi_deg</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+                      <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate covariance matrices from the one-ring model.</span>
+
+<span class="sd">    This function generates approximate covariance matrices for the</span>
+<span class="sd">    so-called `one-ring` model (Eq. 2.24) [BHS2017]_. A uniform</span>
+<span class="sd">    linear array (ULA) with uniform antenna spacing is assumed. The elements</span>
+<span class="sd">    of the covariance matrices are computed as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathbf{R}_{\ell,m} =</span>
+<span class="sd">              \exp\left( j2\pi d_\text{H} (\ell -m)\sin(\varphi) \right)</span>
+<span class="sd">              \exp\left( -\frac{\sigma_\varphi^2}{2}</span>
+<span class="sd">              \left( 2\pi d_\text{H}(\ell -m)\cos(\varphi) \right)^2 \right)</span>
+
+<span class="sd">    for :math:`\ell,m = 1,\dots, M`, where :math:`M` is the number of antennas,</span>
+<span class="sd">    :math:`\varphi` is the angle of arrival, :math:`d_\text{H}` is the antenna</span>
+<span class="sd">    spacing in multiples of the wavelength,</span>
+<span class="sd">    and :math:`\sigma^2_\varphi` is the angular standard deviation.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    phi_deg : [n_0, ..., n_k], tf.float</span>
+<span class="sd">        A tensor of arbitrary rank containing azimuth angles (deg) of arrival.</span>
+
+<span class="sd">    num_ant : int</span>
+<span class="sd">        Number of antennas</span>
+
+<span class="sd">    d_h : float</span>
+<span class="sd">        Antenna spacing in multiples of the wavelength. Defaults to 0.5.</span>
+
+<span class="sd">    sigma_phi_deg : float</span>
+<span class="sd">        Angular standard deviation (deg). Defaults to 15 (deg). Values greater</span>
+<span class="sd">        than 15 should not be used as the approximation becomes invalid.</span>
+
+<span class="sd">    dtype : tf.complex64, tf.complex128</span>
+<span class="sd">        The dtype of the output.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    R : [n_0, ..., n_k, num_ant, nun_ant], `dtype`</span>
+<span class="sd">        Tensor containing the covariance matrices of the desired dtype.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">sigma_phi_deg</span><span class="o">&gt;</span><span class="mi">15</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;sigma_phi_deg should be smaller than 15.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert all inputs to radians</span>
+    <span class="n">phi_deg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">sigma_phi_deg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">sigma_phi_deg</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">deg_2_rad</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">)</span>
+    <span class="n">sigma_phi</span> <span class="o">=</span> <span class="n">deg_2_rad</span><span class="p">(</span><span class="n">sigma_phi_deg</span><span class="p">)</span>
+
+    <span class="c1"># Add dimensions for broadcasting</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sigma_phi</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">sigma_phi</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Compute first column</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="o">*</span><span class="n">d_h</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_ant</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">),</span> <span class="n">d</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span>
+    <span class="n">exp_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># First exponential term</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">sigma_phi</span><span class="o">*</span><span class="n">d</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">exp_b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span> <span class="c1"># Second exponetial term</span>
+
+    <span class="n">col</span> <span class="o">=</span> <span class="n">exp_a</span><span class="o">*</span><span class="n">exp_b</span> <span class="c1"># First column</span>
+
+    <span class="c1"># First row is just the complex conjugate of first column</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+    <span class="c1"># Create Toeplitz operator</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinearOperatorToeplitz</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span>
+
+    <span class="c1"># Generate dense tensor from operator</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">r</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

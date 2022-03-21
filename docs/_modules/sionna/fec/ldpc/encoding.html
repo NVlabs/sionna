@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sionna.fec.ldpc.encoding &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/clipboard.min.js"></script>
+        <script src="../../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/sionna.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>sionna.fec.ldpc.encoding</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sionna.fec.ldpc.encoding</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Layers for LDPC channel encoding and utility functions.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">importlib_resources</span> <span class="kn">import</span> <span class="n">files</span><span class="p">,</span> <span class="n">as_file</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">codes</span> <span class="c1"># pylint: disable=relative-beyond-top-level</span>
+<span class="kn">import</span> <span class="nn">numbers</span> <span class="c1"># to check if n, k are numbers</span>
+
+
+<div class="viewcode-block" id="AllZeroEncoder"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.encoding.AllZeroEncoder">[docs]</a><span class="k">class</span> <span class="nc">AllZeroEncoder</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;AllZeroEncoder(k, n, dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    Dummy encoder that always outputs the all-zero codeword of length ``n``.</span>
+<span class="sd">    Note that this encoder is a dummy encoder and does NOT perform real</span>
+<span class="sd">    encoding!</span>
+
+<span class="sd">    The class inherits from the Keras layer class and can be used as layer in a</span>
+<span class="sd">    Keras model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        k: int</span>
+<span class="sd">            Defining the number of information bit per codeword.</span>
+
+<span class="sd">        n: int</span>
+<span class="sd">            Defining the desired codeword length.</span>
+
+<span class="sd">        dtype: tf.DType</span>
+<span class="sd">            Defaults to `tf.float32`. Defines the datatype for internal</span>
+<span class="sd">            calculations and the output dtype.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">        inputs: tf.float32</span>
+<span class="sd">            2+D tensor of shape `[...,k]`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">        : tf.float32</span>
+<span class="sd">            2+D tensor of shape `[...,n]`.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">        AssertionError</span>
+<span class="sd">            ``k`` and ``n`` must be positive integers and ``k`` must be smaller</span>
+<span class="sd">            (or equal) than ``n``.</span>
+
+<span class="sd">        AssertionError</span>
+<span class="sd">            If ``k`` is not `int`.</span>
+
+<span class="sd">        AssertionError</span>
+<span class="sd">            If ``n`` is not `int`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">        As the all-zero codeword is part of any linear code, it is often used</span>
+<span class="sd">        to simulate BER curves of arbitrary (LDPC) codes without the need of</span>
+<span class="sd">        having access to the actual generator matrix. However, this `&quot;all-zero</span>
+<span class="sd">        codeword trick&quot;` requires symmetric channels (such as BPSK), otherwise</span>
+<span class="sd">        scrambling is required (cf. [Pfister]_ for further details).</span>
+
+<span class="sd">        This encoder is a dummy encoder that is needed for some all-zero</span>
+<span class="sd">        codeword simulations independent of the input. It does NOT perform</span>
+<span class="sd">        real encoding although the information bits are taken as input.</span>
+<span class="sd">        This is just to ensure compatibility with other encoding layers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">k</span><span class="p">,</span>
+                 <span class="n">n</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1">#assert error if r&gt;1 or k,n are negativ</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">),</span> <span class="s2">&quot;k must be number.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">),</span> <span class="s2">&quot;n must be number.&quot;</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1"># k or n can be float (e.g. as result of n=k*r)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="c1"># k or n can be float (e.g. as result of n=k*r)</span>
+        <span class="k">assert</span> <span class="n">k</span><span class="o">&gt;-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;k cannot be negative.&quot;</span>
+        <span class="k">assert</span> <span class="n">n</span><span class="o">&gt;-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;n cannot be negative.&quot;</span>
+        <span class="k">assert</span> <span class="n">n</span><span class="o">&gt;=</span><span class="n">k</span><span class="p">,</span> <span class="s2">&quot;Invalid coderate (&gt;1).&quot;</span>
+        <span class="c1"># init encoder parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span>
+
+    <span class="c1">#########################################</span>
+    <span class="c1"># Public methods and properties</span>
+    <span class="c1">#########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of information bits per codeword.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Codeword length.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coderate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coderate of the LDPC code.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span>
+
+    <span class="c1">#########################</span>
+    <span class="c1"># Keras layer functions</span>
+    <span class="c1">#########################</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Nothing to build.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encoding function that outputs the all-zero codeword.</span>
+
+<span class="sd">        This function returns the all-zero codeword of shape `[..., n]`.</span>
+<span class="sd">        Note that this encoder is a dummy encoder and does NOT perform real</span>
+<span class="sd">        encoding!</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (tf.float32): Tensor of arbitrary shape.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `tf.float32`: Tensor of shape `[...,n]`.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This encoder is a dummy encoder that is needed for some all-zero</span>
+<span class="sd">            codeword simulations independent of the input. It does NOT perform</span>
+<span class="sd">            real encoding although the information bits are taken as input.</span>
+<span class="sd">            This is just to ensure compatibility with other encoding layers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># keep shape of first dimensions</span>
+        <span class="c1"># return an all-zero tensor of shape [..., n]</span>
+        <span class="n">output_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">inputs</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">])],</span>
+                                  <span class="mi">0</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">output_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c</span></div>
+
+<div class="viewcode-block" id="LDPC5GEncoder"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.encoding.LDPC5GEncoder">[docs]</a><span class="k">class</span> <span class="nc">LDPC5GEncoder</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sd">&quot;&quot;&quot;LDPC5GEncoder(k, n, dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    5G NR LDPC Encoder following the 3GPP NR Initiative [3GPPTS38212_LDPC]_</span>
+<span class="sd">    including rate-matching.</span>
+
+<span class="sd">    The class inherits from the Keras layer class and can be used as layer in a</span>
+<span class="sd">    Keras model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        k: int</span>
+<span class="sd">            Defining the number of information bit per codeword.</span>
+
+<span class="sd">        n: int</span>
+<span class="sd">            Defining the desired codeword length.</span>
+
+<span class="sd">        dtype: tf.DType</span>
+<span class="sd">            Defaults to `tf.float32`. Defines the output datatype of the layer</span>
+<span class="sd">            (internal precision remains `tf.uint8`).</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">        inputs: tf.float32</span>
+<span class="sd">            2+D tensor of shape `[...,k]` containing the information bits to be</span>
+<span class="sd">            encoded.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">        : tf.float32</span>
+<span class="sd">            2+D tensor of same shape as inputs besides last dimension has</span>
+<span class="sd">            changed to `[...,n]` containing the encoded codeword bits.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">        k: int</span>
+<span class="sd">            Defining the number of information bit per codeword.</span>
+
+<span class="sd">        n: int</span>
+<span class="sd">            Defining the desired codeword length.</span>
+
+<span class="sd">        coderate: float</span>
+<span class="sd">            Defining the coderate r= ``k`` / ``n``.</span>
+
+<span class="sd">        n_ldpc: int</span>
+<span class="sd">            An integer defining the total codeword length (before</span>
+<span class="sd">            punturing) of the lifted parity-check matrix.</span>
+
+<span class="sd">        k_ldpc: int</span>
+<span class="sd">            An integer defining the total information bit length</span>
+<span class="sd">            (before zero removal) of the lifted parity-check matrix. Gap to</span>
+<span class="sd">            ``k`` must be filled with so-called filler bits.</span>
+
+<span class="sd">        _check_input: bool</span>
+<span class="sd">            A boolean that indicates whether the input vector</span>
+<span class="sd">            during call of the layer should be checked for consistency (i.e.,</span>
+<span class="sd">            binary).</span>
+
+<span class="sd">        _bg: str</span>
+<span class="sd">            Denoting the selected basegraph (either `bg1` or `bg2`).</span>
+
+<span class="sd">        _z: int</span>
+<span class="sd">            Denoting the lifting factor.</span>
+
+<span class="sd">        _i_ls: int</span>
+<span class="sd">            Defining which version of the basegraph to load.</span>
+<span class="sd">            Can take values between 0 and 7.</span>
+
+<span class="sd">        _k_b: int</span>
+<span class="sd">            Defining the number of `information bit columns` in the</span>
+<span class="sd">            basegraph. Determined by the code design procedure in</span>
+<span class="sd">            [3GPPTS38212_LDPC]_.</span>
+
+<span class="sd">        _bm: ndarray</span>
+<span class="sd">            An ndarray defining the basegraph.</span>
+
+<span class="sd">        _pcm: sp.sparse.csr_matrix</span>
+<span class="sd">            A sparse matrix of shape `[k_ldpc-n_ldpc, n_ldpc]`</span>
+<span class="sd">            containing the sparse parity-check matrix.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">        AssertionError</span>
+<span class="sd">            If ``k`` is not `int`.</span>
+
+<span class="sd">        AssertionError</span>
+<span class="sd">            If ``n`` is not `int`.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``code_length`` is not supported.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If `dtype` is not supported.</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``inputs`` contains other values than `0` or `1`.</span>
+
+<span class="sd">        InvalidArgumentError</span>
+<span class="sd">            When rank(``inputs``)&lt;2.</span>
+
+<span class="sd">        InvalidArgumentError</span>
+<span class="sd">            When shape of last dim is not ``k``.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">        As specified in [3GPPTS38212_LDPC]_, the encoder also performs</span>
+<span class="sd">        puncturing and shortening. Thus, the corresponding decoder needs to</span>
+<span class="sd">        `invert` these operations, i.e., must be compatible with the 5G</span>
+<span class="sd">        encoding scheme.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">k</span><span class="p">,</span>
+                 <span class="n">n</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">),</span> <span class="s2">&quot;k must be number.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">),</span> <span class="s2">&quot;n must be number.&quot;</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="c1"># k or n can be float (e.g. as result of n=k*r)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="c1"># k or n can be float (e.g. as result of n=k*r)</span>
+
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Note: decoder uses tf.float32 for internal calculations.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint32</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported dtype.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+
+        <span class="k">if</span> <span class="n">k</span><span class="o">&gt;</span><span class="mi">8448</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported code length (k too large).&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">&lt;</span><span class="mi">12</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported code length (k too small).&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">316</span><span class="o">*</span><span class="mi">384</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported code length (n too large).&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported code length (n negative).&quot;</span><span class="p">)</span>
+
+        <span class="c1"># init encoder parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span> <span class="o">=</span> <span class="n">k</span> <span class="c1"># number of input bits (= input shape)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="n">n</span> <span class="c1"># the desired length (= output shape)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># check input for consistency (i.e., binary)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">11</span><span class="o">/</span><span class="mi">12</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Unsupported coderate (r&gt;11/12); n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, k=</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span><span class="o">&lt;</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">5</span><span class="p">):</span>
+            <span class="c1"># outer rep. coding currently not supported</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported coderate (r&lt;1/5).&quot;</span><span class="p">)</span>
+
+        <span class="c1"># construct the basegraph according to 38.212</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_i_ls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_lifting</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_i_ls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bg</span><span class="p">)</span>
+
+        <span class="c1"># total number of codeword bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_ldpc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+        <span class="c1"># if K_real &lt; K _target puncturing must be applied earlier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k_ldpc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_b</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+
+        <span class="c1"># construct explicit graph via lifting</span>
+        <span class="n">pcm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lift_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">)</span>
+
+        <span class="n">pcm_a</span><span class="p">,</span> <span class="n">pcm_b_inv</span><span class="p">,</span> <span class="n">pcm_c1</span><span class="p">,</span> <span class="n">pcm_c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gen_submat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bm</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">_k_b</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">,</span>
+                                                            <span class="bp">self</span><span class="o">.</span><span class="n">_bg</span><span class="p">)</span>
+
+        <span class="c1"># init sub-matrices for fast encoding (&quot;RU&quot;-method)</span>
+        <span class="c1"># note: dtype is tf.float32;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pcm</span> <span class="o">=</span> <span class="n">pcm</span> <span class="c1"># store the sparse parity-check matrix (for decoding)</span>
+
+        <span class="c1"># store indices for fast gathering (instead of explicit matmul)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pcm_a_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mat_to_ind</span><span class="p">(</span><span class="n">pcm_a</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pcm_b_inv_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mat_to_ind</span><span class="p">(</span><span class="n">pcm_b_inv</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pcm_c1_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mat_to_ind</span><span class="p">(</span><span class="n">pcm_c1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pcm_c2_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mat_to_ind</span><span class="p">(</span><span class="n">pcm_c2</span><span class="p">)</span>
+
+    <span class="c1">#########################################</span>
+    <span class="c1"># Public methods and properties</span>
+    <span class="c1">#########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of input information bits.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Number of output codeword bits.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coderate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coderate of the LDPC code after rate-matching.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k_ldpc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of LDPC information bits after rate-matching.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_ldpc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_ldpc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of LDPC codeword bits before rate-matching.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ldpc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pcm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parity-check matrix for given code parameters.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pcm</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lifting factor of the basegraph.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+
+    <span class="c1">#########################</span>
+    <span class="c1"># Utility methods</span>
+    <span class="c1">#########################</span>
+
+    <span class="k">def</span> <span class="nf">_sel_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select basegraph according to [3GPPTS38212_LDPC]_.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">292</span><span class="p">:</span>
+            <span class="n">bg</span> <span class="o">=</span> <span class="s2">&quot;bg2&quot;</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">3824</span> <span class="ow">and</span> <span class="n">r</span> <span class="o">&lt;=</span> <span class="mf">0.67</span><span class="p">:</span>
+            <span class="n">bg</span> <span class="o">=</span> <span class="s2">&quot;bg2&quot;</span>
+        <span class="k">elif</span> <span class="n">r</span> <span class="o">&lt;=</span> <span class="mf">0.25</span><span class="p">:</span>
+            <span class="n">bg</span> <span class="o">=</span> <span class="s2">&quot;bg2&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bg</span> <span class="o">=</span> <span class="s2">&quot;bg1&quot;</span>
+
+        <span class="c1"># add for consistency</span>
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg1&quot;</span> <span class="ow">and</span> <span class="n">k</span><span class="o">&gt;</span><span class="mi">8448</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;K is not supported by BG1 (too large).&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg2&quot;</span> <span class="ow">and</span> <span class="n">k</span><span class="o">&gt;</span><span class="mi">3840</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;K is not supported by BG2 (too large) k =</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg1&quot;</span> <span class="ow">and</span> <span class="n">r</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only coderate&gt;1/3 supported for BG1. </span><span class="se">\</span>
+<span class="s2">            Remark: Repetition coding is currently not supported.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg2&quot;</span> <span class="ow">and</span> <span class="n">r</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">/</span><span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only coderate&gt;1/5 supported for BG2. </span><span class="se">\</span>
+<span class="s2">            Remark: Repetition coding is currently not supported.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">bg</span>
+
+    <span class="k">def</span> <span class="nf">_load_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_ls</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to load basegraph from csv files.</span>
+
+<span class="sd">        ``i_ls`` is sub_index of the basegraph and fixed during lifting</span>
+<span class="sd">        selection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">i_ls</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;i_ls too large.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">i_ls</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;i_ls cannot be negative.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># csv files are taken from 38.212 and dimension is explicitly given</span>
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg1&quot;</span><span class="p">:</span>
+            <span class="n">bm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">46</span><span class="p">,</span> <span class="mi">68</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># init matrix with -1 (None positions)</span>
+        <span class="k">elif</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg2&quot;</span><span class="p">:</span>
+            <span class="n">bm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">42</span><span class="p">,</span> <span class="mi">52</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># init matrix with -1 (None positions)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Basegraph not supported.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># and load the basegraph from csv format in folder &quot;codes&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;5G_</span><span class="si">{</span><span class="n">bg</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">as_file</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">as</span> <span class="n">codes</span><span class="o">.</span><span class="n">csv</span><span class="p">:</span>
+            <span class="n">bg_csv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">codes</span><span class="o">.</span><span class="n">csv</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># reconstruct BG for given i_ls</span>
+        <span class="n">r_ind</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">bg_csv</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="c1"># check for next row index</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">bg_csv</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="mi">0</span><span class="p">]):</span>
+                <span class="n">r_ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bg_csv</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">c_ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bg_csv</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="c1"># second column in csv is column index</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">bg_csv</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">i_ls</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span> <span class="c1"># i_ls entries start at offset 2</span>
+            <span class="n">bm</span><span class="p">[</span><span class="n">r_ind</span><span class="p">,</span> <span class="n">c_ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">bm</span>
+
+    <span class="k">def</span> <span class="nf">_lift_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bm</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Lift basegraph with lifting factor ``z`` and shifted identities as</span>
+<span class="sd">        defined by the entries of ``bm``.&quot;&quot;&quot;</span>
+
+        <span class="n">num_nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">bm</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># num of non-neg elements in bm</span>
+
+        <span class="c1"># init all non-zero row/column indices</span>
+        <span class="n">r_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">z</span><span class="o">*</span><span class="n">num_nonzero</span><span class="p">)</span>
+        <span class="n">c_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">z</span><span class="o">*</span><span class="n">num_nonzero</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">z</span><span class="o">*</span><span class="n">num_nonzero</span><span class="p">)</span>
+
+        <span class="c1"># row/column indices of identity matrix for lifting</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">bm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">bm</span><span class="p">[</span><span class="n">r</span><span class="p">,</span><span class="n">c</span><span class="p">]</span><span class="o">==-</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># -1 is used as all-zero matrix placeholder</span>
+                    <span class="k">pass</span> <span class="c1">#do nothing (sparse)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># roll matrix by bm[r,c]</span>
+                    <span class="n">c_roll</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">im</span><span class="o">+</span><span class="n">bm</span><span class="p">[</span><span class="n">r</span><span class="p">,</span><span class="n">c</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span>
+                    <span class="c1"># append rolled identity matrix to pcm</span>
+                    <span class="n">r_idx</span><span class="p">[</span><span class="n">idx</span><span class="o">*</span><span class="n">z</span><span class="p">:(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">im</span>
+                    <span class="n">c_idx</span><span class="p">[</span><span class="n">idx</span><span class="o">*</span><span class="n">z</span><span class="p">:(</span><span class="n">idx</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">z</span> <span class="o">+</span> <span class="n">c_roll</span>
+                    <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># generate lifted sparse matrix from incides</span>
+        <span class="n">pcm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">data</span><span class="p">,(</span><span class="n">r_idx</span><span class="p">,</span> <span class="n">c_idx</span><span class="p">)),</span>
+                                   <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">z</span><span class="o">*</span><span class="n">bm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">z</span><span class="o">*</span><span class="n">bm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">pcm</span>
+
+    <span class="k">def</span> <span class="nf">_sel_lifting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select lifting as defined in Sec. 5.2.2 in [3GPPTS38212_LDPC]_.</span>
+
+<span class="sd">        We assume B &lt; K_cb, thus B&#39;= B and C = 1, i.e., no</span>
+<span class="sd">        additional CRC is appended. Thus, K&#39; = B&#39;/C = B and B is our K.</span>
+
+<span class="sd">        Z is the lifting factor.</span>
+<span class="sd">        i_ls is the set index ranging from 0...7 (specifying the exact bg</span>
+<span class="sd">        selection).</span>
+<span class="sd">        k_b is the number of information bit columns in the basegraph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># lifting set according to 38.212 Tab 5.3.2-1</span>
+        <span class="n">s_val</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">96</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">384</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">160</span><span class="p">,</span> <span class="mi">320</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">112</span><span class="p">,</span> <span class="mi">224</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">144</span><span class="p">,</span> <span class="mi">288</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">44</span><span class="p">,</span> <span class="mi">88</span><span class="p">,</span> <span class="mi">176</span><span class="p">,</span> <span class="mi">352</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span> <span class="mi">208</span><span class="p">],</span>
+                <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">240</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="n">bg</span> <span class="o">==</span> <span class="s2">&quot;bg1&quot;</span><span class="p">:</span>
+            <span class="n">k_b</span> <span class="o">=</span> <span class="mi">22</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">640</span><span class="p">:</span>
+                <span class="n">k_b</span> <span class="o">=</span> <span class="mi">10</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">560</span><span class="p">:</span>
+                <span class="n">k_b</span> <span class="o">=</span> <span class="mi">9</span>
+            <span class="k">elif</span> <span class="n">k</span> <span class="o">&gt;</span> <span class="mi">192</span><span class="p">:</span>
+                <span class="n">k_b</span> <span class="o">=</span> <span class="mi">8</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_b</span> <span class="o">=</span> <span class="mi">6</span>
+
+        <span class="c1"># find the min of Z from Tab. 5.3.2-1 s.t. k_b*Z&gt;=K&#39;</span>
+        <span class="n">min_val</span> <span class="o">=</span> <span class="mi">100000</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">i_ls</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">s_val</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">s1</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">k_b</span> <span class="o">*</span><span class="n">s1</span>
+                <span class="k">if</span>  <span class="n">x</span> <span class="o">&gt;=</span> <span class="n">k</span><span class="p">:</span>
+                    <span class="c1"># valid solution</span>
+                    <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">min_val</span><span class="p">:</span>
+                        <span class="n">min_val</span> <span class="o">=</span> <span class="n">x</span>
+                        <span class="n">z</span> <span class="o">=</span> <span class="n">s1</span>
+                        <span class="n">i_ls</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="c1"># and set K=22*Z for bg1 and K=10Z for bg2</span>
+        <span class="k">if</span> <span class="n">bg</span> <span class="o">==</span> <span class="s2">&quot;bg1&quot;</span><span class="p">:</span>
+            <span class="n">k_b</span> <span class="o">=</span> <span class="mi">22</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_b</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">i_ls</span><span class="p">,</span> <span class="n">k_b</span>
+
+    <span class="k">def</span> <span class="nf">_gen_submat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bm</span><span class="p">,</span> <span class="n">k_b</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Split the basegraph into multiple sub-matrices such that efficient</span>
+<span class="sd">        encoding is possible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># code property (always fixed for 5G)</span>
+        <span class="n">mb</span> <span class="o">=</span> <span class="n">bm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># number of CN rows in basegraph (BG property)</span>
+
+        <span class="n">bm_a</span> <span class="o">=</span> <span class="n">bm</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">k_b</span><span class="p">]</span>
+        <span class="n">bm_b</span> <span class="o">=</span> <span class="n">bm</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">g</span><span class="p">,</span> <span class="n">k_b</span><span class="p">:(</span><span class="n">k_b</span><span class="o">+</span><span class="n">g</span><span class="p">)]</span>
+        <span class="n">bm_c1</span> <span class="o">=</span> <span class="n">bm</span><span class="p">[</span><span class="n">g</span><span class="p">:</span><span class="n">mb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">k_b</span><span class="p">]</span>
+        <span class="n">bm_c2</span> <span class="o">=</span> <span class="n">bm</span><span class="p">[</span><span class="n">g</span><span class="p">:</span><span class="n">mb</span><span class="p">,</span> <span class="n">k_b</span><span class="p">:(</span><span class="n">k_b</span><span class="o">+</span><span class="n">g</span><span class="p">)]</span>
+
+        <span class="c1"># H could be sliced immediately (but easier to implement if based on B)</span>
+        <span class="n">hm_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lift_basegraph</span><span class="p">(</span><span class="n">bm_a</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="c1"># not required for encoding, but helpful for debugging</span>
+        <span class="c1">#hm_b = self._lift_basegraph(bm_b, z)</span>
+
+        <span class="n">hm_c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lift_basegraph</span><span class="p">(</span><span class="n">bm_c1</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+        <span class="n">hm_c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lift_basegraph</span><span class="p">(</span><span class="n">bm_c2</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="n">hm_b_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_hm_b_inv</span><span class="p">(</span><span class="n">bm_b</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">bg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">hm_a</span><span class="p">,</span> <span class="n">hm_b_inv</span><span class="p">,</span> <span class="n">hm_c1</span><span class="p">,</span> <span class="n">hm_c2</span>
+
+    <span class="k">def</span> <span class="nf">_find_hm_b_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bm_b</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; For encoding we need to find the inverse of `hm_b` such that</span>
+<span class="sd">        `hm_b^-1 * hm_b = I`.</span>
+
+<span class="sd">        Could be done sparse</span>
+<span class="sd">        For BG1 the structure of hm_b is given as (for all values of i_ls)</span>
+<span class="sd">        hm_b =</span>
+<span class="sd">        [P_A I 0 0</span>
+<span class="sd">         P_B I I 0</span>
+<span class="sd">         0 0 I I</span>
+<span class="sd">         P_A 0 0 I]</span>
+<span class="sd">        where P_B and P_A are Shifted identities.</span>
+
+<span class="sd">        The inverse can be found by solving a linear system of equations</span>
+<span class="sd">        hm_b_inv =</span>
+<span class="sd">        [P_B^-1, P_B^-1, P_B^-1, P_B^-1,</span>
+<span class="sd">         I + P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1,</span>
+<span class="sd">         P_A*P_B^-1, P_A*P_B^-1, I+P_A*P_B^-1, I+P_A*P_B^-1,</span>
+<span class="sd">         P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1, I+P_A*P_B^-1].</span>
+
+
+<span class="sd">        For bg2 the structure of hm_b is given as (for all values of i_ls)</span>
+<span class="sd">        hm_b =</span>
+<span class="sd">        [P_A I 0 0</span>
+<span class="sd">         0 I I 0</span>
+<span class="sd">         P_B 0 I I</span>
+<span class="sd">         P_A 0 0 I]</span>
+<span class="sd">        where P_B and P_A are Shifted identities</span>
+
+<span class="sd">        The inverse can be found by solving a linear system of equations</span>
+<span class="sd">        hm_b_inv =</span>
+<span class="sd">        [P_B^-1, P_B^-1, P_B^-1, P_B^-1,</span>
+<span class="sd">         I + P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1,</span>
+<span class="sd">         I+P_A*P_B^-1, I+P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1,</span>
+<span class="sd">         P_A*P_B^-1, P_A*P_B^-1, P_A*P_B^-1, I+P_A*P_B^-1]</span>
+
+<span class="sd">        Note: the inverse of B is simply a shifted identity matrix with</span>
+<span class="sd">        negative shift direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># permutation indices</span>
+        <span class="n">pm_a</span><span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bm_b</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg1&quot;</span><span class="p">:</span>
+            <span class="n">pm_b_inv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="n">bm_b</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># structure of B is slightly different for bg2</span>
+            <span class="n">pm_b_inv</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="o">-</span><span class="n">bm_b</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">hm_b_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">])</span>
+
+        <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="n">am</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">pm_a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">b_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">pm_b_inv</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ab_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">am</span><span class="p">,</span> <span class="n">b_inv</span><span class="p">)</span>
+
+        <span class="c1"># row 0</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">b_inv</span>
+
+        <span class="c1"># row 1</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">im</span> <span class="o">+</span> <span class="n">ab_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+
+        <span class="c1"># row 2</span>
+        <span class="k">if</span> <span class="n">bg</span><span class="o">==</span><span class="s2">&quot;bg1&quot;</span><span class="p">:</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">im</span> <span class="o">+</span> <span class="n">ab_inv</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">im</span> <span class="o">+</span> <span class="n">ab_inv</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># for bg2 the structure is slightly different</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">im</span> <span class="o">+</span> <span class="n">ab_inv</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">im</span> <span class="o">+</span> <span class="n">ab_inv</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+            <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+
+        <span class="c1"># row 3</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">ab_inv</span>
+        <span class="n">hm_b_inv</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">z</span><span class="p">:</span><span class="mi">4</span><span class="o">*</span><span class="n">z</span><span class="p">]</span> <span class="o">=</span> <span class="n">im</span> <span class="o">+</span> <span class="n">ab_inv</span>
+
+        <span class="c1"># return results as sparse matrix</span>
+        <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">hm_b_inv</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_mat_to_ind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Helper to transform matrix into index representation for</span>
+<span class="sd">        tf.gather. An index pointing to the `last_ind+1` is used for non-existing edges due to irregular degrees.&quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># transpose mat for sorted column format</span>
+        <span class="n">c_idx</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+
+        <span class="c1"># find max number of no-zero entries</span>
+        <span class="n">n_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># init index array with n (pointer to last_ind+1, will be a default</span>
+        <span class="c1"># value)</span>
+        <span class="n">gat_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">m</span><span class="p">,</span> <span class="n">n_max</span><span class="p">])</span> <span class="o">+</span> <span class="n">n</span>
+
+        <span class="n">r_val</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">c_val</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c_idx</span><span class="p">)):</span>
+            <span class="c1"># check if same row or if a new row starts</span>
+            <span class="k">if</span> <span class="n">r_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">!=</span> <span class="n">r_val</span><span class="p">:</span>
+                <span class="n">r_val</span> <span class="o">=</span> <span class="n">r_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="n">c_val</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">gat_idx</span><span class="p">[</span><span class="n">r_val</span><span class="p">,</span> <span class="n">c_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="n">c_val</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">gat_idx</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">gat_idx</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">gat_idx</span>
+
+    <span class="k">def</span> <span class="nf">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implements a fast sparse matmul via gather function.&quot;&quot;&quot;</span>
+
+        <span class="c1"># add 0 entry for gather-reduce_sum operation</span>
+        <span class="c1"># (otherwise ragged Tensors are required)</span>
+        <span class="n">bs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">vec</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">vec</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">bs</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)],</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">retval</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">_encode_fast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Main encoding function based on gathering function.&quot;&quot;&quot;</span>
+        <span class="n">p_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcm_a_ind</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">p_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcm_b_inv_ind</span><span class="p">,</span> <span class="n">p_a</span><span class="p">)</span>
+
+        <span class="c1"># calc second part of parity bits p_b</span>
+        <span class="c1"># second parities are given by C_1*s&#39; + C_2*p_a&#39; + p_b&#39; = 0</span>
+        <span class="n">p_b_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcm_c1_ind</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">p_b_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcm_c2_ind</span><span class="p">,</span> <span class="n">p_a</span><span class="p">)</span>
+        <span class="n">p_b</span> <span class="o">=</span> <span class="n">p_b_1</span> <span class="o">+</span> <span class="n">p_b_2</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">s</span><span class="p">,</span> <span class="n">p_a</span><span class="p">,</span> <span class="n">p_b</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># faster implementation of mod-2 operation c = tf.math.mod(c, 2)</span>
+        <span class="n">c_uint8</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">c_bin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">bitwise</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">c_uint8</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">c_bin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># returns nx1 vector</span>
+        <span class="k">return</span> <span class="n">c</span>
+
+    <span class="c1">#########################</span>
+    <span class="c1"># Keras layer functions</span>
+    <span class="c1">#########################</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;&quot;Build layer.&quot;&quot;&quot;</span>
+        <span class="c1"># check if k and input shape match</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">),</span> <span class="s2">&quot;Last dimension must be of length k.&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;Rank of input must be at least 2.&quot;</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;5G LDPC encoding function including rate-matching.</span>
+
+<span class="sd">        This function returns the encoded codewords as specified by the 3GPP NR Initiative [3GPPTS38212_LDPC]_ including puncturing and shortening.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (tf.float32): Tensor of shape `[...,k]` containing the</span>
+<span class="sd">                information bits to be encoded.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            `tf.float32`: Tensor of shape `[...,n]`.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If ``inputs`` contains other values than `0` or `1`.</span>
+
+<span class="sd">            InvalidArgumentError: When rank(``inputs``)&lt;2.</span>
+
+<span class="sd">            InvalidArgumentError: When shape of last dim is not ``k``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">tf</span><span class="o">.</span><span class="n">debugging</span><span class="o">.</span><span class="n">assert_type</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="s2">&quot;Invalid input dtype.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Reshape inputs to [...,k]</span>
+        <span class="n">input_shape</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()</span><span class="o">.</span><span class="n">as_list</span><span class="p">()</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+
+        <span class="c1"># assert if u is non binary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span><span class="p">:</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">debugging</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)),</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)),</span>
+                            <span class="p">),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)),</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
+                <span class="s2">&quot;Input must be binary.&quot;</span><span class="p">)</span>
+            <span class="c1"># input datatype consistency should be only evaluated once</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_input</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">u</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># add &quot;filler&quot; bits to last positions to match info bit length k_ldpc</span>
+        <span class="n">u_fill</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">u</span><span class="p">,</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_ldpc</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)],</span>
+                            <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># use optimized encoding based on tf.gather</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_fast</span><span class="p">(</span><span class="n">u_fill</span><span class="p">)</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ldpc</span><span class="p">])</span> <span class="c1"># remove last dim</span>
+
+        <span class="c1"># remove filler bits at pos (k, k_ldpc)</span>
+        <span class="n">c_no_filler1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">])</span>
+        <span class="n">c_no_filler2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">c</span><span class="p">,</span>
+                               <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_ldpc</span><span class="p">],</span>
+                               <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ldpc</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_k_ldpc</span><span class="p">])</span>
+
+        <span class="n">c_no_filler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">c_no_filler1</span><span class="p">,</span> <span class="n">c_no_filler2</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># shorten the first 2*Z positions and end after n bits</span>
+        <span class="c1"># (remaining parity bits can be used for IR-HARQ)</span>
+        <span class="n">c_short</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">slice</span><span class="p">(</span><span class="n">c_no_filler</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_z</span><span class="p">],</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">])</span>
+        <span class="c1"># incremental redundancy could be generated by accessing the last bits</span>
+
+        <span class="c1"># Reshape c_short so that it matches the original input dimensions</span>
+        <span class="n">output_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
+        <span class="n">output_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">c_reshaped</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">c_short</span><span class="p">,</span> <span class="n">output_shape</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">c_reshaped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

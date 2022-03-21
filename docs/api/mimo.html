@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple-Input Multiple-Output (MIMO) &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Utility Functions" href="utils.html" />
+    <link rel="prev" title="Orthogonal Frequency-Division Multiplexing (OFDM)" href="ofdm.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="sionna.html">API Documentation</a> &raquo;</li>
+      <li>Multiple-Input Multiple-Output (MIMO)</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="multiple-input-multiple-output-mimo">
+<h1>Multiple-Input Multiple-Output (MIMO)<a class="headerlink" href="#multiple-input-multiple-output-mimo" title="Permalink to this headline"></a></h1>
+<p>This module provides layers and functions to support simulation of multicell
+MIMO transmissions.</p>
+<div class="section" id="stream-management">
+<h2>Stream Management<a class="headerlink" href="#stream-management" title="Permalink to this headline"></a></h2>
+<p>Stream management determines which transmitter is sending which stream to
+which receiver. Transmitters and receivers can be user terminals or base
+stations, depending on whether uplink or downlink transmissions are considered.
+The <a class="reference internal" href="#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a> class has various properties that
+are needed to recover desired or interfering channel coefficients for precoding
+and equalization. In order to understand how the various properties of
+<a class="reference internal" href="#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a> can be used, we recommend to have a look
+at the source code of the <a class="reference internal" href="ofdm.html#sionna.ofdm.LMMSEEqualizer" title="sionna.ofdm.LMMSEEqualizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LMMSEEqualizer</span></code></a> or
+<a class="reference internal" href="ofdm.html#sionna.ofdm.ZFPrecoder" title="sionna.ofdm.ZFPrecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">ZFPrecoder</span></code></a>.</p>
+<p>The following code snippet shows how to configure
+<a class="reference internal" href="#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a> for a simple uplink scenario, where
+four transmitters send each one stream to a receiver. Note that
+<a class="reference internal" href="#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a> is independent of the actual number of
+antennas at the transmitters and receivers.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">num_tx</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">num_rx</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">num_streams_per_tx</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Indicate which transmitter is associated with which receiver</span>
+<span class="c1"># rx_tx_association[i,j] = 1 means that transmitter j sends one</span>
+<span class="c1"># or mutiple streams to receiver i.</span>
+<span class="n">rx_tx_association</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_rx</span><span class="p">,</span> <span class="n">num_tx</span><span class="p">])</span>
+<span class="n">rx_tx_association</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">rx_tx_association</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">rx_tx_association</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">rx_tx_association</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">sm</span> <span class="o">=</span> <span class="n">StreamManagement</span><span class="p">(</span><span class="n">rx_tx_association</span><span class="p">,</span> <span class="n">num_streams_per_tx</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mimo.</span></span><span class="sig-name descname"><span class="pre">StreamManagement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rx_tx_association</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_streams_per_tx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mimo/stream_management.html#StreamManagement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mimo.StreamManagement" title="Permalink to this definition"></a></dt>
+<dd><p>Class for management of streams in multi-cell MIMO networks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rx_tx_association</strong> (<em>[</em><em>num_rx</em><em>, </em><em>num_tx</em><em>]</em><em>, </em><em>np.int</em>) – A binary NumPy array where <code class="docutils literal notranslate"><span class="pre">rx_tx_association[i,j]=1</span></code> means
+that receiver <cite>i</cite> gets one ore multiple streams from
+transmitter <cite>j</cite>.</p></li>
+<li><p><strong>num_streams_per_tx</strong> (<em>int</em>) – Indicates the number of streams that are transmitted by each
+transmitter.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Several symmetry constraints on <code class="docutils literal notranslate"><span class="pre">rx_tx_association</span></code> are imposed
+to ensure efficient processing. All row sums and all column sums
+must be equal, i.e., all receivers have the same number of associated
+transmitters and all transmitters have the same number of associated
+receivers. It is also assumed that all transmitters send the same
+number of streams <code class="docutils literal notranslate"><span class="pre">num_streams_per_tx</span></code>.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.detection_desired_ind">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">detection_desired_ind</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.detection_desired_ind" title="Permalink to this definition"></a></dt>
+<dd><p>Indices needed to gather desired channels for receive processing.</p>
+<p>A NumPy array of shape <cite>[num_rx*num_streams_per_rx]</cite> that
+can be used to gather desired channels from the flattened
+channel tensor of shape
+<cite>[…,num_rx, num_tx, num_streams_per_tx,…]</cite>.
+The result of the gather operation can be reshaped to
+<cite>[…,num_rx, num_streams_per_rx,…]</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.detection_undesired_ind">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">detection_undesired_ind</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.detection_undesired_ind" title="Permalink to this definition"></a></dt>
+<dd><p>Indices needed to gather undesired channels for receive processing.</p>
+<p>A NumPy array of shape <cite>[num_rx*num_streams_per_rx]</cite> that
+can be used to gather undesired channels from the flattened
+channel tensor of shape <cite>[…,num_rx, num_tx, num_streams_per_tx,…]</cite>.
+The result of the gather operation can be reshaped to
+<cite>[…,num_rx, num_interfering_streams_per_rx,…]</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_interfering_streams_per_rx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_interfering_streams_per_rx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_interfering_streams_per_rx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of interfering streams received at each eceiver.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_rx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_rx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_rx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of receivers.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_rx_per_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_rx_per_tx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_rx_per_tx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of receivers communicating with a transmitter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_streams_per_rx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_streams_per_rx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_streams_per_rx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of streams transmitted to each receiver.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_streams_per_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_streams_per_tx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_streams_per_tx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of streams per transmitter.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_tx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_tx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_tx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of transmitters.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.num_tx_per_rx">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_tx_per_rx</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.num_tx_per_rx" title="Permalink to this definition"></a></dt>
+<dd><p>Number of transmitters communicating with a receiver.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.precoding_ind">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">precoding_ind</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.precoding_ind" title="Permalink to this definition"></a></dt>
+<dd><p>Indices needed to gather channels for precoding.</p>
+<p>A NumPy array of shape <cite>[num_tx, num_rx_per_tx]</cite>,
+where <code class="docutils literal notranslate"><span class="pre">precoding_ind[i,:]</span></code> contains the indices of the
+receivers to which transmitter <cite>i</cite> is sending streams.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.rx_stream_ids">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">rx_stream_ids</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.rx_stream_ids" title="Permalink to this definition"></a></dt>
+<dd><p>Mapping of streams to receivers.</p>
+<p>A Numpy array of shape <cite>[num_rx, num_streams_per_rx]</cite>.
+This array is obtained from <code class="docutils literal notranslate"><span class="pre">tx_stream_ids</span></code> together with
+the <code class="docutils literal notranslate"><span class="pre">rx_tx_association</span></code>. <code class="docutils literal notranslate"><span class="pre">rx_stream_ids[i,:]</span></code> contains
+the indices of streams that are supposed to be decoded by receiver <cite>i</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.rx_tx_association">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">rx_tx_association</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.rx_tx_association" title="Permalink to this definition"></a></dt>
+<dd><p>Association between receivers and transmitters.</p>
+<p>A binary NumPy array of shape <cite>[num_rx, num_tx]</cite>,
+where <code class="docutils literal notranslate"><span class="pre">rx_tx_association[i,j]=1</span></code> means that receiver <cite>i</cite>
+gets one ore multiple streams from transmitter <cite>j</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.stream_association">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">stream_association</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.stream_association" title="Permalink to this definition"></a></dt>
+<dd><p>Association between receivers, transmitters, and streams.</p>
+<p>A binary NumPy array of shape
+<cite>[num_rx, num_tx, num_streams_per_tx]</cite>, where
+<code class="docutils literal notranslate"><span class="pre">stream_association[i,j,k]=1</span></code> means that receiver <cite>i</cite> gets
+the <cite>k</cite> th stream from transmitter <cite>j</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.stream_ind">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">stream_ind</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.stream_ind" title="Permalink to this definition"></a></dt>
+<dd><p>Indices needed to gather received streams in the correct order.</p>
+<p>A NumPy array of shape <cite>[num_rx*num_streams_per_rx]</cite> that can be
+used to gather streams from the flattened tensor of received streams
+of shape <cite>[…,num_rx, num_streams_per_rx,…]</cite>. The result of the
+gather operation is then reshaped to
+<cite>[…,num_tx, num_streams_per_tx,…]</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mimo.StreamManagement.tx_stream_ids">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tx_stream_ids</span></span><a class="headerlink" href="#sionna.mimo.StreamManagement.tx_stream_ids" title="Permalink to this definition"></a></dt>
+<dd><p>Mapping of streams to transmitters.</p>
+<p>A NumPy array of shape <cite>[num_tx, num_streams_per_tx]</cite>.
+Streams are numbered from 0,1,… and assiged to transmitters in
+increasing order, i.e., transmitter 0 gets the first
+<cite>num_streams_per_tx</cite> and so on.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="precoding">
+<h2>Precoding<a class="headerlink" href="#precoding" title="Permalink to this headline"></a></h2>
+<div class="section" id="zero-forcing-precoder">
+<h3>zero_forcing_precoder<a class="headerlink" href="#zero-forcing-precoder" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.mimo.zero_forcing_precoder">
+<span class="sig-prename descclassname"><span class="pre">sionna.mimo.</span></span><span class="sig-name descname"><span class="pre">zero_forcing_precoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_precoding_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mimo/precoding.html#zero_forcing_precoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mimo.zero_forcing_precoder" title="Permalink to this definition"></a></dt>
+<dd><p>Zero-Forcing (ZF) Precoder</p>
+<p>This function implements ZF precoding for a MIMO link, assuming the
+following model:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{y} = \mathbf{H}\mathbf{G}\mathbf{x} + \mathbf{n}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{y}\in\mathbb{C}^K\)</span> is the received signal vector,
+<span class="math notranslate nohighlight">\(\mathbf{H}\in\mathbb{C}^{K\times M}\)</span> is the known channel matrix,
+<span class="math notranslate nohighlight">\(\mathbf{G}\in\mathbb{C}^{M\times K}\)</span> is the precoding matrix,
+<span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{C}^K\)</span> is the symbol vector to be precoded,
+and <span class="math notranslate nohighlight">\(\mathbf{n}\in\mathbb{C}^K\)</span> is a noise vector. It is assumed that
+<span class="math notranslate nohighlight">\(K\le M\)</span>.</p>
+<p>The precoding matrix <span class="math notranslate nohighlight">\(\mathbf{G}\)</span> is defined as (Eq. 4.37) <a class="reference internal" href="#bhs2017" id="id1"><span>[BHS2017]</span></a> :</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{G} = \mathbf{V}\mathbf{D}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\mathbf{V} &amp;= \mathbf{H}^{\mathsf{H}}\left(\mathbf{H} \mathbf{H}^{\mathsf{H}}\right)^{-1}\\
+\mathbf{D} &amp;= \mathop{\text{diag}}\left( \lVert \mathbf{v}_{k} \rVert_2^{-1}, k=0,\dots,K-1 \right).\end{split}\]</div>
+<p>This ensures that each stream is precoded with a unit-norm vector,
+i.e., <span class="math notranslate nohighlight">\(\mathop{\text{tr}}\left(\mathbf{G}\mathbf{G}^{\mathsf{H}}\right)=K\)</span>.
+The function returns the precoded vector <span class="math notranslate nohighlight">\(\mathbf{G}\mathbf{x}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…,K], tf.complex</em>) – 1+D tensor containing the symbol vectors to be precoded.</p></li>
+<li><p><strong>h</strong> (<em>[…,K,M], tf.complex</em>) – 2+D tensor containing the channel matrices</p></li>
+<li><p><strong>return_precoding_matrices</strong> (<em>bool</em>) – Indicates if the precoding matrices should be returned or not.
+Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x_precoded</strong> (<em>[…,M], tf.complex</em>) – Tensor of the same shape and dtype as <code class="docutils literal notranslate"><span class="pre">x</span></code> apart from the last
+dimensions that has changed from <cite>K</cite> to <cite>M</cite>. It contains the
+precoded symbol vectors.</p></li>
+<li><p><strong>g</strong> (<em>[…,M,K], tf.complex</em>) – 2+D tensor containing the precoding matrices. It is only returned
+if <code class="docutils literal notranslate"><span class="pre">return_precoding_matrices=True</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to use this function in Graph mode with XLA, i.e., within
+a function that is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;tf.function(jit_compile=True)</span></code>,
+you must set <code class="docutils literal notranslate"><span class="pre">sionna.Config.xla_compat=true</span></code>.
+See <a class="reference internal" href="config.html#sionna.Config.xla_compat" title="sionna.Config.xla_compat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xla_compat</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="equalization">
+<h2>Equalization<a class="headerlink" href="#equalization" title="Permalink to this headline"></a></h2>
+<div class="section" id="lmmse-equalizer">
+<h3>lmmse_equalizer<a class="headerlink" href="#lmmse-equalizer" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.mimo.lmmse_equalizer">
+<span class="sig-prename descclassname"><span class="pre">sionna.mimo.</span></span><span class="sig-name descname"><span class="pre">lmmse_equalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whiten_interference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mimo/equalization.html#lmmse_equalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mimo.lmmse_equalizer" title="Permalink to this definition"></a></dt>
+<dd><p>MIMO LMMSE Equalizer</p>
+<p>This function implements LMMSE equalization for a MIMO link, assuming the
+following model:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{y} = \mathbf{H}\mathbf{x} + \mathbf{n}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{y}\in\mathbb{C}^M\)</span> is the received signal vector,
+<span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{C}^K\)</span> is the vector of transmitted symbols,
+<span class="math notranslate nohighlight">\(\mathbf{H}\in\mathbb{C}^{M\times K}\)</span> is the known channel matrix,
+and <span class="math notranslate nohighlight">\(\mathbf{n}\in\mathbb{C}^M\)</span> is a noise vector.
+It is assumed that <span class="math notranslate nohighlight">\(\mathbb{E}\left[\mathbf{x}\right]=\mathbb{E}\left[\mathbf{n}\right]=\mathbf{0}\)</span>,
+<span class="math notranslate nohighlight">\(\mathbb{E}\left[\mathbf{x}\mathbf{x}^{\mathsf{H}}\right]=\mathbf{I}_K\)</span> and
+<span class="math notranslate nohighlight">\(\mathbb{E}\left[\mathbf{n}\mathbf{n}^{\mathsf{H}}\right]=\mathbf{S}\)</span>.</p>
+<p>The estimated symbol vector <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\in\mathbb{C}^K\)</span> is given as
+(Lemma B.19) <a class="reference internal" href="#bhs2017" id="id2"><span>[BHS2017]</span></a> :</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{x}} = \mathop{\text{diag}}\left(\mathbf{G}\mathbf{H}\right)^{-1}\mathbf{G}\mathbf{y}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{G} = \mathbf{H}^{\mathsf{H}} \left(\mathbf{H}\mathbf{H}^{\mathsf{H}} + \mathbf{S}\right)^{-1}.\]</div>
+<p>This leads to the post-equalized per-symbol model:</p>
+<div class="math notranslate nohighlight">
+\[\hat{x}_k = x_k + e_k,\quad k=0,\dots,K-1\]</div>
+<p>where the variances <span class="math notranslate nohighlight">\(\sigma^2_k\)</span> of the effective residual noise
+terms <span class="math notranslate nohighlight">\(e_k\)</span> are given by the diagonal elements of</p>
+<div class="math notranslate nohighlight">
+\[\mathop{\text{diag}}\left(\mathbb{E}\left[\mathbf{e}\mathbf{e}^{\mathsf{H}}\right]\right)
+= \mathop{\text{diag}}\left(\mathbf{G}\mathbf{H} \right)^{-1}
+  - \mathop{\text{diag}}\left(\mathbf{G}\mathbf{H} \right)^{-2}
+    \mathop{\text{diag}}\left(\mathbf{G}\mathbf{H}\mathbf{H}^{\mathsf{H}} \mathbf{G}^{\mathsf{H}}\right)^{-1}\]</div>
+<p>Note that the scaling by <span class="math notranslate nohighlight">\(\mathop{\text{diag}}\left(\mathbf{G}\mathbf{H}\right)^{-1}\)</span>
+is important for the <a class="reference internal" href="mapping.html#sionna.mapping.Demapper" title="sionna.mapping.Demapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Demapper</span></code></a> although it does
+not change the signal-to-noise ratio.</p>
+<p>The function returns <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> and
+<span class="math notranslate nohighlight">\(\boldsymbol{\sigma}^2=\left[\sigma^2_0,\dots, \sigma^2_{K-1}\right]^{\mathsf{T}}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>[…,M], tf.complex</em>) – 1+D tensor containing the received signals.</p></li>
+<li><p><strong>h</strong> (<em>[…,M,K], tf.complex</em>) – 2+D tensor containing the channel matrices.</p></li>
+<li><p><strong>s</strong> (<em>[…,M,M], tf.complex</em>) – 2+D tensor containing the noise covariance matrix.</p></li>
+<li><p><strong>whiten_interference</strong> (<em>bool</em>) – If <cite>True</cite> (default), the interference is first whitened before equalization.
+In this case, an alternative expression for the receive filter is used that
+can be numerically more stable. Defaults to <cite>True</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x_hat</strong> (<em>[…,K], tf.complex</em>) – 1+D tensor representing the estimated symbol vectors.</p></li>
+<li><p><strong>no_eff</strong> (<em>tf.float</em>) – Tensor of the same shape as <code class="docutils literal notranslate"><span class="pre">x_hat</span></code> containing the effective noise
+variance estimates.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to use this function in Graph mode with XLA, i.e., within
+a function that is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;tf.function(jit_compile=True)</span></code>,
+you must set <code class="docutils literal notranslate"><span class="pre">sionna.Config.xla_compat=true</span></code>.
+See <a class="reference internal" href="config.html#sionna.Config.xla_compat" title="sionna.Config.xla_compat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xla_compat</span></code></a>.</p>
+</div>
+</dd></dl>
+
+<dl>
+<dt>References:</dt><dd><dl class="citation">
+<dt class="label" id="bhs2017"><span class="brackets">BHS2017</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
+<dd><p>Emil Björnson, Jakob Hoydis and Luca Sanguinetti (2017),
+<a class="reference external" href="https://massivemimobook.com">“Massive MIMO Networks: Spectral, Energy, and Hardware Efficiency”</a>,
+Foundations and Trends in Signal Processing:
+Vol. 11, No. 3-4, pp 154–655.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ofdm.html" class="btn btn-neutral float-left" title="Orthogonal Frequency-Division Multiplexing (OFDM)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="Utility Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

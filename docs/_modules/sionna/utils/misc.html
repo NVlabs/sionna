@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sionna.utils.misc &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>sionna.utils.misc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sionna.utils.misc</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Miscellaneous utility functions of the Sionna package.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">tensorflow.experimental.numpy</span> <span class="kn">import</span> <span class="n">swapaxes</span>
+<span class="kn">from</span> <span class="nn">tensorflow.experimental.numpy</span> <span class="kn">import</span> <span class="n">log10</span> <span class="k">as</span> <span class="n">_log10</span>
+<span class="kn">from</span> <span class="nn">tensorflow.experimental.numpy</span> <span class="kn">import</span> <span class="n">log2</span> <span class="k">as</span> <span class="n">_log2</span>
+<span class="kn">from</span> <span class="nn">sionna.utils.metrics</span> <span class="kn">import</span> <span class="n">count_errors</span><span class="p">,</span> <span class="n">count_block_errors</span>
+<span class="kn">from</span> <span class="nn">sionna.mapping</span> <span class="kn">import</span> <span class="n">Constellation</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<div class="viewcode-block" id="ebnodb2no"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.ebnodb2no">[docs]</a><span class="k">def</span> <span class="nf">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">coderate</span><span class="p">,</span> <span class="n">resource_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the noise variance `No` for a given `Eb/No` in dB.</span>
+
+<span class="sd">    The function takes into account the number of coded bits per constellation</span>
+<span class="sd">    symbol, the coderate, as well as possible additional overheads related to</span>
+<span class="sd">    OFDM transmissions, such as the cyclic prefix and pilots.</span>
+
+<span class="sd">    The value of `No` is computed according to the following expression</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        N_o = \left(\frac{E_b}{N_o} \frac{r M}{E_s}\right)^{-1}</span>
+
+<span class="sd">    where :math:`2^M` is the constellation size, i.e., :math:`M` is the</span>
+<span class="sd">    average number of coded bits per constellation symbol,</span>
+<span class="sd">    :math:`E_s=1` is the average energy per constellation per symbol,</span>
+<span class="sd">    :math:`r\in(0,1]` is the coderate,</span>
+<span class="sd">    :math:`E_b` is the energy per information bit,</span>
+<span class="sd">    and :math:`N_o` is the noise power spectral density.</span>
+<span class="sd">    For OFDM transmissions, :math:`E_s` is scaled</span>
+<span class="sd">    according to the ratio between the total number of resource elements in</span>
+<span class="sd">    a resource grid with non-zero energy and the number</span>
+<span class="sd">    of resource elements used for data transmission. Also the additionally</span>
+<span class="sd">    transmitted energy during the cyclic prefix is taken into account, as</span>
+<span class="sd">    well as the number of transmitted streams per transmitter.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    ebno_db : float</span>
+<span class="sd">        The `Eb/No` value in dB.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per symbol.</span>
+
+<span class="sd">    coderate : float</span>
+<span class="sd">        The coderate used.</span>
+
+<span class="sd">    resource_grid : ResourceGrid</span>
+<span class="sd">        An (optional) instance of :class:`~sionna.ofdm.ResourceGrid`</span>
+<span class="sd">        for OFDM transmissions.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : float</span>
+<span class="sd">        The value of :math:`N_o` in linear scale.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">is_tensor</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">ebno_db</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span>
+
+    <span class="n">ebno</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">10.</span><span class="p">,</span> <span class="n">dtype</span><span class="p">),</span> <span class="n">ebno_db</span><span class="o">/</span><span class="mf">10.</span><span class="p">)</span>
+
+    <span class="n">energy_per_symbol</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">resource_grid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Divide energy per symbol by the number of transmitted streams</span>
+        <span class="n">energy_per_symbol</span> <span class="o">/=</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">num_streams_per_tx</span>
+
+        <span class="c1"># Number of nonzero energy symbols.</span>
+        <span class="c1"># We do not account for the nulled DC and guard carriers.</span>
+        <span class="n">cp_overhead</span> <span class="o">=</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">cyclic_prefix_length</span> \
+                      <span class="o">/</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">fft_size</span>
+        <span class="n">num_syms</span> <span class="o">=</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">num_ofdm_symbols</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">cp_overhead</span><span class="p">)</span> \
+                    <span class="o">*</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">num_effective_subcarriers</span>
+        <span class="n">energy_per_symbol</span> <span class="o">*=</span> <span class="n">num_syms</span> <span class="o">/</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">num_data_symbols</span>
+
+    <span class="n">no</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">ebno</span> <span class="o">*</span> <span class="n">coderate</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span> \
+          <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">energy_per_symbol</span><span class="p">,</span> <span class="n">dtype</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">no</span></div>
+
+<div class="viewcode-block" id="empirical_psd"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.empirical_psd">[docs]</a><span class="k">def</span> <span class="nf">empirical_psd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Computes the empirical power spectral density.</span>
+
+<span class="sd">    Computes the empirical power spectral density (PSD) of ``x``</span>
+<span class="sd">    along the last dimension by averaging over all other dimensions.</span>
+<span class="sd">    Note that this function</span>
+<span class="sd">    simply returns the averaged absolute squared discrete Fourier</span>
+<span class="sd">    spectrum of ``x``.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    x : [...,N],  complex</span>
+<span class="sd">        The signal of which to compute the PSD.</span>
+
+<span class="sd">    show : bool</span>
+<span class="sd">        Indicates if a plot of the PSD should be generated.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    freqs : [N], float</span>
+<span class="sd">        The normalized frequencies at which the PSD was evaluated.</span>
+
+<span class="sd">    psd : [N], float</span>
+<span class="sd">        The PSD.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s2">&quot;ortho&quot;</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">axis</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ndim</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">psd</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">z</span><span class="p">)))</span>
+    <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">psd</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Power Spectral Density&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Normalized Frequency&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\mathbb</span><span class="si">{E}</span><span class="s2">\left[|X(f)|^2\right]$ (dB)&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">freqs</span><span class="p">,</span> <span class="n">psd</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="fft"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.fft">[docs]</a><span class="k">def</span> <span class="nf">fft</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the normalized DFT along a specified axis.</span>
+
+<span class="sd">    This operation computes the normalized one-dimensional discrete Fourier</span>
+<span class="sd">    transform (DFT) along the ``axis`` dimension of a ``tensor``.</span>
+<span class="sd">    For a vector :math:`\mathbf{x}\in\mathbb{C}^N`, the DFT</span>
+<span class="sd">    :math:`\mathbf{X}\in\mathbb{C}^N` is computed as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        X_m = \frac{1}{\sqrt{N}}\sum_{n=0}^{N-1} x_n \exp \left\{</span>
+<span class="sd">            -j2\pi\frac{mn}{N}\right\},\quad m=0,\dots,N-1.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    tensor : tf.complex</span>
+<span class="sd">        Tensor of arbitrary shape.</span>
+<span class="sd">    axis : int</span>
+<span class="sd">        Indicates the dimension along which the DFT is taken.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : tf.complex</span>
+<span class="sd">        Tensor of the same dtype and shape as ``tensor``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fft_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">tensor</span><span class="p">)[</span><span class="n">axis</span><span class="p">],</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fft_size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">]:</span>
+        <span class="n">output</span> <span class="o">=</span>  <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">swapaxes</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="ifft"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.ifft">[docs]</a><span class="k">def</span> <span class="nf">ifft</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the normalized IDFT along a specified axis.</span>
+
+<span class="sd">    This operation computes the normalized one-dimensional discrete inverse</span>
+<span class="sd">    Fourier transform (IDFT) along the ``axis`` dimension of a ``tensor``.</span>
+<span class="sd">    For a vector :math:`\mathbf{X}\in\mathbb{C}^N`, the IDFT</span>
+<span class="sd">    :math:`\mathbf{x}\in\mathbb{C}^N` is computed as</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        x_n = \frac{1}{\sqrt{N}}\sum_{m=0}^{N-1} X_m \exp \left\{</span>
+<span class="sd">            j2\pi\frac{mn}{N}\right\},\quad n=0,\dots,N-1.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    tensor : tf.complex</span>
+<span class="sd">        Tensor of arbitrary shape.</span>
+
+<span class="sd">    axis : int</span>
+<span class="sd">        Indicates the dimension along which the IDFT is taken.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : tf.complex</span>
+<span class="sd">        Tensor of the same dtype and shape as ``tensor``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fft_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">tensor</span><span class="p">)[</span><span class="n">axis</span><span class="p">],</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fft_size</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">axis</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">]:</span>
+        <span class="n">output</span> <span class="o">=</span>  <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">swapaxes</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">scale</span> <span class="o">*</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="hard_decisions"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.hard_decisions">[docs]</a><span class="k">def</span> <span class="nf">hard_decisions</span><span class="p">(</span><span class="n">llr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Transforms LLRs into hard decisions.</span>
+
+<span class="sd">    Positive values are mapped to :math:`1`.</span>
+<span class="sd">    Nonpositive values are mapped to :math:`0`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    llr : any non-complex tf.DType</span>
+<span class="sd">        Tensor of LLRs.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : Same shape and dtype as ``llr``</span>
+<span class="sd">        The hard decisions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">zero</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">llr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">greater</span><span class="p">(</span><span class="n">llr</span><span class="p">,</span> <span class="n">zero</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">llr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="log10"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.log10">[docs]</a><span class="k">def</span> <span class="nf">log10</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=C0301</span>
+    <span class="sd">&quot;&quot;&quot;TensorFlow implementation of NumPy&#39;s `log10` function.</span>
+
+<span class="sd">    Simple extension to `tf.experimental.numpy.log10`</span>
+<span class="sd">    which casts the result to the `dtype` of the input.</span>
+<span class="sd">    For more details see the `TensorFlow &lt;https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10&gt;`_ and `NumPy &lt;https://numpy.org/doc/1.16/reference/generated/numpy.log10.html&gt;`_ documentation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">_log10</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="log2"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.log2">[docs]</a><span class="k">def</span> <span class="nf">log2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=C0301</span>
+    <span class="sd">&quot;&quot;&quot;TensorFlow implementation of NumPy&#39;s `log2` function.</span>
+
+<span class="sd">    Simple extension to `tf.experimental.numpy.log2`</span>
+<span class="sd">    which casts the result to the `dtype` of the input.</span>
+<span class="sd">    For more details see the `TensorFlow &lt;https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log2&gt;`_ and `NumPy &lt;https://numpy.org/doc/1.16/reference/generated/numpy.log2.html&gt;`_ documentation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">_log2</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BinarySource"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.BinarySource">[docs]</a><span class="k">class</span> <span class="nc">BinarySource</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;BinarySource(dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    Layer generating random binary tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dtype : tf.DType</span>
+<span class="sd">        Defines the output datatype of the layer.</span>
+<span class="sd">        Defaults to `tf.float32`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    shape : 1D tensor/array/list, int</span>
+<span class="sd">        The desired shape of the output tensor.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : ``shape``, ``dtype``</span>
+<span class="sd">        Tensor filled with random binary values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QAMSource"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.QAMSource">[docs]</a><span class="k">class</span> <span class="nc">QAMSource</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;QAMSource(num_bits_per_symbol, seed=None, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Layer generating a tensor of arbitrary shape filled with random QAM symbols.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        Indicates the number of bits per constellation symbol.</span>
+<span class="sd">        It must be a multiple of two.</span>
+
+<span class="sd">    seed : int or None</span>
+<span class="sd">        Set the seed for the random generator used to generate the QAM symbols.</span>
+<span class="sd">        Set to `None` for random initialization of the RNG.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128], tf.DType</span>
+<span class="sd">        Defines the output datatype of the layer.</span>
+<span class="sd">        Defaults to `tf.complex64`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    shape : 1D tensor/array/list, int</span>
+<span class="sd">        The desired shape of the output tensor.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : ``shape``, ``dtype``</span>
+<span class="sd">        Tensor filled with random QAM symbols.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                 <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span> <span class="o">=</span> <span class="n">num_bits_per_symbol</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported dtype.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span>
+                                            <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="o">.</span><span class="n">from_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="o">.</span><span class="n">from_non_deterministic_state</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="sim_ber"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.sim_ber">[docs]</a><span class="k">def</span> <span class="nf">sim_ber</span><span class="p">(</span><span class="n">mc_fun</span><span class="p">,</span>
+            <span class="n">ebno_dbs</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="p">,</span>
+            <span class="n">max_mc_iter</span><span class="p">,</span>
+            <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">num_target_bit_errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">num_target_block_errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Simulates until target number of errors is reached and returns BER/BLER.</span>
+
+<span class="sd">    The simulation continues with the next SNR point if either</span>
+<span class="sd">    ``num_target_bit_errors`` bit errors or ``num_target_block_errors`` block</span>
+<span class="sd">    errors is achieved. Further, it continues with the next SNR point after</span>
+<span class="sd">    ``max_mc_iter`` batches of size ``batch_size`` have been simulated.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    mc_fun:</span>
+<span class="sd">        Function that yields the transmitted bits `b` and the</span>
+<span class="sd">        receiver&#39;s estimate `b_hat` for a given ``batch_size`` and</span>
+<span class="sd">        ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as</span>
+<span class="sd">        logit.</span>
+
+<span class="sd">    ebno_dbs: tf.float32</span>
+<span class="sd">        A tensor containing SNR points to be evaluated.</span>
+
+<span class="sd">    batch_size: tf.int32</span>
+<span class="sd">        Batch-size for evaluation.</span>
+
+<span class="sd">    max_mc_iter: tf.int32</span>
+<span class="sd">        Max. number of Monte-Carlo iterations per SNR point.</span>
+
+<span class="sd">    soft_estimates: bool</span>
+<span class="sd">        A boolean, defaults to False. If True, `b_hat``</span>
+<span class="sd">        is interpreted as logit and an additional hard-decision is applied</span>
+<span class="sd">        internally.</span>
+
+<span class="sd">    num_target_bit_errors: tf.int32</span>
+<span class="sd">        Defaults to None. Target number of bit errors per SNR point until</span>
+<span class="sd">        the simulation continues to next SNR point.</span>
+
+<span class="sd">    num_target_block_errors: tf.int32</span>
+<span class="sd">        Defaults to None. Target number of block errors per SNR point</span>
+<span class="sd">        until the simulation continues</span>
+
+<span class="sd">    early_stop: bool</span>
+<span class="sd">        A boolean defaults to True. If True, the simulation stops after the</span>
+<span class="sd">        first error-free SNR point (i.e., no error occurred after</span>
+<span class="sd">        ``max_mc_iter`` Monte-Carlo iterations).</span>
+
+<span class="sd">    verbose: bool</span>
+<span class="sd">        A boolean defaults to True. If True, the current progress will be</span>
+<span class="sd">        printed.</span>
+
+<span class="sd">    forward_keyboard_interrupt: bool</span>
+<span class="sd">        A boolean defaults to True. If False, KeyboardInterrupts will be</span>
+<span class="sd">        catched internally and not forwarded (e.g., will not stop outer loops).</span>
+<span class="sd">        If False, the simulation ends and returns the intermediate simulation</span>
+<span class="sd">        results.</span>
+
+<span class="sd">    dtype: tf.complex64</span>
+<span class="sd">        Datatype of the model / function to be used (``mc_fun``).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    (ber, bler) :</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    ber: tf.float32</span>
+<span class="sd">        The bit-error rate.</span>
+
+<span class="sd">    bler: tf.float32</span>
+<span class="sd">        The block-error rate.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        If ``soft_estimates`` is not bool.</span>
+
+<span class="sd">    AssertionError</span>
+<span class="sd">        If ``dtype`` is not `tf.complex`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This function is implemented based on tensors to allow</span>
+<span class="sd">    full compatibility with tf.function(). However, to run simulations</span>
+<span class="sd">    in graph mode, the provided ``mc_fun`` must use the `@tf.function()`</span>
+<span class="sd">    decorator.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># utility function to print progress</span>
+    <span class="k">def</span> <span class="nf">_print_progress</span><span class="p">(</span><span class="n">is_final</span><span class="p">,</span> <span class="n">rt</span><span class="p">,</span> <span class="n">idx_snr</span><span class="p">,</span> <span class="n">idx_it</span><span class="p">,</span> <span class="n">header_text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Print summary of current simulation progress.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        is_final: bool</span>
+<span class="sd">            A boolean. If True, the progress is printed into a new line.</span>
+<span class="sd">        rt: float</span>
+<span class="sd">            The runtime of the current SNR point in seconds.</span>
+<span class="sd">        idx_snr: int</span>
+<span class="sd">            Index of current SNR point.</span>
+<span class="sd">        idx_it: int</span>
+<span class="sd">            Current iteration index.</span>
+<span class="sd">        header_text: list of str</span>
+<span class="sd">            Elements will be printed instead of current progress, iff not None.</span>
+<span class="sd">            Can be used to generate table header.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set carriage return if not final step</span>
+        <span class="k">if</span> <span class="n">is_final</span><span class="p">:</span>
+            <span class="n">end_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">end_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span>
+
+        <span class="c1"># prepare to print table header</span>
+        <span class="k">if</span> <span class="n">header_text</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">row_text</span> <span class="o">=</span> <span class="n">header_text</span>
+            <span class="n">end_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># calculate intermediate ber / bler</span>
+            <span class="n">ber_np</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">bit_errors</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+                        <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">nb_bits</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="n">ber_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">ber_np</span><span class="p">)</span> <span class="c1"># avoid nan for first point</span>
+            <span class="n">bler_np</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">block_errors</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+                        <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">nb_blocks</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+            <span class="n">bler_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">bler_np</span><span class="p">)</span> <span class="c1"># avoid nan for first point</span>
+
+            <span class="c1"># load statuslevel</span>
+            <span class="c1"># print current iter if simulation is still running</span>
+            <span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">status_txt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;iter: </span><span class="si">{</span><span class="n">idx_it</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_mc_iter</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status_txt</span> <span class="o">=</span> <span class="n">status_levels</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">status</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">])]</span>
+
+            <span class="c1"># generate list with all elements to be printed</span>
+            <span class="n">row_text</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">3</span><span class="p">)),</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ber_np</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bler_np</span><span class="si">:</span><span class="s2">.4e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">bit_errors</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">nb_bits</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">block_errors</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">nb_blocks</span><span class="p">[</span><span class="n">idx_snr</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">rt</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="n">status_txt</span><span class="p">]</span>
+
+        <span class="c1"># pylint: disable=line-too-long, consider-using-f-string</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{: &gt;9}</span><span class="s2"> |</span><span class="si">{: &gt;11}</span><span class="s2"> |</span><span class="si">{: &gt;11}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;13}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;10}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">row_text</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">end_str</span><span class="p">)</span>
+
+
+     <span class="c1"># init table headers</span>
+    <span class="n">header_text</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;EbNo [dB]&quot;</span><span class="p">,</span> <span class="s2">&quot;BER&quot;</span><span class="p">,</span> <span class="s2">&quot;BLER&quot;</span><span class="p">,</span> <span class="s2">&quot;bit errors&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;num bits&quot;</span><span class="p">,</span> <span class="s2">&quot;block errors&quot;</span><span class="p">,</span> <span class="s2">&quot;num blocks&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;runtime [s]&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">]</span>
+
+    <span class="c1"># replace status by text</span>
+    <span class="n">status_levels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;not simulated&quot;</span><span class="p">,</span> <span class="c1"># status=0</span>
+            <span class="s2">&quot;reached max iter       &quot;</span><span class="p">,</span> <span class="c1"># status=1; spacing for impr. layout</span>
+            <span class="s2">&quot;no errors - early stop&quot;</span><span class="p">,</span> <span class="c1"># status=2</span>
+            <span class="s2">&quot;reached target bit errors&quot;</span><span class="p">,</span> <span class="c1"># status=3</span>
+            <span class="s2">&quot;reached target block errors&quot;</span><span class="p">]</span> <span class="c1"># status=4</span>
+
+    <span class="c1"># check inputs for consistency</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">early_stop</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;early_stop must be bool.&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">soft_estimates</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;soft_estimates must be bool.&quot;</span>
+    <span class="k">assert</span> <span class="n">dtype</span><span class="o">.</span><span class="n">is_complex</span><span class="p">,</span> <span class="s2">&quot;dtype must be a complex type.&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;verbose must be bool.&quot;</span>
+
+    <span class="n">ebno_dbs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">ebno_dbs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ebno_dbs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bit_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>   <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">block_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>  <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">nb_bits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>  <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">nb_blocks</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>  <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+    <span class="c1"># track status of simulation (early termination etc.)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_points</span><span class="p">)</span>
+
+    <span class="c1"># measure runtime per SNR point</span>
+    <span class="n">runtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_points</span><span class="p">)</span>
+
+    <span class="c1"># ensure num_target_errors is a tensor</span>
+    <span class="k">if</span> <span class="n">num_target_bit_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">num_target_bit_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">num_target_bit_errors</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_target_block_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">num_target_block_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">num_target_block_errors</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># simulate until a target number of errors is reached</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">num_points</span><span class="p">):</span>
+            <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="c1"># save start time</span>
+            <span class="n">iter_count</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># for print in verbose mode</span>
+            <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">max_mc_iter</span><span class="p">):</span>
+
+                <span class="n">iter_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">outputs</span> <span class="o">=</span> <span class="n">mc_fun</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="o">=</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+                <span class="c1"># assume first and second return value is b and b_hat</span>
+                <span class="c1"># other returns are ignored</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">b_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">soft_estimates</span><span class="p">:</span>
+                    <span class="n">b_hat</span> <span class="o">=</span> <span class="n">hard_decisions</span><span class="p">(</span><span class="n">b_hat</span><span class="p">)</span>
+
+                <span class="c1"># count errors</span>
+                <span class="n">bit_e</span> <span class="o">=</span> <span class="n">count_errors</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span><span class="p">)</span>
+                <span class="n">block_e</span> <span class="o">=</span> <span class="n">count_block_errors</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span><span class="p">)</span>
+
+                <span class="c1"># count total number of bits</span>
+                <span class="n">bit_n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+                <span class="n">block_n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+                <span class="c1"># update variables</span>
+                <span class="n">bit_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_add</span><span class="p">(</span>  <span class="n">bit_errors</span><span class="p">,</span> <span class="p">[[</span><span class="n">i</span><span class="p">]],</span>
+                                                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="n">bit_e</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+                <span class="n">block_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_add</span><span class="p">(</span>  <span class="n">block_errors</span><span class="p">,</span> <span class="p">[[</span><span class="n">i</span><span class="p">]],</span>
+                                                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="n">block_e</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+                <span class="n">nb_bits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_add</span><span class="p">(</span> <span class="n">nb_bits</span><span class="p">,</span> <span class="p">[[</span><span class="n">i</span><span class="p">]],</span>
+                                                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="n">bit_n</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+                <span class="n">nb_blocks</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_add</span><span class="p">(</span> <span class="n">nb_blocks</span><span class="p">,</span> <span class="p">[[</span><span class="n">i</span><span class="p">]],</span>
+                                                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="n">block_n</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+
+                <span class="c1"># print progress summary</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="c1"># print summary header during first iteration</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">iter_count</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                        <span class="n">_print_progress</span><span class="p">(</span><span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">rt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                        <span class="n">idx_snr</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                        <span class="n">idx_it</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                        <span class="n">header_text</span><span class="o">=</span><span class="n">header_text</span><span class="p">)</span>
+                        <span class="c1"># print seperator after headline</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="o">*</span> <span class="mi">135</span><span class="p">)</span>
+
+                    <span class="c1"># evaluate current runtime</span>
+                    <span class="n">rt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="c1"># print current progress</span>
+                    <span class="n">_print_progress</span><span class="p">(</span><span class="n">is_final</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">idx_snr</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">idx_it</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span> <span class="n">rt</span><span class="o">=</span><span class="n">rt</span><span class="p">)</span>
+
+
+                <span class="c1"># bit-error based stopping cond.</span>
+                <span class="k">if</span> <span class="n">num_target_bit_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">(</span><span class="n">bit_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">num_target_bit_errors</span><span class="p">):</span>
+                        <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># change internal status for summary</span>
+                        <span class="c1"># stop runtime timer</span>
+                        <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="k">break</span> <span class="c1"># enough errors for SNR point have been simulated</span>
+
+                <span class="c1"># block-error based stopping cond.</span>
+                <span class="k">if</span> <span class="n">num_target_block_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">(</span><span class="n">block_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                        <span class="n">num_target_block_errors</span><span class="p">):</span>
+                        <span class="c1"># stop runtime timer</span>
+                        <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># change internal status for summary</span>
+                        <span class="k">break</span> <span class="c1"># enough errors for SNR point have been simulated</span>
+
+                <span class="c1"># max iter have been reached -&gt; continue with next SNR point</span>
+                <span class="k">if</span> <span class="n">iter_count</span><span class="o">==</span><span class="n">max_mc_iter</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="c1"># all iterations are done</span>
+                    <span class="c1"># stop runtime timer</span>
+                    <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># change internal status for summary</span>
+
+            <span class="c1"># print results again AFTER last iteration / early stop (new status)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">_print_progress</span><span class="p">(</span><span class="n">is_final</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">idx_snr</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                                <span class="n">idx_it</span><span class="o">=</span><span class="n">iter_count</span><span class="p">,</span>
+                                <span class="n">rt</span><span class="o">=</span><span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+            <span class="c1"># early stop if no error occurred</span>
+            <span class="k">if</span> <span class="n">early_stop</span><span class="p">:</span> <span class="c1"># only if early stop is active</span>
+                <span class="k">if</span> <span class="n">block_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># change internal status for summary</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped as no error occurred &quot;</span> \
+                              <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> dB.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+    <span class="c1"># Stop if KeyboardInterrupt is detected and set remaining SNR points to -1</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+
+        <span class="c1"># Raise Interrupt again to stop outer loops</span>
+        <span class="k">if</span> <span class="n">forward_keyboard_interrupt</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped by the user &quot;</span> \
+              <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">}</span><span class="s2"> dB&quot;</span><span class="p">)</span>
+        <span class="c1"># overwrite remaining BER / BLER positions with -1</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_points</span><span class="p">):</span>
+            <span class="n">bit_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span> <span class="n">bit_errors</span><span class="p">,</span> <span class="p">[[</span><span class="n">idx</span><span class="p">]],</span>
+                                                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+            <span class="n">block_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span> <span class="n">block_errors</span><span class="p">,</span> <span class="p">[[</span><span class="n">idx</span><span class="p">]],</span>
+                                                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+            <span class="n">nb_bits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span> <span class="n">nb_bits</span><span class="p">,</span> <span class="p">[[</span><span class="n">idx</span><span class="p">]],</span>
+                                                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+            <span class="n">nb_blocks</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span> <span class="n">nb_blocks</span><span class="p">,</span> <span class="p">[[</span><span class="n">idx</span><span class="p">]],</span>
+                                                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
+
+    <span class="c1"># calculate BER / BLER</span>
+    <span class="n">ber</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">bit_errors</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">nb_bits</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="n">bler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">block_errors</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">nb_blocks</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="c1"># replace nans (from early stop)</span>
+    <span class="n">ber</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">is_nan</span><span class="p">(</span><span class="n">ber</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">ber</span><span class="p">),</span> <span class="n">ber</span><span class="p">)</span>
+    <span class="n">bler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">is_nan</span><span class="p">(</span><span class="n">bler</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">bler</span><span class="p">),</span> <span class="n">bler</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ber</span><span class="p">,</span> <span class="n">bler</span></div>
+
+
+<div class="viewcode-block" id="complex_normal"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.complex_normal">[docs]</a><span class="k">def</span> <span class="nf">complex_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a tensor of complex normal random variables.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    shape : tf.shape, or list</span>
+<span class="sd">        The desired shape.</span>
+
+<span class="sd">    var : float</span>
+<span class="sd">        The total variance., i.e., each complex dimension has</span>
+<span class="sd">        variance ``var/2``.</span>
+
+<span class="sd">    dtype: tf.complex</span>
+<span class="sd">        The desired dtype. Defaults to `tf.complex64`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : ``shape``, ``dtype``</span>
+<span class="sd">        Tensor of complex normal random variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Half the variance for each dimension</span>
+    <span class="n">var_dim</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">stddev</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_dim</span><span class="p">)</span>
+
+    <span class="c1"># Generate complex Gaussian noise with the right variance</span>
+    <span class="n">xr</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">stddev</span><span class="o">=</span><span class="n">stddev</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">xi</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">stddev</span><span class="o">=</span><span class="n">stddev</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">xr</span><span class="p">,</span> <span class="n">xi</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

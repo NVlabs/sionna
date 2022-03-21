@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FEC Utility Functions &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Mapping" href="mapping.html" />
+    <link rel="prev" title="Scrambling" href="fec.scrambling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fec.html">Forward Error Correction (FEC)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="sionna.html">API Documentation</a> &raquo;</li>
+          <li><a href="fec.html">Forward Error Correction (FEC)</a> &raquo;</li>
+      <li>FEC Utility Functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="fec-utility-functions">
+<h1>FEC Utility Functions<a class="headerlink" href="#fec-utility-functions" title="Permalink to this headline"></a></h1>
+<p>This module provides utility functions for the FEC package. It also provides serval functions to simplify EXIT analysis of iterative receivers.</p>
+<div class="section" id="exit-analysis">
+<h2>EXIT Analysis<a class="headerlink" href="#exit-analysis" title="Permalink to this headline"></a></h2>
+<p>The LDPC BP decoder allows to track the internal information flow (<cite>extrinsic information</cite>) during decoding. This can be plotted in so-called EXIT Charts <a class="reference internal" href="#tenbrinkexit" id="id1"><span>[tenBrinkEXIT]</span></a> to visualize the decoding convergence.</p>
+<img alt="../_images/exit.png" src="../_images/exit.png" />
+<p>This short code snippet shows how to generate and plot EXIT charts:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># parameters</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="c1"># simulation SNR</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># QPSK</span>
+
+<span class="n">pcm_id</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># decide which parity check matrix should be used (0-2: BCH; 3: (3,6)-LDPC 4: LDPC 802.11n</span>
+<span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span> <span class="p">,</span> <span class="n">coderate</span> <span class="o">=</span> <span class="n">load_parity_check_examples</span><span class="p">(</span><span class="n">pcm_id</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">noise_var</span> <span class="o">=</span> <span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="o">=</span><span class="n">ebno_db</span><span class="p">,</span>
+                      <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                      <span class="n">coderate</span><span class="o">=</span><span class="n">coderate</span><span class="p">)</span>
+
+<span class="c1"># init components</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">LDPCBPDecoder</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span>
+                        <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">cn_type</span><span class="o">=</span><span class="s2">&quot;boxplus&quot;</span><span class="p">,</span>
+                        <span class="n">trainable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">track_exit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># if activated, the decoder stores the outgoing extrinsic mutual information per iteration</span>
+                        <span class="n">num_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># generates fake llrs as if the all-zero codeword was transmitted over an AWNG channel with BPSK modulation</span>
+<span class="n">llr_source</span> <span class="o">=</span> <span class="n">GaussianPriorSource</span><span class="p">()</span>
+
+
+<span class="c1"># generate fake LLRs (Gaussian approximation)</span>
+<span class="n">llr</span> <span class="o">=</span> <span class="n">llr_source</span><span class="p">([[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n</span><span class="p">],</span> <span class="n">noise_var</span><span class="p">])</span>
+
+<span class="c1"># simulate free running decoder (for EXIT trajectory)</span>
+<span class="n">decoder</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+
+<span class="c1"># calculate analytical EXIT characteristics</span>
+<span class="c1"># Hint: these curves assume asymptotic code length, i.e., may become inaccurate in the short length regime</span>
+<span class="n">Ia</span><span class="p">,</span> <span class="n">Iev</span><span class="p">,</span> <span class="n">Iec</span> <span class="o">=</span> <span class="n">get_exit_analytic</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">)</span>
+
+<span class="c1"># and plot the analytical exit curves</span>
+
+<span class="n">plt</span> <span class="o">=</span> <span class="n">plot_exit_chart</span><span class="p">(</span><span class="n">Ia</span><span class="p">,</span> <span class="n">Iev</span><span class="p">,</span> <span class="n">Iec</span><span class="p">)</span>
+
+<span class="c1"># and add simulated trajectory (requires &quot;track_exit=True&quot;)</span>
+<span class="n">plot_trajectory</span><span class="p">(</span><span class="n">plt</span><span class="p">,</span> <span class="n">decoder</span><span class="o">.</span><span class="n">ie_v</span><span class="p">,</span> <span class="n">decoder</span><span class="o">.</span><span class="n">ie_c</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Remark: for rate-matched 5G LDPC codes, the EXIT approximation becomes
+inaccurate due to the rate-matching and the very specific structure of the
+code.</p>
+<div class="section" id="plot-exit-chart">
+<h3>plot_exit_chart<a class="headerlink" href="#plot-exit-chart" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.plot_exit_chart">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">plot_exit_chart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mi_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi_ev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi_ec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'EXIT-Chart'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#plot_exit_chart"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.plot_exit_chart" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to plot EXIT-Charts <a class="reference internal" href="#tenbrinkexit" id="id2"><span>[tenBrinkEXIT]</span></a>.</p>
+<p>If all inputs are <cite>None</cite> an empty EXIT chart is generated. Otherwise,
+the mutual information curves are plotted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mi_a</strong> (<em>float</em>) – An ndarray of floats containing the a priori mutual
+information.</p></li>
+<li><p><strong>mi_v</strong> (<em>float</em>) – An ndarray of floats containing the variable node mutual
+information.</p></li>
+<li><p><strong>mi_c</strong> (<em>float</em>) – An ndarray of floats containing the check node mutual
+information.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – A string defining the title of the EXIT chart.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><strong>plt</strong> (<em>matplotlib.figure</em>) – A matplotlib figure handle</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">title</span></code> is not <cite>str</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="get-exit-analytic">
+<h3>get_exit_analytic<a class="headerlink" href="#get-exit-analytic" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.get_exit_analytic">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">get_exit_analytic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebno_db</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#get_exit_analytic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.get_exit_analytic" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the analytic EXIT-curves for a given parity-check matrix.</p>
+<p>This function extracts the degree profile from <code class="docutils literal notranslate"><span class="pre">pcm</span></code> and calculates the
+variable (VN) and check node (CN) decoder EXIT curves. Please note that
+this is an asymptotic tool which needs a certain codeword length for
+accurate predictions.</p>
+<p>Transmission over an AWGN channel with BPSK modulation and SNR <code class="docutils literal notranslate"><span class="pre">ebno_db</span></code>
+is assumed. The detailed equations can be found in <a class="reference internal" href="#tenbrink" id="id3"><span>[tenBrink]</span></a> and
+<a class="reference internal" href="#tenbrinkexit" id="id4"><span>[tenBrinkEXIT]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pcm</strong> (<em>ndarray</em>) – The parity-check matrix.</p></li>
+<li><p><strong>ebno_db</strong> (<em>float</em>) – The channel SNR in dB.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>mi_a</strong> (<em>ndarray of floats</em>) – NumPy array containing the <cite>a priori</cite> mutual information.</p></li>
+<li><p><strong>mi_ev</strong> (<em>ndarray of floats</em>) – NumPy array containing the extrinsic mutual information of the
+variable node decoder for the corresponding <code class="docutils literal notranslate"><span class="pre">mi_a</span></code>.</p></li>
+<li><p><strong>mi_ec</strong> (<em>ndarray of floats</em>) – NumPy array containing the extrinsic mutual information of the check
+node decoder for the corresponding <code class="docutils literal notranslate"><span class="pre">mi_a</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function assumes random parity-check matrices without any imposed
+structure. Thus, explicit code construction algorithms may lead
+to inaccurate EXIT predictions. Further, this function is based
+on asymptotic properties of the code, i.e., only works well for large
+parity-check matrices. For details see <a class="reference internal" href="#tenbrink" id="id5"><span>[tenBrink]</span></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="plot-trajectory">
+<h3>plot_trajectory<a class="headerlink" href="#plot-trajectory" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.plot_trajectory">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">plot_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi_v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mi_c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebno</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#plot_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.plot_trajectory" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to plot the trajectory of an EXIT-chart.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plot</strong> (<em>matplotlib.figure</em>) – A handle to a matplotlib figure.</p></li>
+<li><p><strong>mi_v</strong> (<em>float</em>) – An ndarray of floats containing the variable node mutual
+information.</p></li>
+<li><p><strong>mi_c</strong> (<em>float</em>) – An ndarray of floats containing the check node mutual
+information.</p></li>
+<li><p><strong>ebno</strong> (<em>float</em>) – A float denoting the EbNo in dB for the legend entry.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="miscellaneous">
+<h2>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline"></a></h2>
+<div class="section" id="gaussianpriorsource">
+<h3>GaussianPriorSource<a class="headerlink" href="#gaussianpriorsource" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.utils.GaussianPriorSource">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">GaussianPriorSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">specified_by_mi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#GaussianPriorSource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.GaussianPriorSource" title="Permalink to this definition"></a></dt>
+<dd><p>Generates <cite>fake</cite> LLRs as if the all-zero codeword was transmitted
+over an Bi-AWGN channel with noise variance <code class="docutils literal notranslate"><span class="pre">no</span></code> or mutual information
+(if <code class="docutils literal notranslate"><span class="pre">specified_by_mi</span></code> is True). If selected, the mutual information
+denotes the mutual information associated with a binary random variable
+observed at the output of a corresponding AWGN channel (cf. Gaussian
+approximation).</p>
+<img alt="../_images/GaussianPriorSource.png" src="../_images/GaussianPriorSource.png" />
+<p>The generated LLRs are drawn from a Gaussian distribution with</p>
+<div class="math notranslate nohighlight">
+\[\sigma_{\text{llr}}^2 = \frac{4}{\sigma_\text{ch}^2}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight">
+\[\mu_{\text{llr}} = \frac{\sigma_\text{llr}^2}{2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\sigma_\text{ch}^2\)</span> is the channel noise variance as defined by
+<code class="docutils literal notranslate"><span class="pre">no</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">specified_by_mi</span></code> is True, this class uses the of the so-called
+<cite>J-function</cite> (relates mutual information to Gaussian distributed LLRs) as
+proposed in <a class="reference internal" href="#brannstrom" id="id6"><span>[Brannstrom]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>specified_by_mi</strong> (<em>bool</em>) – Defaults to False. If True, the second input parameter <code class="docutils literal notranslate"><span class="pre">no</span></code> is
+interpreted as mutual information instead of noise variance.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – Defaults to <cite>tf.float32</cite>. Defines the datatype for internal
+calculations and the output. Must be one of the following
+<cite>(tf.float16, tf.bfloat16, tf.float32, tf.float64)</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(output_shape, no)</strong> – Tuple:</p></li>
+<li><p><strong>output_shape</strong> (<em>tf.int</em>) – Integer tensor or Python array defining the shape of the desired
+output tensor.</p></li>
+<li><p><strong>no</strong> (<em>tf.float32</em>) – Scalar defining the noise variance or mutual information (if
+<code class="docutils literal notranslate"><span class="pre">specified_by_mi</span></code> is True) of the corresponding (fake) AWGN
+channel.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">dtype</span></code>, defaults to <cite>tf.float32</cite> – 1+D Tensor with shape as defined by <code class="docutils literal notranslate"><span class="pre">output_shape</span></code>.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>InvalidArgumentError</strong> – If mutual information is not in (0,1).</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is not a list with 2 elements.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="load-parity-check-examples">
+<h3>load_parity_check_examples<a class="headerlink" href="#load-parity-check-examples" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.load_parity_check_examples">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">load_parity_check_examples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pcm_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#load_parity_check_examples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.load_parity_check_examples" title="Permalink to this definition"></a></dt>
+<dd><p>Utility function to load example codes stored in sub-folder LDPC/codes.</p>
+<p>The following codes are available</p>
+<ul class="simple">
+<li><p>0 : <cite>(7,4)</cite>-Hamming code of length <cite>k=4</cite> information bits and codeword    length <cite>n=7</cite>.</p></li>
+<li><p>1 : <cite>(63,45)</cite>-BCH code of length <cite>k=45</cite> information bits and codeword    length <cite>n=63</cite>.</p></li>
+<li><p>2 : (127,106)-BCH code of length <cite>k=106</cite> information bits and codeword    length <cite>n=127</cite>.</p></li>
+<li><p>3 : Random LDPC code with regular variable node degree 3 and check node degree 6 of length <cite>k=50</cite> information bits and codeword length         <cite>n=100</cite>.</p></li>
+<li><p>4 : 802.11n LDPC code of length of length <cite>k=324</cite> information bits and    codeword length <cite>n=648</cite>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pcm_id</strong> (<em>int</em>) – An integer defining which matrix id to load.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean defaults to False. If True, the code parameters are
+printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>pcm</strong> (ndarray of <cite>zeros</cite> and <cite>ones</cite>) – An ndarray containing the parity check matrix.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – An integer defining the number of information bits.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – An integer defining the number of codeword bits.</p></li>
+<li><p><strong>coderate</strong> (<em>float</em>) – A float defining the coderate (assuming full rank of
+parity-check matrix).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="alist2mat">
+<h3>alist2mat<a class="headerlink" href="#alist2mat" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.alist2mat">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">alist2mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#alist2mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.alist2mat" title="Permalink to this definition"></a></dt>
+<dd><p>Convert <cite>alist</cite> <a class="reference internal" href="#mackay" id="id7"><span>[MacKay]</span></a> code definition to <cite>full</cite> parity-check matrix.</p>
+<p>Many code examples can be found in <a class="reference internal" href="#unikl" id="id8"><span>[UniKL]</span></a>.</p>
+<p>About <cite>alist</cite> (see <a class="reference internal" href="#mackay" id="id9"><span>[MacKay]</span></a> for details):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>1.</cite> Row defines parity-check matrix dimension <cite>m x n</cite></p></li>
+<li><p><cite>2.</cite> Row defines int with <cite>max_CN_degree</cite>, <cite>max_VN_degree</cite></p></li>
+<li><p><cite>3.</cite> Row defines VN degree of all <cite>n</cite> column</p></li>
+<li><p><cite>4.</cite> Row defines CN degree of all <cite>m</cite> rows</p></li>
+<li><p>Next <cite>n</cite> rows contain non-zero entries of each column (can be zero padded at the end)</p></li>
+<li><p>Next <cite>m</cite> rows contain non-zero entries of each row.</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alist</strong> (<em>list</em>) – Nested list in <cite>alist</cite>-format <a class="reference internal" href="#mackay" id="id10"><span>[MacKay]</span></a>.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Defaults to True. If True, the code parameters are printed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(pcm, k, n, coderate)</strong> – Tuple:</p></li>
+<li><p><strong>pcm</strong> (<em>ndarray</em>) – NumPy array of shape <cite>[n-k, n]</cite> containing the parity-check matrix.</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of information bits.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Number of codewords bits.</p></li>
+<li><p><strong>coderate</strong> (<em>float</em>) – Coderate of the code.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use <a class="reference internal" href="#sionna.fec.utils.load_alist" title="sionna.fec.utils.load_alist"><code class="xref py py-class docutils literal notranslate"><span class="pre">load_alist</span></code></a> to import alist from a
+textfile.</p>
+<p>For example the following code snippet will import an alist from a file called <code class="docutils literal notranslate"><span class="pre">filename</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">coderate</span> <span class="o">=</span> <span class="n">alist2mat</span><span class="p">(</span><span class="n">load_alist</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="n">filename</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="load-alist">
+<h3>load_alist<a class="headerlink" href="#load-alist" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.load_alist">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">load_alist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#load_alist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.load_alist" title="Permalink to this definition"></a></dt>
+<dd><p>Read <cite>alist</cite>-file <a class="reference internal" href="#mackay" id="id11"><span>[MacKay]</span></a> and return nested list describing the
+parity-check matrix of a code.</p>
+<p>Many code examples can be found in <a class="reference internal" href="#unikl" id="id12"><span>[UniKL]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – Path to file to be loaded.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><strong>alist</strong> (<em>list</em>) – A nested list containing the imported alist data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="bin2int">
+<h3>bin2int<a class="headerlink" href="#bin2int" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.bin2int">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">bin2int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#bin2int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.bin2int" title="Permalink to this definition"></a></dt>
+<dd><p>Convert binary array to integer.</p>
+<p>For example <code class="docutils literal notranslate"><span class="pre">arr</span></code> = <cite>[1, 0, 1]</cite> is converted to <cite>5</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>int or float</em>) – An iterable that yields 0’s and 1’s.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>int</em> – Integer representation of <code class="docutils literal notranslate"><span class="pre">arr</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="int2bin">
+<h3>int2bin<a class="headerlink" href="#int2bin" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.int2bin">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">int2bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">len_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#int2bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.int2bin" title="Permalink to this definition"></a></dt>
+<dd><p>Convert <code class="docutils literal notranslate"><span class="pre">num</span></code> of int type to list of length <code class="docutils literal notranslate"><span class="pre">len_</span></code> with 0’s and 1’s.
+<code class="docutils literal notranslate"><span class="pre">num</span></code> and <code class="docutils literal notranslate"><span class="pre">len_</span></code> have to non-negative.</p>
+<p>For e.g., <code class="docutils literal notranslate"><span class="pre">num</span></code> = <cite>5</cite>; <cite>int2bin(num</cite>, <code class="docutils literal notranslate"><span class="pre">len_</span></code> =4) = <cite>[0, 1, 0, 1]</cite>.</p>
+<p>For e.g., <code class="docutils literal notranslate"><span class="pre">num</span></code> = <cite>12</cite>; <cite>int2bin(num</cite>, <code class="docutils literal notranslate"><span class="pre">len_</span></code> =3) = <cite>[1, 0, 0]</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num</strong> (<em>int</em>) – An integer to be converted into binary representation.</p></li>
+<li><p><strong>len_</strong> (<em>int</em>) – An integer defining the length of the desired output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>list of int</em> – Binary representation of <code class="docutils literal notranslate"><span class="pre">num</span></code> of length <code class="docutils literal notranslate"><span class="pre">len_</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="bin2int-tf">
+<h3>bin2int_tf<a class="headerlink" href="#bin2int-tf" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.bin2int_tf">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">bin2int_tf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#bin2int_tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.bin2int_tf" title="Permalink to this definition"></a></dt>
+<dd><p>Converts binary tensor to int tensor. Binary representation in <code class="docutils literal notranslate"><span class="pre">arr</span></code>
+is across the last dimension from most significant to least significant.</p>
+<p>For example <code class="docutils literal notranslate"><span class="pre">arr</span></code> = <cite>[0, 1, 1]</cite> is converted to <cite>3</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>int or float</em>) – Tensor of  0’s and 1’s.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>int</em> – Tensor containing the integer representation of <code class="docutils literal notranslate"><span class="pre">arr</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="int2bin-tf">
+<h3>int2bin_tf<a class="headerlink" href="#int2bin-tf" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.int2bin_tf">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">int2bin_tf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">len_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#int2bin_tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.int2bin_tf" title="Permalink to this definition"></a></dt>
+<dd><p>Converts (int) tensor to (int) tensor with 0’s and 1’s. <cite>len_</cite> should be
+to non-negative. Additional dimension of size <cite>len_</cite> is inserted at end.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ints</strong> (<em>int</em>) – Tensor of arbitrary shape <cite>[…,k]</cite> containing integer to be
+converted into binary representation.</p></li>
+<li><p><strong>len_</strong> (<em>int</em>) – An integer defining the length of the desired output.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>int</em> – Tensor of same shape as <code class="docutils literal notranslate"><span class="pre">ints</span></code> except dimension of length
+<code class="docutils literal notranslate"><span class="pre">len_</span></code> is added at the end <cite>[…,k, len_]</cite>. Contains the binary
+representation of <code class="docutils literal notranslate"><span class="pre">ints</span></code> of length <code class="docutils literal notranslate"><span class="pre">len_</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="llr2mi">
+<h3>llr2mi<a class="headerlink" href="#llr2mi" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.llr2mi">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">llr2mi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">llr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#llr2mi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.llr2mi" title="Permalink to this definition"></a></dt>
+<dd><p>Implements an approximation of the mutual information based on LLRs.</p>
+<p>The function approximates the mutual information for given <code class="docutils literal notranslate"><span class="pre">llr</span></code> as
+derived in <a class="reference internal" href="#hagenauer" id="id13"><span>[Hagenauer]</span></a> assuming an <cite>all-zero codeword</cite> transmission</p>
+<div class="math notranslate nohighlight">
+\[I \approx 1 - \sum \operatorname{log_2} \left( 1 + \operatorname{e}^{-\text{llr}} \right).\]</div>
+<p>This approximation assumes that the following <cite>symmetry condition</cite> is fulfilled</p>
+<div class="math notranslate nohighlight">
+\[p(\text{llr}|x=0) = p(\text{llr}|x=1) \cdot \operatorname{exp}(\text{llr}).\]</div>
+<p>For <cite>non-all-zero</cite> codeword transmissions, this methods requires knowledge
+about the signs of the original bit sequence <code class="docutils literal notranslate"><span class="pre">s</span></code> and flips the signs
+correspondingly (as if the all-zero codeword was transmitted).</p>
+<p>Please note that we define LLRs as <span class="math notranslate nohighlight">\(\frac{p(x=1)}{p(x=0)}\)</span>, i.e.,
+the sign of the LLRs differ to the solution in <a class="reference internal" href="#hagenauer" id="id14"><span>[Hagenauer]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>llr</strong> (<em>tf.float32</em>) – Tensor of arbitrary shape containing LLR-values.</p></li>
+<li><p><strong>s</strong> (<em>None or tf.float32</em>) – Tensor of same shape as llr containing the signs of the
+transmitted sequence (assuming BPSK), i.e., +/-1 values.</p></li>
+<li><p><strong>reduce_dims</strong> (<em>bool</em>) – Defaults to True. If True, all dimensions are
+reduced and the return is a scalar. Otherwise, <cite>reduce_mean</cite> is
+only taken over the last dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><strong>mi</strong> (<em>tf.float32</em>) – A scalar tensor (if <code class="docutils literal notranslate"><span class="pre">reduce_dims</span></code> is True) or a tensor of same
+shape as <code class="docutils literal notranslate"><span class="pre">llr</span></code> apart from the last dimensions that is removed.
+It contains the approximated value of the mutual information.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>TypeError</strong> – If dtype of <code class="docutils literal notranslate"><span class="pre">llr</span></code> is not a real-valued float.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="j-fun">
+<h3>j_fun<a class="headerlink" href="#j-fun" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.j_fun">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">j_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#j_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.j_fun" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the <cite>J-function</cite> in NumPy.</p>
+<p>The so-called <cite>J-function</cite> relates mutual information to the mean of
+Gaussian distributed LLRs (cf. Gaussian approximation). We use the
+approximation as proposed in <a class="reference internal" href="#brannstrom" id="id15"><span>[Brannstrom]</span></a> which can be written as</p>
+<div class="math notranslate nohighlight">
+\[J(\mu) \approx \left( 1- 2^{H_\text{1}(2\mu)^{H_\text{2}}}\right)^{H_\text{2}}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu\)</span> denoting the mean value of the LLR distribution and
+<span class="math notranslate nohighlight">\(H_\text{1}=0.3073\)</span>, <span class="math notranslate nohighlight">\(H_\text{2}=0.8935\)</span> and
+<span class="math notranslate nohighlight">\(H_\text{3}=1.1064\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>mu</strong> (<em>float</em>) – float or <cite>ndarray</cite> of float.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>float</em> – <cite>ndarray</cite> of same shape as the input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="j-fun-inv">
+<h3>j_fun_inv<a class="headerlink" href="#j-fun-inv" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.j_fun_inv">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">j_fun_inv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mi</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#j_fun_inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.j_fun_inv" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the inverse <cite>J-function</cite> in NumPy.</p>
+<p>The so-called <cite>J-function</cite> relates mutual information to the mean of
+Gaussian distributed LLRs (cf. Gaussian approximation). We use the
+approximation as proposed in <a class="reference internal" href="#brannstrom" id="id16"><span>[Brannstrom]</span></a> which can be written as</p>
+<div class="math notranslate nohighlight">
+\[J(\mu) \approx \left( 1- 2^{H_\text{1}(2\mu)^{H_\text{2}}}\right)^{H_\text{2}}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu\)</span> denoting the mean value of the LLR distribution and
+<span class="math notranslate nohighlight">\(H_\text{1}=0.3073\)</span>, <span class="math notranslate nohighlight">\(H_\text{2}=0.8935\)</span> and
+<span class="math notranslate nohighlight">\(H_\text{3}=1.1064\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>mi</strong> (<em>float</em>) – float or <cite>ndarray</cite> of float.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>float</em> – <cite>ndarray</cite> of same shape as the input.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">mi</span></code> &lt; 0.001 or <code class="docutils literal notranslate"><span class="pre">mi</span></code> &gt; 0.999.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="j-fun-tf">
+<h3>j_fun_tf<a class="headerlink" href="#j-fun-tf" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.j_fun_tf">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">j_fun_tf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#j_fun_tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.j_fun_tf" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the <cite>J-function</cite> in Tensorflow.</p>
+<p>The so-called <cite>J-function</cite> relates mutual information to the mean of
+Gaussian distributed LLRs (cf. Gaussian approximation). We use the
+approximation as proposed in <a class="reference internal" href="#brannstrom" id="id17"><span>[Brannstrom]</span></a> which can be written as</p>
+<div class="math notranslate nohighlight">
+\[J(\mu) \approx \left( 1- 2^{H_\text{1}(2\mu)^{H_\text{2}}}\right)^{H_\text{2}}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu\)</span> denoting the mean value of the LLR distribution and
+<span class="math notranslate nohighlight">\(H_\text{1}=0.3073\)</span>, <span class="math notranslate nohighlight">\(H_\text{2}=0.8935\)</span> and
+<span class="math notranslate nohighlight">\(H_\text{3}=1.1064\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mu</strong> (<em>tf.float32</em>) – Tensor of arbitrary shape.</p></li>
+<li><p><strong>verify_inputs</strong> (<em>bool</em>) – A boolean defaults to True. If True, <code class="docutils literal notranslate"><span class="pre">mu</span></code> is clipped internally
+to be numerical stable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>tf.float32</em> – Tensor of same shape and dtype as <code class="docutils literal notranslate"><span class="pre">mu</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>InvalidArgumentError</strong> – If <code class="docutils literal notranslate"><span class="pre">mu</span></code> is negative.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="j-fun-inv-tf">
+<h3>j_fun_inv_tf<a class="headerlink" href="#j-fun-inv-tf" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.utils.j_fun_inv_tf">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.utils.</span></span><span class="sig-name descname"><span class="pre">j_fun_inv_tf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify_inputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/utils.html#j_fun_inv_tf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.utils.j_fun_inv_tf" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the inverse <cite>J-function</cite> in Tensorflow.</p>
+<p>The so-called <cite>J-function</cite> relates mutual information to the mean of
+Gaussian distributed LLRs (cf. Gaussian approximation). We use the
+approximation as proposed in <a class="reference internal" href="#brannstrom" id="id18"><span>[Brannstrom]</span></a> which can be written as</p>
+<div class="math notranslate nohighlight">
+\[J(\mu) \approx \left( 1- 2^{H_\text{1}(2\mu)^{H_\text{2}}}\right)^{H_\text{2}}\]</div>
+<p>with <span class="math notranslate nohighlight">\(\mu\)</span> denoting the mean value of the LLR distribution and
+<span class="math notranslate nohighlight">\(H_\text{1}=0.3073\)</span>, <span class="math notranslate nohighlight">\(H_\text{2}=0.8935\)</span> and
+<span class="math notranslate nohighlight">\(H_\text{3}=1.1064\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mi</strong> (<em>tf.float32</em>) – Tensor of arbitrary shape.</p></li>
+<li><p><strong>verify_inputs</strong> (<em>bool</em>) – A boolean defaults to True. If True, <code class="docutils literal notranslate"><span class="pre">mi</span></code> is clipped internally
+to be numerical stable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>tf.float32</em> – Tensor of same shape and dtype as the <code class="docutils literal notranslate"><span class="pre">mi</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>InvalidArgumentError</strong> – If <code class="docutils literal notranslate"><span class="pre">mi</span></code> is not in <cite>(0,1)</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl>
+<dt>References:</dt><dd><dl class="citation">
+<dt class="label" id="tenbrinkexit"><span class="brackets">tenBrinkEXIT</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id4">3</a>)</span></dt>
+<dd><p>S. ten Brink, “Convergence Behavior of Iteratively
+Decoded Parallel Concatenated Codes,” IEEE Transactions on
+Communications, vol. 49, no. 10, pp. 1727-1737, 2001.</p>
+</dd>
+<dt class="label" id="brannstrom"><span class="brackets">Brannstrom</span><span class="fn-backref">(<a href="#id6">1</a>,<a href="#id15">2</a>,<a href="#id16">3</a>,<a href="#id17">4</a>,<a href="#id18">5</a>)</span></dt>
+<dd><p>F. Brannstrom, L. K. Rasmussen, and A. J. Grant,
+“Convergence analysis and optimal scheduling for multiple
+concatenated codes,” IEEE Trans. Inform. Theory, vol. 51, no. 9,
+pp. 3354–3364, 2005.</p>
+</dd>
+<dt class="label" id="hagenauer"><span class="brackets">Hagenauer</span><span class="fn-backref">(<a href="#id13">1</a>,<a href="#id14">2</a>)</span></dt>
+<dd><p>J. Hagenauer, “The Turbo Principle in Mobile
+Communications,” in Proc. IEEE Int. Symp. Inf. Theory and its Appl.
+(ISITA), 2002.</p>
+</dd>
+<dt class="label" id="tenbrink"><span class="brackets">tenBrink</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id5">2</a>)</span></dt>
+<dd><p>S. ten Brink, G. Kramer, and A. Ashikhmin, “Design of
+low-density parity-check codes for modulation and detection,” IEEE
+Trans. Commun., vol. 52, no. 4, pp. 670–678, Apr. 2004.</p>
+</dd>
+<dt class="label" id="mackay"><span class="brackets">MacKay</span><span class="fn-backref">(<a href="#id7">1</a>,<a href="#id9">2</a>,<a href="#id10">3</a>,<a href="#id11">4</a>)</span></dt>
+<dd><p><a class="reference external" href="http://www.inference.org.uk/mackay/codes/alist.html">http://www.inference.org.uk/mackay/codes/alist.html</a></p>
+</dd>
+<dt class="label" id="unikl"><span class="brackets">UniKL</span><span class="fn-backref">(<a href="#id8">1</a>,<a href="#id12">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.uni-kl.de/en/channel-codes/">https://www.uni-kl.de/en/channel-codes/</a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fec.scrambling.html" class="btn btn-neutral float-left" title="Scrambling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mapping.html" class="btn btn-neutral float-right" title="Mapping" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1695 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discover Sionna &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorials" href="../tutorials.html" />
+    <link rel="prev" title="“Hello, world!”" href="Hello_World.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/sionna.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Discover Sionna</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<style>h3 {display: block !important}</style>
+<div style="margin-bottom:15px;">
+    <table>
+        <td style="padding: 0px 0px;">
+            <a href=" https://colab.research.google.com/github/NVlabs/sionna/blob/main/examples/Discover_Sionna.ipynb" style="vertical-align:text-bottom">
+                <img alt="Colab logo" src="../_static/colab_logo.svg" style="width: 40px; min-width: 40px">
+            </a>
+        </td>
+        <td style="padding: 4px 0px;">
+            <a href=" https://colab.research.google.com/github/nvlabs/sionna/blob/main/examples/Discover_Sionna.ipynb" style="vertical-align:text-bottom">
+                Run in Google Colab
+            </a>
+        </td>
+
+        <td style="padding: 0px 15px;">
+        </td>
+
+        <td class="wy-breadcrumbs-aside" style="padding: 0 30px;">
+            <a href="https://github.com/nvlabs/sionna/blob/main/examples/Discover_Sionna.ipynb" style="vertical-align:text-bottom">
+                <i class="fa fa-github" style="font-size:24px;"></i>
+                View on GitHub
+            </a>
+        </td>
+
+        <td class="wy-breadcrumbs-aside" style="padding: 0 35px;">
+            <a href="../examples/Discover_Sionna.ipynb" download target="_blank" style="vertical-align:text-bottom">
+                <i class="fa fa-download" style="font-size:24px;"></i>
+                Download notebook
+            </a>
+
+        </td>
+    </table>
+
+</div><div class="section" id="Discover-Sionna">
+<h1>Discover Sionna<a class="headerlink" href="#Discover-Sionna" title="Permalink to this headline"></a></h1>
+<p>This example notebook will guide you through the basic principles and illustrates the key features of <a class="reference external" href="https://nvlabs.github.io/sionna">Sionna</a>. With only a few commands, you can simulate the PHY-layer link-level performance for many 5G-compliant components, including easy visualization of the results.</p>
+<div class="section" id="Load-Required-Packages">
+<h2>Load Required Packages<a class="headerlink" href="#Load-Required-Packages" title="Permalink to this headline"></a></h2>
+<p>The Sionna python package must be <a class="reference external" href="https://nvlabs.github.io/sionna/installation.html">installed</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+
+<span class="c1"># Import Sionna</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sionna</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Install Sionna if package is not already installed</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install sionna&quot;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">sionna</span>
+
+<span class="c1"># IPython &quot;magic function&quot; for inline plots</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Tip</strong>: you can run bash commands in Jupyter via the <code class="docutils literal notranslate"><span class="pre">!</span></code> operator.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">!</span>nvidia-smi
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Wed Mar 16 14:05:36 2022
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 470.103.01   Driver Version: 470.103.01   CUDA Version: 11.4     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  Off  | 00000000:01:00.0 Off |                  N/A |
+| 51%   65C    P2   208W / 350W |   5207MiB / 24267MiB |     39%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+|   1  NVIDIA GeForce ...  Off  | 00000000:4C:00.0 Off |                  N/A |
+|  0%   28C    P8    13W / 350W |  17371MiB / 24268MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
++-----------------------------------------------------------------------------+
+</pre></div></div>
+</div>
+<p>In case multiple GPUs are available, we restrict this notebook to single-GPU usage. You can ignore this command if only one GPU is available.</p>
+<p>Further, we want to avoid that this notebook instantiates the whole GPU memory when initialized and set <code class="docutils literal notranslate"><span class="pre">memory_growth</span></code> as active.</p>
+<p><em>Remark</em>: Sionna does not require a GPU. Everything can also run on your CPU - but you may need to wait a little longer.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Configure the notebook to use only a single GPU and allocate only as much memory as needed</span>
+<span class="c1"># For more details, see https://www.tensorflow.org/guide/gpu</span>
+<span class="n">gpus</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of GPUs available :&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">gpus</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">gpus</span><span class="p">:</span>
+    <span class="n">gpu_num</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Index of the GPU to be used</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#tf.config.set_visible_devices([], &#39;GPU&#39;)</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_visible_devices</span><span class="p">(</span><span class="n">gpus</span><span class="p">[</span><span class="n">gpu_num</span><span class="p">],</span> <span class="s1">&#39;GPU&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Only GPU number&#39;</span><span class="p">,</span> <span class="n">gpu_num</span><span class="p">,</span> <span class="s1">&#39;used.&#39;</span><span class="p">)</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">set_memory_growth</span><span class="p">(</span><span class="n">gpus</span><span class="p">[</span><span class="n">gpu_num</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of GPUs available : 2
+Only GPU number 0 used.
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Sionna-Data-flow-and-Design-Paradigms">
+<h2>Sionna Data-flow and Design Paradigms<a class="headerlink" href="#Sionna-Data-flow-and-Design-Paradigms" title="Permalink to this headline"></a></h2>
+<p>Sionna inherently parallelizes simulations via <em>batching</em>, i.e., each element in the batch dimension is simulated independently.</p>
+<p>This means the first tensor dimension is always used for <em>inter-frame</em> parallelization similar to an outer <em>for-loop</em> in Matlab/NumPy simulations.</p>
+<p>To keep the dataflow efficient, Sionna follows a few simple design principles:</p>
+<ul class="simple">
+<li><p>Signal-processing components are implemented as an individual <a class="reference external" href="https://keras.io/api/layers/">Keras layer</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tf.float32</span></code> is used as preferred datatype and <code class="docutils literal notranslate"><span class="pre">tf.complex64</span></code> for complex-valued datatypes, respectively.
+This allows simpler re-use of components (e.g., the same scrambling layer can be used for binary inputs and LLR-values).</p></li>
+<li><p>Models can be developed in <em>eager mode</em> allowing simple (and fast) modification of system parameters.</p></li>
+<li><p>Number crunching simulations can be executed in the faster <em>graph mode</em> or even <em>XLA</em> acceleration is available for most components.</p></li>
+<li><p>Whenever possible, components are automatically differentiable via <a class="reference external" href="https://www.tensorflow.org/guide/autodiff">auto-grad</a> to simplify the deep learning design-flow.</p></li>
+<li><p>Code is structured into sub-packages for different tasks such as channel coding, mapping,… (see <a class="reference external" href="https://nvlabs.github.io/sionna/api/sionna.html">API documentation</a> for details).</p></li>
+</ul>
+<p>The division into individual blocks simplifies deployment and all layers and functions comes with unittests to ensure their correct behavior.</p>
+<p>These paradigms simplify the re-useability and reliability of our components for a wide range of communications related applications.</p>
+</div>
+<div class="section" id="Let’s-Get-Started---The-First-Layers-(Eager-Mode)">
+<h2>Let’s Get Started - The First Layers (<em>Eager Mode</em>)<a class="headerlink" href="#Let’s-Get-Started---The-First-Layers-(Eager-Mode)" title="Permalink to this headline"></a></h2>
+<p>Every layer needs to be initialized once before it can be used.</p>
+<p><strong>Tip</strong>: use the <a class="reference external" href="https://nvlabs.github.io/sionna/api/sionna.html">API documentation</a> to find an overview of all existing components.</p>
+<p>We now want to transmit some symbols over an AWGN channel. First, we need to initialize the corresponding layer.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">channel</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">AWGN</span><span class="p">()</span> <span class="c1"># init AWGN channel layer</span>
+</pre></div>
+</div>
+</div>
+<p>In this first example, we want to add Gaussian noise to some given values of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<p>Remember - the first dimension is the <em>batch-dimension</em>.</p>
+<p>We simulate 2 message frames each containing 4 symbols.</p>
+<p><em>Remark</em>: the <a class="reference external" href="https://nvlabs.github.io/sionna/api/channel.html#awgn">AWGN channel</a> is defined to be complex-valued.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># define a (complex-valued) tensor to be transmitted</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span> <span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+
+<span class="c1"># let&#39;s have look at the shape</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of x: &quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Values of x: &quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Shape of x:  (2, 4)
+Values of x:  tf.Tensor(
+[[ 0. +0.j  1.5+0.j  1. +0.j  0. +0.j]
+ [-1. +0.j  0. +0.j -2. +0.j  3. +0.j]], shape=(2, 4), dtype=complex64)
+</pre></div></div>
+</div>
+<p>We want to simulate the channel at an SNR of 5 dB. For this, we can simply <em>call</em> the previously defined layer <code class="docutils literal notranslate"><span class="pre">channel</span></code>.</p>
+<p>If you have never used <a class="reference external" href="https://keras.io">Keras</a> you can think of a layer as of a function: it has an input and returns the processed output.</p>
+<p><em>Remark</em>: Each time this cell is executed a new noise realization is drawn.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ebno_db</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># calculate noise variance from given EbNo</span>
+<span class="n">no</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span> <span class="o">=</span> <span class="n">ebno_db</span><span class="p">,</span>
+                            <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># QPSK</span>
+                            <span class="n">coderate</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">channel</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Noisy symbols are: &quot;</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Noisy symbols are:  tf.Tensor(
+[[ 0.17642795-0.21076633j  1.540727  +0.2577709j   0.676615  -0.14763176j
+  -0.14807788-0.01961605j]
+ [-0.9018068 -0.04732923j -0.55583185+0.41312575j -1.8852113 -0.23232108j
+   3.3803759 +0.2269492j ]], shape=(2, 4), dtype=complex64)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Batches-and-Multi-dimensional-Tensors">
+<h2>Batches and Multi-dimensional Tensors<a class="headerlink" href="#Batches-and-Multi-dimensional-Tensors" title="Permalink to this headline"></a></h2>
+<p>Sionna natively supports multi-dimensional tensors.</p>
+<p>Most layers operate at the last dimension and can have arbitrary input shapes (preserved at output).</p>
+<p>Let us assume we want to add a CRC-24 check to 64 codewords of length 500 (e.g., different CRC per sub-carrier). Further, we want to parallelize the simulation over a batch of 100 samples.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># outer level of parallelism</span>
+<span class="n">num_codewords</span> <span class="o">=</span> <span class="mi">64</span> <span class="c1"># codewords per batch sample</span>
+<span class="n">info_bit_length</span> <span class="o">=</span> <span class="mi">500</span> <span class="c1"># info bits PER codeword</span>
+
+<span class="n">source</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">BinarySource</span><span class="p">()</span> <span class="c1"># yields random bits</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_codewords</span><span class="p">,</span> <span class="n">info_bit_length</span><span class="p">])</span> <span class="c1"># call the source layer</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of u: &quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># initialize an CRC encoder with the standard compliant &quot;CRC24A&quot; polynomial</span>
+<span class="n">encoder_crc</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">crc</span><span class="o">.</span><span class="n">CRCEncoder</span><span class="p">(</span><span class="s2">&quot;CRC24A&quot;</span><span class="p">)</span>
+<span class="n">decoder_crc</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">crc</span><span class="o">.</span><span class="n">CRCDecoder</span><span class="p">(</span><span class="n">encoder_crc</span><span class="p">)</span> <span class="c1"># connect to encoder</span>
+
+<span class="c1"># add the CRC to the information bits u</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">encoder_crc</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="c1"># returns a list [c, crc_valid]</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of c: &quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processed bits: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span>
+
+<span class="c1"># we can also verify the results</span>
+<span class="c1"># returns list of [info bits without CRC bits, indicator if CRC holds]</span>
+<span class="n">u_hat</span><span class="p">,</span> <span class="n">crc_valid</span> <span class="o">=</span> <span class="n">decoder_crc</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of u_hat: &quot;</span><span class="p">,</span> <span class="n">u_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of crc_valid: &quot;</span><span class="p">,</span> <span class="n">crc_valid</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Valid CRC check of first codeword: &quot;</span><span class="p">,</span> <span class="n">crc_valid</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Shape of u:  (100, 64, 500)
+Shape of c:  (100, 64, 524)
+Processed bits:  3353600
+Shape of u_hat:  (100, 64, 500)
+Shape of crc_valid:  (100, 64, 1)
+Valid CRC check of first codeword:  True
+</pre></div></div>
+</div>
+<p>We want to do another simulation but for 5 independent users.</p>
+<p>Instead of defining 5 different tensors, we can simply add another dimension.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">num_users</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_users</span><span class="p">,</span> <span class="n">num_codewords</span><span class="p">,</span> <span class="n">info_bit_length</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New shape of u: &quot;</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># We can re-use the same encoder as before</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">encoder_crc</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;New shape of c: &quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processed bits: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">numpy</span><span class="p">()))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+New shape of u:  (100, 5, 64, 500)
+New shape of c:  (100, 5, 64, 524)
+Processed bits:  16768000
+</pre></div></div>
+</div>
+<p>Often a good visualization of results helps to get new research ideas. Thus, Sionna has built-in plotting functions.</p>
+<p>Let’s have look at a 16-QAM constellation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">constellation</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Constellation</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">constellation</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_Discover_Sionna_19_0.png" src="../_images/examples_Discover_Sionna_19_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="First-Link-level-Simulation">
+<h2>First Link-level Simulation<a class="headerlink" href="#First-Link-level-Simulation" title="Permalink to this headline"></a></h2>
+<p>We can already build powerful code with a few simple commands.</p>
+<p>As mentioned earlier, Sionna aims at hiding system complexity into Keras layers. However, we still want to provide as much flexibility as possible. Thus, most layers have several choices of init parameters, but often the default choice is a good start.</p>
+<p><strong>Tip</strong>: the <a class="reference external" href="https://nvlabs.github.io/sionna/api/sionna.html">API documentation</a> provides many helpful references and implementation details.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># system parameters</span>
+<span class="n">n_ldpc</span> <span class="o">=</span> <span class="mi">500</span> <span class="c1"># LDPC codeword length</span>
+<span class="n">k_ldpc</span> <span class="o">=</span> <span class="mi">250</span> <span class="c1"># number of info bits per LDPC codeword</span>
+<span class="n">coderate</span> <span class="o">=</span> <span class="n">k_ldpc</span> <span class="o">/</span> <span class="n">n_ldpc</span>
+<span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># number of bits mapped to one symbol (cf. QAM)</span>
+</pre></div>
+</div>
+</div>
+<p>Often, several different algorithms are implemented, e.g., the demapper supports <em>“true app”</em> demapping, but also <em>“max-log”</em> demapping.</p>
+<p>The check-node (CN) update function of the LDPC BP decoder also supports multiple algorithms.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">demapping_method</span> <span class="o">=</span> <span class="s2">&quot;app&quot;</span> <span class="c1"># try &quot;max-log&quot;</span>
+<span class="n">ldpc_cn_type</span> <span class="o">=</span> <span class="s2">&quot;boxplus&quot;</span> <span class="c1"># try also &quot;minsum&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>Let us initialize all required components for the given system parameters.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">binary_source</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">BinarySource</span><span class="p">()</span>
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">LDPC5GEncoder</span><span class="p">(</span><span class="n">k_ldpc</span><span class="p">,</span> <span class="n">n_ldpc</span><span class="p">)</span>
+<span class="n">constellation</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Constellation</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">)</span>
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Mapper</span><span class="p">(</span><span class="n">constellation</span><span class="o">=</span><span class="n">constellation</span><span class="p">)</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">AWGN</span><span class="p">()</span>
+<span class="n">demapper</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Demapper</span><span class="p">(</span><span class="n">demapping_method</span><span class="p">,</span>
+                                   <span class="n">constellation</span><span class="o">=</span><span class="n">constellation</span><span class="p">)</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">decoding</span><span class="o">.</span><span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span>
+                                                 <span class="n">hard_out</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cn_type</span><span class="o">=</span><span class="n">ldpc_cn_type</span><span class="p">,</span>
+                                                 <span class="n">num_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can now run the code in <em>eager mode</em>. This allows us to modify the structure at any time - you can try a different <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> or a different SNR <code class="docutils literal notranslate"><span class="pre">ebno_db</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># simulation parameters</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># Generate a batch of random bit vectors</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">binary_source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">k_ldpc</span><span class="p">])</span>
+
+<span class="c1"># Encode the bits using 5G LDPC code</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape before encoding: &quot;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape after encoding: &quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Map bits to constellation symbols</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape after mapping: &quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Transmit over an AWGN channel at SNR &#39;ebno_db&#39;</span>
+<span class="n">no</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">coderate</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">channel</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape after channel: &quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Demap to LLRs</span>
+<span class="n">llr</span> <span class="o">=</span> <span class="n">demapper</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape after demapping: &quot;</span><span class="p">,</span> <span class="n">llr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># LDPC decoding using 20 BP iterations</span>
+<span class="n">b_hat</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape after decoding: &quot;</span><span class="p">,</span> <span class="n">b_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># calculate BERs</span>
+<span class="n">c_hat</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">llr</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="c1"># hard-decided bits before dec.</span>
+<span class="n">ber_uncoded</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">compute_ber</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">c_hat</span><span class="p">)</span>
+
+<span class="n">ber_coded</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">compute_ber</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BER uncoded = </span><span class="si">{:.3f}</span><span class="s2"> at EbNo = </span><span class="si">{:.1f}</span><span class="s2"> dB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ber_uncoded</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BER after decoding = </span><span class="si">{:.3f}</span><span class="s2"> at EbNo = </span><span class="si">{:.1f}</span><span class="s2"> dB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ber_coded</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;In total </span><span class="si">{}</span><span class="s2"> bits were simulated&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">numpy</span><span class="p">())))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Shape before encoding:  (1000, 250)
+Shape after encoding:  (1000, 500)
+Shape after mapping:  (1000, 125)
+Shape after channel:  (1000, 125)
+Shape after demapping:  (1000, 500)
+Shape after decoding:  (1000, 250)
+BER uncoded = 0.119 at EbNo = 4.0 dB
+BER after decoding = 0.010 at EbNo = 4.0 dB
+In total 250000 bits were simulated
+</pre></div></div>
+</div>
+<p>Just to summarize: we have simulated the transmission of 250,000 bits including higher-order modulation and channel coding!</p>
+<p>But we can go even faster with the <em>TF graph execution</em>!</p>
+</div>
+<div class="section" id="Setting-up-the-End-to-end-Model">
+<h2>Setting up the End-to-end Model<a class="headerlink" href="#Setting-up-the-End-to-end-Model" title="Permalink to this headline"></a></h2>
+<p>We now define a <em>Keras model</em> that is more convenient for training and Monte-Carlo simulations.</p>
+<p>We simulate the transmission over a time-varying multi-path channel (the <em>TDL-A</em> model from 3GPP TR38.901). For this, OFDM and a <em>conventional</em> bit-interleaved coded modulation (BICM) scheme with higher order modulation is used. The information bits are protected by a 5G-compliant LDPC code.</p>
+<p><em>Remark</em>: Due to the large number of parameters, we define them as dictionary.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">class</span> <span class="nc">e2e_model</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span> <span class="c1"># inherits from keras.model</span>
+    <span class="sd">&quot;&quot;&quot;Example model for end-to-end link-level simulations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params: dict</span>
+<span class="sd">        A dictionary defining the system parameters.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    batch_size: int or tf.int</span>
+<span class="sd">        The batch_sizeused for the simulation.</span>
+
+<span class="sd">    ebno_db: float or tf.float</span>
+<span class="sd">        A float defining the simulation SNR.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    (b, b_hat):</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    b: tf.float32</span>
+<span class="sd">        A tensor of shape `[batch_size, k]` containing the transmitted</span>
+<span class="sd">        information bits.</span>
+
+<span class="sd">    b_hat: tf.float32</span>
+<span class="sd">        A tensor of shape `[batch_size, k]` containing the receiver&#39;s</span>
+<span class="sd">        estimate of the transmitted information bits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">params</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+
+        <span class="c1"># Define an OFDM Resource Grid Object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rg</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">ResourceGrid</span><span class="p">(</span>
+                            <span class="n">num_ofdm_symbols</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_ofdm_symbols&quot;</span><span class="p">],</span>
+                            <span class="n">fft_size</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;fft_size&quot;</span><span class="p">],</span>
+                            <span class="n">subcarrier_spacing</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;subcarrier_spacing&quot;</span><span class="p">],</span>
+                            <span class="n">num_tx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">num_streams_per_tx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">cyclic_prefix_length</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cyclic_prefix_length&quot;</span><span class="p">],</span>
+                            <span class="n">pilot_pattern</span><span class="o">=</span><span class="s2">&quot;kronecker&quot;</span><span class="p">,</span>
+                            <span class="n">pilot_ofdm_symbol_indices</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;pilot_ofdm_symbol_indices&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Create a Stream Management object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sm</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mimo</span><span class="o">.</span><span class="n">StreamManagement</span><span class="p">(</span><span class="n">rx_tx_association</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]]),</span>
+                                               <span class="n">num_streams_per_tx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">coderate</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;coderate&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;num_bits_per_symbol&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="o">.</span><span class="n">num_data_symbols</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="o">*</span><span class="n">coderate</span><span class="p">)</span>
+
+        <span class="c1"># Init layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binary_source</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">BinarySource</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">encoding</span><span class="o">.</span><span class="n">LDPC5GEncoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interleaver</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">interleaving</span><span class="o">.</span><span class="n">RowColumnInterleaver</span><span class="p">(</span>
+                                        <span class="n">row_depth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deinterleaver</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">interleaving</span><span class="o">.</span><span class="n">Deinterleaver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interleaver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Mapper</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rg_mapper</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">ResourceGridMapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tdl</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">tr38901</span><span class="o">.</span><span class="n">TDL</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span>
+                           <span class="n">delay_spread</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;delay_spread&quot;</span><span class="p">],</span>
+                           <span class="n">carrier_frequency</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;carrier_frequency&quot;</span><span class="p">],</span>
+                           <span class="n">min_speed</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;min_speed&quot;</span><span class="p">],</span>
+                           <span class="n">max_speed</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;max_speed&quot;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">OFDMChannel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tdl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="p">,</span> <span class="n">add_awgn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ls_est</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">LSChannelEstimator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="p">,</span> <span class="n">interpolation_type</span><span class="o">=</span><span class="s2">&quot;nn&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmmse_equ</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">LMMSEEqualizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Demapper</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;demapping_method&quot;</span><span class="p">],</span>
+                                                <span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">decoding</span><span class="o">.</span><span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">,</span>
+                                                    <span class="n">hard_out</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                    <span class="n">cn_type</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cn_type&quot;</span><span class="p">],</span>
+                                                    <span class="n">num_iter</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;bp_iter&quot;</span><span class="p">])</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of pilots: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="o">.</span><span class="n">num_pilot_symbols</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of data symbols: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="o">.</span><span class="n">num_data_symbols</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of resource elements: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="o">.</span><span class="n">num_resource_elements</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pilot overhead: </span><span class="si">{:.2f}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="o">.</span><span class="n">num_pilot_symbols</span> <span class="o">/</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="o">.</span><span class="n">num_resource_elements</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Cyclic prefix overhead: </span><span class="si">{:.2f}</span><span class="s2">%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                    <span class="n">params</span><span class="p">[</span><span class="s2">&quot;cyclic_prefix_length&quot;</span><span class="p">]</span> <span class="o">/</span>
+                                    <span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;cyclic_prefix_length&quot;</span><span class="p">]</span>
+                                    <span class="o">+</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;fft_size&quot;</span><span class="p">])</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Each frame contains </span><span class="si">{}</span><span class="s2"> information bits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+
+        <span class="c1"># Generate a batch of random bit vectors</span>
+        <span class="c1"># We need two dummy dimension representing the number of</span>
+        <span class="c1"># transmitters and streams per transmitter, respectively.</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">])</span>
+
+        <span class="c1"># Encode the bits using the all-zero dummy encoder</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+        <span class="c1"># Interleave the bits before mapping (BICM)</span>
+        <span class="n">c_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interleaver</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="c1"># Map bits to constellation symbols</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="p">(</span><span class="n">c_int</span><span class="p">)</span>
+
+        <span class="c1"># Map symbols onto OFDM ressource grid</span>
+        <span class="n">x_rg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rg_mapper</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="c1"># Transmit over noisy multi-path channel</span>
+        <span class="n">no</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coderate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rg</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">([</span><span class="n">x_rg</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span>
+
+        <span class="c1"># LS Channel estimation with nearest pilot interpolation</span>
+        <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ls_est</span> <span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span>
+
+        <span class="c1"># LMMSE Equalization</span>
+        <span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmmse_equ</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span>
+
+        <span class="c1"># Demap to LLRs</span>
+        <span class="n">llr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span><span class="p">([</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span><span class="p">])</span>
+
+        <span class="c1"># Deinterleave before decoding</span>
+        <span class="n">llr_int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deinterleaver</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+
+        <span class="c1"># Decode</span>
+        <span class="n">b_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">llr_int</span><span class="p">)</span>
+
+        <span class="c1"># number of simulated bits</span>
+        <span class="n">nb_bits</span> <span class="o">=</span> <span class="n">batch_size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span>
+
+        <span class="c1"># transmitted bits and the receiver&#39;s estimate after decoding</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span>
+</pre></div>
+</div>
+</div>
+<p>Let us define the system parameters for our simulation as dictionary:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sys_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Channel</span>
+    <span class="s2">&quot;carrier_frequency&quot;</span> <span class="p">:</span> <span class="mf">3.5e9</span><span class="p">,</span>
+    <span class="s2">&quot;delay_spread&quot;</span> <span class="p">:</span> <span class="mf">100e-9</span><span class="p">,</span>
+    <span class="s2">&quot;min_speed&quot;</span> <span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;max_speed&quot;</span> <span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;tdl_model&quot;</span> <span class="p">:</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span>
+
+    <span class="c1"># OFDM</span>
+    <span class="s2">&quot;fft_size&quot;</span> <span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="s2">&quot;subcarrier_spacing&quot;</span> <span class="p">:</span> <span class="mf">30e3</span><span class="p">,</span>
+    <span class="s2">&quot;num_ofdm_symbols&quot;</span> <span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="s2">&quot;cyclic_prefix_length&quot;</span> <span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s2">&quot;pilot_ofdm_symbol_indices&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span>
+
+    <span class="c1"># Code &amp; Modulation</span>
+    <span class="s2">&quot;coderate&quot;</span> <span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="s2">&quot;num_bits_per_symbol&quot;</span> <span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">&quot;demapping_method&quot;</span> <span class="p">:</span> <span class="s2">&quot;app&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cn_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;boxplus&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bp_iter&quot;</span> <span class="p">:</span> <span class="mi">20</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>…and initialize the model:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model</span> <span class="o">=</span> <span class="n">e2e_model</span><span class="p">(</span><span class="n">sys_params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of pilots: 512
+Number of data symbols: 3072
+Number of resource elements: 3584
+Pilot overhead: 14.29%
+Cyclic prefix overhead: 5.88%
+Each frame contains 6144 information bits
+</pre></div></div>
+</div>
+<p>As before, we can simply <em>call</em> the model to simulate the BER for the given simulation parameters.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#simulation parameters</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="c1"># and call the model</span>
+<span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">)</span>
+
+<span class="n">ber</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">compute_ber</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span><span class="p">)</span>
+<span class="n">nb_bits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BER: </span><span class="si">{:.4}</span><span class="s2"> at Eb/No of </span><span class="si">{}</span><span class="s2"> dB and </span><span class="si">{}</span><span class="s2"> simulated bits&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ber</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">ebno_db</span><span class="p">,</span> <span class="n">nb_bits</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+BER: 0.006234 at Eb/No of 10 dB and 1228800 simulated bits
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Run-some-Throughput-Tests-(Graph-Mode)">
+<h2>Run some Throughput Tests (Graph Mode)<a class="headerlink" href="#Run-some-Throughput-Tests-(Graph-Mode)" title="Permalink to this headline"></a></h2>
+<p>Sionna is not just an easy-to-use library, but also incredibly fast. Let us measure the throughput of the model defined above.</p>
+<p>We compare <em>eager</em> and <em>graph</em> execution modes (see <a class="reference external" href="https://www.tensorflow.org/guide/intro_to_graphs">Tensorflow Doc</a> for details), as well as <em>eager with XLA</em> (see <a class="reference external" href="https://www.tensorflow.org/xla#enable_xla_for_tensorflow_models">https://www.tensorflow.org/xla#enable_xla_for_tensorflow_models</a>). Note that we need to activate the <a class="reference external" href="https://nvlabs.github.io/sionna/api/config.html#sionna.Config.xla_compat">sionna.config.xla_compat</a> feature for XLA to work.</p>
+<p><strong>Tip</strong>: change the <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> to see how the batch parallelism enhances the throughput. Depending on your machine, the <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> may be too large.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span> <span class="c1"># this block requires the timeit library</span>
+
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># evalaute SNR point</span>
+<span class="n">repetitions</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># throughput is averaged over multiple runs</span>
+
+<span class="k">def</span> <span class="nf">get_throughput</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Simulate throughput in bit/s per ebno_db point.</span>
+
+<span class="sd">    The results are average over `repetition` trials.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    batch_size: int or tf.int32</span>
+<span class="sd">        Batch-size for evaluation.</span>
+
+<span class="sd">    ebno_db: float or tf.float32</span>
+<span class="sd">        A tensor containing the SNR points be evaluated</span>
+
+<span class="sd">    model:</span>
+<span class="sd">        Function or model that yields the transmitted bits `u` and the</span>
+<span class="sd">        receiver&#39;s estimate `u_hat` for a given ``batch_size`` and</span>
+<span class="sd">        ``ebno_db``.</span>
+
+<span class="sd">    repetitions: int</span>
+<span class="sd">        An integer defining how many trails of the throughput</span>
+<span class="sd">        simulation are averaged.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="c1"># call model once to be sure it is compile properly</span>
+    <span class="c1"># otherwise time to build graph is measured as well.</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">u_hat</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+                     <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+    <span class="n">t_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="c1"># average over multiple runs</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">repetitions</span><span class="p">):</span>
+        <span class="n">u</span><span class="p">,</span> <span class="n">u_hat</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span> <span class="n">float32</span><span class="p">))</span>
+    <span class="n">t_stop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+    <span class="c1"># throughput in bit/s</span>
+    <span class="n">throughput</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span><span class="o">*</span><span class="n">repetitions</span> <span class="o">/</span> <span class="p">(</span><span class="n">t_stop</span> <span class="o">-</span> <span class="n">t_start</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">throughput</span>
+
+<span class="c1"># eager mode - just call the model</span>
+<span class="k">def</span> <span class="nf">run_eager</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">)</span>
+
+<span class="n">time_eager</span> <span class="o">=</span> <span class="n">get_throughput</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">,</span> <span class="n">run_eager</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># the decorator &quot;@tf.function&quot; enables the graph mode</span>
+<span class="nd">@tf</span><span class="o">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">run_graph</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">)</span>
+
+<span class="n">time_graph</span> <span class="o">=</span> <span class="n">get_throughput</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">,</span> <span class="n">run_graph</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># the decorator &quot;@tf.function(jit_compile=True)&quot; enables the graph mode with XLA</span>
+<span class="c1"># we need to activate the sionna.config.xla_compat feature for this to work</span>
+<span class="n">sionna</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">xla_compat</span><span class="o">=</span><span class="kc">True</span>
+<span class="nd">@tf</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">jit_compile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">run_graph_xla</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">)</span>
+
+<span class="n">time_graph_xla</span> <span class="o">=</span> <span class="n">get_throughput</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">,</span> <span class="n">run_graph_xla</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># we deactivate the sionna.config.xla_compat so that the cell can be run mutiple times</span>
+<span class="n">sionna</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">xla_compat</span><span class="o">=</span><span class="kc">False</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Throughput in eager execution: </span><span class="si">{</span><span class="n">time_eager</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Mb/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Throughput in graph execution: </span><span class="si">{</span><span class="n">time_graph</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Mb/s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Throughput in graph execution with XLA: </span><span class="si">{</span><span class="n">time_graph_xla</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Mb/s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+WARNING:tensorflow:From /usr/local/lib/python3.8/dist-packages/tensorflow/python/util/dispatch.py:1082: calling gather (from tensorflow.python.ops.array_ops) with validate_indices is deprecated and will be removed in a future version.
+Instructions for updating:
+The `validate_indices` argument has no effect. Indices are always validated on CPU and never validated on GPU.
+Throughput in eager execution: 0.51 Mb/s
+Throughput in graph execution: 4.10 Mb/s
+Throughput in graph execution with XLA: 43.72 Mb/s
+</pre></div></div>
+</div>
+<p>Obviously, <em>graph</em> execution (with XLA) yields much higher throughputs (at least if a fast GPU is available). Thus, for exhaustive training and Monte-Carlo simulations the <em>graph</em> mode (with XLA and GPU acceleration) is the preferred choice.</p>
+</div>
+<div class="section" id="Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">
+<h2>Bit-Error Rate (BER) Monte-Carlo Simulations<a class="headerlink" href="#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations" title="Permalink to this headline"></a></h2>
+<p>Monte-Carlo simulations are omnipresent in todays communications research and development. Due its performant implementation, Sionna can be directly used to simulate BER at a performance that competes with compiled languages – but still keeps the flexibility of a script language.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ebno_dbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">200</span> <span class="c1"># reduce in case you receive an out-of-memory (OOM) error</span>
+
+<span class="n">max_mc_iter</span> <span class="o">=</span> <span class="mi">1000</span> <span class="c1"># max number of Monte-Carlo iterations before going to next SNR point</span>
+<span class="n">num_target_block_errors</span> <span class="o">=</span> <span class="mi">500</span> <span class="c1"># continue with next SNR point after target number of block errors</span>
+
+<span class="c1"># we use the built-in ber simulator function from Sionna which uses and early stop after reaching num_target_errors</span>
+<span class="n">sionna</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">xla_compat</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">ber_mc</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">sim_ber</span><span class="p">(</span><span class="n">run_graph_xla</span><span class="p">,</span> <span class="c1"># you can also evaluate the model directly</span>
+                                <span class="n">ebno_dbs</span><span class="p">,</span>
+                                <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                                <span class="n">num_target_block_errors</span><span class="o">=</span><span class="n">num_target_block_errors</span><span class="p">,</span>
+                                <span class="n">max_mc_iter</span><span class="o">=</span><span class="n">max_mc_iter</span><span class="p">,</span>
+                                <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># print status and summary</span>
+<span class="n">sionna</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">xla_compat</span><span class="o">=</span><span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 3.4157e-01 | 1.0000e+00 |     1259148 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      1.0 | 3.1979e-01 | 1.0000e+00 |     1178870 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      2.0 | 2.9844e-01 | 1.0000e+00 |     1100177 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      3.0 | 2.7401e-01 | 1.0000e+00 |     1010102 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      4.0 | 2.4763e-01 | 1.0000e+00 |      912849 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      5.0 | 2.2038e-01 | 1.0000e+00 |      812407 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      6.0 | 1.8646e-01 | 1.0000e+00 |      687378 |     3686400 |          600 |         600 |         0.1 |reached target block errors
+      7.0 | 1.1909e-01 | 9.9000e-01 |      439008 |     3686400 |          594 |         600 |         0.1 |reached target block errors
+      8.0 | 4.1536e-02 | 4.7667e-01 |      306236 |     7372800 |          572 |        1200 |         0.2 |reached target block errors
+      9.0 | 1.2096e-02 | 1.4028e-01 |      267553 |    22118400 |          505 |        3600 |         0.6 |reached target block errors
+     10.0 | 3.2914e-03 | 3.5278e-02 |      291203 |    88473600 |          508 |       14400 |         2.5 |reached target block errors
+     11.0 | 9.5878e-04 | 9.8814e-03 |      298073 |   310886400 |          500 |       50600 |         8.5 |reached target block errors
+     12.0 | 2.6973e-04 | 2.7933e-03 |      296647 |  1099776000 |          500 |      179000 |        29.6 |reached target block errors
+     13.0 | 9.2277e-05 | 9.6000e-04 |      113390 |  1228800000 |          192 |      200000 |        32.9 |reached max iter
+     14.0 | 3.3341e-05 | 3.8000e-04 |       40970 |  1228800000 |           76 |      200000 |        32.6 |reached max iter
+</pre></div></div>
+</div>
+<p>Let’s look at the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">sionna</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">plotting</span><span class="o">.</span><span class="n">plot_ber</span><span class="p">(</span><span class="n">ebno_dbs</span><span class="p">,</span>
+                               <span class="n">ber_mc</span><span class="p">,</span>
+                               <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;E2E Model&quot;</span><span class="p">,</span>
+                               <span class="n">ylabel</span><span class="o">=</span><span class="s2">&quot;Coded BER&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_Discover_Sionna_43_0.png" src="../_images/examples_Discover_Sionna_43_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Conclusion">
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline"></a></h2>
+<p>We hope you are excited about Sionna - there is much more to be discovered:</p>
+<ul class="simple">
+<li><p>TensorBoard debugging available</p></li>
+<li><p>Scaling to multi-GPU simulation is simple</p></li>
+<li><p>See the <a class="reference external" href="https://nvlabs.github.io/sionna/tutorials.html">available tutorials</a> for more advanced examples.</p></li>
+</ul>
+<p>And if something is still missing - the project is <a class="reference external" href="https://github.com/nvlabs/sionna/">open-source</a>: you can modify, add, and extend any component at any time.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Hello_World.html" class="btn btn-neutral float-left" title="“Hello, world!”" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

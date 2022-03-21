@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapping &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Channel" href="channel.html" />
+    <link rel="prev" title="FEC Utility Functions" href="fec.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="sionna.html">API Documentation</a> &raquo;</li>
+      <li>Mapping</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="mapping">
+<h1>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline"></a></h1>
+<p>This module contains classes and functions related to mapping
+of bits to constellation symbols and demapping of soft-symbols
+to log-likelihood ratios (LLRs). The key components are the
+<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>, <a class="reference internal" href="#sionna.mapping.Mapper" title="sionna.mapping.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a>,
+and <a class="reference internal" href="#sionna.mapping.Demapper" title="sionna.mapping.Demapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Demapper</span></code></a>. A <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+can be made trainable to enable learning of geometric shaping.</p>
+<div class="section" id="constellations">
+<h2>Constellations<a class="headerlink" href="#constellations" title="Permalink to this headline"></a></h2>
+<div class="section" id="constellation">
+<h3>Constellation<a class="headerlink" href="#constellation" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">Constellation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Constellation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Constellation" title="Permalink to this definition"></a></dt>
+<dd><p>Constellation that can be used by a (de)mapper.</p>
+<p>This class defines a constellation, i.e., a complex-valued vector of
+constellation points. A constellation can be trainable. The binary
+representation of the index of an element of this vector corresponds
+to the bit label of the constellation point. This implicit bit
+labeling is used by the <code class="docutils literal notranslate"><span class="pre">Mapper</span></code> and <code class="docutils literal notranslate"><span class="pre">Demapper</span></code> classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, the constellation points are randomly initialized
+if no <code class="docutils literal notranslate"><span class="pre">initial_value</span></code> is provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.</p></li>
+<li><p><strong>initial_value</strong> (<span class="math notranslate nohighlight">\([2^\text{num_bits_per_symbol}]\)</span>, NumPy array or Tensor) – Initial values of the constellation points. If <code class="docutils literal notranslate"><span class="pre">normalize</span></code> or
+<code class="docutils literal notranslate"><span class="pre">center</span></code> are <cite>True</cite>, the initial constellation might be changed.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the constellation is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>center</strong> (<em>bool</em>) – If <cite>True</cite>, the constellation is ensured to have zero mean.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the constellation points are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>[</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>]</em><em>, </em><em>tf.DType</em>) – The dtype of the constellation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\([2^\text{num_bits_per_symbol}]\)</span>, <code class="docutils literal notranslate"><span class="pre">dtype</span></code> – The constellation.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>One can create a trainable PAM/QAM constellation. This is
+equivalent to creating a custom trainable constellation which is
+initialized with PAM/QAM constellation points.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation.center">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#sionna.mapping.Constellation.center" title="Permalink to this definition"></a></dt>
+<dd><p>Indicates if the constellation is centered.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.mapping.Constellation.normalize" title="Permalink to this definition"></a></dt>
+<dd><p>Indicates if the constellation is normalized or not.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation.num_bits_per_symbol">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_bits_per_symbol</span></span><a class="headerlink" href="#sionna.mapping.Constellation.num_bits_per_symbol" title="Permalink to this definition"></a></dt>
+<dd><p>The number of bits per constellation symbol.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation.points">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#sionna.mapping.Constellation.points" title="Permalink to this definition"></a></dt>
+<dd><p>The (possibly) centered and normalized constellation points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(7,</span> <span class="pre">7)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Constellation.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Constellation.show" title="Permalink to this definition"></a></dt>
+<dd><p>Generate a scatter-plot of the constellation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>labels</strong> (<em>bool</em>) – If <cite>True</cite>, the bit labels will be drawn next to each constellation
+point. Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>figsize</strong> (<em>Two-element Tuple, float</em>) – Width and height in inches. Defaults to <cite>(7,7)</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>matplotlib.figure.Figure</em> – A handle to a matplot figure object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="qam">
+<h3>qam<a class="headerlink" href="#qam" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.mapping.qam">
+<span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">qam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#qam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.qam" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a QAM constellation.</p>
+<p>This function generates a complex-valued vector, where each element is
+a constellation point of an M-ary QAM constellation. The bit
+label of the <code class="docutils literal notranslate"><span class="pre">n</span></code> th point is given by the length-<code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code>
+binary represenation of <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation point.
+Must be a multiple of two, e.g., 2, 4, 6, 8, etc.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the constellation is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\([2^{\text{num_bits_per_symbol}}]\)</span>, np.complex64 – The QAM constellation.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The bit label of the nth constellation point is given by the binary
+representation of its position within the array and can be obtained
+through <code class="docutils literal notranslate"><span class="pre">np.binary_repr(n,</span> <span class="pre">num_bits_per_symbol)</span></code>.</p>
+</div>
+<p>The normalization factor of a QAM constellation is given in
+closed-form as:</p>
+<div class="math notranslate nohighlight">
+\[\sqrt{\frac{1}{2^{n-2}}\sum_{i=1}^{2^{n-1}}(2i-1)^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n= \text{num_bits_per_symbol}/2\)</span> is the number of bits
+per dimension.</p>
+<p>This algorithm is a recursive implementation of the expressions found in
+Section 5.1 of <a class="reference internal" href="#gppts38211" id="id1"><span>[3GPPTS38211]</span></a>. It is used in the 5G standard.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pam">
+<h3>pam<a class="headerlink" href="#pam" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.mapping.pam">
+<span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">pam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#pam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.pam" title="Permalink to this definition"></a></dt>
+<dd><p>Generates a PAM constellation.</p>
+<p>This function generates a real-valued vector, where each element is
+a constellation point of an M-ary PAM constellation. The bit
+label of the <code class="docutils literal notranslate"><span class="pre">n</span></code> th point is given by the length-<code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code>
+binary represenation of <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation point.
+Must be positive.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the constellation is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\([2^{\text{num_bits_per_symbol}}]\)</span>, np.float32 – The PAM constellation.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The bit label of the nth constellation point is given by the binary
+representation of its position within the array and can be obtained
+through <code class="docutils literal notranslate"><span class="pre">np.binary_repr(n,</span> <span class="pre">num_bits_per_symbol)</span></code>.</p>
+</div>
+<p>The normalization factor of a PAM constellation is given in
+closed-form as:</p>
+<div class="math notranslate nohighlight">
+\[\sqrt{\frac{1}{2^{n-1}}\sum_{i=1}^{2^{n-1}}(2i-1)^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(n= \text{num_bits_per_symbol}\)</span> is the number of bits
+per symbol.</p>
+<p>This algorithm is a recursive implementation of the expressions found in
+Section 5.1 of <a class="reference internal" href="#gppts38211" id="id2"><span>[3GPPTS38211]</span></a>. It is used in the 5G standard.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pam-gray">
+<h3>pam_gray<a class="headerlink" href="#pam-gray" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.mapping.pam_gray">
+<span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">pam_gray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#pam_gray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.pam_gray" title="Permalink to this definition"></a></dt>
+<dd><p>Maps a vector of bits to a PAM constellation points with Gray labeling.</p>
+<p>This recursive function maps a binary vector to Gray-labelled PAM
+constellation points. It can be used to generated QAM constellations.
+The constellation is not normalized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>b</strong> (<em>[n], NumPy array</em>) – Tensor with with binary entries.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>signed int</em> – The PAM constellation point taking values in
+<span class="math notranslate nohighlight">\(\{\pm 1,\pm 3,\dots,\pm (2^n-1)\}\)</span>.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This algorithm is a recursive implementation of the expressions found in
+Section 5.1 of <a class="reference internal" href="#gppts38211" id="id3"><span>[3GPPTS38211]</span></a>. It is used in the 5G standard.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="mapper">
+<h2>Mapper<a class="headerlink" href="#mapper" title="Permalink to this headline"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.Mapper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Mapper" title="Permalink to this definition"></a></dt>
+<dd><p>Maps binary tensors to points of a constellation.</p>
+<p>This class defines a layer that maps a tensor of binary values
+to a tensor of points from a provided constellation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or
+<cite>None</cite>. In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>]</em><em>, </em><em>tf.DType</em>) – The output dtype. Defaults to tf.complex64.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[…, n], tf.float or tf.int</em> – Tensor with with binary entries.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n/Constellation.num_bits_per_symbol], tf.complex</em> – The mapped constellation symbols.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The last input dimension must be an integer multiple of the
+number of bits per constellation symbol.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.mapping.Mapper.constellation">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">constellation</span></span><a class="headerlink" href="#sionna.mapping.Mapper.constellation" title="Permalink to this definition"></a></dt>
+<dd><p>The Constellation used by the Mapper.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="demapping">
+<h2>Demapping<a class="headerlink" href="#demapping" title="Permalink to this headline"></a></h2>
+<div class="section" id="demapper">
+<h3>Demapper<a class="headerlink" href="#demapper" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.Demapper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">Demapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demapping_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Demapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Demapper" title="Permalink to this definition"></a></dt>
+<dd><p>Computes log-likelihood ratios (LLRs) or hard-decisions on bits
+for a tensor of received symbols.</p>
+<p>This class defines a layer implementing different demapping
+functions. All demapping functions are fully differentiable when soft-decisions
+are computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>demapping_method</strong> (<em>One of</em><em> [</em><em>&quot;app&quot;</em><em>, </em><em>&quot;maxlog&quot;</em><em>]</em><em>, </em><em>str</em>) – The demapping method used.</p></li>
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or <cite>None</cite>.
+In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the demapper provides hard-decided bits instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype of <cite>y</cite>. Defaults to tf.complex64.
+The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[…,n], tf.complex</em>) – The received symbols.</p></li>
+<li><p><strong>no</strong> (<em>Scalar or […,n], tf.float</em>) – The noise variance estimate. It can be provided either as scalar
+for the entire input batch or as a tensor that is “broadcastable” to
+<code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n*num_bits_per_symbol], tf.float</em> – LLRs or hard-decisions for every bit.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>With the “app” demapping method, the LLR for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+is computed according to</p>
+<div class="math notranslate nohighlight">
+\[LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y\right)}{\Pr\left(b_i=0\lvert y\right)}\right) =\ln\left(\frac{
+        \sum_{c\in\mathcal{C}_{i,1}} \exp\left(
+            -\frac{1}{N_o}\left|y-c\right|^2
+            \right)
+        }{
+        \sum_{c\in\mathcal{C}_{i,0}} \exp\left(
+            -\frac{1}{N_o}\left|y-c\right|^2
+            \right)
+        }\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{C}_{i,1}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{C}_{i,0}\)</span> are the
+sets of constellation points for which the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit is
+equal to 1 and 0, respectively. The definition of the LLR has been
+chosen such that it is equivalent with that of logits. This is
+different from many textbooks in communications, where the LLR is
+defined as <span class="math notranslate nohighlight">\(LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)\)</span>.</p>
+<p>With the “maxlog” demapping method, LLRs for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+are approximated like</p>
+<div class="math notranslate nohighlight">
+\[LLR(i) \approx\ln\left(\frac{
+    \max_{c\in\mathcal{C}_{i,1}} \exp\left(
+        -\frac{1}{N_o}\left|y-c\right|^2
+        \right)
+    }{
+    \max_{c\in\mathcal{C}_{i,0}} \exp\left(
+        -\frac{1}{N_o}\left|y-c\right|^2
+        \right)
+    }\right)
+    = \frac{1}{N_o}\left(\min_{c\in\mathcal{C}_{i,0}}|y-c|^2-
+     \min_{c\in\mathcal{C}_{i,1}}|y-c|^2\right)
+    .\]</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="demapperwithprior">
+<h3>DemapperWithPrior<a class="headerlink" href="#demapperwithprior" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.DemapperWithPrior">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">DemapperWithPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">demapping_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#DemapperWithPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.DemapperWithPrior" title="Permalink to this definition"></a></dt>
+<dd><p>Computes log-likelihood ratios (LLRs) or hard-decisions on bits
+for a tensor of received symbols, assuming prior
+knowledge on the bits is available.</p>
+<p>This class defines a layer implementing different demapping
+functions. All demapping functions are fully differentiable when soft-decisions
+are computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>demapping_method</strong> (<em>One of</em><em> [</em><em>&quot;app&quot;</em><em>, </em><em>&quot;maxlog&quot;</em><em>]</em><em>, </em><em>str</em>) – The demapping method used.</p></li>
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or <cite>None</cite>.
+In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the demapper provides hard-decided bits instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype of <cite>y</cite>. Defaults to tf.complex64.
+The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, prior, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[…,n], tf.complex</em>) – The received symbols.</p></li>
+<li><p><strong>prior</strong> (<em>[num_bits_per_symbol] or […,num_bits_per_symbol], tf.float</em>) – Prior for every bit as LLRs.
+It can be provided either as a tensor of shape <cite>[num_bits_per_symbol]</cite> for the
+entire input batch, or as a tensor that is “broadcastable”
+to <cite>[…, n, num_bits_per_symbol]</cite>.</p></li>
+<li><p><strong>no</strong> (<em>Scalar or […,n], tf.float</em>) – The noise variance estimate. It can be provided either as scalar
+for the entire input batch or as a tensor that is “broadcastable” to
+<code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n*num_bits_per_symbol], tf.float</em> – LLRs or hard-decisions for every bit.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>With the “app” demapping method, the LLR for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+is computed according to</p>
+<div class="math notranslate nohighlight">
+\[LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y,\mathbf{p}\right)}{\Pr\left(b_i=0\lvert y,\mathbf{p}\right)}\right) =\ln\left(\frac{
+        \sum_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)
+        \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)
+        }{
+        \sum_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
+        \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)
+        }\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{C}_{i,1}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{C}_{i,0}\)</span> are the
+sets of constellation points for which the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit is
+equal to 1 and 0, respectively. <span class="math notranslate nohighlight">\(\mathbf{p} = \left[p_0,\dots,p_{K-1}\right]\)</span>
+is the vector of LLRs that serves as prior knowledge on the <span class="math notranslate nohighlight">\(K\)</span> bits that are mapped to
+a constellation point, and <span class="math notranslate nohighlight">\(\Pr(c\lvert\mathbf{p})\)</span> is the prior probability on the constellation symbol
+<span class="math notranslate nohighlight">\(c\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\Pr\left(c\lvert\mathbf{p}\right) = \prod_{k=0}^{K-1} \text{sigmoid}\left(p_k \ell(c)_k\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\ell(c)_k\)</span> is the <span class="math notranslate nohighlight">\(k^{th}\)</span> bit label of <span class="math notranslate nohighlight">\(c\)</span>, where 0 is
+replaced by -1.
+The definition of the LLR has been
+chosen such that it is equivalent with that of logits. This is
+different from many textbooks in communications, where the LLR is
+defined as <span class="math notranslate nohighlight">\(LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)\)</span>.</p>
+<p>With the “maxlog” demapping method, LLRs for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+are approximated like</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align}
+    LLR(i) &amp;\approx\ln\left(\frac{
+        \max_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)
+            \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)
+        }{
+        \max_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
+            \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)
+        }\right)\\
+        &amp;= \max_{c\in\mathcal{C}_{i,0}}
+            \left(\ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right)-\frac{|y-c|^2}{N_o}\right) -
+         \max_{c\in\mathcal{C}_{i,1}}\left( \ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right) - \frac{|y-c|^2}{N_o}\right)
+        .
+\end{align}\end{split}\]</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="symboldemapper">
+<h3>SymbolDemapper<a class="headerlink" href="#symboldemapper" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.SymbolDemapper">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">SymbolDemapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#SymbolDemapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.SymbolDemapper" title="Permalink to this definition"></a></dt>
+<dd><p>Computes normalized log-probabilities (logits) or hard-decisions on symbols
+for a tensor of received symbols.
+The demapping function is fully differentiable when soft-values are
+computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or <cite>None</cite>.
+In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the demapper provides hard-decided symbols instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype of <cite>y</cite>. Defaults to tf.complex64.
+The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[…,n], tf.complex</em>) – The received symbols.</p></li>
+<li><p><strong>no</strong> (<em>Scalar or […,n], tf.float</em>) – The noise variance estimate. It can be provided either as scalar
+for the entire input batch or as a tensor that is “broadcastable” to
+<code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n, num_points] or […,n], tf.float</em> – A tensor of shape <cite>[…,n, num_points]</cite> of logits for every constellation
+point if <cite>hard_out</cite> is set to <cite>False</cite>.
+Otherwise, a tensor of shape <cite>[…,n]</cite> of hard-decisions on the symbols.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The normalized log-probability for the constellation point <span class="math notranslate nohighlight">\(c\)</span> is computed according to</p>
+<div class="math notranslate nohighlight">
+\[\ln\left(\Pr\left(c \lvert y\right)\right) = \ln\left( \frac{\exp\left(-\frac{|y-c|^2}{N_0} \right)}{\sum_{c'\in\mathcal{C}} \exp\left(-\frac{|y-c'|^2}{N_0} \right)} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{C}\)</span> is the set of constellation points used for modulation.</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="symboldemapperwithprior">
+<h3>SymbolDemapperWithPrior<a class="headerlink" href="#symboldemapperwithprior" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.SymbolDemapperWithPrior">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">SymbolDemapperWithPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#SymbolDemapperWithPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.SymbolDemapperWithPrior" title="Permalink to this definition"></a></dt>
+<dd><p>Computes normalized log-probabilities (logits) or hard-decisions on symbols
+for a tensor of received symbols and assuming prior knowldge on the transmitted constellation points is available.
+The demapping function is fully differentiable when soft-values are
+computed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or <cite>None</cite>.
+In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the demapper provides hard-decided symbols instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype of <cite>y</cite>. Defaults to tf.complex64.
+The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, prior, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[…,n], tf.complex</em>) – The received symbols.</p></li>
+<li><p><strong>prior</strong> (<em>[num_points] or […,num_points], tf.float</em>) – Prior for every symbol as log-probabilities (logits).
+It can be provided either as a tensor of shape <cite>[num_points]</cite> for the
+entire input batch, or as a tensor that is “broadcastable”
+to <cite>[…, n, num_points]</cite>.</p></li>
+<li><p><strong>no</strong> (<em>Scalar or […,n], tf.float</em>) – The noise variance estimate. It can be provided either as scalar
+for the entire input batch or as a tensor that is “broadcastable” to
+<code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n, num_points] or […,n], tf.float</em> – A tensor of shape <cite>[…,n, num_points]</cite> of logits for every constellation
+point if <cite>hard_out</cite> is set to <cite>False</cite>.
+Otherwise, a tensor of shape <cite>[…,n]</cite> of hard-decisions on the symbols.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The normalized log-probability for the constellation point <span class="math notranslate nohighlight">\(c\)</span> is computed according to</p>
+<div class="math notranslate nohighlight">
+\[\ln\left(\Pr\left(c \lvert y,\mathbf{p}\right)\right) = \ln\left( \frac{\exp\left(-\frac{|y-c|^2}{N_0} + p_c \right)}{\sum_{c'\in\mathcal{C}} \exp\left(-\frac{|y-c'|^2}{N_0} + p_{c'} \right)} \right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{C}\)</span> is the set of constellation points used for modulation, and <span class="math notranslate nohighlight">\(\mathbf{p} = \left\{p_c \lvert c \in \mathcal{C}\right\}\)</span> the prior information on constellation points given as log-probabilities.</p>
+</div>
+</dd></dl>
+
+<dl>
+<dt>References:</dt><dd><dl class="citation">
+<dt class="label" id="gppts38211"><span class="brackets">3GPPTS38211</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>)</span></dt>
+<dd><p>ETSI TS 138 211 “5G NR Physical channels and modulation”, V16.2.0, Jul. 2020
+<a class="reference external" href="https://www.3gpp.org/ftp/Specs/archive/38_series/38.211/38211-h00.zip">https://www.3gpp.org/ftp/Specs/archive/38_series/38.211/38211-h00.zip</a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fec.utils.html" class="btn btn-neutral float-left" title="FEC Utility Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="channel.html" class="btn btn-neutral float-right" title="Channel" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

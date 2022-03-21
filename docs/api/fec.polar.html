@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polar Codes &mdash; Sionna 0.8.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Convolutional Codes" href="fec.conv.html" />
+    <link rel="prev" title="Low-Density Parity-Check (LDPC)" href="fec.ldpc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fec.html">Forward Error Correction (FEC)</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log10">log10</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#empirical-psd">empirical_psd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="sionna.html">API Documentation</a> &raquo;</li>
+          <li><a href="fec.html">Forward Error Correction (FEC)</a> &raquo;</li>
+      <li>Polar Codes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="polar-codes">
+<h1>Polar Codes<a class="headerlink" href="#polar-codes" title="Permalink to this headline"></a></h1>
+<p>The Polar code module supports 5G-compliant Polar codes and includes successive cancellation (SC), successive cancellation list (SCL), and belief propagation (BP) decoding.</p>
+<p>The module supports rate-matching and CRC-aided decoding.
+Further, Reed-Muller (RM) code design is available and can be used in combination with the Polar encoding/decoding algorithms.</p>
+<p>The following code snippets show how to setup and run a rate-matched 5G compliant Polar encoder and a corresponding successive cancellation list (SCL) decoder.</p>
+<p>First, we need to create instances of <a class="reference internal" href="#sionna.fec.polar.encoding.Polar5GEncoder" title="sionna.fec.polar.encoding.Polar5GEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polar5GEncoder</span></code></a> and <a class="reference internal" href="#sionna.fec.polar.decoding.Polar5GDecoder" title="sionna.fec.polar.decoding.Polar5GDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polar5GDecoder</span></code></a>:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">encoder</span> <span class="o">=</span> <span class="n">Polar5GEncoder</span><span class="p">(</span><span class="n">k</span>          <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="c1"># number of information bits (input)</span>
+                         <span class="n">n</span>          <span class="o">=</span> <span class="mi">200</span><span class="p">)</span> <span class="c1"># number of codeword bits (output)</span>
+
+
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">Polar5GDecoder</span><span class="p">(</span><span class="n">encoder</span>    <span class="o">=</span> <span class="n">encoder</span><span class="p">,</span> <span class="c1"># connect the Polar decoder to the encoder</span>
+                         <span class="n">dec_type</span>   <span class="o">=</span> <span class="s2">&quot;SCL&quot;</span><span class="p">,</span> <span class="c1"># can be also &quot;SC&quot; or &quot;BP&quot;</span>
+                         <span class="n">list_size</span>  <span class="o">=</span> <span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, the encoder and decoder can be used by:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># --- encoder ---</span>
+<span class="c1"># u contains the information bits to be encoded and has shape [...,k].</span>
+<span class="c1"># c contains the polar encoded codewords and has shape [...,n].</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+<span class="c1"># --- decoder ---</span>
+<span class="c1"># llr contains the log-likelihood ratios from the demapper and has shape [...,n].</span>
+<span class="c1"># u_hat contains the estimated information bits and has shape [...,k].</span>
+<span class="n">u_hat</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="polar-encoding">
+<h2>Polar Encoding<a class="headerlink" href="#polar-encoding" title="Permalink to this headline"></a></h2>
+<div class="section" id="polar5gencoder">
+<h3>Polar5GEncoder<a class="headerlink" href="#polar5gencoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.Polar5GEncoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.encoding.</span></span><span class="sig-name descname"><span class="pre">Polar5GEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/encoding.html#Polar5GEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.encoding.Polar5GEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>5G compliant Polar encoder including rate-matching following <a class="reference internal" href="#gppts38212" id="id1"><span>[3GPPTS38212]</span></a>
+for the uplink scenario (<cite>UCI</cite>).</p>
+<p>This layer performs polar encoding for <code class="docutils literal notranslate"><span class="pre">k</span></code> information bits and
+rate-matching such that the codeword lengths is <code class="docutils literal notranslate"><span class="pre">n</span></code>. This includes the CRC
+concatenation and the interleaving as defined in <a class="reference internal" href="#gppts38212" id="id2"><span>[3GPPTS38212]</span></a>.</p>
+<p>Note: <cite>block segmentation</cite> is currently not supported (<cite>I_seq=False</cite>).</p>
+<p>We follow the basic structure from Fig. 6 in <a class="reference internal" href="#bioglio-design" id="id3"><span>[Bioglio_Design]</span></a> with disabled
+downlink interleaver (<cite>I_IL=False</cite>).</p>
+<div class="figure align-default" id="id30">
+<img alt="../_images/PolarEncoding5G.png" src="../_images/PolarEncoding5G.png" />
+<p class="caption"><span class="caption-text">Fig. 1: Implemented 5G Polar encoding chain following Fig. 6 in
+<a class="reference internal" href="#bioglio-design" id="id4"><span>[Bioglio_Design]</span></a> for the uplink scenario without <cite>block segmentation</cite>.</span><a class="headerlink" href="#id30" title="Permalink to this image"></a></p>
+</div>
+<p>For further details we refer to <a class="reference internal" href="#gppts38212" id="id5"><span>[3GPPTS38212]</span></a>, <a class="reference internal" href="#bioglio-design" id="id6"><span>[Bioglio_Design]</span></a> and
+<a class="reference internal" href="#hui-channelcoding" id="id7"><span>[Hui_ChannelCoding]</span></a>.</p>
+<p>The class inherits from the Keras layer class and can be used as layer in a
+Keras model. Further, the class inherits from PolarEncoder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) – Defining the number of information bit per codeword.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Defining the codeword length.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Defaults to False. If True, rate-matching parameters will be
+printed.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – Defaults to tf.float32. Defines the output datatype of the layer
+(internal precision remains tf.uint8).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>inputs</strong> (<em>tf.float32</em>) – 2+D tensor of shape <cite>[…,k]</cite> containing the information bits to be
+encoded.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>tf.float32</em> – 2+D tensor of shape <cite>[…,n]</cite> containing the codeword bits.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – <code class="docutils literal notranslate"><span class="pre">k</span></code> and <code class="docutils literal notranslate"><span class="pre">n</span></code> must be positive integers and <code class="docutils literal notranslate"><span class="pre">k</span></code> must be smaller
+    (or equal) than <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> and <code class="docutils literal notranslate"><span class="pre">k</span></code> are invalid code parameters (see <a class="reference internal" href="#gppts38212" id="id8"><span>[3GPPTS38212]</span></a>).</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">verbose</span></code> is not <cite>bool</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">dtype</span></code> is not supported.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We implement the <cite>uplink</cite> Polar coding (<cite>UCI</cite>) scheme from
+<a class="reference internal" href="#gppts38212" id="id9"><span>[3GPPTS38212]</span></a>. Downlink is currently not supported.</p>
+<p>For <cite>12 &lt;= k &lt;= 19</cite> the 3 additional parity bits as defined in
+<a class="reference internal" href="#gppts38212" id="id10"><span>[3GPPTS38212]</span></a> are not implemented as it would also require a
+modified decoding procedure to materialize the potential gains.</p>
+<p><cite>Code segmentation</cite> is currently not supported and, thus, <code class="docutils literal notranslate"><span class="pre">n</span></code> is
+limited to a maximum length of 1088 codeword bits.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.Polar5GEncoder.channel_interleaver">
+<span class="sig-name descname"><span class="pre">channel_interleaver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/encoding.html#Polar5GEncoder.channel_interleaver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.encoding.Polar5GEncoder.channel_interleaver" title="Permalink to this definition"></a></dt>
+<dd><p>Triangular interleaver following Sec. 5.4.1.3 in <a class="reference internal" href="#gppts38212" id="id11"><span>[3GPPTS38212]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>c</strong> (<em>ndarray</em>) – 1D array to be interleaved.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>ndarray</em> – Interleaved version of <code class="docutils literal notranslate"><span class="pre">c</span></code> with same shape and dtype as <code class="docutils literal notranslate"><span class="pre">c</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.Polar5GEncoder.enc_crc">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">enc_crc</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.Polar5GEncoder.enc_crc" title="Permalink to this definition"></a></dt>
+<dd><p>CRC Encoder layer used for CRC concatenation.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.Polar5GEncoder.k_target">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k_target</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.Polar5GEncoder.k_target" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits including rate-matching.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.Polar5GEncoder.n_target">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_target</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.Polar5GEncoder.n_target" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length including rate-matching.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.Polar5GEncoder.subblock_interleaving">
+<span class="sig-name descname"><span class="pre">subblock_interleaving</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/encoding.html#Polar5GEncoder.subblock_interleaving"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.encoding.Polar5GEncoder.subblock_interleaving" title="Permalink to this definition"></a></dt>
+<dd><p>Input bit interleaving as defined in Sec 5.4.1.1 <a class="reference internal" href="#gppts38212" id="id12"><span>[3GPPTS38212]</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>u</strong> (<em>ndarray</em>) – 1D array to be interleaved. Length of <code class="docutils literal notranslate"><span class="pre">u</span></code> must be a multiple
+of 32.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>ndarray</em> – Interleaved version of <code class="docutils literal notranslate"><span class="pre">u</span></code> with same shape and dtype as <code class="docutils literal notranslate"><span class="pre">u</span></code>.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>AssertionError</strong> – If length of <code class="docutils literal notranslate"><span class="pre">u</span></code> is not a multiple of 32.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="polarencoder">
+<h3>PolarEncoder<a class="headerlink" href="#polarencoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.PolarEncoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.encoding.</span></span><span class="sig-name descname"><span class="pre">PolarEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frozen_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/encoding.html#PolarEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.encoding.PolarEncoder" title="Permalink to this definition"></a></dt>
+<dd><p>Polar encoder for given code parameters.</p>
+<p>This layer performs polar encoding for the given <code class="docutils literal notranslate"><span class="pre">k</span></code> information bits and
+the <cite>frozen set</cite> (i.e., indices of frozen positions) specified by
+<code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code>.</p>
+<p>The class inherits from the Keras layer class and can be used as layer in a
+Keras model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frozen_pos</strong> (<em>ndarray</em>) – Array of <cite>int</cite> defining the <cite>n-k</cite> frozen indices, i.e., information
+bits are mapped onto the <cite>k</cite> complementary positions.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Defining the codeword length.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – Defaults to tf.float32. Defines the output datatype of the layer
+(internal precision is tf.uint8).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>inputs</strong> (<em>tf.float32</em>) – 2+D tensor of shape <cite>[…,k]</cite> containing the information bits to be
+encoded.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>tf.float32</em> – 2+D tensor of shape <cite>[…,n]</cite> containing the codeword bits.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – <code class="docutils literal notranslate"><span class="pre">k</span></code> and <code class="docutils literal notranslate"><span class="pre">n</span></code> must be positive integers and <code class="docutils literal notranslate"><span class="pre">k</span></code> must be smaller
+    (or equal) than <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not a power of 2.</p></li>
+<li><p><strong>AssertionError</strong> – If the number of elements in <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> is great than <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> does not consists of <cite>int</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">dtype</span></code> is not supported.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">inputs</span></code> contains other values than <cite>0</cite> or <cite>1</cite>.</p></li>
+<li><p><strong>TypeError</strong> – If <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is not <cite>tf.float32</cite>.</p></li>
+<li><p><strong>InvalidArgumentError</strong> – When rank(<code class="docutils literal notranslate"><span class="pre">inputs</span></code>)&lt;2.</p></li>
+<li><p><strong>InvalidArgumentError</strong> – When shape of last dim is not <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As commonly done, we assume frozen bits are set to <cite>0</cite>. Please note
+that - although its practical relevance is only little - setting frozen
+bits to <cite>1</cite> may result in <cite>affine</cite> codes instead of linear code as the
+<cite>all-zero</cite> codeword is not necessarily part of the code any more.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.PolarEncoder.frozen_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">frozen_pos</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.PolarEncoder.frozen_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Frozen positions for Polar decoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.PolarEncoder.info_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">info_pos</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.PolarEncoder.info_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Information bit positions for Polar encoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.PolarEncoder.k">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.PolarEncoder.k" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.encoding.PolarEncoder.n">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#sionna.fec.polar.encoding.PolarEncoder.n" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="polar-decoding">
+<h2>Polar Decoding<a class="headerlink" href="#polar-decoding" title="Permalink to this headline"></a></h2>
+<div class="section" id="polar5gdecoder">
+<h3>Polar5GDecoder<a class="headerlink" href="#polar5gdecoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.decoding.</span></span><span class="sig-name descname"><span class="pre">Polar5GDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enc_polar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/decoding.html#Polar5GDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper for 5G compliant decoding including rate-recovery and CRC removal.</p>
+<p>The class inherits from the Keras layer class and can be used as layer in a
+Keras model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enc_polar</strong> (<a class="reference internal" href="#sionna.fec.polar.encoding.Polar5GEncoder" title="sionna.fec.polar.encoding.Polar5GEncoder"><em>Polar5GEncoder</em></a>) – Instance of the <a class="reference internal" href="#sionna.fec.polar.encoding.Polar5GEncoder" title="sionna.fec.polar.encoding.Polar5GEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">Polar5GEncoder</span></code></a>
+used for encoding including rate-matching.</p></li>
+<li><p><strong>dec_type</strong> (<em>str</em>) – Defaults to <cite>“SC”</cite>. Defining the decoder to be used.
+Must be one of the following <cite>{“SC”, “SCL”, “hybSCL”, “BP”}</cite>.</p></li>
+<li><p><strong>list_size</strong> (<em>int</em>) – Defaults to 8. Defining the list size <cite>iff</cite> list-decoding is used.
+Only required for <code class="docutils literal notranslate"><span class="pre">dec_types</span></code> <cite>{“SCL”, “hybSCL”}</cite>.</p></li>
+<li><p><strong>num_iter</strong> (<em>int</em>) – Defaults to 20. Defining the number of BP iterations. Only required
+for <code class="docutils literal notranslate"><span class="pre">dec_type</span></code> <cite>“BP”</cite>.</p></li>
+<li><p><strong>output_dtype</strong> (<em>tf.DType</em>) – Defaults to tf.float32. Defines the output datatype of the layer
+(internal precision remains tf.float32).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>inputs</strong> (<em>tf.float32</em>) – 2+D tensor of shape <cite>[…,n]</cite> containing the channel logits/llr
+values.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>tf.float32</em> – 2+D tensor of shape <cite>[…,k]</cite> containing hard-decided estimates of
+all <code class="docutils literal notranslate"><span class="pre">k</span></code> information bits.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">enc_polar</span></code> is not <cite>Polar5GEncoder</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">dec_type</span></code> is not <cite>{“SC”, “SCL”, “SCL8”, “SCL32”, “hybSCL”,
+    “BP”}</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">dec_type</span></code> is not <cite>str</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is not of shape <cite>[…, n]</cite> or <cite>dtype</cite> is not
+    the same as <code class="docutils literal notranslate"><span class="pre">output_dtype</span></code>.</p></li>
+<li><p><strong>InvalidArgumentError</strong> – When rank(<code class="docutils literal notranslate"><span class="pre">inputs</span></code>)&lt;2.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This layer only supports the uplink polar rate-matching scheme without
+<cite>codeword segmentation</cite>.</p>
+<p>Although the decoding <cite>list size</cite> is not provided by 3GPP
+<a class="reference internal" href="#gppts38212" id="id13"><span>[3GPPTS38212]</span></a>, the consortium has agreed on a <cite>list size</cite> of 8 for the
+5G decoding reference curves <a class="reference internal" href="#bioglio-design" id="id14"><span>[Bioglio_Design]</span></a>.</p>
+<p>All list-decoders apply <cite>CRC-aided</cite> decoding, however, the non-list
+decoders (<cite>“SC”</cite> and <cite>“BP”</cite>) cannot materialize the CRC leading to an
+effective rate-loss.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.dec_type">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">dec_type</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.dec_type" title="Permalink to this definition"></a></dt>
+<dd><p>Decoder type used for decoding as str.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.frozen_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">frozen_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.frozen_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Frozen positions for Polar decoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.info_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">info_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.info_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Information bit positions for Polar encoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.k_polar">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k_polar</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.k_polar" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits of mother Polar code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.k_target">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k_target</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.k_target" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits including rate-matching.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.llr_max">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">llr_max</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.llr_max" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum LLR value for internal calculations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.n_polar">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_polar</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.n_polar" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length of mother Polar code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.n_target">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n_target</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.n_target" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length including rate-matching.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.output_dtype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">output_dtype</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.output_dtype" title="Permalink to this definition"></a></dt>
+<dd><p>Output dtype of decoder.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.Polar5GDecoder.polar_dec">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">polar_dec</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.Polar5GDecoder.polar_dec" title="Permalink to this definition"></a></dt>
+<dd><p>Decoder instance used for decoding.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="polarscdecoder">
+<h3>PolarSCDecoder<a class="headerlink" href="#polarscdecoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.decoding.</span></span><span class="sig-name descname"><span class="pre">PolarSCDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frozen_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/decoding.html#PolarSCDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Successive cancellation (SC) decoder <a class="reference internal" href="#arikan-polar" id="id15"><span>[Arikan_Polar]</span></a> for Polar codes and
+Polar-like codes.</p>
+<p>The class inherits from the Keras layer class and can be used as layer in a
+Keras model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frozen_pos</strong> (<em>ndarray</em>) – Array of <cite>int</cite> defining the <code class="docutils literal notranslate"><span class="pre">n-k</span></code> indices of the frozen positions.</p></li>
+<li><p><strong>n</strong> – Defining the codeword length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>inputs</strong> (<em>tf.float32</em>) – 2+D tensor of shape <cite>[…,n]</cite> containing the channel LLR values (as
+logits).</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>tf.float32</em> – 2+D tensor of shape <cite>[…,k]</cite> containing hard-decided estimations
+of all <code class="docutils literal notranslate"><span class="pre">k</span></code> information bits.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not a power of 2.</p></li>
+<li><p><strong>AssertionError</strong> – If the number of elements in <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> is greater than <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> does not consists of <cite>int</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">output_dtype</span></code> is not {tf.float16, tf.float32, tf.float64}.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This layer implements the SC decoder as described in
+<a class="reference internal" href="#arikan-polar" id="id16"><span>[Arikan_Polar]</span></a>. However, the implementation follows the`recursive
+tree` <a class="reference internal" href="#gross-fast-scl" id="id17"><span>[Gross_Fast_SCL]</span></a> terminology and combines nodes for increased
+throughputs without changing the outcome of the algorithm.</p>
+<p>As commonly done, we assume frozen bits are set to <cite>0</cite>. Please note
+that - although its practical relevance is only little - setting frozen
+bits to <cite>1</cite> may result in <cite>affine</cite> codes instead of linear code as the
+<cite>all-zero</cite> codeword is not necessarily part of the code any more.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder.frozen_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">frozen_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder.frozen_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Frozen positions for Polar decoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder.info_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">info_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder.info_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Information bit positions for Polar encoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder.k">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder.k" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder.llr_max">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">llr_max</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder.llr_max" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum LLR value for internal calculations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder.n">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder.n" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCDecoder.output_dtype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">output_dtype</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCDecoder.output_dtype" title="Permalink to this definition"></a></dt>
+<dd><p>Output dtype of decoder.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="polarscldecoder">
+<h3>PolarSCLDecoder<a class="headerlink" href="#polarscldecoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.decoding.</span></span><span class="sig-name descname"><span class="pre">PolarSCLDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frozen_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crc_degree</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_hybrid_sc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fast_scl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_scatter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/decoding.html#PolarSCLDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Successive cancellation list (SCL) decoder <a class="reference internal" href="#tal-scl" id="id18"><span>[Tal_SCL]</span></a> for Polar codes
+and Polar-like codes.</p>
+<p>The class inherits from the Keras layer class and can be used as layer in a
+Keras model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frozen_pos</strong> (<em>ndarray</em>) – Array of <cite>int</cite> defining the <code class="docutils literal notranslate"><span class="pre">n-k</span></code> indices of the frozen positions.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Defining the codeword length.</p></li>
+<li><p><strong>list_size</strong> (<em>int</em>) – Defaults to 8. Defines the list size of the decoder.</p></li>
+<li><p><strong>crc_degree</strong> (<em>str</em>) – Defining the CRC polynomial to be used. Can be any value from
+<cite>{CRC24A, CRC24B, CRC24C, CRC16, CRC11, CRC6}</cite>.</p></li>
+<li><p><strong>use_hybrid_sc</strong> (<em>bool</em>) – Defaults to False. If True, SC decoding is applied and only the
+codewords with invalid CRC are decoded with SCL. This option
+requires an outer CRC specified via <code class="docutils literal notranslate"><span class="pre">crc_degree</span></code>.
+Remark: hybrid_sc does not support XLA optimization, i.e.,
+<cite>&#64;tf.function(jit_compile=True)</cite>.</p></li>
+<li><p><strong>use_fast_scl</strong> (<em>bool</em>) – Defaults to True. If True, Tree pruning is used to
+reduce the decoding complexity. The output is equivalent to the
+non-pruned version (besides numerical differences).</p></li>
+<li><p><strong>cpu_only</strong> (<em>bool</em>) – Defaults to False. If True, <cite>tf.py_function</cite> embedding
+is used and the decoder runs on the CPU. This option is usually
+slower, but also more memory efficient and, in particular,
+recommended for larger blocklengths. Remark: cpu_only does not
+support XLA optimization <cite>&#64;tf.function(jit_compile=True)</cite>.</p></li>
+<li><p><strong>use_scatter</strong> – Defaults to False. If True, <cite>tf.tensor_scatter_update</cite> is used for
+tensor updates. This option is usually slower, but more memory
+efficient.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>inputs</strong> (<em>tf.float32</em>) – 2+D tensor of shape <cite>[…,n]</cite> containing the channel LLR values
+(as logits).</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>tf.float32</em> – 2+D tensor of shape <cite>[…,k]</cite> containing hard-decided estimations
+of all <code class="docutils literal notranslate"><span class="pre">k</span></code> information bits.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not a power of 2.</p></li>
+<li><p><strong>AssertionError</strong> – If the number of elements in <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> is greater than <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> does not consists of <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">list_size</span></code> is not <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">cpu_only</span></code> is not <cite>bool</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">use_scatter</span></code> is not <cite>bool</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">use_fast_scl</span></code> is not <cite>bool</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">use_hybrid_sc</span></code> is not <cite>bool</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">list_size</span></code> is not a power of 2.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">output_dtype</span></code> is not {tf.float16, tf.float32, tf.
+    float64}.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">inputs</span></code> is not of shape <cite>[…, n]</cite> or <cite>dtype</cite> is not
+    correct.</p></li>
+<li><p><strong>InvalidArgumentError</strong> – When rank(<code class="docutils literal notranslate"><span class="pre">inputs</span></code>)&lt;2.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This layer implements the successive cancellation list (SCL) decoder
+as described in <a class="reference internal" href="#tal-scl" id="id19"><span>[Tal_SCL]</span></a> but uses LLR-based message updates
+<a class="reference internal" href="#stimming-llr" id="id20"><span>[Stimming_LLR]</span></a>. The implementation follows the notation from
+<a class="reference internal" href="#gross-fast-scl" id="id21"><span>[Gross_Fast_SCL]</span></a>, <a class="reference internal" href="#hashemi-sscl" id="id22"><span>[Hashemi_SSCL]</span></a>. If option <cite>use_fast_scl</cite> is active
+tree pruning is used and tree nodes are combined if possible (see
+<a class="reference internal" href="#hashemi-sscl" id="id23"><span>[Hashemi_SSCL]</span></a> for details).</p>
+<p>Implementing SCL decoding as TensorFlow graph is a difficult task that
+requires several design tradeoffs to match the TF constraints while
+maintaining a reasonable throughput. Thus, the decoder minimizes
+the <cite>control flow</cite> as much as possible, leading to a strong memory
+occupation (e.g., due to full path duplication after each decision).
+For longer code lengths, the complexity of the decoding graph becomes
+large and we recommend to use the <cite>CPU_only</cite> option that uses an
+embedded Numpy decoder. Further, this function recursively unrolls the
+SCL decoding tree, thus, for larger values of <code class="docutils literal notranslate"><span class="pre">n</span></code> building the
+decoding graph can become time consuming. Please consider the
+<code class="docutils literal notranslate"><span class="pre">cpu_only</span></code> option if building the graph takes to long.</p>
+<p>A hybrid SC/SCL decoder as proposed in <a class="reference internal" href="#cammerer-hybrid-scl" id="id24"><span>[Cammerer_Hybrid_SCL]</span></a> (using SC
+instead of BP) can be activated with option <code class="docutils literal notranslate"><span class="pre">use_hybrid_sc</span></code> iff an
+outer CRC is available. Please note that the results are not exactly
+SCL performance caused by the false positive rate of the CRC.</p>
+<p>As commonly done, we assume frozen bits are set to <cite>0</cite>. Please note
+that - although its practical relevance is only little - setting frozen
+bits to <cite>1</cite> may result in <cite>affine</cite> codes instead of linear code as the
+<cite>all-zero</cite> codeword is not necessarily part of the code any more.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.frozen_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">frozen_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.frozen_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Frozen positions for Polar decoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.info_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">info_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.info_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Information bit positions for Polar encoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.k">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.k" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.k_crc">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k_crc</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.k_crc" title="Permalink to this definition"></a></dt>
+<dd><p>Number of CRC bits.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.list_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">list_size</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.list_size" title="Permalink to this definition"></a></dt>
+<dd><p>List size for SCL decoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.llr_max">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">llr_max</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.llr_max" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum LLR value for internal calculations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.n">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.n" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarSCLDecoder.output_dtype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">output_dtype</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarSCLDecoder.output_dtype" title="Permalink to this definition"></a></dt>
+<dd><p>Output dtype of decoder.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="polarbpdecoder">
+<h3>PolarBPDecoder<a class="headerlink" href="#polarbpdecoder" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.decoding.</span></span><span class="sig-name descname"><span class="pre">PolarBPDecoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frozen_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/decoding.html#PolarBPDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder" title="Permalink to this definition"></a></dt>
+<dd><p>Belief propagation (BP) decoder for Polar codes <a class="reference internal" href="#arikan-polar" id="id25"><span>[Arikan_Polar]</span></a> and
+Polar-like codes based on <a class="reference internal" href="#arikan-bp" id="id26"><span>[Arikan_BP]</span></a> and <a class="reference internal" href="#forney-graphs" id="id27"><span>[Forney_Graphs]</span></a>.</p>
+<p>The class inherits from the Keras layer class and can be used as layer in a
+Keras model.</p>
+<p>Remark: The PolarBPDecoder does currently not support XLA.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frozen_pos</strong> (<em>ndarray</em>) – Array of <cite>int</cite> defining the <code class="docutils literal notranslate"><span class="pre">n-k</span></code> indices of the frozen positions.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Defining the codeword length.</p></li>
+<li><p><strong>num_iter</strong> (<em>int</em>) – Defining the number of decoder iterations (no early stopping used
+at the moment).</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – Defaults to True. If True, the decoder provides hard-decided
+information bits instead of soft-values.</p></li>
+<li><p><strong>output_dtype</strong> (<em>tf.DType</em>) – Defaults to tf.float32. Defines the output datatype of the layer
+(internal precision remains tf.float32).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>inputs</strong> (<em>tf.float32</em>) – 2+D tensor of shape <cite>[…,n]</cite> containing the channel logits/llr
+values.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>tf.float32</em> – 2+D tensor of shape <cite>[…,k]</cite> containing bit-wise soft-estimates
+(or hard-decided bit-values) of all <code class="docutils literal notranslate"><span class="pre">k</span></code> information bits.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not a power of 2.</p></li>
+<li><p><strong>AssertionError</strong> – If the number of elements in <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> is greater than <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">frozen_pos</span></code> does not consists of <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">hard_out</span></code> is not <cite>bool</cite>.</p></li>
+<li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">output_dtype</span></code> is not {tf.float16, tf.float32, tf.float64}.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">num_iter</span></code> is not <cite>int</cite>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">num_iter</span></code> is not a positive value.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This decoder is fully differentiable and, thus, well-suited for
+gradient descent-based learning tasks such as <cite>learned code design</cite>
+<a class="reference internal" href="#ebada-design" id="id28"><span>[Ebada_Design]</span></a>.</p>
+<p>As commonly done, we assume frozen bits are set to <cite>0</cite>. Please note
+that - although its practical relevance is only little - setting frozen
+bits to <cite>1</cite> may result in <cite>affine</cite> codes instead of linear code as the
+<cite>all-zero</cite> codeword is not necessarily part of the code any more.</p>
+</div>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.frozen_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">frozen_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.frozen_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Frozen positions for Polar decoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.hard_out">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">hard_out</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.hard_out" title="Permalink to this definition"></a></dt>
+<dd><p>Indicates if decoder hard-decides outputs.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.info_pos">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">info_pos</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.info_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Information bit positions for Polar encoding.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.k">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.k" title="Permalink to this definition"></a></dt>
+<dd><p>Number of information bits.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.llr_max">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">llr_max</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.llr_max" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum LLR value for internal calculations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.n">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">n</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.n" title="Permalink to this definition"></a></dt>
+<dd><p>Codeword length.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.num_iter">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">num_iter</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.num_iter" title="Permalink to this definition"></a></dt>
+<dd><p>Number of decoding iterations.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.polar.decoding.PolarBPDecoder.output_dtype">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">output_dtype</span></span><a class="headerlink" href="#sionna.fec.polar.decoding.PolarBPDecoder.output_dtype" title="Permalink to this definition"></a></dt>
+<dd><p>Output dtype of decoder.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="polar-utility-functions">
+<h2>Polar Utility Functions<a class="headerlink" href="#polar-utility-functions" title="Permalink to this headline"></a></h2>
+<div class="section" id="generate-5g-ranking">
+<h3>generate_5g_ranking<a class="headerlink" href="#generate-5g-ranking" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.polar.utils.generate_5g_ranking">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.utils.</span></span><span class="sig-name descname"><span class="pre">generate_5g_ranking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/utils.html#generate_5g_ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.utils.generate_5g_ranking" title="Permalink to this definition"></a></dt>
+<dd><p>Returns information and frozen bit positions of the 5G Polar code
+as defined in Tab. 5.3.1.2-1 in <a class="reference internal" href="#gppts38212" id="id29"><span>[3GPPTS38212]</span></a> for given values of <code class="docutils literal notranslate"><span class="pre">k</span></code>
+and <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k</strong> (<em>int</em>) – Defining the number of information bit per codeword.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Defining the desired codeword length. Must be a power of two.</p></li>
+<li><p><strong>sort</strong> (<em>bool</em>) – Defaults to True. Indicates if the returned indices are
+sorted.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>[frozen_pos, info_pos]</strong> – List:</p></li>
+<li><p><strong>frozen_pos</strong> (<em>ndarray</em>) – An array of ints of shape <cite>[n-k]</cite> containing the frozen
+position indices.</p></li>
+<li><p><strong>info_pos</strong> (<em>ndarray</em>) – An array of ints of shape <cite>[k]</cite> containing the information
+position indices.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">k</span></code> or <code class="docutils literal notranslate"><span class="pre">n</span></code> are not positve ints.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">sort</span></code> is not bool.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">k</span></code> or <code class="docutils literal notranslate"><span class="pre">n</span></code> are larger than 1024</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is less than 32.</p></li>
+<li><p><strong>AssertionError</strong> – If the resulting coderate is invalid (<cite>&gt;1.0</cite>).</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">n</span></code> is not a power of 2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="generate-polar-transform-mat">
+<h3>generate_polar_transform_mat<a class="headerlink" href="#generate-polar-transform-mat" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.polar.utils.generate_polar_transform_mat">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.utils.</span></span><span class="sig-name descname"><span class="pre">generate_polar_transform_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/utils.html#generate_polar_transform_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.utils.generate_polar_transform_mat" title="Permalink to this definition"></a></dt>
+<dd><p>Generate the polar transformation matrix (Kronecker product).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – Defining the Kronecker power, i.e., how often is the kernel lifted.</p>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>ndarray</em> – Array of <cite>0s</cite> and <cite>1s</cite> of shape <cite>[2^n , 2^n]</cite> containing the Polar
+transformation matrix.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="generate-rm-code">
+<h3>generate_rm_code<a class="headerlink" href="#generate-rm-code" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.fec.polar.utils.generate_rm_code">
+<span class="sig-prename descclassname"><span class="pre">sionna.fec.polar.utils.</span></span><span class="sig-name descname"><span class="pre">generate_rm_code</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/fec/polar/utils.html#generate_rm_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.fec.polar.utils.generate_rm_code" title="Permalink to this definition"></a></dt>
+<dd><p>Generate frozen positions of the (r, m) Reed Muller (RM) code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>int</em>) – Defining the order of the RM code.</p></li>
+<li><p><strong>m</strong> (<em>int</em>) – Defining <cite>log2</cite> of the desired codeword length.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>[frozen_pos, info_pos, n, k, d_min]</strong> – List:</p></li>
+<li><p><strong>frozen_pos</strong> (<em>ndarray</em>) – An array of ints of shape <cite>[n-k]</cite> containing the frozen
+position indices.</p></li>
+<li><p><strong>info_pos</strong> (<em>ndarray</em>) – An array of ints of shape <cite>[k]</cite> containing the information
+position indices.</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – Resulting codeword length</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Number of information bits</p></li>
+<li><p><strong>d_min</strong> (<em>int</em>) – Minimum distance of the code.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">r</span></code> is larger than <code class="docutils literal notranslate"><span class="pre">m</span></code>.</p></li>
+<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">r</span></code> or <code class="docutils literal notranslate"><span class="pre">m</span></code> are not positive ints.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl>
+<dt>References:</dt><dd><dl class="citation">
+<dt class="label" id="gppts38212"><span class="brackets">3GPPTS38212</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id5">3</a>,<a href="#id8">4</a>,<a href="#id9">5</a>,<a href="#id10">6</a>,<a href="#id11">7</a>,<a href="#id12">8</a>,<a href="#id13">9</a>,<a href="#id29">10</a>)</span></dt>
+<dd><p>ETSI 3GPP TS 38.212 “5G NR Multiplexing and channel
+coding”, v.16.5.0, 2021-03.</p>
+</dd>
+<dt class="label" id="bioglio-design"><span class="brackets">Bioglio_Design</span><span class="fn-backref">(<a href="#id3">1</a>,<a href="#id4">2</a>,<a href="#id6">3</a>,<a href="#id14">4</a>)</span></dt>
+<dd><p>V. Bioglio, C. Condo, I. Land, “Design of
+Polar Codes in 5G New Radio,” IEEE Communications Surveys &amp;
+Tutorials, 2020. Online availabe <a class="reference external" href="https://arxiv.org/pdf/1804.04389.pdf">https://arxiv.org/pdf/1804.04389.pdf</a></p>
+</dd>
+<dt class="label" id="hui-channelcoding"><span class="brackets"><a class="fn-backref" href="#id7">Hui_ChannelCoding</a></span></dt>
+<dd><p>D. Hui, S. Sandberg, Y. Blankenship, M.
+Andersson, L. Grosjean “Channel coding in 5G new radio: A
+Tutorial Overview and Performance Comparison with 4G LTE,” IEEE
+Vehicular Technology Magazine, 2018.</p>
+</dd>
+<dt class="label" id="arikan-polar"><span class="brackets">Arikan_Polar</span><span class="fn-backref">(<a href="#id15">1</a>,<a href="#id16">2</a>,<a href="#id25">3</a>)</span></dt>
+<dd><p>E. Arikan, “Channel polarization: A method for
+constructing capacity-achieving codes for symmetric
+binary-input memoryless channels,” IEEE Trans. on Information
+Theory, 2009.</p>
+</dd>
+<dt class="label" id="gross-fast-scl"><span class="brackets">Gross_Fast_SCL</span><span class="fn-backref">(<a href="#id17">1</a>,<a href="#id21">2</a>)</span></dt>
+<dd><p>Seyyed Ali Hashemi, Carlo Condo, and Warren J.
+Gross, “Fast and Flexible Successive-cancellation List Decoders
+for Polar Codes.” IEEE Trans. on Signal Processing, 2017.</p>
+</dd>
+<dt class="label" id="tal-scl"><span class="brackets">Tal_SCL</span><span class="fn-backref">(<a href="#id18">1</a>,<a href="#id19">2</a>)</span></dt>
+<dd><p>Ido Tal and Alexander Vardy, “List Decoding of Polar
+Codes.” IEEE Trans Inf Theory, 2015.</p>
+</dd>
+<dt class="label" id="stimming-llr"><span class="brackets"><a class="fn-backref" href="#id20">Stimming_LLR</a></span></dt>
+<dd><p>Alexios Balatsoukas-Stimming, Mani Bastani Parizi,
+Andreas Burg, “LLR-Based Successive Cancellation List Decoding
+of Polar Codes.” IEEE Trans Signal Processing, 2015.</p>
+</dd>
+<dt class="label" id="hashemi-sscl"><span class="brackets">Hashemi_SSCL</span><span class="fn-backref">(<a href="#id22">1</a>,<a href="#id23">2</a>)</span></dt>
+<dd><p>Seyyed Ali Hashemi, Carlo Condo, and Warren J.
+Gross, “Simplified Successive-Cancellation List Decoding
+of Polar Codes.” IEEE ISIT, 2016.</p>
+</dd>
+<dt class="label" id="cammerer-hybrid-scl"><span class="brackets"><a class="fn-backref" href="#id24">Cammerer_Hybrid_SCL</a></span></dt>
+<dd><p>Sebastian Cammerer, Benedikt Leible, Matthias
+Stahl, Jakob Hoydis, and Stephan ten Brink, “Combining Belief
+Propagation and Successive Cancellation List Decoding of Polar
+Codes on a GPU Platform,” IEEE ICASSP, 2017.</p>
+</dd>
+<dt class="label" id="arikan-bp"><span class="brackets"><a class="fn-backref" href="#id26">Arikan_BP</a></span></dt>
+<dd><p>E. Arikan, “A Performance Comparison of Polar Codes and
+Reed-Muller Codes,” IEEE Commun. Lett., vol. 12, no. 6, pp.
+447-449, Jun. 2008.</p>
+</dd>
+<dt class="label" id="forney-graphs"><span class="brackets"><a class="fn-backref" href="#id27">Forney_Graphs</a></span></dt>
+<dd><p>G. D. Forney, “Codes on graphs: normal realizations,”
+IEEE Trans. Inform. Theory, vol. 47, no. 2, pp. 520-548, Feb. 2001.</p>
+</dd>
+<dt class="label" id="ebada-design"><span class="brackets"><a class="fn-backref" href="#id28">Ebada_Design</a></span></dt>
+<dd><p>M. Ebada, S. Cammerer, A. Elkelesh and S. ten Brink,
+“Deep Learning-based Polar Code Design”, Annual Allerton
+Conference on Communication, Control, and Computing, 2019.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fec.ldpc.html" class="btn btn-neutral float-left" title="Low-Density Parity-Check (LDPC)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fec.conv.html" class="btn btn-neutral float-right" title="Convolutional Codes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
