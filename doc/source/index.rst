@@ -3,14 +3,13 @@ Sionna
 ==================
 .. include:: <isonum.txt>
 
-Sionna\ |trade| is a `TensorFlow <https://www.tensorflow.org>`_-based open-source library for simulating the physical layer of wireless communication systems.
+`Sionna <https://github.com/NVlabs/sionna>`_\ |trade| is a `TensorFlow <https://www.tensorflow.org>`_-based open-source library for simulating the physical layer of wireless communication systems.
 The rapid prototyping of complex communication system architectures is as simple as connecting the desired building blocks, which are provided as `Keras <https://keras.io>`_ layers.
 Using differentiable layers, gradients can be backpropagated through an entire system, which is the key enabler for system optimization and machine learning, especially the integration of neural networks.
 NVIDIA GPU acceleration provides orders-of-magnitude faster simulation, enabling the interactive exploration of such systems, for example, in `Jupyter notebooks <https://jupyter.org/>`_ that can be run on cloud services such as `Google Colab <https://colab.research.google.com>`_.
 If no GPU is available, Sionna will run on the CPU.
 
 Sionna is developed, continuously extended, and used by NVIDIA to drive 5G and 6G research. It supports MU-MIMO (multi-user multiple input multiple output) link-level simulation setups with 5G-compliant codes including low-density parity check (LDPC) and Polar en-/decoders, the 3GPP channel models, OFDM (orthogonal frequency-division multiplexing), channel estimation, equalization, and soft-demapping. Every building block is an independent module that can be easily tested, understood, and modified according to your needs. The documentation is complete and includes references.
-
 
 The Benefits of using Sionna
 ###################################
@@ -58,7 +57,7 @@ If you use this software, please cite it as:
     year = {2022},
     month = {Mar.},
     journal = {arXiv preprint},
-    online = {https://github.com/NVlabs/sionna/blob/main/sionna.pdf}
+    online = {https://arxiv.org/abs/2203.11854}
    }
 
 
