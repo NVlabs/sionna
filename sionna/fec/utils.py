@@ -816,7 +816,7 @@ def alist2mat(alist, verbose=True):
 
         For example the following code snippet will import an alist from a file called ``filename``:
 
-        .. code-block::
+        .. code-block:: python
 
             pcm, k, n, coderate = alist2mat(load_alist(path = filename))
     """
