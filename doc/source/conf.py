@@ -43,7 +43,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx_rtd_theme",
     "sphinx.ext.viewcode",
-    'sphinx_copybutton'
+    "sphinx_copybutton",
     ]
 
 # Add any paths that contain templates here, relative to this directory.
