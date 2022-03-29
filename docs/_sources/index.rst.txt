@@ -11,6 +11,15 @@ If no GPU is available, Sionna will run on the CPU.
 
 Sionna is developed, continuously extended, and used by NVIDIA to drive 5G and 6G research. It supports MU-MIMO (multi-user multiple input multiple output) link-level simulation setups with 5G-compliant codes including low-density parity check (LDPC) and Polar en-/decoders, the 3GPP channel models, OFDM (orthogonal frequency-division multiplexing), channel estimation, equalization, and soft-demapping. Every building block is an independent module that can be easily tested, understood, and modified according to your needs. The documentation is complete and includes references.
 
+Here is a short video showing Sionna in action:
+
+.. raw:: html
+
+   <center>
+   <iframe width="560" height="315" src="https://www.youtube.com/embed/cYUNE4i4Q4E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   </center>
+|
+
 The Benefits of using Sionna
 ###################################
 Most researchers in communications need a tool for link-level simulation to
