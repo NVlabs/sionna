@@ -657,10 +657,11 @@
 <span class="sd">            `[...,num_ofdm_symbols, fft_size]`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># Cut last samples that do not fit into and OFDM symbol</span>
+        <span class="c1"># Cut last samples that do not fit into an OFDM symbol</span>
         <span class="n">rest</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floormod</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">fft_size</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cyclic_prefix_length</span><span class="p">)</span>
-        <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="o">-</span><span class="n">rest</span><span class="p">]</span>
+
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs</span> <span class="k">if</span> <span class="n">rest</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="n">inputs</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="o">-</span><span class="n">rest</span><span class="p">]</span>
 
         <span class="c1"># Reshape input to separate OFDM symbols</span>
         <span class="n">new_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">inputs</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>

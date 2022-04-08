@@ -928,11 +928,16 @@
 <span class="sd">    -----</span>
 <span class="sd">    : [batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols, fft_size, data_dim]</span>
 <span class="sd">        The full OFDM resource grid in the frequency domain.</span>
+<span class="sd">        The last dimension `data_dim` is optional. If `data_dim`</span>
+<span class="sd">        is used, it refers to the dimensionality of the data that should be</span>
+<span class="sd">        demapped to individual streams. An example would be LLRs.</span>
 
 <span class="sd">    Output</span>
 <span class="sd">    ------</span>
 <span class="sd">    : [batch_size, num_rx, num_streams_per_rx, num_data_symbols, data_dim]</span>
 <span class="sd">        The data that were mapped into the resource grid.</span>
+<span class="sd">        The last dimension `data_dim` is only returned if it was used for the</span>
+<span class="sd">        input.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">resource_grid</span><span class="p">,</span>
@@ -954,6 +959,10 @@
         <span class="c1"># y has shape</span>
         <span class="c1"># [batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols,...</span>
         <span class="c1"># ..., fft_size, data_dim]</span>
+
+        <span class="c1"># If data_dim is not provided, add a dummy dimension</span>
+        <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">==</span><span class="mi">5</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Remove nulled subcarriers from y (guards, dc). New shape:</span>
         <span class="c1"># [batch_size, num_rx, num_rx_ant, ...</span>
@@ -994,6 +1003,10 @@
         <span class="c1"># Put batch_dim first</span>
         <span class="c1"># [batch_size, num_tx, num_streams, num_data_symbols]</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+        <span class="c1"># Squeeze data_dim</span>
+        <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">y</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">y</span></div>
 

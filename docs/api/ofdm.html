@@ -843,10 +843,15 @@ Defaults to <cite>tf.complex64</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Input</dt>
-<dd class="field-even"><p><em>[batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols, fft_size, data_dim]</em> – The full OFDM resource grid in the frequency domain.</p>
+<dd class="field-even"><p><em>[batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols, fft_size, data_dim]</em> – The full OFDM resource grid in the frequency domain.
+The last dimension <cite>data_dim</cite> is optional. If <cite>data_dim</cite>
+is used, it refers to the dimensionality of the data that should be
+demapped to individual streams. An example would be LLRs.</p>
 </dd>
 <dt class="field-odd">Output</dt>
-<dd class="field-odd"><p><em>[batch_size, num_rx, num_streams_per_rx, num_data_symbols, data_dim]</em> – The data that were mapped into the resource grid.</p>
+<dd class="field-odd"><p><em>[batch_size, num_rx, num_streams_per_rx, num_data_symbols, data_dim]</em> – The data that were mapped into the resource grid.
+The last dimension <cite>data_dim</cite> is only returned if it was used for the
+input.</p>
 </dd>
 </dl>
 </dd></dl>
