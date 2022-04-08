@@ -1199,7 +1199,7 @@ class TestPolarDecoding5G(unittest.TestCase):
 
             # run same test for XLA (jit_compile=True)
             # BP does currently not support XLA
-            if dec_type is not "BP":
+            if dec_type != "BP":
                 u = source([[bs, n], 0.5])
                 x = run_graph_xla(u).numpy()
                 x = run_graph_xla(u).numpy()

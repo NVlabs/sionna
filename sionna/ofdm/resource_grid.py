@@ -401,11 +401,16 @@ class ResourceGridDemapper(Layer):
     -----
     : [batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols, fft_size, data_dim]
         The full OFDM resource grid in the frequency domain.
+        The last dimension `data_dim` is optional. If `data_dim`
+        is used, it refers to the dimensionality of the data that should be
+        demapped to individual streams. An example would be LLRs.
 
     Output
     ------
     : [batch_size, num_rx, num_streams_per_rx, num_data_symbols, data_dim]
         The data that were mapped into the resource grid.
+        The last dimension `data_dim` is only returned if it was used for the
+        input.
     """
     def __init__(self,
                  resource_grid,
@@ -427,6 +432,10 @@ class ResourceGridDemapper(Layer):
         # y has shape
         # [batch_size, num_rx, num_streams_per_rx, num_ofdm_symbols,...
         # ..., fft_size, data_dim]
+
+        # If data_dim is not provided, add a dummy dimension
+        if tf.rank(y)==5:
+            y = tf.expand_dims(y, -1)
 
         # Remove nulled subcarriers from y (guards, dc). New shape:
         # [batch_size, num_rx, num_rx_ant, ...
@@ -467,6 +476,10 @@ class ResourceGridDemapper(Layer):
         # Put batch_dim first
         # [batch_size, num_tx, num_streams, num_data_symbols]
         y = tf.transpose(y, [4, 0, 1, 2, 3])
+
+        # Squeeze data_dim
+        if tf.shape(y)[-1]==1:
+            y = tf.squeeze(y, -1)
 
         return y
 

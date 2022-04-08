@@ -130,10 +130,11 @@ class OFDMDemodulator(Layer):
             `[...,num_ofdm_symbols, fft_size]`.
         """
 
-        # Cut last samples that do not fit into and OFDM symbol
+        # Cut last samples that do not fit into an OFDM symbol
         rest = tf.math.floormod(inputs.shape[-1],
                                 self.fft_size + self.cyclic_prefix_length)
-        inputs = inputs[...,:-rest]
+
+        inputs = inputs if rest==0 else inputs[...,:-rest]
 
         # Reshape input to separate OFDM symbols
         new_shape = tf.concat([tf.shape(inputs)[:-1], [-1],
