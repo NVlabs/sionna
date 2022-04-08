@@ -21,6 +21,7 @@ We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/ins
 ### Installation using pip
 
 We recommend to do this within a [virtual environment](https://docs.python.org/3/tutorial/venv.html), e.g., using [conda](https://docs.conda.io).
+On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensorflow_macos) first.
 
 1.) Install the package
 ```
