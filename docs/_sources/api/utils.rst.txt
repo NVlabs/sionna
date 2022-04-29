@@ -112,14 +112,6 @@ complex_normal
 --------------
 .. autofunction:: sionna.utils.complex_normal
 
-fft
----
-.. autofunction:: sionna.utils.fft
-
-ifft
-----
-.. autofunction:: sionna.utils.ifft
-
 log2
 ----
 .. autofunction:: sionna.utils.log2
@@ -127,7 +119,3 @@ log2
 log10
 -----
 .. autofunction:: sionna.utils.log10
-
-empirical_psd
--------------
-.. autofunction:: sionna.utils.empirical_psd

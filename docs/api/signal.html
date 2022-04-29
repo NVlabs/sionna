@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signal &mdash; Sionna 0.9.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Utility Functions" href="utils.html" />
+    <link rel="prev" title="Multiple-Input Multiple-Output (MIMO)" href="mimo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Pulse_shaping_basics.html">Pulse-shaping Basics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Pulse_shaping_basics.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Pulse_shaping_basics.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Pulse_shaping_basics.html#Pulse-shaping-of-a-sequence-of-QAM-symbols">Pulse-shaping of a sequence of QAM symbols</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Pulse_shaping_basics.html#Recovering-the-QAM-symbols-through-matched-filtering-and-downsampling">Recovering the QAM symbols through matched filtering and downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Pulse_shaping_basics.html#Investigating-the-ACLR">Investigating the ACLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Pulse_shaping_basics.html#Windowing">Windowing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#awgn">AWGN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#panelarray">PanelArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#external-datasets">External datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="channel.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#empirical-aclr">empirical_aclr</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#matrix-inv">matrix_inv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#log10">log10</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="sionna.html">API Documentation</a> &raquo;</li>
+      <li>Signal</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="signal">
+<h1>Signal<a class="headerlink" href="#signal" title="Permalink to this headline"></a></h1>
+<p>This module contains classes and functions for <a class="reference internal" href="#filter"><span class="std std-ref">filtering</span></a> (pulse shaping), <a class="reference internal" href="#window"><span class="std std-ref">windowing</span></a>, and <a class="reference internal" href="#upsampling"><span class="std std-ref">up-</span></a> and <a class="reference internal" href="#downsampling"><span class="std std-ref">downsampling</span></a>.
+The following figure shows the different components that can be implemented using this module.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/signal_module.png"><img alt="../_images/signal_module.png" src="../_images/signal_module.png" style="width: 75%;" /></a>
+</div>
+<p>This module also contains <a class="reference internal" href="#utility"><span class="std std-ref">utility functions</span></a> for computing the (inverse) discrete Fourier transform (<a class="reference internal" href="#fft"><span class="std std-ref">FFT</span></a>/<a class="reference internal" href="#ifft"><span class="std std-ref">IFFT</span></a>), and for empirically computing the <a class="reference internal" href="#empirical-psd"><span class="std std-ref">power spectral density (PSD)</span></a> and <a class="reference internal" href="#empirical-aclr"><span class="std std-ref">adjacent channel leakage ratio (ACLR)</span></a> of a signal.</p>
+<p>The following code snippet shows how to filter a sequence of QAM baseband symbols using a root-raised-cosine filter with a Hann window:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create batch of QAM-16 sequences</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">num_symbols</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">QAMSource</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">])</span>
+
+<span class="c1"># Create a root-raised-cosine filter with Hann windowing</span>
+<span class="n">beta</span> <span class="o">=</span> <span class="mf">0.22</span> <span class="c1"># Roll-off factor</span>
+<span class="n">span_in_symbols</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># Filter span in symbols</span>
+<span class="n">samples_per_symbol</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># Number of samples per symbol, i.e., the oversampling factor</span>
+<span class="n">rrcf_hann</span> <span class="o">=</span> <span class="n">RootRaisedCosineFilter</span><span class="p">(</span><span class="n">span_in_symbols</span><span class="p">,</span> <span class="n">samples_per_symbol</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s2">&quot;hann&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create instance of the Upsampling layer</span>
+<span class="n">us</span> <span class="o">=</span> <span class="n">Upsampling</span><span class="p">(</span><span class="n">samples_per_symbol</span><span class="p">)</span>
+
+<span class="c1"># Upsample the baseband x</span>
+<span class="n">x_us</span> <span class="o">=</span> <span class="n">us</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># Filter the upsampled sequence</span>
+<span class="n">x_rrcf</span> <span class="o">=</span> <span class="n">rrcf_hann</span><span class="p">(</span><span class="n">x_us</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>On the receiver side, one would recover the baseband symbols as follows:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate a downsampling layer</span>
+<span class="n">ds</span> <span class="o">=</span> <span class="n">Downsampling</span><span class="p">(</span><span class="n">samples_per_symbol</span><span class="p">,</span> <span class="n">rrcf_hann</span><span class="o">.</span><span class="n">length</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_symbols</span><span class="p">)</span>
+
+<span class="c1"># Apply the matched filter</span>
+<span class="n">x_mf</span> <span class="o">=</span> <span class="n">rrcf_hann</span><span class="p">(</span><span class="n">x_rrcf</span><span class="p">)</span>
+
+<span class="c1"># Recover the transmitted symbol sequence</span>
+<span class="n">x_hat</span> <span class="o">=</span> <span class="n">ds</span><span class="p">(</span><span class="n">x_mf</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="filters">
+<span id="filter"></span><h2>Filters<a class="headerlink" href="#filters" title="Permalink to this headline"></a></h2>
+<div class="section" id="sincfilter">
+<h3>SincFilter<a class="headerlink" href="#sincfilter" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">SincFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_in_symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/filter.html#SincFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.SincFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a sinc filter of <code class="docutils literal notranslate"><span class="pre">length</span></code> K
+to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of length N.</p>
+<p>The sinc filter is defined by</p>
+<div class="math notranslate nohighlight">
+\[h(t) = \frac{1}{T}\text{sinc}\left(\frac{t}{T}\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(T\)</span> the symbol duration.</p>
+<p>The filter length K is equal to the filter span in symbols (<code class="docutils literal notranslate"><span class="pre">span_in_symbols</span></code>)
+multiplied by the oversampling factor (<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code>).
+If this product is even, a value of one will be added.</p>
+<p>The filter is applied through discrete convolution.</p>
+<p>An optional windowing function <code class="docutils literal notranslate"><span class="pre">window</span></code> can be applied to the filter.</p>
+<p>The <cite>dtype</cite> of the output is <cite>tf.float</cite> if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter coefficients have dtype <cite>tf.float</cite>.
+Otherwise, the dtype of the output is <cite>tf.complex</cite>.</p>
+<p>Three padding modes are available for applying the filter:</p>
+<ul class="simple">
+<li><p>“full” (default): Returns the convolution at each point of overlap between <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+The length of the output is N + K - 1. Zero-padding of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> is performed to
+compute the convolution at the borders.</p></li>
+<li><p>“same”: Returns an output of the same length as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>. The convolution is computed such
+that the coefficients of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> are centered on the coefficient of the filter with index
+(K-1)/2. Zero-padding of the input signal is performed to compute the convolution at the borders.</p></li>
+<li><p>“valid”: Returns the convolution only at points where <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter completely overlap.
+The length of the output is N - K + 1.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>span_in_symbols</strong> (<em>int</em>) – Filter span as measured by the number of symbols.</p></li>
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><em>Window</em></a><em> or </em><em>string</em><em> (</em><em>[</em><em>&quot;hann&quot;</em><em>, </em><em>&quot;hamming&quot;</em><em>, </em><em>&quot;blackman&quot;</em><em>]</em><em>)</em>) – Instance of <a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a> that is applied to the filter coefficients.
+Alternatively, a string indicating the window name can be provided. In this case,
+the chosen window will be instantiated with the default parameters. Custom windows
+must be provided as instance.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the filter is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the filter coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the filter is applied.
+The filter is applied along the last dimension.</p></li>
+<li><p><strong>padding</strong> (<em>string ([“full”, “valid”, “same”])</em>) – Padding mode for convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+Must be one of “full”, “valid”, or “same”. Case insensitive.
+Defaults to “full”.</p></li>
+<li><p><strong>conjugate</strong> (<em>bool</em>) – If <cite>True</cite>, the complex conjugate of the filter is applied.
+Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,M], tf.complex or tf.float</em>) – Filtered input.
+It is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter are <cite>tf.float</cite>.
+It is <cite>tf.complex</cite> otherwise.
+The length M depends on the <code class="docutils literal notranslate"><span class="pre">padding</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.aclr">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">aclr</span></span><a class="headerlink" href="#sionna.signal.SincFilter.aclr" title="Permalink to this definition"></a></dt>
+<dd><p>ACLR of the filter</p>
+<p>This ACLR corresponds to what one would obtain from using
+this filter as pulse shaping filter on an i.i.d. sequence of symbols.
+The in-band is assumed to range from [-0.5, 0.5] in normalized
+frequency.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.SincFilter.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The filter coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.SincFilter.length" title="Permalink to this definition"></a></dt>
+<dd><p>The filter length in samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.SincFilter.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter is normalized to have unit power. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.sampling_times">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sampling_times</span></span><a class="headerlink" href="#sionna.signal.SincFilter.sampling_times" title="Permalink to this definition"></a></dt>
+<dd><p>Sampling times in multiples of the symbol duration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'impulse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.SincFilter.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the impulse or magnitude response</p>
+<p>Plots the impulse response (time domain) or magnitude response
+(frequency domain) of the filter.</p>
+<p>For the computation of the magnitude response, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the filter coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>str, one of [“impulse”, “magnitude”]</em>) – The desired response type.
+Defaults to “impulse”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude response.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.SincFilter.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.SincFilter.window">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">window</span></span><a class="headerlink" href="#sionna.signal.SincFilter.window" title="Permalink to this definition"></a></dt>
+<dd><p>The window function that is applied to the filter coefficients. <cite>None</cite> if no window is applied.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="raisedcosinefilter">
+<h3>RaisedCosineFilter<a class="headerlink" href="#raisedcosinefilter" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">RaisedCosineFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_in_symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/filter.html#RaisedCosineFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.RaisedCosineFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a raised-cosine filter of <code class="docutils literal notranslate"><span class="pre">length</span></code> K
+to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of length N.</p>
+<p>The raised-cosine filter is defined by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}h(t) =
+\begin{cases}
+\frac{\pi}{4T} \text{sinc}\left(\frac{1}{2\beta}\right), &amp; \text { if }t = \pm \frac{T}{2\beta}\\
+\frac{1}{T}\text{sinc}\left(\frac{t}{T}\right)\frac{\cos\left(\frac{\pi\beta t}{T}\right)}{1-\left(\frac{2\beta t}{T}\right)^2}, &amp; \text{otherwise}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\beta\)</span> is the roll-off factor and <span class="math notranslate nohighlight">\(T\)</span> the symbol duration.</p>
+<p>The filter length K is equal to the filter span in symbols (<code class="docutils literal notranslate"><span class="pre">span_in_symbols</span></code>)
+multiplied by the oversampling factor (<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code>).
+If this product is even, a value of one will be added.</p>
+<p>The filter is applied through discrete convolution.</p>
+<p>An optional windowing function <code class="docutils literal notranslate"><span class="pre">window</span></code> can be applied to the filter.</p>
+<p>The <cite>dtype</cite> of the output is <cite>tf.float</cite> if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter coefficients have dtype <cite>tf.float</cite>.
+Otherwise, the dtype of the output is <cite>tf.complex</cite>.</p>
+<p>Three padding modes are available for applying the filter:</p>
+<ul class="simple">
+<li><p>“full” (default): Returns the convolution at each point of overlap between <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+The length of the output is N + K - 1. Zero-padding of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> is performed to
+compute the convolution at the borders.</p></li>
+<li><p>“same”: Returns an output of the same length as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>. The convolution is computed such
+that the coefficients of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> are centered on the coefficient of the filter with index
+(K-1)/2. Zero-padding of the input signal is performed to compute the convolution at the borders.</p></li>
+<li><p>“valid”: Returns the convolution only at points where <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter completely overlap.
+The length of the output is N - K + 1.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>span_in_symbols</strong> (<em>int</em>) – Filter span as measured by the number of symbols.</p></li>
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Roll-off factor.
+Must be in the range <span class="math notranslate nohighlight">\([0,1]\)</span>.</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><em>Window</em></a><em> or </em><em>string</em><em> (</em><em>[</em><em>&quot;hann&quot;</em><em>, </em><em>&quot;hamming&quot;</em><em>, </em><em>&quot;blackman&quot;</em><em>]</em><em>)</em>) – Instance of <a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a> that is applied to the filter coefficients.
+Alternatively, a string indicating the window name can be provided. In this case,
+the chosen window will be instantiated with the default parameters. Custom windows
+must be provided as instance.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the filter is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the filter coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the filter is applied.
+The filter is applied along the last dimension.</p></li>
+<li><p><strong>padding</strong> (<em>string ([“full”, “valid”, “same”])</em>) – Padding mode for convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+Must be one of “full”, “valid”, or “same”.
+Defaults to “full”.</p></li>
+<li><p><strong>conjugate</strong> (<em>bool</em>) – If <cite>True</cite>, the complex conjugate of the filter is applied.
+Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,M], tf.complex or tf.float</em>) – Filtered input.
+It is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter are <cite>tf.float</cite>.
+It is <cite>tf.complex</cite> otherwise.
+The length M depends on the <code class="docutils literal notranslate"><span class="pre">padding</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.aclr">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">aclr</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.aclr" title="Permalink to this definition"></a></dt>
+<dd><p>ACLR of the filter</p>
+<p>This ACLR corresponds to what one would obtain from using
+this filter as pulse shaping filter on an i.i.d. sequence of symbols.
+The in-band is assumed to range from [-0.5, 0.5] in normalized
+frequency.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.beta">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.beta" title="Permalink to this definition"></a></dt>
+<dd><p>Roll-off factor</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The filter coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.length" title="Permalink to this definition"></a></dt>
+<dd><p>The filter length in samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter is normalized to have unit power. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.sampling_times">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sampling_times</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.sampling_times" title="Permalink to this definition"></a></dt>
+<dd><p>Sampling times in multiples of the symbol duration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'impulse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the impulse or magnitude response</p>
+<p>Plots the impulse response (time domain) or magnitude response
+(frequency domain) of the filter.</p>
+<p>For the computation of the magnitude response, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the filter coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>str, one of [“impulse”, “magnitude”]</em>) – The desired response type.
+Defaults to “impulse”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude response.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RaisedCosineFilter.window">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">window</span></span><a class="headerlink" href="#sionna.signal.RaisedCosineFilter.window" title="Permalink to this definition"></a></dt>
+<dd><p>The window function that is applied to the filter coefficients. <cite>None</cite> if no window is applied.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="rootraisedcosinefilter">
+<h3>RootRaisedCosineFilter<a class="headerlink" href="#rootraisedcosinefilter" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">RootRaisedCosineFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_in_symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/filter.html#RootRaisedCosineFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a root-raised-cosine filter of <code class="docutils literal notranslate"><span class="pre">length</span></code> K
+to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of length N.</p>
+<p>The root-raised-cosine filter is defined by</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}h(t) =
+\begin{cases}
+\frac{1}{T} \left(1 + \beta\left(\frac{4}{\pi}-1\right) \right), &amp; \text { if }t = 0\\
+\frac{\beta}{T\sqrt{2}} \left[ \left(1+\frac{2}{\pi}\right)\sin\left(\frac{\pi}{4\beta}\right) + \left(1-\frac{2}{\pi}\right)\cos\left(\frac{\pi}{4\beta}\right) \right], &amp; \text { if }t = \pm\frac{T}{4\beta} \\
+\frac{1}{T} \frac{\sin\left(\pi\frac{t}{T}(1-\beta)\right) + 4\beta\frac{t}{T}\cos\left(\pi\frac{t}{T}(1+\beta)\right)}{\pi\frac{t}{T}\left(1-\left(4\beta\frac{t}{T}\right)^2\right)}, &amp; \text { otherwise}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\beta\)</span> is the roll-off factor and <span class="math notranslate nohighlight">\(T\)</span> the symbol duration.</p>
+<p>The filter length K is equal to the filter span in symbols (<code class="docutils literal notranslate"><span class="pre">span_in_symbols</span></code>)
+multiplied by the oversampling factor (<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code>).
+If this product is even, a value of one will be added.</p>
+<p>The filter is applied through discrete convolution.</p>
+<p>An optional windowing function <code class="docutils literal notranslate"><span class="pre">window</span></code> can be applied to the filter.</p>
+<p>The <cite>dtype</cite> of the output is <cite>tf.float</cite> if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter coefficients have dtype <cite>tf.float</cite>.
+Otherwise, the dtype of the output is <cite>tf.complex</cite>.</p>
+<p>Three padding modes are available for applying the filter:</p>
+<ul class="simple">
+<li><p>“full” (default): Returns the convolution at each point of overlap between <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+The length of the output is N + K - 1. Zero-padding of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> is performed to
+compute the convolution at the borders.</p></li>
+<li><p>“same”: Returns an output of the same length as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>. The convolution is computed such
+that the coefficients of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> are centered on the coefficient of the filter with index
+(K-1)/2. Zero-padding of the input signal is performed to compute the convolution at the borders.</p></li>
+<li><p>“valid”: Returns the convolution only at points where <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter completely overlap.
+The length of the output is N - K + 1.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>span_in_symbols</strong> (<em>int</em>) – Filter span as measured by the number of symbols.</p></li>
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Roll-off factor.
+Must be in the range <span class="math notranslate nohighlight">\([0,1]\)</span>.</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><em>Window</em></a><em> or </em><em>string</em><em> (</em><em>[</em><em>&quot;hann&quot;</em><em>, </em><em>&quot;hamming&quot;</em><em>, </em><em>&quot;blackman&quot;</em><em>]</em><em>)</em>) – Instance of <a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a> that is applied to the filter coefficients.
+Alternatively, a string indicating the window name can be provided. In this case,
+the chosen window will be instantiated with the default parameters. Custom windows
+must be provided as instance.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the filter is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the filter coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the filter is applied.
+The filter is applied along the last dimension.</p></li>
+<li><p><strong>padding</strong> (<em>string ([“full”, “valid”, “same”])</em>) – Padding mode for convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+Must be one of “full”, “valid”, or “same”. Case insensitive.
+Defaults to “full”.</p></li>
+<li><p><strong>conjugate</strong> (<em>bool</em>) – If <cite>True</cite>, the complex conjugate of the filter is applied.
+Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,M], tf.complex or tf.float</em>) – Filtered input.
+It is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter are <cite>tf.float</cite>.
+It is <cite>tf.complex</cite> otherwise.
+The length M depends on the <code class="docutils literal notranslate"><span class="pre">padding</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.aclr">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">aclr</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.aclr" title="Permalink to this definition"></a></dt>
+<dd><p>ACLR of the filter</p>
+<p>This ACLR corresponds to what one would obtain from using
+this filter as pulse shaping filter on an i.i.d. sequence of symbols.
+The in-band is assumed to range from [-0.5, 0.5] in normalized
+frequency.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.beta">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.beta" title="Permalink to this definition"></a></dt>
+<dd><p>Roll-off factor</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The filter coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.length" title="Permalink to this definition"></a></dt>
+<dd><p>The filter length in samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter is normalized to have unit power. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.sampling_times">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sampling_times</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.sampling_times" title="Permalink to this definition"></a></dt>
+<dd><p>Sampling times in multiples of the symbol duration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'impulse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the impulse or magnitude response</p>
+<p>Plots the impulse response (time domain) or magnitude response
+(frequency domain) of the filter.</p>
+<p>For the computation of the magnitude response, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the filter coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>str, one of [“impulse”, “magnitude”]</em>) – The desired response type.
+Defaults to “impulse”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude response.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.RootRaisedCosineFilter.window">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">window</span></span><a class="headerlink" href="#sionna.signal.RootRaisedCosineFilter.window" title="Permalink to this definition"></a></dt>
+<dd><p>The window function that is applied to the filter coefficients. <cite>None</cite> if no window is applied.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="customfilter">
+<h3>CustomFilter<a class="headerlink" href="#customfilter" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">CustomFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_in_symbols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefficients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/filter.html#CustomFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.CustomFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a custom filter of <code class="docutils literal notranslate"><span class="pre">length</span></code> K
+to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of length N.</p>
+<p>The filter length K is equal to the filter span in symbols (<code class="docutils literal notranslate"><span class="pre">span_in_symbols</span></code>)
+multiplied by the oversampling factor (<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code>).
+If this product is even, a value of one will be added.</p>
+<p>The filter is applied through discrete convolution.</p>
+<p>An optional windowing function <code class="docutils literal notranslate"><span class="pre">window</span></code> can be applied to the filter.</p>
+<p>The <cite>dtype</cite> of the output is <cite>tf.float</cite> if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter coefficients have dtype <cite>tf.float</cite>.
+Otherwise, the dtype of the output is <cite>tf.complex</cite>.</p>
+<p>Three padding modes are available for applying the filter:</p>
+<ul class="simple">
+<li><p>“full” (default): Returns the convolution at each point of overlap between <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+The length of the output is N + K - 1. Zero-padding of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> is performed to
+compute the convolution at the borders.</p></li>
+<li><p>“same”: Returns an output of the same length as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>. The convolution is computed such
+that the coefficients of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> are centered on the coefficient of the filter with index
+(K-1)/2. Zero-padding of the input signal is performed to compute the convolution at the borders.</p></li>
+<li><p>“valid”: Returns the convolution only at points where <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter completely overlap.
+The length of the output is N - K + 1.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>span_in_symbols</strong> (<em>int</em>) – Filter span as measured by the number of symbols.
+Only needs to be provided if <code class="docutils literal notranslate"><span class="pre">coefficients</span></code> is None.</p></li>
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.
+Must always be provided.</p></li>
+<li><p><strong>coefficients</strong> (<em>[</em><em>K</em><em>]</em><em>, </em><em>tf.float</em><em> or </em><em>tf.complex</em>) – Optional filter coefficients.
+If set to <cite>None</cite>, then a random filter of K is generated
+by sampling a Gaussian distribution. Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><em>Window</em></a><em> or </em><em>string</em><em> (</em><em>[</em><em>&quot;hann&quot;</em><em>, </em><em>&quot;hamming&quot;</em><em>, </em><em>&quot;blackman&quot;</em><em>]</em><em>)</em>) – Instance of <a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a> that is applied to the filter coefficients.
+Alternatively, a string indicating the window name can be provided. In this case,
+the chosen window will be instantiated with the default parameters. Custom windows
+must be provided as instance.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the filter is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the filter coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the filter is applied.
+The filter is applied along the last dimension.</p></li>
+<li><p><strong>padding</strong> (<em>string ([“full”, “valid”, “same”])</em>) – Padding mode for convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+Must be one of “full”, “valid”, or “same”. Case insensitive.
+Defaults to “full”.</p></li>
+<li><p><strong>conjugate</strong> (<em>bool</em>) – If <cite>True</cite>, the complex conjugate of the filter is applied.
+Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,M], tf.complex or tf.float</em>) – Filtered input.
+It is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter are <cite>tf.float</cite>.
+It is <cite>tf.complex</cite> otherwise.
+The length M depends on the <code class="docutils literal notranslate"><span class="pre">padding</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.aclr">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">aclr</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.aclr" title="Permalink to this definition"></a></dt>
+<dd><p>ACLR of the filter</p>
+<p>This ACLR corresponds to what one would obtain from using
+this filter as pulse shaping filter on an i.i.d. sequence of symbols.
+The in-band is assumed to range from [-0.5, 0.5] in normalized
+frequency.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The filter coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.length" title="Permalink to this definition"></a></dt>
+<dd><p>The filter length in samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter is normalized to have unit power. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.sampling_times">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sampling_times</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.sampling_times" title="Permalink to this definition"></a></dt>
+<dd><p>Sampling times in multiples of the symbol duration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'impulse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.CustomFilter.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the impulse or magnitude response</p>
+<p>Plots the impulse response (time domain) or magnitude response
+(frequency domain) of the filter.</p>
+<p>For the computation of the magnitude response, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the filter coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>str, one of [“impulse”, “magnitude”]</em>) – The desired response type.
+Defaults to “impulse”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude response.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomFilter.window">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">window</span></span><a class="headerlink" href="#sionna.signal.CustomFilter.window" title="Permalink to this definition"></a></dt>
+<dd><p>The window function that is applied to the filter coefficients. <cite>None</cite> if no window is applied.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h3>Filter<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.Filter">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">span_in_symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/filter.html#Filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.Filter" title="Permalink to this definition"></a></dt>
+<dd><p>This is an abtract class for defining a filter of <code class="docutils literal notranslate"><span class="pre">length</span></code> K which can be
+applied to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of length N.</p>
+<p>The filter length K is equal to the filter span in symbols (<code class="docutils literal notranslate"><span class="pre">span_in_symbols</span></code>)
+multiplied by the oversampling factor (<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code>).
+If this product is even, a value of one will be added.</p>
+<p>The filter is applied through discrete convolution.</p>
+<p>An optional windowing function <code class="docutils literal notranslate"><span class="pre">window</span></code> can be applied to the filter.</p>
+<p>The <cite>dtype</cite> of the output is <cite>tf.float</cite> if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter coefficients have dtype <cite>tf.float</cite>.
+Otherwise, the dtype of the output is <cite>tf.complex</cite>.</p>
+<p>Three padding modes are available for applying the filter:</p>
+<ul class="simple">
+<li><p>“full” (default): Returns the convolution at each point of overlap between <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+The length of the output is N + K - 1. Zero-padding of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> is performed to
+compute the convolution at the borders.</p></li>
+<li><p>“same”: Returns an output of the same length as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>. The convolution is computed such
+that the coefficients of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> are centered on the coefficient of the filter with index
+(K-1)/2. Zero-padding of the input signal is performed to compute the convolution at the borders.</p></li>
+<li><p>“valid”: Returns the convolution only at points where <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter completely overlap.
+The length of the output is N - K + 1.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>span_in_symbols</strong> (<em>int</em>) – Filter span as measured by the number of symbols.</p></li>
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>window</strong> (<a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><em>Window</em></a><em> or </em><em>string</em><em> (</em><em>[</em><em>&quot;hann&quot;</em><em>, </em><em>&quot;hamming&quot;</em><em>, </em><em>&quot;blackman&quot;</em><em>]</em><em>)</em>) – Instance of <a class="reference internal" href="#sionna.signal.Window" title="sionna.signal.Window"><code class="xref py py-class docutils literal notranslate"><span class="pre">Window</span></code></a> that is applied to the filter coefficients.
+Alternatively, a string indicating the window name can be provided. In this case,
+the chosen window will be instantiated with the default parameters. Custom windows
+must be provided as instance.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the filter is normalized to have unit power.
+Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the filter coefficients are trainable.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the filter is applied.
+The filter is applied along the last dimension.</p></li>
+<li><p><strong>padding</strong> (<em>string ([“full”, “valid”, “same”])</em>) – Padding mode for convolving <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter.
+Must be one of “full”, “valid”, or “same”. Case insensitive.
+Defaults to “full”.</p></li>
+<li><p><strong>conjugate</strong> (<em>bool</em>) – If <cite>True</cite>, the complex conjugate of the filter is applied.
+Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,M], tf.complex or tf.float</em>) – Filtered input.
+It is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">x</span></code> and the filter are <cite>tf.float</cite>.
+It is <cite>tf.complex</cite> otherwise.
+The length M depends on the <code class="docutils literal notranslate"><span class="pre">padding</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.aclr">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">aclr</span></span><a class="headerlink" href="#sionna.signal.Filter.aclr" title="Permalink to this definition"></a></dt>
+<dd><p>ACLR of the filter</p>
+<p>This ACLR corresponds to what one would obtain from using
+this filter as pulse shaping filter on an i.i.d. sequence of symbols.
+The in-band is assumed to range from [-0.5, 0.5] in normalized
+frequency.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.Filter.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The filter coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.Filter.length" title="Permalink to this definition"></a></dt>
+<dd><p>The filter length in samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.Filter.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter is normalized to have unit power. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.sampling_times">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sampling_times</span></span><a class="headerlink" href="#sionna.signal.Filter.sampling_times" title="Permalink to this definition"></a></dt>
+<dd><p>Sampling times in multiples of the symbol duration</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.Filter.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'impulse'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/filter.html#Filter.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.Filter.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the impulse or magnitude response</p>
+<p>Plots the impulse response (time domain) or magnitude response
+(frequency domain) of the filter.</p>
+<p>For the computation of the magnitude response, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the filter coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>str, one of [“impulse”, “magnitude”]</em>) – The desired response type.
+Defaults to “impulse”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude response.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.Filter.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the filter coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Filter.window">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">window</span></span><a class="headerlink" href="#sionna.signal.Filter.window" title="Permalink to this definition"></a></dt>
+<dd><p>The window function that is applied to the filter coefficients. <cite>None</cite> if no window is applied.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="window-functions">
+<span id="window"></span><h2>Window functions<a class="headerlink" href="#window-functions" title="Permalink to this headline"></a></h2>
+<div class="section" id="hannwindow">
+<h3>HannWindow<a class="headerlink" href="#hannwindow" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.HannWindow">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">HannWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/window.html#HannWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.HannWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a Hann window function of length <code class="docutils literal notranslate"><span class="pre">length</span></code> to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of the same length.</p>
+<p>The window function is applied through element-wise multiplication.</p>
+<p>The window function is real-valued, i.e., has <cite>tf.float</cite> as <cite>dtype</cite>.
+The <cite>dtype</cite> of the output is the same as the <cite>dtype</cite> of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> to which the window function is applied.
+The window function and the input must have the same precision.</p>
+<p>The Hann window is defined by</p>
+<div class="math notranslate nohighlight">
+\[w_n = \sin^2 \left( \frac{\pi n}{N} \right), 0 \leq n \leq N-1\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the window length.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – Window length (number of samples).</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the window coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the window is normalized to have unit average power
+per coefficient.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Must be either <cite>tf.float32</cite> or <cite>tf.float64</cite>.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the window function is applied.
+The window function is applied along the last dimension.
+The length of the last dimension <code class="docutils literal notranslate"><span class="pre">N</span></code> must be the same as the <code class="docutils literal notranslate"><span class="pre">length</span></code> of the window function.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,N], tf.complex or tf.float</em>) – Output of the windowing operation.
+The output has the same shape and <cite>dtype</cite> as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HannWindow.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.HannWindow.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The window coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HannWindow.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.HannWindow.length" title="Permalink to this definition"></a></dt>
+<dd><p>Window length in number of samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HannWindow.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.HannWindow.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window is normalized to have unit average power per coefficient. <cite>False</cite>
+otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.HannWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.HannWindow.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the window in time or frequency domain</p>
+<p>For the computation of the Fourier transform, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the window coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>domain</strong> (<em>str, one of [“time”, “frequency”]</em>) – The desired domain.
+Defaults to “time”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude in the frequency domain.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HannWindow.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.HannWindow.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hammingwindow">
+<h3>HammingWindow<a class="headerlink" href="#hammingwindow" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.HammingWindow">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">HammingWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/window.html#HammingWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.HammingWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a Hamming window function of length <code class="docutils literal notranslate"><span class="pre">length</span></code> to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of the same length.</p>
+<p>The window function is applied through element-wise multiplication.</p>
+<p>The window function is real-valued, i.e., has <cite>tf.float</cite> as <cite>dtype</cite>.
+The <cite>dtype</cite> of the output is the same as the <cite>dtype</cite> of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> to which the window function is applied.
+The window function and the input must have the same precision.</p>
+<p>The Hamming window is defined by</p>
+<div class="math notranslate nohighlight">
+\[w_n = a_0 - (1-a_0) \cos \left( \frac{2 \pi n}{N} \right), 0 \leq n \leq N-1\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the window length and <span class="math notranslate nohighlight">\(a_0 = \frac{25}{46}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – Window length (number of samples).</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the window coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the window is normalized to have unit average power
+per coefficient.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Must be either <cite>tf.float32</cite> or <cite>tf.float64</cite>.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the window function is applied.
+The window function is applied along the last dimension.
+The length of the last dimension <code class="docutils literal notranslate"><span class="pre">N</span></code> must be the same as the <code class="docutils literal notranslate"><span class="pre">length</span></code> of the window function.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,N], tf.complex or tf.float</em>) – Output of the windowing operation.
+The output has the same shape and <cite>dtype</cite> as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HammingWindow.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.HammingWindow.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The window coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HammingWindow.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.HammingWindow.length" title="Permalink to this definition"></a></dt>
+<dd><p>Window length in number of samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HammingWindow.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.HammingWindow.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window is normalized to have unit average power per coefficient. <cite>False</cite>
+otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.HammingWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.HammingWindow.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the window in time or frequency domain</p>
+<p>For the computation of the Fourier transform, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the window coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>domain</strong> (<em>str, one of [“time”, “frequency”]</em>) – The desired domain.
+Defaults to “time”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude in the frequency domain.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.HammingWindow.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.HammingWindow.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="blackmanwindow">
+<h3>BlackmanWindow<a class="headerlink" href="#blackmanwindow" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.BlackmanWindow">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">BlackmanWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/window.html#BlackmanWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.BlackmanWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for applying a Blackman window function of length <code class="docutils literal notranslate"><span class="pre">length</span></code> to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of the same length.</p>
+<p>The window function is applied through element-wise multiplication.</p>
+<p>The window function is real-valued, i.e., has <cite>tf.float</cite> as <cite>dtype</cite>.
+The <cite>dtype</cite> of the output is the same as the <cite>dtype</cite> of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> to which the window function is applied.
+The window function and the input must have the same precision.</p>
+<p>The Blackman window is defined by</p>
+<div class="math notranslate nohighlight">
+\[w_n = a_0 - a_1 \cos \left( \frac{2 \pi n}{N} \right) + a_2 \cos \left( \frac{4 \pi n}{N} \right), 0 \leq n \leq N-1\]</div>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is the window length, <span class="math notranslate nohighlight">\(a_0 = \frac{7938}{18608}\)</span>, <span class="math notranslate nohighlight">\(a_1 = \frac{9240}{18608}\)</span>, and <span class="math notranslate nohighlight">\(a_2 = \frac{1430}{18608}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – Window length (number of samples).</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the window coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the window is normalized to have unit average power
+per coefficient.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Must be either <cite>tf.float32</cite> or <cite>tf.float64</cite>.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the window function is applied.
+The window function is applied along the last dimension.
+The length of the last dimension <code class="docutils literal notranslate"><span class="pre">N</span></code> must be the same as the <code class="docutils literal notranslate"><span class="pre">length</span></code> of the window function.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,N], tf.complex or tf.float</em>) – Output of the windowing operation.
+The output has the same shape and <cite>dtype</cite> as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.BlackmanWindow.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.BlackmanWindow.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The window coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.BlackmanWindow.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.BlackmanWindow.length" title="Permalink to this definition"></a></dt>
+<dd><p>Window length in number of samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.BlackmanWindow.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.BlackmanWindow.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window is normalized to have unit average power per coefficient. <cite>False</cite>
+otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.BlackmanWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.BlackmanWindow.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the window in time or frequency domain</p>
+<p>For the computation of the Fourier transform, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the window coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>domain</strong> (<em>str, one of [“time”, “frequency”]</em>) – The desired domain.
+Defaults to “time”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude in the frequency domain.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.BlackmanWindow.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.BlackmanWindow.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="customwindow">
+<h3>CustomWindow<a class="headerlink" href="#customwindow" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.CustomWindow">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">CustomWindow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefficients</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/window.html#CustomWindow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.CustomWindow" title="Permalink to this definition"></a></dt>
+<dd><p>Layer for defining and applying a custom window function of length <code class="docutils literal notranslate"><span class="pre">length</span></code> to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of the same length.</p>
+<p>The window function is applied through element-wise multiplication.</p>
+<p>The window function is real-valued, i.e., has <cite>tf.float</cite> as <cite>dtype</cite>.
+The <cite>dtype</cite> of the output is the same as the <cite>dtype</cite> of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> to which the window function is applied.
+The window function and the input must have the same precision.</p>
+<p>The window coefficients can be set through the <code class="docutils literal notranslate"><span class="pre">coefficients</span></code> parameter.
+If not provided, random window coefficients are generated by sampling a Gaussian distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – Window length (number of samples).</p></li>
+<li><p><strong>coefficients</strong> (<em>[</em><em>N</em><em>]</em><em>, </em><em>tf.float</em>) – Optional window coefficients.
+If set to <cite>None</cite>, then a random window of length <code class="docutils literal notranslate"><span class="pre">length</span></code> is generated by sampling a Gaussian distribution.
+Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the window coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the window is normalized to have unit average power
+per coefficient.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Must be either <cite>tf.float32</cite> or <cite>tf.float64</cite>.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the window function is applied.
+The window function is applied along the last dimension.
+The length of the last dimension <code class="docutils literal notranslate"><span class="pre">N</span></code> must be the same as the <code class="docutils literal notranslate"><span class="pre">length</span></code> of the window function.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,N], tf.complex or tf.float</em>) – Output of the windowing operation.
+The output has the same shape and <cite>dtype</cite> as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomWindow.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.CustomWindow.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The window coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomWindow.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.CustomWindow.length" title="Permalink to this definition"></a></dt>
+<dd><p>Window length in number of samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomWindow.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.CustomWindow.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window is normalized to have unit average power per coefficient. <cite>False</cite>
+otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.CustomWindow.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.signal.CustomWindow.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the window in time or frequency domain</p>
+<p>For the computation of the Fourier transform, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the window coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>domain</strong> (<em>str, one of [“time”, “frequency”]</em>) – The desired domain.
+Defaults to “time”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude in the frequency domain.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.CustomWindow.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.CustomWindow.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="id2">
+<h3>Window<a class="headerlink" href="#id2" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.Window">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">Window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/window.html#Window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.Window" title="Permalink to this definition"></a></dt>
+<dd><p>This is an abtract class for defining and applying a window function of length <code class="docutils literal notranslate"><span class="pre">length</span></code> to an input <code class="docutils literal notranslate"><span class="pre">x</span></code> of the same length.</p>
+<p>The window function is applied through element-wise multiplication.</p>
+<p>The window function is real-valued, i.e., has <cite>tf.float</cite> as <cite>dtype</cite>.
+The <cite>dtype</cite> of the output is the same as the <cite>dtype</cite> of the input <code class="docutils literal notranslate"><span class="pre">x</span></code> to which the window function is applied.
+The window function and the input must have the same precision.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> (<em>int</em>) – Window length (number of samples).</p></li>
+<li><p><strong>trainable</strong> (<em>bool</em>) – If <cite>True</cite>, the window coefficients are trainable variables.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If <cite>True</cite>, the window is normalized to have unit average power
+per coefficient.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.DType</em>) – The <cite>dtype</cite> of the filter coefficients.
+Must be either <cite>tf.float32</cite> or <cite>tf.float64</cite>.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…, N], tf.complex or tf.float</em>) – The input to which the window function is applied.
+The window function is applied along the last dimension.
+The length of the last dimension <code class="docutils literal notranslate"><span class="pre">N</span></code> must be the same as the <code class="docutils literal notranslate"><span class="pre">length</span></code> of the window function.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> (<em>[…,N], tf.complex or tf.float</em>) – Output of the windowing operation.
+The output has the same shape and <cite>dtype</cite> as the input <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Window.coefficients">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">coefficients</span></span><a class="headerlink" href="#sionna.signal.Window.coefficients" title="Permalink to this definition"></a></dt>
+<dd><p>The window coefficients (after normalization)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Window.length">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">length</span></span><a class="headerlink" href="#sionna.signal.Window.length" title="Permalink to this definition"></a></dt>
+<dd><p>Window length in number of samples</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Window.normalize">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">normalize</span></span><a class="headerlink" href="#sionna.signal.Window.normalize" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window is normalized to have unit average power per coefficient. <cite>False</cite>
+otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.signal.Window.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'time'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/window.html#Window.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.Window.show" title="Permalink to this definition"></a></dt>
+<dd><p>Plot the window in time or frequency domain</p>
+<p>For the computation of the Fourier transform, a minimum DFT size
+of 1024 is assumed which is obtained through zero padding of
+the window coefficients in the time domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – Number of samples per symbol, i.e., the oversampling factor.</p></li>
+<li><p><strong>domain</strong> (<em>str, one of [“time”, “frequency”]</em>) – The desired domain.
+Defaults to “time”</p></li>
+<li><p><strong>scale</strong> (<em>str, one of [“lin”, “db”]</em>) – The y-scale of the magnitude in the frequency domain.
+Can be “lin” (i.e., linear) or “db” (, i.e., Decibel).
+Defaults to “lin”.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.signal.Window.trainable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">trainable</span></span><a class="headerlink" href="#sionna.signal.Window.trainable" title="Permalink to this definition"></a></dt>
+<dd><p><cite>True</cite> if the window coefficients are trainable. <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="utility-functions-and-layers">
+<span id="utility"></span><h2>Utility functions and layers<a class="headerlink" href="#utility-functions-and-layers" title="Permalink to this headline"></a></h2>
+<div class="section" id="convolve">
+<h3>convolve<a class="headerlink" href="#convolve" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.signal.convolve">
+<span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">convolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ker</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/utils.html#convolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.convolve" title="Permalink to this definition"></a></dt>
+<dd><p>Filters an input <code class="docutils literal notranslate"><span class="pre">inp</span></code> of length <cite>N</cite> by convolving it with a kernel <code class="docutils literal notranslate"><span class="pre">ker</span></code> of length <cite>K</cite>.</p>
+<p>The length of the kernel <code class="docutils literal notranslate"><span class="pre">ker</span></code> must not be greater than the one of the input sequence <code class="docutils literal notranslate"><span class="pre">inp</span></code>.</p>
+<p>The <cite>dtype</cite> of the output is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">inp</span></code> and <code class="docutils literal notranslate"><span class="pre">ker</span></code> are <cite>tf.float</cite>. It is <cite>tf.complex</cite> otherwise.
+<code class="docutils literal notranslate"><span class="pre">inp</span></code> and <code class="docutils literal notranslate"><span class="pre">ker</span></code> must have the same precision.</p>
+<p>Three padding modes are available:</p>
+<ul class="simple">
+<li><p>“full” (default): Returns the convolution at each point of overlap between <code class="docutils literal notranslate"><span class="pre">ker</span></code> and <code class="docutils literal notranslate"><span class="pre">inp</span></code>.
+The length of the output is <cite>N + K - 1</cite>. Zero-padding of the input <code class="docutils literal notranslate"><span class="pre">inp</span></code> is performed to
+compute the convolution at the border points.</p></li>
+<li><p>“same”: Returns an output of the same length as the input <code class="docutils literal notranslate"><span class="pre">inp</span></code>. The convolution is computed such
+that the coefficients of the input <code class="docutils literal notranslate"><span class="pre">inp</span></code> are centered on the coefficient of the kernel <code class="docutils literal notranslate"><span class="pre">ker</span></code> with index
+<code class="docutils literal notranslate"><span class="pre">(K-1)/2</span></code> for kernels of odd length, and <code class="docutils literal notranslate"><span class="pre">K/2</span> <span class="pre">-</span> <span class="pre">1</span></code> for kernels of even length.
+Zero-padding of the input signal is performed to compute the convolution at the border points.</p></li>
+<li><p>“valid”: Returns the convolution only at points where <code class="docutils literal notranslate"><span class="pre">inp</span></code> and <code class="docutils literal notranslate"><span class="pre">ker</span></code> completely overlap.
+The length of the output is <cite>N - K + 1</cite>.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inp</strong> (<em>[…,N], tf.complex or tf.real</em>) – Input to filter.</p></li>
+<li><p><strong>ker</strong> (<em>[K], tf.complex or tf.real</em>) – Kernel of the convolution.</p></li>
+<li><p><strong>padding</strong> (<em>string</em>) – Padding mode. Must be one of “full”, “valid”, or “same”. Case insensitive.
+Defaults to “full”.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis along which to perform the convolution.
+Defaults to <cite>-1</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><strong>out</strong> (<em>[…,M], tf.complex or tf.float</em>) – Convolution output.
+It is <cite>tf.float</cite> only if both <code class="docutils literal notranslate"><span class="pre">inp</span></code> and <code class="docutils literal notranslate"><span class="pre">ker</span></code> are <cite>tf.float</cite>. It is <cite>tf.complex</cite> otherwise.
+The length <cite>M</cite> of the output depends on the <code class="docutils literal notranslate"><span class="pre">padding</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="fft">
+<span id="id3"></span><h3>fft<a class="headerlink" href="#fft" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.signal.fft">
+<span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">fft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/utils.html#fft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.fft" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the normalized DFT along a specified axis.</p>
+<p>This operation computes the normalized one-dimensional discrete Fourier
+transform (DFT) along the <code class="docutils literal notranslate"><span class="pre">axis</span></code> dimension of a <code class="docutils literal notranslate"><span class="pre">tensor</span></code>.
+For a vector <span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{C}^N\)</span>, the DFT
+<span class="math notranslate nohighlight">\(\mathbf{X}\in\mathbb{C}^N\)</span> is computed as</p>
+<div class="math notranslate nohighlight">
+\[X_m = \frac{1}{\sqrt{N}}\sum_{n=0}^{N-1} x_n \exp \left\{
+    -j2\pi\frac{mn}{N}\right\},\quad m=0,\dots,N-1.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor</strong> (<em>tf.complex</em>) – Tensor of arbitrary shape.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Indicates the dimension along which the DFT is taken.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>tf.complex</em> – Tensor of the same dtype and shape as <code class="docutils literal notranslate"><span class="pre">tensor</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="ifft">
+<span id="id4"></span><h3>ifft<a class="headerlink" href="#ifft" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.signal.ifft">
+<span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">ifft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/utils.html#ifft"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.ifft" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the normalized IDFT along a specified axis.</p>
+<p>This operation computes the normalized one-dimensional discrete inverse
+Fourier transform (IDFT) along the <code class="docutils literal notranslate"><span class="pre">axis</span></code> dimension of a <code class="docutils literal notranslate"><span class="pre">tensor</span></code>.
+For a vector <span class="math notranslate nohighlight">\(\mathbf{X}\in\mathbb{C}^N\)</span>, the IDFT
+<span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{C}^N\)</span> is computed as</p>
+<div class="math notranslate nohighlight">
+\[x_n = \frac{1}{\sqrt{N}}\sum_{m=0}^{N-1} X_m \exp \left\{
+    j2\pi\frac{mn}{N}\right\},\quad n=0,\dots,N-1.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tensor</strong> (<em>tf.complex</em>) – Tensor of arbitrary shape.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Indicates the dimension along which the IDFT is taken.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><em>tf.complex</em> – Tensor of the same dtype and shape as <code class="docutils literal notranslate"><span class="pre">tensor</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="upsampling">
+<span id="id5"></span><h3>Upsampling<a class="headerlink" href="#upsampling" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.Upsampling">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">Upsampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/upsampling.html#Upsampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.Upsampling" title="Permalink to this definition"></a></dt>
+<dd><p>Upsamples a tensor along a specified axis by inserting zeros
+between samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – The upsampling factor. If <code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code> is equal to <cite>n</cite>,
+then the upsampled axis will be <cite>n</cite>-times longer.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The dimension to be up-sampled. Must not be the first dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…,n,…], tf.DType</em>) – The tensor to be upsampled. <cite>n</cite> is the size of the <cite>axis</cite> dimension.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> ([…,n*samples_per_symbol,…], same dtype as <code class="docutils literal notranslate"><span class="pre">x</span></code>) – The upsampled tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="downsampling">
+<span id="id6"></span><h3>Downsampling<a class="headerlink" href="#downsampling" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.signal.Downsampling">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">Downsampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_symbols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/downsampling.html#Downsampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.Downsampling" title="Permalink to this definition"></a></dt>
+<dd><p>Downsamples a tensor along a specified axis by retaining one out of
+<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code> elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_symbol</strong> (<em>int</em>) – The downsampling factor. If <code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code> is equal to <cite>n</cite>, then the
+downsampled axis will be <cite>n</cite>-times shorter.</p></li>
+<li><p><strong>offset</strong> (<em>int</em>) – Defines the index of the first element to be retained.
+Defaults to zero.</p></li>
+<li><p><strong>num_symbols</strong> (<em>int</em>) – Defines the total number of symbols to be retained after
+downsampling.
+Defaults to None (i.e., the maximum possible number).</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – The dimension to be downsampled. Must not be the first dimension.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>x</strong> (<em>[…,n,…], tf.DType</em>) – The tensor to be downsampled. <cite>n</cite> is the size of the <cite>axis</cite> dimension.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><strong>y</strong> ([…,k,…], same dtype as <code class="docutils literal notranslate"><span class="pre">x</span></code>) – The downsampled tensor, where <code class="docutils literal notranslate"><span class="pre">k</span></code>
+is min((<code class="docutils literal notranslate"><span class="pre">n</span></code>-<code class="docutils literal notranslate"><span class="pre">offset</span></code>)//<code class="docutils literal notranslate"><span class="pre">samples_per_symbol</span></code>, <code class="docutils literal notranslate"><span class="pre">num_symbols</span></code>).</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="empirical-psd">
+<span id="id7"></span><h3>empirical_psd<a class="headerlink" href="#empirical-psd" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.signal.empirical_psd">
+<span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">empirical_psd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-</span> <span class="pre">30,</span> <span class="pre">3)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/utils.html#empirical_psd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.empirical_psd" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the empirical power spectral density.</p>
+<p>Computes the empirical power spectral density (PSD) of tensor <code class="docutils literal notranslate"><span class="pre">x</span></code>
+along the last dimension by averaging over all other dimensions.
+Note that this function
+simply returns the averaged absolute squared discrete Fourier
+spectrum of <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…,N], tf.complex</em>) – The signal of which to compute the PSD.</p></li>
+<li><p><strong>show</strong> (<em>bool</em>) – Indicates if a plot of the PSD should be generated.
+Defaults to True,</p></li>
+<li><p><strong>oversampling</strong> (<em>float</em>) – The oversampling factor. Defaults to 1.</p></li>
+<li><p><strong>ylim</strong> (<em>tuple of floats</em>) – The limits of the y axis. Defaults to [-30, 3].
+Only relevant if <code class="docutils literal notranslate"><span class="pre">show</span></code> is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>freqs</strong> (<em>[N], float</em>) – The normalized frequencies at which the PSD was evaluated.</p></li>
+<li><p><strong>psd</strong> (<em>[N], float</em>) – The PSD.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="empirical-aclr">
+<span id="id8"></span><h3>empirical_aclr<a class="headerlink" href="#empirical-aclr" title="Permalink to this headline"></a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.signal.empirical_aclr">
+<span class="sig-prename descclassname"><span class="pre">sionna.signal.</span></span><span class="sig-name descname"><span class="pre">empirical_aclr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oversampling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/signal/utils.html#empirical_aclr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.signal.empirical_aclr" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the empirical ACLR.</p>
+<p>Computes the empirical adjacent channel leakgae ration (ACLR)
+of tensor <code class="docutils literal notranslate"><span class="pre">x</span></code> based on its empirical power spectral density (PSD)
+which is computed along the last dimension by averaging over
+all other dimensions.</p>
+<p>It is assumed that the in-band ranges from [<code class="docutils literal notranslate"><span class="pre">f_min</span></code>, <code class="docutils literal notranslate"><span class="pre">f_max</span></code>] in
+normalized frequency. The ACLR is then defined as</p>
+<div class="math notranslate nohighlight">
+\[\text{ACLR} = \frac{P_\text{out}}{P_\text{in}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P_\text{in}\)</span> and <span class="math notranslate nohighlight">\(P_\text{out}\)</span> are the in-band
+and out-of-band power, respectively.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>[…,N],  complex</em>) – The signal for which to compute the ACLR.</p></li>
+<li><p><strong>oversampling</strong> (<em>float</em>) – The oversampling factor. Defaults to 1.</p></li>
+<li><p><strong>f_min</strong> (<em>float</em>) – The lower border of the in-band in normalized frequency.
+Defaults to -0.5.</p></li>
+<li><p><strong>f_max</strong> (<em>float</em>) – The upper border of the in-band in normalized frequency.
+Defaults to 0.5.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><strong>aclr</strong> (<em>float</em>) – The ACLR in linear scale.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mimo.html" class="btn btn-neutral float-left" title="Multiple-Input Multiple-Output (MIMO)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="Utility Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
