@@ -1237,7 +1237,7 @@ def los_probability(model, d_2d_out, h_ut):
         p = (18./d_2d_out)+np.exp(-d_2d_out/36.)*(1.-18./d_2d_out)
         return np.where(d_2d_out < 18.0, 1.0, p)
     elif model == 'uma':
-        c = np.where(h_ut < 13.0, 0.0, np.power((h_ut-13.)/10., 1.5))
+        c = np.where(h_ut < 13.0, 0.0, np.power(np.abs(h_ut-13.)/10., 1.5))
         p1 = (18./d_2d_out)+np.exp(-d_2d_out/63.)*(1.-18./d_2d_out)
         p2 = 1.+c*5/4*np.power(d_2d_out/1e2,3)*np.exp(-d_2d_out/150)
         return np.where(d_2d_out<18., 1., p1*p2)

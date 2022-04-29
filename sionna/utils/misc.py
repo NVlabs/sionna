@@ -5,15 +5,15 @@
 """Miscellaneous utility functions of the Sionna package."""
 
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
-from tensorflow.experimental.numpy import swapaxes
 from tensorflow.experimental.numpy import log10 as _log10
 from tensorflow.experimental.numpy import log2 as _log2
 from sionna.utils.metrics import count_errors, count_block_errors
 from sionna.mapping import Constellation
 import time
+from sionna import signal
+
 
 def ebnodb2no(ebno_db, num_bits_per_symbol, coderate, resource_grid=None):
     r"""Compute the noise variance `No` for a given `Eb/No` in dB.
@@ -86,119 +86,6 @@ def ebnodb2no(ebno_db, num_bits_per_symbol, coderate, resource_grid=None):
 
     return no
 
-def empirical_psd(x, show=True):
-    """Computes the empirical power spectral density.
-
-    Computes the empirical power spectral density (PSD) of ``x``
-    along the last dimension by averaging over all other dimensions.
-    Note that this function
-    simply returns the averaged absolute squared discrete Fourier
-    spectrum of ``x``.
-
-    Input
-    -----
-    x : [...,N],  complex
-        The signal of which to compute the PSD.
-
-    show : bool
-        Indicates if a plot of the PSD should be generated.
-
-    Output
-    ------
-    freqs : [N], float
-        The normalized frequencies at which the PSD was evaluated.
-
-    psd : [N], float
-        The PSD.
-    """
-
-    z = np.abs(np.fft.fft(x, norm="ortho"))**2
-    axis = tuple(range(x.ndim-1))
-    z = np.mean(z, axis=axis)
-    psd = 10*np.log10(np.abs(np.fft.fftshift(z)))
-    freqs = np.linspace(-0.5, 0.5, x.shape[-1])
-    if show:
-        plt.figure()
-        plt.plot(freqs, psd)
-        plt.title("Power Spectral Density")
-        plt.xlabel("Normalized Frequency")
-        plt.xlim([-0.5, 0.5])
-        plt.ylabel(r"$\mathbb{E}\left[|X(f)|^2\right]$ (dB)")
-        plt.ylim([-30,3])
-        plt.grid(True, which="both")
-
-    return (freqs, psd)
-
-def fft(tensor, axis=-1):
-    r"""Computes the normalized DFT along a specified axis.
-
-    This operation computes the normalized one-dimensional discrete Fourier
-    transform (DFT) along the ``axis`` dimension of a ``tensor``.
-    For a vector :math:`\mathbf{x}\in\mathbb{C}^N`, the DFT
-    :math:`\mathbf{X}\in\mathbb{C}^N` is computed as
-
-    .. math::
-        X_m = \frac{1}{\sqrt{N}}\sum_{n=0}^{N-1} x_n \exp \left\{
-            -j2\pi\frac{mn}{N}\right\},\quad m=0,\dots,N-1.
-
-    Input
-    -----
-    tensor : tf.complex
-        Tensor of arbitrary shape.
-    axis : int
-        Indicates the dimension along which the DFT is taken.
-
-    Output
-    ------
-    : tf.complex
-        Tensor of the same dtype and shape as ``tensor``.
-    """
-    fft_size = tf.cast(tf.shape(tensor)[axis], tensor.dtype)
-    scale = 1/tf.sqrt(fft_size)
-
-    if axis not in [-1, tensor.shape.rank]:
-        output =  tf.signal.fft(swapaxes(tensor, axis, -1))
-        output = swapaxes(output, axis, -1)
-    else:
-        output = tf.signal.fft(tensor)
-
-    return scale * output
-
-def ifft(tensor, axis=-1):
-    r"""Computes the normalized IDFT along a specified axis.
-
-    This operation computes the normalized one-dimensional discrete inverse
-    Fourier transform (IDFT) along the ``axis`` dimension of a ``tensor``.
-    For a vector :math:`\mathbf{X}\in\mathbb{C}^N`, the IDFT
-    :math:`\mathbf{x}\in\mathbb{C}^N` is computed as
-
-    .. math::
-        x_n = \frac{1}{\sqrt{N}}\sum_{m=0}^{N-1} X_m \exp \left\{
-            j2\pi\frac{mn}{N}\right\},\quad n=0,\dots,N-1.
-
-    Input
-    -----
-    tensor : tf.complex
-        Tensor of arbitrary shape.
-
-    axis : int
-        Indicates the dimension along which the IDFT is taken.
-
-    Output
-    ------
-    : tf.complex
-        Tensor of the same dtype and shape as ``tensor``.
-    """
-    fft_size = tf.cast(tf.shape(tensor)[axis], tensor.dtype)
-    scale = tf.sqrt(fft_size)
-
-    if axis not in [-1, tensor.shape.rank]:
-        output =  tf.signal.ifft(swapaxes(tensor, axis, -1))
-        output = swapaxes(output, axis, -1)
-    else:
-        output = tf.signal.ifft(tensor)
-
-    return scale * output
 
 def hard_decisions(llr):
     """Transforms LLRs into hard decisions.
@@ -220,6 +107,7 @@ def hard_decisions(llr):
 
     return tf.cast(tf.math.greater(llr, zero), dtype=llr.dtype)
 
+
 def log10(x):
     # pylint: disable=C0301
     """TensorFlow implementation of NumPy's `log10` function.
@@ -230,6 +118,7 @@ def log10(x):
     """
     return tf.cast(_log10(x), x.dtype)
 
+
 def log2(x):
     # pylint: disable=C0301
     """TensorFlow implementation of NumPy's `log2` function.
@@ -239,6 +128,7 @@ def log2(x):
     For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log2>`_ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log2.html>`_ documentation.
     """
     return tf.cast(_log2(x), x.dtype)
+
 
 class BinarySource(Layer):
     """BinarySource(dtype=tf.float32, **kwargs)
@@ -267,6 +157,7 @@ class BinarySource(Layer):
     def call(self, inputs):
         return tf.cast(tf.random.uniform(inputs, 0, 2, tf.int32),
                        dtype=super().dtype)
+
 
 class QAMSource(Layer):
     """QAMSource(num_bits_per_symbol, seed=None, dtype=tf.complex64, **kwargs)
@@ -321,6 +212,7 @@ class QAMSource(Layer):
         x = tf.gather(self._constellation.points, ind)
 
         return x
+
 
 def sim_ber(mc_fun,
             ebno_dbs,
@@ -672,3 +564,26 @@ def complex_normal(shape, var=1.0, dtype=tf.complex64):
     x = tf.complex(xr, xi)
 
     return x
+
+
+###########################################################
+# Deprecated aliases that will not be included in the next
+# major release
+###########################################################
+
+def fft(tensor, axis=-1):
+    print(  "Warning: The alias utils.fft will not be included in Sionna 1.0."
+            " Please use signal.fft instead.")
+    return signal.fft(tensor, axis)
+
+
+def ifft(tensor, axis=-1):
+    print(  "Warning: The alias utils.ifft will not be included in Sionna 1.0."
+            " Please use signal.ifft instead.")
+    return signal.ifft(tensor, axis)
+
+
+def empirical_psd(x, show=True, oversampling=1.0, ylim=(-30,3)):
+    print(  "Warning: The alias utils.empirical_psd will not be included in"
+            " Sionna 1.0. Please use signal.empirical_psd instead.")
+    return signal.empirical_psd(x, show, oversampling, ylim)

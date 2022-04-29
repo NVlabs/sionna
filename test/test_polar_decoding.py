@@ -20,6 +20,7 @@ if gpus:
         print(e)
 
 import unittest
+import pytest # for pytest filterwarnings
 import numpy as np
 
 from sionna.fec.polar.encoding import PolarEncoder, Polar5GEncoder
@@ -292,6 +293,8 @@ class TestPolarDecodingSC(unittest.TestCase):
 
 class TestPolarDecodingSCL(unittest.TestCase):
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_invalid_inputs(self):
         """Test against invalid values of n and frozen_pos."""
 
@@ -323,6 +326,8 @@ class TestPolarDecodingSCL(unittest.TestCase):
             frozen_pos,_ = generate_5g_ranking(32, 64)
             PolarSCLDecoder(frozen_pos, 64, output_dtype=tf.complex64)
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_output_dim(self):
         """Test that output dims are correct (=n) and output is the all-zero
          codeword."""
@@ -377,6 +382,8 @@ class TestPolarDecodingSCL(unittest.TestCase):
                         u_hat = np.zeros([bs, k])
                         self.assertTrue(np.array_equal(u, u_hat))
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_numerical_stab(self):
         """Test for numerical stability (no nan or infty as output)"""
 
@@ -416,6 +423,8 @@ class TestPolarDecodingSCL(unittest.TestCase):
                         self.assertFalse(np.any(np.isinf(u2)))
                         self.assertFalse(np.any(np.isneginf(u2)))
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_identity(self):
         """Test that info bits can be recovered if no noise is added."""
 
@@ -497,6 +506,8 @@ class TestPolarDecodingSCL(unittest.TestCase):
                     model(b2)
                     model.summary()
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_multi_dimensional(self):
         """Test against multi-dimensional input shapes.
 
@@ -595,6 +606,8 @@ class TestPolarDecodingSCL(unittest.TestCase):
                             u = source([bs+1, n])
                             x = run_graph_xla(u).numpy()
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_ref_implementation(self):
         """Test against pre-calculated results from internal implementation.
 
@@ -1067,6 +1080,8 @@ class TestPolarDecoding5G(unittest.TestCase):
         with self.assertRaises(AssertionError):
             Polar5GDecoder("SC")
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_identity_de_ratematching(self):
         """Test that info bits can be recovered if no noise is added and
         dimensions are correct."""
@@ -1091,6 +1106,8 @@ class TestPolarDecoding5G(unittest.TestCase):
 
                 self.assertTrue(np.array_equal(u.numpy(), u_hat.numpy()))
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_keras(self):
         """Test that Keras model can be compiled (supports dynamic shapes)."""
 
@@ -1113,6 +1130,8 @@ class TestPolarDecoding5G(unittest.TestCase):
             model(b2)
             model.summary()
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_multi_dimensional(self):
         """Test against arbitrary shapes."""
 
@@ -1138,6 +1157,8 @@ class TestPolarDecoding5G(unittest.TestCase):
             # both version should yield same result
             self.assertTrue(np.array_equal(c, c_res))
 
+    # Filter warnings related to large ressource allocation
+    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
         """

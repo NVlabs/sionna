@@ -9,6 +9,7 @@ API Documentation
    channel
    ofdm
    mimo
+   signal
    utils
    config
 

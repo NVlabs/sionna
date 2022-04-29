@@ -12,6 +12,7 @@ except ImportError as e:
 from sionna.ofdm import OFDMModulator, OFDMDemodulator, ResourceGrid, ResourceGridMapper, ResourceGridDemapper
 from sionna.mimo import StreamManagement
 from sionna.utils import QAMSource
+from tensorflow.keras import Model
 
 import pytest
 import unittest
@@ -100,6 +101,34 @@ class TestOFDMDemodulator(unittest.TestCase):
             x_time = tf.concat([x_time, x_time[...,:10]], axis=-1)
             x_hat = demodulator(x_time)
             self.assertTrue(np.max(np.abs(x-x_hat))<1e-6)
+
+class TestOFDMModDemod(unittest.TestCase):
+    def test_end_to_end(self):
+        """E2E test verying that all shapes can be properly inferred (see Issue #7)"""
+        class E2ESystem(Model):
+            def __init__(self, cp_length, padding):
+                super().__init__()
+                self.cp_length = cp_length
+                self.padding = padding
+                self.fft_size = 72
+                self.num_ofdm_symbols = 14
+                self.qam = QAMSource(4)
+                self.mod = OFDMModulator(self.cp_length)
+                self.demod  = OFDMDemodulator(self.fft_size, 0, self.cp_length)
+
+            @tf.function(jit_compile=True)
+            def call(self, batch_size):
+                x_rg = self.qam([batch_size, 1, 1, self.num_ofdm_symbols, self.fft_size])
+                x_time  = self.mod(x_rg)
+                pad = tf.zeros_like(x_time)[...,:self.padding]
+                x_time = tf.concat([x_time, pad], axis=-1)
+                x_f = self.demod(x_time)
+                return x_f
+
+        for cp_length in [0,1,5,12]:
+            for padding in [0,1,5,71]:
+                e2e = E2ESystem(cp_length, padding)
+                self.assertEqual(e2e(128).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
 
 class TestResourceGridDemapper(unittest.TestCase):
 

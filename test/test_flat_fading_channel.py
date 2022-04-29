@@ -50,7 +50,7 @@ class TestGenerateFlatFading(unittest.TestCase):
         r_rx = exp_corr_mat(0.99, num_rx_ant)
         kron = KroneckerModel(r_tx, r_rx)
         gen_chn = GenerateFlatFadingChannel(num_tx_ant, num_rx_ant, spatial_corr=kron)
-        
+
         @tf.function()
         def func():
             h = gen_chn(1000000)
@@ -76,7 +76,7 @@ class TestGenerateFlatFading(unittest.TestCase):
         r_rx = exp_corr_mat(0.99, num_rx_ant)
         kron = KroneckerModel(r_tx, r_rx)
         gen_chn = GenerateFlatFadingChannel(num_tx_ant, num_rx_ant)
-        
+
         @tf.function()
         def func():
             gen_chn.spatial_corr = kron
@@ -101,7 +101,7 @@ class TestGenerateApplyFading(unittest.TestCase):
     def test_without_noise(self):
         num_tx_ant = 4
         num_rx_ant = 16
-        batch_size = 24 
+        batch_size = 24
         r_tx = exp_corr_mat(0.4, num_tx_ant)
         r_rx = exp_corr_mat(0.99, num_rx_ant)
         kron = KroneckerModel(r_tx, r_rx)
@@ -134,7 +134,7 @@ class TestFlatFadingChannel(unittest.TestCase):
     def test_without_noise(self):
         num_tx_ant = 4
         num_rx_ant = 16
-        batch_size = 24 
+        batch_size = 24
         dtype=tf.complex128
         r_tx = exp_corr_mat(0.4, num_tx_ant, dtype)
         r_rx = exp_corr_mat(0.99, num_rx_ant, dtype)
