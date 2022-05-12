@@ -434,7 +434,7 @@ class ResourceGridDemapper(Layer):
         # ..., fft_size, data_dim]
 
         # If data_dim is not provided, add a dummy dimension
-        if tf.rank(y)==5:
+        if len(y.shape)==5:
             y = tf.expand_dims(y, -1)
 
         # Remove nulled subcarriers from y (guards, dc). New shape:
@@ -478,7 +478,7 @@ class ResourceGridDemapper(Layer):
         y = tf.transpose(y, [4, 0, 1, 2, 3])
 
         # Squeeze data_dim
-        if tf.shape(y)[-1]==1:
+        if y.shape[-1]==1:
             y = tf.squeeze(y, -1)
 
         return y
