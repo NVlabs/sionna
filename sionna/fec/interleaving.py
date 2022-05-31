@@ -476,7 +476,7 @@ class RandomInterleaver(Layer):
 
         # use seed if explicit seed is provided
         if seed is not None:
-            seed = (tf.constant(1337), tf.constant(seed))
+            seed = (tf.constant(1337), tf.cast(seed, tf.int32))
         elif self._keep_state:
             # use sequence as defined by seed
             seed = self._seed
@@ -603,8 +603,7 @@ class RandomInterleaver(Layer):
 
         # use seed if explicit seed is provided
         if seed is not None:
-            #assert isinstance(seed, int), "seed must be int."
-            seed = (tf.constant(1337), tf.constant(seed))
+            seed = (tf.constant(1337), tf.cast(seed, tf.int32))
         # only generate a new random sequence if keep_state==False
         elif self._keep_state:
             # use sequence as defined by seed

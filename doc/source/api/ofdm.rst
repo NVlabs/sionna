@@ -37,6 +37,7 @@ The following code snippet shows how to setup and visualize an instance of
 
    rg = ResourceGrid(num_ofdm_symbols = 14,
                      fft_size = 64,
+                     subcarrier_spacing = 30e3,
                      num_tx = 1,
                      num_streams_per_tx = 1,
                      num_guard_carriers = [5, 6],

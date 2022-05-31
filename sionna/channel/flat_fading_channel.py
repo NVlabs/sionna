@@ -109,7 +109,7 @@ class ApplyFlatFadingChannel(tf.keras.layers.Layer):
         Tensor of channel realizations. Will be broadcast to the
         dimensions of ``x`` if needed.
 
-    no : Scalar of Tensor, tf.float
+    no : Scalar or Tensor, tf.float
         The noise power ``no`` is per complex dimension.
         Only required if ``add_awgn==True``.
         Will be broadcast to the shape of ``y``.

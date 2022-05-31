@@ -35,7 +35,7 @@ On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensor
 ```
     >>> import sionna
     >>> print(sionna.__version__)
-    0.9.0
+    0.9.1
 ```
 
 3.) Once Sionna is installed, you can run the [Sionna "Hello, World!" example](https://nvlabs.github.io/sionna/examples/Hello_World.html), have a look at the [quick start guide](https://nvlabs.github.io/sionna/quickstart.html), or at the [tutorials](https://nvlabs.github.io/sionna/tutorials.html).

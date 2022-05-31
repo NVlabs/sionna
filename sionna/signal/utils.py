@@ -67,17 +67,9 @@ def convolve(inp, ker, padding='full', axis=-1):
     # Reshape the input to a 2D tensor
     batch_shape = tf.shape(inp)[:-1]
     inp_len = tf.shape(inp)[-1]
+    inp_dtype = inp.dtype
+    ker_dtype = ker.dtype
     inp = tf.reshape(inp, [-1, inp_len])
-
-    # If one of `inp` or `ker` is complex-valued, then the output
-    # is complex-valued. Otherwise, the output is real-valued.
-    if inp.dtype.is_complex and ker.dtype.is_floating:
-        ker = tf.complex(ker, tf.zeros_like(ker))
-    elif inp.dtype.is_floating and ker.dtype.is_complex:
-        inp = tf.complex(inp, tf.zeros_like(inp))
-    # We need to know if we will need to compute the imaginary-component
-    # of the output
-    complex_output = bool(inp.dtype.is_complex or ker.dtype.is_complex)
 
     # Using Tensorflow convolution implementation, we need to manually flip
     # the kernel
@@ -88,48 +80,59 @@ def convolve(inp, ker, padding='full', axis=-1):
     # Tensorflow convolution expects a channel dim for the convolution
     inp = tf.expand_dims(inp, axis=-1)
 
+    # Pad the kernel or input if required depending on the convolution type.
+    # Also, set the padding-mode for TF convolution
     if padding == 'valid':
-        if complex_output:
-            inp_real = tf.math.real(inp)
-            inp_imag = tf.math.imag(inp)
-            ker_real = tf.math.real(ker)
-            ker_imag = tf.math.imag(ker)
-            out_1 = tf.nn.convolution(inp_real, ker_real, padding='VALID')
-            out_2 = tf.nn.convolution(inp_imag, ker_imag, padding='VALID')
-            out_3 = tf.nn.convolution(inp_real, ker_imag, padding='VALID')
-            out_4 = tf.nn.convolution(inp_imag, ker_real, padding='VALID')
-            out = tf.complex(out_1 - out_2,
-                             out_3 + out_4)
+        # No padding required in this case
+        tf_conv_mode = 'VALID'
+    elif padding == 'same':
+        ker = tf.pad(ker, [[0,1],[0,0],[0,0]])
+        tf_conv_mode = 'SAME'
+    elif padding == 'full':
+        ker_len = ker.shape[0] #tf.shape(ker)[0]
+        if (ker_len % 2) == 0:
+            extra_padding_left = ker_len // 2
+            extra_padding_right = extra_padding_left-1
         else:
-            out = tf.nn.convolution(inp, ker, padding='VALID')
-    else:
-        if padding == 'same':
-            ker = tf.pad(ker, [[0,1],[0,0],[0,0]])
-        elif padding == 'full':
-            ker_len = tf.shape(ker)[0]
-            if tf.equal(tf.math.floormod(ker_len,2), 0):
-                extra_padding_left = ker_len // 2
-                extra_padding_right = extra_padding_left-1
-            else:
-                extra_padding_left = (ker_len-1) // 2
-                extra_padding_right = extra_padding_left
-            inp = tf.pad(inp, [[0,0],
-                            [extra_padding_left,extra_padding_right],
-                            [0,0]])
-        if complex_output:
-            inp_real = tf.math.real(inp)
-            inp_imag = tf.math.imag(inp)
-            ker_real = tf.math.real(ker)
-            ker_imag = tf.math.imag(ker)
-            out_1 = tf.nn.convolution(inp_real, ker_real, padding='SAME')
-            out_2 = tf.nn.convolution(inp_imag, ker_imag, padding='SAME')
-            out_3 = tf.nn.convolution(inp_real, ker_imag, padding='SAME')
-            out_4 = tf.nn.convolution(inp_imag, ker_real, padding='SAME')
-            out = tf.complex(out_1 - out_2,
-                             out_3 + out_4)
-        else:
-            out = tf.nn.convolution(inp, ker, padding='SAME')
+            extra_padding_left = (ker_len-1) // 2
+            extra_padding_right = extra_padding_left
+        inp = tf.pad(inp, [[0,0],
+                        [extra_padding_left,extra_padding_right],
+                        [0,0]])
+        tf_conv_mode = 'SAME'
 
+    # Extract the real and imaginary components of the input and kernel
+    inp_real = tf.math.real(inp)
+    ker_real = tf.math.real(ker)
+    inp_imag = tf.math.imag(inp)
+    ker_imag = tf.math.imag(ker)
+
+    # Compute convolution
+    # The output is complex-valued if the input or the kernel is.
+    # Defaults to False, and set to True if required later
+    complex_output = False
+    out_1 = tf.nn.convolution(inp_real, ker_real, padding=tf_conv_mode)
+    if inp_dtype.is_complex:
+        out_4 = tf.nn.convolution(inp_imag, ker_real, padding=tf_conv_mode)
+        complex_output = True
+    else:
+        out_4 = tf.zeros_like(out_1)
+    if ker_dtype.is_complex:
+        out_3 = tf.nn.convolution(inp_real, ker_imag, padding=tf_conv_mode)
+        complex_output = True
+    else:
+        out_3 = tf.zeros_like(out_1)
+    if inp_dtype.is_complex and ker.dtype.is_complex:
+        out_2 = tf.nn.convolution(inp_imag, ker_imag, padding=tf_conv_mode)
+    else:
+        out_2 = tf.zeros_like(out_1)
+    if complex_output:
+        out = tf.complex(out_1 - out_2,
+                        out_3 + out_4)
+    else:
+        out = out_1
+
+    # Reshape the output to the expected shape
     out = tf.squeeze(out, axis=-1)
     out_len = tf.shape(out)[-1]
     out = tf.reshape(out, tf.concat([batch_shape, [out_len]], axis=-1))
