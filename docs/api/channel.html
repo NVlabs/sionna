@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Channel &mdash; Sionna 0.9.0 documentation</title>
+  <title>Channel &mdash; Sionna 0.9.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -961,7 +961,7 @@ Defaults to <cite>True</cite>.</p></li>
 <li><p><strong>x</strong> (<em>[batch_size, num_tx_ant], tf.complex</em>) – Tensor of transmit vectors.</p></li>
 <li><p><strong>h</strong> (<em>[batch_size, num_rx_ant, num_tx_ant], tf.complex</em>) – Tensor of channel realizations. Will be broadcast to the
 dimensions of <code class="docutils literal notranslate"><span class="pre">x</span></code> if needed.</p></li>
-<li><p><strong>no</strong> (<em>Scalar of Tensor, tf.float</em>) – The noise power <code class="docutils literal notranslate"><span class="pre">no</span></code> is per complex dimension.
+<li><p><strong>no</strong> (<em>Scalar or Tensor, tf.float</em>) – The noise power <code class="docutils literal notranslate"><span class="pre">no</span></code> is per complex dimension.
 Only required if <code class="docutils literal notranslate"><span class="pre">add_awgn==True</span></code>.
 Will be broadcast to the shape of <code class="docutils literal notranslate"><span class="pre">y</span></code>.
 For more details, see <a class="reference internal" href="#sionna.channel.AWGN" title="sionna.channel.AWGN"><code class="xref py py-class docutils literal notranslate"><span class="pre">AWGN</span></code></a>.</p></li>
@@ -2013,29 +2013,29 @@ an OFDM waveform:</p>
 spread.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 60%" />
-<col style="width: 40%" />
+<col style="width: 58%" />
+<col style="width: 42%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Model</p></th>
-<th class="head"><p>Delay spread</p></th>
+<th class="head"><p>Delay spread [ns]</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Very short delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(10\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(10\)</span></p></td>
 </tr>
 <tr class="row-odd"><td><p>Short short delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(10\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(10\)</span></p></td>
 </tr>
 <tr class="row-even"><td><p>Nominal delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(100\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(100\)</span></p></td>
 </tr>
 <tr class="row-odd"><td><p>Long delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(300\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(300\)</span></p></td>
 </tr>
 <tr class="row-even"><td><p>Very long delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(1000\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(1000\)</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -2051,11 +2051,21 @@ spread.</p>
 <col style="width: 5%" />
 <col style="width: 6%" />
 </colgroup>
-<tbody>
-<tr class="row-odd"><td colspan="2"><p>Delay spread [ns]</p></td>
-<td colspan="7"><p>Frequency [GHz]</p></td>
+<thead>
+<tr class="row-odd"><th class="head" colspan="2" rowspan="2"><p>Delay spread [ns]</p></th>
+<th class="head" colspan="7"><p>Frequency [GHz]</p></th>
 </tr>
-<tr class="row-even"><td rowspan="3"><p>Indoor office</p></td>
+<tr class="row-even"><th class="head"><p>2</p></th>
+<th class="head"><p>6</p></th>
+<th class="head"><p>15</p></th>
+<th class="head"><p>28</p></th>
+<th class="head"><p>39</p></th>
+<th class="head"><p>60</p></th>
+<th class="head"><p>70</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td rowspan="3"><p>Indoor office</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>20</p></td>
 <td><p>16</p></td>
@@ -2065,7 +2075,7 @@ spread.</p>
 <td><p>16</p></td>
 <td><p>16</p></td>
 </tr>
-<tr class="row-odd"><td><p>Normal delay profile</p></td>
+<tr class="row-even"><td><p>Normal delay profile</p></td>
 <td><p>39</p></td>
 <td><p>30</p></td>
 <td><p>24</p></td>
@@ -2074,7 +2084,7 @@ spread.</p>
 <td><p>16</p></td>
 <td><p>16</p></td>
 </tr>
-<tr class="row-even"><td><p>Long delay profile</p></td>
+<tr class="row-odd"><td><p>Long delay profile</p></td>
 <td><p>59</p></td>
 <td><p>53</p></td>
 <td><p>47</p></td>
@@ -2083,7 +2093,7 @@ spread.</p>
 <td><p>38</p></td>
 <td><p>37</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><p>UMi Street-canyon</p></td>
+<tr class="row-even"><td rowspan="3"><p>UMi Street-canyon</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>65</p></td>
 <td><p>45</p></td>
@@ -2093,7 +2103,7 @@ spread.</p>
 <td><p>27</p></td>
 <td><p>26</p></td>
 </tr>
-<tr class="row-even"><td><p>Normal delay profile</p></td>
+<tr class="row-odd"><td><p>Normal delay profile</p></td>
 <td><p>129</p></td>
 <td><p>93</p></td>
 <td><p>76</p></td>
@@ -2102,7 +2112,7 @@ spread.</p>
 <td><p>55</p></td>
 <td><p>53</p></td>
 </tr>
-<tr class="row-odd"><td><p>Long delay profile</p></td>
+<tr class="row-even"><td><p>Long delay profile</p></td>
 <td><p>634</p></td>
 <td><p>316</p></td>
 <td><p>307</p></td>
@@ -2111,7 +2121,7 @@ spread.</p>
 <td><p>293</p></td>
 <td><p>291</p></td>
 </tr>
-<tr class="row-even"><td rowspan="3"><p>UMa</p></td>
+<tr class="row-odd"><td rowspan="3"><p>UMa</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>93</p></td>
 <td><p>93</p></td>
@@ -2121,7 +2131,7 @@ spread.</p>
 <td><p>75</p></td>
 <td><p>74</p></td>
 </tr>
-<tr class="row-odd"><td><p>Normal delay profile</p></td>
+<tr class="row-even"><td><p>Normal delay profile</p></td>
 <td><p>363</p></td>
 <td><p>363</p></td>
 <td><p>302</p></td>
@@ -2130,7 +2140,7 @@ spread.</p>
 <td><p>228</p></td>
 <td><p>221</p></td>
 </tr>
-<tr class="row-even"><td><p>Long delay profile</p></td>
+<tr class="row-odd"><td><p>Long delay profile</p></td>
 <td><p>1148</p></td>
 <td><p>1148</p></td>
 <td><p>955</p></td>
@@ -2139,7 +2149,7 @@ spread.</p>
 <td><p>720</p></td>
 <td><p>698</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><p>RMa / RMa O2I</p></td>
+<tr class="row-even"><td rowspan="3"><p>RMa / RMa O2I</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>32</p></td>
 <td><p>32</p></td>
@@ -2149,7 +2159,7 @@ spread.</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>Normal delay profile</p></td>
+<tr class="row-odd"><td><p>Normal delay profile</p></td>
 <td><p>37</p></td>
 <td><p>37</p></td>
 <td><p>N/A</p></td>
@@ -2158,7 +2168,7 @@ spread.</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Long delay profile</p></td>
+<tr class="row-even"><td><p>Long delay profile</p></td>
 <td><p>153</p></td>
 <td><p>153</p></td>
 <td><p>N/A</p></td>
@@ -2167,11 +2177,11 @@ spread.</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td rowspan="2"><p>UMi / UMa O2I</p></td>
+<tr class="row-odd"><td rowspan="2"><p>UMi / UMa O2I</p></td>
 <td><p>Normal delay profile</p></td>
 <td colspan="7"><p>242</p></td>
 </tr>
-<tr class="row-odd"><td><p>Long delay profile</p></td>
+<tr class="row-even"><td><p>Long delay profile</p></td>
 <td colspan="7"><p>616</p></td>
 </tr>
 </tbody>
@@ -2299,29 +2309,29 @@ an OFDM waveform:</p>
 spread.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 60%" />
-<col style="width: 40%" />
+<col style="width: 58%" />
+<col style="width: 42%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Model</p></th>
-<th class="head"><p>Delay spread</p></th>
+<th class="head"><p>Delay spread [ns]</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Very short delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(10\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(10\)</span></p></td>
 </tr>
 <tr class="row-odd"><td><p>Short short delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(10\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(10\)</span></p></td>
 </tr>
 <tr class="row-even"><td><p>Nominal delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(100\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(100\)</span></p></td>
 </tr>
 <tr class="row-odd"><td><p>Long delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(300\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(300\)</span></p></td>
 </tr>
 <tr class="row-even"><td><p>Very long delay spread</p></td>
-<td><p><span class="math notranslate nohighlight">\(1000\)</span> ns</p></td>
+<td><p><span class="math notranslate nohighlight">\(1000\)</span></p></td>
 </tr>
 </tbody>
 </table>
@@ -2337,11 +2347,21 @@ spread.</p>
 <col style="width: 5%" />
 <col style="width: 6%" />
 </colgroup>
-<tbody>
-<tr class="row-odd"><td colspan="2"><p>Delay spread [ns]</p></td>
-<td colspan="7"><p>Frequency [GHz]</p></td>
+<thead>
+<tr class="row-odd"><th class="head" colspan="2" rowspan="2"><p>Delay spread [ns]</p></th>
+<th class="head" colspan="7"><p>Frequency [GHz]</p></th>
 </tr>
-<tr class="row-even"><td rowspan="3"><p>Indoor office</p></td>
+<tr class="row-even"><th class="head"><p>2</p></th>
+<th class="head"><p>6</p></th>
+<th class="head"><p>15</p></th>
+<th class="head"><p>28</p></th>
+<th class="head"><p>39</p></th>
+<th class="head"><p>60</p></th>
+<th class="head"><p>70</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-odd"><td rowspan="3"><p>Indoor office</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>20</p></td>
 <td><p>16</p></td>
@@ -2351,7 +2371,7 @@ spread.</p>
 <td><p>16</p></td>
 <td><p>16</p></td>
 </tr>
-<tr class="row-odd"><td><p>Normal delay profile</p></td>
+<tr class="row-even"><td><p>Normal delay profile</p></td>
 <td><p>39</p></td>
 <td><p>30</p></td>
 <td><p>24</p></td>
@@ -2360,7 +2380,7 @@ spread.</p>
 <td><p>16</p></td>
 <td><p>16</p></td>
 </tr>
-<tr class="row-even"><td><p>Long delay profile</p></td>
+<tr class="row-odd"><td><p>Long delay profile</p></td>
 <td><p>59</p></td>
 <td><p>53</p></td>
 <td><p>47</p></td>
@@ -2369,7 +2389,7 @@ spread.</p>
 <td><p>38</p></td>
 <td><p>37</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><p>UMi Street-canyon</p></td>
+<tr class="row-even"><td rowspan="3"><p>UMi Street-canyon</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>65</p></td>
 <td><p>45</p></td>
@@ -2379,7 +2399,7 @@ spread.</p>
 <td><p>27</p></td>
 <td><p>26</p></td>
 </tr>
-<tr class="row-even"><td><p>Normal delay profile</p></td>
+<tr class="row-odd"><td><p>Normal delay profile</p></td>
 <td><p>129</p></td>
 <td><p>93</p></td>
 <td><p>76</p></td>
@@ -2388,7 +2408,7 @@ spread.</p>
 <td><p>55</p></td>
 <td><p>53</p></td>
 </tr>
-<tr class="row-odd"><td><p>Long delay profile</p></td>
+<tr class="row-even"><td><p>Long delay profile</p></td>
 <td><p>634</p></td>
 <td><p>316</p></td>
 <td><p>307</p></td>
@@ -2397,7 +2417,7 @@ spread.</p>
 <td><p>293</p></td>
 <td><p>291</p></td>
 </tr>
-<tr class="row-even"><td rowspan="3"><p>UMa</p></td>
+<tr class="row-odd"><td rowspan="3"><p>UMa</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>93</p></td>
 <td><p>93</p></td>
@@ -2407,7 +2427,7 @@ spread.</p>
 <td><p>75</p></td>
 <td><p>74</p></td>
 </tr>
-<tr class="row-odd"><td><p>Normal delay profile</p></td>
+<tr class="row-even"><td><p>Normal delay profile</p></td>
 <td><p>363</p></td>
 <td><p>363</p></td>
 <td><p>302</p></td>
@@ -2416,7 +2436,7 @@ spread.</p>
 <td><p>228</p></td>
 <td><p>221</p></td>
 </tr>
-<tr class="row-even"><td><p>Long delay profile</p></td>
+<tr class="row-odd"><td><p>Long delay profile</p></td>
 <td><p>1148</p></td>
 <td><p>1148</p></td>
 <td><p>955</p></td>
@@ -2425,7 +2445,7 @@ spread.</p>
 <td><p>720</p></td>
 <td><p>698</p></td>
 </tr>
-<tr class="row-odd"><td rowspan="3"><p>RMa / RMa O2I</p></td>
+<tr class="row-even"><td rowspan="3"><p>RMa / RMa O2I</p></td>
 <td><p>Short delay profile</p></td>
 <td><p>32</p></td>
 <td><p>32</p></td>
@@ -2435,7 +2455,7 @@ spread.</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td><p>Normal delay profile</p></td>
+<tr class="row-odd"><td><p>Normal delay profile</p></td>
 <td><p>37</p></td>
 <td><p>37</p></td>
 <td><p>N/A</p></td>
@@ -2444,7 +2464,7 @@ spread.</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-odd"><td><p>Long delay profile</p></td>
+<tr class="row-even"><td><p>Long delay profile</p></td>
 <td><p>153</p></td>
 <td><p>153</p></td>
 <td><p>N/A</p></td>
@@ -2453,11 +2473,11 @@ spread.</p>
 <td><p>N/A</p></td>
 <td><p>N/A</p></td>
 </tr>
-<tr class="row-even"><td rowspan="2"><p>UMi / UMa O2I</p></td>
+<tr class="row-odd"><td rowspan="2"><p>UMi / UMa O2I</p></td>
 <td><p>Normal delay profile</p></td>
 <td colspan="7"><p>242</p></td>
 </tr>
-<tr class="row-odd"><td><p>Long delay profile</p></td>
+<tr class="row-even"><td><p>Long delay profile</p></td>
 <td colspan="7"><p>616</p></td>
 </tr>
 </tbody>

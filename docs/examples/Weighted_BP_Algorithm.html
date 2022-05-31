@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Weighted Belief Propagation Decoding &mdash; Sionna 0.9.0 documentation</title>
+  <title>Weighted Belief Propagation Decoding &mdash; Sionna 0.9.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -911,7 +911,7 @@ algorithm and, thus, the concept can be seen as a generalized BP decoder.</p>
 <div class="section" id="GPU-Configuration-and-Imports">
 <h2>GPU Configuration and Imports<a class="headerlink" href="#GPU-Configuration-and-Imports" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -923,7 +923,7 @@ algorithm and, thus, the concept can be seen as a generalized BP decoder.</p>
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -953,7 +953,7 @@ Only GPU number 0 used.
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -994,7 +994,7 @@ Only GPU number 0 used.
 <li><p>For the proposed <em>multi-loss</em> [1] (i.e., the loss is averaged over all iterations), we need to access the decoders intermediate output after each iteration. This is done by calling the decoding function multiple times while setting <code class="docutils literal notranslate"><span class="pre">keep_state</span></code> to True, i.e., the decoder continuous the decoding process at the last internal state.</p></li>
 </ul>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1079,7 +1079,7 @@ Only GPU number 0 used.
 </div>
 <p>Load a parity-check matrix used for the experiment. We use the same BCH(63,45) code as in [1]. The code can be replaced by any parity-check matrix of your choice.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1411,7 +1411,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <p>In this Section, you will experience what happens if we apply the same concept to the 5G LDPC code (including rate matching).</p>
 <p>For this, we need to define a new model.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1468,13 +1468,14 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 
         <span class="bp">self</span><span class="o">.</span><span class="n">llr_source</span> <span class="o">=</span> <span class="n">GaussianPriorSource</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_iter</span> <span class="o">=</span> <span class="n">num_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span> <span class="o">=</span> <span class="n">k</span><span class="o">/</span><span class="n">n</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_bce</span> <span class="o">=</span> <span class="n">BinaryCrossentropy</span><span class="p">(</span><span class="n">from_logits</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
 
         <span class="n">noise_var</span> <span class="o">=</span> <span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span>
                               <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="c1"># QPSK</span>
-                              <span class="n">coderate</span><span class="o">=</span><span class="n">coderate</span><span class="p">)</span>
+                              <span class="n">coderate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span><span class="p">)</span>
 
         <span class="c1"># BPSK modulated all-zero CW</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="c1"># decoder only returns info bits</span>
@@ -1496,7 +1497,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1530,19 +1531,22 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <div class="highlight"><pre>
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.9345e-02 | 5.5700e-01 |        7738 |      400000 |          557 |        1000 |         0.5 |reached target bit errors
-     0.25 | 8.1425e-03 | 3.1900e-01 |        3257 |      400000 |          319 |        1000 |         0.5 |reached target bit errors
-      0.5 | 2.8738e-03 | 1.5350e-01 |        2299 |      800000 |          307 |        2000 |         1.0 |reached target bit errors
-     0.75 | 7.4679e-04 | 5.8286e-02 |        2091 |     2800000 |          408 |        7000 |         3.4 |reached target bit errors
-      1.0 | 1.3655e-04 | 1.4973e-02 |        2021 |    14800000 |          554 |       37000 |        17.9 |reached target bit errors
-     1.25 | 2.7350e-05 | 3.6900e-03 |        1094 |    40000000 |          369 |      100000 |        48.8 |reached max iter
-      1.5 | 4.8250e-06 | 7.7000e-04 |         193 |    40000000 |           77 |      100000 |        48.7 |reached max iter
-     1.75 | 4.2500e-07 | 1.3000e-04 |          17 |    40000000 |           13 |      100000 |        48.0 |reached max iter
-      2.0 | 7.5000e-08 | 3.0000e-05 |           3 |    40000000 |            3 |      100000 |        47.6 |reached max iter
-     2.25 | 0.0000e+00 | 0.0000e+00 |           0 |    40000000 |            0 |      100000 |        48.1 |reached max iter
-
-Simulation stopped as no error occurred @ EbNo = 2.2 dB.
-
+      0.0 | 1.6636e-01 | 1.0000e+00 |       66543 |      400000 |         1000 |        1000 |         0.5 |reached target bit errors
+     0.25 | 1.4451e-01 | 1.0000e+00 |       57805 |      400000 |         1000 |        1000 |         0.5 |reached target bit errors
+      0.5 | 1.2333e-01 | 9.9800e-01 |       49331 |      400000 |          998 |        1000 |         0.5 |reached target bit errors
+     0.75 | 9.5880e-02 | 9.8600e-01 |       38352 |      400000 |          986 |        1000 |         0.5 |reached target bit errors
+      1.0 | 6.7670e-02 | 9.3300e-01 |       27068 |      400000 |          933 |        1000 |         0.5 |reached target bit errors
+     1.25 | 4.0310e-02 | 8.2100e-01 |       16124 |      400000 |          821 |        1000 |         0.5 |reached target bit errors
+      1.5 | 2.1362e-02 | 6.3800e-01 |        8545 |      400000 |          638 |        1000 |         0.5 |reached target bit errors
+     1.75 | 1.0825e-02 | 4.1200e-01 |        4330 |      400000 |          412 |        1000 |         0.5 |reached target bit errors
+      2.0 | 3.3400e-03 | 1.8050e-01 |        2672 |      800000 |          361 |        2000 |         1.0 |reached target bit errors
+     2.25 | 1.0225e-03 | 7.0600e-02 |        2045 |     2000000 |          353 |        5000 |         2.5 |reached target bit errors
+      2.5 | 2.0710e-04 | 2.1160e-02 |        2071 |    10000000 |          529 |       25000 |        12.3 |reached target bit errors
+     2.75 | 4.1625e-05 | 5.1100e-03 |        1665 |    40000000 |          511 |      100000 |        49.7 |reached max iter
+      3.0 | 5.7500e-06 | 8.9000e-04 |         230 |    40000000 |           89 |      100000 |        49.2 |reached max iter
+     3.25 | 6.7500e-07 | 1.8000e-04 |          27 |    40000000 |           18 |      100000 |        49.1 |reached max iter
+      3.5 | 4.0000e-07 | 6.0000e-05 |          16 |    40000000 |            6 |      100000 |        49.4 |reached max iter
+     3.75 | 5.0000e-08 | 1.0000e-05 |           2 |    40000000 |            1 |      100000 |        49.2 |reached max iter
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1554,7 +1558,7 @@ Simulation stopped as no error occurred @ EbNo = 2.2 dB.
 </div>
 <p>And let’s train this new model.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1563,8 +1567,8 @@ Simulation stopped as no error occurred @ EbNo = 2.2 dB.
 <span class="n">train_iter</span> <span class="o">=</span> <span class="mi">200</span>
 <span class="n">clip_value_grad</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># gradient clipping seems to be important</span>
 
-<span class="c1"># smaller training SNR as the new code is longer(=stronger) than before</span>
-<span class="n">ebno_db</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="c1"># rule of thumb: train at ber = 1e-2</span>
+<span class="c1"># smaller training SNR as the new code is longer (=stronger) than before</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="c1"># rule of thumb: train at ber = 1e-2</span>
 
 <span class="c1"># only used as metric</span>
 <span class="n">bmi</span> <span class="o">=</span> <span class="n">BitwiseMutualInformation</span><span class="p">()</span>
@@ -1599,36 +1603,36 @@ Simulation stopped as no error occurred @ EbNo = 2.2 dB.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Current loss: 1.359401 ber: 0.0087 bmi: 0.967
-Current loss: 1.353617 ber: 0.0078 bmi: 0.971
-Current loss: 1.395665 ber: 0.0096 bmi: 0.964
-Current loss: 1.346740 ber: 0.0088 bmi: 0.967
-Current loss: 1.402181 ber: 0.0102 bmi: 0.962
-Current loss: 1.384932 ber: 0.0093 bmi: 0.965
-Current loss: 1.370841 ber: 0.0087 bmi: 0.967
-Current loss: 1.398058 ber: 0.0093 bmi: 0.965
-Current loss: 1.383930 ber: 0.0089 bmi: 0.966
-Current loss: 1.391738 ber: 0.0097 bmi: 0.963
-Current loss: 1.426701 ber: 0.0105 bmi: 0.960
-Current loss: 1.378524 ber: 0.0091 bmi: 0.966
-Current loss: 1.383693 ber: 0.0092 bmi: 0.965
-Current loss: 1.355805 ber: 0.0082 bmi: 0.968
-Current loss: 1.380507 ber: 0.0083 bmi: 0.969
-Current loss: 1.389037 ber: 0.0099 bmi: 0.963
-Current loss: 1.379723 ber: 0.0092 bmi: 0.965
-Current loss: 1.376932 ber: 0.0091 bmi: 0.966
-Current loss: 1.398467 ber: 0.0095 bmi: 0.964
-Current loss: 1.370421 ber: 0.0084 bmi: 0.968
+Current loss: 1.690817 ber: 0.0201 bmi: 0.926
+Current loss: 1.750949 ber: 0.0236 bmi: 0.913
+Current loss: 1.707593 ber: 0.0209 bmi: 0.922
+Current loss: 1.732505 ber: 0.0227 bmi: 0.918
+Current loss: 1.724445 ber: 0.0216 bmi: 0.920
+Current loss: 1.705015 ber: 0.0204 bmi: 0.925
+Current loss: 1.731379 ber: 0.0218 bmi: 0.920
+Current loss: 1.704374 ber: 0.0209 bmi: 0.922
+Current loss: 1.750113 ber: 0.0225 bmi: 0.917
+Current loss: 1.743338 ber: 0.0225 bmi: 0.918
+Current loss: 1.709146 ber: 0.0196 bmi: 0.927
+Current loss: 1.729053 ber: 0.0222 bmi: 0.919
+Current loss: 1.715304 ber: 0.0215 bmi: 0.921
+Current loss: 1.729004 ber: 0.0221 bmi: 0.919
+Current loss: 1.740029 ber: 0.0226 bmi: 0.917
+Current loss: 1.729731 ber: 0.0217 bmi: 0.919
+Current loss: 1.739670 ber: 0.0221 bmi: 0.919
+Current loss: 1.741475 ber: 0.0221 bmi: 0.919
+Current loss: 1.756827 ber: 0.0232 bmi: 0.914
+Current loss: 1.720860 ber: 0.0211 bmi: 0.923
 </pre></div></div>
 </div>
 <p>We now simulate the new results and compare it to the untrained results.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">ebno_dbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">))</span>
-<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">mc_iters</span> <span class="o">=</span> <span class="mi">100</span>
 
 <span class="n">ber_plot_5G</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model5G</span><span class="p">,</span>
@@ -1648,20 +1652,24 @@ Current loss: 1.370421 ber: 0.0084 bmi: 0.968
 <div class="highlight"><pre>
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.8646e-02 | 5.7390e-01 |       74583 |     4000000 |         5739 |       10000 |         0.6 |reached target bit errors
-     0.25 | 7.5215e-03 | 3.3150e-01 |       30086 |     4000000 |         3315 |       10000 |         0.6 |reached target bit errors
-      0.5 | 2.4595e-03 | 1.5210e-01 |        9838 |     4000000 |         1521 |       10000 |         0.6 |reached target bit errors
-     0.75 | 6.7025e-04 | 5.4500e-02 |        2681 |     4000000 |          545 |       10000 |         0.6 |reached target bit errors
-      1.0 | 1.3087e-04 | 1.4900e-02 |        2094 |    16000000 |          596 |       40000 |         2.5 |reached target bit errors
-     1.25 | 2.4119e-05 | 3.3048e-03 |        2026 |    84000000 |          694 |      210000 |        12.9 |reached target bit errors
-      1.5 | 4.0825e-06 | 6.5200e-04 |        1633 |   400000000 |          652 |     1000000 |        60.4 |reached max iter
-     1.75 | 6.0500e-07 | 1.1700e-04 |         242 |   400000000 |          117 |     1000000 |        60.7 |reached max iter
-      2.0 | 9.0000e-08 | 1.7000e-05 |          36 |   400000000 |           17 |     1000000 |        61.0 |reached max iter
-     2.25 | 2.5000e-08 | 6.0000e-06 |          10 |   400000000 |            6 |     1000000 |        60.8 |reached max iter
-      2.5 | 1.2500e-08 | 1.0000e-06 |           5 |   400000000 |            1 |     1000000 |        60.7 |reached max iter
-     2.75 | 0.0000e+00 | 0.0000e+00 |           0 |   400000000 |            0 |     1000000 |        60.4 |reached max iter
+      0.0 | 1.6853e-01 | 1.0000e+00 |       67413 |      400000 |         1000 |        1000 |         0.5 |reached target bit errors
+     0.25 | 1.4647e-01 | 1.0000e+00 |       58587 |      400000 |         1000 |        1000 |         0.5 |reached target bit errors
+      0.5 | 1.2812e-01 | 9.9800e-01 |       51248 |      400000 |          998 |        1000 |         0.5 |reached target bit errors
+     0.75 | 9.6227e-02 | 9.9400e-01 |       38491 |      400000 |          994 |        1000 |         0.5 |reached target bit errors
+      1.0 | 6.8642e-02 | 9.3600e-01 |       27457 |      400000 |          936 |        1000 |         0.5 |reached target bit errors
+     1.25 | 4.2702e-02 | 8.1400e-01 |       17081 |      400000 |          814 |        1000 |         0.5 |reached target bit errors
+      1.5 | 2.3113e-02 | 6.3000e-01 |        9245 |      400000 |          630 |        1000 |         0.5 |reached target bit errors
+     1.75 | 1.0305e-02 | 3.9600e-01 |        4122 |      400000 |          396 |        1000 |         0.5 |reached target bit errors
+      2.0 | 3.1412e-03 | 1.8150e-01 |        2513 |      800000 |          363 |        2000 |         1.0 |reached target bit errors
+     2.25 | 9.4167e-04 | 6.7333e-02 |        2260 |     2400000 |          404 |        6000 |         2.9 |reached target bit errors
+      2.5 | 1.7208e-04 | 1.7600e-02 |        2065 |    12000000 |          528 |       30000 |        14.7 |reached target bit errors
+     2.75 | 3.5425e-05 | 4.6400e-03 |        1417 |    40000000 |          464 |      100000 |        49.5 |reached max iter
+      3.0 | 6.1750e-06 | 8.4000e-04 |         247 |    40000000 |           84 |      100000 |        49.5 |reached max iter
+     3.25 | 8.7500e-07 | 1.8000e-04 |          35 |    40000000 |           18 |      100000 |        48.9 |reached max iter
+      3.5 | 2.0000e-07 | 5.0000e-05 |           8 |    40000000 |            5 |      100000 |        49.3 |reached max iter
+     3.75 | 0.0000e+00 | 0.0000e+00 |           0 |    40000000 |            0 |      100000 |        49.0 |reached max iter
 
-Simulation stopped as no error occurred @ EbNo = 2.8 dB.
+Simulation stopped as no error occurred @ EbNo = 3.8 dB.
 
 </pre></div></div>
 </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.channel.tr38901.antenna &mdash; Sionna 0.9.0 documentation</title>
+  <title>sionna.channel.tr38901.antenna &mdash; Sionna 0.9.1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -572,6 +572,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.markers</span> <span class="kn">import</span> <span class="n">MarkerStyle</span>
 
 <span class="kn">from</span> <span class="nn">sionna</span> <span class="kn">import</span> <span class="n">SPEED_OF_LIGHT</span><span class="p">,</span> <span class="n">PI</span>
 <span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">log10</span>
@@ -1174,16 +1175,24 @@
 
 <div class="viewcode-block" id="PanelArray.show"><a class="viewcode-back" href="../../../../api/channel.html#sionna.channel.tr38901.PanelArray.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Show the panel array geometry&quot;&quot;&quot;</span>
+        <span class="n">marker_vert</span> <span class="o">=</span> <span class="n">MarkerStyle</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="n">marker_horz</span> <span class="o">=</span> <span class="n">MarkerStyle</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;single&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization_type</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
+            <span class="n">marker_vert</span> <span class="o">=</span> <span class="n">marker_horz</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;dual&#39;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization_type</span> <span class="o">==</span> <span class="s1">&#39;cross&#39;</span><span class="p">:</span>
+            <span class="n">marker_vert</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">rotate_deg</span><span class="p">(</span><span class="o">-</span><span class="mi">45</span><span class="p">)</span>      <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">marker_horz</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">rotate_deg</span><span class="p">(</span><span class="o">-</span><span class="mi">45</span><span class="p">)</span>      <span class="c1"># pylint: disable=protected-access</span>
+
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">pos_pol1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos_pol1</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pos_pol1</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos_pol1</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pos_pol1</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos_pol1</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="n">marker_vert</span><span class="p">,</span>
             <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
             <span class="n">markeredgewidth</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pos_pol1</span><span class="p">):</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ant_ind_pol1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;dual&#39;</span><span class="p">:</span>
             <span class="n">pos_pol2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos_pol2</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pos_pol2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos_pol2</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="p">,</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pos_pol2</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos_pol2</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="n">marker_horz</span><span class="p">,</span>
                 <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
                 <span class="n">markeredgewidth</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;y (m)&quot;</span><span class="p">)</span>
