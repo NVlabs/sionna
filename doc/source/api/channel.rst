@@ -502,6 +502,23 @@ Rural macrocell (RMa)
    :exclude-members: __call__
    :inherited-members:
 
+Optical Channel models
+========================
+
+Optical Fiber
+--------------
+
+.. autoclass:: sionna.channel.optical.fiber.SSFM
+   :members:
+   :exclude-members: call, build
+
+Erbium-Doped Amplifier
+-----------------------
+
+.. autoclass:: sionna.channel.optical.edfa.EDFA
+   :members:
+   :exclude-members: call, build
+
 .. _external-datasets:
 
 External datasets

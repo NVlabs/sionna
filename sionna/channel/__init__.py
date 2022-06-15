@@ -11,6 +11,7 @@ from .spatial_correlation import SpatialCorrelation, KroneckerModel, PerColumnMo
 from .flat_fading_channel import GenerateFlatFadingChannel, ApplyFlatFadingChannel, FlatFadingChannel
 from .channel_model import ChannelModel
 from . import tr38901
+from . import optical
 from .generate_ofdm_channel import GenerateOFDMChannel
 from .generate_time_channel import GenerateTimeChannel
 from .apply_ofdm_channel import ApplyOFDMChannel
