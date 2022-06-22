@@ -16,8 +16,8 @@ import tensorflow as tf
 
 # Local application imports
 import sionna
-from sionna.optical import utils
-from sionna.channel import fiber
+from sionna.channel.optical import utils
+from sionna.channel.optical import fiber
 
 
 class TestSSFM(unittest.TestCase):
@@ -37,7 +37,7 @@ class TestSSFM(unittest.TestCase):
 		T = 100  # time window (period)
 		N = 2 ** 12  # number of points
 		dt = T / N  # timestep(dt)
-		(t, f) = utils.generate_time_frequency(
+		(t, f) = utils.time_frequency_vector(
 			N, dt, dtype=self._complex_dtype.real_dtype)
 		z = 5.0  # propagation distance
 		N_SSFM = 2000  # number of steps
@@ -102,7 +102,7 @@ class TestSSFM(unittest.TestCase):
 		T = 100  # time window (period)
 		N = 2 ** 12  # number of points
 		dt = T / N  # timestep(dt)
-		t, f = utils.generate_time_frequency(
+		t, f = utils.time_frequency_vector(
 			N, dt, dtype=self._complex_dtype.real_dtype)
 		z = 5.0  # propagation distance
 		N_SSFM = 2000  # number of steps
@@ -173,7 +173,7 @@ class TestSSFM(unittest.TestCase):
 		T = 100  # time window (period)
 		N = 2 ** 12  # number of points
 		dt = T / N  # timestep(dt)
-		t, f = utils.generate_time_frequency(
+		t, f = utils.time_frequency_vector(
 			N, dt, dtype=self._complex_dtype.real_dtype)
 		z = 5.0  # propagation distance
 		N_SSFM = 2000  # number of steps

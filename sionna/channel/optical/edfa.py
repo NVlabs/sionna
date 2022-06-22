@@ -27,16 +27,38 @@ from tensorflow.keras.layers import Layer
 
 # Local application imports
 import sionna
-from sionna.channel.optical import utils
 
 
 class EDFA(Layer):
-    r"""EDFA(G, F, f_c, dt, dtype=tf.complex64, **kwargs)
+    r"""EDFA(g, f, f_c, dt, dtype=tf.complex64, **kwargs)
 
-    Erbium-Doped Fiber Amplifier
+    **Erbium-Doped Fiber Amplifier**
 
     Amplifies the input optical signal ``x`` by factor ``sqrt(G)`` and adds
     amplified spontaneous emission (ASE) noise.
+
+    The noise figure including the noise due to beating of signal and
+    spontaneous emission only is :math:`F_\mathrm{ASE,shot} =\frac{\mathrm{SNR}_\mathrm{in}}{\mathrm{SNR}_\mathrm{out}}`
+    where ideally the detector is limited by shot noise only. Shot noise is
+    neglected here but only helps to derive the noise power of the amplifier, as
+    otherwise the input SNR was infinitely large. Hence, for the input SNR
+    following [A2012]_ that :math:`\mathrm{SNR}_\mathrm{in}=\frac{P}{2hf_0B_\mathrm{w}}`
+    The output SNR is decreased by ASE noise induced by the amplification. Note
+    that, shot noise is applied after the amplifier and is hence not amplified.
+    It results that :math:`\mathrm{SNR}_\mathrm{out}=\frac{GP}{\left(4\rho_\mathrm{ASE}+2hf_0\right)B_\mathrm{w}}`
+    Hence, one can write the former equation as :math:`F_\mathrm{ASE,shot} = 2 n_\mathrm{sp} \left(1-G^{-1}\right) + G^{-1}`.
+    Dropping shot noise again results in :math:`F = 2 n_\mathrm{sp} \left(1-G^{-1}\right)=2 n_\mathrm{sp} \frac{G-1}{G}`.
+
+    For, e.g., a transparent link, the required gain per span is :math:`G = \exp\left(\alpha \Delta z\right)`.
+    The spontaneous emission factor calculates as :math:`n_\mathrm{sp}=\frac{F}{2}\frac{G}{G-1}`.
+    According to [A2012]_, [EKWFG2010]_ combined with [BGT2000]_, and [GD1991]_,
+    for the noise power spectral density of the EDFA per state of
+    polarization one obtains :math:`\rho_\mathrm{ASE}^{(1)} = n_\mathrm{sp}\left(G-1\right) h f_0=\frac{1}{2}G F h f_0`.
+    At simulation frequency :math:`f_\mathrm{sim}` the noise has a power of
+    :math:`P_\mathrm{ASE}^{(1)}=\sigma_\mathrm{n,ASE}^2=2\rho_\mathrm{ASE}^{(1)}\cdot f_\mathrm{sim}`
+    where the factor :math:`2` accounts for the unpolarized noise.
+    Here the :math:`()^{(1)}` means that this is the noise introduced by a
+    single EDFA.
 
     This class inherits from the Keras `Layer` class and can be used as layer in
     a Keras model.
@@ -55,17 +77,17 @@ class EDFA(Layer):
 
     Parameters
     ----------
-        g : Tensor, tf.float
-            Amplifier gain in (1)
+        g : float
+            Amplifier gain :math:`G` in :math:`(1)`
 
-        n_sp : Tensor, tf.float
-            Spontaneous emission factor in (1)
+        f : float
+            Noise figure :math:`F` in :math:`(1)`
 
-        f_c : Tensor, tf.float
-            Carrier frequency in (Hz)
+        f_c : float
+            Carrier frequency :math:`f_\mathrm{c}` in :math:`(Hz)`
 
-        dt : Tensor, tf.float
-            Time step in (s)
+        dt : float
+            Time step :math:`\Delta_t` in :math:`(s)`
 
         dtype : Complex tf.DType
             Defines the datatype for internal calculations and the output

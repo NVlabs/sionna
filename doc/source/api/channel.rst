@@ -502,8 +502,8 @@ Rural macrocell (RMa)
    :exclude-members: __call__
    :inherited-members:
 
-Optical Channel models
-========================
+Optical Channel
+================
 
 Optical Fiber
 --------------
@@ -618,3 +618,37 @@ References:
          <https://massivemimobook.com>`_,
          Foundations and Trends in Signal Processing:
          Vol. 11, No. 3-4, pp 154–655.
+
+   .. [SSFM] R. H. Hardin and F. D. Tappert,
+         "Applications of the SplitStep Fourier Method to the Numerical Solution of Nonlinear and Variable Coefficient Wave Equations.",
+         SIAM Review Chronicles, Vol. 15, No. 2, Part 1, p 423, 1973.
+
+   .. [SymSSFM] J. A. Fleck, J. R. Morris, and M. D. Feit,
+         "Time-dependent propagation of high energy laser beams through the atmosphere",
+         Appl. Phys., Vol. 10, pp 129–160, 1976.
+
+   .. [RamanASE] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
+         "ASE Noise Simulation in Raman Amplification Systems",
+         Conftele, 2009.
+
+   .. [A2012] G. P. Agrawal,
+         "Fiber-optic communication systems",
+         4th ed. Wiley series in microwave and optical engineering 222. New York: Wiley, 2010.
+
+   .. [EKWFG2010] R. J. Essiambre, G. Kramer, P. J. Winzer, G. J. Foschini, and B. Goebel,
+         "Capacity Limits of Optical Fiber Networks",
+         Journal of Lightwave Technology 28, No. 4, 2010.
+
+   .. [BGT2000] D. M. Baney, P. Gallion, and R. S. Tucker,
+         "Theory and Measurement Techniques for the Noise Figure of Optical Amplifiers",
+         Optical Fiber Technology 6, No. 2, 2000
+
+   .. [GD1991] C.R. Giles, and E. Desurvire,
+         "Modeling Erbium-Doped Fiber Amplifiers",
+         Journal of Lightwave Technology 9, No. 2, 1991
+
+
+
+
+
+

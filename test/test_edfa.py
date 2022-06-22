@@ -16,7 +16,7 @@ import tensorflow as tf
 
 # Local application imports
 import sionna
-from sionna.optical import edfa
+from sionna.channel.optical import edfa
 
 
 class TestEDFA(unittest.TestCase):
