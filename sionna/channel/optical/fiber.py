@@ -26,8 +26,8 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 # Local application imports
+import sionna
 from sionna.channel.optical import utils
-
 
 class SSFM(Layer):
     r"""SSFM(alpha, beta_2, f_c, gamma, half_window_length, ell, n_ssfm, n_sp, dt, t_norm, with_amplification, with_attenuation, with_dispersion, with_nonlinearity, swap_memory=True, dtype=tf.complex64, **kwargs)
@@ -150,7 +150,7 @@ class SSFM(Layer):
         self._dt = tf.cast(dt, dtype=dtype.real_dtype)
 
         self._rho_n = \
-            utils.h / (self._t_norm ** 2.0) * self._f_c * tf.cast(
+            sionna.constants.H / (self._t_norm ** 2.0) * self._f_c * tf.cast(
                 self._alpha, dtype.real_dtype) * self._ell * self._n_sp
 
         # Calculate noise power depending on simulation bandwidth
@@ -180,7 +180,7 @@ class SSFM(Layer):
         input_shape = x.shape
 
         # Generate frequency vectors
-        t, f = utils.generate_time_frequency(
+        t, f = utils.time_frequency_vector(
             x.shape[-1], self._dt, dtype=rdtype)
 
         # Window function calculation
@@ -207,7 +207,7 @@ class SSFM(Layer):
             tf.complex(
                 tf.zeros(input_shape[-1], rdtype),
                 -self._beta_2 / tf.cast(2.0, rdtype) * self._dz *
-                (tf.cast(2.0, rdtype) * tf.cast(utils.pi, rdtype) *
+                (tf.cast(2.0, rdtype) * tf.cast(sionna.constants.PI, rdtype) *
                  f) ** tf.cast(2.0, rdtype)
             )
         )

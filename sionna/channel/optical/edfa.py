@@ -26,6 +26,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 # Local application imports
+import sionna
 from sionna.channel.optical import utils
 
 
@@ -104,7 +105,7 @@ class EDFA(Layer):
 
         self._rho_n_ase = tf.cast(
             self._n_sp * (self._g - tf.cast(1.0, self._real_dtype)) *
-            utils.h * self._f_c,
+            sionna.constants.H * self._f_c,
             self._real_dtype)  # Noise density in (W/Hz)
         self._p_n_ase = tf.cast(
             2.0, self._real_dtype) * self._rho_n_ase * tf.cast(

@@ -508,14 +508,14 @@ Optical Channel models
 Optical Fiber
 --------------
 
-.. autoclass:: sionna.channel.optical.fiber.SSFM
+.. autoclass:: sionna.channel.SSFM
    :members:
    :exclude-members: call, build
 
 Erbium-Doped Amplifier
 -----------------------
 
-.. autoclass:: sionna.channel.optical.edfa.EDFA
+.. autoclass:: sionna.channel.EDFA
    :members:
    :exclude-members: call, build
 
@@ -593,6 +593,11 @@ one_ring_corr_mat
 -------------------
 
 .. autofunction:: sionna.channel.one_ring_corr_mat
+
+generate_time_frequency
+------------------------------
+
+.. autofunction:: sionna.channel.optical.utils.time_frequency_vector
 
 References:
    .. [TR38901] 3GPP TR 38.901,

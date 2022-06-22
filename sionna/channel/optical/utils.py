@@ -26,45 +26,45 @@ import tensorflow as tf
 # Local application imports
 
 
-def conv1d(x, h, padding="SAME"):
-    x = tf.expand_dims(x, axis=-1)
-    x_real = tf.math.real(x)
-    x_imag = tf.math.imag(x)
-    x = tf.concat([x_real, x_imag], axis=2)
-    x = tf.transpose(x, [0, 2, 1])
+def time_frequency_vector(n, dt, dtype=tf.float32):
+    # pylint: disable=line-too-long
+    r"""
+    Compute the time and frequency vector with sample duration ``dt`` in
+    normalized time unit unit_time and ``n`` samples, i.e.,
 
-    h = tf.reverse(h, [-1])
-    h = tf.stack([tf.math.real(h), tf.math.imag(h)])
-    h = tf.transpose(h)
-    h = tf.reshape(h, [-1, 2])
-    h = tf.stack([h, tf.reverse(h, [-1])], axis=2)
-    h = tf.reshape(h, [-1, 4])
-    h1, h2, h3, h4 = tf.split(h, 4, axis=1)
-    h = tf.stack([h1, h2, -h3, h4], axis=1)
-    h = tf.reshape(h, [-1, 2, 2])
+    >>> t = tf.cast(tf.linspace(-n_min, n_max, n), dtype) * dt
+    >>> f = tf.cast(tf.linspace(-n_min, n_max, n), dtype) * df
 
-    x = tf.nn.conv1d(x, h, stride=1, padding=padding, data_format='NCW')
+    Input
+    ------
+        n : int
+            Number of samples (1)
 
-    x = tf.transpose(x, [0, 2, 1])
-    x_real, x_imag = tf.split(x, 2, axis=2)
-    x = tf.complex(x_real, x_imag)
-    x = tf.reshape(x, [1, -1])
+        dt : float
+            Sample duration (unit_time)
 
-    return x
+        dtype : tf.DType
+            Datatype to use for internal processing and output.
+            If a complex datatype is provided, the corresponding precision of
+            real components is used.
+            Defaults to `tf.float32`.
 
+    Output
+    ------
+        t : [n], tf.float
+            Time vector
 
-def generate_time_frequency(N, dt, dtype=tf.float32):
+        f : [n], tf.float
+            Frequency vector
+    """
+
     # Time vector
-    N_min = tf.cast(tf.math.ceil((N-1)/2), dtype=tf.int32)
-    N_max = N-N_min-1
-    t = tf.cast(tf.linspace(-N_min, N_max, N), dtype) * dt
+    n_min = tf.cast(tf.math.ceil((n - 1) / 2), dtype=tf.int32)
+    n_max = n - n_min - 1
+    t = tf.cast(tf.linspace(-n_min, n_max, n), dtype) * dt
 
     # Frequency vector
-    df = 1.0/dt/tf.cast(N, dtype)
-    f = tf.cast(tf.linspace(-N_min, N_max, N), dtype) * df
+    df = 1.0/dt/tf.cast(n, dtype)
+    f = tf.cast(tf.linspace(-n_min, n_max, n), dtype) * df
 
     return t, f
-
-
-pi = 3.141592653589793
-h = 6.62607015 * 10 ** (-34)
