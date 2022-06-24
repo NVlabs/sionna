@@ -41,7 +41,7 @@ def subcarrier_frequencies(num_subcarriers, subcarrier_spacing,
 
     Output
     ------
-        frequencies : [num_subcarrier], tf.float
+        frequencies : [``num_subcarrier``], tf.float
             Baseband frequencies of subcarriers
     """
 
@@ -64,6 +64,49 @@ def subcarrier_frequencies(num_subcarriers, subcarrier_spacing,
                             dtype=real_dtype)
     frequencies = frequencies*subcarrier_spacing
     return frequencies
+
+def time_frequency_vector(num_samples, sample_duration, dtype=tf.float32):
+    # pylint: disable=line-too-long
+    r"""
+    Compute the time and frequency vector for a given number of samples
+    and duration per sample in normalized time unit.
+
+    >>> t = tf.cast(tf.linspace(-n_min, n_max, num_samples), dtype) * sample_duration
+    >>> f = tf.cast(tf.linspace(-n_min, n_max, num_samples), dtype) * 1/(sample_duration*num_samples)
+
+    Input
+    ------
+        num_samples : int
+            Number of samples
+
+        sample_duration : float
+            Sample duration in normalized time
+
+        dtype : tf.DType
+            Datatype to use for internal processing and output.
+            Defaults to `tf.float32`.
+
+    Output
+    ------
+        t : [``num_samples``], ``dtype``
+            Time vector
+
+        f : [``num_samples``], ``dtype``
+            Frequency vector
+    """
+
+    # Time vector
+    n_min = tf.cast(tf.math.ceil((num_samples-1) / 2), dtype=tf.int32)
+    n_max = num_samples - n_min - 1
+    t = tf.cast(tf.linspace(-n_min, n_max, num_samples), dtype) \
+        * tf.cast(sample_duration, dtype)
+
+    # Frequency vector
+    df = tf.cast(1.0/sample_duration, dtype)/tf.cast(num_samples, dtype)
+    f = tf.cast(tf.linspace(-n_min, n_max, num_samples), dtype) \
+        * tf.cast(df, dtype)
+
+    return t, f
 
 def time_lag_discrete_time_channel(bandwidth, maximum_delay_spread=3e-6):
     # pylint: disable=line-too-long

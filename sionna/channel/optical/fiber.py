@@ -1,45 +1,35 @@
-# $Id: fiber.py 0 13.06.2022 13:53$
+#
+# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
 # Author: Tim Alexander Uhlemann <uhlemann@ieee.org>
-# Copyright:
 
 """
-This module defines the following classes:
-
-- `SSFM`, the split-step Fourier method to approximate the solution of the NLSE
-
-Exception classes:
-
-Functions:
-
-
-How To Use This Module
-======================
-(See the individual classes, methods, and attributes for details.)
+This module defines the split-step Fourier method to approximate the solution of
+the nonlinear Schroedinger equation.
 """
 
-__docformat__ = 'restructuredtext'
-
-# Standard library imports
-
-# Third party imports
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
-
-# Local application imports
 import sionna
-from sionna.channel.optical import utils
+from sionna.channel import utils
 
 
 class SSFM(Layer):
     # pylint: disable=line-too-long
     r"""SSFM(alpha, beta_2, f_c, gamma, half_window_length, ell, n_ssfm, n_sp, dt, t_norm, with_amplification, with_attenuation, with_dispersion, with_nonlinearity, swap_memory=True, dtype=tf.complex64, **kwargs)
 
-    **Split-step Fourier method**
+    Layer implementing the split-step Fourier method (SSFM).
 
     The SSFM (first mentioned in [SSFM]_) is implemented as
     symmetrized SSFM according to Eq. (7) of [SymSSFM]_ and can be written as
-    :math:`E(z+\Delta_z,\,t)\approx\exp\left(\frac{\Delta_z}{2}\hat{D}\right)\exp\left(\int^{z+\Delta_z}_z \hat{N}(z')dz'\right)\exp\left(\frac{\Delta_z}{2}\hat{D}\right)E(z,\,t)`.
+
+    .. math::
+
+        E(z+\Delta_z,t) \approx \exp\left(\frac{\Delta_z}{2}\hat{D}\right)\exp\left(\int^{z+\Delta_z}_z \hat{N}(z')dz'\right)\exp\left(\frac{\Delta_z}{2}\hat{D}\right)E(z,\,t)
+
     The integral is approximated by :math:`\Delta_z\hat{N}`.
+
     Additionally, ideally distributed Raman amplification may be applied, which
     is implemented as in [RamanASE]_.
 
@@ -47,7 +37,7 @@ class SSFM(Layer):
     distance units :math:`L_\text{norm}` (e.g., 1 km). Hence, parameters as well
     as the signal itself have to be given in the same normalized units. Note
     that, despite the normalization, the SSFM is implemented with physical units
-    what is different from the normalization, e.g., used for the nonlinear
+    different from the normalization, e.g., used for the nonlinear
     Fourier transform.
 
     This class inherits from the Keras `Layer` class and can be used as layer in
@@ -64,35 +54,33 @@ class SSFM(Layer):
 
     Running:
 
-    >>> y = ssfm_channel(
-    >>>     ([1.0+1.0j, 1.0+1.0j, 1.0+1.0j])
-    >>> )
+    >>> y = ssfm_channel([1.0+1.0j, 1.0+1.0j, 1.0+1.0j])
 
     Parameters
     ----------
         alpha : float
-            Attenuation coefficient :math:`\alpha` in :math:`(1/L_\text{norm})`.
+            Attenuation coefficient :math:`\alpha` in :math:`(1/L_\text{norm})`
 
         beta_2 : float
-            Chromatic dispersion coefficient :math:`\beta_2` in :math:`(T_\text{norm}^2/L_\text{norm})`.
+            Chromatic dispersion coefficient :math:`\beta_2` in :math:`(T_\text{norm}^2/L_\text{norm})`
 
         f_c : float
-            Carrier frequency :math:`f_\mathrm{c}` in :math:`(1/T_\text{norm})`.
+            Carrier frequency :math:`f_\mathrm{c}` in :math:`(1/T_\text{norm})`
 
         gamma : float
-            Kerr-nonlinearity :math:`\gamma` in :math:`(1/L_\text{norm}/W)`.
+            Kerr-nonlinearity :math:`\gamma` in :math:`(1/L_\text{norm}/W)`
 
         half_window_length : int
-            Half of the Hammwing window length in :math:`(1)`.
+            Half of the Hammwing window length
 
         ell : float
-            Fiber length :math:`\ell` in :math:`(L_\text{norm})`.
+            Fiber length :math:`\ell` in :math:`(L_\text{norm})`
 
         n_ssfm : int
-            Number of steps :math:`N_\mathrm{SSFM}` in :math:`(1)`.
+            Number of steps :math:`N_\mathrm{SSFM}`
 
         n_sp : float
-            Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification in :math:`(1)`.
+            Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification
 
         dt : float
             Normalized time step :math:`\Delta_t` in :math:`(T_\text{norm})`
@@ -101,20 +89,20 @@ class SSFM(Layer):
             Time normalization :math:`T_\text{norm}` in :math:`(s)`.
 
         with_attenuation : bool
-            Enables application of attenuation (True/False).
+            Enables application of attenuation
 
         with_amplification : bool
             Enables application of ideal inline amplification and corresponding
-            noise (True/False).
+            noise
 
         with_dispersion : bool
-            Enables application of chromatic dispersion (True/False).
+            Enables application of chromatic dispersion
 
         with_nonlinearity : bool
-            Enables application of Kerr nonlinearity (True/False).
+            Enables application of Kerr nonlinearity
 
         swap_memory : bool
-            Use CPU memory for while loop (True/False). Defaults to True.
+            Use CPU memory for while loop. Defaults to True.
 
         dtype : Complex tf.DType
             Defines the datatype for internal calculations and the output
@@ -122,18 +110,14 @@ class SSFM(Layer):
 
     Input
     -----
-        (x) : Tuple:
-
         x : Tensor, tf.complex
-            Input signal in :math:`(W^(1/2))`
-
+            Input signal in :math:`(W^{\frac12})`
 
     Output
     -------
         y : Tensor with same shape as ``x``, tf.complex
             Channel output
     """
-
     def __init__(self, alpha, beta_2, f_c, gamma, half_window_length, ell,
                  n_ssfm, n_sp, dt, t_norm,
                  with_amplification, with_attenuation, with_dispersion,
@@ -265,7 +249,7 @@ class SSFM(Layer):
         return tf.less(step_counter, n_steps)
 
     def call(self, inputs):
-        (x) = inputs
+        x = inputs
 
         # Calculate support parameters
         input_shape = x.shape

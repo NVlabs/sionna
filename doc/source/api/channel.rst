@@ -502,17 +502,17 @@ Rural macrocell (RMa)
    :exclude-members: __call__
    :inherited-members:
 
-Optical Channel
+Optical channel
 ================
 
-Optical Fiber
+Optical fiber
 --------------
 
 .. autoclass:: sionna.channel.SSFM
    :members:
    :exclude-members: call, build
 
-Erbium-Doped Amplifier
+Erbium-Doped amplifier
 -----------------------
 
 .. autoclass:: sionna.channel.EDFA
@@ -538,6 +538,11 @@ subcarrier_frequencies
 ------------------------
 
 .. autofunction:: sionna.channel.subcarrier_frequencies
+
+generate_time_frequency
+------------------------------
+
+.. autofunction:: sionna.channel.utils.time_frequency_vector
 
 time_lag_discrete_time_channel
 -------------------------------
@@ -594,10 +599,6 @@ one_ring_corr_mat
 
 .. autofunction:: sionna.channel.one_ring_corr_mat
 
-generate_time_frequency
-------------------------------
-
-.. autofunction:: sionna.channel.optical.utils.time_frequency_vector
 
 References:
    .. [TR38901] 3GPP TR 38.901,
