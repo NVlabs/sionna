@@ -14,7 +14,7 @@ In order to run the tutorial notebooks on your machine, you also need [Jupyter](
 You can alternatively test them on [Google Colab](https://colab.research.google.com/).
 Although not necessary, we recommend running Sionna in a [Docker container](https://www.docker.com). 
 
-Sionna requires [TensorFlow 2.5 or higher](https://www.tensorflow.org/install) and Python 3.6-3.9. We recommend Ubuntu 20.04.
+Sionna requires [TensorFlow 2.6-2.8](https://www.tensorflow.org/install) and Python 3.6-3.9. We recommend Ubuntu 20.04.
 
 We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/install/gpu) for GPU support and the required driver setup.
 
@@ -35,7 +35,7 @@ On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensor
 ```
     >>> import sionna
     >>> print(sionna.__version__)
-    0.9.1
+    0.9.2
 ```
 
 3.) Once Sionna is installed, you can run the [Sionna "Hello, World!" example](https://nvlabs.github.io/sionna/examples/Hello_World.html), have a look at the [quick start guide](https://nvlabs.github.io/sionna/quickstart.html), or at the [tutorials](https://nvlabs.github.io/sionna/tutorials.html).
