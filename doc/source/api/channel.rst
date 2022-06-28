@@ -621,7 +621,7 @@ References:
          Vol. 11, No. 3-4, pp 154–655.
 
    .. [SSFM] R. H. Hardin and F. D. Tappert,
-         "Applications of the SplitStep Fourier Method to the Numerical Solution of Nonlinear and Variable Coefficient Wave Equations.",
+         "Applications of the Split-Step Fourier Method to the Numerical Solution of Nonlinear and Variable Coefficient Wave Equations.",
          SIAM Review Chronicles, Vol. 15, No. 2, Part 1, p 423, 1973.
 
    .. [SymSSFM] J. A. Fleck, J. R. Morris, and M. D. Feit,
