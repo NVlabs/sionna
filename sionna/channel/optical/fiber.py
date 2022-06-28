@@ -71,7 +71,7 @@ class SSFM(Layer):
             Kerr-nonlinearity :math:`\gamma` in :math:`(1/L_\text{norm}/W)`
 
         half_window_length : int
-            Half of the Hammwing window length
+            Half of the Hamming window length
 
         ell : float
             Fiber length :math:`\ell` in :math:`(L_\text{norm})`
