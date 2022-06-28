@@ -18,7 +18,7 @@ class EDFA(Layer):
 
     Layer implementing a model of an Erbium-Doped Fiber Amplifier
 
-    Amplifies the input optical signal by a given gain and adds
+    Amplifies the optical input signal by a given gain and adds
     amplified spontaneous emission (ASE) noise.
 
     The noise figure including the noise due to beating of signal and
