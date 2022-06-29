@@ -2,7 +2,7 @@ Low-Density Parity-Check (LDPC)
 ===============================
 
 The low-density parity-check (LDPC) code module supports 5G compliant LDPC codes and allows iterative belief propagation (BP) decoding.
-Further, the module supports rate-matching for 5G.
+Further, the module supports rate-matching for 5G and provides a generic linear encoder.
 
 The following code snippets show how to setup and run a rate-matched 5G compliant LDPC encoder and a corresponding belief propagation (BP) decoder.
 

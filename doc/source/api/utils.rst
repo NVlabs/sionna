@@ -83,9 +83,17 @@ BinarySource
 ------------
 .. autoclass:: sionna.utils.BinarySource
 
+SymbolSource
+------------
+.. autoclass:: sionna.utils.SymbolSource
+
 QAMSource
 ---------
 .. autoclass:: sionna.utils.QAMSource
+
+PAMSource
+---------
+.. autoclass:: sionna.utils.PAMSource
 
 PlotBER
 -------

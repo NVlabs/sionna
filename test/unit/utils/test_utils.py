@@ -14,8 +14,9 @@ import tensorflow as tf
 
 from sionna.utils.metrics import BitErrorRate, BitwiseMutualInformation, compute_ber, compute_bler, count_block_errors, count_errors
 from sionna.fec.interleaving import RandomInterleaver
-from sionna.utils import sim_ber, complex_normal
+from sionna.utils import sim_ber, complex_normal, SymbolSource, BinarySource, QAMSource, PAMSource
 from sionna.fec.utils import GaussianPriorSource
+from sionna.mapping import SymbolDemapper, Demapper, Constellation
 
 gpus = tf.config.list_physical_devices('GPU')
 print('Number of GPUs available :', len(gpus))
@@ -262,3 +263,136 @@ class TestComplexNormal(unittest.TestCase):
         var = tf.cast(0.3, tf.int32)
         var_hat = np.var(func(100000, var))
         self.assertTrue(np.allclose(var, var_hat, rtol=1e-3))
+
+
+class TestSources(unittest.TestCase):
+
+    def test_binary_source(self):        
+        shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
+        dtypes = [tf.int16, tf.float64, tf.complex64]
+        seeds = [None, 1, 2]
+        for dtype in dtypes:
+            for seed in seeds:
+                binary_source = BinarySource(dtype=dtype, seed=seed)
+                binary_source2 = BinarySource(dtype=dtype, seed=seed)
+                binary_source3 = BinarySource(dtype=dtype, seed=3)
+                for shape in shapes:
+                    b = binary_source(shape)
+                    self.assertTrue(np.array_equal(b.shape, shape))
+                    self.assertTrue(b.dtype==dtype)
+                    if seed is not None:
+                        b2 = binary_source2(shape)
+                        b3 = binary_source3(shape)
+                        self.assertTrue(np.array_equal(b, b2))
+                        self.assertFalse(np.array_equal(b, b3))
+
+    def test_symbol_source_pam(self):        
+        shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
+        dtypes = [tf.complex64, tf.complex128]
+        seeds = [None, 1, 2]
+        bits_per_symbol = [1, 2, 3, 4]
+        for dtype in dtypes:
+            for seed in seeds:
+                for num_bits_per_symbol in bits_per_symbol:
+                    symbol_source = SymbolSource("pam", num_bits_per_symbol, dtype=dtype, seed=seed)
+                    symbol_source2 = PAMSource(num_bits_per_symbol, dtype=dtype, seed=seed)
+                    symbol_source3 = SymbolSource("pam", num_bits_per_symbol, dtype=dtype, seed=3)
+                    for shape in shapes:
+                        x = symbol_source(shape)
+                        self.assertTrue(np.array_equal(x.shape, shape))
+                        self.assertTrue(x.dtype==dtype)
+                        if seed is not None:
+                            x2 = symbol_source2(shape)
+                            x3 = symbol_source3(shape)
+                            # Same seed must lead to same result
+                            self.assertTrue(np.array_equal(x, x2))
+                            # Different seed must lead to different results
+                            self.assertFalse(np.array_equal(x, x3))
+
+    def test_symbol_source_qam(self):        
+        shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
+        dtypes = [tf.complex64, tf.complex128]
+        seeds = [None, 1, 2]
+        bits_per_symbol = [2, 4, 6]
+        for dtype in dtypes:
+            for seed in seeds:
+                for num_bits_per_symbol in bits_per_symbol:
+                    symbol_source = SymbolSource("qam", num_bits_per_symbol, dtype=dtype, seed=seed)
+                    symbol_source2 = QAMSource(num_bits_per_symbol, dtype=dtype, seed=seed)
+                    symbol_source3 = SymbolSource("qam", num_bits_per_symbol, dtype=dtype, seed=3)
+                    for shape in shapes:
+                        x = symbol_source(shape)
+                        self.assertTrue(np.array_equal(x.shape, shape))
+                        self.assertTrue(x.dtype==dtype)
+                        if seed is not None:
+                            x2 = symbol_source2(shape)
+                            x3 = symbol_source3(shape)
+                            # Same seed must lead to same result
+                            self.assertTrue(np.array_equal(x, x2))
+                            # Different seed must lead to different results
+                            self.assertFalse(np.array_equal(x, x3))
+
+    def test_symbol_source_custom(self):        
+        shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
+        dtypes = [tf.complex64, tf.complex128]
+        seeds = [None, 1, 2]
+        bits_per_symbol = [2, 4, 6]
+        for dtype in dtypes:
+            for seed in seeds:
+                for num_bits_per_symbol in bits_per_symbol:
+                    constellation = Constellation("custom", num_bits_per_symbol, dtype=dtype)
+                    symbol_source = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, dtype=dtype, seed=seed)
+                    symbol_source2 = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, dtype=dtype, seed=seed)
+                    symbol_source3 = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, dtype=dtype, seed=3)
+                    for shape in shapes:
+                        x = symbol_source(shape)
+                        self.assertTrue(np.array_equal(x.shape, shape))
+                        self.assertTrue(x.dtype==dtype)
+                        if seed is not None:
+                            x2 = symbol_source2(shape)
+                            x3 = symbol_source3(shape)
+                            # Same seed must lead to same result
+                            self.assertTrue(np.array_equal(x, x2))
+                            # Different seed must lead to different results
+                            self.assertFalse(np.array_equal(x, x3))
+
+    def test_symbol_source_output_flags(self):
+        shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
+        seeds = [None, 1, 2]
+        bits_per_symbol = [2, 4, 6]
+        return_indices = [False, True]
+        return_bits = [False, True]
+        for num_bits_per_symbol in bits_per_symbol:
+            for ri in return_indices:
+                for rb in return_bits:
+                    symbol_source = SymbolSource("qam", num_bits_per_symbol, return_indices=ri, return_bits=rb)
+                    symbol_demapper = SymbolDemapper("qam", num_bits_per_symbol, hard_out=True)
+                    demapper = Demapper("app","qam", num_bits_per_symbol, hard_out=True)
+                    for shape in shapes:
+                        if not ri and not rb:
+                            x = symbol_source(shape)
+                            self.assertTrue(np.array_equal(x.shape, shape))
+                        if ri and not rb:
+                            x, ind = symbol_source(shape)
+                            self.assertTrue(np.array_equal(x.shape, shape))
+                            self.assertTrue(np.array_equal(ind.shape, shape))
+                            ind2 = symbol_demapper([x, 0.01])
+                            self.assertTrue(np.array_equal(ind, ind2))
+                        if not ri and rb:
+                            x, b = symbol_source(shape)
+                            self.assertTrue(np.array_equal(x.shape, shape))
+                            self.assertTrue(np.array_equal(b.shape, shape+[num_bits_per_symbol]))
+                            b2 = demapper([x, 0.01])
+                            b2 = tf.reshape(b2, b.shape)
+                            self.assertTrue(np.array_equal(b, b2))
+
+                        if ri and rb:
+                            x, ind, b = symbol_source(shape)
+                            self.assertTrue(np.array_equal(x.shape, shape))
+                            self.assertTrue(np.array_equal(ind.shape, shape))
+                            self.assertTrue(np.array_equal(b.shape, shape+[num_bits_per_symbol]))
+                            ind2 = symbol_demapper([x, 0.01])
+                            self.assertTrue(np.array_equal(ind, ind2))
+                            b2 = demapper([x, 0.01])
+                            b2 = tf.reshape(b2, b.shape)
+                            self.assertTrue(np.array_equal(b, b2))

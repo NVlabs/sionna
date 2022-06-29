@@ -56,7 +56,6 @@ class TestKroneckerModel(unittest.TestCase):
             tmp = func()
             r_tx_hat += tmp[0]/iterations/M
             r_rx_hat += tmp[1]/iterations/K
-        print(np.max(np.abs(r_rx-r_rx_hat)))
         self.assertTrue(np.allclose(r_tx, r_tx_hat, atol=1e-3))
         self.assertTrue(np.allclose(r_rx, r_rx_hat, atol=1e-3))
 
@@ -191,7 +190,7 @@ class TestPerColumnModel(unittest.TestCase):
     def test_property_setter(self):
         M = 16
         K = 4
-        dtype = tf.complex64
+        dtype = tf.complex128
         batch_size = 24
         onering = PerColumnModel(None)
         @tf.function()
@@ -202,6 +201,7 @@ class TestPerColumnModel(unittest.TestCase):
             h_corr = onering(h)
             return h, h_corr, r_rx
 
+        tf.random.set_seed(1)
         h, h_corr, r_rx = func()
         for i in range(batch_size):
             for k in range(K):

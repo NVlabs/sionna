@@ -12,7 +12,6 @@ from importlib_resources import files, as_file
 from . import codes # pylint: disable=relative-beyond-top-level
 import numbers # to check if n, k are numbers
 
-
 class AllZeroEncoder(Layer):
     """AllZeroEncoder(k, n, dtype=tf.float32, **kwargs)
 
@@ -37,13 +36,13 @@ class AllZeroEncoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,k]`.
+        inputs: [...,k], tf.float32
+            2+D tensor contaiming arbitrary values (not used!).
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,n]`.
+        : [...,n], tf.float32
+            2+D tensor containing all-zero codewords.
 
     Raises
     ------
@@ -80,8 +79,8 @@ class AllZeroEncoder(Layer):
         super().__init__(dtype=dtype, **kwargs)
 
         #assert error if r>1 or k,n are negativ
-        assert isinstance(k, numbers.Number), "k must be number."
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(k, numbers.Number), "k must be a number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         k = int(k) # k or n can be float (e.g. as result of n=k*r)
         n = int(n) # k or n can be float (e.g. as result of n=k*r)
         assert k>-1, "k cannot be negative."
@@ -170,15 +169,15 @@ class LDPC5GEncoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,k]` containing the information bits to be
+        inputs: [...,k], tf.float32
+            2+D tensor containing the information bits to be
             encoded.
 
     Output
     ------
-        : tf.float32
+        : [...,n], tf.float32
             2+D tensor of same shape as inputs besides last dimension has
-            changed to `[...,n]` containing the encoded codeword bits.
+            changed to `n` containing the encoded codeword bits.
 
     Attributes
     ----------
@@ -266,8 +265,8 @@ class LDPC5GEncoder(Layer):
 
         super().__init__(dtype=dtype, **kwargs)
 
-        assert isinstance(k, numbers.Number), "k must be number."
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(k, numbers.Number), "k must be a number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         k = int(k) # k or n can be float (e.g. as result of n=k*r)
         n = int(n) # k or n can be float (e.g. as result of n=k*r)
 

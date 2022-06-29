@@ -20,8 +20,8 @@ class LDPCBPDecoder(Layer):
     codes and other `codes on graphs`.
 
     This class defines a generic belief propagation decoder for decoding
-    of arbitrary parity-check matrices. It can be used to iteratively estimate/
-    recover the transmitted codeword (or information bits) based on the
+    with arbitrary parity-check matrices. It can be used to iteratively
+    estimate/recover the transmitted codeword (or information bits) based on the
     LLR-values of the received noisy codeword observation.
 
     The decoder implements the flooding SPA algorithm [Ryan]_, i.e., all nodes
@@ -113,7 +113,7 @@ class LDPCBPDecoder(Layer):
             the moment!).
 
         keep_state: bool
-            Defaults to False. If True, the decoder continues wth the internal
+            Defaults to False. If True, the decoder continues with the internal
             VN messages from the previous decoding iteration (required for IDD).
 
         output_dtype: tf.DType
@@ -122,14 +122,13 @@ class LDPCBPDecoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,n]` containing the channel logits/llr
-            values.
+        inputs: [...,n], tf.float32
+            2+D tensor containing the channel logits/llr values.
 
     Output
     ------
-        : tf.float32
-            2+D Tensor of same shape as ``inputs``, i.e., `[...,n]`, containing
+        : [...,n], tf.float32
+            2+D Tensor of same shape as ``inputs`` containing
             bit-wise soft-estimates (or hard-decided bit-values) of all
             codeword bits.
 
@@ -276,7 +275,6 @@ class LDPCBPDecoder(Layer):
         assert isinstance(hard_out, bool), 'hard_out must be bool.'
         assert isinstance(track_exit, bool), 'track_exit must be bool.'
         assert isinstance(cn_type, str) , 'cn_type must be str.'
-        assert isinstance(num_iter, int), 'num_iter must be int.'
         assert isinstance(num_iter, int), 'num_iter must be int.'
         assert num_iter>=0, 'num_iter cannot be negative.'
         assert isinstance(keep_state, bool), 'keep_state must be bool.'
@@ -499,7 +497,7 @@ class LDPCBPDecoder(Layer):
             if con[i] != cur_node:
                 node_mask.append(i)
                 cur_node += 1
-        node_mask.append(self._num_edges) # last element must be number of
+        node_mask.append(self._num_edges) # last element must be a number of
         # elements (delimiter)
         return node_mask
 
@@ -510,12 +508,23 @@ class LDPCBPDecoder(Layer):
         function. It takes the sum over all incoming messages ``msg`` excluding
         the intrinsic (= outgoing) message itself.
 
-        Additionally the channel LLR ``llr_ch`` is added to each message.
+        Additionally, the channel LLR ``llr_ch`` is added to each message.
         """
+        # aggregate all incoming messages per node
         x = tf.reduce_sum(msg, axis=1)
         x = tf.add(x, llr_ch)
-        x = tf.expand_dims(x, axis=1)
-        x = tf.add(-msg, x)
+
+        # TF2.9 does not support XLA for the addition of ragged tensors
+        # the following code provides a workaround that supports XLA
+
+        # subtract extrinsic message from node value
+        # x = tf.expand_dims(x, axis=1)
+        # x = tf.add(-msg, x)
+        add_ragged_tensors = lambda x, y, row_ind : x + tf.gather(y, row_ind)
+        x = tf.ragged.map_flat_values(add_ragged_tensors,
+                                      -1.*msg,
+                                      x,
+                                      msg.value_rowids())
         return x
 
     def _extrinsic_min(self, msg):
@@ -555,7 +564,7 @@ class LDPCBPDecoder(Layer):
         return msg_mod
 
     def _cn_update_tanh(self, msg):
-        """ Check node update function implementing the exact boxplus operation.
+        """Check node update function implementing the exact boxplus operation.
 
         This function implements the (extrinsic) check node update
         function. It calculates the boxplus function over all incoming messages
@@ -569,17 +578,27 @@ class LDPCBPDecoder(Layer):
         """
 
         msg = msg / 2
-        # tanh is not overleaded for ragged tensors
-        msg = tf.ragged.map_flat_values(tf.tanh, msg) # tanh is not overleaded
+        # tanh is not overloaded for ragged tensors
+        msg = tf.ragged.map_flat_values(tf.tanh, msg) # tanh is not overloaded
 
         # for ragged tensors; map to flat tensor first
         msg = tf.ragged.map_flat_values(self._where_ragged, msg)
 
         msg_prod= tf.reduce_prod(msg, axis=1)
 
-         # ^-1 to avoid division
-         # Note this is (potentially) numerically unstable
-        msg = msg**-1 * tf.expand_dims(msg_prod, axis=1) # remove own edge
+
+        # TF2.9 does not support XLA for the multiplication of ragged tensors
+        # the following code provides a workaround that supports XLA
+
+        # ^-1 to avoid division
+        # Note this is (potentially) numerically unstable
+        # msg = msg**-1 * tf.expand_dims(msg_prod, axis=1) # remove own edge
+
+        mult_ragged_tensor = lambda x, y, row_ind : x * tf.gather(y, row_ind)
+        msg = tf.ragged.map_flat_values(mult_ragged_tensor,
+                                        msg**-1,
+                                        msg_prod,
+                                        msg.value_rowids())
 
         # Overwrite small (numerical zeros) message values with exact zero
         # these are introduced by the previous "_where_ragged" operation
@@ -591,12 +610,12 @@ class LDPCBPDecoder(Layer):
                                clip_value_min=-self._atanh_clip_value,
                                clip_value_max=self._atanh_clip_value)
 
-        # atanh is not overleaded for ragged tensors
+        # atanh is not overloaded for ragged tensors
         msg = 2 * tf.ragged.map_flat_values(tf.atanh, msg)
         return msg
 
     def _phi(self, x):
-        """ Helper function for the check node update.
+        """Helper function for the check node update.
 
         This function implements the (element-wise) `"_phi"` function as defined
         in [Ryan]_.
@@ -606,7 +625,7 @@ class LDPCBPDecoder(Layer):
         return tf.math.log(tf.math.exp(x)+1) - tf.math.log(tf.math.exp(x)-1)
 
     def _cn_update_phi(self, msg):
-        """ Check node update function implementing the exact boxplus operation.
+        """Check node update function implementing the exact boxplus operation.
 
         This function implements the (extrinsic) check node update function
         based on the numerically more stable `"_phi"` function (cf. [Ryan]_).
@@ -628,16 +647,34 @@ class LDPCBPDecoder(Layer):
                             sign_val)
 
         sign_node = tf.reduce_prod(sign_val, axis=1)
-        sign_val = sign_val * tf.expand_dims(sign_node, axis=1)
+
+        # TF2.9 does not support XLA for the multiplication of ragged tensors
+        # the following code provides a workaround that supports XLA
+
+        # sign_val = sign_val * tf.expand_dims(sign_node, axis=1)
+        mult_ragged_tensor = lambda x, y, row_ind : x * tf.gather(y, row_ind)
+        sign_val = tf.ragged.map_flat_values(mult_ragged_tensor,
+                                             sign_val,
+                                             sign_node,
+                                             sign_val.value_rowids())
 
         msg = tf.ragged.map_flat_values(tf.abs, msg) # remove sign
 
-        # apply _phi element-wise (does not suppport ragged Tensors)
+        # apply _phi element-wise (does not support ragged Tensors)
         msg = tf.ragged.map_flat_values(self._phi, msg)
         msg_sum = tf.reduce_sum(msg, axis=1)
-        msg = tf.add( -msg, tf.expand_dims(msg_sum, axis=1)) # remove own edge
 
-        # apply _phi element-wise (does not suppport ragged Tensors)
+        # TF2.9 does not support XLA for the addition of ragged tensors
+        # the following code provides a workaround that supports XLA
+
+        # msg = tf.add( -msg, tf.expand_dims(msg_sum, axis=1)) # remove own edge
+        add_ragged_tensor = lambda x, y, row_ind : x + tf.gather(y, row_ind)
+        msg = tf.ragged.map_flat_values(add_ragged_tensor,
+                                        -1.*msg,
+                                        msg_sum,
+                                        msg.value_rowids())
+
+        # apply _phi element-wise (does not support ragged Tensors)
         msg = self._stop_ragged_gradient(sign_val) * tf.ragged.map_flat_values(
                                                             self._phi, msg)
         return msg
@@ -648,8 +685,8 @@ class LDPCBPDecoder(Layer):
         return rt.with_flat_values(tf.stop_gradient(rt.flat_values))
 
     def _sign_val_minsum(self, msg):
-        """Helper to replace find sign during min-sum (called with
-        `map_flat_values`)"""
+        """Helper to replace find sign-value during min-sum decoding.
+        Must be called with `map_flat_values`."""
 
         sign_val = tf.sign(msg)
         sign_val = tf.where(tf.equal(sign_val, 0),
@@ -708,7 +745,7 @@ class LDPCBPDecoder(Layer):
         # a constant used overwrite the first min
         LARGE_VAL = 10000. # pylint: disable=invalid-name
 
-        # clipp values for numerical stability
+        # clip values for numerical stability
         msg = tf.clip_by_value(msg,
                                clip_value_min=-self._llr_max_minsum,
                                clip_value_max=self._llr_max_minsum)
@@ -717,8 +754,17 @@ class LDPCBPDecoder(Layer):
         sign_val = tf.ragged.map_flat_values(self._sign_val_minsum, msg)
 
         sign_node = tf.reduce_prod(sign_val, axis=1)
-        sign_val = self._stop_ragged_gradient(sign_val) * tf.expand_dims(
-                                                             sign_node, axis=1)
+
+        # TF2.9 does not support XLA for the multiplication of ragged tensors
+        # the following code provides a workaround that supports XLA
+
+        # sign_val = self._stop_ragged_gradient(sign_val) \
+        #             * tf.expand_dims(sign_node, axis=1)
+        mult_rt = lambda x, y, row_ind: tf.multiply(x, tf.gather(y, row_ind))
+        sign_val = tf.ragged.map_flat_values(mult_rt,
+                                        self._stop_ragged_gradient(sign_val),
+                                        sign_node,
+                                        sign_val.value_rowids())
 
         msg = tf.ragged.map_flat_values(tf.abs, msg) # remove sign
 
@@ -727,14 +773,23 @@ class LDPCBPDecoder(Layer):
         # However, in some cases the second smallest value may equal the
         # smallest value (multiplicity of mins).
         # Please note that this needs to be applied to raggedTensors, e.g.,
-        # tf.top_k() is currently not supported and the ops must support graph # mode.
+        # tf.top_k() is currently not supported and the ops must support graph
+        # # mode.
 
         # find min_value per node
         min_val = tf.reduce_min(msg, axis=1, keepdims=True)
 
-        # and substract min; the new array contains zero at the min positions
+        # TF2.9 does not support XLA for the subtraction of ragged tensors
+        # the following code provides a workaround that supports XLA
+
+        # and subtract min; the new array contains zero at the min positions
         # benefits from broadcasting; all other values are positive
-        msg_min1 = msg - min_val
+        # msg_min1 = msg - min_val
+        sub_ragged_tensor = lambda x, y, row_ind: x- tf.gather(y, row_ind)
+        msg_min1 = tf.ragged.map_flat_values(sub_ragged_tensor,
+                                             msg,
+                                             tf.squeeze(min_val, axis=1),
+                                             msg.value_rowids())
 
         # replace 0 (=min positions) with large value to ignore it for further
         # min calculations
@@ -743,7 +798,7 @@ class LDPCBPDecoder(Layer):
                                         msg_min1)
 
         # find the second smallest element (we add min_val as this has been
-        # substracted before)
+        # subtracted before)
         min_val2 = tf.reduce_min(msg, axis=1, keepdims=True) + min_val
 
         # Detect duplicated minima (i.e., min_val occurs at two incoming
@@ -769,8 +824,14 @@ class LDPCBPDecoder(Layer):
                                     tf.ensure_shape(x, msg.flat_values.shape),
                                           msg_e)
 
+        # TF2.9 does not support XLA for the multiplication of ragged tensors
+        # the following code provides a workaround that supports XLA
+
         # and apply sign
-        msg = sign_val * msg_e
+        #msg = sign_val * msg_e
+        msg = tf.ragged.map_flat_values(tf.multiply,
+                                        sign_val,
+                                        msg_e)
 
         return msg
 
@@ -795,8 +856,8 @@ class LDPCBPDecoder(Layer):
     def call(self, inputs):
         """Iterative BP decoding function.
 
-        This function performs ``num_iter`` belief progation decoding iterations
-        and returns the estimated codeword.
+        This function performs ``num_iter`` belief propagation decoding
+        iterations and returns the estimated codeword.
 
         Args:
             inputs (tf.float32): Tensor of shape `[...,n]` containing the
@@ -1016,14 +1077,13 @@ class LDPC5GDecoder(LDPCBPDecoder):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,n]` containing the channel logits/llr
-            values.
+        inputs: [...,n], tf.float32
+            2+D tensor containing the channel logits/llr values.
 
     Output
     ------
-        : tf.float32
-            2+D Tensor of shape `[...,n]`, or `[...,k]`
+        : [...,n], or [...,k], tf.float32
+            2+D tensor of shape `[...,n]`, or `[...,k]`
             if ``return_infobits`` is True, containing bit-wise soft-estimates
             (or hard-decided bit-values) of all codeword bits (or info
             bits, respectively).
@@ -1190,8 +1250,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
     def call(self, inputs):
         """Iterative BP decoding function.
 
-        This function performs ``num_iter`` belief progation decoding iterations
-        and returns the estimated codeword.
+        This function performs ``num_iter`` belief propagation decoding
+        iterations and returns the estimated codeword.
 
         Args:
             inputs (tf.float32): Tensor of shape `[...,n]` containing the

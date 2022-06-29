@@ -8,9 +8,11 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
 from importlib_resources import files, as_file
 from sionna.fec.ldpc import codes
 from sionna.utils.misc import log2
+
 
 class GaussianPriorSource(Layer):
     r"""GaussianPriorSource(specified_by_mi=False, dtype=tf.float32, **kwargs)
@@ -636,7 +638,7 @@ def load_parity_check_examples(pcm_id, verbose=False):
             An integer defining which matrix id to load.
 
         verbose : bool
-            A boolean defaults to False. If True, the code parameters are
+            Defaults to False. If True, the code parameters are
             printed.
 
     Output
@@ -814,11 +816,12 @@ def alist2mat(alist, verbose=True):
         Use :class:`~sionna.fec.utils.load_alist` to import alist from a
         textfile.
 
-        For example the following code snippet will import an alist from a file called ``filename``:
+        For example, the following code snippet will import an alist from a file called ``filename``:
 
         .. code-block:: python
 
-            pcm, k, n, coderate = alist2mat(load_alist(path = filename))
+            al = load_alist(path = filename)
+            pcm, k, n, coderate = alist2mat(al)
     """
 
     assert len(alist)>4, "Invalid alist format."
@@ -908,3 +911,450 @@ def load_alist(path):
                 alist.append(l)
 
     return alist
+
+def make_systematic(mat, is_pcm=False):
+    r"""Bring binary matrix in its systematic form.
+
+    Input
+    -----
+    mat : ndarray
+        Binary matrix to be transformed to systematic form of shape `[k, n]`.
+
+    is_pcm: bool
+        Defaults to False. If true, ``mat`` is interpreted as parity-check
+        matrix and, thus, the last k columns will be the identity part.
+
+    Output
+    ------
+    mat_sys: ndarray
+        Binary matrix in systematic form, i.e., the first `k` columns equal the
+        identity matrix (or last `k` if ``is_pcm`` is True).
+
+    column_swaps: list of int tuples
+        A list of integer tuples that describes the swapped columns (in the
+        order of execution).
+
+    Note
+    ----
+    This algorithm (potentially) swaps columns of the input matrix. Thus, the
+    resulting systematic matrix (potentially) relates to a permuted version of
+    the code, this is defined by the returned list ``column_swap``.
+    Note that, the inverse permutation must be applied in the inverse list
+    order (in case specific columns are swapped multiple times).
+
+    If a parity-check matrix is passed as input (i.e., ``is_pcm`` is True), the
+    identity part will be re-arranged to the last columns."""
+
+    m = mat.shape[0]
+    n = mat.shape[1]
+
+    assert m<=n, "Invalid matrix dimensions."
+
+    # check for all-zero columns (=unchecked nodes)
+    if is_pcm:
+        c_node_deg = np.sum(mat, axis=0)
+        if np.any(c_node_deg==0):
+            warnings.warn("All-zero column in parity-check matrix detected. " \
+                "It seems as if the code contains unprotected nodes.")
+
+    mat = np.copy(mat)
+    column_swaps = [] # store all column swaps
+
+    # convert to bool for faster arithmetics
+    mat = mat.astype(bool)
+
+    # bring in upper triangular form
+    for idx_c in range(m):
+        success = False
+        # step 1: find next leading "1"
+        for idx_r in range(idx_c,m):
+            # skip if entry is "0"
+            if mat[idx_r, idx_c]:
+                mat[[idx_c, idx_r]] = mat[[idx_r, idx_c]] # swap rows
+                success = True
+                break
+
+        # Could not find "1"-entry for column idx_c
+        # => swap with columns from non-sys part
+        # The task is to find a column with index idx_cc that has a "1" at
+        # row idx_c
+        if not success:
+            for idx_cc in range(m, n):
+                if mat[idx_c, idx_cc]:
+                    # swap columns
+                    mat[:,[idx_c, idx_cc]] = mat[:,[idx_cc, idx_c]]
+                    column_swaps.append([idx_c, idx_cc])
+                    success=True
+                    break
+
+        if not success:
+            raise ValueError("Could not succeed; mat is not full rank?")
+
+        # we can now assume a leading "1" at row idx_c
+        for idx_r in range(idx_c+1, m):
+            if mat[idx_r, idx_c]:
+                mat[idx_r,:] ^= mat[idx_c,:] # bin. add of row idx_c to idx_r
+
+    # remove upper triangle part in inverse order
+    for idx_c in range(m-1, -1, -1):
+        for idx_r in range(idx_c-1, -1, -1):
+            if mat[idx_r, idx_c]:
+                mat[idx_r,:] ^= mat[idx_c,:] # bin. add of row idx_c to idx_r
+
+    # verify results
+    assert np.array_equal(mat[:,:m], np.eye(m)), \
+                            "Internal error, could not find systematic matrix."
+
+    # bring identity part to end of matrix if parity-check matrix is provided
+    if is_pcm:
+        im = np.copy(mat[:,:m])
+        mat[:,:m] = mat[:,-m:]
+        mat[:,-m:] = im
+        # and track column swaps
+        for idx in range(m):
+            column_swaps.append([idx, n-m+idx])
+
+    # return integer array
+    mat = mat.astype(int)
+    return mat, column_swaps
+
+def gm2pcm(gm, verify_results=True):
+    r"""Generate the parity-check matrix for a given generator matrix.
+
+    This function brings ``gm`` :math:`\mathbf{G}` in its systematic form and
+    uses the following relation to find the parity-check matrix
+    :math:`\mathbf{H}` in GF(2)
+
+    .. math::
+
+        \mathbf{G} = [\mathbf{I} |  \mathbf{M}]
+        \Leftrightarrow \mathbf{H} = [\mathbf{M} ^t | \mathbf{I}]. \tag{1}
+
+    This follows from the fact that for an all-zero syndrome, it must hold that
+
+    .. math::
+
+        \mathbf{H} \mathbf{c}^t = \mathbf{H} * (\mathbf{u} * \mathbf{G})^t =
+        \mathbf{H} * \mathbf{G} ^t * \mathbf{u}^t =: \mathbf{0}
+
+    where :math:`\mathbf{c}` denotes an arbitrary codeword and
+    :math:`\mathbf{u}` the corresponding information bits.
+
+    This leads to
+
+    .. math::
+
+     \mathbf{G} * \mathbf{H} ^t =: \mathbf{0}. \tag{2}
+
+    It can be seen that (1) fulfills (2), as it holds in GF(2) that
+
+    .. math::
+
+        [\mathbf{I} |  \mathbf{M}] * [\mathbf{M} ^t | \mathbf{I}]^t
+         = \mathbf{M} + \mathbf{M} = \mathbf{0}.
+
+    Input
+    -----
+    gm : ndarray
+        Binary generator matrix of shape `[k, n]`.
+
+    verify_results: bool
+        Defaults to True. If True, it is verified that the generated
+        parity-check matrix is orthogonal to the generator matrix in GF(2).
+
+    Output
+    ------
+    : ndarray
+        Binary parity-check matrix of shape `[n-k, n]`.
+
+    Note
+    ----
+    This algorithm only works if ``gm`` has full rank. Otherwise an error is
+    raised.
+
+    """
+    k = gm.shape[0]
+    n = gm.shape[1]
+
+    assert k<n, "Invalid matrix dimensions."
+
+    # bring gm in systematic form
+    gm_sys, c_swaps = make_systematic(gm, is_pcm=False)
+
+    m_mat = np.transpose(np.copy(gm_sys[:,-(n-k):]))
+    i_mat = np.eye(n-k)
+
+    pcm = np.concatenate((m_mat, i_mat), axis=1)
+
+    # undo column swaps
+    for l in c_swaps[::-1]: # reverse ordering when going through list
+        pcm[:,[l[0], l[1]]] = pcm[:,[l[1], l[0]]] # swap columns
+
+    if verify_results:
+        assert verify_gm_pcm(gm=gm, pcm=pcm), \
+            "Resulting parity-check matrix does not match to generator matrix."
+
+    return pcm
+
+def pcm2gm(pcm, verify_results=True):
+    r"""Generate the generator matrix for a given parity-check matrix.
+
+    This function brings ``pcm`` :math:`\mathbf{H}` in its systematic form and
+    uses the following relation to find the generator matrix
+    :math:`\mathbf{G}` in GF(2)
+
+    .. math::
+
+        \mathbf{G} = [\mathbf{I} |  \mathbf{M}]
+        \Leftrightarrow \mathbf{H} = [\mathbf{M} ^t | \mathbf{I}]. \tag{1}
+
+    This follows from the fact that for an all-zero syndrome, it must hold that
+
+    .. math::
+
+        \mathbf{H} \mathbf{c}^t = \mathbf{H} * (\mathbf{u} * \mathbf{G})^t =
+        \mathbf{H} * \mathbf{G} ^t * \mathbf{u}^t =: \mathbf{0}
+
+    where :math:`\mathbf{c}` denotes an arbitrary codeword and
+    :math:`\mathbf{u}` the corresponding information bits.
+
+    This leads to
+
+    .. math::
+
+     \mathbf{G} * \mathbf{H} ^t =: \mathbf{0}. \tag{2}
+
+    It can be seen that (1) fulfills (2) as in GF(2) it holds that
+
+    .. math::
+
+        [\mathbf{I} |  \mathbf{M}] * [\mathbf{M} ^t | \mathbf{I}]^t
+         = \mathbf{M} + \mathbf{M} = \mathbf{0}.
+
+    Input
+    -----
+    pcm : ndarray
+        Binary parity-check matrix of shape `[n-k, n]`.
+
+    verify_results: bool
+        Defaults to True. If True, it is verified that the generated
+        generator matrix is orthogonal to the parity-check matrix in GF(2).
+
+    Output
+    ------
+    : ndarray
+        Binary generator matrix of shape `[k, n]`.
+
+    Note
+    ----
+    This algorithm only works if ``pcm`` has full rank. Otherwise an error is
+    raised.
+
+    """
+    n = pcm.shape[1]
+    k = n - pcm.shape[0]
+
+    assert k<n, "Invalid matrix dimensions."
+
+    # bring pcm in systematic form
+    pcm_sys, c_swaps = make_systematic(pcm, is_pcm=True)
+
+    m_mat = np.transpose(np.copy(pcm_sys[:,:k]))
+    i_mat = np.eye(k)
+    gm = np.concatenate((i_mat, m_mat), axis=1)
+
+    # undo column swaps
+    for l in c_swaps[::-1]: # reverse ordering when going through list
+        gm[:,[l[0], l[1]]] = gm[:,[l[1], l[0]]] # swap columns
+
+    if verify_results:
+        assert verify_gm_pcm(gm=gm, pcm=pcm), \
+            "Resulting parity-check matrix does not match to generator matrix."
+    return gm
+
+def verify_gm_pcm(gm, pcm):
+    r"""Verify that generator matrix :math:`\mathbf{G}` ``gm`` and parity-check
+    matrix :math:`\mathbf{H}` ``pcm`` are orthogonal in GF(2).
+
+    For an all-zero syndrome, it must hold that
+
+    .. math::
+
+        \mathbf{H} \mathbf{c}^t = \mathbf{H} * (\mathbf{u} * \mathbf{G})^t =
+        \mathbf{H} * \mathbf{G} ^t * \mathbf{u}^t =: \mathbf{0}
+
+    where :math:`\mathbf{c}` denotes an arbitrary codeword and
+    :math:`\mathbf{u}` the corresponding information bits.
+
+    As :math:`\mathbf{u}` can be arbitrary it follows that
+
+    .. math::
+        \mathbf{H} * \mathbf{G} ^t =: \mathbf{0}.
+
+    Input
+    -----
+    gm : ndarray
+        Binary generator matrix of shape `[k, n]`.
+
+    pcm : ndarray
+        Binary parity-check matrix of shape `[n-k, n]`.
+
+    Output
+    ------
+    : bool
+        True if ``gm`` and ``pcm`` define a valid pair of parity-check and
+        generator matrices in GF(2).
+    """
+
+    # check for valid dimensions
+    k = gm.shape[0]
+    n = gm.shape[1]
+
+    n_pcm = pcm.shape[1]
+    k_pcm = n_pcm - pcm.shape[0]
+
+    assert k==k_pcm, "Inconsistent shape of gm and pcm."
+    assert n==n_pcm, "Inconsistent shape of gm and pcm."
+
+    # check that both matrices are binary
+    assert ((gm==0) | (gm==1)).all(), "gm is not binary."
+    assert ((pcm==0) | (pcm==1)).all(), "pcm is not binary."
+
+    # check for zero syndrome
+    s = np.mod(np.matmul(pcm, np.transpose(gm)), 2) # mod2 to account for GF(2)
+    return np.sum(s)==0 # Check for Non-zero syndrom of H*G'
+
+class LinearEncoder(Layer):
+    # pylint: disable=line-too-long
+    r"""LinearEncoder(enc_mat, is_pcm=False, dtype=tf.float32, **kwargs)
+
+    Linear binary encoder for a given encoding matrix ``enc_mat``.
+
+    If ``is_pcm`` is True, ``enc_mat`` is interpreted as parity-check
+    matrix and internally converted to a corresponding generator matrix.
+
+    The class inherits from the Keras layer class and can be used as layer in a
+    Keras model.
+
+    Parameters
+    ----------
+    enc_mat : [k, n] or [n-k, n], ndarray
+        Binary generator matrix of shape `[k, n]`. If ``is_pcm`` is
+        True, ``enc_mat`` is interpreted as parity-check matrix of shape
+        `[n-k, n]`.
+
+    dtype: tf.DType
+        Defaults to `tf.float32`. Defines the datatype for the output dtype.
+
+    Input
+    -----
+    inputs: [...,k], tf.float32
+        2+D tensor containing information bits.
+
+    Output
+    ------
+    : [...,n], tf.float32
+        2+D tensor containing codewords with same shape as inputs, except the
+        last dimension changes to `[...,n]`.
+
+    Raises
+    ------
+    AssertionError
+        If the encoding matrix is not a valid binary 2-D matrix.
+
+    Note
+    ----
+        If ``is_pcm`` is True, this layer uses
+        :class:`~sionna.fec.utils.pcm2gm` to find the generator matrix for
+        encoding. Please note that this imposes a few constraints on the
+        provided parity-check matrix such as full rank and it must be binary.
+
+        Note that this encoder is generic for all binary linear block codes
+        and, thus, cannot implement any code specifc optimizations. As a
+        result, the encoding complexity is :math:`O(k^2)`. Please consider code
+        specific encoders such as the
+        :class:`~sionna.fec.polar.encoding.Polar5GEncoder` or
+        :class:`~sionna.fec.ldpc.encoding.LDPC5GEncoder` for an improved
+        encoding performance.
+    """
+
+    def __init__(self,
+                 enc_mat,
+                 is_pcm=False,
+                 dtype=tf.float32,
+                 **kwargs):
+
+        super().__init__(dtype=dtype, **kwargs)
+
+        # tf.int8 currently not supported by tf.matmult
+        assert (dtype in
+               (tf.float16, tf.float32, tf.float64, tf.int32, tf.int64)), \
+               "Unsupported dtype."
+
+        # check input values for consistency
+        assert isinstance(is_pcm, bool), \
+                                    'is_parity_check must be bool.'
+
+        # verify that enc_mat is binary
+        assert ((enc_mat==0) | (enc_mat==1)).all(), "enc_mat is not binary."
+        assert (len(enc_mat.shape)==2), "enc_mat must be 2-D array."
+
+        # in case parity-check matrix is provided, convert to generator matrix
+        if is_pcm:
+            self._gm = pcm2gm(enc_mat, verify_results=True)
+        else:
+            self._gm = enc_mat
+
+        self._k = self._gm.shape[0]
+        self._n = self._gm.shape[1]
+        self._coderate = self._k / self._n
+
+        assert (self._k<=self._n), "Invalid matrix dimensions."
+
+        self._gm = tf.cast(self._gm, dtype=self.dtype)
+
+    #########################################
+    # Public methods and properties
+    #########################################
+
+    @property
+    def k(self):
+        """Number of information bits per codeword."""
+        return self._k
+
+    @property
+    def n(self):
+        "Codeword length."
+        return self._n
+
+    @property
+    def gm(self):
+        "Generator matrix used for encoding."
+        return self._gn
+
+    @property
+    def coderate(self):
+        """Coderate of the code."""
+        return self._coderate
+
+    #########################
+    # Keras layer functions
+    #########################
+
+    def build(self, input_shape):
+        """Nothing to build, but check for valid shapes."""
+        assert input_shape[-1]==self._k, "Invalid input shape."
+        assert (len(input_shape)>=2), 'The inputs must have at least rank 2.'
+
+    def call(self, inputs):
+        """Generic encoding function based on generator matrix multiplication.
+        """
+
+        c = tf.linalg.matmul(inputs, self._gm)
+
+        # faster implementation of tf.math.mod(c, 2)
+        c_uint8 = tf.cast(c, tf.uint8)
+        c_bin = tf.bitwise.bitwise_and(c_uint8, tf.constant(1, tf.uint8))
+        c = tf.cast(c_bin, self.dtype)
+
+        return c

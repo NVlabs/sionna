@@ -32,13 +32,13 @@ class TestAllZeroEncoder(unittest.TestCase):
     def test_invalid_inputs(self):
         """Test against invalid values of n and k."""
 
-        param_invalid = [[-1, 10],[10,-3],["a", 10],[3, "10"],[10,9]] # (k,n)
+        param_invalid = [[-1, 10],[10, -3],["a", 10],[3, "10"],[10, 9]] # (k,n)
         for p in param_invalid:
             with self.assertRaises(AssertionError):
                 AllZeroEncoder(p[0], p[1])
 
         # (k,n)
-        param_valid = [[1, 10],[10,30],[1000, 1566],[3, 1013], [10,10], [0,1]]
+        param_valid = [[1, 10],[10, 30],[1000, 1566],[3, 1013],[10, 10],[0, 1]]
         for p in param_valid:
             AllZeroEncoder(p[0], p[1])
 
@@ -203,11 +203,10 @@ class TestLDPC5GEncoder(unittest.TestCase):
         bs = 20
         k = 100
         n = 200
-        u = np.zeros([bs, k])
         enc = LDPC5GEncoder(k+1, n)
         # test for non-binary input
         with self.assertRaises(BaseException):
-            x = enc(tf.constant(u, dtype=tf.float32))
+            x = enc(tf.zeros([bs, k]))
 
     def test_example_matrices(self):
         """test against reference matrices.
@@ -249,7 +248,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
 
             u = source([bs, k]) # random info bits
             enc = LDPC5GEncoder(k, n)
-            c = enc(tf.constant(u, dtype=tf.float32))
+            c = enc(u)
 
             # direct encoding
             # add dim for matrix/vect. mult.
@@ -263,13 +262,12 @@ class TestLDPC5GEncoder(unittest.TestCase):
             self.assertTrue(np.array_equal(c, c_ref),
                             "not equal for k={}, n={}".format(k, n))
 
-
     def test_multi_dimensional(self):
         """Test against arbitrary shapes.
         """
         k = 100
         n = 200
-        shapes =[[10, 20, 30, k], [1, 40, k],[10,2,3,4,3,k]]
+        shapes =[[10, 20, 30, k], [1, 40, k],[10, 2 ,3, 4, 3, k]]
         enc = LDPC5GEncoder(k, n)
 
         for s in shapes:
@@ -300,10 +298,10 @@ class TestLDPC5GEncoder(unittest.TestCase):
         x = LDPC5GEncoder(k, n)(inputs)
         model = tf.keras.Model(inputs=inputs, outputs=x)
 
-        b = source([bs,k])
+        b = source([bs, k])
         model(b)
         # call twice to see that bs can change
-        b2 = source([bs+1,k])
+        b2 = source([bs+1, k])
         model(b2)
         model.summary()
 
@@ -326,7 +324,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
         enc = LDPC5GEncoder(k, n)
         source = BinarySource()
 
-        u = source([bs,k])
+        u = source([bs, k])
         run_graph(u)
         run_graph_xla(u)
 

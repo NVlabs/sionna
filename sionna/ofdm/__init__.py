@@ -10,6 +10,7 @@ from .resource_grid import ResourceGrid, RemoveNulledSubcarriers, ResourceGridMa
 from .pilot_pattern import PilotPattern, EmptyPilotPattern, KroneckerPilotPattern
 from .modulator import OFDMModulator
 from .demodulator import OFDMDemodulator
-from .channel_estimation import LSChannelEstimator, NearestNeighborInterpolator
+from .channel_estimation import LSChannelEstimator, NearestNeighborInterpolator, LinearInterpolator
 from .equalization import LMMSEEqualizer
+from .detection import MaximumLikelihoodDetector
 from .precoding import ZFPrecoder

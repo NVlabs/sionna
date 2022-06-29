@@ -25,7 +25,9 @@ if gpus:
         tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
     except Runtime as e:
         print(e)
-from sionna.fec.polar.utils import generate_5g_ranking, generate_rm_code
+from sionna.fec.polar.utils import generate_5g_ranking, generate_rm_code, generate_dense_polar
+from sionna.fec.polar import PolarEncoder
+from sionna.utils import BinarySource
 
 class TestPolarUtils(unittest.TestCase):
     """Test polar utils.
@@ -70,3 +72,58 @@ class TestPolarUtils(unittest.TestCase):
             self.assertEqual(d_min, p[4])
             self.assertEqual(len(frozen_pos), n-k)
             self.assertEqual(len(info_pos), k)
+
+    def test_generate_dense_polar(self):
+        """test naive (dense) polar code construction method."""
+
+        # sweep over many code parameters
+        ns = [32, 64, 128, 256, 512, 1024]
+        rates = [0.1, 0.5, 0.9]
+        batch_size = 100
+        source = BinarySource()
+
+        for n in ns:
+            for r in rates:
+                k = int(n*r)
+
+                frozen_pos, _ = generate_5g_ranking(k, n)
+
+                # run method under test
+                pcm, gm = generate_dense_polar(frozen_pos, n, verbose=False)
+
+                # cast dtype to tf.float32
+                gm = tf.cast(gm, dtype=tf.float32)
+                pcm = tf.cast(pcm, dtype=tf.float32)
+
+                # verify shapes
+                self.assertTrue(pcm.shape[0]==n-k)
+                self.assertTrue(pcm.shape[1]==n)
+                self.assertTrue(gm.shape[0]==k)
+                self.assertTrue(gm.shape[1]==n)
+
+                # Verify that H*G has an all-zero syndrome.
+                s = np.mod(np.matmul(pcm, np.transpose(gm)),2)
+                self.assertTrue(np.sum(s)==0) # Non-zero syndrom for H*G'
+
+                # compare against Sionna encoder
+                encoder = PolarEncoder(frozen_pos, n)
+
+                # draw random info bits
+                u = source([batch_size, k])
+                # and encode as reference
+                c = encoder(u)
+
+                # encode via generator matrix
+                c_new = tf.matmul(tf.expand_dims(u, axis=1), gm)
+                # account for GF(2) operations
+                c_new = tf.math.mod(tf.squeeze(c_new, axis=1), 2)
+
+                # both encodings must lead to same result
+                self.assertTrue(np.array_equal(c, c_new.numpy()))
+
+                # verify H, i.e., must lead to zero syndrome: Hc^t=0
+                s = tf.matmul(pcm, tf.expand_dims(c, axis=2))
+                # account for GF(2) operations
+                s = tf.math.mod(tf.squeeze(s, axis=2), 2)
+                self.assertTrue(np.array_equal(s.numpy(),
+                                               np.zeros_like(s.numpy())))

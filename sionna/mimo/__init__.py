@@ -7,5 +7,6 @@
 """
 
 from .equalization import lmmse_equalizer
+from .detection import MaximumLikelihoodDetector
 from .precoding import zero_forcing_precoder
 from .stream_management import StreamManagement

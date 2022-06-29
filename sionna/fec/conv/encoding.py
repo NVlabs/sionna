@@ -39,16 +39,17 @@ class ConvEncoder(Layer):
 
     Input
     -----
-        tf.float32
-            2+D tensor of shape `[...,k]`. `k` is the information length.
+        inputs : [...,k], tf.float32
+            2+D tensor containing the information bits where `k` is the
+            information length.
 
     Output
     ------
-        tf.float32
-            2+D tensor of shape `[...,k/rate]` where `rate` is
+        : [...,k/rate], tf.float32
+            2+D tensor containing the encoded codeword for the given input
+            information tensor where`rate` is
             :math:`\frac{1}{len\left(\textrm{gen_poly}\right)}`
-            (if ``gen_poly`` is provided). Output is encoded codeword for the
-            input information tensor.
+            (if ``gen_poly`` is provided).
 
     Note
     ----
