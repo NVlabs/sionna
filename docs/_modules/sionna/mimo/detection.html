@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.channel.apply_ofdm_channel &mdash; Sionna 0.10.0 documentation</title>
+  <title>sionna.mimo.detection &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -514,35 +514,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customfilter">CustomFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id1">Filter</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#window-functions">Window functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hannwindow">HannWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hammingwindow">HammingWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customwindow">CustomWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id2">Window</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#convolve">convolve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#fft">fft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#ifft">ifft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#upsampling">Upsampling</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#downsampling">Downsampling</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-psd">empirical_psd</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/utils.html">Utility Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#metrics">Metrics</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#biterrorrate">BitErrorRate</a></li>
@@ -602,7 +573,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>sionna.channel.apply_ofdm_channel</li>
+      <li>sionna.mimo.detection</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -611,113 +582,379 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for sionna.channel.apply_ofdm_channel</h1><div class="highlight"><pre>
+  <h1>Source code for sionna.mimo.detection</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
 <span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Layer for applying OFDM channel: single-tap channel response in the frequency</span>
-<span class="sd">domain</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;Classes and functions related to MIMO channel detection&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">expand_to_rank</span><span class="p">,</span> <span class="n">matrix_sqrt_inv</span>
+<span class="kn">from</span> <span class="nn">sionna.mapping</span> <span class="kn">import</span> <span class="n">Constellation</span><span class="p">,</span> <span class="n">SymbolLogits2LLRs</span>
 
-<span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">expand_to_rank</span>
-<span class="kn">from</span> <span class="nn">.awgn</span> <span class="kn">import</span> <span class="n">AWGN</span>
 
-<div class="viewcode-block" id="ApplyOFDMChannel"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.ApplyOFDMChannel">[docs]</a><span class="k">class</span> <span class="nc">ApplyOFDMChannel</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+<div class="viewcode-block" id="MaximumLikelihoodDetector"><a class="viewcode-back" href="../../../api/mimo.html#sionna.mimo.MaximumLikelihoodDetector">[docs]</a><span class="k">class</span> <span class="nc">MaximumLikelihoodDetector</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ApplyOFDMChannel(add_awgn=True, dtype=tf.complex64, **kwargs)</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    MaximumLikelihoodDetector(output, demapping_method, k, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
 
-<span class="sd">    Apply single-tap channel frequency responses to channel inputs.</span>
+<span class="sd">    MIMO maximum-likelihood (ML) detector.</span>
 
-<span class="sd">    This class inherits from the Keras `Layer` class and can be used as layer</span>
-<span class="sd">    in a Keras model.</span>
-
-<span class="sd">    For each OFDM symbol :math:`s` and subcarrier :math:`n`, the single-tap channel</span>
-<span class="sd">    is applied as follows:</span>
+<span class="sd">    This layer implements MIMO maximum-likelihood (ML) detection assuming the</span>
+<span class="sd">    following channel model:</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        y_{s,n} = \widehat{h}_{s, n} x_{s,n} + w_{s,n}</span>
+<span class="sd">        \mathbf{y} = \mathbf{H}\mathbf{x} + \mathbf{n}</span>
 
-<span class="sd">    where :math:`y_{s,n}` is the channel output computed by this layer,</span>
-<span class="sd">    :math:`\widehat{h}_{s, n}` the frequency channel response (``h_freq``),</span>
-<span class="sd">    :math:`x_{s,n}` the channel input ``x``, and :math:`w_{s,n}` the additive noise.</span>
+<span class="sd">    where :math:`\mathbf{y}\in\mathbb{C}^M` is the received signal vector,</span>
+<span class="sd">    :math:`\mathbf{x}\in\mathcal{C}^K` is the vector of transmitted symbols which</span>
+<span class="sd">    are uniformly and independently drawn from the constellation :math:`\mathcal{C}`,</span>
+<span class="sd">    :math:`\mathbf{H}\in\mathbb{C}^{M\times K}` is the known channel matrix,</span>
+<span class="sd">    and :math:`\mathbf{n}\in\mathbb{C}^M` is a complex Gaussian noise vector.</span>
+<span class="sd">    It is assumed that :math:`\mathbb{E}\left[\mathbf{n}\right]=\mathbf{0}` and</span>
+<span class="sd">    :math:`\mathbb{E}\left[\mathbf{n}\mathbf{n}^{\mathsf{H}}\right]=\mathbf{S}`,</span>
+<span class="sd">    where :math:`\mathbf{S}` has full rank.</span>
 
-<span class="sd">    For multiple-input multiple-output (MIMO) links, the channel output is computed for each antenna</span>
-<span class="sd">    of each receiver and by summing over all the antennas of all transmitters.</span>
+<span class="sd">    Prior to demapping, the received signal is whitened:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \tilde{\mathbf{y}} &amp;= \mathbf{S}^{-\frac{1}{2}}\mathbf{y}\\</span>
+<span class="sd">        &amp;=  \mathbf{S}^{-\frac{1}{2}}\mathbf{H}\mathbf{x} + \mathbf{S}^{-\frac{1}{2}}\mathbf{n}\\</span>
+<span class="sd">        &amp;= \tilde{\mathbf{H}}\mathbf{x} + \tilde{\mathbf{n}}</span>
+
+<span class="sd">    The layer can compute ML detection of symbols or bits with either</span>
+<span class="sd">    soft- or hard-decisions. Note that decisions are computed symbol-/bit-wise</span>
+<span class="sd">    and not jointly for the entire vector :math:`\textbf{x}` (or the underlying vector</span>
+<span class="sd">    of bits).</span>
+
+<span class="sd">    **\ML detection of bits:**</span>
+
+<span class="sd">    Soft-decisions on bits are called log-likelihood ratios (LLR).</span>
+<span class="sd">    With the “app” demapping method, the LLR for the :math:`i\text{th}` bit</span>
+<span class="sd">    of the :math:`k\text{th}` user is then computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        LLR(k,i) = \ln\left(\frac{\Pr\left(b_{k,i}=1\lvert \mathbf{y},\mathbf{H}\right)}{\Pr\left(b_{k,i}=0\lvert \mathbf{y},\mathbf{H}\right)}\right) =\ln\left(\frac{</span>
+<span class="sd">                \sum_{\mathbf{c}\in\mathcal{C}_{k,i,1}} \exp\left(</span>
+<span class="sd">                    -\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{c}\right\rVert^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }{</span>
+<span class="sd">                \sum_{\mathbf{c}\in\mathcal{C}_{k,i,0}} \exp\left(</span>
+<span class="sd">                    -\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{c}\right\rVert^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }\right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}_{k,i,1}` and :math:`\mathcal{C}_{k,i,0}` are the</span>
+<span class="sd">    sets of vectors of constellation points for which the :math:`i\text{th}` bit</span>
+<span class="sd">    of the :math:`k\text{th}` user is equal to 1 and 0, respectively. The definition of the LLR has been</span>
+<span class="sd">    chosen such that it is equivalent with that of logit. This is</span>
+<span class="sd">    different from many textbooks in communications, where the LLR is</span>
+<span class="sd">    defined as :math:`LLR(k,i) = \ln\left(\frac{\Pr\left(b_{k,i}=0\lvert \mathbf{y},\mathbf{H}\right)}{\Pr\left(b_{k,i}=1\lvert \mathbf{y},\mathbf{H}\right)}\right)`.</span>
+
+<span class="sd">    With the &quot;maxlog&quot; demapping method, the LLR for the :math:`i\text{th}` bit</span>
+<span class="sd">    of the :math:`k\text{th}` user is approximated like</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \begin{align}</span>
+<span class="sd">            LLR(k,i) \approx&amp;\ln\left(\frac{</span>
+<span class="sd">                \max_{\mathbf{c}\in\mathcal{C}_{k,i,1}} \exp\left(</span>
+<span class="sd">                    -\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{c}\right\rVert^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }{</span>
+<span class="sd">                \max_{\mathbf{c}\in\mathcal{C}_{k,i,0}} \exp\left(</span>
+<span class="sd">                    -\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{c}\right\rVert^2</span>
+<span class="sd">                    \right)</span>
+<span class="sd">                }\right)\\</span>
+<span class="sd">                = &amp;\min_{\mathbf{c}\in\mathcal{C}_{k,i,0}}\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{c}\right\rVert^2-</span>
+<span class="sd">                    \min_{\mathbf{c}\in\mathcal{C}_{k,i,1}}\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{c}\right\rVert^2.</span>
+<span class="sd">            \end{align}</span>
+
+<span class="sd">    **ML detection of symbols:**</span>
+
+<span class="sd">    Soft-decisions on symbols are called logits (i.e., unnormalized log-probability).</span>
+
+<span class="sd">    With the “app” demapping method, the logit for the</span>
+<span class="sd">    constellation point :math:`c \in \mathcal{C}` of the :math:`k\text{th}` user  is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \begin{align}</span>
+<span class="sd">            \text{logit}(k,c) &amp;= \ln\left(\sum_{\mathbf{x} : x_k = c} \exp\left(</span>
+<span class="sd">                        -\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{x}\right\rVert^2</span>
+<span class="sd">                        \right)\right)\\</span>
+<span class="sd">                            &amp;= \ln\left( \Pr\left(x_k = c \lvert \mathbf{y} \right) \right) + C</span>
+<span class="sd">        \end{align}</span>
+
+<span class="sd">    where :math:`C` is a constant.</span>
+
+<span class="sd">    With the &quot;maxlog&quot; demapping method, the logit for the constellation point :math:`c \in \mathcal{C}`</span>
+<span class="sd">    of the :math:`k\text{th}` user  is approximated like</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \text{logit}(k,c) \approx \max_{\mathbf{x} : x_k = c} \left(</span>
+<span class="sd">                -\left\lVert\tilde{\mathbf{y}}-\tilde{\mathbf{H}}\mathbf{x}\right\rVert^2</span>
+<span class="sd">                \right).</span>
+
+<span class="sd">    When hard decisions are requested, this layer returns for the :math:`k` th stream</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \hat{c}_k = \underset{c \in \mathcal{C}}{\text{argmax}} \Pr\left(x_k = c \lvert \mathbf{y} \right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}` is the set of constellation points.</span>
+<span class="sd">    This is not the same as returning the vector :math:`\hat{\mathbf{x}} = \left[ x_0,\dots,x_{K-1} \right]` such that</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \hat{\mathbf{x}} = \min_{\mathbf{x} \in \mathcal{C}^K} \lVert \mathbf{y} - \mathbf{H}\mathbf{x} \rVert^2.</span>
 
 <span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
+<span class="sd">    -----------</span>
+<span class="sd">    output : One of [&quot;bit&quot;, &quot;symbol&quot;], str</span>
+<span class="sd">        The type of output, either LLRs on bits or logits on constellation symbols.</span>
 
-<span class="sd">    add_awgn : bool</span>
-<span class="sd">        If set to `False`, no white Gaussian noise is added.</span>
-<span class="sd">        Defaults to `True`.</span>
+<span class="sd">    demapping_method : One of [&quot;app&quot;, &quot;maxlog&quot;], str</span>
+<span class="sd">        The demapping method used.</span>
 
-<span class="sd">    dtype : tf.DType</span>
-<span class="sd">        Complex datatype to use for internal processing and output. Defaults to</span>
-<span class="sd">        `tf.complex64`.</span>
+<span class="sd">    k : tf.int</span>
+<span class="sd">        Number of transmit streams.</span>
+
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the detector computes hard-decided bit values or</span>
+<span class="sd">        constellation point indices instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)</span>
+<span class="sd">        The dtype of ``y``. Defaults to tf.complex64.</span>
+<span class="sd">        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</span>
 
 <span class="sd">    Input</span>
-<span class="sd">    -----</span>
-
-<span class="sd">    (x, h_freq, no) or (x, h_freq):</span>
+<span class="sd">    ------</span>
+<span class="sd">    (y, h, s) :</span>
 <span class="sd">        Tuple:</span>
 
-<span class="sd">    x :  [batch size, num_tx, num_tx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
-<span class="sd">        Channel inputs</span>
+<span class="sd">    y : [...,M], tf.complex</span>
+<span class="sd">        1+D tensor containing the received signals.</span>
 
-<span class="sd">    h_freq : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
-<span class="sd">        Channel frequency responses</span>
+<span class="sd">    h : [...,M,K], tf.complex</span>
+<span class="sd">        2+D tensor containing the channel matrices.</span>
 
-<span class="sd">    no : Scalar or Tensor, tf.float</span>
-<span class="sd">        Scalar or tensor whose shape can be broadcast to the shape of the</span>
-<span class="sd">        channel outputs:</span>
-<span class="sd">        [batch size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size].</span>
-<span class="sd">        Only required if ``add_awgn`` is set to `True`.</span>
-<span class="sd">        The noise power ``no`` is per complex dimension. If ``no`` is a</span>
-<span class="sd">        scalar, noise of the same variance will be added to the outputs.</span>
-<span class="sd">        If ``no`` is a tensor, it must have a shape that can be broadcast to</span>
-<span class="sd">        the shape of the channel outputs. This allows, e.g., adding noise of</span>
-<span class="sd">        different variance to each example in a batch. If ``no`` has a lower</span>
-<span class="sd">        rank than the channel outputs, then ``no`` will be broadcast to the</span>
-<span class="sd">        shape of the channel outputs by adding dummy dimensions after the</span>
-<span class="sd">        last axis.</span>
+<span class="sd">    s : [...,M,M], tf.complex</span>
+<span class="sd">        2+D tensor containing the noise covariance matrices.</span>
 
 <span class="sd">    Output</span>
-<span class="sd">    -------</span>
-<span class="sd">    y : [batch size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
-<span class="sd">        Channel outputs</span>
+<span class="sd">    ------</span>
+<span class="sd">    One of:</span>
+
+<span class="sd">    : [..., K, num_bits_per_symbol], tf.float</span>
+<span class="sd">        LLRs or hard-decisions for every bit of every stream, if ``output`` equals `&quot;bit&quot;`.</span>
+
+<span class="sd">    : [..., K, num_points], tf.float or [..., K], tf.int</span>
+<span class="sd">       Logits or hard-decisions on constellation symbols for every stream, if ``output`` equals `&quot;symbol&quot;`.</span>
+<span class="sd">       Hard-decisions correspond to the symbol indices.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    If you want to use this layer in Graph mode with XLA, i.e., within</span>
+<span class="sd">    a function that is decorated with ``@tf.function(jit_compile=True)``,</span>
+<span class="sd">    you must set ``sionna.Config.xla_compat=true``.</span>
+<span class="sd">    See :py:attr:`~sionna.Config.xla_compat`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_awgn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">output</span><span class="p">,</span>
+                 <span class="n">demapping_method</span><span class="p">,</span>
+                 <span class="n">k</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">trainable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">],</span>\
+            <span class="s2">&quot;dtype must be tf.complex64 or tf.complex128&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span> <span class="o">=</span> <span class="n">add_awgn</span>
+        <span class="k">assert</span> <span class="n">output</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;bit&quot;</span><span class="p">,</span> <span class="s2">&quot;symbol&quot;</span><span class="p">),</span> <span class="s2">&quot;Unknown output&quot;</span>
 
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span> <span class="c1">#pylint: disable=unused-argument</span>
+        <span class="k">assert</span> <span class="n">demapping_method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span><span class="s2">&quot;maxlog&quot;</span><span class="p">),</span> <span class="s2">&quot;Unknown demapping method&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_awgn</span> <span class="o">=</span> <span class="n">AWGN</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output</span> <span class="o">=</span> <span class="n">output</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_demapping_method</span> <span class="o">=</span> <span class="n">demapping_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
+
+        <span class="c1"># Determine the reduce function for LLR computation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_demapping_method</span> <span class="o">==</span> <span class="s2">&quot;app&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_logsumexp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span>
+
+        <span class="c1"># Create constellation object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="o">.</span><span class="n">create_or_check_constellation</span><span class="p">(</span>
+                                                        <span class="n">constellation_type</span><span class="p">,</span>
+                                                        <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                        <span class="n">constellation</span><span class="p">)</span>
+
+        <span class="c1"># Utility function to compute</span>
+        <span class="c1"># vecs : [num_vecs, K] The list of all possible transmitted vectors.</span>
+        <span class="c1"># c : [num_vecs/num_points, K, num_points] Which is such that `c[:,k,s]`</span>
+        <span class="c1">#   gives the symbol indices in the first dimension of `vecs` for which</span>
+        <span class="c1">#   the `k`th stream transmitted the `s`th constellation point.</span>
+        <span class="n">vecs</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_vecs</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vecs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span> <span class="o">==</span> <span class="s1">&#39;bit&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logits2llr</span> <span class="o">=</span> <span class="n">SymbolLogits2LLRs</span><span class="p">(</span>
+                                    <span class="n">method</span><span class="o">=</span><span class="n">demapping_method</span><span class="p">,</span>
+                                    <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                    <span class="n">hard_out</span><span class="o">=</span><span class="n">hard_out</span><span class="p">,</span>
+                                    <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">,</span>
+                                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">constellation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span>
+
+    <span class="k">def</span> <span class="nf">_build_vecs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Utility function for building the list of all possible transmitted</span>
+<span class="sd">        vectors of constellation points and the symbol indices corresponding to</span>
+<span class="sd">        all possibly transmitted constellation points for every stream.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        ------</span>
+<span class="sd">        k : int</span>
+<span class="sd">            Number of transmit streams.</span>
+
+<span class="sd">        Output</span>
+<span class="sd">        -------</span>
+<span class="sd">        vecs : [num_vecs, K], tf.complex</span>
+<span class="sd">            List of all possible transmitted vectors.</span>
+
+<span class="sd">        c : [num_vecs/num_points, K, num_points], int</span>
+<span class="sd">            `c[:,k,s]` gives the symbol indices in the first dimension of `vecs`</span>
+<span class="sd">            for which the `k`th stream transmitted the `s`th symbol.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span>
+
+        <span class="c1"># Recursive function for generating all possible transmitted</span>
+        <span class="c1"># vector of symbols.</span>
+        <span class="c1"># `n` is the remaining number of stream to process</span>
+        <span class="k">def</span> <span class="nf">_build_vecs_</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># If there is a single stream, then the list of possibly</span>
+                <span class="c1"># transmitted vectors corresponds to the constellation points.</span>
+                <span class="c1"># No recusrion is needed.</span>
+                <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If the number of streams is `n &gt;= 2` streams, then the list</span>
+                <span class="c1"># of possibly transmitted vectors is</span>
+                <span class="c1">#</span>
+                <span class="c1"># [c_1 v , c_2 v, ..., c_N v]</span>
+                <span class="c1">#</span>
+                <span class="c1"># where `[c_1, ..., c_N]` is the constellation of size N, and</span>
+                <span class="c1"># `v` is the list of possible vectors for `n-1` streams.</span>
+                <span class="c1"># This list has therefore length `N x len(v)`.</span>
+                <span class="c1">#</span>
+                <span class="c1"># Building the list for `n-1` streams, recursively.</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">_build_vecs_</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># Building the list of `n` streams by appending the</span>
+                <span class="c1"># constellation points.</span>
+                <span class="n">vecs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+                    <span class="n">vecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">([</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">),</span>
+                                                <span class="n">v</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">vecs</span>
+
+        <span class="c1"># Building the list of possible vectors for the `k` streams.</span>
+        <span class="c1"># [num_vecs, K]</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="n">_build_vecs_</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="c1"># Compute symbol indices for every stream.</span>
+        <span class="c1"># For every constellation point `p` and for every stream `j`, we gather</span>
+        <span class="c1"># the list of vector indices from `vecs` corresponding the vectors for</span>
+        <span class="c1"># which the `jth` stream transmitted `p`.</span>
+        <span class="c1"># [num_vecs/num_points, K, num_points]</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+            <span class="n">c_</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="n">c_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">vecs</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span><span class="o">==</span><span class="n">p</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">c_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">c_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c_</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">vecs</span><span class="p">,</span> <span class="n">c</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">inputs</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">h_freq</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
+        <span class="c1"># Compute square-root of interference covariance matrix</span>
+        <span class="n">s_inv</span> <span class="o">=</span> <span class="n">matrix_sqrt_inv</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="c1"># Whiten the observation</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">s_inv</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Compute channel after whitening</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">s_inv</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+        <span class="c1"># Add extra dims for broadcasting with the dimensions corresponding</span>
+        <span class="c1"># to all possible transmimtted vectors</span>
+        <span class="c1"># Shape: [..., 1, M, K]</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1"># Add extra dims for broadcasting with the dimensions corresponding</span>
+        <span class="c1"># to all possible transmimtted vectors</span>
+        <span class="c1"># Shape: [..., 1, M]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Reshape list of all possible vectors from</span>
+        <span class="c1"># [num_vecs, K]</span>
+        <span class="c1"># to</span>
+        <span class="c1"># [1,...,1, num_vecs, K, 1]</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vecs</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">vecs</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">h</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Compute exponents</span>
+        <span class="c1"># [..., num_vecs]</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">h</span><span class="nd">@vecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">exponents</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">diff</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Gather exponents for all symbols</span>
+        <span class="c1"># [..., num_vecs/num_points, K, num_points]</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Compute logits on constellation points</span>
+        <span class="c1"># [..., K, num_points]</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output</span> <span class="o">==</span> <span class="s1">&#39;bit&#39;</span><span class="p">:</span>
+            <span class="c1"># Compute LLRs or hard decisions</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logits2llr</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">h_freq</span> <span class="o">=</span> <span class="n">inputs</span>
-
-        <span class="c1"># Apply the channel response</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">h_freq</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">h_freq</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-
-        <span class="c1"># Add AWGN if requested</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awgn</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">y</span></div>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">logits</span></div>
 </pre></div>
 
            </div>

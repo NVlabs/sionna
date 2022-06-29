@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.mapping &mdash; Sionna 0.9.1 documentation</title>
+  <title>sionna.mapping &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -284,6 +284,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
 </ul>
 </li>
 </ul>
@@ -318,6 +319,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
@@ -326,9 +338,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#alist2mat">alist2mat</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#load-alist">load_alist</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -358,6 +367,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
 </ul>
@@ -440,6 +452,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#linearinterpolator">LinearInterpolator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#precoding">Precoding</a><ul>
@@ -448,6 +461,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -460,6 +477,39 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 </ul>
@@ -517,7 +567,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#symbolsource">SymbolSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#pamsource">PAMSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#plotber">PlotBER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#sim-ber">sim_ber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
@@ -863,6 +915,60 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">points</span><span class="p">,</span>
                                     <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
 
+    <span class="c1"># pylint: disable=no-self-argument</span>
+<div class="viewcode-block" id="Constellation.create_or_check_constellation"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Constellation.create_or_check_constellation">[docs]</a>    <span class="k">def</span> <span class="nf">create_or_check_constellation</span><span class="p">(</span>  <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                        <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Static method for conviently creating a constellation object or checking that an existing one</span>
+<span class="sd">        is consistent with requested settings.</span>
+
+<span class="sd">        If ``constellation`` is `None`, then this method creates a :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        object of type ``constellation_type`` and with ``num_bits_per_symbol`` bits per symbol.</span>
+<span class="sd">        Otherwise, this method checks that `constellation` is consistent with ``constellation_type`` and</span>
+<span class="sd">        ``num_bits_per_symbol``. If it is, ``constellation`` is returned. Otherwise, an assertion is raised.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        ------</span>
+<span class="sd">        constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">            For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">            must be provided.</span>
+
+<span class="sd">        num_bits_per_symbol : int</span>
+<span class="sd">            The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">            Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">        constellation :  Constellation</span>
+<span class="sd">            An instance of :class:`~sionna.mapping.Constellation` or</span>
+<span class="sd">            `None`. In the latter case, ``constellation_type``</span>
+<span class="sd">            and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">        Output</span>
+<span class="sd">        -------</span>
+<span class="sd">        : :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">            A constellation object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">constellation_object</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
+                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
+                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
+            <span class="k">assert</span> <span class="n">constellation</span><span class="o">.</span><span class="n">dtype</span><span class="o">==</span><span class="n">dtype</span><span class="p">,</span> \
+                <span class="s2">&quot;Constellation has wrong dtype.&quot;</span>
+            <span class="n">constellation_object</span> <span class="o">=</span> <span class="n">constellation</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
+                <span class="s2">&quot;Wrong constellation type.&quot;</span>
+            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
+            <span class="n">constellation_object</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span>   <span class="n">constellation_type</span><span class="p">,</span>
+                                                    <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                    <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">constellation_object</span></div>
+
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span> <span class="c1">#pylint: disable=unused-argument</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_points</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -943,7 +1049,7 @@
 <div class="viewcode-block" id="Mapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Mapper">[docs]</a><span class="k">class</span> <span class="nc">Mapper</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Mapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, dtype=tf.complex64, **kwargs)</span>
+<span class="sd">    Mapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, return_indices=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Maps binary tensors to points of a constellation.</span>
 
@@ -965,6 +1071,10 @@
 <span class="sd">        `None`. In the latter case, ``constellation_type``</span>
 <span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
 
+<span class="sd">    return_indices : bool</span>
+<span class="sd">        If enabled, symbol indices are additionally returned.</span>
+<span class="sd">        Defaults to `False`.</span>
+
 <span class="sd">    dtype : One of [tf.complex64, tf.complex128], tf.DType</span>
 <span class="sd">        The output dtype. Defaults to tf.complex64.</span>
 
@@ -978,6 +1088,11 @@
 <span class="sd">    : [...,n/Constellation.num_bits_per_symbol], tf.complex</span>
 <span class="sd">        The mapped constellation symbols.</span>
 
+<span class="sd">    : [...,n/Constellation.num_bits_per_symbol], tf.int32</span>
+<span class="sd">        The symbol indices corresponding to the constellation symbols.</span>
+<span class="sd">        Only returned if ``return_indices`` is set to True.</span>
+
+
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
 <span class="sd">    The last input dimension must be an integer multiple of the</span>
@@ -987,30 +1102,24 @@
                  <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">return_indices</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span>
                 <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">],</span>\
             <span class="s2">&quot;dtype must be tf.complex64 or tf.complex128&quot;</span>
-        <span class="c1">#self._dtype = dtype</span>
-        <span class="c1">#print(dtype, self._dtype)</span>
 
-        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
-            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
-                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">constellation</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
-                <span class="s2">&quot;Wrong constellation type.&quot;</span>
-            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
-                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="n">constellation_type</span><span class="p">,</span>
-                                                <span class="n">num_bits_per_symbol</span><span class="p">,</span>
-                                                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+        <span class="c1"># Create constellation object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="o">.</span><span class="n">create_or_check_constellation</span><span class="p">(</span>
+                                                        <span class="n">constellation_type</span><span class="p">,</span>
+                                                        <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                        <span class="n">constellation</span><span class="p">,</span>
+                                                        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_return_indices</span> <span class="o">=</span> <span class="n">return_indices</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_return_indices</span> <span class="o">=</span> <span class="n">return_indices</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_binary_base</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span>
                         <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
@@ -1036,7 +1145,262 @@
         <span class="c1"># Map integers to constellation symbols</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">int_rep</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">x</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_return_indices</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">int_rep</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="SymbolLogits2LLRsWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolLogits2LLRsWithPrior">[docs]</a><span class="k">class</span> <span class="nc">SymbolLogits2LLRsWithPrior</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SymbolLogits2LLRsWithPrior(method, num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
+<span class="sd">    from a tensor of logits (i.e., unnormalized log-probabilities) on constellation points,</span>
+<span class="sd">    assuming prior knowledge on the bits is available.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : One of [&quot;app&quot;, &quot;maxlog&quot;], str</span>
+<span class="sd">        The method used for computing the LLRs.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the layer provides hard-decided bits instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)</span>
+<span class="sd">        The dtype for the input and output.</span>
+<span class="sd">        Defaults to `tf.float32`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    (logits, prior) :</span>
+<span class="sd">        Tuple:</span>
+
+<span class="sd">    logits : [...,n, num_points], tf.float</span>
+<span class="sd">        Logits on constellation points.</span>
+
+<span class="sd">    prior : [num_bits_per_symbol] or [...n, num_bits_per_symbol], tf.float</span>
+<span class="sd">        Prior for every bit as LLRs.</span>
+<span class="sd">        It can be provided either as a tensor of shape `[num_bits_per_symbol]` for the</span>
+<span class="sd">        entire input batch, or as a tensor that is &quot;broadcastable&quot;</span>
+<span class="sd">        to `[..., n, num_bits_per_symbol]`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n, num_bits_per_symbol], tf.float</span>
+<span class="sd">        LLRs or hard-decisions for every bit.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    With the &quot;app&quot; method, the LLR for the :math:`i\text{th}` bit</span>
+<span class="sd">    is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert \mathbf{z},\mathbf{p}\right)}{\Pr\left(b_i=0\lvert \mathbf{z},\mathbf{p}\right)}\right) =\ln\left(\frac{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                e^{z_c}</span>
+<span class="sd">                }{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                e^{z_c}</span>
+<span class="sd">                }\right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the</span>
+<span class="sd">    sets of :math:`2^K` constellation points for which the :math:`i\text{th}` bit is</span>
+<span class="sd">    equal to 1 and 0, respectively. :math:`\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]` is the vector of logits on the constellation points, :math:`\mathbf{p} = \left[p_0,\dots,p_{K-1}\right]`</span>
+<span class="sd">    is the vector of LLRs that serves as prior knowledge on the :math:`K` bits that are mapped to</span>
+<span class="sd">    a constellation point, and :math:`\Pr(c\lvert\mathbf{p})` is the prior probability on the constellation symbol</span>
+<span class="sd">    :math:`c`:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \Pr\left(c\lvert\mathbf{p}\right) = \prod_{k=0}^{K-1} \Pr\left(b_k = \ell(c)_k \lvert\mathbf{p} \right)</span>
+<span class="sd">        = \prod_{k=0}^{K-1} \text{sigmoid}\left(p_k \ell(c)_k\right)</span>
+
+<span class="sd">    where :math:`\ell(c)_k` is the :math:`k^{th}` bit label of :math:`c`, where 0 is</span>
+<span class="sd">    replaced by -1.</span>
+<span class="sd">    The definition of the LLR has been</span>
+<span class="sd">    chosen such that it is equivalent with that of logits. This is</span>
+<span class="sd">    different from many textbooks in communications, where the LLR is</span>
+<span class="sd">    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.</span>
+
+<span class="sd">    With the &quot;maxlog&quot; method, LLRs for the :math:`i\text{th}` bit</span>
+<span class="sd">    are approximated like</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \begin{align}</span>
+<span class="sd">            LLR(i) &amp;\approx\ln\left(\frac{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                    e^{z_c}</span>
+<span class="sd">                }{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)</span>
+<span class="sd">                    e^{z_c}</span>
+<span class="sd">                }\right)</span>
+<span class="sd">                .</span>
+<span class="sd">        \end{align}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">method</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                 <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span><span class="s2">&quot;maxlog&quot;</span><span class="p">),</span> <span class="s2">&quot;Unknown demapping method&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span> <span class="o">=</span> <span class="n">num_bits_per_symbol</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+
+        <span class="c1"># Array composed of binary representations of all symbols indices</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_points</span><span class="p">):</span>
+            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">)),</span>
+                              <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+
+        <span class="c1"># Compute symbol indices for which the bits are 0 or 1</span>
+        <span class="n">c0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">num_points</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">num_points</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">c0</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">c1</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Symbols with ith bit=0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Symbols with ith bit=1</span>
+
+        <span class="c1"># Array of labels from {-1, 1} of all symbols</span>
+        <span class="c1"># [num_points, num_bits_per_symbol]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="c1"># Determine the reduce function for LLR computation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">==</span> <span class="s2">&quot;app&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_logsumexp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">num_bits_per_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">logits</span><span class="p">,</span> <span class="n">prior</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="c1"># Compute exponents</span>
+        <span class="n">exponents</span> <span class="o">=</span> <span class="n">logits</span>
+
+        <span class="c1"># Gather exponents for all bits</span>
+        <span class="c1"># shape [...,n,num_points/2,num_bits_per_symbol]</span>
+        <span class="n">exp0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">exp1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Expanding `prior` such that it is broadcastable with</span>
+        <span class="c1"># shape [..., n or 1, 1, num_bits_per_symbol]</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">logits</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Expand the symbol labeling to be broadcastable with prior</span>
+        <span class="c1"># shape [..., 1, num_points, num_bits_per_symbol]</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">prior</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Compute the prior probabilities on symbols exponents</span>
+        <span class="c1"># shape [..., n or 1, num_points]</span>
+        <span class="n">exp_ps</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log_sigmoid</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">prior</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Gather prior probability symbol for all bits</span>
+        <span class="c1"># shape [..., n or 1, num_points/2, num_bits_per_symbol]</span>
+        <span class="n">exp_ps0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exp_ps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">exp_ps1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exp_ps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Compute LLRs using the definition log( Pr(b=1)/Pr(b=0) )</span>
+        <span class="c1"># shape [..., n, num_bits_per_symbol]</span>
+        <span class="n">llr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp_ps1</span> <span class="o">+</span> <span class="n">exp1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>\
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp_ps0</span> <span class="o">+</span> <span class="n">exp0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">hard_decisions</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">llr</span></div>
+
+<div class="viewcode-block" id="SymbolLogits2LLRs"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolLogits2LLRs">[docs]</a><span class="k">class</span> <span class="nc">SymbolLogits2LLRs</span><span class="p">(</span><span class="n">SymbolLogits2LLRsWithPrior</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SymbolLogits2LLRs(method, num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
+<span class="sd">    from a tensor of logits (i.e., unnormalized log-probabilities) on constellation points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : One of [&quot;app&quot;, &quot;maxlog&quot;], str</span>
+<span class="sd">        The method used for computing the LLRs.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the layer provides hard-decided bits instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)</span>
+<span class="sd">        The dtype for the input and output.</span>
+<span class="sd">        Defaults to `tf.float32`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    logits : [...,n, num_points], tf.float</span>
+<span class="sd">        Logits on constellation points.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n, num_bits_per_symbol], tf.float</span>
+<span class="sd">        LLRs or hard-decisions for every bit.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    With the &quot;app&quot; method, the LLR for the :math:`i\text{th}` bit</span>
+<span class="sd">    is computed according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y\right)}{\Pr\left(b_i=0\lvert y\right)}\right) =\ln\left(\frac{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,1}}</span>
+<span class="sd">                    e^{z_c}</span>
+<span class="sd">                }{</span>
+<span class="sd">                \sum_{c\in\mathcal{C}_{i,0}}</span>
+<span class="sd">                    e^{z_c}</span>
+<span class="sd">                }\right)</span>
+
+<span class="sd">    where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the</span>
+<span class="sd">    sets of :math:`2^K` constellation points for which the :math:`i\text{th}` bit is</span>
+<span class="sd">    equal to 1 and 0, respectively. :math:`\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]` is the vector of logits on the constellation points. The definition of the LLR has been</span>
+<span class="sd">    chosen such that it is equivalent with that of logits. This is</span>
+<span class="sd">    different from many textbooks in communications, where the LLR is</span>
+<span class="sd">    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.</span>
+
+<span class="sd">    With the &quot;maxlog&quot; method, LLRs for the :math:`i\text{th}` bit</span>
+<span class="sd">    are approximated like</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">            LLR(i) &amp;\approx\ln\left(\frac{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,1}}</span>
+<span class="sd">                    e^{z_c}</span>
+<span class="sd">                }{</span>
+<span class="sd">                \max_{c\in\mathcal{C}_{i,0}}</span>
+<span class="sd">                    e^{z_c}</span>
+<span class="sd">                }\right)\\</span>
+<span class="sd">                &amp;=  \max_{c\in\mathcal{C}_{i,1}} z_c</span>
+<span class="sd">                - \max_{c\in\mathcal{C}_{i,0}} z_c</span>
+<span class="sd">                .</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="c1"># Settings all priors to 0</span>
+        <span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span>
+        <span class="n">null_prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> <span class="n">logits</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">logits</span><span class="p">,</span> <span class="n">null_prior</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="DemapperWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.DemapperWithPrior">[docs]</a><span class="k">class</span> <span class="nc">DemapperWithPrior</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
@@ -1159,54 +1523,20 @@
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">demapping_method</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span><span class="s2">&quot;maxlog&quot;</span><span class="p">),</span> <span class="s2">&quot;Unknown demapping method&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_demapping_method</span> <span class="o">=</span> <span class="n">demapping_method</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
 
-        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
-            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
-                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">constellation</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
-                <span class="s2">&quot;Wrong constellation type.&quot;</span>
-            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
-                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="n">constellation_type</span><span class="p">,</span>
-                                                <span class="n">num_bits_per_symbol</span><span class="p">,</span>
-                                                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
+        <span class="c1"># Create constellation object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="o">.</span><span class="n">create_or_check_constellation</span><span class="p">(</span>
+                                                        <span class="n">constellation_type</span><span class="p">,</span>
+                                                        <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                        <span class="n">constellation</span><span class="p">)</span>
         <span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span>
-        <span class="n">num_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
 
-        <span class="c1"># Array composed of binary representations of all symbols indices</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_points</span><span class="p">):</span>
-            <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">binary_repr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">)),</span>
-                              <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
-
-        <span class="c1"># Compute symbol indices for which the bits are 0 or 1</span>
-        <span class="n">c0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">num_points</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
-        <span class="n">c1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">num_points</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">num_bits_per_symbol</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-            <span class="n">c0</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">c1</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">c0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Symbols with ith bit=0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Symbols with ith bit=1</span>
-
-        <span class="c1"># Array of labels from {-1, 1} of all symbols</span>
-        <span class="c1"># [num_points, num_bits_per_symbol]</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-
-        <span class="c1"># Determine the reduce function for LLR computation</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_demapping_method</span> <span class="o">==</span> <span class="s2">&quot;app&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_logsumexp</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logits2llrs</span> <span class="o">=</span> <span class="n">SymbolLogits2LLRsWithPrior</span><span class="p">(</span> <span class="n">demapping_method</span><span class="p">,</span>
+                                                        <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                        <span class="n">hard_out</span><span class="p">,</span>
+                                                        <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">,</span>
+                                                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">constellation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1216,7 +1546,7 @@
         <span class="n">y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
 
         <span class="c1"># Reshape constellation points to [1,...1,num_points]</span>
-        <span class="n">points_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">points_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="n">points_shape</span><span class="p">)</span>
 
         <span class="c1"># Compute squared distances from y to all points</span>
@@ -1230,44 +1560,15 @@
         <span class="c1"># Compute exponents</span>
         <span class="n">exponents</span> <span class="o">=</span> <span class="o">-</span><span class="n">squared_dist</span><span class="o">/</span><span class="n">no</span>
 
-        <span class="c1"># Gather exponents for all bits</span>
-        <span class="c1"># shape [...,n,num_points/2,num_bits_per_symbol]</span>
-        <span class="n">exp0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">exp1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exponents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="c1"># Expanding `prior` such that it is broadcastable with</span>
-        <span class="c1"># shape [..., n or 1, 1, num_bits_per_symbol]</span>
-        <span class="n">prior</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
-
-        <span class="c1"># Expand the symbol labeling to be broadcastable with prior</span>
-        <span class="c1"># shape [..., 1, num_points, num_bits_per_symbol]</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_a</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">prior</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="c1"># Compute the prior probabilities on symbols exponents</span>
-        <span class="c1"># shape [..., n or 1, num_points]</span>
-        <span class="n">exp_ps</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log_sigmoid</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">prior</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># Gather prior probability symbol for all bits</span>
-        <span class="c1"># shape [..., n or 1, num_points/2, num_bits_per_symbol]</span>
-        <span class="n">exp_ps0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exp_ps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">exp_ps1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">exp_ps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># Compute LLRs using the definition log( Pr(b=1)/Pr(b=0) )</span>
-        <span class="c1"># shape [..., n, num_bits_per_symbol]</span>
-        <span class="n">llr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp_ps1</span> <span class="o">+</span> <span class="n">exp1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>\
-                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce</span><span class="p">(</span><span class="n">exp_ps0</span> <span class="o">+</span> <span class="n">exp0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">llr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logits2llrs</span><span class="p">([</span><span class="n">exponents</span><span class="p">,</span> <span class="n">prior</span><span class="p">])</span>
 
         <span class="c1"># Reshape LLRs to [...,n*num_bits_per_symbol]</span>
         <span class="n">out_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">y</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
                                <span class="p">[</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> \
-                                <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">]],</span> <span class="mi">0</span><span class="p">)</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">]],</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">llr_reshaped</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">llr</span><span class="p">,</span> <span class="n">out_shape</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">hard_decisions</span><span class="p">(</span><span class="n">llr_reshaped</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">llr_reshaped</span></div>
+        <span class="k">return</span> <span class="n">llr_reshaped</span></div>
 
 <div class="viewcode-block" id="Demapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Demapper">[docs]</a><span class="k">class</span> <span class="nc">Demapper</span><span class="p">(</span><span class="n">DemapperWithPrior</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
@@ -1364,14 +1665,13 @@
 <span class="sd">                = \frac{1}{N_o}\left(\min_{c\in\mathcal{C}_{i,0}}|y-c|^2-</span>
 <span class="sd">                 \min_{c\in\mathcal{C}_{i,1}}|y-c|^2\right)</span>
 <span class="sd">                .</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
 
         <span class="c1"># Settings all priors to 0</span>
-        <span class="n">num_bits_per_symbol</span> <span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span>
+        <span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span>
         <span class="n">null_prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">null_prior</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span></div>
@@ -1455,21 +1755,11 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
 
-        <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
-            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
-                     <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">constellation</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="s2">&quot;pam&quot;</span><span class="p">],</span> \
-                <span class="s2">&quot;Wrong constellation type.&quot;</span>
-            <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
-                <span class="s2">&quot;`num_bits_per_symbol` must be provided.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="n">constellation_type</span><span class="p">,</span>
-                                                <span class="n">num_bits_per_symbol</span><span class="p">,</span>
-                                                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="c1"># Create constellation object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="o">.</span><span class="n">create_or_check_constellation</span><span class="p">(</span>
+                                                        <span class="n">constellation_type</span><span class="p">,</span>
+                                                        <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                        <span class="n">constellation</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="n">y</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
@@ -1485,7 +1775,7 @@
         <span class="n">prior</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">exp</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">output_type</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">exp</span> <span class="o">+</span> <span class="n">prior</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
 
@@ -1560,6 +1850,88 @@
         <span class="n">null_prior</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">null_prior</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SymbolLogits2Moments"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolLogits2Moments">[docs]</a><span class="k">class</span> <span class="nc">SymbolLogits2Moments</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SymbolLogits2Moments(constellation_type=None, num_bits_per_symbol=None, constellation=None, dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    Computes the mean and variance of a constellation from logits (unnormalized log-probabilities) on the</span>
+<span class="sd">    constellation points.</span>
+
+<span class="sd">    More precisely, given a constellation :math:`\mathcal{C} = \left[ c_0,\dots,c_{N-1} \right]` of size :math:`N`, this layer computes the mean and variance</span>
+<span class="sd">    according to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \begin{align}</span>
+<span class="sd">            \mu &amp;= \sum_{n = 0}^{N-1} c_n \Pr \left(c_n \lvert \mathbf{\ell} \right)\\</span>
+<span class="sd">            \nu &amp;= \sum_{n = 0}^{N-1} \left( c_n - \mu \right)^2 \Pr \left(c_n \lvert \mathbf{\ell} \right)</span>
+<span class="sd">        \end{align}</span>
+
+
+<span class="sd">    where :math:`\mathbf{\ell} = \left[ \ell_0, \dots, \ell_{N-1} \right]` are the logits, and</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \Pr \left(c_n \lvert \mathbf{\ell} \right) = \frac{\exp \left( \ell_n \right)}{\sum_{i=0}^{N-1} \exp \left( \ell_i \right) }.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)</span>
+<span class="sd">        The dtype for the input and output.</span>
+<span class="sd">        Defaults to `tf.float32`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    logits : [...,n, num_points], tf.float</span>
+<span class="sd">        Logits on constellation points.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    mean : [...,n], tf.float</span>
+<span class="sd">        Mean of the constellation.</span>
+
+<span class="sd">    var : [...,n], tf.float</span>
+<span class="sd">        Variance of the constellation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Create constellation object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="o">.</span><span class="n">create_or_check_constellation</span><span class="p">(</span>
+                                                        <span class="n">constellation_type</span><span class="p">,</span>
+                                                        <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                                                        <span class="n">constellation</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">):</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span><span class="o">.</span><span class="n">points</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="n">points</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">points</span> <span class="o">-</span> <span class="n">mean</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">var</span></div>
 </pre></div>
 
            </div>

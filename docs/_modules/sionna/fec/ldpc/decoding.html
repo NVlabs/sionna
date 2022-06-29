@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.9.1 documentation</title>
+  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -284,6 +284,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
 </ul>
 </li>
 </ul>
@@ -318,6 +319,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
@@ -326,9 +338,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-alist">load_alist</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -358,6 +367,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
 </ul>
@@ -440,6 +452,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#linearinterpolator">LinearInterpolator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#precoding">Precoding</a><ul>
@@ -448,6 +461,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -460,6 +477,39 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 </ul>
@@ -517,7 +567,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#symbolsource">SymbolSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#pamsource">PAMSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#plotber">PlotBER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#sim-ber">sim_ber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
@@ -582,8 +634,8 @@
 <span class="sd">    codes and other `codes on graphs`.</span>
 
 <span class="sd">    This class defines a generic belief propagation decoder for decoding</span>
-<span class="sd">    of arbitrary parity-check matrices. It can be used to iteratively estimate/</span>
-<span class="sd">    recover the transmitted codeword (or information bits) based on the</span>
+<span class="sd">    with arbitrary parity-check matrices. It can be used to iteratively</span>
+<span class="sd">    estimate/recover the transmitted codeword (or information bits) based on the</span>
 <span class="sd">    LLR-values of the received noisy codeword observation.</span>
 
 <span class="sd">    The decoder implements the flooding SPA algorithm [Ryan]_, i.e., all nodes</span>
@@ -675,7 +727,7 @@
 <span class="sd">            the moment!).</span>
 
 <span class="sd">        keep_state: bool</span>
-<span class="sd">            Defaults to False. If True, the decoder continues wth the internal</span>
+<span class="sd">            Defaults to False. If True, the decoder continues with the internal</span>
 <span class="sd">            VN messages from the previous decoding iteration (required for IDD).</span>
 
 <span class="sd">        output_dtype: tf.DType</span>
@@ -684,14 +736,13 @@
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
-<span class="sd">        inputs: tf.float32</span>
-<span class="sd">            2+D tensor of shape `[...,n]` containing the channel logits/llr</span>
-<span class="sd">            values.</span>
+<span class="sd">        inputs: [...,n], tf.float32</span>
+<span class="sd">            2+D tensor containing the channel logits/llr values.</span>
 
 <span class="sd">    Output</span>
 <span class="sd">    ------</span>
-<span class="sd">        : tf.float32</span>
-<span class="sd">            2+D Tensor of same shape as ``inputs``, i.e., `[...,n]`, containing</span>
+<span class="sd">        : [...,n], tf.float32</span>
+<span class="sd">            2+D Tensor of same shape as ``inputs`` containing</span>
 <span class="sd">            bit-wise soft-estimates (or hard-decided bit-values) of all</span>
 <span class="sd">            codeword bits.</span>
 
@@ -838,7 +889,6 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hard_out</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s1">&#39;hard_out must be bool.&#39;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">track_exit</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s1">&#39;track_exit must be bool.&#39;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cn_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="p">,</span> <span class="s1">&#39;cn_type must be str.&#39;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_iter</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;num_iter must be int.&#39;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_iter</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;num_iter must be int.&#39;</span>
         <span class="k">assert</span> <span class="n">num_iter</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;num_iter cannot be negative.&#39;</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keep_state</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s1">&#39;keep_state must be bool.&#39;</span>
@@ -1061,7 +1111,7 @@
             <span class="k">if</span> <span class="n">con</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">cur_node</span><span class="p">:</span>
                 <span class="n">node_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                 <span class="n">cur_node</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">node_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_edges</span><span class="p">)</span> <span class="c1"># last element must be number of</span>
+        <span class="n">node_mask</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_edges</span><span class="p">)</span> <span class="c1"># last element must be a number of</span>
         <span class="c1"># elements (delimiter)</span>
         <span class="k">return</span> <span class="n">node_mask</span>
 
@@ -1072,12 +1122,23 @@
 <span class="sd">        function. It takes the sum over all incoming messages ``msg`` excluding</span>
 <span class="sd">        the intrinsic (= outgoing) message itself.</span>
 
-<span class="sd">        Additionally the channel LLR ``llr_ch`` is added to each message.</span>
+<span class="sd">        Additionally, the channel LLR ``llr_ch`` is added to each message.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># aggregate all incoming messages per node</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">llr_ch</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="o">-</span><span class="n">msg</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># TF2.9 does not support XLA for the addition of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
+        <span class="c1"># subtract extrinsic message from node value</span>
+        <span class="c1"># x = tf.expand_dims(x, axis=1)</span>
+        <span class="c1"># x = tf.add(-msg, x)</span>
+        <span class="n">add_ragged_tensors</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">add_ragged_tensors</span><span class="p">,</span>
+                                      <span class="o">-</span><span class="mf">1.</span><span class="o">*</span><span class="n">msg</span><span class="p">,</span>
+                                      <span class="n">x</span><span class="p">,</span>
+                                      <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">def</span> <span class="nf">_extrinsic_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
@@ -1117,7 +1178,7 @@
         <span class="k">return</span> <span class="n">msg_mod</span>
 
     <span class="k">def</span> <span class="nf">_cn_update_tanh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check node update function implementing the exact boxplus operation.</span>
+        <span class="sd">&quot;&quot;&quot;Check node update function implementing the exact boxplus operation.</span>
 
 <span class="sd">        This function implements the (extrinsic) check node update</span>
 <span class="sd">        function. It calculates the boxplus function over all incoming messages</span>
@@ -1131,17 +1192,27 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="c1"># tanh is not overleaded for ragged tensors</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="c1"># tanh is not overleaded</span>
+        <span class="c1"># tanh is not overloaded for ragged tensors</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tanh</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="c1"># tanh is not overloaded</span>
 
         <span class="c1"># for ragged tensors; map to flat tensor first</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_where_ragged</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="n">msg_prod</span><span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_prod</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-         <span class="c1"># ^-1 to avoid division</span>
-         <span class="c1"># Note this is (potentially) numerically unstable</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">**-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">msg_prod</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># remove own edge</span>
+
+        <span class="c1"># TF2.9 does not support XLA for the multiplication of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
+        <span class="c1"># ^-1 to avoid division</span>
+        <span class="c1"># Note this is (potentially) numerically unstable</span>
+        <span class="c1"># msg = msg**-1 * tf.expand_dims(msg_prod, axis=1) # remove own edge</span>
+
+        <span class="n">mult_ragged_tensor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span> <span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">mult_ragged_tensor</span><span class="p">,</span>
+                                        <span class="n">msg</span><span class="o">**-</span><span class="mi">1</span><span class="p">,</span>
+                                        <span class="n">msg_prod</span><span class="p">,</span>
+                                        <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
 
         <span class="c1"># Overwrite small (numerical zeros) message values with exact zero</span>
         <span class="c1"># these are introduced by the previous &quot;_where_ragged&quot; operation</span>
@@ -1153,12 +1224,12 @@
                                <span class="n">clip_value_min</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">_atanh_clip_value</span><span class="p">,</span>
                                <span class="n">clip_value_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_atanh_clip_value</span><span class="p">)</span>
 
-        <span class="c1"># atanh is not overleaded for ragged tensors</span>
+        <span class="c1"># atanh is not overloaded for ragged tensors</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">atanh</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Helper function for the check node update.</span>
+        <span class="sd">&quot;&quot;&quot;Helper function for the check node update.</span>
 
 <span class="sd">        This function implements the (element-wise) `&quot;_phi&quot;` function as defined</span>
 <span class="sd">        in [Ryan]_.</span>
@@ -1168,7 +1239,7 @@
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_cn_update_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check node update function implementing the exact boxplus operation.</span>
+        <span class="sd">&quot;&quot;&quot;Check node update function implementing the exact boxplus operation.</span>
 
 <span class="sd">        This function implements the (extrinsic) check node update function</span>
 <span class="sd">        based on the numerically more stable `&quot;_phi&quot;` function (cf. [Ryan]_).</span>
@@ -1190,16 +1261,34 @@
                             <span class="n">sign_val</span><span class="p">)</span>
 
         <span class="n">sign_node</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_prod</span><span class="p">(</span><span class="n">sign_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">sign_val</span> <span class="o">=</span> <span class="n">sign_val</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">sign_node</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># TF2.9 does not support XLA for the multiplication of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
+        <span class="c1"># sign_val = sign_val * tf.expand_dims(sign_node, axis=1)</span>
+        <span class="n">mult_ragged_tensor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span> <span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">)</span>
+        <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">mult_ragged_tensor</span><span class="p">,</span>
+                                             <span class="n">sign_val</span><span class="p">,</span>
+                                             <span class="n">sign_node</span><span class="p">,</span>
+                                             <span class="n">sign_val</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="c1"># remove sign</span>
 
-        <span class="c1"># apply _phi element-wise (does not suppport ragged Tensors)</span>
+        <span class="c1"># apply _phi element-wise (does not support ragged Tensors)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_phi</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
         <span class="n">msg_sum</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="o">-</span><span class="n">msg</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">msg_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># remove own edge</span>
 
-        <span class="c1"># apply _phi element-wise (does not suppport ragged Tensors)</span>
+        <span class="c1"># TF2.9 does not support XLA for the addition of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
+        <span class="c1"># msg = tf.add( -msg, tf.expand_dims(msg_sum, axis=1)) # remove own edge</span>
+        <span class="n">add_ragged_tensor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span> <span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">add_ragged_tensor</span><span class="p">,</span>
+                                        <span class="o">-</span><span class="mf">1.</span><span class="o">*</span><span class="n">msg</span><span class="p">,</span>
+                                        <span class="n">msg_sum</span><span class="p">,</span>
+                                        <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
+
+        <span class="c1"># apply _phi element-wise (does not support ragged Tensors)</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_ragged_gradient</span><span class="p">(</span><span class="n">sign_val</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span>
                                                             <span class="bp">self</span><span class="o">.</span><span class="n">_phi</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">msg</span>
@@ -1210,8 +1299,8 @@
         <span class="k">return</span> <span class="n">rt</span><span class="o">.</span><span class="n">with_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">flat_values</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_sign_val_minsum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper to replace find sign during min-sum (called with</span>
-<span class="sd">        `map_flat_values`)&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Helper to replace find sign-value during min-sum decoding.</span>
+<span class="sd">        Must be called with `map_flat_values`.&quot;&quot;&quot;</span>
 
         <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">sign_val</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
@@ -1270,7 +1359,7 @@
         <span class="c1"># a constant used overwrite the first min</span>
         <span class="n">LARGE_VAL</span> <span class="o">=</span> <span class="mf">10000.</span> <span class="c1"># pylint: disable=invalid-name</span>
 
-        <span class="c1"># clipp values for numerical stability</span>
+        <span class="c1"># clip values for numerical stability</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span>
                                <span class="n">clip_value_min</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max_minsum</span><span class="p">,</span>
                                <span class="n">clip_value_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max_minsum</span><span class="p">)</span>
@@ -1279,8 +1368,17 @@
         <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sign_val_minsum</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="n">sign_node</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_prod</span><span class="p">(</span><span class="n">sign_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">sign_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_ragged_gradient</span><span class="p">(</span><span class="n">sign_val</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span>
-                                                             <span class="n">sign_node</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># TF2.9 does not support XLA for the multiplication of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
+        <span class="c1"># sign_val = self._stop_ragged_gradient(sign_val) \</span>
+        <span class="c1">#             * tf.expand_dims(sign_node, axis=1)</span>
+        <span class="n">mult_rt</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">))</span>
+        <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">mult_rt</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_stop_ragged_gradient</span><span class="p">(</span><span class="n">sign_val</span><span class="p">),</span>
+                                        <span class="n">sign_node</span><span class="p">,</span>
+                                        <span class="n">sign_val</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="c1"># remove sign</span>
 
@@ -1289,14 +1387,23 @@
         <span class="c1"># However, in some cases the second smallest value may equal the</span>
         <span class="c1"># smallest value (multiplicity of mins).</span>
         <span class="c1"># Please note that this needs to be applied to raggedTensors, e.g.,</span>
-        <span class="c1"># tf.top_k() is currently not supported and the ops must support graph # mode.</span>
+        <span class="c1"># tf.top_k() is currently not supported and the ops must support graph</span>
+        <span class="c1"># # mode.</span>
 
         <span class="c1"># find min_value per node</span>
         <span class="n">min_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="c1"># and substract min; the new array contains zero at the min positions</span>
+        <span class="c1"># TF2.9 does not support XLA for the subtraction of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
+        <span class="c1"># and subtract min; the new array contains zero at the min positions</span>
         <span class="c1"># benefits from broadcasting; all other values are positive</span>
-        <span class="n">msg_min1</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">-</span> <span class="n">min_val</span>
+        <span class="c1"># msg_min1 = msg - min_val</span>
+        <span class="n">sub_ragged_tensor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">:</span> <span class="n">x</span><span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">)</span>
+        <span class="n">msg_min1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">sub_ragged_tensor</span><span class="p">,</span>
+                                             <span class="n">msg</span><span class="p">,</span>
+                                             <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                                             <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
 
         <span class="c1"># replace 0 (=min positions) with large value to ignore it for further</span>
         <span class="c1"># min calculations</span>
@@ -1305,7 +1412,7 @@
                                         <span class="n">msg_min1</span><span class="p">)</span>
 
         <span class="c1"># find the second smallest element (we add min_val as this has been</span>
-        <span class="c1"># substracted before)</span>
+        <span class="c1"># subtracted before)</span>
         <span class="n">min_val2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">min_val</span>
 
         <span class="c1"># Detect duplicated minima (i.e., min_val occurs at two incoming</span>
@@ -1331,8 +1438,14 @@
                                     <span class="n">tf</span><span class="o">.</span><span class="n">ensure_shape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">flat_values</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
                                           <span class="n">msg_e</span><span class="p">)</span>
 
+        <span class="c1"># TF2.9 does not support XLA for the multiplication of ragged tensors</span>
+        <span class="c1"># the following code provides a workaround that supports XLA</span>
+
         <span class="c1"># and apply sign</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">sign_val</span> <span class="o">*</span> <span class="n">msg_e</span>
+        <span class="c1">#msg = sign_val * msg_e</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span>
+                                        <span class="n">sign_val</span><span class="p">,</span>
+                                        <span class="n">msg_e</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">msg</span>
 
@@ -1357,8 +1470,8 @@
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterative BP decoding function.</span>
 
-<span class="sd">        This function performs ``num_iter`` belief progation decoding iterations</span>
-<span class="sd">        and returns the estimated codeword.</span>
+<span class="sd">        This function performs ``num_iter`` belief propagation decoding</span>
+<span class="sd">        iterations and returns the estimated codeword.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            inputs (tf.float32): Tensor of shape `[...,n]` containing the</span>
@@ -1578,14 +1691,13 @@
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
-<span class="sd">        inputs: tf.float32</span>
-<span class="sd">            2+D tensor of shape `[...,n]` containing the channel logits/llr</span>
-<span class="sd">            values.</span>
+<span class="sd">        inputs: [...,n], tf.float32</span>
+<span class="sd">            2+D tensor containing the channel logits/llr values.</span>
 
 <span class="sd">    Output</span>
 <span class="sd">    ------</span>
-<span class="sd">        : tf.float32</span>
-<span class="sd">            2+D Tensor of shape `[...,n]`, or `[...,k]`</span>
+<span class="sd">        : [...,n], or [...,k], tf.float32</span>
+<span class="sd">            2+D tensor of shape `[...,n]`, or `[...,k]`</span>
 <span class="sd">            if ``return_infobits`` is True, containing bit-wise soft-estimates</span>
 <span class="sd">            (or hard-decided bit-values) of all codeword bits (or info</span>
 <span class="sd">            bits, respectively).</span>
@@ -1752,8 +1864,8 @@
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Iterative BP decoding function.</span>
 
-<span class="sd">        This function performs ``num_iter`` belief progation decoding iterations</span>
-<span class="sd">        and returns the estimated codeword.</span>
+<span class="sd">        This function performs ``num_iter`` belief propagation decoding</span>
+<span class="sd">        iterations and returns the estimated codeword.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            inputs (tf.float32): Tensor of shape `[...,n]` containing the</span>

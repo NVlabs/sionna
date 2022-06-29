@@ -62,6 +62,24 @@ SymbolDemapperWithPrior
    :exclude-members: call, build
    :members:
 
+SymbolLogits2LLRs
+------------------
+.. autoclass:: sionna.mapping.SymbolLogits2LLRs
+   :exclude-members: call, build
+   :members:
+
+SymbolLogits2LLRsWithPrior
+---------------------------
+.. autoclass:: sionna.mapping.SymbolLogits2LLRsWithPrior
+   :exclude-members: call, build
+   :members:
+
+SymbolLogits2Moments
+----------------------
+.. autoclass:: sionna.mapping.SymbolLogits2Moments
+   :exclude-members: call, build
+   :members:
+
 References:
    .. [3GPPTS38211] ETSI TS 138 211 "5G NR Physical channels and modulation", V16.2.0, Jul. 2020
       https://www.3gpp.org/ftp/Specs/archive/38_series/38.211/38211-h00.zip

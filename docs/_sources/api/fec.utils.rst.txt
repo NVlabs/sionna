@@ -3,6 +3,86 @@ FEC Utility Functions
 
 This module provides utility functions for the FEC package. It also provides serval functions to simplify EXIT analysis of iterative receivers.
 
+(Binary) Linear Codes
+**************************
+
+Several functions are provided to convert parity-check matrices into generator matrices and vice versa. Please note that currently only binary codes are supported.
+Further, a universal linear encoder is available and can be initialized either with a generator or with a parity-check matrix, respectively.
+
+.. code-block:: Python
+
+   # load example parity-check matrix
+   pcm, k, n, coderate = load_parity_check_examples(pcm_id=3)
+
+   # the encoder can be directly initialized with a parity-check matrix
+   encoder = LinearEncoder(pcm, is_pcm=True)
+
+Note that many research projects provide their parity-check matrices in the  `alist` format [MacKay]_ (e.g., see [UniKL]_). The follwing code snippet provides an example of how to import an external LDPC parity-check matrix from an `alist` file and how to set-up an encoder/decoder.
+
+.. code-block:: Python
+
+   # load external example parity-check matrix in alist format
+   al = load_alist(path=filename)
+   pcm, k, n, coderate = alist2mat(al)
+
+   # the encoder can be directly initialized with a parity-check matrix
+   encoder = LinearEncoder(pcm, is_pcm=True)
+
+   # initalize BP decoder for the given parity-check matrix
+   decoder = LDPCBPDecoder(pcm, num_iter=20)
+
+   # and run simulation with random information bits
+   no = 1.
+   batch_size = 10
+   num_bits_per_symbol = 2
+
+   source = BinarySource()
+   mapper = Mapper("qam", num_bits_per_symbol)
+   channel = AWGN()
+   demapper = Demapper("app", "qam", num_bits_per_symbol)
+
+   u = source([batch_size, k])
+   c = encoder(u)
+   x = mapper(c)
+   y = channel([x, no])
+   llr = demapper([y, no])
+   c_hat = decoder(llr)
+
+LinearEncoder
+-------------
+.. autoclass:: sionna.fec.utils.LinearEncoder
+   :members:
+   :exclude-members: call, build
+
+load_parity_check_examples
+--------------------------
+.. autofunction:: sionna.fec.utils.load_parity_check_examples
+
+alist2mat
+---------
+.. autofunction:: sionna.fec.utils.alist2mat
+
+load_alist
+----------
+.. autofunction:: sionna.fec.utils.load_alist
+
+make_systematic
+---------------
+.. autofunction:: sionna.fec.utils.make_systematic
+
+gm2pcm
+------
+.. autofunction:: sionna.fec.utils.gm2pcm
+
+pcm2gm
+------
+.. autofunction:: sionna.fec.utils.pcm2gm
+
+verify_gm_pcm
+-------------
+.. autofunction:: sionna.fec.utils.verify_gm_pcm
+
+
 EXIT Analysis
 *************
 
@@ -79,18 +159,6 @@ GaussianPriorSource
 -------------------
 .. autoclass:: sionna.fec.utils.GaussianPriorSource
 
-load_parity_check_examples
---------------------------
-.. autofunction:: sionna.fec.utils.load_parity_check_examples
-
-alist2mat
----------
-.. autofunction:: sionna.fec.utils.alist2mat
-
-load_alist
-----------
-.. autofunction:: sionna.fec.utils.load_alist
-
 bin2int
 -------
 .. autofunction:: sionna.fec.utils.bin2int
@@ -126,7 +194,6 @@ j_fun_tf
 j_fun_inv_tf
 ------------
 .. autofunction:: sionna.fec.utils.j_fun_inv_tf
-
 
 
 References:

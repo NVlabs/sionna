@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.ofdm.channel_estimation &mdash; Sionna 0.9.1 documentation</title>
+  <title>sionna.ofdm.channel_estimation &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -284,6 +284,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
 </ul>
 </li>
 </ul>
@@ -318,6 +319,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
@@ -326,9 +338,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-alist">load_alist</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -358,6 +367,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
 </ul>
@@ -440,6 +452,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#linearinterpolator">LinearInterpolator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#precoding">Precoding</a><ul>
@@ -448,6 +461,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -460,6 +477,39 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 </ul>
@@ -517,7 +567,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#symbolsource">SymbolSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#pamsource">PAMSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#plotber">PlotBER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#sim-ber">sim_ber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
@@ -618,9 +670,12 @@
 <span class="sd">    resource_grid : ResourceGrid</span>
 <span class="sd">        An instance of :class:`~sionna.ofdm.ResourceGrid`.</span>
 
-<span class="sd">    interpolation_type : One of [&quot;nn&quot;], string</span>
+<span class="sd">    interpolation_type : One of [&quot;nn&quot;, &quot;lin&quot;, &quot;lin_time_avg&quot;], string</span>
 <span class="sd">        The interpolation to be used. Currently only the</span>
-<span class="sd">        :class:`~sionna.ofdm.NearestNeighborInterpolator` is supported.</span>
+<span class="sd">        :class:`~sionna.ofdm.NearestNeighborInterpolator` (`&quot;nn`&quot;) and</span>
+<span class="sd">        :class:`~sionna.ofdm.LinearInterpolator`</span>
+<span class="sd">        without (`&quot;lin&quot;`) and with averaging across OFDM</span>
+<span class="sd">        symbols (`&quot;lin_time_avg&quot;`) are supported.</span>
 
 <span class="sd">    dtype : tf.Dtype</span>
 <span class="sd">        Datatype for internal calculations and the output dtype.</span>
@@ -654,11 +709,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span> <span class="o">=</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">pilot_pattern</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_removed_nulled_scs</span> <span class="o">=</span> <span class="n">RemoveNulledSubcarriers</span><span class="p">(</span><span class="n">resource_grid</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">interpolation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nn&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> \
+        <span class="k">assert</span> <span class="n">interpolation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;nn&quot;</span><span class="p">,</span> <span class="s2">&quot;lin&quot;</span><span class="p">,</span> <span class="s2">&quot;lin_time_avg&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> \
             <span class="s2">&quot;Unsupported `interpolation_type`&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interpolation_type</span> <span class="o">=</span> <span class="n">interpolation_type</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolation_type</span><span class="o">==</span><span class="s2">&quot;nn&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_interpol</span> <span class="o">=</span> <span class="n">NearestNeighborInterpolator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolation_type</span><span class="o">==</span><span class="s2">&quot;lin&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interpol</span> <span class="o">=</span> <span class="n">LinearInterpolator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolation_type</span><span class="o">==</span><span class="s2">&quot;lin_time_avg&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interpol</span> <span class="o">=</span> <span class="n">LinearInterpolator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="p">,</span> <span class="n">time_avg</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Precompute indices to gather received pilot signals</span>
         <span class="n">num_pilot_symbols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="o">.</span><span class="n">num_pilot_symbols</span>
@@ -694,11 +753,12 @@
         <span class="n">y_pilots</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y_eff_flat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Compute LS channel estimates</span>
-        <span class="c1"># Note: Some might be NaN because pilots=0, but we do not care</span>
-        <span class="c1"># as only the valid estimates will be considered during interpolation</span>
+        <span class="c1"># Note: Some might be Inf because pilots=0, but we do not care</span>
+        <span class="c1"># as only the valid estimates will be considered during interpolation.</span>
+        <span class="c1"># We do a save division to replace Inf by 0.</span>
         <span class="c1"># Broadcasting from pilots here is automatic since pilots have shape</span>
         <span class="c1"># [num_tx, num_streams, num_pilot_symbols]</span>
-        <span class="n">h_ls</span> <span class="o">=</span> <span class="n">y_pilots</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="o">.</span><span class="n">pilots</span>
+        <span class="n">h_ls</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">(</span><span class="n">y_pilots</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="o">.</span><span class="n">pilots</span><span class="p">)</span>
 
         <span class="c1"># Compute error variance and broadcast to the same shape as h_ls</span>
         <span class="c1"># Expand rank of no for broadcasting</span>
@@ -706,13 +766,15 @@
 
         <span class="c1"># Expand rank of pilots for broadcasting</span>
         <span class="n">pilots</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pilot_pattern</span><span class="o">.</span><span class="n">pilots</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">h_ls</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
         <span class="c1"># Compute error variance, broadcastable to the shape of h_ls</span>
-        <span class="n">err_var</span> <span class="o">=</span> <span class="n">no</span><span class="o">/</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pilots</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">err_var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">(</span><span class="n">no</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pilots</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># Interpolate channel estimates over the resource grid</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolation_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">h_ls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpol</span><span class="p">(</span><span class="n">h_ls</span><span class="p">)</span>
-            <span class="n">err_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpol</span><span class="p">(</span><span class="n">err_var</span><span class="p">)</span>
+            <span class="n">err_var</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_interpol</span><span class="p">(</span><span class="n">err_var</span><span class="p">),</span>
+                                 <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">err_var</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">h_ls</span><span class="p">,</span> <span class="n">err_var</span></div>
 
@@ -721,7 +783,7 @@
     <span class="sd">&quot;&quot;&quot;Nearest-neighbor channel estimate interpolation on a resource grid.</span>
 
 <span class="sd">    This class assigns to each element of an OFDM resource grid one of</span>
-<span class="sd">    ``num_pilots`` provided measurements, e.g., channel estimates of error</span>
+<span class="sd">    ``num_pilots`` provided measurements, e.g., channel estimates or error</span>
 <span class="sd">    variances, according to the nearest neighbor method. It is assumed</span>
 <span class="sd">    that the measurements were taken at the nonzero positions of a</span>
 <span class="sd">    :class:`~sionna.ofdm.PilotPattern`.</span>
@@ -740,7 +802,7 @@
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
-<span class="sd">    : [k, l ,m, num_tx, num_streams_per_tx, num_pilots], tf.DType</span>
+<span class="sd">    : [k, l ,m, num_tx, num_streams_per_tx, num_pilot_symbols], tf.DType</span>
 <span class="sd">        Tensor of quantities to be interpolated according to</span>
 <span class="sd">        a :class:`~sionna.ofdm.PilotPattern`. This can be channel estimates</span>
 <span class="sd">        as well as the related error variances.</span>
@@ -767,7 +829,7 @@
 
         <span class="n">max_num_zero_pilots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pilots</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
         <span class="k">assert</span> <span class="n">max_num_zero_pilots</span><span class="o">&lt;</span><span class="n">pilots</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>\
-            <span class="sd">&quot;&quot;&quot;Each pilot sequence must have at least on nonzero entry&quot;&quot;&quot;</span>
+            <span class="sd">&quot;&quot;&quot;Each pilot sequence must have at least one nonzero entry&quot;&quot;&quot;</span>
 
         <span class="c1"># Compute gather indices for nearest neighbor interpolation</span>
         <span class="n">gather_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
@@ -816,6 +878,289 @@
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">outputs</span></div>
+
+
+<div class="viewcode-block" id="LinearInterpolator"><a class="viewcode-back" href="../../../api/ofdm.html#sionna.ofdm.LinearInterpolator">[docs]</a><span class="k">class</span> <span class="nc">LinearInterpolator</span><span class="p">():</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Linear channel estimate interpolation on a resource grid.</span>
+
+<span class="sd">    This class computes for each element of an OFDM resource grid</span>
+<span class="sd">    a channel estimate based on ``num_pilots`` provided measurements,</span>
+<span class="sd">    e.g., channel estimates or error variances, through linear interpolation.</span>
+<span class="sd">    It is assumed that the measurements were taken at the nonzero positions</span>
+<span class="sd">    of a :class:`~sionna.ofdm.PilotPattern`.</span>
+
+<span class="sd">    The interpolation is done first across sub-carriers and then</span>
+<span class="sd">    across OFDM symbols.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    pilot_pattern : PilotPattern</span>
+<span class="sd">        An instance of :class:`~sionna.ofdm.PilotPattern`.</span>
+
+<span class="sd">    time_avg : bool</span>
+<span class="sd">        If enabled, measurements will be averaged across OFDM symbols</span>
+<span class="sd">        (i.e., time). This is useful for channels that do not vary</span>
+<span class="sd">        substantially over the duration of an OFDM frame. Defaults to `False`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    : [k, l ,m, num_tx, num_streams_per_tx, num_pilot_symbols], tf.DType</span>
+<span class="sd">        Tensor of quantities to be interpolated according to</span>
+<span class="sd">        a :class:`~sionna.ofdm.PilotPattern`. This can be channel estimates</span>
+<span class="sd">        as well as the related error variances.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [k, l, m, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex</span>
+<span class="sd">        The interpolated input tensor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pilot_pattern</span><span class="p">,</span> <span class="n">time_avg</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">assert</span><span class="p">(</span><span class="n">pilot_pattern</span><span class="o">.</span><span class="n">num_pilot_symbols</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">),</span>\
+            <span class="sd">&quot;&quot;&quot;The pilot pattern cannot be empty&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time_avg</span> <span class="o">=</span> <span class="n">time_avg</span>
+
+        <span class="c1"># Reshape mask to shape [-1,num_ofdm_symbols,num_effective_subcarriers]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pilot_pattern</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">mask_shape</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span> <span class="c1"># Store to reconstruct the original shape</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">mask_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]))</span>
+
+        <span class="c1"># Reshape the pilots to shape [-1, num_pilot_symbols]</span>
+        <span class="n">pilots</span> <span class="o">=</span> <span class="n">pilot_pattern</span><span class="o">.</span><span class="n">pilots</span>
+        <span class="n">pilots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pilots</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">pilots</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+
+        <span class="n">max_num_zero_pilots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pilots</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">max_num_zero_pilots</span><span class="o">&lt;</span><span class="n">pilots</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>\
+            <span class="sd">&quot;&quot;&quot;Each pilot sequence must have at least one nonzero entry&quot;&quot;&quot;</span>
+
+        <span class="c1"># Create actual pilot patterns for each stream over the resource grid</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">z</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">a</span><span class="p">])]</span> <span class="o">=</span> <span class="n">pilots</span><span class="p">[</span><span class="n">a</span><span class="p">]</span>
+
+        <span class="c1"># Linear interpolation works as follows:</span>
+        <span class="c1"># We compute for each resource element (RE)</span>
+        <span class="c1"># x_0 : The x-value (i.e., sub-carrier index or OFDM symbol) at which</span>
+        <span class="c1">#       the first channel measurement was taken</span>
+        <span class="c1"># x_1 : The x-value (i.e., sub-carrier index or OFDM symbol) at which</span>
+        <span class="c1">#       the second channel measurement was taken</span>
+        <span class="c1"># y_0 : The first channel estimate</span>
+        <span class="c1"># y_1 : The second channel estimate</span>
+        <span class="c1"># x   : The x-value (i.e., sub-carrier index or OFDM symbol)</span>
+        <span class="c1">#</span>
+        <span class="c1"># The linearly interpolated value y is then given as:</span>
+        <span class="c1"># y = (x-x_0) * (y_1-y_0) / (x_1-x_0) + y_0</span>
+        <span class="c1">#</span>
+        <span class="c1"># The following code pre-computes various quantities and indices</span>
+        <span class="c1"># that are needed to compute x_0, x_1, y_0, y_1, x for frequency- and</span>
+        <span class="c1"># time-domain interpolation.</span>
+
+        <span class="c1">##</span>
+        <span class="c1">## Frequency-domain interpolation</span>
+        <span class="c1">##</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_freq</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span>
+                                              <span class="mi">7</span><span class="p">,</span>
+                                              <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                               <span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="c1"># Permutation indices to shift batch_dims last during gather</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perm_fwd_freq</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">x_0_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">x_1_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="c1"># Set REs of OFDM symbols without any pilot equal to -1 (dummy value)</span>
+        <span class="n">x_0_freq</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">x_1_freq</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">y_0_freq_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">x_0_freq</span><span class="p">)</span> <span class="c1"># Indices used to gather estimates</span>
+        <span class="n">y_1_freq_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">x_1_freq</span><span class="p">)</span> <span class="c1"># Indices used to gather estimates</span>
+
+        <span class="c1"># For each stream</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+
+            <span class="n">pilot_count</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Counts the number of non-zero pilots</span>
+
+            <span class="c1"># Indices of non-zero pilots within the pilots vector</span>
+            <span class="n">pilot_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">pilots</span><span class="p">[</span><span class="n">a</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Go through all OFDM symbols</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x_0_freq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+
+                <span class="c1"># Indices of non-zero pilots within the OFDM symbol</span>
+                <span class="n">pilot_ind_ofdm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">i</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="c1"># If OFDM symbol contains only one non-zero pilot</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pilot_ind_ofdm</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="c1"># Set the indices of the first and second pilot to the same</span>
+                    <span class="c1"># value for all REs of the OFDM symbol</span>
+                    <span class="n">x_0_freq</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind_ofdm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">x_1_freq</span><span class="p">[</span><span class="n">a</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind_ofdm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y_0_freq_ind</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind</span><span class="p">[</span><span class="n">pilot_count</span><span class="p">]</span>
+                    <span class="n">y_1_freq_ind</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind</span><span class="p">[</span><span class="n">pilot_count</span><span class="p">]</span>
+
+                <span class="c1"># If OFDM symbol contains two or more pilots</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">pilot_ind_ofdm</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">:</span>
+                    <span class="n">x0</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span>
+
+                    <span class="c1"># Go through all resource elements of this OFDM symbol</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x_0_freq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                        <span class="n">x_0_freq</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind_ofdm</span><span class="p">[</span><span class="n">x0</span><span class="p">]</span>
+                        <span class="n">x_1_freq</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind_ofdm</span><span class="p">[</span><span class="n">x1</span><span class="p">]</span>
+                        <span class="n">y_0_freq_ind</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind</span><span class="p">[</span><span class="n">pilot_count</span> <span class="o">+</span> <span class="n">x0</span><span class="p">]</span>
+                        <span class="n">y_1_freq_ind</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pilot_ind</span><span class="p">[</span><span class="n">pilot_count</span> <span class="o">+</span> <span class="n">x1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">j</span><span class="o">==</span><span class="n">pilot_ind_ofdm</span><span class="p">[</span><span class="n">x1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x1</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">pilot_ind_ofdm</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                            <span class="n">x0</span> <span class="o">=</span> <span class="n">x1</span>
+                            <span class="n">x1</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">pilot_count</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pilot_ind_ofdm</span><span class="p">)</span>
+
+        <span class="n">x_0_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_0_freq</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">)</span>
+        <span class="n">x_1_freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">x_1_freq</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">)</span>
+        <span class="n">x_0_freq</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">x_0_freq</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">x_1_freq</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">x_1_freq</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_0_freq</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">x_0_freq</span><span class="p">,</span> <span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_1_freq</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">x_1_freq</span><span class="p">,</span> <span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="c1"># We add +1 here to shift all indices as the input will be padded</span>
+        <span class="c1"># at the beginning with 0, (i.e., the dummy index -1 will become 0).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_0_freq_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_0_freq_ind</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_1_freq_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_1_freq_ind</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+
+        <span class="c1">##</span>
+        <span class="c1">## Time-domain interpolation</span>
+        <span class="c1">##</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_time</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_time</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">expand_to_rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_time</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+                               <span class="n">dtype</span><span class="o">=</span><span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="c1"># Indices used to gather estimates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perm_fwd_time</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">y_0_time_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Gather indices</span>
+        <span class="n">y_1_time_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span> <span class="c1"># Gather indices</span>
+
+        <span class="c1"># For each stream</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+
+            <span class="c1"># Indices of OFDM symbols for which channel estimates were computed</span>
+            <span class="n">ofdm_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">a</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Only one OFDM symbol with pilots</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ofdm_ind</span><span class="p">)</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">y_0_time_ind</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">ofdm_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y_1_time_ind</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">ofdm_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Two or more OFDM symbols with pilots</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">ofdm_ind</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">:</span>
+                <span class="n">x0</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">x1</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="n">y_0_time_ind</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ofdm_ind</span><span class="p">[</span><span class="n">x0</span><span class="p">]</span>
+                    <span class="n">y_1_time_ind</span><span class="p">[</span><span class="n">a</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ofdm_ind</span><span class="p">[</span><span class="n">x1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="n">ofdm_ind</span><span class="p">[</span><span class="n">x1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x1</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">ofdm_ind</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="n">x0</span> <span class="o">=</span> <span class="n">x1</span>
+                        <span class="n">x1</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_0_time_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_0_time_ind</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_y_1_time_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">y_1_time_ind</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_0_time</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_0_time_ind</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                                                       <span class="mi">7</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_0_time</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_0_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_1_time</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_y_1_time_ind</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                                                       <span class="mi">7</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_x_1_time</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_1_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pilots</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Other precomputed values</span>
+        <span class="c1">#</span>
+        <span class="c1"># Undo permutation of batch_dims for gather</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_perm_bwd</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">7</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Padding for the inputs</span>
+        <span class="n">pad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">pad</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad</span> <span class="o">=</span> <span class="n">pad</span>
+
+        <span class="c1"># Number of ofdm symbols carrying at least one pilot.</span>
+        <span class="c1"># Used for time-averaging (optional)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">mask_shape</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">n</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_ofdm_symbols</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y0_ind</span><span class="p">,</span> <span class="n">y1_ind</span><span class="p">):</span>
+        <span class="c1"># Gather the right values for y0 and y1</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">y0_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">y1_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Undo the permutation of the inputs</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_bwd</span><span class="p">)</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_bwd</span><span class="p">)</span>
+
+        <span class="c1"># Compute linear interpolation</span>
+        <span class="n">slope</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">(</span><span class="n">y1</span><span class="o">-</span><span class="n">y0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">x1</span><span class="o">-</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">y0</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">y0</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">*</span><span class="n">slope</span> <span class="o">+</span> <span class="n">y0</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="c1">#</span>
+        <span class="c1"># Prepare inputs</span>
+        <span class="c1">#</span>
+        <span class="c1"># inputs has shape:</span>
+        <span class="c1"># [k, l, m, num_tx, num_streams_per_tx, num_pilots]</span>
+
+        <span class="c1"># Pad the inputs with a leading 0.</span>
+        <span class="c1"># All undefined channel estimates will get this value.</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Transpose inputs to bring batch_dims for gather last. New shape:</span>
+        <span class="c1"># [num_tx, num_streams_per_tx, 1+num_pilots, k, l, m]</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_fwd_freq</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Frequency-domain interpolation</span>
+        <span class="c1">#</span>
+        <span class="c1"># h_hat_freq has shape:</span>
+        <span class="c1"># [k, l, m, num_tx, num_streams_per_tx, num_ofdm_symbols,...</span>
+        <span class="c1">#  ...num_effective_subcarriers]</span>
+        <span class="n">h_hat_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_x_freq</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_x_0_freq</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_x_1_freq</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_y_0_freq_ind</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">_y_1_freq_ind</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Time-domain interpolation</span>
+        <span class="c1">#</span>
+
+        <span class="c1"># Time-domain averaging (optional)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_avg</span><span class="p">:</span>
+            <span class="n">num_ofdm_symbols</span> <span class="o">=</span> <span class="n">h_hat_freq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">h_hat_freq</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">h_hat_freq</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">h_hat_freq</span> <span class="o">/=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_pilot_ofdm_symbols</span><span class="p">,</span> <span class="n">h_hat_freq</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">h_hat_freq</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">h_hat_freq</span><span class="p">,</span> <span class="p">[</span><span class="n">num_ofdm_symbols</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Transpose h_hat_freq to bring batch_dims for gather last. New shape:</span>
+        <span class="c1"># [num_tx, num_streams_per_tx, num_ofdm_symbols,...</span>
+        <span class="c1">#  ...num_effective_subcarriers, k, l, m]</span>
+        <span class="n">h_hat_time</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">h_hat_freq</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_perm_fwd_time</span><span class="p">)</span>
+
+        <span class="c1"># h_hat_time has shape:</span>
+        <span class="c1"># [k, l, m, num_tx, num_streams_per_tx, num_ofdm_symbols,...</span>
+        <span class="c1">#  ...num_effective_subcarriers]</span>
+        <span class="n">h_hat_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interpolate</span><span class="p">(</span><span class="n">h_hat_time</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_x_time</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_x_0_time</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_x_1_time</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_y_0_time_ind</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">_y_1_time_ind</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">h_hat_time</span></div>
 </pre></div>
 
            </div>

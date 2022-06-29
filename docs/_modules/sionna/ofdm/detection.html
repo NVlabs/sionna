@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.channel.apply_ofdm_channel &mdash; Sionna 0.10.0 documentation</title>
+  <title>sionna.ofdm.detection &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -514,35 +514,6 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customfilter">CustomFilter</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id1">Filter</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#window-functions">Window functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hannwindow">HannWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hammingwindow">HammingWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customwindow">CustomWindow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id2">Window</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#convolve">convolve</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#fft">fft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#ifft">ifft</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#upsampling">Upsampling</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#downsampling">Downsampling</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-psd">empirical_psd</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/utils.html">Utility Functions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#metrics">Metrics</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#biterrorrate">BitErrorRate</a></li>
@@ -602,7 +573,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-      <li>sionna.channel.apply_ofdm_channel</li>
+      <li>sionna.ofdm.detection</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -611,113 +582,300 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for sionna.channel.apply_ofdm_channel</h1><div class="highlight"><pre>
+  <h1>Source code for sionna.ofdm.detection</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
 <span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Layer for applying OFDM channel: single-tap channel response in the frequency</span>
-<span class="sd">domain</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;Class definition and functions related to OFDM channel equalization&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">sionna</span> <span class="k">as</span> <span class="nn">sn</span>
+<span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">flatten_dims</span><span class="p">,</span> <span class="n">split_dim</span><span class="p">,</span> <span class="n">flatten_last_dims</span><span class="p">,</span> <span class="n">expand_to_rank</span>
+<span class="kn">from</span> <span class="nn">sionna.ofdm</span> <span class="kn">import</span> <span class="n">RemoveNulledSubcarriers</span>
 
-<span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">expand_to_rank</span>
-<span class="kn">from</span> <span class="nn">.awgn</span> <span class="kn">import</span> <span class="n">AWGN</span>
 
-<div class="viewcode-block" id="ApplyOFDMChannel"><a class="viewcode-back" href="../../../api/channel.html#sionna.channel.ApplyOFDMChannel">[docs]</a><span class="k">class</span> <span class="nc">ApplyOFDMChannel</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">Layer</span><span class="p">):</span>
+<div class="viewcode-block" id="MaximumLikelihoodDetector"><a class="viewcode-back" href="../../../api/ofdm.html#sionna.ofdm.MaximumLikelihoodDetector">[docs]</a><span class="k">class</span> <span class="nc">MaximumLikelihoodDetector</span><span class="p">(</span><span class="n">sn</span><span class="o">.</span><span class="n">mimo</span><span class="o">.</span><span class="n">MaximumLikelihoodDetector</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;ApplyOFDMChannel(add_awgn=True, dtype=tf.complex64, **kwargs)</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;MaximumLikelihoodDetector(output, demapping_method, resource_grid, stream_management, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
 
-<span class="sd">    Apply single-tap channel frequency responses to channel inputs.</span>
+<span class="sd">    Maximum-likelihood (ML) detection for OFDM MIMO transmissions.</span>
 
-<span class="sd">    This class inherits from the Keras `Layer` class and can be used as layer</span>
-<span class="sd">    in a Keras model.</span>
-
-<span class="sd">    For each OFDM symbol :math:`s` and subcarrier :math:`n`, the single-tap channel</span>
-<span class="sd">    is applied as follows:</span>
-
-<span class="sd">    .. math::</span>
-<span class="sd">        y_{s,n} = \widehat{h}_{s, n} x_{s,n} + w_{s,n}</span>
-
-<span class="sd">    where :math:`y_{s,n}` is the channel output computed by this layer,</span>
-<span class="sd">    :math:`\widehat{h}_{s, n}` the frequency channel response (``h_freq``),</span>
-<span class="sd">    :math:`x_{s,n}` the channel input ``x``, and :math:`w_{s,n}` the additive noise.</span>
-
-<span class="sd">    For multiple-input multiple-output (MIMO) links, the channel output is computed for each antenna</span>
-<span class="sd">    of each receiver and by summing over all the antennas of all transmitters.</span>
+<span class="sd">    This layer implements maximum-likelihood (ML) detection</span>
+<span class="sd">    for OFDM MIMO transmissions. Both ML detection of symbols or bits with either</span>
+<span class="sd">    soft- or hard-decisions are supported. The OFDM and stream configuration are provided</span>
+<span class="sd">    by a :class:`~sionna.ofdm.ResourceGrid` and</span>
+<span class="sd">    :class:`~sionna.mimo.StreamManagement` instance, respectively. The</span>
+<span class="sd">    actual detector is an instance of :class:`~sionna.mimo.MaximumLikelihoodDetector`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+<span class="sd">    output : One of [&quot;bit&quot;, &quot;symbol&quot;], str</span>
+<span class="sd">        The type of output, either LLRs on bits or logits on constellation symbols.</span>
 
-<span class="sd">    add_awgn : bool</span>
-<span class="sd">        If set to `False`, no white Gaussian noise is added.</span>
-<span class="sd">        Defaults to `True`.</span>
+<span class="sd">    demapping_method : One of [&quot;app&quot;, &quot;maxlog&quot;], str</span>
+<span class="sd">        The demapping method used.</span>
 
-<span class="sd">    dtype : tf.DType</span>
-<span class="sd">        Complex datatype to use for internal processing and output. Defaults to</span>
-<span class="sd">        `tf.complex64`.</span>
+<span class="sd">    resource_grid : ResourceGrid</span>
+<span class="sd">        An instance of :class:`~sionna.ofdm.ResourceGrid`.</span>
+
+<span class="sd">    stream_management : StreamManagement</span>
+<span class="sd">        An instance of :class:`~sionna.mimo.StreamManagement`.</span>
+
+<span class="sd">    constellation_type : One of [&quot;qam&quot;, &quot;pam&quot;, &quot;custom&quot;], str</span>
+<span class="sd">        For &quot;custom&quot;, an instance of :class:`~sionna.mapping.Constellation`</span>
+<span class="sd">        must be provided.</span>
+
+<span class="sd">    num_bits_per_symbol : int</span>
+<span class="sd">        The number of bits per constellation symbol, e.g., 4 for QAM16.</span>
+<span class="sd">        Only required for ``constellation_type`` in [&quot;qam&quot;, &quot;pam&quot;].</span>
+
+<span class="sd">    constellation : Constellation</span>
+<span class="sd">        An instance of :class:`~sionna.mapping.Constellation` or `None`.</span>
+<span class="sd">        In the latter case, ``constellation_type``</span>
+<span class="sd">        and ``num_bits_per_symbol`` must be provided.</span>
+
+<span class="sd">    hard_out : bool</span>
+<span class="sd">        If `True`, the detector computes hard-decided bit values or</span>
+<span class="sd">        constellation point indices instead of soft-values.</span>
+<span class="sd">        Defaults to `False`.</span>
+
+<span class="sd">    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)</span>
+<span class="sd">        The dtype of `y`. Defaults to tf.complex64.</span>
+<span class="sd">        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</span>
 
 <span class="sd">    Input</span>
-<span class="sd">    -----</span>
-
-<span class="sd">    (x, h_freq, no) or (x, h_freq):</span>
+<span class="sd">    ------</span>
+<span class="sd">    (y, h_hat, err_var, no) :</span>
 <span class="sd">        Tuple:</span>
 
-<span class="sd">    x :  [batch size, num_tx, num_tx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
-<span class="sd">        Channel inputs</span>
+<span class="sd">    y : [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
+<span class="sd">        The received OFDM resource grid after cyclic prefix removal and FFT.</span>
 
-<span class="sd">    h_freq : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
-<span class="sd">        Channel frequency responses</span>
+<span class="sd">    h_hat : [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex</span>
+<span class="sd">        The channel estimates for all streams from all transmitters.</span>
 
-<span class="sd">    no : Scalar or Tensor, tf.float</span>
-<span class="sd">        Scalar or tensor whose shape can be broadcast to the shape of the</span>
-<span class="sd">        channel outputs:</span>
-<span class="sd">        [batch size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size].</span>
-<span class="sd">        Only required if ``add_awgn`` is set to `True`.</span>
-<span class="sd">        The noise power ``no`` is per complex dimension. If ``no`` is a</span>
-<span class="sd">        scalar, noise of the same variance will be added to the outputs.</span>
-<span class="sd">        If ``no`` is a tensor, it must have a shape that can be broadcast to</span>
-<span class="sd">        the shape of the channel outputs. This allows, e.g., adding noise of</span>
-<span class="sd">        different variance to each example in a batch. If ``no`` has a lower</span>
-<span class="sd">        rank than the channel outputs, then ``no`` will be broadcast to the</span>
-<span class="sd">        shape of the channel outputs by adding dummy dimensions after the</span>
-<span class="sd">        last axis.</span>
+<span class="sd">    err_var : [Broadcastable to shape of ``h_hat``], tf.float</span>
+<span class="sd">        The variance of the channel estimation error.</span>
+
+<span class="sd">    no : [batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float</span>
+<span class="sd">        The variance of the AWGN noise.</span>
 
 <span class="sd">    Output</span>
-<span class="sd">    -------</span>
-<span class="sd">    y : [batch size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex</span>
-<span class="sd">        Channel outputs</span>
+<span class="sd">    ------</span>
+<span class="sd">    One of:</span>
+
+<span class="sd">    : [batch_size, num_tx, num_streams, num_data_symbols*num_bits_per_symbol], tf.float</span>
+<span class="sd">        LLRs or hard-decisions for every bit of every stream, if ``output`` equals `&quot;bit&quot;`.</span>
+
+<span class="sd">    : [batch_size, num_tx, num_streams, num_data_symbols, num_points], tf.float or [batch_size, num_tx, num_streams, num_data_symbols], tf.int</span>
+<span class="sd">        Logits or hard-decisions on constellation symbols for every stream, if ``output`` equals `&quot;symbol&quot;`.</span>
+<span class="sd">        Hard-decisions correspond to the symbol indices.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    If you want to use this layer in Graph mode with XLA, i.e., within</span>
+<span class="sd">    a function that is decorated with ``@tf.function(jit_compile=True)``,</span>
+<span class="sd">    you must set ``sionna.Config.xla_compat=true``.</span>
+<span class="sd">    See :py:attr:`~sionna.Config.xla_compat`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_awgn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">output</span><span class="p">,</span>
+                 <span class="n">demapping_method</span><span class="p">,</span>
+                 <span class="n">resource_grid</span><span class="p">,</span>
+                 <span class="n">stream_management</span><span class="p">,</span>
+                 <span class="n">constellation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">trainable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resource_grid</span> <span class="o">=</span> <span class="n">resource_grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span> <span class="o">=</span> <span class="n">stream_management</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_removed_nulled_scs</span> <span class="o">=</span> <span class="n">RemoveNulledSubcarriers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_resource_grid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output</span> <span class="o">=</span> <span class="n">output</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span> <span class="o">=</span> <span class="n">add_awgn</span>
+        <span class="c1"># Precompute indices to extract data symbols</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">pilot_pattern</span><span class="o">.</span><span class="n">mask</span>
+        <span class="n">num_data_symbols</span> <span class="o">=</span> <span class="n">resource_grid</span><span class="o">.</span><span class="n">pilot_pattern</span><span class="o">.</span><span class="n">num_data_symbols</span>
+        <span class="n">data_ind</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">flatten_last_dims</span><span class="p">(</span><span class="n">mask</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;ASCENDING&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_ind</span> <span class="o">=</span> <span class="n">data_ind</span><span class="p">[</span><span class="o">...</span><span class="p">,:</span><span class="n">num_data_symbols</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span> <span class="c1">#pylint: disable=unused-argument</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_awgn</span> <span class="o">=</span> <span class="n">AWGN</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="c1"># Initializing maximum-likelihood baseclass</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">,</span>
+                         <span class="n">demapping_method</span><span class="o">=</span><span class="n">demapping_method</span><span class="p">,</span>
+                         <span class="n">k</span> <span class="o">=</span> <span class="n">stream_management</span><span class="o">.</span><span class="n">num_streams_per_rx</span><span class="p">,</span>
+                         <span class="n">constellation_type</span><span class="o">=</span><span class="n">constellation_type</span><span class="p">,</span>
+                         <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                         <span class="n">constellation</span><span class="o">=</span><span class="n">constellation</span><span class="p">,</span>
+                         <span class="n">hard_out</span><span class="o">=</span><span class="n">hard_out</span><span class="p">,</span>
+                         <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                         <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
+        <span class="c1"># y has shape:</span>
+        <span class="c1"># [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">h_freq</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">inputs</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">h_freq</span> <span class="o">=</span> <span class="n">inputs</span>
+        <span class="c1"># h_hat has shape:</span>
+        <span class="c1"># [batch_size, num_rx, num_rx_ant, num_tx, num_streams,...</span>
+        <span class="c1">#  ..., num_ofdm_symbols, num_effective_subcarriers]</span>
 
-        <span class="c1"># Apply the channel response</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">h_freq</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">h_freq</span><span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="c1"># err_var has a shape that is broadcastable to h_hat</span>
 
-        <span class="c1"># Add AWGN if requested</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_awgn</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_awgn</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">))</span>
+        <span class="c1"># no has shape [batch_size, num_rx, num_rx_ant]</span>
+        <span class="c1"># or just the first n dimensions of this</span>
 
-        <span class="k">return</span> <span class="n">y</span></div>
+        <span class="c1"># Remove nulled subcarriers from y (guards, dc). New shape:</span>
+        <span class="c1"># [batch_size, num_rx, num_rx_ant, ...</span>
+        <span class="c1">#  ..., num_ofdm_symbols, num_effective_subcarriers]</span>
+        <span class="n">y_eff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_removed_nulled_scs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        <span class="c1">####################################################</span>
+        <span class="c1">### Prepare the observation y for MIMO detection ###</span>
+        <span class="c1">####################################################</span>
+        <span class="c1"># Transpose y_eff to put num_rx_ant last. New shape:</span>
+        <span class="c1"># [batch_size, num_rx, num_ofdm_symbols,...</span>
+        <span class="c1">#  ..., num_effective_subcarriers, num_rx_ant]</span>
+        <span class="n">y_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">y_eff</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">y_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">y_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="c1">##############################################</span>
+        <span class="c1">### Prepare the err_var for MIMO detection ###</span>
+        <span class="c1">##############################################</span>
+        <span class="c1"># New shape is:</span>
+        <span class="c1"># [batch_size, num_rx, num_ofdm_symbols,...</span>
+        <span class="c1">#  ..., num_effective_subcarriers, num_rx_ant, num_tx*num_streams]</span>
+        <span class="n">err_var_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">err_var</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">h_hat</span><span class="p">))</span>
+        <span class="n">err_var_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">err_var_dt</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+        <span class="n">err_var_dt</span> <span class="o">=</span> <span class="n">flatten_last_dims</span><span class="p">(</span><span class="n">err_var_dt</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">err_var_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">err_var_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="c1">###############################</span>
+        <span class="c1">### Construct MIMO channels ###</span>
+        <span class="c1">###############################</span>
+
+        <span class="c1"># Reshape h_hat for the construction of desired/interfering channels:</span>
+        <span class="c1"># [num_rx, num_tx, num_streams_per_tx, batch_size, num_rx_ant, ,...</span>
+        <span class="c1">#  ..., num_ofdm_symbols, num_effective_subcarriers]</span>
+        <span class="n">perm</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+        <span class="n">h_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">h_hat</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
+
+        <span class="c1"># Flatten first tthree dimensions:</span>
+        <span class="c1"># [num_rx*num_tx*num_streams_per_tx, batch_size, num_rx_ant, ...</span>
+        <span class="c1">#  ..., num_ofdm_symbols, num_effective_subcarriers]</span>
+        <span class="n">h_dt</span> <span class="o">=</span> <span class="n">flatten_dims</span><span class="p">(</span><span class="n">h_dt</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Gather desired and undesired channels</span>
+        <span class="n">ind_desired</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">detection_desired_ind</span>
+        <span class="n">ind_undesired</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">detection_undesired_ind</span>
+        <span class="n">h_dt_desired</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">h_dt</span><span class="p">,</span> <span class="n">ind_desired</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">h_dt_undesired</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">h_dt</span><span class="p">,</span> <span class="n">ind_undesired</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Split first dimension to separate RX and TX:</span>
+        <span class="c1"># [num_rx, num_streams_per_rx, batch_size, num_rx_ant, ...</span>
+        <span class="c1">#  ..., num_ofdm_symbols, num_effective_subcarriers]</span>
+        <span class="n">h_dt_desired</span> <span class="o">=</span> <span class="n">split_dim</span><span class="p">(</span><span class="n">h_dt_desired</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">num_rx</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">h_dt_undesired</span> <span class="o">=</span> <span class="n">split_dim</span><span class="p">(</span><span class="n">h_dt_undesired</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">num_rx</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Permutate dims to</span>
+        <span class="c1"># [batch_size, num_rx, num_ofdm_symbols, num_effective_subcarriers,..</span>
+        <span class="c1">#  ..., num_rx_ant, num_streams_per_rx(num_Interfering_streams_per_rx)]</span>
+        <span class="n">perm</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">h_dt_desired</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">h_dt_desired</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
+        <span class="n">h_dt_desired</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">h_dt_desired</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+        <span class="n">h_dt_undesired</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">h_dt_undesired</span><span class="p">,</span> <span class="n">perm</span><span class="p">)</span>
+
+        <span class="c1">##################################</span>
+        <span class="c1">### Prepare the noise variance ###</span>
+        <span class="c1">##################################</span>
+        <span class="c1"># no is first broadcast to [batch_size, num_rx, num_rx_ant]</span>
+        <span class="c1"># then the rank is expanded to that of y</span>
+        <span class="c1"># then it is transposed like y to the final shape</span>
+        <span class="c1"># [batch_size, num_rx, num_ofdm_symbols,...</span>
+        <span class="c1">#  ..., num_effective_subcarriers, num_rx_ant]</span>
+        <span class="n">no_dt</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">no</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">no_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">no_dt</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">y</span><span class="p">)[:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">no_dt</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">no_dt</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">no_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">no_dt</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">no_dt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">no_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="c1">##################################################</span>
+        <span class="c1">### Compute the interference covariance matrix ###</span>
+        <span class="c1">##################################################</span>
+        <span class="c1"># Covariance of undesired transmitters</span>
+        <span class="n">s_inf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_dt_undesired</span><span class="p">,</span> <span class="n">h_dt_undesired</span><span class="p">,</span> <span class="n">adjoint_b</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1">#Thermal noise</span>
+        <span class="n">s_no</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">no_dt</span><span class="p">)</span>
+
+        <span class="c1"># Channel estimation errors</span>
+        <span class="c1"># As we have only error variance information for each element,</span>
+        <span class="c1"># we simply sum them across transmitters and build a</span>
+        <span class="c1"># diagonal covariance matrix from this</span>
+        <span class="n">s_csi</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">err_var_dt</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># Final covariance matrix</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s_inf</span> <span class="o">+</span> <span class="n">s_no</span> <span class="o">+</span> <span class="n">s_csi</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="c1">#################################</span>
+        <span class="c1">### Maximum-likelihood detection</span>
+        <span class="c1">#################################</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="n">y_dt</span><span class="p">,</span><span class="n">h_dt_desired</span><span class="p">,</span><span class="n">s</span><span class="p">])</span>
+
+        <span class="c1">##############################################</span>
+        <span class="c1">### Extract data symbols for all detected TX</span>
+        <span class="c1">##############################################</span>
+        <span class="c1"># Transpose tensor to shape</span>
+        <span class="c1"># [num_rx, num_streams_per_rx, num_ofdm_symbols,</span>
+        <span class="c1">#    num_effective_subcarriers, num_bits_per_symbol or num_points,</span>
+        <span class="c1">#       batch_size]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Merge num_rx amd num_streams_per_rx</span>
+        <span class="c1"># [num_rx * num_streams_per_rx, num_ofdm_symbols,</span>
+        <span class="c1">#    num_effective_subcarriers, num_bits_per_symbol or num_points,</span>
+        <span class="c1">#   batch_size]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">flatten_dims</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Put first dimension into the right ordering</span>
+        <span class="n">stream_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">stream_ind</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">stream_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Reshape first dimensions to [num_tx, num_streams] so that</span>
+        <span class="c1"># we can compare to the way the streams were created.</span>
+        <span class="c1"># [num_tx, num_streams, num_ofdm_symbols, num_effective_subcarriers,</span>
+        <span class="c1">#     num_bits_per_symbol or num_points, batch_size]</span>
+        <span class="n">num_streams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">num_streams_per_tx</span>
+        <span class="n">num_tx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stream_management</span><span class="o">.</span><span class="n">num_tx</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">split_dim</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">[</span><span class="n">num_tx</span><span class="p">,</span> <span class="n">num_streams</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Flatten resource grid dimensions</span>
+        <span class="c1"># [num_tx, num_streams, num_ofdm_symbols*num_effective_subcarrier,</span>
+        <span class="c1">#    num_bits_per_symbol or num_points, batch_size]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">flatten_dims</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Gather data symbols</span>
+        <span class="c1"># [num_tx, num_streams, num_data_symbols,</span>
+        <span class="c1">#    num_bits_per_symbol or num_points, batch_size]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_ind</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Put batch_dim first</span>
+        <span class="c1"># [batch_size, num_tx, num_streams,</span>
+        <span class="c1">#     num_data_symbols, num_bits_per_symbol or num_points]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+        <span class="c1"># Reshape LLRs to</span>
+        <span class="c1"># [batch_size, num_tx, num_streams,</span>
+        <span class="c1">#     n = num_data_symbols*num_bits_per_symbol]</span>
+        <span class="c1"># if output is LLRs on bits</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output</span> <span class="o">==</span> <span class="s1">&#39;bit&#39;</span><span class="p">:</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="n">flatten_dims</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">z</span></div>
 </pre></div>
 
            </div>

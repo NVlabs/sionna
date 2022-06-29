@@ -94,6 +94,10 @@ generate_rm_code
 ----------------
 .. autofunction:: sionna.fec.polar.utils.generate_rm_code
 
+generate_dense_polar
+--------------------
+.. autofunction:: sionna.fec.polar.utils.generate_dense_polar
+
 References:
    .. [3GPPTS38212] ETSI 3GPP TS 38.212 "5G NR Multiplexing and channel
       coding", v.16.5.0, 2021-03.
@@ -142,3 +146,6 @@ References:
    .. [Ebada_Design] M. Ebada, S. Cammerer, A. Elkelesh and S. ten Brink,
       “Deep Learning-based Polar Code Design”, Annual Allerton
       Conference on Communication, Control, and Computing, 2019.
+
+   .. [Goala_LP] N. Goela, S. Korada, M. Gastpar, "On LP decoding of Polar
+        Codes," IEEE ITW 2010.

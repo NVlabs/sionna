@@ -60,6 +60,14 @@ lmmse_equalizer
 ---------------
 .. autofunction:: sionna.mimo.lmmse_equalizer
 
+Detection
+**********
+
+MaximumLikelihoodDetector
+---------------------------------
+.. autoclass:: sionna.mimo.MaximumLikelihoodDetector
+   :exclude-members: call, build
+   :members:
 
 References:
         .. [BHS2017] Emil Björnson, Jakob Hoydis and Luca Sanguinetti (2017),

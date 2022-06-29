@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.utils &mdash; Sionna 0.9.1 documentation</title>
+  <title>sionna.fec.utils &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -284,6 +284,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
 </ul>
 </li>
 </ul>
@@ -318,6 +319,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
@@ -326,9 +338,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#load-alist">load_alist</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -358,6 +367,9 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
 </ul>
@@ -440,6 +452,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#linearinterpolator">LinearInterpolator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#precoding">Precoding</a><ul>
@@ -448,6 +461,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -460,6 +477,39 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 </ul>
@@ -517,7 +567,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#symbolsource">SymbolSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#pamsource">PAMSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#plotber">PlotBER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#sim-ber">sim_ber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
@@ -570,9 +622,11 @@
 <span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">importlib_resources</span> <span class="kn">import</span> <span class="n">files</span><span class="p">,</span> <span class="n">as_file</span>
 <span class="kn">from</span> <span class="nn">sionna.fec.ldpc</span> <span class="kn">import</span> <span class="n">codes</span>
 <span class="kn">from</span> <span class="nn">sionna.utils.misc</span> <span class="kn">import</span> <span class="n">log2</span>
+
 
 <div class="viewcode-block" id="GaussianPriorSource"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.GaussianPriorSource">[docs]</a><span class="k">class</span> <span class="nc">GaussianPriorSource</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;GaussianPriorSource(specified_by_mi=False, dtype=tf.float32, **kwargs)</span>
@@ -1198,7 +1252,7 @@
 <span class="sd">            An integer defining which matrix id to load.</span>
 
 <span class="sd">        verbose : bool</span>
-<span class="sd">            A boolean defaults to False. If True, the code parameters are</span>
+<span class="sd">            Defaults to False. If True, the code parameters are</span>
 <span class="sd">            printed.</span>
 
 <span class="sd">    Output</span>
@@ -1376,11 +1430,12 @@
 <span class="sd">        Use :class:`~sionna.fec.utils.load_alist` to import alist from a</span>
 <span class="sd">        textfile.</span>
 
-<span class="sd">        For example the following code snippet will import an alist from a file called ``filename``:</span>
+<span class="sd">        For example, the following code snippet will import an alist from a file called ``filename``:</span>
 
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">            pcm, k, n, coderate = alist2mat(load_alist(path = filename))</span>
+<span class="sd">            al = load_alist(path = filename)</span>
+<span class="sd">            pcm, k, n, coderate = alist2mat(al)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;Invalid alist format.&quot;</span>
@@ -1470,6 +1525,453 @@
                 <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">alist</span></div>
+
+<div class="viewcode-block" id="make_systematic"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.make_systematic">[docs]</a><span class="k">def</span> <span class="nf">make_systematic</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">is_pcm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bring binary matrix in its systematic form.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    mat : ndarray</span>
+<span class="sd">        Binary matrix to be transformed to systematic form of shape `[k, n]`.</span>
+
+<span class="sd">    is_pcm: bool</span>
+<span class="sd">        Defaults to False. If true, ``mat`` is interpreted as parity-check</span>
+<span class="sd">        matrix and, thus, the last k columns will be the identity part.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    mat_sys: ndarray</span>
+<span class="sd">        Binary matrix in systematic form, i.e., the first `k` columns equal the</span>
+<span class="sd">        identity matrix (or last `k` if ``is_pcm`` is True).</span>
+
+<span class="sd">    column_swaps: list of int tuples</span>
+<span class="sd">        A list of integer tuples that describes the swapped columns (in the</span>
+<span class="sd">        order of execution).</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This algorithm (potentially) swaps columns of the input matrix. Thus, the</span>
+<span class="sd">    resulting systematic matrix (potentially) relates to a permuted version of</span>
+<span class="sd">    the code, this is defined by the returned list ``column_swap``.</span>
+<span class="sd">    Note that, the inverse permutation must be applied in the inverse list</span>
+<span class="sd">    order (in case specific columns are swapped multiple times).</span>
+
+<span class="sd">    If a parity-check matrix is passed as input (i.e., ``is_pcm`` is True), the</span>
+<span class="sd">    identity part will be re-arranged to the last columns.&quot;&quot;&quot;</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="n">m</span><span class="o">&lt;=</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;Invalid matrix dimensions.&quot;</span>
+
+    <span class="c1"># check for all-zero columns (=unchecked nodes)</span>
+    <span class="k">if</span> <span class="n">is_pcm</span><span class="p">:</span>
+        <span class="n">c_node_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">c_node_deg</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;All-zero column in parity-check matrix detected. &quot;</span> \
+                <span class="s2">&quot;It seems as if the code contains unprotected nodes.&quot;</span><span class="p">)</span>
+
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+    <span class="n">column_swaps</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># store all column swaps</span>
+
+    <span class="c1"># convert to bool for faster arithmetics</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="c1"># bring in upper triangular form</span>
+    <span class="k">for</span> <span class="n">idx_c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># step 1: find next leading &quot;1&quot;</span>
+        <span class="k">for</span> <span class="n">idx_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span><span class="p">,</span><span class="n">m</span><span class="p">):</span>
+            <span class="c1"># skip if entry is &quot;0&quot;</span>
+            <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]:</span>
+                <span class="n">mat</span><span class="p">[[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_r</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]]</span> <span class="c1"># swap rows</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+
+        <span class="c1"># Could not find &quot;1&quot;-entry for column idx_c</span>
+        <span class="c1"># =&gt; swap with columns from non-sys part</span>
+        <span class="c1"># The task is to find a column with index idx_cc that has a &quot;1&quot; at</span>
+        <span class="c1"># row idx_c</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx_cc</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_cc</span><span class="p">]:</span>
+                    <span class="c1"># swap columns</span>
+                    <span class="n">mat</span><span class="p">[:,[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_cc</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[:,[</span><span class="n">idx_cc</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]]</span>
+                    <span class="n">column_swaps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_cc</span><span class="p">])</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not succeed; mat is not full rank?&quot;</span><span class="p">)</span>
+
+        <span class="c1"># we can now assume a leading &quot;1&quot; at row idx_c</span>
+        <span class="k">for</span> <span class="n">idx_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]:</span>
+                <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,:]</span> <span class="o">^=</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,:]</span> <span class="c1"># bin. add of row idx_c to idx_r</span>
+
+    <span class="c1"># remove upper triangle part in inverse order</span>
+    <span class="k">for</span> <span class="n">idx_c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]:</span>
+                <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,:]</span> <span class="o">^=</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,:]</span> <span class="c1"># bin. add of row idx_c to idx_r</span>
+
+    <span class="c1"># verify results</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">mat</span><span class="p">[:,:</span><span class="n">m</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">m</span><span class="p">)),</span> \
+                            <span class="s2">&quot;Internal error, could not find systematic matrix.&quot;</span>
+
+    <span class="c1"># bring identity part to end of matrix if parity-check matrix is provided</span>
+    <span class="k">if</span> <span class="n">is_pcm</span><span class="p">:</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mat</span><span class="p">[:,:</span><span class="n">m</span><span class="p">])</span>
+        <span class="n">mat</span><span class="p">[:,:</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[:,</span><span class="o">-</span><span class="n">m</span><span class="p">:]</span>
+        <span class="n">mat</span><span class="p">[:,</span><span class="o">-</span><span class="n">m</span><span class="p">:]</span> <span class="o">=</span> <span class="n">im</span>
+        <span class="c1"># and track column swaps</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="n">column_swaps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">idx</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="n">m</span><span class="o">+</span><span class="n">idx</span><span class="p">])</span>
+
+    <span class="c1"># return integer array</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">,</span> <span class="n">column_swaps</span></div>
+
+<div class="viewcode-block" id="gm2pcm"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.gm2pcm">[docs]</a><span class="k">def</span> <span class="nf">gm2pcm</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">verify_results</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the parity-check matrix for a given generator matrix.</span>
+
+<span class="sd">    This function brings ``gm`` :math:`\mathbf{G}` in its systematic form and</span>
+<span class="sd">    uses the following relation to find the parity-check matrix</span>
+<span class="sd">    :math:`\mathbf{H}` in GF(2)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{G} = [\mathbf{I} |  \mathbf{M}]</span>
+<span class="sd">        \Leftrightarrow \mathbf{H} = [\mathbf{M} ^t | \mathbf{I}]. \tag{1}</span>
+
+<span class="sd">    This follows from the fact that for an all-zero syndrome, it must hold that</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{H} \mathbf{c}^t = \mathbf{H} * (\mathbf{u} * \mathbf{G})^t =</span>
+<span class="sd">        \mathbf{H} * \mathbf{G} ^t * \mathbf{u}^t =: \mathbf{0}</span>
+
+<span class="sd">    where :math:`\mathbf{c}` denotes an arbitrary codeword and</span>
+<span class="sd">    :math:`\mathbf{u}` the corresponding information bits.</span>
+
+<span class="sd">    This leads to</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">     \mathbf{G} * \mathbf{H} ^t =: \mathbf{0}. \tag{2}</span>
+
+<span class="sd">    It can be seen that (1) fulfills (2), as it holds in GF(2) that</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        [\mathbf{I} |  \mathbf{M}] * [\mathbf{M} ^t | \mathbf{I}]^t</span>
+<span class="sd">         = \mathbf{M} + \mathbf{M} = \mathbf{0}.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    gm : ndarray</span>
+<span class="sd">        Binary generator matrix of shape `[k, n]`.</span>
+
+<span class="sd">    verify_results: bool</span>
+<span class="sd">        Defaults to True. If True, it is verified that the generated</span>
+<span class="sd">        parity-check matrix is orthogonal to the generator matrix in GF(2).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : ndarray</span>
+<span class="sd">        Binary parity-check matrix of shape `[n-k, n]`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This algorithm only works if ``gm`` has full rank. Otherwise an error is</span>
+<span class="sd">    raised.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;Invalid matrix dimensions.&quot;</span>
+
+    <span class="c1"># bring gm in systematic form</span>
+    <span class="n">gm_sys</span><span class="p">,</span> <span class="n">c_swaps</span> <span class="o">=</span> <span class="n">make_systematic</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">is_pcm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">m_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">gm_sys</span><span class="p">[:,</span><span class="o">-</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">):]))</span>
+    <span class="n">i_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">m_mat</span><span class="p">,</span> <span class="n">i_mat</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># undo column swaps</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">c_swaps</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># reverse ordering when going through list</span>
+        <span class="n">pcm</span><span class="p">[:,[</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">pcm</span><span class="p">[:,[</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span> <span class="c1"># swap columns</span>
+
+    <span class="k">if</span> <span class="n">verify_results</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="o">=</span><span class="n">gm</span><span class="p">,</span> <span class="n">pcm</span><span class="o">=</span><span class="n">pcm</span><span class="p">),</span> \
+            <span class="s2">&quot;Resulting parity-check matrix does not match to generator matrix.&quot;</span>
+
+    <span class="k">return</span> <span class="n">pcm</span></div>
+
+<div class="viewcode-block" id="pcm2gm"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.pcm2gm">[docs]</a><span class="k">def</span> <span class="nf">pcm2gm</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">verify_results</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the generator matrix for a given parity-check matrix.</span>
+
+<span class="sd">    This function brings ``pcm`` :math:`\mathbf{H}` in its systematic form and</span>
+<span class="sd">    uses the following relation to find the generator matrix</span>
+<span class="sd">    :math:`\mathbf{G}` in GF(2)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{G} = [\mathbf{I} |  \mathbf{M}]</span>
+<span class="sd">        \Leftrightarrow \mathbf{H} = [\mathbf{M} ^t | \mathbf{I}]. \tag{1}</span>
+
+<span class="sd">    This follows from the fact that for an all-zero syndrome, it must hold that</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{H} \mathbf{c}^t = \mathbf{H} * (\mathbf{u} * \mathbf{G})^t =</span>
+<span class="sd">        \mathbf{H} * \mathbf{G} ^t * \mathbf{u}^t =: \mathbf{0}</span>
+
+<span class="sd">    where :math:`\mathbf{c}` denotes an arbitrary codeword and</span>
+<span class="sd">    :math:`\mathbf{u}` the corresponding information bits.</span>
+
+<span class="sd">    This leads to</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">     \mathbf{G} * \mathbf{H} ^t =: \mathbf{0}. \tag{2}</span>
+
+<span class="sd">    It can be seen that (1) fulfills (2) as in GF(2) it holds that</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        [\mathbf{I} |  \mathbf{M}] * [\mathbf{M} ^t | \mathbf{I}]^t</span>
+<span class="sd">         = \mathbf{M} + \mathbf{M} = \mathbf{0}.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    pcm : ndarray</span>
+<span class="sd">        Binary parity-check matrix of shape `[n-k, n]`.</span>
+
+<span class="sd">    verify_results: bool</span>
+<span class="sd">        Defaults to True. If True, it is verified that the generated</span>
+<span class="sd">        generator matrix is orthogonal to the parity-check matrix in GF(2).</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : ndarray</span>
+<span class="sd">        Binary generator matrix of shape `[k, n]`.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This algorithm only works if ``pcm`` has full rank. Otherwise an error is</span>
+<span class="sd">    raised.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">n</span><span class="p">,</span> <span class="s2">&quot;Invalid matrix dimensions.&quot;</span>
+
+    <span class="c1"># bring pcm in systematic form</span>
+    <span class="n">pcm_sys</span><span class="p">,</span> <span class="n">c_swaps</span> <span class="o">=</span> <span class="n">make_systematic</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">is_pcm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">m_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">pcm_sys</span><span class="p">[:,:</span><span class="n">k</span><span class="p">]))</span>
+    <span class="n">i_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">gm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">i_mat</span><span class="p">,</span> <span class="n">m_mat</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># undo column swaps</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">c_swaps</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="c1"># reverse ordering when going through list</span>
+        <span class="n">gm</span><span class="p">[:,[</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">gm</span><span class="p">[:,[</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span> <span class="c1"># swap columns</span>
+
+    <span class="k">if</span> <span class="n">verify_results</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="o">=</span><span class="n">gm</span><span class="p">,</span> <span class="n">pcm</span><span class="o">=</span><span class="n">pcm</span><span class="p">),</span> \
+            <span class="s2">&quot;Resulting parity-check matrix does not match to generator matrix.&quot;</span>
+    <span class="k">return</span> <span class="n">gm</span></div>
+
+<div class="viewcode-block" id="verify_gm_pcm"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.verify_gm_pcm">[docs]</a><span class="k">def</span> <span class="nf">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">pcm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Verify that generator matrix :math:`\mathbf{G}` ``gm`` and parity-check</span>
+<span class="sd">    matrix :math:`\mathbf{H}` ``pcm`` are orthogonal in GF(2).</span>
+
+<span class="sd">    For an all-zero syndrome, it must hold that</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{H} \mathbf{c}^t = \mathbf{H} * (\mathbf{u} * \mathbf{G})^t =</span>
+<span class="sd">        \mathbf{H} * \mathbf{G} ^t * \mathbf{u}^t =: \mathbf{0}</span>
+
+<span class="sd">    where :math:`\mathbf{c}` denotes an arbitrary codeword and</span>
+<span class="sd">    :math:`\mathbf{u}` the corresponding information bits.</span>
+
+<span class="sd">    As :math:`\mathbf{u}` can be arbitrary it follows that</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathbf{H} * \mathbf{G} ^t =: \mathbf{0}.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    gm : ndarray</span>
+<span class="sd">        Binary generator matrix of shape `[k, n]`.</span>
+
+<span class="sd">    pcm : ndarray</span>
+<span class="sd">        Binary parity-check matrix of shape `[n-k, n]`.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : bool</span>
+<span class="sd">        True if ``gm`` and ``pcm`` define a valid pair of parity-check and</span>
+<span class="sd">        generator matrices in GF(2).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check for valid dimensions</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">n_pcm</span> <span class="o">=</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k_pcm</span> <span class="o">=</span> <span class="n">n_pcm</span> <span class="o">-</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">assert</span> <span class="n">k</span><span class="o">==</span><span class="n">k_pcm</span><span class="p">,</span> <span class="s2">&quot;Inconsistent shape of gm and pcm.&quot;</span>
+    <span class="k">assert</span> <span class="n">n</span><span class="o">==</span><span class="n">n_pcm</span><span class="p">,</span> <span class="s2">&quot;Inconsistent shape of gm and pcm.&quot;</span>
+
+    <span class="c1"># check that both matrices are binary</span>
+    <span class="k">assert</span> <span class="p">((</span><span class="n">gm</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">gm</span><span class="o">==</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;gm is not binary.&quot;</span>
+    <span class="k">assert</span> <span class="p">((</span><span class="n">pcm</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">pcm</span><span class="o">==</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;pcm is not binary.&quot;</span>
+
+    <span class="c1"># check for zero syndrome</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">gm</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># mod2 to account for GF(2)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="c1"># Check for Non-zero syndrom of H*G&#39;</span></div>
+
+<div class="viewcode-block" id="LinearEncoder"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.LinearEncoder">[docs]</a><span class="k">class</span> <span class="nc">LinearEncoder</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;LinearEncoder(enc_mat, is_pcm=False, dtype=tf.float32, **kwargs)</span>
+
+<span class="sd">    Linear binary encoder for a given encoding matrix ``enc_mat``.</span>
+
+<span class="sd">    If ``is_pcm`` is True, ``enc_mat`` is interpreted as parity-check</span>
+<span class="sd">    matrix and internally converted to a corresponding generator matrix.</span>
+
+<span class="sd">    The class inherits from the Keras layer class and can be used as layer in a</span>
+<span class="sd">    Keras model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    enc_mat : [k, n] or [n-k, n], ndarray</span>
+<span class="sd">        Binary generator matrix of shape `[k, n]`. If ``is_pcm`` is</span>
+<span class="sd">        True, ``enc_mat`` is interpreted as parity-check matrix of shape</span>
+<span class="sd">        `[n-k, n]`.</span>
+
+<span class="sd">    dtype: tf.DType</span>
+<span class="sd">        Defaults to `tf.float32`. Defines the datatype for the output dtype.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">    inputs: [...,k], tf.float32</span>
+<span class="sd">        2+D tensor containing information bits.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">    : [...,n], tf.float32</span>
+<span class="sd">        2+D tensor containing codewords with same shape as inputs, except the</span>
+<span class="sd">        last dimension changes to `[...,n]`.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        If the encoding matrix is not a valid binary 2-D matrix.</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">        If ``is_pcm`` is True, this layer uses</span>
+<span class="sd">        :class:`~sionna.fec.utils.pcm2gm` to find the generator matrix for</span>
+<span class="sd">        encoding. Please note that this imposes a few constraints on the</span>
+<span class="sd">        provided parity-check matrix such as full rank and it must be binary.</span>
+
+<span class="sd">        Note that this encoder is generic for all binary linear block codes</span>
+<span class="sd">        and, thus, cannot implement any code specifc optimizations. As a</span>
+<span class="sd">        result, the encoding complexity is :math:`O(k^2)`. Please consider code</span>
+<span class="sd">        specific encoders such as the</span>
+<span class="sd">        :class:`~sionna.fec.polar.encoding.Polar5GEncoder` or</span>
+<span class="sd">        :class:`~sionna.fec.ldpc.encoding.LDPC5GEncoder` for an improved</span>
+<span class="sd">        encoding performance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">enc_mat</span><span class="p">,</span>
+                 <span class="n">is_pcm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># tf.int8 currently not supported by tf.matmult</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">dtype</span> <span class="ow">in</span>
+               <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)),</span> \
+               <span class="s2">&quot;Unsupported dtype.&quot;</span>
+
+        <span class="c1"># check input values for consistency</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">is_pcm</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> \
+                                    <span class="s1">&#39;is_parity_check must be bool.&#39;</span>
+
+        <span class="c1"># verify that enc_mat is binary</span>
+        <span class="k">assert</span> <span class="p">((</span><span class="n">enc_mat</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">enc_mat</span><span class="o">==</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="s2">&quot;enc_mat is not binary.&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">enc_mat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;enc_mat must be 2-D array.&quot;</span>
+
+        <span class="c1"># in case parity-check matrix is provided, convert to generator matrix</span>
+        <span class="k">if</span> <span class="n">is_pcm</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gm</span> <span class="o">=</span> <span class="n">pcm2gm</span><span class="p">(</span><span class="n">enc_mat</span><span class="p">,</span> <span class="n">verify_results</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gm</span> <span class="o">=</span> <span class="n">enc_mat</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">),</span> <span class="s2">&quot;Invalid matrix dimensions.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1">#########################################</span>
+    <span class="c1"># Public methods and properties</span>
+    <span class="c1">#########################################</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of information bits per codeword.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Codeword length.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">gm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Generator matrix used for encoding.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gn</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coderate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Coderate of the code.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span>
+
+    <span class="c1">#########################</span>
+    <span class="c1"># Keras layer functions</span>
+    <span class="c1">#########################</span>
+
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Nothing to build, but check for valid shapes.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="s2">&quot;Invalid input shape.&quot;</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;The inputs must have at least rank 2.&#39;</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generic encoding function based on generator matrix multiplication.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gm</span><span class="p">)</span>
+
+        <span class="c1"># faster implementation of tf.math.mod(c, 2)</span>
+        <span class="n">c_uint8</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">c_bin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">bitwise</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">c_uint8</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">c_bin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">c</span></div>
 </pre></div>
 
            </div>

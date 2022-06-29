@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Orthogonal Frequency-Division Multiplexing (OFDM) &mdash; Sionna 0.9.1 documentation</title>
+  <title>Orthogonal Frequency-Division Multiplexing (OFDM) &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -288,6 +288,7 @@
 <li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
 </ul>
 </li>
 </ul>
@@ -322,6 +323,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
@@ -330,9 +342,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -362,6 +371,9 @@
 <li class="toctree-l4"><a class="reference internal" href="mapping.html#demapperwithprior">DemapperWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapper">SymbolDemapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
 </ul>
@@ -444,6 +456,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#channel-estimation">Channel Estimation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#lschannelestimator">LSChannelEstimator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linearinterpolator">LinearInterpolator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#precoding">Precoding</a><ul>
@@ -452,6 +465,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -464,6 +481,39 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 </ul>
@@ -521,7 +571,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#symbolsource">SymbolSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#pamsource">PAMSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
@@ -1221,6 +1273,7 @@ domain.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rg</span> <span class="o">=</span> <span class="n">ResourceGrid</span><span class="p">(</span><span class="n">num_ofdm_symbols</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="n">fft_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+<span class="gp">... </span>                  <span class="n">subcarrier_spacing</span> <span class="o">=</span> <span class="mf">30e3</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="n">num_tx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="n">num_streams_per_tx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
 <span class="gp">... </span>                  <span class="n">pilot_pattern</span> <span class="o">=</span> <span class="s2">&quot;kronecker&quot;</span><span class="p">,</span>
@@ -1270,8 +1323,11 @@ the entire resource grid.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
-<li><p><strong>interpolation_type</strong> (<em>One of</em><em> [</em><em>&quot;nn&quot;</em><em>]</em><em>, </em><em>string</em>) – The interpolation to be used. Currently only the
-<a class="reference internal" href="#sionna.ofdm.NearestNeighborInterpolator" title="sionna.ofdm.NearestNeighborInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">NearestNeighborInterpolator</span></code></a> is supported.</p></li>
+<li><p><strong>interpolation_type</strong> (<em>One of</em><em> [</em><em>&quot;nn&quot;</em><em>, </em><em>&quot;lin&quot;</em><em>, </em><em>&quot;lin_time_avg&quot;</em><em>]</em><em>, </em><em>string</em>) – The interpolation to be used. Currently only the
+<a class="reference internal" href="#sionna.ofdm.NearestNeighborInterpolator" title="sionna.ofdm.NearestNeighborInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">NearestNeighborInterpolator</span></code></a> (<cite>“nn</cite>”) and
+<a class="reference internal" href="#sionna.ofdm.LinearInterpolator" title="sionna.ofdm.LinearInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearInterpolator</span></code></a>
+without (<cite>“lin”</cite>) and with averaging across OFDM
+symbols (<cite>“lin_time_avg”</cite>) are supported.</p></li>
 <li><p><strong>dtype</strong> (<em>tf.Dtype</em>) – Datatype for internal calculations and the output dtype.
 Defaults to <cite>tf.complex64</cite>.</p></li>
 </ul>
@@ -1302,7 +1358,7 @@ for all transmitters and streams.</p></li>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">NearestNeighborInterpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pilot_pattern</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/channel_estimation.html#NearestNeighborInterpolator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.NearestNeighborInterpolator" title="Permalink to this definition"></a></dt>
 <dd><p>Nearest-neighbor channel estimate interpolation on a resource grid.</p>
 <p>This class assigns to each element of an OFDM resource grid one of
-<code class="docutils literal notranslate"><span class="pre">num_pilots</span></code> provided measurements, e.g., channel estimates of error
+<code class="docutils literal notranslate"><span class="pre">num_pilots</span></code> provided measurements, e.g., channel estimates or error
 variances, according to the nearest neighbor method. It is assumed
 that the measurements were taken at the nonzero positions of a
 <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>.</p>
@@ -1316,7 +1372,41 @@ to the same measurement value.</p>
 <dd class="field-odd"><p><strong>pilot_pattern</strong> (<a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><em>PilotPattern</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>.</p>
 </dd>
 <dt class="field-even">Input</dt>
-<dd class="field-even"><p><em>[k, l ,m, num_tx, num_streams_per_tx, num_pilots], tf.DType</em> – Tensor of quantities to be interpolated according to
+<dd class="field-even"><p><em>[k, l ,m, num_tx, num_streams_per_tx, num_pilot_symbols], tf.DType</em> – Tensor of quantities to be interpolated according to
+a <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>. This can be channel estimates
+as well as the related error variances.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[k, l, m, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex</em> – The interpolated input tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="linearinterpolator">
+<h3>LinearInterpolator<a class="headerlink" href="#linearinterpolator" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.LinearInterpolator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">LinearInterpolator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pilot_pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_avg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/channel_estimation.html#LinearInterpolator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.LinearInterpolator" title="Permalink to this definition"></a></dt>
+<dd><p>Linear channel estimate interpolation on a resource grid.</p>
+<p>This class computes for each element of an OFDM resource grid
+a channel estimate based on <code class="docutils literal notranslate"><span class="pre">num_pilots</span></code> provided measurements,
+e.g., channel estimates or error variances, through linear interpolation.
+It is assumed that the measurements were taken at the nonzero positions
+of a <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>.</p>
+<p>The interpolation is done first across sub-carriers and then
+across OFDM symbols.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pilot_pattern</strong> (<a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><em>PilotPattern</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>.</p></li>
+<li><p><strong>time_avg</strong> (<em>bool</em>) – If enabled, measurements will be averaged across OFDM symbols
+(i.e., time). This is useful for channels that do not vary
+substantially over the duration of an OFDM frame. Defaults to <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><em>[k, l ,m, num_tx, num_streams_per_tx, num_pilot_symbols], tf.DType</em> – Tensor of quantities to be interpolated according to
 a <a class="reference internal" href="#sionna.ofdm.PilotPattern" title="sionna.ofdm.PilotPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">PilotPattern</span></code></a>. This can be channel estimates
 as well as the related error variances.</p>
 </dd>
@@ -1423,6 +1513,70 @@ Defaults to <cite>tf.complex64</cite>.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x_hat</strong> (<em>[batch_size, num_tx, num_streams, num_data_symbols], tf.complex</em>) – The estimated symbols.</p></li>
 <li><p><strong>no_eff</strong> (<em>[batch_size, num_tx, num_streams, num_data_symbols], tf.float</em>) – The effective noise variance for each estimated symbol.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you want to use this layer in Graph mode with XLA, i.e., within
+a function that is decorated with <code class="docutils literal notranslate"><span class="pre">&#64;tf.function(jit_compile=True)</span></code>,
+you must set <code class="docutils literal notranslate"><span class="pre">sionna.Config.xla_compat=true</span></code>.
+See <a class="reference internal" href="config.html#sionna.Config.xla_compat" title="sionna.Config.xla_compat"><code class="xref py py-attr docutils literal notranslate"><span class="pre">xla_compat</span></code></a>.</p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="detection">
+<h2>Detection<a class="headerlink" href="#detection" title="Permalink to this headline"></a></h2>
+<div class="section" id="maximumlikelihooddetector">
+<h3>MaximumLikelihoodDetector<a class="headerlink" href="#maximumlikelihooddetector" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.ofdm.MaximumLikelihoodDetector">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.ofdm.</span></span><span class="sig-name descname"><span class="pre">MaximumLikelihoodDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">demapping_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_management</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/ofdm/detection.html#MaximumLikelihoodDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.ofdm.MaximumLikelihoodDetector" title="Permalink to this definition"></a></dt>
+<dd><p>Maximum-likelihood (ML) detection for OFDM MIMO transmissions.</p>
+<p>This layer implements maximum-likelihood (ML) detection
+for OFDM MIMO transmissions. Both ML detection of symbols or bits with either
+soft- or hard-decisions are supported. The OFDM and stream configuration are provided
+by a <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a> and
+<a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a> instance, respectively. The
+actual detector is an instance of <a class="reference internal" href="mimo.html#sionna.mimo.MaximumLikelihoodDetector" title="sionna.mimo.MaximumLikelihoodDetector"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaximumLikelihoodDetector</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>One of</em><em> [</em><em>&quot;bit&quot;</em><em>, </em><em>&quot;symbol&quot;</em><em>]</em><em>, </em><em>str</em>) – The type of output, either LLRs on bits or logits on constellation symbols.</p></li>
+<li><p><strong>demapping_method</strong> (<em>One of</em><em> [</em><em>&quot;app&quot;</em><em>, </em><em>&quot;maxlog&quot;</em><em>]</em><em>, </em><em>str</em>) – The demapping method used.</p></li>
+<li><p><strong>resource_grid</strong> (<a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><em>ResourceGrid</em></a>) – An instance of <a class="reference internal" href="#sionna.ofdm.ResourceGrid" title="sionna.ofdm.ResourceGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceGrid</span></code></a>.</p></li>
+<li><p><strong>stream_management</strong> (<a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><em>StreamManagement</em></a>) – An instance of <a class="reference internal" href="mimo.html#sionna.mimo.StreamManagement" title="sionna.mimo.StreamManagement"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamManagement</span></code></a>.</p></li>
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="mapping.html#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="mapping.html#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="mapping.html#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or <cite>None</cite>.
+In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the detector computes hard-decided bit values or
+constellation point indices instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype of <cite>y</cite>. Defaults to tf.complex64.
+The output dtype is the corresponding real dtype (tf.float32 or tf.float64).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(y, h_hat, err_var, no)</strong> – Tuple:</p></li>
+<li><p><strong>y</strong> (<em>[batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex</em>) – The received OFDM resource grid after cyclic prefix removal and FFT.</p></li>
+<li><p><strong>h_hat</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex</em>) – The channel estimates for all streams from all transmitters.</p></li>
+<li><p><strong>err_var</strong> ([Broadcastable to shape of <code class="docutils literal notranslate"><span class="pre">h_hat</span></code>], tf.float) – The variance of the channel estimation error.</p></li>
+<li><p><strong>no</strong> (<em>[batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float</em>) – The variance of the AWGN noise.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>One of</strong></p></li>
+<li><p><em>[batch_size, num_tx, num_streams, num_data_symbols*num_bits_per_symbol], tf.float</em> – LLRs or hard-decisions for every bit of every stream, if <code class="docutils literal notranslate"><span class="pre">output</span></code> equals <cite>“bit”</cite>.</p></li>
+<li><p><em>[batch_size, num_tx, num_streams, num_data_symbols, num_points], tf.float or [batch_size, num_tx, num_streams, num_data_symbols], tf.int</em> – Logits or hard-decisions on constellation symbols for every stream, if <code class="docutils literal notranslate"><span class="pre">output</span></code> equals <cite>“symbol”</cite>.
+Hard-decisions correspond to the symbol indices.</p></li>
 </ul>
 </dd>
 </dl>

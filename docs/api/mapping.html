@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapping &mdash; Sionna 0.9.1 documentation</title>
+  <title>Mapping &mdash; Sionna 0.10.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -288,6 +288,7 @@
 <li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
 </ul>
 </li>
 </ul>
@@ -322,6 +323,17 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
@@ -330,9 +342,6 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#alist2mat">alist2mat</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fec.utils.html#load-alist">load_alist</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -362,6 +371,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#demapperwithprior">DemapperWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#symboldemapper">SymbolDemapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
 </ul>
@@ -444,6 +456,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ofdm.html#channel-estimation">Channel Estimation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#linearinterpolator">LinearInterpolator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ofdm.html#precoding">Precoding</a><ul>
@@ -452,6 +465,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ofdm.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -464,6 +481,39 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="signal.html#utility-functions-and-layers">Utility functions and layers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 </ul>
@@ -521,7 +571,9 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#symbolsource">SymbolSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#pamsource">PAMSource</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#plotber">PlotBER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#sim-ber">sim_ber</a></li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#ebnodb2no">ebnodb2no</a></li>
@@ -639,6 +691,33 @@ initialized with PAM/QAM constellation points.</p>
 <dt class="sig sig-object py" id="sionna.mapping.Constellation.center">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#sionna.mapping.Constellation.center" title="Permalink to this definition"></a></dt>
 <dd><p>Indicates if the constellation is centered.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.mapping.Constellation.create_or_check_constellation">
+<span class="sig-name descname"><span class="pre">create_or_check_constellation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Constellation.create_or_check_constellation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Constellation.create_or_check_constellation" title="Permalink to this definition"></a></dt>
+<dd><p>Static method for conviently creating a constellation object or checking that an existing one
+is consistent with requested settings.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">constellation</span></code> is <cite>None</cite>, then this method creates a <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+object of type <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> and with <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> bits per symbol.
+Otherwise, this method checks that <cite>constellation</cite> is consistent with <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code>. If it is, <code class="docutils literal notranslate"><span class="pre">constellation</span></code> is returned. Otherwise, an assertion is raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Input</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constellation_type</strong> (<em>One of [“qam”, “pam”, “custom”], str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<em>Constellation</em>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or
+<cite>None</cite>. In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Output</dt>
+<dd class="field-even"><p><a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> – A constellation object.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py property">
@@ -791,7 +870,7 @@ Section 5.1 of <a class="reference internal" href="#gppts38211" id="id3"><span>[
 <h2>Mapper<a class="headerlink" href="#mapper" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="sionna.mapping.Mapper">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Mapper" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#Mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.Mapper" title="Permalink to this definition"></a></dt>
 <dd><p>Maps binary tensors to points of a constellation.</p>
 <p>This class defines a layer that maps a tensor of binary values
 to a tensor of points from a provided constellation.</p>
@@ -805,6 +884,8 @@ Only required for <code class="docutils literal notranslate"><span class="pre">c
 <li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or
 <cite>None</cite>. In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
 and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>return_indices</strong> (<em>bool</em>) – If enabled, symbol indices are additionally returned.
+Defaults to <cite>False</cite>.</p></li>
 <li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.complex64</em><em>, </em><em>tf.complex128</em><em>]</em><em>, </em><em>tf.DType</em>) – The output dtype. Defaults to tf.complex64.</p></li>
 </ul>
 </dd>
@@ -812,7 +893,11 @@ and <code class="docutils literal notranslate"><span class="pre">num_bits_per_sy
 <dd class="field-even"><p><em>[…, n], tf.float or tf.int</em> – Tensor with with binary entries.</p>
 </dd>
 <dt class="field-odd">Output</dt>
-<dd class="field-odd"><p><em>[…,n/Constellation.num_bits_per_symbol], tf.complex</em> – The mapped constellation symbols.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><em>[…,n/Constellation.num_bits_per_symbol], tf.complex</em> – The mapped constellation symbols.</p></li>
+<li><p><em>[…,n/Constellation.num_bits_per_symbol], tf.int32</em> – The symbol indices corresponding to the constellation symbols.
+Only returned if <code class="docutils literal notranslate"><span class="pre">return_indices</span></code> is set to True.</p></li>
+</ul>
 </dd>
 </dl>
 <div class="admonition note">
@@ -1102,6 +1187,187 @@ Otherwise, a tensor of shape <cite>[…,n]</cite> of hard-decisions on the symbo
 \[\ln\left(\Pr\left(c \lvert y,\mathbf{p}\right)\right) = \ln\left( \frac{\exp\left(-\frac{|y-c|^2}{N_0} + p_c \right)}{\sum_{c'\in\mathcal{C}} \exp\left(-\frac{|y-c'|^2}{N_0} + p_{c'} \right)} \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(\mathcal{C}\)</span> is the set of constellation points used for modulation, and <span class="math notranslate nohighlight">\(\mathbf{p} = \left\{p_c \lvert c \in \mathcal{C}\right\}\)</span> the prior information on constellation points given as log-probabilities.</p>
 </div>
+</dd></dl>
+
+</div>
+<div class="section" id="symbollogits2llrs">
+<h3>SymbolLogits2LLRs<a class="headerlink" href="#symbollogits2llrs" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.SymbolLogits2LLRs">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">SymbolLogits2LLRs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#SymbolLogits2LLRs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.SymbolLogits2LLRs" title="Permalink to this definition"></a></dt>
+<dd><p>Computes log-likelihood ratios (LLRs) or hard-decisions on bits
+from a tensor of logits (i.e., unnormalized log-probabilities) on constellation points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>One of</em><em> [</em><em>&quot;app&quot;</em><em>, </em><em>&quot;maxlog&quot;</em><em>]</em><em>, </em><em>str</em>) – The method used for computing the LLRs.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the layer provides hard-decided bits instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.float32</em><em>, </em><em>tf.float64</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype for the input and output.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>logits</strong> (<em>[…,n, num_points], tf.float</em>) – Logits on constellation points.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n, num_bits_per_symbol], tf.float</em> – LLRs or hard-decisions for every bit.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>With the “app” method, the LLR for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+is computed according to</p>
+<div class="math notranslate nohighlight">
+\[LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y\right)}{\Pr\left(b_i=0\lvert y\right)}\right) =\ln\left(\frac{
+        \sum_{c\in\mathcal{C}_{i,1}}
+            e^{z_c}
+        }{
+        \sum_{c\in\mathcal{C}_{i,0}}
+            e^{z_c}
+        }\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{C}_{i,1}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{C}_{i,0}\)</span> are the
+sets of <span class="math notranslate nohighlight">\(2^K\)</span> constellation points for which the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit is
+equal to 1 and 0, respectively. <span class="math notranslate nohighlight">\(\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]\)</span> is the vector of logits on the constellation points. The definition of the LLR has been
+chosen such that it is equivalent with that of logits. This is
+different from many textbooks in communications, where the LLR is
+defined as <span class="math notranslate nohighlight">\(LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)\)</span>.</p>
+<p>With the “maxlog” method, LLRs for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+are approximated like</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}LLR(i) &amp;\approx\ln\left(\frac{
+    \max_{c\in\mathcal{C}_{i,1}}
+        e^{z_c}
+    }{
+    \max_{c\in\mathcal{C}_{i,0}}
+        e^{z_c}
+    }\right)\\
+    &amp;=  \max_{c\in\mathcal{C}_{i,1}} z_c
+    - \max_{c\in\mathcal{C}_{i,0}} z_c
+    .\end{split}\]</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="symbollogits2llrswithprior">
+<h3>SymbolLogits2LLRsWithPrior<a class="headerlink" href="#symbollogits2llrswithprior" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.SymbolLogits2LLRsWithPrior">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">SymbolLogits2LLRsWithPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hard_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#SymbolLogits2LLRsWithPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.SymbolLogits2LLRsWithPrior" title="Permalink to this definition"></a></dt>
+<dd><p>Computes log-likelihood ratios (LLRs) or hard-decisions on bits
+from a tensor of logits (i.e., unnormalized log-probabilities) on constellation points,
+assuming prior knowledge on the bits is available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>One of</em><em> [</em><em>&quot;app&quot;</em><em>, </em><em>&quot;maxlog&quot;</em><em>]</em><em>, </em><em>str</em>) – The method used for computing the LLRs.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.</p></li>
+<li><p><strong>hard_out</strong> (<em>bool</em>) – If <cite>True</cite>, the layer provides hard-decided bits instead of soft-values.
+Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.float32</em><em>, </em><em>tf.float64</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype for the input and output.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(logits, prior)</strong> – Tuple:</p></li>
+<li><p><strong>logits</strong> (<em>[…,n, num_points], tf.float</em>) – Logits on constellation points.</p></li>
+<li><p><strong>prior</strong> (<em>[num_bits_per_symbol] or […n, num_bits_per_symbol], tf.float</em>) – Prior for every bit as LLRs.
+It can be provided either as a tensor of shape <cite>[num_bits_per_symbol]</cite> for the
+entire input batch, or as a tensor that is “broadcastable”
+to <cite>[…, n, num_bits_per_symbol]</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><p><em>[…,n, num_bits_per_symbol], tf.float</em> – LLRs or hard-decisions for every bit.</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>With the “app” method, the LLR for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+is computed according to</p>
+<div class="math notranslate nohighlight">
+\[LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert \mathbf{z},\mathbf{p}\right)}{\Pr\left(b_i=0\lvert \mathbf{z},\mathbf{p}\right)}\right) =\ln\left(\frac{
+        \sum_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)
+        e^{z_c}
+        }{
+        \sum_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
+        e^{z_c}
+        }\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathcal{C}_{i,1}\)</span> and <span class="math notranslate nohighlight">\(\mathcal{C}_{i,0}\)</span> are the
+sets of <span class="math notranslate nohighlight">\(2^K\)</span> constellation points for which the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit is
+equal to 1 and 0, respectively. <span class="math notranslate nohighlight">\(\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]\)</span> is the vector of logits on the constellation points, <span class="math notranslate nohighlight">\(\mathbf{p} = \left[p_0,\dots,p_{K-1}\right]\)</span>
+is the vector of LLRs that serves as prior knowledge on the <span class="math notranslate nohighlight">\(K\)</span> bits that are mapped to
+a constellation point, and <span class="math notranslate nohighlight">\(\Pr(c\lvert\mathbf{p})\)</span> is the prior probability on the constellation symbol
+<span class="math notranslate nohighlight">\(c\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\Pr\left(c\lvert\mathbf{p}\right) = \prod_{k=0}^{K-1} \Pr\left(b_k = \ell(c)_k \lvert\mathbf{p} \right)
+= \prod_{k=0}^{K-1} \text{sigmoid}\left(p_k \ell(c)_k\right)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\ell(c)_k\)</span> is the <span class="math notranslate nohighlight">\(k^{th}\)</span> bit label of <span class="math notranslate nohighlight">\(c\)</span>, where 0 is
+replaced by -1.
+The definition of the LLR has been
+chosen such that it is equivalent with that of logits. This is
+different from many textbooks in communications, where the LLR is
+defined as <span class="math notranslate nohighlight">\(LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)\)</span>.</p>
+<p>With the “maxlog” method, LLRs for the <span class="math notranslate nohighlight">\(i\text{th}\)</span> bit
+are approximated like</p>
+<div class="math notranslate nohighlight">
+\[\begin{align}
+    LLR(i) &amp;\approx\ln\left(\frac{
+        \max_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)
+            e^{z_c}
+        }{
+        \max_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
+            e^{z_c}
+        }\right)
+        .
+\end{align}\]</div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="symbollogits2moments">
+<h3>SymbolLogits2Moments<a class="headerlink" href="#symbollogits2moments" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.mapping.SymbolLogits2Moments">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.mapping.</span></span><span class="sig-name descname"><span class="pre">SymbolLogits2Moments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constellation_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits_per_symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constellation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.float32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/mapping.html#SymbolLogits2Moments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.mapping.SymbolLogits2Moments" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the mean and variance of a constellation from logits (unnormalized log-probabilities) on the
+constellation points.</p>
+<p>More precisely, given a constellation <span class="math notranslate nohighlight">\(\mathcal{C} = \left[ c_0,\dots,c_{N-1} \right]\)</span> of size <span class="math notranslate nohighlight">\(N\)</span>, this layer computes the mean and variance
+according to</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{align}
+    \mu &amp;= \sum_{n = 0}^{N-1} c_n \Pr \left(c_n \lvert \mathbf{\ell} \right)\\
+    \nu &amp;= \sum_{n = 0}^{N-1} \left( c_n - \mu \right)^2 \Pr \left(c_n \lvert \mathbf{\ell} \right)
+\end{align}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{\ell} = \left[ \ell_0, \dots, \ell_{N-1} \right]\)</span> are the logits, and</p>
+<div class="math notranslate nohighlight">
+\[\Pr \left(c_n \lvert \mathbf{\ell} \right) = \frac{\exp \left( \ell_n \right)}{\sum_{i=0}^{N-1} \exp \left( \ell_i \right) }.\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>constellation_type</strong> (<em>One of</em><em> [</em><em>&quot;qam&quot;</em><em>, </em><em>&quot;pam&quot;</em><em>, </em><em>&quot;custom&quot;</em><em>]</em><em>, </em><em>str</em>) – For “custom”, an instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a>
+must be provided.</p></li>
+<li><p><strong>num_bits_per_symbol</strong> (<em>int</em>) – The number of bits per constellation symbol, e.g., 4 for QAM16.
+Only required for <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code> in [“qam”, “pam”].</p></li>
+<li><p><strong>constellation</strong> (<a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><em>Constellation</em></a>) – An instance of <a class="reference internal" href="#sionna.mapping.Constellation" title="sionna.mapping.Constellation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Constellation</span></code></a> or <cite>None</cite>.
+In the latter case, <code class="docutils literal notranslate"><span class="pre">constellation_type</span></code>
+and <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> must be provided.</p></li>
+<li><p><strong>dtype</strong> (<em>One of</em><em> [</em><em>tf.float32</em><em>, </em><em>tf.float64</em><em>] </em><em>tf.DType</em><em> (</em><em>dtype</em><em>)</em>) – The dtype for the input and output.
+Defaults to <cite>tf.float32</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Input</dt>
+<dd class="field-even"><p><strong>logits</strong> (<em>[…,n, num_points], tf.float</em>) – Logits on constellation points.</p>
+</dd>
+<dt class="field-odd">Output</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mean</strong> (<em>[…,n], tf.float</em>) – Mean of the constellation.</p></li>
+<li><p><strong>var</strong> (<em>[…,n], tf.float</em>) – Variance of the constellation</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl>
