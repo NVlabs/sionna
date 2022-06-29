@@ -19,7 +19,7 @@ For Beginners
     examples/Sionna_tutorial_part3.ipynb
     examples/Sionna_tutorial_part4.ipynb
     examples/Simple_MIMO_Simulation.ipynb
-    examples/Optical_Lumped_Amplification_Channel.ipynb
+    examples/Pulse_shaping_basics.ipynb
 
 For Experts
 -----------
