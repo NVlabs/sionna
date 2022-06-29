@@ -48,7 +48,7 @@ class SSFM(Layer):
 
     Setting-up:
 
-    >>> ssfm_channel = SSFM(
+    >>> ssfm = SSFM(
     >>>     alpha=0.046, beta_2=-21.67, f_c=193.55, gamma=1.27,
     >>>     half_window_length=100, ell=80, n_ssfm=200, n_sp=1.0, dt=1.0,
     >>>     t_norm=1e-12, with_amplification=True, with_attenuation=True,
@@ -56,7 +56,7 @@ class SSFM(Layer):
 
     Running:
 
-    >>> y = ssfm_channel([1.0+1.0j, 1.0+1.0j, 1.0+1.0j])
+    >>> y = ssfm([1.0+1.0j, 1.0+1.0j, 1.0+1.0j])
 
     Parameters
     ----------
@@ -84,7 +84,7 @@ class SSFM(Layer):
         n_sp : float
             Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification
 
-        dt : float
+        sample_duration : float
             Normalized time step :math:`\Delta_t` in :math:`(T_\text{norm})`
 
         t_norm : float
@@ -121,7 +121,7 @@ class SSFM(Layer):
             Channel output
     """
     def __init__(self, alpha, beta_2, f_c, gamma, half_window_length, length,
-                 n_ssfm, n_sp=1.0,  dt=1.0, t_norm=1e-12,
+                 n_ssfm, n_sp=1.0, sample_duration=1.0, t_norm=1e-12,
                  with_amplification=False, with_attenuation=True,
                  with_dispersion=True, with_nonlinearity=True,
                  swap_memory=True, dtype=tf.complex64, **kwargs):
@@ -143,7 +143,7 @@ class SSFM(Layer):
         self._with_nonlinearity = tf.cast(with_nonlinearity, dtype=tf.bool)
         self._cdtype = dtype
         self._rdtype = dtype.real_dtype
-        self._dt = tf.cast(dt, dtype=dtype.real_dtype)
+        self._sample_duration = tf.cast(sample_duration, dtype=dtype.real_dtype)
 
         self._rho_n = \
             sionna.constants.H / (self._t_norm ** 2.0) * 2.0 * \
@@ -151,7 +151,7 @@ class SSFM(Layer):
             self._n_sp
 
         # Calculate noise power depending on simulation bandwidth
-        self._p_n_ase = self._rho_n / self._dt
+        self._p_n_ase = self._rho_n / self._sample_duration
 
         # Precalculate uniform step size
         self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
@@ -167,7 +167,7 @@ class SSFM(Layer):
             )
         )
 
-    def _apply_linear_operator(self, q, dz, zeros, f):
+    def _apply_linear_operator(self, q, dz, zeros, frequency_vector):
         # Chromatic dispersion
         if self._with_dispersion:
             dispersion = tf.exp(
@@ -176,7 +176,8 @@ class SSFM(Layer):
                     -self._beta_2 / tf.cast(2.0, self._rdtype) * dz *
                     (
                             tf.cast(2.0, self._rdtype) *
-                            tf.cast(sionna.constants.PI, self._rdtype) * f
+                            tf.cast(sionna.constants.PI, self._rdtype) *
+                            frequency_vector
                     ) ** tf.cast(2.0, self._rdtype)
                 )
             )
@@ -261,7 +262,7 @@ class SSFM(Layer):
 
         # Generate frequency vectors
         _, f = utils.time_frequency_vector(
-            input_shape[-1], self._dt, dtype=self._rdtype)
+            input_shape[-1], self._sample_duration, dtype=self._rdtype)
 
         # Window function calculation (depends on length of the signal)
         window = tf.concat(
