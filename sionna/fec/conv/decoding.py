@@ -37,26 +37,24 @@ class ViterbiDecoder(Layer):
             ``gen_poly`` is `None`.
 
         method: str
-            `soft_llr`, `soft` or `hard`. In computing path metrics, `soft_llr` and
-            `soft` assume an additive white Gaussian channel, whereas  `hard` assumes a
-            `binary symmetric channel` (BSC). In case of  `hard`, `inputs` will
-            be quantized to 0/1 values.
-
+            `soft_llr`, `soft` or `hard`. In computing path metrics, `soft_llr`
+            and `soft` assume an additive white Gaussian channel, whereas
+            `hard` assumes a `binary symmetric channel` (BSC). In case of
+            `hard`, `inputs` will be quantized to 0/1 values.
 
         output_dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer.
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,n]` containing the (noisy) channel
-            output symbols. `n` is codeword length.
+        inputs: [...,n], tf.float32
+            2+D tensor containing the (noisy) channel output symbols. `n` is
+            the codeword length.
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,rate*n]` containing the estimates of the
-            information bit tensor.
+        : [...,rate*n], tf.float32
+            2+D tensor containing the estimates of the information bit tensor.
 
     Note
     ----

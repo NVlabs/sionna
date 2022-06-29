@@ -274,7 +274,7 @@ class PlotBER():
     @property
     def snr(self):
         """List containing all stored SNR curves."""
-        return self._bers
+        return self._snrs
 
     @property
     def legend(self):
@@ -356,7 +356,7 @@ class PlotBER():
             to the internal list of results.
 
         show_fig: bool
-            Defaults to True. If True, a BER figure will be ploted.
+            Defaults to True. If True, a BER figure will be plotted.
 
         verbose: bool
             A boolean defaults to True. If True, the current progress will be

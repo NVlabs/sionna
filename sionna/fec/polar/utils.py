@@ -5,6 +5,9 @@
 """Utility functions and layers for the Polar code package."""
 
 import numpy as np
+import numbers
+from numpy.core.numerictypes import issubdtype
+import matplotlib.pyplot as plt
 from scipy.special import comb
 from importlib_resources import files, as_file
 from . import codes # pylint: disable=relative-beyond-top-level
@@ -17,10 +20,10 @@ def generate_5g_ranking(k, n, sort=True):
     Input
     -----
         k: int
-            Defining the number of information bit per codeword.
+            The number of information bit per codeword.
 
         n: int
-            Defining the desired codeword length. Must be a power of two.
+            The desired codeword length. Must be a power of two.
 
         sort: bool
             Defaults to True. Indicates if the returned indices are
@@ -139,10 +142,10 @@ def generate_rm_code(r, m):
     Input
     -----
         r: int
-            Defining the order of the RM code.
+            The order of the RM code.
 
         m: int
-            Defining `log2` of the desired codeword length.
+            `log2` of the desired codeword length.
 
     Output
     ------
@@ -206,3 +209,75 @@ def generate_rm_code(r, m):
     assert k_res==k, "Error: resulting k is inconsistent."
 
     return frozen_pos, info_pos, n, k, d_min
+
+
+def generate_dense_polar(frozen_pos, n, verbose=True):
+    """Generate *naive* (dense) Polar parity-check and generator matrix.
+
+    This function follows Lemma 1 in [Goala_LP]_ and returns a parity-check
+    matrix for Polar codes.
+
+    Note
+    ----
+    The resulting matrix can be used for decoding with the
+    :class:`~sionna.fec.ldpc.LDPCBPDecoder` class. However, the resulting
+    parity-check matrix is (usually) not sparse and, thus, not suitable for
+    belief propagation decoding as the graph has many short cycles.
+    Please consider :class:`~sionna.fec.polar.PolarBPDecoder` for iterative
+    decoding over the encoding graph.
+
+    Input
+    -----
+    frozen_pos: ndarray
+        Array of `int` defining the ``n-k`` indices of the frozen positions.
+
+    n: int
+        The codeword length.
+
+    verbose: bool
+        Defaults to True. If True, the code properties are printed.
+
+    Output
+    ------
+    pcm: ndarray of `zeros` and `ones` of shape [n-k, n]
+        The parity-check matrix.
+
+    gm: ndarray of `zeros` and `ones` of shape [k, n]
+        The generator matrix.
+
+    """
+
+    assert isinstance(n, numbers.Number), "n must be a number."
+    n = int(n) # n can be float (e.g. as result of n=k*r)
+    assert issubdtype(frozen_pos.dtype, int), "frozen_pos must \
+                                                consist of ints."
+    assert len(frozen_pos)<=n, "Number of elements in frozen_pos cannot \
+                                be greater than n."
+
+    assert np.log2(n)==int(np.log2(n)), "n must be a power of 2."
+
+    k = n - len(frozen_pos)
+
+    # generate info positions
+    info_pos = np.setdiff1d(np.arange(n), frozen_pos)
+    assert k==len(info_pos), "Internal error: invalid " \
+                                            "info_pos generated."
+
+    gm_mat = generate_polar_transform_mat(int(np.log2(n)))
+
+    gm_true = gm_mat[info_pos,:]
+    pcm = np.transpose(gm_mat[:,frozen_pos])
+
+    if verbose:
+        print("Shape of the generator matrix: ", gm_true.shape)
+        print("Shape of the parity-check matrix: ", pcm.shape)
+        plt.spy(pcm)
+
+    # Verify result, i.e., check that H*G has an all-zero syndrome.
+    # Note: we have no proof that Lemma 1 holds for all possible
+    # frozen_positions. Thus, it seems to be better to verify the generated
+    # results individually.
+    s = np.mod(np.matmul(pcm, np.transpose(gm_true)),2)
+    assert np.sum(s)==0, "Non-zero syndrom for H*G'."
+
+    return pcm, gm_true

@@ -294,6 +294,7 @@ class KroneckerPilotPattern(PilotPattern):
     --------
     >>> rg = ResourceGrid(num_ofdm_symbols=14,
     ...                   fft_size=64,
+    ...                   subcarrier_spacing = 30e3,
     ...                   num_tx=4,
     ...                   num_streams_per_tx=2,
     ...                   pilot_pattern = "kronecker",
@@ -334,7 +335,7 @@ class KroneckerPilotPattern(PilotPattern):
         # Prepare empty mask and pilots
         shape = [num_tx, num_streams_per_tx,
                  num_ofdm_symbols,num_effective_subcarriers]
-        mask = np.zeros(shape, np.bool)
+        mask = np.zeros(shape, bool)
         shape[2] = num_pilot_symbols
         pilots = np.zeros(shape, np.complex64)
 

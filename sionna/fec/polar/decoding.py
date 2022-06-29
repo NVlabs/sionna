@@ -37,15 +37,14 @@ class PolarSCDecoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,n]` containing the channel LLR values (as
-            logits).
+        inputs: [...,n], tf.float32
+            2+D tensor containing the channel LLR values (as logits).
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,k]` containing hard-decided estimations
-            of all ``k`` information bits.
+        : [...,k], tf.float32
+            2+D tensor  containing hard-decided estimations of all ``k``
+            information bits.
 
     Raises
     ------
@@ -91,7 +90,7 @@ class PolarSCDecoder(Layer):
         self._output_dtype = output_dtype
 
         # assert error if r>1 or k, n are negativ
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         n = int(n) # n can be float (e.g. as result of n=k*r)
 
         assert issubdtype(frozen_pos.dtype, int), "frozen_pos contains non int."
@@ -366,15 +365,14 @@ class PolarSCLDecoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,n]` containing the channel LLR values
-            (as logits).
+        inputs: [...,n], tf.float32
+            2+D tensor containing the channel LLR values (as logits).
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,k]` containing hard-decided estimations
-            of all ``k`` information bits.
+        : [...,k], tf.float32
+            2+D tensor containing hard-decided estimations of all `k`
+            information bits.
 
     Raises:
         AssertionError
@@ -473,7 +471,7 @@ class PolarSCLDecoder(Layer):
         self._output_dtype = output_dtype
 
         # assert error if r>1 or k, n are negative
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         n = int(n) # n can be float (e.g. as result of n=k*r)
         assert isinstance(list_size, int), "list_size must be integer."
         assert isinstance(cpu_only, bool), "cpu_only must be bool."
@@ -502,7 +500,6 @@ class PolarSCLDecoder(Layer):
         self._use_fast_scl = use_fast_scl # optimize rate-0 and rep nodes
         self._use_scatter = use_scatter # slower but more memory friendly
         self._cpu_only = cpu_only # run numpy decoder
-        self._verify_results = False # only used for debugging at the moment.
         self._use_hybrid_sc = use_hybrid_sc
 
         # store internal attributes
@@ -722,8 +719,9 @@ class PolarSCLDecoder(Layer):
 
         We implement (10) from [Stimming_LLR]_.
         """
-        u_hat = tf.squeeze(msg_uhat[:, :, 0, ind_u[0]])
-        llr = tf.squeeze(msg_llr[:, :, 0, ind_u[0]])
+        u_hat = msg_uhat[:, :, 0, ind_u[0]]
+        llr = msg_llr[:, :, 0, ind_u[0]]
+
         llr_in = tf.clip_by_value(llr,
                                   clip_value_min=-self._llr_max,
                                   clip_value_max=self._llr_max)
@@ -1472,12 +1470,6 @@ class PolarSCLDecoder(Layer):
             else:
                 msg_uhat, msg_pm = self._decode_tf(llr_ch)
 
-        # just for testing, will be removed later:
-        if self._verify_results:
-            msg_uhat2, msg_pm2 = self._decode_tf(llr_ch)
-            print("diff: ", np.sum(np.abs(msg_uhat - msg_uhat2)))
-            print("diff: ", np.sum(np.abs(msg_pm - msg_pm2)))
-
         # check crc (and remove CRC parity bits)
         if self._use_crc:
             u_hat_list = tf.gather(msg_uhat[:, :, 0, :], self._info_pos,
@@ -1535,14 +1527,13 @@ class PolarBPDecoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,n]` containing the channel logits/llr
-            values.
+        inputs: [...,n], tf.float32
+            2+D tensor containing the channel logits/llr values.
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,k]` containing bit-wise soft-estimates
+        : [...,k], tf.float32
+            2+D tensor containing bit-wise soft-estimates
             (or hard-decided bit-values) of all ``k`` information bits.
 
     Raises
@@ -1603,7 +1594,7 @@ class PolarBPDecoder(Layer):
         self._output_dtype = output_dtype
 
         # assert error if r>1 or k, n are negative
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         n = int(n) # n can be float (e.g. as result of n=k*r)
         assert issubdtype(frozen_pos.dtype, int), "frozen_pos contains non int."
         assert len(frozen_pos)<=n, "Num. of elements in frozen_pos cannot " \
@@ -1834,7 +1825,7 @@ class PolarBPDecoder(Layer):
     def call(self, inputs):
         """Iterative BP decoding function.
 
-        This function performs `num_iter` belief progation decoding iterations
+        This function performs `num_iter` belief propagation decoding iterations
         and returns the estimated information bits.
 
         Args:
@@ -1914,15 +1905,14 @@ class Polar5GDecoder(Layer):
 
     Input
     -----
-        inputs:  tf.float32
-            2+D tensor of shape `[...,n]` containing the channel logits/llr
-            values.
+        inputs: [...,n], tf.float32
+            2+D tensor containing the channel logits/llr values.
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,k]` containing hard-decided estimates of
-            all ``k`` information bits.
+        : [...,k], tf.float32
+            2+D tensor  containing hard-decided estimates of all `k`
+            information bits.
 
     Raises
     ------
@@ -2172,10 +2162,8 @@ class Polar5GDecoder(Layer):
         # 3.) Remove subblock interleaving
         llr_dec = tf.gather(llr_dematched, self.ind_sub_int_inv, axis=1)
         # 4.) Run main decoder
-        if self._dec_type=="BP":
-            u_hat_crc = self._polar_dec(llr_dec)
-        else:
-            u_hat_crc = self._polar_dec(llr_dec)
+        u_hat_crc = self._polar_dec(llr_dec)
+
         # 5.) Shortening should be implicitely recovered by decoder
 
         # 6.) Remove CRC (and PC)

@@ -188,6 +188,11 @@ NearestNeighborInterpolator
 .. autoclass:: sionna.ofdm.NearestNeighborInterpolator
    :members:
 
+LinearInterpolator
+---------------------------
+.. autoclass:: sionna.ofdm.LinearInterpolator
+   :members:
+
 
 Precoding
 *********
@@ -205,5 +210,14 @@ Equalization
 LMMSEEqualizer
 --------------
 .. autoclass:: sionna.ofdm.LMMSEEqualizer
+   :exclude-members: call, build
+   :members:
+
+Detection
+**********
+
+MaximumLikelihoodDetector
+----------------------------
+.. autoclass:: sionna.ofdm.MaximumLikelihoodDetector
    :exclude-members: call, build
    :members:

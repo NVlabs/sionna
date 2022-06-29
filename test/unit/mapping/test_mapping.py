@@ -24,8 +24,11 @@ if gpus:
 from scipy.special import logsumexp
 from sionna.mapping import Constellation, Mapper, Demapper, DemapperWithPrior
 from sionna.mapping import SymbolDemapperWithPrior, SymbolDemapper
+from sionna.mapping import SymbolLogits2LLRsWithPrior, SymbolLogits2LLRs
+from sionna.mapping import SymbolLogits2Moments
 from sionna.utils import BinarySource
 from sionna.channel import AWGN
+from scipy.special import softmax
 
 class TestMapper(unittest.TestCase):
 
@@ -90,6 +93,18 @@ class TestMapper(unittest.TestCase):
         model.compile()
         self.assertEqual(model(binary_source([100, 3, 400])).shape, [100, 3, 100])
         self.assertEqual(model(binary_source([400, 3, 400])).shape, [400, 3, 100])
+
+    def test_symbol_ind_output(self):
+        binary_source = BinarySource()
+        mapper = Mapper("qam", 4, return_indices=True)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            return mapper(b)
+        x, ind = run(100)
+        self.assertEqual(x.shape, [100, 3, 100])
+        self.assertEqual(ind.shape, [100, 3, 100])
+        self.assertTrue(ind.dtype==tf.int32)
 
 class TestDemapper(unittest.TestCase):
     def test_assert_demapping_method(self):
@@ -176,11 +191,11 @@ class TestDemapper(unittest.TestCase):
                 dist = np.abs(y - p)**2
                 exp = -dist/No[l,i]
 
-                llrnp_app = logsumexp(np.take(exp, d_app._c1),axis=0) - logsumexp(np.take(exp, d_app._c0),axis=0)
+                llrnp_app = logsumexp(np.take(exp, d_app._logits2llrs._c1),axis=0) - logsumexp(np.take(exp, d_app._logits2llrs._c0),axis=0)
                 llrtarget_app = llr_app[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_app, llrtarget_app, atol=1e-5))
 
-                llrnp_maxlog = np.max(np.take(exp, d_maxlog._c1),axis=0) - np.max(np.take(exp, d_maxlog._c0),axis=0)
+                llrnp_maxlog = np.max(np.take(exp, d_maxlog._logits2llrs._c1),axis=0) - np.max(np.take(exp, d_maxlog._logits2llrs._c0),axis=0)
                 llrtarget_maxlog = llr_maxlog[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
 
@@ -202,11 +217,11 @@ class TestDemapper(unittest.TestCase):
                 dist = np.abs(y - p)**2
                 exp = -dist/No[0,i]
 
-                llrnp_app = logsumexp(np.take(exp, d_app._c1),axis=0) - logsumexp(np.take(exp, d_app._c0),axis=0)
+                llrnp_app = logsumexp(np.take(exp, d_app._logits2llrs._c1),axis=0) - logsumexp(np.take(exp, d_app._logits2llrs._c0),axis=0)
                 llrtarget_app = llr_app[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_app, llrtarget_app, atol=1e-5))
 
-                llrnp_maxlog = np.max(np.take(exp, d_maxlog._c1),axis=0) - np.max(np.take(exp, d_maxlog._c0),axis=0)
+                llrnp_maxlog = np.max(np.take(exp, d_maxlog._logits2llrs._c1),axis=0) - np.max(np.take(exp, d_maxlog._logits2llrs._c0),axis=0)
                 llrtarget_maxlog = llr_maxlog[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
 
@@ -389,13 +404,13 @@ class TestDemapperWithPrior(unittest.TestCase):
                 exp = -dist/No[l,i]
                 ps_exp_ = ps_exp[l,i]
 
-                llrnp_app = logsumexp(np.take(exp, d_app._c1) + np.take(ps_exp_, d_app._c1),axis=0)\
-                    - logsumexp(np.take(exp, d_app._c0) + np.take(ps_exp_, d_app._c0),axis=0)
+                llrnp_app = logsumexp(np.take(exp, d_app._logits2llrs._c1) + np.take(ps_exp_, d_app._logits2llrs._c1),axis=0)\
+                    - logsumexp(np.take(exp, d_app._logits2llrs._c0) + np.take(ps_exp_, d_app._logits2llrs._c0),axis=0)
                 llrtarget_app = llr_app[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_app, llrtarget_app, atol=1e-5))
 
-                llrnp_maxlog = np.max(np.take(exp, d_maxlog._c1) + np.take(ps_exp_, d_app._c1),axis=0)\
-                    - np.max(np.take(exp, d_maxlog._c0) + np.take(ps_exp_, d_app._c0),axis=0)
+                llrnp_maxlog = np.max(np.take(exp, d_maxlog._logits2llrs._c1) + np.take(ps_exp_, d_app._logits2llrs._c1),axis=0)\
+                    - np.max(np.take(exp, d_maxlog._logits2llrs._c0) + np.take(ps_exp_, d_app._logits2llrs._c0),axis=0)
                 llrtarget_maxlog = llr_maxlog[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
 
@@ -429,13 +444,13 @@ class TestDemapperWithPrior(unittest.TestCase):
                 dist = np.abs(y - p)**2
                 exp = -dist/No[0,i]
 
-                llrnp_app = logsumexp(np.take(exp, d_app._c1) + np.take(ps_exp, d_app._c1),axis=0)\
-                    - logsumexp(np.take(exp, d_app._c0) + np.take(ps_exp, d_app._c0),axis=0)
+                llrnp_app = logsumexp(np.take(exp, d_app._logits2llrs._c1) + np.take(ps_exp, d_app._logits2llrs._c1),axis=0)\
+                    - logsumexp(np.take(exp, d_app._logits2llrs._c0) + np.take(ps_exp, d_app._logits2llrs._c0),axis=0)
                 llrtarget_app = llr_app[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_app, llrtarget_app, atol=1e-5))
 
-                llrnp_maxlog = np.max(np.take(exp, d_maxlog._c1) + np.take(ps_exp, d_app._c1),axis=0)\
-                    - np.max(np.take(exp, d_maxlog._c0) + np.take(ps_exp, d_app._c0),axis=0)
+                llrnp_maxlog = np.max(np.take(exp, d_maxlog._logits2llrs._c1) + np.take(ps_exp, d_app._logits2llrs._c1),axis=0)\
+                    - np.max(np.take(exp, d_maxlog._logits2llrs._c0) + np.take(ps_exp, d_app._logits2llrs._c0),axis=0)
                 llrtarget_maxlog = llr_maxlog[l,i*num_bits_per_symbol:(i+1)*num_bits_per_symbol].numpy()
                 self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
 
@@ -871,3 +886,297 @@ class TestSymbolDemapper(unittest.TestCase):
         in1 = binary_source([400, 3, 400])
         in2 = tf.random.uniform([400, 3, 100], minval=0.01, maxval=100, dtype=np.float32)
         self.assertEqual(model([in1, in2]).shape, [400, 3, 100, num_points])
+
+class TestSymbolLogits2LLRsWithPrior(unittest.TestCase):
+    def test_assert_demapping_method(self):
+        with self.assertRaises(AssertionError):
+            SymbolLogits2LLRsWithPrior("asdfiu", 6)
+
+    def test_assert_non_broadcastable_dimensions(self):
+        d = SymbolLogits2LLRsWithPrior("app", 4)
+        l = tf.random.uniform([16, 50, 200, 16], minval=-20., maxval=20., dtype=tf.dtypes.float32)
+        # prior
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            p = tf.random.uniform([16, 50, 4])
+            llr = d([l, p])
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            p = tf.random.uniform([16, 50, 200])
+            llr = d([l, p])
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            p = tf.random.uniform([16, 1])
+            llr = d([l, p])
+
+    def test_output_dimensions1(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+            batch_size = 99
+            dim1 = 10
+            dim2 = 12
+            l = tf.random.uniform([batch_size, dim1, dim2, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            p = tf.random.uniform([num_bits_per_symbol])
+            llr = d([l, p])
+            self.assertEqual(llr.shape, [batch_size, dim1, dim2, num_bits_per_symbol])
+
+    def test_output_dimensions2(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+            batch_size = 99
+            l = tf.random.uniform([batch_size, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            p = tf.random.uniform([num_bits_per_symbol])
+            llr = d([l, p])
+            self.assertEqual(llr.shape, [batch_size, num_bits_per_symbol])
+
+    def test_prior_inputs(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+            l = tf.random.uniform([100, 10, 50, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            p = tf.random.uniform([100, 10, 50, num_bits_per_symbol])
+            llr = d([l, p])
+            self.assertEqual(llr.shape, [100, 10, 50, num_bits_per_symbol])
+
+            with self.assertRaises(tf.errors.InvalidArgumentError):
+                p = tf.random.uniform([100, 10, 49, num_bits_per_symbol])
+                llr = d([l, p])
+
+    def test_llr_calc(self):
+        "Test LLRs computation APP/MAXLOG"
+        num_bits_per_symbol = 6
+        num_points = 2**num_bits_per_symbol
+        d_app = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+        d_maxlog = SymbolLogits2LLRsWithPrior("maxlog", num_bits_per_symbol)
+        logits = tf.random.uniform([100, 10, num_points],
+                                        minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+        # Precompute priors and probabilities on symbols
+        prior = tf.random.normal(tf.concat([logits.shape[:-1], [num_bits_per_symbol]], axis=0))
+        a = np.zeros([num_points, num_bits_per_symbol])
+        for i in range(0, num_points):
+            a[i,:] = np.array(list(np.binary_repr(i, num_bits_per_symbol)),
+                              dtype=np.int16)
+        a = 2*a-1
+        a = np.expand_dims(a, axis=(0, 1))
+        ps_exp = a*np.expand_dims(prior, axis=-2)
+        ps_exp = ps_exp - np.log(1+np.exp(ps_exp)) # log(sigmoid(ps_exp))
+        ps_exp = np.sum(ps_exp, axis=-1) # [batch size, block length, num points]
+        #
+        llr_app = d_app([logits, prior])
+        llr_maxlog = d_maxlog([logits, prior])
+        for b in range(0, logits.shape[0]):
+            for i in range(0, logits.shape[1]):
+                ps_exp_ = ps_exp[b,i]
+
+                llrnp_app = logsumexp(np.take(logits[b,i], d_app._c1) + np.take(ps_exp_, d_app._c1),axis=0)\
+                    - logsumexp(np.take(logits[b,i], d_app._c0) + np.take(ps_exp_, d_app._c0),axis=0)
+                llrtarget_app = llr_app[b,i].numpy()
+                self.assertTrue(np.allclose(llrnp_app, llrtarget_app, atol=1e-5))
+
+                llrnp_maxlog = np.max(np.take(logits[b,i], d_maxlog._c1) + np.take(ps_exp_, d_app._c1),axis=0)\
+                    - np.max(np.take(logits[b,i], d_maxlog._c0) + np.take(ps_exp_, d_app._c0),axis=0)
+                llrtarget_maxlog = llr_maxlog[b,i].numpy()
+                self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
+
+    def test_graph_mode(self):
+        num_bits_per_symbol = 4
+        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+        @tf.function
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            prior = tf.random.normal([num_bits_per_symbol])
+            return l2l([logits, prior])
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+    def test_graph_mode_jit(self):
+        num_bits_per_symbol = 4
+        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            prior = tf.random.normal([num_bits_per_symbol])
+            return l2l([logits, prior])
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+    def test_model_mode(self):
+        l2l = SymbolLogits2LLRsWithPrior("app", 4)
+        logits = tf.keras.Input(shape=(150, 16), dtype=tf.float32)
+        prior = tf.keras.Input(shape=(4), dtype=tf.float32)
+        llr = l2l([logits, prior])
+        model = tf.keras.Model(inputs=[logits, prior], outputs=llr)
+        model.compile()
+        in1 = tf.random.normal([100, 150, 16])
+        in2 = tf.random.normal([4])
+        self.assertEqual(model([in1, in2]).shape, [100, 150, 4])
+        in1 = tf.random.normal([256, 150, 16])
+        in2 = tf.random.normal([4])
+        self.assertEqual(model([in1, in2]).shape, [256, 150, 4])
+
+class TestSymbolLogits2LLRs(unittest.TestCase):
+    def test_assert_demapping_method(self):
+        with self.assertRaises(AssertionError):
+            SymbolLogits2LLRs("asdfiu", 6)
+
+    def test_output_dimensions1(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = SymbolLogits2LLRs("app", num_bits_per_symbol)
+            batch_size = 99
+            dim1 = 10
+            dim2 = 12
+            l = tf.random.uniform([batch_size, dim1, dim2, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            llr = d(l)
+            self.assertEqual(llr.shape, [batch_size, dim1, dim2, num_bits_per_symbol])
+
+    def test_output_dimensions2(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = SymbolLogits2LLRs("app", num_bits_per_symbol)
+            batch_size = 99
+            l = tf.random.uniform([batch_size, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            llr = d(l)
+            self.assertEqual(llr.shape, [batch_size, num_bits_per_symbol])
+
+    def test_llr_calc(self):
+        "Test LLRs computation APP/MAXLOG"
+        num_bits_per_symbol = 6
+        num_points = 2**num_bits_per_symbol
+        d_app = SymbolLogits2LLRs("app", num_bits_per_symbol)
+        d_maxlog = SymbolLogits2LLRs("maxlog", num_bits_per_symbol)
+        logits = tf.random.uniform([100, 10, num_points],
+                                        minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+        llr_app = d_app(logits)
+        llr_maxlog = d_maxlog(logits)
+        for b in range(0, logits.shape[0]):
+            for i in range(0, logits.shape[1]):
+                llrnp_app = logsumexp(np.take(logits[b,i], d_app._c1),axis=0) - logsumexp(np.take(logits[b,i], d_app._c0),axis=0)
+                llrtarget_app = llr_app[b,i].numpy()
+                self.assertTrue(np.allclose(llrnp_app, llrtarget_app, atol=1e-5))
+
+                llrnp_maxlog = np.max(np.take(logits[b,i], d_maxlog._c1),axis=0) - np.max(np.take(logits[b,i], d_maxlog._c0),axis=0)
+                llrtarget_maxlog = llr_maxlog[b,i].numpy()
+                self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
+
+    def test_graph_mode(self):
+        num_bits_per_symbol = 4
+        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol)
+        @tf.function
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2l(logits)
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+    def test_graph_mode_jit(self):
+        num_bits_per_symbol = 4
+        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2l(logits)
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+    def test_model_mode(self):
+        l2l = SymbolLogits2LLRs("app", 4)
+        logits = tf.keras.Input(shape=(150, 16), dtype=tf.float32)
+        llr = l2l(logits)
+        model = tf.keras.Model(inputs=[logits], outputs=llr)
+        model.compile()
+        in1 = tf.random.normal([100, 150, 16])
+        self.assertEqual(model([in1]).shape, [100, 150, 4])
+        in1 = tf.random.normal([256, 150, 16])
+        self.assertEqual(model([in1]).shape, [256, 150, 4])
+
+class TestSymbolLogits2Moments(unittest.TestCase):
+    def test_output_dimensions1(self):
+        for num_bits_per_symbol in [2, 4, 6]:
+            d = SymbolLogits2Moments("qam", num_bits_per_symbol)
+            batch_size = 99
+            dim1 = 10
+            dim2 = 12
+            l = tf.random.uniform([batch_size, dim1, dim2, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            m, v = d(l)
+            self.assertEqual(m.shape, [batch_size, dim1, dim2])
+            self.assertEqual(v.shape, [batch_size, dim1, dim2])
+
+    def test_output_dimensions2(self):
+        for num_bits_per_symbol in [2, 4, 6]:
+            d = SymbolLogits2Moments("qam", num_bits_per_symbol)
+            batch_size = 99
+            l = tf.random.uniform([batch_size, 2**num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            m,v = d(l)
+            self.assertEqual(m.shape, [batch_size])
+            self.assertEqual(v.shape, [batch_size])
+
+    def test_moments_calc(self):
+        "Test LLRs computation APP/MAXLOG"
+        num_bits_per_symbol = 6
+        num_points = 2**num_bits_per_symbol
+        c = Constellation("qam", num_bits_per_symbol)
+        points = c.points
+
+        d = SymbolLogits2Moments(constellation=c)
+        logits = tf.random.uniform([100, num_points],
+                                        minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+        m,v = d(logits)
+
+        for l in range(0, logits.shape[0]):
+            p = softmax(logits[l])
+            m_ = np.sum(p*points)
+            v_ = np.sum(p*np.square(points-m_))
+
+            self.assertTrue(np.allclose(m[l], m_, atol=1e-5))
+            self.assertTrue(np.allclose(v[l], v_, atol=1e-5))
+
+    def test_graph_mode(self):
+        num_bits_per_symbol = 4
+        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol)
+        @tf.function
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2m(logits)
+
+        m,v = run(100)
+        self.assertEqual(m.shape, [100, 150])
+        self.assertEqual(v.shape, [100, 150])
+
+        m,v = run(400)
+        self.assertEqual(m.shape, [400, 150])
+        self.assertEqual(v.shape, [400, 150])
+
+    def test_graph_mode_jit(self):
+        num_bits_per_symbol = 4
+        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2m(logits)
+
+        m,v = run(100)
+        self.assertEqual(m.shape, [100, 150])
+        self.assertEqual(v.shape, [100, 150])
+
+        m,v = run(400)
+        self.assertEqual(m.shape, [400, 150])
+        self.assertEqual(v.shape, [400, 150])
+
+    def test_model_mode(self):
+        l2m = SymbolLogits2Moments("qam", 4)
+        logits = tf.keras.Input(shape=(150, 16), dtype=tf.float32)
+        m,v = l2m(logits)
+        model = tf.keras.Model(inputs=[logits], outputs=(m,v))
+        model.compile()
+
+        in1 = tf.random.normal([100, 150, 16])
+        m,v = model([in1])
+        self.assertEqual(m.shape, [100, 150])
+        self.assertEqual(v.shape, [100, 150])
+
+        in1 = tf.random.normal([256, 150, 16])
+        m,v = model([in1])
+        self.assertEqual(m.shape, [256, 150])
+        self.assertEqual(v.shape, [256, 150])

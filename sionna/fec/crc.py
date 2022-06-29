@@ -30,14 +30,14 @@ class CRCEncoder(Layer):
 
     Input
     -----
-        inputs : tf.float32
-            2+D Tensor of arbitrary shape where the last dimension is
+        inputs : [...,k], tf.float32
+            2+D tensor of arbitrary shape where the last dimension is
             `[...,k]`. Must have at least rank two.
 
     Output
     ------
-        x_crc : tf.float32
-            2+D Tensor containing CRC encoded bits of same shape as
+        x_crc : [...,k+crc_degree], tf.float32
+            2+D tensor containing CRC encoded bits of same shape as
             ``inputs`` except the last dimension changes to
             `[...,k+crc_degree]`.
 
@@ -241,22 +241,21 @@ class CRCDecoder(Layer):
 
     Input
     -----
-        inputs: tf.float32
-            2+D Tensor of arbitrary shape `[...,k+crc_degree]`. Must have at
-            least rank two.
+        inputs: [...,k+crc_degree], tf.float32
+            2+D Tensor containing the CRC encoded bits (i.e., the last
+            `crc_degree` bits are parity bits). Must have at least rank two.
 
     Output
     ------
         (x, crc_valid):
             Tuple:
 
-        x : tf.float32
-            2+D tensor ``x`` of shape `[...,k]` containing the information bit
-            sequence without CRC parity bits.
+        x : [...,k], tf.float32
+            2+D tensor containing the information bit sequence without CRC
+            parity bits.
 
-        crc_valid : tf.bool
-            2+D tensor ``crc_valid`` of shape `[...,1]` containing the result
-            of the CRC per codeword.
+        crc_valid : [...,1], tf.bool
+            2+D tensor containing the result of the CRC per codeword.
 
     Raises
     ------

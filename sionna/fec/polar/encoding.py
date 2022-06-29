@@ -35,19 +35,18 @@ class PolarEncoder(Layer):
             Defining the codeword length.
 
         dtype: tf.DType
-            Defaults to tf.float32. Defines the output datatype of the layer
-            (internal precision is tf.uint8).
+            Defaults to `tf.float32`. Defines the output datatype of the layer
+            (internal precision is `tf.uint8`).
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,k]` containing the information bits to be
-            encoded.
+        inputs: [...,k], tf.float32
+            2+D tensor containing the information bits to be encoded.
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,n]` containing the codeword bits.
+        : [...,n], tf.float32
+            2+D tensor containing the codeword bits.
 
     Raises
     ------
@@ -98,7 +97,7 @@ class PolarEncoder(Layer):
 
         super().__init__(dtype=dtype)
 
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         n = int(n) # n can be float (e.g. as result of n=k*r)
         assert issubdtype(frozen_pos.dtype, int), "frozen_pos must \
                                                    consist of ints."
@@ -307,14 +306,13 @@ class Polar5GEncoder(PolarEncoder):
 
     Input
     -----
-        inputs: tf.float32
-            2+D tensor of shape `[...,k]` containing the information bits to be
-            encoded.
+        inputs: [...,k], tf.float32
+            2+D tensor containing the information bits to be encoded.
 
     Output
     ------
-        : tf.float32
-            2+D tensor of shape `[...,n]` containing the codeword bits.
+        : [...,n], tf.float32
+            2+D tensor containing the codeword bits.
 
     Raises
     ------
@@ -355,8 +353,8 @@ class Polar5GEncoder(PolarEncoder):
             tf.int32, tf.int64, tf.uint8, tf.uint16, tf.uint32):
             raise ValueError("Unsupported dtype.")
 
-        assert isinstance(k, numbers.Number), "k must be number."
-        assert isinstance(n, numbers.Number), "n must be number."
+        assert isinstance(k, numbers.Number), "k must be a number."
+        assert isinstance(n, numbers.Number), "n must be a number."
         k = int(k) # k or n can be float (e.g. as result of n=k*r)
         n = int(n) # k or n can be float (e.g. as result of n=k*r)
         assert n>=k, "Invalid coderate (>1)."

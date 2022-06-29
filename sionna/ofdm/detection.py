@@ -5,47 +5,62 @@
 """Class definition and functions related to OFDM channel equalization"""
 
 import tensorflow as tf
-from tensorflow.keras.layers import Layer
-import sionna
+import sionna as sn
 from sionna.utils import flatten_dims, split_dim, flatten_last_dims, expand_to_rank
-from sionna.mimo import lmmse_equalizer
 from sionna.ofdm import RemoveNulledSubcarriers
 
 
-class LMMSEEqualizer(Layer):
+class MaximumLikelihoodDetector(sn.mimo.MaximumLikelihoodDetector):
     # pylint: disable=line-too-long
-    """LMMSEEqualizer(resource_grid, stream_management, whiten_interference=True, dtype=tf.complex64, **kwargs)
+    r"""MaximumLikelihoodDetector(output, demapping_method, resource_grid, stream_management, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)
 
-    LMMSE equalization for OFDM MIMO transmissions.
+    Maximum-likelihood (ML) detection for OFDM MIMO transmissions.
 
-    This layer computes linear minimum mean squared error (LMMSE) estimation
-    for OFDM MIMO transmissions. The OFDM and stream configuration are provided
+    This layer implements maximum-likelihood (ML) detection
+    for OFDM MIMO transmissions. Both ML detection of symbols or bits with either
+    soft- or hard-decisions are supported. The OFDM and stream configuration are provided
     by a :class:`~sionna.ofdm.ResourceGrid` and
     :class:`~sionna.mimo.StreamManagement` instance, respectively. The
-    detection algorithm is the :meth:`~sionna.mimo.lmmse_equalizer`. The layer
-    computes soft-symbol estimates together with effective noise variances
-    for all streams which can, e.g., be used by a
-    :class:`~sionna.mapping.Demapper` to obtain LLRs.
+    actual detector is an instance of :class:`~sionna.mimo.MaximumLikelihoodDetector`.
 
     Parameters
     ----------
+    output : One of ["bit", "symbol"], str
+        The type of output, either LLRs on bits or logits on constellation symbols.
+
+    demapping_method : One of ["app", "maxlog"], str
+        The demapping method used.
+
     resource_grid : ResourceGrid
         An instance of :class:`~sionna.ofdm.ResourceGrid`.
 
     stream_management : StreamManagement
         An instance of :class:`~sionna.mimo.StreamManagement`.
 
-    whiten_interference : bool
-        If `True` (default), the interference is first whitened before equalization.
-        In this case, an alternative expression for the receive filter is used which
-        can be numerically more stable.
+    constellation_type : One of ["qam", "pam", "custom"], str
+        For "custom", an instance of :class:`~sionna.mapping.Constellation`
+        must be provided.
 
-    dtype : tf.Dtype
-        Datatype for internal calculations and the output dtype.
-        Defaults to `tf.complex64`.
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 4 for QAM16.
+        Only required for ``constellation_type`` in ["qam", "pam"].
+
+    constellation : Constellation
+        An instance of :class:`~sionna.mapping.Constellation` or `None`.
+        In the latter case, ``constellation_type``
+        and ``num_bits_per_symbol`` must be provided.
+
+    hard_out : bool
+        If `True`, the detector computes hard-decided bit values or
+        constellation point indices instead of soft-values.
+        Defaults to `False`.
+
+    dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)
+        The dtype of `y`. Defaults to tf.complex64.
+        The output dtype is the corresponding real dtype (tf.float32 or tf.float64).
 
     Input
-    -----
+    ------
     (y, h_hat, err_var, no) :
         Tuple:
 
@@ -63,11 +78,14 @@ class LMMSEEqualizer(Layer):
 
     Output
     ------
-    x_hat : [batch_size, num_tx, num_streams, num_data_symbols], tf.complex
-        The estimated symbols.
+    One of:
 
-    no_eff : [batch_size, num_tx, num_streams, num_data_symbols], tf.float
-        The effective noise variance for each estimated symbol.
+    : [batch_size, num_tx, num_streams, num_data_symbols*num_bits_per_symbol], tf.float
+        LLRs or hard-decisions for every bit of every stream, if ``output`` equals `"bit"`.
+
+    : [batch_size, num_tx, num_streams, num_data_symbols, num_points], tf.float or [batch_size, num_tx, num_streams, num_data_symbols], tf.int
+        Logits or hard-decisions on constellation symbols for every stream, if ``output`` equals `"symbol"`.
+        Hard-decisions correspond to the symbol indices.
 
     Note
     ----
@@ -76,19 +94,23 @@ class LMMSEEqualizer(Layer):
     you must set ``sionna.Config.xla_compat=true``.
     See :py:attr:`~sionna.Config.xla_compat`.
     """
+
     def __init__(self,
+                 output,
+                 demapping_method,
                  resource_grid,
                  stream_management,
-                 whiten_interference=True,
+                 constellation_type=None,
+                 num_bits_per_symbol=None,
+                 constellation=None,
+                 hard_out=False,
                  dtype=tf.complex64,
                  **kwargs):
-        super().__init__(dtype=dtype, **kwargs)
-        assert isinstance(resource_grid, sionna.ofdm.ResourceGrid)
-        assert isinstance(stream_management, sionna.mimo.StreamManagement)
+
         self._resource_grid = resource_grid
         self._stream_management = stream_management
-        self._whiten_interference = whiten_interference
         self._removed_nulled_scs = RemoveNulledSubcarriers(self._resource_grid)
+        self._output = output
 
         # Precompute indices to extract data symbols
         mask = resource_grid.pilot_pattern.mask
@@ -96,8 +118,18 @@ class LMMSEEqualizer(Layer):
         data_ind = tf.argsort(flatten_last_dims(mask), direction="ASCENDING")
         self._data_ind = data_ind[...,:num_data_symbols]
 
-    def call(self, inputs):
+        # Initializing maximum-likelihood baseclass
+        super().__init__(output=output,
+                         demapping_method=demapping_method,
+                         k = stream_management.num_streams_per_rx,
+                         constellation_type=constellation_type,
+                         num_bits_per_symbol=num_bits_per_symbol,
+                         constellation=constellation,
+                         hard_out=hard_out,
+                         dtype=dtype,
+                         **kwargs)
 
+    def call(self, inputs):
         y, h_hat, err_var, no = inputs
         # y has shape:
         # [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size]
@@ -204,60 +236,58 @@ class LMMSEEqualizer(Layer):
         s = s_inf + s_no + s_csi
         s = tf.cast(s, self._dtype)
 
-        ############################################################
-        #### Compute LMMSE estimate and effective noise variance ###
-        ############################################################
-        # [batch_size, num_rx, num_ofdm_symbols, num_effective_subcarriers,...
-        #  ..., num_stream_per_rx]
-        x_hat, no_eff = lmmse_equalizer(y_dt, h_dt_desired,
-                                        s, self._whiten_interference)
+        #################################
+        ### Maximum-likelihood detection
+        #################################
+        z = super().call([y_dt,h_dt_desired,s])
 
-        ################################################
-        ### Extract data symbols for all detected TX ###
-        ################################################
+        ##############################################
+        ### Extract data symbols for all detected TX
+        ##############################################
         # Transpose tensor to shape
-        # [num_rx, num_streams_per_rx, num_ofdm_symbols,...
-        #  ..., num_effective_subcarriers, batch_size]
-        x_hat = tf.transpose(x_hat, [1, 4, 2, 3, 0])
-        no_eff = tf.transpose(no_eff, [1, 4, 2, 3, 0])
+        # [num_rx, num_streams_per_rx, num_ofdm_symbols,
+        #    num_effective_subcarriers, num_bits_per_symbol or num_points,
+        #       batch_size]
+        z = tf.transpose(z, [1, 4, 2, 3, 5, 0])
 
         # Merge num_rx amd num_streams_per_rx
-        # [num_rx * num_streams_per_rx, num_ofdm_symbols,...
-        #  ...,num_effective_subcarriers, batch_size]
-        x_hat = flatten_dims(x_hat, 2, 0)
-        no_eff = flatten_dims(no_eff, 2, 0)
+        # [num_rx * num_streams_per_rx, num_ofdm_symbols,
+        #    num_effective_subcarriers, num_bits_per_symbol or num_points,
+        #   batch_size]
+        z = flatten_dims(z, 2, 0)
 
         # Put first dimension into the right ordering
         stream_ind = self._stream_management.stream_ind
-        x_hat = tf.gather(x_hat, stream_ind, axis=0)
-        no_eff = tf.gather(no_eff, stream_ind, axis=0)
+        z = tf.gather(z, stream_ind, axis=0)
 
         # Reshape first dimensions to [num_tx, num_streams] so that
-        # we can compared to the way the streams were created.
-        # [num_tx, num_streams, num_ofdm_symbols, num_effective_subcarriers,...
-        #  ..., batch_size]
+        # we can compare to the way the streams were created.
+        # [num_tx, num_streams, num_ofdm_symbols, num_effective_subcarriers,
+        #     num_bits_per_symbol or num_points, batch_size]
         num_streams = self._stream_management.num_streams_per_tx
         num_tx = self._stream_management.num_tx
-        x_hat = split_dim(x_hat, [num_tx, num_streams], 0)
-        no_eff = split_dim(no_eff, [num_tx, num_streams], 0)
+        z = split_dim(z, [num_tx, num_streams], 0)
 
         # Flatten resource grid dimensions
-        # [num_tx, num_streams, num_ofdm_symbols*num_effective_subcarriers,...
-        #  ..., batch_size]
-        x_hat = flatten_dims(x_hat, 2, 2)
-        no_eff = flatten_dims(no_eff, 2, 2)
-
-        # Broadcast no_eff to the shape of x_hat
-        no_eff = tf.broadcast_to(no_eff, tf.shape(x_hat))
+        # [num_tx, num_streams, num_ofdm_symbols*num_effective_subcarrier,
+        #    num_bits_per_symbol or num_points, batch_size]
+        z = flatten_dims(z, 2, 2)
 
         # Gather data symbols
-        # [num_tx, num_streams, num_data_symbols, batch_size]
-        x_hat = tf.gather(x_hat, self._data_ind, batch_dims=2, axis=2)
-        no_eff = tf.gather(no_eff, self._data_ind, batch_dims=2, axis=2)
+        # [num_tx, num_streams, num_data_symbols,
+        #    num_bits_per_symbol or num_points, batch_size]
+        z = tf.gather(z, self._data_ind, batch_dims=2, axis=2)
 
         # Put batch_dim first
-        # [batch_size, num_tx, num_streams, num_data_symbols]
-        x_hat = tf.transpose(x_hat, [3, 0, 1, 2])
-        no_eff = tf.transpose(no_eff, [3, 0, 1, 2])
+        # [batch_size, num_tx, num_streams,
+        #     num_data_symbols, num_bits_per_symbol or num_points]
+        z = tf.transpose(z, [4, 0, 1, 2, 3])
 
-        return (x_hat, no_eff)
+        # Reshape LLRs to
+        # [batch_size, num_tx, num_streams,
+        #     n = num_data_symbols*num_bits_per_symbol]
+        # if output is LLRs on bits
+        if self._output == 'bit':
+            z = flatten_dims(z, 2, 3)
+
+        return z

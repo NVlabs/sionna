@@ -301,6 +301,60 @@ class Constellation(Layer):
             self._points = tf.constant(points,
                                     dtype=tf.as_dtype(self._dtype).real_dtype)
 
+    # pylint: disable=no-self-argument
+    def create_or_check_constellation(  constellation_type=None,
+                                        num_bits_per_symbol=None,
+                                        constellation=None,
+                                        dtype=tf.complex64):
+        # pylint: disable=line-too-long
+        r"""Static method for conviently creating a constellation object or checking that an existing one
+        is consistent with requested settings.
+
+        If ``constellation`` is `None`, then this method creates a :class:`~sionna.mapping.Constellation`
+        object of type ``constellation_type`` and with ``num_bits_per_symbol`` bits per symbol.
+        Otherwise, this method checks that `constellation` is consistent with ``constellation_type`` and
+        ``num_bits_per_symbol``. If it is, ``constellation`` is returned. Otherwise, an assertion is raised.
+
+        Input
+        ------
+        constellation_type : One of ["qam", "pam", "custom"], str
+            For "custom", an instance of :class:`~sionna.mapping.Constellation`
+            must be provided.
+
+        num_bits_per_symbol : int
+            The number of bits per constellation symbol, e.g., 4 for QAM16.
+            Only required for ``constellation_type`` in ["qam", "pam"].
+
+        constellation :  Constellation
+            An instance of :class:`~sionna.mapping.Constellation` or
+            `None`. In the latter case, ``constellation_type``
+            and ``num_bits_per_symbol`` must be provided.
+
+        Output
+        -------
+        : :class:`~sionna.mapping.Constellation`
+            A constellation object.
+        """
+        constellation_object = None
+        if constellation is not None:
+            assert constellation_type in [None, "custom"], \
+                """`constellation_type` must be "custom"."""
+            assert num_bits_per_symbol in \
+                     [None, constellation.num_bits_per_symbol], \
+                """`Wrong value of `num_bits_per_symbol.`"""
+            assert constellation.dtype==dtype, \
+                "Constellation has wrong dtype."
+            constellation_object = constellation
+        else:
+            assert constellation_type in ["qam", "pam"], \
+                "Wrong constellation type."
+            assert num_bits_per_symbol is not None, \
+                "`num_bits_per_symbol` must be provided."
+            constellation_object = Constellation(   constellation_type,
+                                                    num_bits_per_symbol,
+                                                    dtype=dtype)
+        return constellation_object
+
     def call(self, inputs): #pylint: disable=unused-argument
         x = self._points
         x = tf.complex(x[0], x[1])
@@ -381,7 +435,7 @@ class Constellation(Layer):
 class Mapper(Layer):
     # pylint: disable=line-too-long
     r"""
-    Mapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, dtype=tf.complex64, **kwargs)
+    Mapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, return_indices=False, dtype=tf.complex64, **kwargs)
 
     Maps binary tensors to points of a constellation.
 
@@ -403,6 +457,10 @@ class Mapper(Layer):
         `None`. In the latter case, ``constellation_type``
         and ``num_bits_per_symbol`` must be provided.
 
+    return_indices : bool
+        If enabled, symbol indices are additionally returned.
+        Defaults to `False`.
+
     dtype : One of [tf.complex64, tf.complex128], tf.DType
         The output dtype. Defaults to tf.complex64.
 
@@ -416,6 +474,11 @@ class Mapper(Layer):
     : [...,n/Constellation.num_bits_per_symbol], tf.complex
         The mapped constellation symbols.
 
+    : [...,n/Constellation.num_bits_per_symbol], tf.int32
+        The symbol indices corresponding to the constellation symbols.
+        Only returned if ``return_indices`` is set to True.
+
+
     Note
     ----
     The last input dimension must be an integer multiple of the
@@ -425,30 +488,24 @@ class Mapper(Layer):
                  constellation_type=None,
                  num_bits_per_symbol=None,
                  constellation=None,
+                 return_indices=False,
                  dtype=tf.complex64,
                  **kwargs
                 ):
         super().__init__(dtype=dtype, **kwargs)
         assert dtype in [tf.complex64, tf.complex128],\
             "dtype must be tf.complex64 or tf.complex128"
-        #self._dtype = dtype
-        #print(dtype, self._dtype)
 
-        if constellation is not None:
-            assert constellation_type in [None, "custom"], \
-                """`constellation_type` must be "custom"."""
-            assert num_bits_per_symbol in \
-                     [None, constellation.num_bits_per_symbol], \
-                """`Wrong value of `num_bits_per_symbol.`"""
-            self._constellation = constellation
-        else:
-            assert constellation_type in ["qam", "pam"], \
-                "Wrong constellation type."
-            assert num_bits_per_symbol is not None, \
-                "`num_bits_per_symbol` must be provided."
-            self._constellation = Constellation(constellation_type,
-                                                num_bits_per_symbol,
-                                                dtype=self._dtype)
+        # Create constellation object
+        self._constellation = Constellation.create_or_check_constellation(
+                                                        constellation_type,
+                                                        num_bits_per_symbol,
+                                                        constellation,
+                                                        dtype=dtype)
+
+        self._return_indices = return_indices
+
+        self._return_indices = return_indices
 
         self._binary_base = 2**tf.constant(
                         range(self.constellation.num_bits_per_symbol-1,-1,-1))
@@ -474,7 +531,262 @@ class Mapper(Layer):
         # Map integers to constellation symbols
         x = tf.gather(self.constellation.points, int_rep, axis=0)
 
-        return x
+        if self._return_indices:
+            return x, int_rep
+        else:
+            return x
+
+class SymbolLogits2LLRsWithPrior(Layer):
+    # pylint: disable=line-too-long
+    r"""
+    SymbolLogits2LLRsWithPrior(method, num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)
+
+    Computes log-likelihood ratios (LLRs) or hard-decisions on bits
+    from a tensor of logits (i.e., unnormalized log-probabilities) on constellation points,
+    assuming prior knowledge on the bits is available.
+
+    Parameters
+    ----------
+    method : One of ["app", "maxlog"], str
+        The method used for computing the LLRs.
+
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 4 for QAM16.
+
+    hard_out : bool
+        If `True`, the layer provides hard-decided bits instead of soft-values.
+        Defaults to `False`.
+
+    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)
+        The dtype for the input and output.
+        Defaults to `tf.float32`.
+
+    Input
+    -----
+    (logits, prior) :
+        Tuple:
+
+    logits : [...,n, num_points], tf.float
+        Logits on constellation points.
+
+    prior : [num_bits_per_symbol] or [...n, num_bits_per_symbol], tf.float
+        Prior for every bit as LLRs.
+        It can be provided either as a tensor of shape `[num_bits_per_symbol]` for the
+        entire input batch, or as a tensor that is "broadcastable"
+        to `[..., n, num_bits_per_symbol]`.
+
+    Output
+    ------
+    : [...,n, num_bits_per_symbol], tf.float
+        LLRs or hard-decisions for every bit.
+
+    Note
+    ----
+    With the "app" method, the LLR for the :math:`i\text{th}` bit
+    is computed according to
+
+    .. math::
+        LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert \mathbf{z},\mathbf{p}\right)}{\Pr\left(b_i=0\lvert \mathbf{z},\mathbf{p}\right)}\right) =\ln\left(\frac{
+                \sum_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)
+                e^{z_c}
+                }{
+                \sum_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
+                e^{z_c}
+                }\right)
+
+    where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the
+    sets of :math:`2^K` constellation points for which the :math:`i\text{th}` bit is
+    equal to 1 and 0, respectively. :math:`\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]` is the vector of logits on the constellation points, :math:`\mathbf{p} = \left[p_0,\dots,p_{K-1}\right]`
+    is the vector of LLRs that serves as prior knowledge on the :math:`K` bits that are mapped to
+    a constellation point, and :math:`\Pr(c\lvert\mathbf{p})` is the prior probability on the constellation symbol
+    :math:`c`:
+
+    .. math::
+        \Pr\left(c\lvert\mathbf{p}\right) = \prod_{k=0}^{K-1} \Pr\left(b_k = \ell(c)_k \lvert\mathbf{p} \right)
+        = \prod_{k=0}^{K-1} \text{sigmoid}\left(p_k \ell(c)_k\right)
+
+    where :math:`\ell(c)_k` is the :math:`k^{th}` bit label of :math:`c`, where 0 is
+    replaced by -1.
+    The definition of the LLR has been
+    chosen such that it is equivalent with that of logits. This is
+    different from many textbooks in communications, where the LLR is
+    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.
+
+    With the "maxlog" method, LLRs for the :math:`i\text{th}` bit
+    are approximated like
+
+    .. math::
+        \begin{align}
+            LLR(i) &\approx\ln\left(\frac{
+                \max_{c\in\mathcal{C}_{i,1}} \Pr\left(c\lvert\mathbf{p}\right)
+                    e^{z_c}
+                }{
+                \max_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
+                    e^{z_c}
+                }\right)
+                .
+        \end{align}
+    """
+    def __init__(self,
+                 method,
+                 num_bits_per_symbol,
+                 hard_out=False,
+                 dtype=tf.float32,
+                 **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
+        assert method in ("app","maxlog"), "Unknown demapping method"
+        self._method = method
+        self._hard_out = hard_out
+        self._num_bits_per_symbol = num_bits_per_symbol
+        num_points = int(2**num_bits_per_symbol)
+
+        # Array composed of binary representations of all symbols indices
+        a = np.zeros([num_points, num_bits_per_symbol])
+        for i in range(0, num_points):
+            a[i,:] = np.array(list(np.binary_repr(i, num_bits_per_symbol)),
+                              dtype=np.int16)
+
+        # Compute symbol indices for which the bits are 0 or 1
+        c0 = np.zeros([int(num_points/2), num_bits_per_symbol])
+        c1 = np.zeros([int(num_points/2), num_bits_per_symbol])
+        for i in range(num_bits_per_symbol-1,-1,-1):
+            c0[:,i] = np.where(a[:,i]==0)[0]
+            c1[:,i] = np.where(a[:,i]==1)[0]
+        self._c0 = tf.constant(c0, dtype=tf.int32) # Symbols with ith bit=0
+        self._c1 = tf.constant(c1, dtype=tf.int32) # Symbols with ith bit=1
+
+        # Array of labels from {-1, 1} of all symbols
+        # [num_points, num_bits_per_symbol]
+        a = 2*a-1
+        self._a = tf.constant(a, dtype=dtype)
+
+        # Determine the reduce function for LLR computation
+        if self._method == "app":
+            self._reduce = tf.reduce_logsumexp
+        else:
+            self._reduce = tf.reduce_max
+
+    @property
+    def num_bits_per_symbol(self):
+        return self._num_bits_per_symbol
+
+    def call(self, inputs):
+        logits, prior = inputs
+
+        # Compute exponents
+        exponents = logits
+
+        # Gather exponents for all bits
+        # shape [...,n,num_points/2,num_bits_per_symbol]
+        exp0 = tf.gather(exponents, self._c0, axis=-1, batch_dims=0)
+        exp1 = tf.gather(exponents, self._c1, axis=-1, batch_dims=0)
+
+        # Expanding `prior` such that it is broadcastable with
+        # shape [..., n or 1, 1, num_bits_per_symbol]
+        prior = sn.utils.expand_to_rank(prior, tf.rank(logits), axis=0)
+        prior = tf.expand_dims(prior, axis=-2)
+
+        # Expand the symbol labeling to be broadcastable with prior
+        # shape [..., 1, num_points, num_bits_per_symbol]
+        a = sn.utils.expand_to_rank(self._a, tf.rank(prior), axis=0)
+
+        # Compute the prior probabilities on symbols exponents
+        # shape [..., n or 1, num_points]
+        exp_ps = tf.reduce_sum(tf.math.log_sigmoid(a*prior), axis=-1)
+
+        # Gather prior probability symbol for all bits
+        # shape [..., n or 1, num_points/2, num_bits_per_symbol]
+        exp_ps0 = tf.gather(exp_ps, self._c0, axis=-1)
+        exp_ps1 = tf.gather(exp_ps, self._c1, axis=-1)
+
+        # Compute LLRs using the definition log( Pr(b=1)/Pr(b=0) )
+        # shape [..., n, num_bits_per_symbol]
+        llr = self._reduce(exp_ps1 + exp1, axis=-2)\
+                - self._reduce(exp_ps0 + exp0, axis=-2)
+
+        if self._hard_out:
+            return sn.utils.hard_decisions(llr)
+        else:
+            return llr
+
+class SymbolLogits2LLRs(SymbolLogits2LLRsWithPrior):
+    # pylint: disable=line-too-long
+    r"""
+    SymbolLogits2LLRs(method, num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)
+
+    Computes log-likelihood ratios (LLRs) or hard-decisions on bits
+    from a tensor of logits (i.e., unnormalized log-probabilities) on constellation points.
+
+    Parameters
+    ----------
+    method : One of ["app", "maxlog"], str
+        The method used for computing the LLRs.
+
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 4 for QAM16.
+
+    hard_out : bool
+        If `True`, the layer provides hard-decided bits instead of soft-values.
+        Defaults to `False`.
+
+    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)
+        The dtype for the input and output.
+        Defaults to `tf.float32`.
+
+    Input
+    -----
+    logits : [...,n, num_points], tf.float
+        Logits on constellation points.
+
+    Output
+    ------
+    : [...,n, num_bits_per_symbol], tf.float
+        LLRs or hard-decisions for every bit.
+
+    Note
+    ----
+    With the "app" method, the LLR for the :math:`i\text{th}` bit
+    is computed according to
+
+    .. math::
+        LLR(i) = \ln\left(\frac{\Pr\left(b_i=1\lvert y\right)}{\Pr\left(b_i=0\lvert y\right)}\right) =\ln\left(\frac{
+                \sum_{c\in\mathcal{C}_{i,1}}
+                    e^{z_c}
+                }{
+                \sum_{c\in\mathcal{C}_{i,0}}
+                    e^{z_c}
+                }\right)
+
+    where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the
+    sets of :math:`2^K` constellation points for which the :math:`i\text{th}` bit is
+    equal to 1 and 0, respectively. :math:`\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]` is the vector of logits on the constellation points. The definition of the LLR has been
+    chosen such that it is equivalent with that of logits. This is
+    different from many textbooks in communications, where the LLR is
+    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.
+
+    With the "maxlog" method, LLRs for the :math:`i\text{th}` bit
+    are approximated like
+
+    .. math::
+            LLR(i) &\approx\ln\left(\frac{
+                \max_{c\in\mathcal{C}_{i,1}}
+                    e^{z_c}
+                }{
+                \max_{c\in\mathcal{C}_{i,0}}
+                    e^{z_c}
+                }\right)\\
+                &=  \max_{c\in\mathcal{C}_{i,1}} z_c
+                - \max_{c\in\mathcal{C}_{i,0}} z_c
+                .
+    """
+    def call(self, inputs):
+        logits = inputs
+
+        # Settings all priors to 0
+        num_bits_per_symbol = self.num_bits_per_symbol
+        null_prior = tf.zeros([num_bits_per_symbol], logits.dtype)
+
+        return super().call([logits, null_prior])
 
 class DemapperWithPrior(Layer):
     # pylint: disable=line-too-long
@@ -597,54 +909,20 @@ class DemapperWithPrior(Layer):
                  dtype=tf.complex64,
                  **kwargs):
         super().__init__(dtype=dtype, **kwargs)
-        assert demapping_method in ("app","maxlog"), "Unknown demapping method"
-        self._demapping_method = demapping_method
-        self._hard_out = hard_out
 
-        if constellation is not None:
-            assert constellation_type in [None, "custom"], \
-                """`constellation_type` must be "custom"."""
-            assert num_bits_per_symbol in \
-                     [None, constellation.num_bits_per_symbol], \
-                """`Wrong value of `num_bits_per_symbol.`"""
-            self._constellation = constellation
-        else:
-            assert constellation_type in ["qam", "pam"], \
-                "Wrong constellation type."
-            assert num_bits_per_symbol is not None, \
-                "`num_bits_per_symbol` must be provided."
-            self._constellation = Constellation(constellation_type,
-                                                num_bits_per_symbol,
-                                                dtype=dtype)
 
+        # Create constellation object
+        self._constellation = Constellation.create_or_check_constellation(
+                                                        constellation_type,
+                                                        num_bits_per_symbol,
+                                                        constellation)
         num_bits_per_symbol = self._constellation.num_bits_per_symbol
-        num_points = int(2**num_bits_per_symbol)
 
-        # Array composed of binary representations of all symbols indices
-        a = np.zeros([num_points, num_bits_per_symbol])
-        for i in range(0, num_points):
-            a[i,:] = np.array(list(np.binary_repr(i, num_bits_per_symbol)),
-                              dtype=np.int16)
-
-        # Compute symbol indices for which the bits are 0 or 1
-        c0 = np.zeros([int(num_points/2), num_bits_per_symbol])
-        c1 = np.zeros([int(num_points/2), num_bits_per_symbol])
-        for i in range(num_bits_per_symbol-1,-1,-1):
-            c0[:,i] = np.where(a[:,i]==0)[0]
-            c1[:,i] = np.where(a[:,i]==1)[0]
-        self._c0 = tf.constant(c0, dtype=tf.int32) # Symbols with ith bit=0
-        self._c1 = tf.constant(c1, dtype=tf.int32) # Symbols with ith bit=1
-
-        # Array of labels from {-1, 1} of all symbols
-        # [num_points, num_bits_per_symbol]
-        a = 2*a-1
-        self._a = tf.constant(a, dtype=tf.float32)
-
-        # Determine the reduce function for LLR computation
-        if self._demapping_method == "app":
-            self._reduce = tf.reduce_logsumexp
-        else:
-            self._reduce = tf.reduce_max
+        self._logits2llrs = SymbolLogits2LLRsWithPrior( demapping_method,
+                                                        num_bits_per_symbol,
+                                                        hard_out,
+                                                        dtype.real_dtype,
+                                                        **kwargs)
 
     @property
     def constellation(self):
@@ -654,7 +932,7 @@ class DemapperWithPrior(Layer):
         y, prior, no = inputs
 
         # Reshape constellation points to [1,...1,num_points]
-        points_shape = [1]*y.shape.rank + self._constellation.points.shape
+        points_shape = [1]*y.shape.rank + self.constellation.points.shape
         points = tf.reshape(self.constellation.points, points_shape)
 
         # Compute squared distances from y to all points
@@ -668,44 +946,15 @@ class DemapperWithPrior(Layer):
         # Compute exponents
         exponents = -squared_dist/no
 
-        # Gather exponents for all bits
-        # shape [...,n,num_points/2,num_bits_per_symbol]
-        exp0 = tf.gather(exponents, self._c0, axis=-1, batch_dims=0)
-        exp1 = tf.gather(exponents, self._c1, axis=-1, batch_dims=0)
-
-        # Expanding `prior` such that it is broadcastable with
-        # shape [..., n or 1, 1, num_bits_per_symbol]
-        prior = sn.utils.expand_to_rank(prior, tf.rank(y)+1, axis=0)
-        prior = tf.expand_dims(prior, axis=-2)
-
-        # Expand the symbol labeling to be broadcastable with prior
-        # shape [..., 1, num_points, num_bits_per_symbol]
-        a = sn.utils.expand_to_rank(self._a, tf.rank(prior), axis=0)
-
-        # Compute the prior probabilities on symbols exponents
-        # shape [..., n or 1, num_points]
-        exp_ps = tf.reduce_sum(tf.math.log_sigmoid(a*prior), axis=-1)
-
-        # Gather prior probability symbol for all bits
-        # shape [..., n or 1, num_points/2, num_bits_per_symbol]
-        exp_ps0 = tf.gather(exp_ps, self._c0, axis=-1)
-        exp_ps1 = tf.gather(exp_ps, self._c1, axis=-1)
-
-        # Compute LLRs using the definition log( Pr(b=1)/Pr(b=0) )
-        # shape [..., n, num_bits_per_symbol]
-        llr = self._reduce(exp_ps1 + exp1, axis=-2)\
-                - self._reduce(exp_ps0 + exp0, axis=-2)
+        llr = self._logits2llrs([exponents, prior])
 
         # Reshape LLRs to [...,n*num_bits_per_symbol]
         out_shape = tf.concat([tf.shape(y)[:-1],
                                [y.shape[-1] * \
-                                self._constellation.num_bits_per_symbol]], 0)
+                                self.constellation.num_bits_per_symbol]], 0)
         llr_reshaped = tf.reshape(llr, out_shape)
 
-        if self._hard_out:
-            return sn.utils.hard_decisions(llr_reshaped)
-        else:
-            return llr_reshaped
+        return llr_reshaped
 
 class Demapper(DemapperWithPrior):
     # pylint: disable=line-too-long
@@ -802,14 +1051,13 @@ class Demapper(DemapperWithPrior):
                 = \frac{1}{N_o}\left(\min_{c\in\mathcal{C}_{i,0}}|y-c|^2-
                  \min_{c\in\mathcal{C}_{i,1}}|y-c|^2\right)
                 .
-
     """
 
     def call(self, inputs):
         y, no = inputs
 
         # Settings all priors to 0
-        num_bits_per_symbol =self._constellation.num_bits_per_symbol
+        num_bits_per_symbol = self.constellation.num_bits_per_symbol
         null_prior = tf.zeros([num_bits_per_symbol], y.dtype.real_dtype)
 
         return super().call([y, null_prior, no])
@@ -893,21 +1141,11 @@ class SymbolDemapperWithPrior(Layer):
         super().__init__(dtype=dtype, **kwargs)
         self._hard_out = hard_out
 
-        if constellation is not None:
-            assert constellation_type in [None, "custom"], \
-                """`constellation_type` must be "custom"."""
-            assert num_bits_per_symbol in \
-                     [None, constellation.num_bits_per_symbol], \
-                """`Wrong value of `num_bits_per_symbol.`"""
-            self._constellation = constellation
-        else:
-            assert constellation_type in ["qam", "pam"], \
-                "Wrong constellation type."
-            assert num_bits_per_symbol is not None, \
-                "`num_bits_per_symbol` must be provided."
-            self._constellation = Constellation(constellation_type,
-                                                num_bits_per_symbol,
-                                                dtype=dtype)
+        # Create constellation object
+        self._constellation = Constellation.create_or_check_constellation(
+                                                        constellation_type,
+                                                        num_bits_per_symbol,
+                                                        constellation)
 
     def call(self, inputs):
         y, prior, no = inputs
@@ -923,7 +1161,7 @@ class SymbolDemapperWithPrior(Layer):
         prior = sn.utils.expand_to_rank(prior, tf.rank(exp), axis=0)
 
         if self._hard_out:
-            return tf.argmax(exp + prior, axis=-1)
+            return tf.argmax(exp + prior, axis=-1, output_type=tf.int32)
         else:
             return tf.nn.log_softmax(exp + prior, axis=-1)
 
@@ -998,3 +1236,85 @@ class SymbolDemapper(SymbolDemapperWithPrior):
         null_prior = tf.zeros([num_points], y.dtype.real_dtype)
 
         return super().call([y, null_prior, no])
+
+class SymbolLogits2Moments(Layer):
+    # pylint: disable=line-too-long
+    r"""
+    SymbolLogits2Moments(constellation_type=None, num_bits_per_symbol=None, constellation=None, dtype=tf.float32, **kwargs)
+
+    Computes the mean and variance of a constellation from logits (unnormalized log-probabilities) on the
+    constellation points.
+
+    More precisely, given a constellation :math:`\mathcal{C} = \left[ c_0,\dots,c_{N-1} \right]` of size :math:`N`, this layer computes the mean and variance
+    according to
+
+    .. math::
+        \begin{align}
+            \mu &= \sum_{n = 0}^{N-1} c_n \Pr \left(c_n \lvert \mathbf{\ell} \right)\\
+            \nu &= \sum_{n = 0}^{N-1} \left( c_n - \mu \right)^2 \Pr \left(c_n \lvert \mathbf{\ell} \right)
+        \end{align}
+
+
+    where :math:`\mathbf{\ell} = \left[ \ell_0, \dots, \ell_{N-1} \right]` are the logits, and
+
+    .. math::
+        \Pr \left(c_n \lvert \mathbf{\ell} \right) = \frac{\exp \left( \ell_n \right)}{\sum_{i=0}^{N-1} \exp \left( \ell_i \right) }.
+
+    Parameters
+    ----------
+    constellation_type : One of ["qam", "pam", "custom"], str
+        For "custom", an instance of :class:`~sionna.mapping.Constellation`
+        must be provided.
+
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 4 for QAM16.
+        Only required for ``constellation_type`` in ["qam", "pam"].
+
+    constellation : Constellation
+        An instance of :class:`~sionna.mapping.Constellation` or `None`.
+        In the latter case, ``constellation_type``
+        and ``num_bits_per_symbol`` must be provided.
+
+    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)
+        The dtype for the input and output.
+        Defaults to `tf.float32`.
+
+    Input
+    -----
+    logits : [...,n, num_points], tf.float
+        Logits on constellation points.
+
+    Output
+    ------
+    mean : [...,n], tf.float
+        Mean of the constellation.
+
+    var : [...,n], tf.float
+        Variance of the constellation
+    """
+    def __init__(self,
+                 constellation_type=None,
+                 num_bits_per_symbol=None,
+                 constellation=None,
+                 dtype=tf.float32,
+                 **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
+
+        # Create constellation object
+        self._constellation = Constellation.create_or_check_constellation(
+                                                        constellation_type,
+                                                        num_bits_per_symbol,
+                                                        constellation)
+
+    def call(self, logits):
+
+        p = tf.math.softmax(logits, axis=-1)
+        p = tf.complex(p, 0.0)
+        points = self._constellation.points
+        points = sn.utils.expand_to_rank(points, tf.rank(p), axis=0)
+
+        mean = tf.reduce_sum(p*points, axis=-1, keepdims=True)
+        var = tf.reduce_sum(p*tf.square(points - mean), axis=-1)
+        mean = tf.squeeze(mean, axis=-1)
+
+        return mean, var

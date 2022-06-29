@@ -1,0 +1,96 @@
+##
+## Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
+##
+## NVIDIA CORPORATION and its licensors retain all intellectual property
+## and proprietary rights in and to this software, related documentation
+## and any modifications thereto.  Any use, reproduction, disclosure or
+## distribution of this software and related documentation without an express
+## license agreement from NVIDIA CORPORATION is strictly prohibited.
+##
+stages:
+  - build
+  - test
+documentation:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/python-doc:latest
+  stage: build
+  before_script:
+  - echo 'Cleanup environment...'
+  - git branch -D $CI_DOCUMENTATION_BRANCH || IGNORE_FAILURE=true
+  - git remote remove origin-rw || IGNORE_FAILURE=true
+  - git config --local --replace-all user.name "${CI_GIT_USER_NAME}" || IGNORE_FAILURE=true
+  - git config --local --replace-all user.email "${CI_GIT_USER_EMAIL}" || IGNORE_FAILURE=true
+  script:
+  - echo 'Building documentation...'
+  - make doc
+  - echo 'Fetch current state of documentation branch...'
+  - REPO_URL=`echo $CI_REPOSITORY_URL | cut -d'@' -f 2`
+  - git remote add origin-rw https://$CI_GIT_RW_NAME:$CI_GIT_RW_TOKEN@$REPO_URL 
+  - git remote -v
+  - git fetch origin-rw $CI_DOCUMENTATION_BRANCH
+  - git checkout -b $CI_DOCUMENTATION_BRANCH --track origin-rw/${CI_DOCUMENTATION_BRANCH}
+  - echo 'Replace website folders with updated version...'
+  - rm -rf docs
+  - mv doc/build/html docs
+  - echo 'Commit changes to git'
+  - git add docs
+  - git status
+  - |
+    if git diff --cached --quiet
+    then
+      echo 'No changes detected.'
+    else
+      git commit -m "update Documentation from commit ${CI_COMMIT_SHORT_SHA}"
+      git log -n 1
+      git push origin-rw $CI_DOCUMENTATION_BRANCH
+    fi
+  - echo 'Done.'
+  tags:
+  artifacts:
+    name: "$CI_PROJECT_NAME-docs-$CI_COMMIT_SHORT_SHA"
+    paths:
+    - docs
+  only:
+  - main
+all-tests:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.8.0-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report.xml
+  only:
+  - main
+all-tests-tf-2.8.2:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.8.2-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.8.2.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.8.2.xml
+  when: manual
+all-tests-tf-2.9.1:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.9.1-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.9.1.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.9.1.xml
+  when: manual

@@ -8,7 +8,6 @@ import tensorflow as tf
 from sionna.utils import expand_to_rank, matrix_sqrt_inv, matrix_inv
 
 
-
 def lmmse_equalizer(y, h, s, whiten_interference=True):
     # pylint: disable=line-too-long
     r"""MIMO LMMSE Equalizer
@@ -73,7 +72,7 @@ def lmmse_equalizer(y, h, s, whiten_interference=True):
         2+D tensor containing the channel matrices.
 
     s : [...,M,M], tf.complex
-        2+D tensor containing the noise covariance matrix.
+        2+D tensor containing the noise covariance matrices.
 
     whiten_interference : bool
         If `True` (default), the interference is first whitened before equalization.

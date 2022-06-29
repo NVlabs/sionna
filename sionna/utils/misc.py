@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Layer
 from tensorflow.experimental.numpy import log10 as _log10
 from tensorflow.experimental.numpy import log2 as _log2
 from sionna.utils.metrics import count_errors, count_block_errors
-from sionna.mapping import Constellation
+from sionna.mapping import Mapper
 import time
 from sionna import signal
 
@@ -131,7 +131,7 @@ def log2(x):
 
 
 class BinarySource(Layer):
-    """BinarySource(dtype=tf.float32, **kwargs)
+    """BinarySource(dtype=tf.float32, seed=None, **kwargs)
 
     Layer generating random binary tensors.
 
@@ -140,6 +140,10 @@ class BinarySource(Layer):
     dtype : tf.DType
         Defines the output datatype of the layer.
         Defaults to `tf.float32`.
+
+    seed : int or None
+        Set the seed for the random generator used to generate the bits.
+        Set to `None` for random initialization of the RNG.
 
     Input
     -----
@@ -151,32 +155,59 @@ class BinarySource(Layer):
     : ``shape``, ``dtype``
         Tensor filled with random binary values.
     """
-    def __init__(self, dtype=tf.float32, **kwargs):
+    def __init__(self, dtype=tf.float32, seed=None, **kwargs):
         super().__init__(dtype=dtype, **kwargs)
+        self._seed = seed
+        if self._seed is not None:
+            self._rng = tf.random.Generator.from_seed(self._seed)
 
     def call(self, inputs):
-        return tf.cast(tf.random.uniform(inputs, 0, 2, tf.int32),
-                       dtype=super().dtype)
+        if self._seed is not None:
+            return tf.cast(self._rng.uniform(inputs, 0, 2, tf.int32),
+                           dtype=super().dtype)
+        else:
+            return tf.cast(tf.random.uniform(inputs, 0, 2, tf.int32),
+                           dtype=super().dtype)
 
+class SymbolSource(Layer):
+    # pylint: disable=line-too-long
+    r"""SymbolSource(constellation_type=None, num_bits_per_symbol=None, constellation=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)
 
-class QAMSource(Layer):
-    """QAMSource(num_bits_per_symbol, seed=None, dtype=tf.complex64, **kwargs)
-
-    Layer generating a tensor of arbitrary shape filled with random QAM symbols.
+    Layer generating a tensor of arbitrary shape filled with random constellation symbols.
+    Optionally, the symbol indices and/or binary representations of the
+    constellation symbols can be returned.
 
     Parameters
     ----------
+    constellation_type : One of ["qam", "pam", "custom"], str
+        For "custom", an instance of :class:`~sionna.mapping.Constellation`
+        must be provided.
+
     num_bits_per_symbol : int
-        Indicates the number of bits per constellation symbol.
-        It must be a multiple of two.
+        The number of bits per constellation symbol.
+        Only required for ``constellation_type`` in ["qam", "pam"].
+
+    constellation :  Constellation
+        An instance of :class:`~sionna.mapping.Constellation` or
+        `None`. In the latter case, ``constellation_type``
+        and ``num_bits_per_symbol`` must be provided.
+
+    return_indices : bool
+        If enabled, the function also returns the symbol indices.
+        Defaults to `False`.
+
+    return_bits : bool
+        If enabled, the function also returns the binary symbol
+        representations (i.e., bit labels).
+        Defaults to `False`.
 
     seed : int or None
-        Set the seed for the random generator used to generate the QAM symbols.
-        Set to `None` for random initialization of the RNG.
+        The seed for the random generator.
+        `None` leads to a random initialization of the RNG.
+        Defaults to `None`.
 
     dtype : One of [tf.complex64, tf.complex128], tf.DType
-        Defines the output datatype of the layer.
-        Defaults to `tf.complex64`.
+        The output dtype. Defaults to tf.complex64.
 
     Input
     -----
@@ -185,33 +216,184 @@ class QAMSource(Layer):
 
     Output
     ------
-    : ``shape``, ``dtype``
-        Tensor filled with random QAM symbols.
+    symbols : ``shape``, ``dtype``
+        Tensor filled with random symbols of the chosen ``constellation_type``.
+
+    symbol_indices : ``shape``, tf.int32
+        Tensor filled with the symbol indices.
+        Only returned if ``return_indices`` is `True`.
+
+    bits : [``shape``, ``num_bits_per_symbol``], tf.int32
+        Tensor filled with the binary symbol representations (i.e., bit labels).
+        Only returned if ``return_bits`` is `True`.
     """
     def __init__(self,
-                 num_bits_per_symbol,
+                 constellation_type=None,
+                 num_bits_per_symbol=None,
+                 constellation=None,
+                 return_indices=False,
+                 return_bits=False,
                  seed=None,
                  dtype=tf.complex64,
-                 **kwargs):
+                 **kwargs
+                ):
         super().__init__(dtype=dtype, **kwargs)
         self._num_bits_per_symbol = num_bits_per_symbol
-        if dtype not in (tf.complex64, tf.complex128):
-            raise ValueError("Unsupported dtype.")
-        self._dtype = dtype
-        self._constellation = Constellation("qam",
-                                            num_bits_per_symbol,
-                                            dtype=dtype)
-        if seed is not None:
-            self._rng = tf.random.Generator.from_seed(seed)
-        else:
-            self._rng = tf.random.Generator.from_non_deterministic_state()
+        self._return_indices = return_indices
+        self._return_bits = return_bits
+        self._binary_source = BinarySource(seed=seed, dtype=dtype.real_dtype)
+        self._mapper = Mapper(constellation_type,
+                              num_bits_per_symbol,
+                              constellation,
+                              return_indices,
+                              dtype)
 
     def call(self, inputs):
-        num_points = 2**self._num_bits_per_symbol
-        ind = self._rng.uniform(inputs, 0, num_points, tf.int32)
-        x = tf.gather(self._constellation.points, ind)
+        shape = tf.concat([inputs, [self._num_bits_per_symbol]], axis=-1)
+        b = self._binary_source(tf.cast(shape, tf.int32))
+        if self._return_indices:
+            x, ind = self._mapper(b)
+        else:
+            x = self._mapper(b)
 
-        return x
+        result = tf.squeeze(x, -1)
+        if self._return_indices or self._return_bits:
+            result = [result]
+        if self._return_indices:
+            result.append(tf.squeeze(ind, -1))
+        if self._return_bits:
+            result.append(b)
+
+        return result
+
+
+class QAMSource(SymbolSource):
+    # pylint: disable=line-too-long
+    r"""QAMSource(num_bits_per_symbol=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)
+
+    Layer generating a tensor of arbitrary shape filled with random QAM symbols.
+    Optionally, the symbol indices and/or binary representations of the
+    constellation symbols can be returned.
+
+    Parameters
+    ----------
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 4 for QAM16.
+
+    return_indices : bool
+        If enabled, the function also returns the symbol indices.
+        Defaults to `False`.
+
+    return_bits : bool
+        If enabled, the function also returns the binary symbol
+        representations (i.e., bit labels).
+        Defaults to `False`.
+
+    seed : int or None
+        The seed for the random generator.
+        `None` leads to a random initialization of the RNG.
+        Defaults to `None`.
+
+    dtype : One of [tf.complex64, tf.complex128], tf.DType
+        The output dtype. Defaults to tf.complex64.
+
+    Input
+    -----
+    shape : 1D tensor/array/list, int
+        The desired shape of the output tensor.
+
+    Output
+    ------
+    symbols : ``shape``, ``dtype``
+        Tensor filled with random QAM symbols.
+
+    symbol_indices : ``shape``, tf.int32
+        Tensor filled with the symbol indices.
+        Only returned if ``return_indices`` is `True`.
+
+    bits : [``shape``, ``num_bits_per_symbol``], tf.int32
+        Tensor filled with the binary symbol representations (i.e., bit labels).
+        Only returned if ``return_bits`` is `True`.
+    """
+    def __init__(self,
+                 num_bits_per_symbol=None,
+                 return_indices=False,
+                 return_bits=False,
+                 seed=None,
+                 dtype=tf.complex64,
+                 **kwargs
+                ):
+        super().__init__(constellation_type="qam",
+                         num_bits_per_symbol=num_bits_per_symbol,
+                         return_indices=return_indices,
+                         return_bits=return_bits,
+                         seed=seed,
+                         dtype=dtype,
+                         **kwargs)
+
+class PAMSource(SymbolSource):
+    # pylint: disable=line-too-long
+    r"""PAMSource(num_bits_per_symbol=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)
+
+    Layer generating a tensor of arbitrary shape filled with random PAM symbols.
+    Optionally, the symbol indices and/or binary representations of the
+    constellation symbols can be returned.
+
+    Parameters
+    ----------
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 1 for BPSK.
+
+    return_indices : bool
+        If enabled, the function also returns the symbol indices.
+        Defaults to `False`.
+
+    return_bits : bool
+        If enabled, the function also returns the binary symbol
+        representations (i.e., bit labels).
+        Defaults to `False`.
+
+    seed : int or None
+        The seed for the random generator.
+        `None` leads to a random initialization of the RNG.
+        Defaults to `None`.
+
+    dtype : One of [tf.complex64, tf.complex128], tf.DType
+        The output dtype. Defaults to tf.complex64.
+
+    Input
+    -----
+    shape : 1D tensor/array/list, int
+        The desired shape of the output tensor.
+
+    Output
+    ------
+    symbols : ``shape``, ``dtype``
+        Tensor filled with random PAM symbols.
+
+    symbol_indices : ``shape``, tf.int32
+        Tensor filled with the symbol indices.
+        Only returned if ``return_indices`` is `True`.
+
+    bits : [``shape``, ``num_bits_per_symbol``], tf.int32
+        Tensor filled with the binary symbol representations (i.e., bit labels).
+        Only returned if ``return_bits`` is `True`.
+    """
+    def __init__(self,
+                 num_bits_per_symbol=None,
+                 return_indices=False,
+                 return_bits=False,
+                 seed=None,
+                 dtype=tf.complex64,
+                 **kwargs
+                ):
+        super().__init__(constellation_type="pam",
+                         num_bits_per_symbol=num_bits_per_symbol,
+                         return_indices=return_indices,
+                         return_bits=return_bits,
+                         seed=seed,
+                         dtype=dtype,
+                         **kwargs)
 
 
 def sim_ber(mc_fun,
