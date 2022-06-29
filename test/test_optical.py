@@ -223,7 +223,7 @@ class TestOptical(unittest.TestCase):
 		u = ssfm_graph((u_0))
 
 		u_ref = np.expand_dims(self._u_ref, axis=0)
-		u_ref = np.expand_dims(self._u_ref, axis=0)
+		u_ref = np.expand_dims(u_ref, axis=0)
 		u_ref = np.repeat(u_ref, 2, 0)
 		u_ref = np.repeat(u_ref, 2, 1)
 
