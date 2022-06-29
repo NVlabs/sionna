@@ -17,7 +17,7 @@ from sionna.channel import utils
 
 class SSFM(Layer):
     # pylint: disable=line-too-long
-    r"""SSFM(alpha, beta_2, f_c, gamma, half_window_length, ell, n_ssfm, n_sp, dt, t_norm, with_amplification, with_attenuation, with_dispersion, with_nonlinearity, swap_memory=True, dtype=tf.complex64, **kwargs)
+    r"""SSFM(alpha, beta_2, f_c, gamma, half_window_length, length, n_ssfm, n_sp=1.0,  dt=1.0, t_norm=1e-12, with_amplification=False, with_attenuation=True, with_dispersion=True, with_nonlinearity=True, swap_memory=True, dtype=tf.complex64, **kwargs)
 
     Layer implementing the split-step Fourier method (SSFM).
 
@@ -49,8 +49,10 @@ class SSFM(Layer):
     Setting-up:
 
     >>> ssfm_channel = SSFM(
-    >>>     0.046, -21.67, 193.55e12, 1.27, 100, 80, 200, 1e-17, 1.0,
-    >>>     True, True, True, True)
+    >>>     alpha=0.046, beta_2=-21.67, f_c=193.55, gamma=1.27,
+    >>>     half_window_length=100, ell=80, n_ssfm=200, n_sp=1.0, dt=1.0,
+    >>>     t_norm=1e-12, with_amplification=True, with_attenuation=True,
+    >>>     with_dispersion=True, with_nonlinearity=True)
 
     Running:
 
@@ -73,7 +75,7 @@ class SSFM(Layer):
         half_window_length : int
             Half of the Hamming window length
 
-        ell : float
+        length : float
             Fiber length :math:`\ell` in :math:`(L_\text{norm})`
 
         n_ssfm : int
@@ -118,10 +120,10 @@ class SSFM(Layer):
         y : Tensor with same shape as ``x``, tf.complex
             Channel output
     """
-    def __init__(self, alpha, beta_2, f_c, gamma, half_window_length, ell,
-                 n_ssfm, n_sp, dt, t_norm,
-                 with_amplification, with_attenuation, with_dispersion,
-                 with_nonlinearity,
+    def __init__(self, alpha, beta_2, f_c, gamma, half_window_length, length,
+                 n_ssfm, n_sp=1.0,  dt=1.0, t_norm=1e-12,
+                 with_amplification=False, with_attenuation=True,
+                 with_dispersion=True, with_nonlinearity=True,
                  swap_memory=True, dtype=tf.complex64, **kwargs):
         super().__init__(dtype=dtype, **kwargs)
 
@@ -130,7 +132,7 @@ class SSFM(Layer):
         self._f_c = tf.cast(f_c, dtype=dtype.real_dtype)
         self._gamma = tf.cast(gamma, dtype=dtype.real_dtype)
         self._half_window_length = half_window_length
-        self._ell = tf.cast(ell, dtype=dtype.real_dtype)
+        self._length = tf.cast(length, dtype=dtype.real_dtype)
         self._n_ssfm = tf.cast(n_ssfm, dtype=tf.int32)
         self._n_sp = tf.cast(n_sp, dtype=dtype.real_dtype)
         self._swap_memory = swap_memory
@@ -145,14 +147,14 @@ class SSFM(Layer):
 
         self._rho_n = \
             sionna.constants.H / (self._t_norm ** 2.0) * 2.0 * \
-            sionna.constants.PI * self._f_c * self._alpha * self._ell * \
+            sionna.constants.PI * self._f_c * self._alpha * self._length * \
             self._n_sp
 
         # Calculate noise power depending on simulation bandwidth
         self._p_n_ase = self._rho_n / self._dt
 
-        # Precalculate dispersion
-        self._dz = self._ell / tf.cast(self._n_ssfm, dtype=self._rdtype)
+        # Precalculate uniform step size
+        self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
 
         self._window = tf.complex(
             tf.signal.hamming_window(
@@ -165,7 +167,7 @@ class SSFM(Layer):
             )
         )
 
-    def apply_linear_operator(self, q, dz, zeros, f):
+    def _apply_linear_operator(self, q, dz, zeros, f):
         # Chromatic dispersion
         if self._with_dispersion:
             dispersion = tf.exp(
@@ -191,7 +193,7 @@ class SSFM(Layer):
 
         return q
 
-    def apply_noise(self, q, dz):
+    def _apply_noise(self, q, dz):
         # Noise due to Amplification (Raman)
         if self._with_amplification:
             q_n = tf.complex(
@@ -199,8 +201,9 @@ class SSFM(Layer):
                     q.shape,
                     tf.cast(0.0, self._rdtype),
                     tf.sqrt(
-                        self._p_n_ase /
-                        tf.cast(self._n_ssfm, self._rdtype) /
+                        self._p_n_ase *
+                        tf.cast(dz, self._rdtype) /
+                        tf.cast(self._length, self._rdtype) /
                         tf.cast(2.0, self._rdtype)
                     ),
                     self._rdtype),
@@ -209,7 +212,8 @@ class SSFM(Layer):
                     tf.cast(0.0, self._rdtype),
                     tf.sqrt(
                         self._p_n_ase /
-                        tf.cast(self._n_ssfm, self._rdtype) /
+                        tf.cast(dz, self._rdtype) /
+                        tf.cast(self._length, self._rdtype) /
                         tf.cast(2.0, self._rdtype)
                     ),
                     self._rdtype
@@ -219,7 +223,7 @@ class SSFM(Layer):
 
         return q
 
-    def apply_nonlinear_operator(self, q, dz, zeros):
+    def _apply_nonlinear_operator(self, q, dz, zeros):
         if self._with_nonlinearity:
             nonlinearity = tf.complex(
                 zeros,
@@ -229,23 +233,24 @@ class SSFM(Layer):
 
         return q
 
-    def apply_window(self, q, window):
+    def _apply_window(self, q, window):
         return q * window
 
     def _step(self, q, precalculations, n_steps, step_counter):
         (window, dz, zeros, f) = precalculations
 
         # Apply window-function
-        q = self.apply_window(q, window)
-        q = self.apply_nonlinear_operator(q, dz, zeros)  # N
-        q = self.apply_noise(q, dz)
-        q = self.apply_linear_operator(q, dz, zeros, f)  # D
+        q = self._apply_window(q, window)
+        q = self._apply_nonlinear_operator(q, dz, zeros)  # N
+        q = self._apply_noise(q, dz)
+        q = self._apply_linear_operator(q, dz, zeros, f)  # D
 
         step_counter = step_counter + 1
 
         return q, precalculations, n_steps, step_counter
 
     def _cond(self, q, precalculations, n_steps, step_counter):
+        # pylint: disable=unused-argument
         return tf.less(step_counter, n_steps)
 
     def call(self, inputs):
@@ -290,7 +295,7 @@ class SSFM(Layer):
 
         # Symmetric SSFM
         # Start with half linear propagation
-        x = self.apply_linear_operator(x, dz_half, zeros, f)
+        x = self._apply_linear_operator(x, dz_half, zeros, f)
         # Proceed with N_SSFM-1 steps applying nonlinear and linear operator
         x, _, _, _ = tf.while_loop(
             self._cond,
@@ -300,10 +305,10 @@ class SSFM(Layer):
             parallel_iterations=1
         )
         # Final nonlinear operator
-        x = self.apply_nonlinear_operator(x, dz, zeros)
+        x = self._apply_nonlinear_operator(x, dz, zeros)
         # Final noise application
-        x = self.apply_noise(x, dz)
+        x = self._apply_noise(x, dz)
         # End with half linear propagation
-        x = self.apply_linear_operator(x, dz_half, zeros, f)
+        x = self._apply_linear_operator(x, dz_half, zeros, f)
 
         return x

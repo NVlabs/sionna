@@ -52,7 +52,7 @@ class EDFA(Layer):
 
     Setting-up:
 
-    >>> edfa = EDFA(4.0, 2.0, 193.55e12, 1.0)
+    >>> edfa = EDFA(g=4.0, f=2.0, f_c=193.55e12, dt=1.0e-12)
 
     Running:
 
@@ -62,10 +62,10 @@ class EDFA(Layer):
     Parameters
     ----------
         g : float
-            Amplifier gain
+            Amplifier gain (linear domain)
 
         f : float
-            Noise figure
+            Noise figure (linear domain)
 
         f_c : float
             Carrier frequency :math:`f_\mathrm{c}` in :math:`(Hz)`

@@ -505,7 +505,7 @@ Rural macrocell (RMa)
 Optical channel
 ================
 
-Optical fiber
+SSFM
 --------------
 
 .. autoclass:: sionna.channel.SSFM

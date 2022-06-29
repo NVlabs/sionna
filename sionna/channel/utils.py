@@ -19,10 +19,10 @@ def subcarrier_frequencies(num_subcarriers, subcarrier_spacing,
     ``subcarrier_spacing``, i.e.,
 
     >>> # If num_subcarrier is even:
-    >>> frequencies = [-num_subcarrier/2, ..., 0, ..., num_subcarrier/2-1]*subcarrier_spacing
+    >>> frequencies = [-num_subcarrier/2, ..., 0, ..., num_subcarrier/2-1] * subcarrier_spacing
     >>>
     >>> # If num_subcarrier is odd:
-    >>> frequencies = [-(num_subcarrier-1)/2, ..., 0, ..., (num_subcarrier-1)/2]*subcarrier_spacing
+    >>> frequencies = [-(num_subcarrier-1)/2, ..., 0, ..., (num_subcarrier-1)/2] * subcarrier_spacing
 
 
     Input
@@ -95,15 +95,20 @@ def time_frequency_vector(num_samples, sample_duration, dtype=tf.float32):
             Frequency vector
     """
 
+    if tf.math.mod(num_samples, 2) == 0:  # if even
+        n_min = tf.cast(-(num_samples) / 2, dtype=tf.int32)
+        n_max = tf.cast((num_samples) / 2 - 1, dtype=tf.int32)
+    else:  # if odd
+        n_min = tf.cast(-(num_samples-1) / 2, dtype=tf.int32)
+        n_max = tf.cast((num_samples+1) / 2 - 1, dtype=tf.int32)
+
     # Time vector
-    n_min = tf.cast(tf.math.ceil((num_samples-1) / 2), dtype=tf.int32)
-    n_max = num_samples - n_min - 1
-    t = tf.cast(tf.linspace(-n_min, n_max, num_samples), dtype) \
+    t = tf.cast(tf.linspace(n_min, n_max, num_samples), dtype) \
         * tf.cast(sample_duration, dtype)
 
     # Frequency vector
     df = tf.cast(1.0/sample_duration, dtype)/tf.cast(num_samples, dtype)
-    f = tf.cast(tf.linspace(-n_min, n_max, num_samples), dtype) \
+    f = tf.cast(tf.linspace(n_min, n_max, num_samples), dtype) \
         * tf.cast(df, dtype)
 
     return t, f
