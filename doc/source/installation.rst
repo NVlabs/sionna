@@ -15,7 +15,9 @@ Although not necessary, we recommend running Sionna in a `Docker container <http
 Installation using pip
 ----------------------
 We recommend to do this within a `virtual environment <https://docs.python.org/3/tutorial/venv.html>`_,
-e.g., using `conda <https://docs.conda.io>`_.
+e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `tensorflow-macos <https://github.com/apple/tensorflow_macos>`_ first.
+
+
 
 
 1.) Install the package
@@ -35,7 +37,7 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.8.0
+    0.9.2
 
 3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
 
@@ -107,4 +109,4 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.8.0
+    0.9.2

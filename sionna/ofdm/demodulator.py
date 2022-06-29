@@ -8,8 +8,9 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 from tensorflow.signal import fftshift
 from sionna.constants import PI
-from sionna.utils import fft, expand_to_rank
-
+from sionna.utils import expand_to_rank
+from sionna.signal import fft
+import numpy as np
 
 class OFDMDemodulator(Layer):
     # pylint: disable=line-too-long
@@ -118,6 +119,15 @@ class OFDMDemodulator(Layer):
               * tf.range(self.fft_size, dtype=tf.float32)
         self._phase_compensation = tf.exp(tf.complex(0., tmp))
 
+        # Compute number of elements that will be truncated
+        self._rest = np.mod(input_shape[-1],
+                                self.fft_size + self.cyclic_prefix_length)
+
+        # Compute number of full OFDM symbols to be demodulated
+        self._num_ofdm_symbols = np.floor_divide(
+                                    input_shape[-1]-self._rest,
+                                    self.fft_size + self.cyclic_prefix_length)
+
     def call(self, inputs):
         """Demodulate OFDM waveform onto a resource grid.
 
@@ -130,13 +140,11 @@ class OFDMDemodulator(Layer):
             `[...,num_ofdm_symbols, fft_size]`.
         """
 
-        # Cut last samples that do not fit into and OFDM symbol
-        rest = tf.math.floormod(inputs.shape[-1],
-                                self.fft_size + self.cyclic_prefix_length)
-        inputs = inputs[...,:-rest]
+        # Cut last samples that do not fit into an OFDM symbol
+        inputs = inputs if self._rest==0 else inputs[...,:-self._rest]
 
         # Reshape input to separate OFDM symbols
-        new_shape = tf.concat([tf.shape(inputs)[:-1], [-1],
+        new_shape = tf.concat([tf.shape(inputs)[:-1], [self._num_ofdm_symbols],
                                [self.fft_size + self.cyclic_prefix_length]], 0)
         x = tf.reshape(inputs, new_shape)
 

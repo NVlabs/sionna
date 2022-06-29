@@ -171,7 +171,7 @@ class TestTDL(unittest.TestCase):
 
     def corr(self, x, max_lags):
         num_lags = x.shape[-1]//2
-        c = np.zeros([max_lags], dtype=np.complex)
+        c = np.zeros([max_lags], dtype=complex)
         for i in range(0, max_lags):
             c[i] = np.mean(np.conj(x[...,:num_lags])*x[...,i:num_lags+i])
         return c

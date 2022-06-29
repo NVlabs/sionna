@@ -46,7 +46,7 @@ class BitwiseMutualInformation(Metric):
         return tf.cast(tf.math.divide_no_nan(self.bmi, self.counter),
                        dtype=tf.float32)
 
-    def reset_states(self):
+    def reset_state(self):
         self.bmi.assign(0.0)
         self.counter.assign(0.0)
 
@@ -91,7 +91,7 @@ class BitErrorRate(Metric):
         return tf.cast(tf.math.divide_no_nan(self.ber, self.counter),
                        dtype=tf.float32)
 
-    def reset_states(self):
+    def reset_state(self):
         self.ber.assign(0.0)
         self.counter.assign(0.0)
 

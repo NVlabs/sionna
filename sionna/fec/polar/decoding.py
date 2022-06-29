@@ -490,12 +490,12 @@ class PolarSCLDecoder(Layer):
 
         # CPU mode is recommended for larger values of n
         if n>128 and cpu_only is False and use_hybrid_sc is False:
-            warnings.warn("Warning: Required ressource allocation is large " \
+            warnings.warn("Required ressource allocation is large " \
             "for the selected blocklength. Consider option `cpu_only=True`.")
 
         # CPU mode is recommended for larger values of L
         if list_size>32 and cpu_only is False and use_hybrid_sc is False:
-            warnings.warn("Warning: Ressource allocation is high for the " \
+            warnings.warn("Ressource allocation is high for the " \
             "selected list_size. Consider option `cpu_only=True`.")
 
         # internal decoder parameters

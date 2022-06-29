@@ -7,7 +7,8 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 from tensorflow.signal import ifftshift
-from sionna.utils import ifft, flatten_last_dims
+from sionna.utils import flatten_last_dims
+from sionna.signal import ifft
 
 
 class OFDMModulator(Layer):
@@ -67,7 +68,7 @@ class OFDMModulator(Layer):
         # Prepend cyclic prefix
         x = tf.concat([cp, x], -1)
 
-        # Serialize
+        # Serialize last two dimensions
         x = flatten_last_dims(x, 2)
 
         return x

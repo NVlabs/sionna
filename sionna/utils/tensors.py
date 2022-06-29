@@ -66,11 +66,19 @@ def flatten_dims(tensor, num_dims, axis):
     msg ="`num_dims`+`axis` <= rank(`tensor`)"
     tf.debugging.assert_less_equal(num_dims + axis, tf.rank(tensor), msg)
 
-    shape = tf.shape(tensor)
-    new_shape = tf.concat([shape[:axis], [-1], shape[axis+num_dims:]], 0)
-    output = tf.reshape(tensor, new_shape)
+    if num_dims==len(tensor.shape):
+        new_shape = [-1]
+    elif axis==0:
+        shape = tf.shape(tensor)
+        new_shape = tf.concat([[-1], shape[axis+num_dims:]], 0)
+    else:
+        shape = tf.shape(tensor)
+        flat_dim = tf.reduce_prod(tensor.shape[axis:axis+num_dims])
+        new_shape = tf.concat([shape[:axis],
+                               [flat_dim],
+                               shape[axis+num_dims:]], 0)
 
-    return output
+    return tf.reshape(tensor, new_shape)
 
 def flatten_last_dims(tensor, num_dims=2):
     """
@@ -95,8 +103,13 @@ def flatten_last_dims(tensor, num_dims=2):
     msg = "`num_dims` must <= rank(`tensor`)"
     tf.debugging.assert_less_equal(num_dims, tf.rank(tensor), msg)
 
-    shape = tf.shape(tensor)
-    new_shape = tf.concat([shape[:-num_dims], [-1]], 0)
+    if num_dims==len(tensor.shape):
+        new_shape = [-1]
+    else:
+        shape = tf.shape(tensor)
+        last_dim = tf.reduce_prod(tensor.shape[-num_dims:])
+        new_shape = tf.concat([shape[:-num_dims], [last_dim]], 0)
+
     return tf.reshape(tensor, new_shape)
 
 def insert_dims(tensor, num_dims, axis=-1):

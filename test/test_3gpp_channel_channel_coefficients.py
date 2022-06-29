@@ -150,7 +150,7 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
         """Compute the maximum relative error, ``r`` being the reference value,
         ``x`` an esimate of ``r``."""
         err = np.abs(r-x)
-        rel_err = np.where(np.abs(r) > 0.0, err/np.abs(r), err)
+        rel_err = np.where(np.abs(r) > 0.0, np.divide(err,np.abs(r)+1e-6), err)
         return np.max(rel_err)
 
     def unit_sphere_vector_ref(self, theta, phi):

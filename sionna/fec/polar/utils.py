@@ -102,30 +102,30 @@ def generate_5g_ranking(k, n, sort=True):
 
     return [frozen_pos.astype(int), info_pos.astype(int)]
 
-def generate_polar_transform_mat(n):
+def generate_polar_transform_mat(n_lift):
     """Generate the polar transformation matrix (Kronecker product).
 
     Input
     -----
-        n: int
+        n_lift: int
             Defining the Kronecker power, i.e., how often is the kernel lifted.
 
     Output
     ------
        : ndarray
-            Array of `0s` and `1s` of shape `[2^n , 2^n]` containing the Polar
-            transformation matrix.
+            Array of `0s` and `1s` of shape `[2^n_lift , 2^n_lift]` containing
+            the Polar transformation matrix.
     """
 
-    assert isinstance(n, int), "n must be integer"
-    assert n>=0, "n must be positive"
+    assert int(n_lift)==n_lift, "n_lift must be integer"
+    assert n_lift>=0, "n_lift must be positive"
 
-    assert n<20, "Warning: n is the log2 of the length not the length itself."
+    assert n_lift<12, "Warning: the resulting code length is large (=2^n_lift)."
 
     gm = np.array([[1, 0],[ 1, 1]])
 
     gm_l = np.copy(gm)
-    for _ in range(n-1):
+    for _ in range(n_lift-1):
         gm_l_new = np.zeros([2*np.shape(gm_l)[0],2*np.shape(gm_l)[1]])
         for j in range(np.shape(gm_l)[0]):
             for k in range(np.shape(gm_l)[1]):
