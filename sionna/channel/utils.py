@@ -95,6 +95,8 @@ def time_frequency_vector(num_samples, sample_duration, dtype=tf.float32):
             Frequency vector
     """
 
+    num_samples = int(num_samples)
+
     if tf.math.mod(num_samples, 2) == 0:  # if even
         n_min = tf.cast(-(num_samples) / 2, dtype=tf.int32)
         n_max = tf.cast((num_samples) / 2 - 1, dtype=tf.int32)

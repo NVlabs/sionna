@@ -39,7 +39,7 @@ class TestOptical(unittest.TestCase):
 
 		self._complex_dtype = tf.complex128
 
-	def test_reference(self):
+	def test_ssfm_reference(self):
 		dtype = self._complex_dtype
 
 		T = 100  # time window (period)
@@ -69,7 +69,7 @@ class TestOptical(unittest.TestCase):
 
 		ssfm = fiber.SSFM(
 			alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-			half_window_length=0, length=z, n_ssfm=N_SSFM, dt=dt,
+			half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
 			with_amplification=False, with_attenuation=False,
 			with_dispersion=True, with_nonlinearity=True,
 			dtype=dtype, t_norm=t_norm, n_sp=n_sp,
@@ -104,7 +104,7 @@ class TestOptical(unittest.TestCase):
 			1e-7, 'incorrect_ssfm'
 		)
 
-	def test_reference_graph(self):
+	def test_ssfm_reference_graph(self):
 		dtype = self._complex_dtype
 
 		T = 100  # time window (period)
@@ -134,7 +134,7 @@ class TestOptical(unittest.TestCase):
 
 		ssfm = fiber.SSFM(
 			alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-			half_window_length=0, length=z, n_ssfm=N_SSFM, dt=dt,
+			half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
 			with_amplification=False, with_attenuation=False,
 			with_dispersion=True, with_nonlinearity=True,
 			dtype=dtype, t_norm=t_norm, n_sp=n_sp,
@@ -175,7 +175,7 @@ class TestOptical(unittest.TestCase):
 			'incorrect_ssfm_in_graph_mode'
 		)
 
-	def test_batch_processing(self):
+	def test_ssfm_batch_processing(self):
 		dtype = self._complex_dtype
 
 		T = 100  # time window (period)
@@ -210,7 +210,7 @@ class TestOptical(unittest.TestCase):
 
 		ssfm = fiber.SSFM(
 			alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-			half_window_length=0, length=z, n_ssfm=N_SSFM, dt=dt,
+			half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
 			with_amplification=True, with_attenuation=False,
 			with_dispersion=True, with_nonlinearity=True,
 			dtype=dtype, t_norm=t_norm, n_sp=n_sp,
@@ -233,7 +233,7 @@ class TestOptical(unittest.TestCase):
 			'incorrect_batch_processing'
 		)
 
-	def test_variance(self):
+	def test_edfa_variance(self):
 		F = 10 ** (6 / 10)
 		G = 2.0
 		h = 6.62607015e-34
@@ -257,7 +257,7 @@ class TestOptical(unittest.TestCase):
 			'incorrect_variance'
 		)
 
-	def test_gain(self):
+	def test_edfa_gain(self):
 		F = 10 ** (6 / 10)
 		G = 4.0
 		f_c = 193.55e12
@@ -275,3 +275,4 @@ class TestOptical(unittest.TestCase):
 		y = amplifier(x)
 		mu_n_ASE = np.mean(np.mean(np.abs(y.numpy()) ** 2.0, axis=-1))
 		self.assertLessEqual(np.abs(G - mu_n_ASE), 1e-5, 'incorrect_gain')
+

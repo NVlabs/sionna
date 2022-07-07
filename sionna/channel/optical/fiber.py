@@ -34,8 +34,9 @@ class SSFM(Layer):
     is implemented as in [RamanASE]_.
 
     The SSFM operates on normalized time :math:`T_\text{norm}` (e.g., 1 ps) and
-    distance units :math:`L_\text{norm}` (e.g., 1 km). Hence, parameters as well
-    as the signal itself have to be given in the same normalized units. Note
+    distance units :math:`L_\text{norm}` (e.g., 1 km). Hence, all parameters as
+    well as the signal itself have to be given with the same unit prefix for the
+    same unit (e.g., always pico for time, or kilo for distance). Note
     that, despite the normalization, the SSFM is implemented with physical units
     different from the normalization, e.g., used for the nonlinear
     Fourier transform.
@@ -120,8 +121,9 @@ class SSFM(Layer):
         y : Tensor with same shape as ``x``, tf.complex
             Channel output
     """
-    def __init__(self, alpha, beta_2, f_c, gamma, half_window_length, length,
-                 n_ssfm, n_sp=1.0, sample_duration=1.0, t_norm=1e-12,
+    def __init__(self, alpha=0.046, beta_2=-21.67, f_c=193.55e12,
+                 gamma=1.27, half_window_length=0, length=80,
+                 n_ssfm=1, n_sp=1.0, sample_duration=1.0, t_norm=1e-12,
                  with_amplification=False, with_attenuation=True,
                  with_dispersion=True, with_nonlinearity=True,
                  swap_memory=True, dtype=tf.complex64, **kwargs):
