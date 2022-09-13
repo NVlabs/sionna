@@ -13,9 +13,9 @@ class ConvEncoder(Layer):
     # pylint: disable=line-too-long
     r"""ConvEncoder(gen_poly=None, rate= 1/2, constraint_length=3, output_dtype=tf.float32, **kwargs)
 
-    Encodes an information binary tensor to a convolutional codeword. Only non-recursive
-    encoding is available. Currently, only generator polynomials for codes of rate=1/n
-    for n=2,3,4 etc.., are allowed.
+    Encodes an information binary tensor to a convolutional codeword.
+    Only non-recursive encoding is available. Currently, only generator
+    polynomials for codes of rate=1/n for n=2,3,4,... are allowed.
 
     The class inherits from the Keras layer class and can be used as layer in a
     Keras model.
@@ -47,32 +47,35 @@ class ConvEncoder(Layer):
     ------
         : [...,k/rate], tf.float32
             2+D tensor containing the encoded codeword for the given input
-            information tensor where`rate` is
+            information tensor where `rate` is
             :math:`\frac{1}{len\left(\textrm{gen_poly}\right)}`
             (if ``gen_poly`` is provided).
 
     Note
     ----
         The generator polynomials from [Moon]_ are available for various
-        rate and constraint lengths. To select, use ``rate`` and
+        rate and constraint lengths. To select them, use the ``rate`` and
         ``constraint_length`` arguments.
 
         In addition, polynomials for any non-recursive convolutional encoder
-        can be given as input via ``gen_poly`` argument. Currently only  polynomials
-        with rate=1/n are supported. When ``gen_poly`` argument is given, ``rate``
-        and ``constraint_length`` arguments are ignored.
+        can be given as input via ``gen_poly`` argument. Currently, only
+        polynomials with rate=1/n are supported. When the ``gen_poly`` argument
+        is given, the ``rate`` and ``constraint_length`` arguments are ignored.
 
-        Various notations are used in literature to represent the generator polynomials for
-        convolutional codes. In [Moon]_, octal digits format is primarily used. In octal
-        format, generator polynomial `10011` corresponds to 46. Other widely used format
-        is decimal notation with MSB. In this notation, polynomial `10011` corresponds
-        to 19. For simplicity ConvEncoder only accepts the bit format i.e. `10011` for
-        ``gen_poly`` argument.
+        Various notations are used in the literature to represent the generator
+        polynomials for convolutional codes. In [Moon]_, the octal digits
+        format is primarily used. In the octal format, the generator polynomial
+        `10011` corresponds to 46. Another widely used format
+        is decimal notation with MSB. In this notation, polynomial `10011`
+        corresponds to 19. For simplicity, the
+        :class:`~sionna.fec.conv.encoding.ConvEncoder` only accepts the bit
+        format i.e. `10011` as ``gen_poly`` argument.
 
-        Also note that ``constraint_length`` and ``memory`` are two different terms
-        often used to denote the strength of a convolutional code. In this
-        sub-package we use ``constraint_length``. For e.g., polynomial `10011`
-        has a ``constraint_length`` of 5, however it's ``memory`` is only 4.
+        Also note that ``constraint_length`` and ``memory`` are two different
+        terms often used to denote the strength of a convolutional code. In this
+        sub-package, we use ``constraint_length``. For example, the
+        polynomial `10011` has a ``constraint_length`` of 5, however its
+        ``memory`` is only 4.
 
     """
 
@@ -105,7 +108,7 @@ class ConvEncoder(Layer):
             self._gen_poly = polynomial_selector(rate, constraint_length)
 
         self._coderate = 1/len(self.gen_poly)
-        self._trellis = Trellis(self.gen_poly)
+        self._trellis = Trellis(self.gen_poly,rsc=False)
 
         # conv_k denotes number of input bit streams.
         # Only 1 allowed in current implementation
@@ -180,13 +183,14 @@ class ConvEncoder(Layer):
         msg_reshaped = tf.reshape(msg, [-1, self._k])
 
         prev_st = tf.zeros([tf.shape(msg_reshaped)[0]], tf.int32)
-        ta = tf.TensorArray(tf.int32, size=self.num_syms,
-                            dynamic_size=False)
+        ta = tf.TensorArray(tf.int32, size=self.num_syms, dynamic_size=False)
 
-        for idx in range(0, self._k, self._conv_k):
+        idx_offset = range(0, self._conv_k)
+        for idx in tf.range(0, self._k, self._conv_k):
             msg_bits_idx = tf.gather(msg_reshaped,
-                                     tf.range(idx, idx + self._conv_k),
+                                     idx + idx_offset,
                                      axis=-1)
+
             msg_idx = bin2int_tf(msg_bits_idx)
 
             indices = tf.stack([prev_st, msg_idx], -1)
@@ -198,7 +202,7 @@ class ConvEncoder(Layer):
             ta = ta.write(idx//self._conv_k, idx_bits)
             prev_st = new_st
 
-        cw = tf.concat(tf.unstack(ta.stack()),axis=1)
+        cw = tf.concat(tf.unstack(ta.stack()), axis=1)
         cw = tf.cast(cw, self.output_dtype)
         cw_reshaped = tf.reshape(cw, output_shape)
 

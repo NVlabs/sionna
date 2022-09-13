@@ -186,8 +186,8 @@ def matrix_sqrt(tensor):
     and columns, respectively.
 
     Args:
-        tensor ([..., M, M]) : A tensor of rank greater or equal
-            than two.
+        tensor ([..., M, M]) : A tensor of rank greater than or equal
+            to two.
 
     Returns:
         A tensor of the same shape and type as ``tensor`` containing
@@ -196,8 +196,8 @@ def matrix_sqrt(tensor):
     Note:
         If you want to use this function in Graph mode with XLA, i.e., within
         a function that is decorated with ``@tf.function(jit_compile=True)``,
-        you must set ``sionna.Config.xla_compat=true``.
-        See :py:attr:`~sionna.Config.xla_compat`.
+        you must set ``sionna.config.xla_compat=true``.
+        See :py:attr:`~sionna.config.xla_compat`.
     """
     if sn.config.xla_compat and not tf.executing_eagerly():
         s, u = tf.linalg.eigh(tensor)
@@ -226,8 +226,8 @@ def matrix_sqrt_inv(tensor):
     and columns, respectively.
 
     Args:
-        tensor ([..., M, M]) : A tensor of rank greater or equal
-            than two.
+        tensor ([..., M, M]) : A tensor of rank greater than or equal
+            to two.
 
     Returns:
         A tensor of the same shape and type as ``tensor`` containing
@@ -259,18 +259,18 @@ def matrix_inv(tensor):
 
     Given a batch of Hermitian positive definite matrices
     :math:`\mathbf{A}`, the function
-    returns :math:`\mathbf{B}^{-1}`, such that
-    :math:`\mathbf{B}^{-1}\mathbf{A}=\mathbf{I}`.
+    returns :math:`\mathbf{A}^{-1}`, such that
+    :math:`\mathbf{A}^{-1}\mathbf{A}=\mathbf{I}`.
 
     The two inner dimensions are assumed to correspond to the matrix rows
     and columns, respectively.
 
     Args:
-        tensor ([..., M, M]) : A tensor of rank greater or equal
-            than two.
+        tensor ([..., M, M]) : A tensor of rank greater than or equal
+            to two.
 
     Returns:
-        A tensor of the same shape and type as ``tensor`` containing
+        A tensor of the same shape and type as ``tensor``, containing
         the inverse of its last two dimensions.
 
     Note:
@@ -295,3 +295,31 @@ def matrix_inv(tensor):
         return tf.matmul(u*s, u, adjoint_b=True)
     else:
         return tf.linalg.inv(tensor)
+
+def matrix_pinv(tensor):
+    r""" Computes the Moore–Penrose (or pseudo) inverse of a matrix.
+
+    Given a batch of :math:`M \times K` matrices :math:`\mathbf{A}` with rank
+    :math:`K` (i.e., linearly independent columns), the function returns
+    :math:`\mathbf{A}^+`, such that
+    :math:`\mathbf{A}^{+}\mathbf{A}=\mathbf{I}_K`.
+
+    The two inner dimensions are assumed to correspond to the matrix rows
+    and columns, respectively.
+
+    Args:
+        tensor ([..., M, K]) : A tensor of rank greater than or equal
+            to two.
+
+    Returns:
+        A tensor of shape ([..., K,K]) of the same type as ``tensor``,
+        containing the pseudo inverse of its last two dimensions.
+
+    Note:
+        If you want to use this function in Graph mode with XLA, i.e., within
+        a function that is decorated with ``@tf.function(jit_compile=True)``,
+        you must set ``sionna.config.xla_compat=true``.
+        See :py:attr:`~sionna.config.xla_compat`.
+    """
+    inv = matrix_inv(tf.matmul(tensor, tensor, adjoint_a=True))
+    return tf.matmul(inv, tensor, adjoint_b=True)

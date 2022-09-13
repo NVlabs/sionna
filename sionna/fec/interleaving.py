@@ -7,7 +7,8 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
-
+from importlib_resources import files, as_file
+from sionna.fec.turbo import coeffs
 
 class RowColumnInterleaver(Layer):
      # pylint: disable=line-too-long
@@ -376,7 +377,7 @@ class RandomInterleaver(Layer):
         :math:`i-j<S`. This can be used to find optimized interleaver patterns.
 
         ``s_min_stop`` is an additional stopping condition, i.e., stop if
-        current s is already smaller than s_min_stop.
+        current :math:`S` is already smaller than ``s_min_stop``.
 
         Please note that this is a Numpy utility function and usually not part
         of the graph.
@@ -637,6 +638,7 @@ class RandomInterleaver(Layer):
         x = tf.ensure_shape(x, input_shape)
         return x
 
+
 class Deinterleaver(Layer):
     """Deinterleaver(interleaver, dtype=None, **kwargs)
 
@@ -693,7 +695,9 @@ class Deinterleaver(Layer):
                  **kwargs):
 
         if not isinstance(interleaver,
-                          (RandomInterleaver, RowColumnInterleaver)):
+                          (RandomInterleaver,
+                          RowColumnInterleaver,
+                          Turbo3GPPInterleaver)):
             raise ValueError("interleaver is not a valid interleaver instance.")
         self._interleaver = interleaver
 
@@ -744,4 +748,259 @@ class Deinterleaver(Layer):
         x = self._interleaver.call_inverse(inputs)
 
         x = tf.cast(x, super().dtype) # cast output to correct dtype
+        return x
+
+
+class Turbo3GPPInterleaver(Layer):
+    # pylint: disable=line-too-long
+    """Turbo3GPPInterleaver(inverse=False, axis=-1, dtype=tf.float32, **kwargs)
+
+    Interleaver as used in the 3GPP Turbo codes [3GPPTS36212_I]_ and, thus,
+    the maximum length is given as 6144 elements (only for the dimension as
+    specific by ``axis``).
+
+    The class inherits from the Keras layer class and can be used as layer in a
+    Keras model.
+
+    Parameters
+    ----------
+        inverse: bool
+            A boolean defaults to False. If True, the inverse permutation is
+            performed.
+
+        axis: int
+            Defaults to `-1`. The dimension that should be interleaved.
+            First dimension (`axis=0`) is not allowed.
+
+        dtype: tf.DType
+            Defaults to `tf.float32`. Defines the datatype for internal
+            calculations and the output dtype.
+
+    Input
+    -----
+        x: tf.DType
+            2+D tensor of arbitrary shape and dtype.
+
+    Output
+    ------
+        : tf.DType
+            2+D tensor of same shape and dtype as the input ``x``.
+
+    Raises
+    ------
+        AssertionError
+            If ``axis`` is not `int`.
+
+        AssertionError
+            If ``axis`` > number of input dimensions.
+
+        AssertionError
+            If ``inverse`` is not bool.
+
+        InvalidArgumentError
+            When rank(``x``)<2.
+
+    Note
+    ----
+        Note that this implementation slightly deviates from the 3GPP
+        standard [3GPPTS36212_I]_ in a sense that zero-padding is introduced
+        for cases when the exact interleaver length is not supported by the
+        standard.
+    """
+
+    def __init__(self,
+                 inverse=False,
+                 axis=-1,
+                 dtype=tf.float32,
+                 **kwargs):
+
+        super().__init__(dtype=dtype, **kwargs)
+
+        assert isinstance(axis, int), "axis must be int."
+        assert axis!=0, "Cannot permute batch dimension."
+        self._axis=axis
+        self._keep_state = True # only required for deinterleaver
+        self.frame_size = None
+
+        assert isinstance(inverse, bool), "inverse must be boolean"
+        self._inverse = inverse
+
+        # load interleaver patterns as defined in the 3GPP standard
+        self.coeffs_dict = {}
+        source = files(coeffs).joinpath("turbo_coeffs.csv")
+        with as_file(source) as coeffs.csv:
+            csv_reader = np.genfromtxt(coeffs.csv, delimiter=",")
+
+            for (line_count, row) in enumerate(csv_reader):
+                if line_count >0: #igonore first line (=header)
+                    self.coeffs_dict[int(row[1])] = (int(row[2]), int(row[3]))
+    #########################################
+    # Public methods and properties
+    #########################################
+
+    @property
+    def axis(self):
+        """Axis to be permuted."""
+        return self._axis
+
+    def find_s_min(self, frame_size, s_min_stop=0):
+        r"""Find :math:`S` parameter such that :math:`\pi(i)-\pi(j)>S` for all
+        :math:`i-j<S`. This can be used to find optimized interleaver patterns.
+
+        ``s_min_stop`` is an additional stopping condition, i.e., stop if
+        current :math:`S` is already smaller than ``s_min_stop``.
+
+        Please note that this is a Numpy utility function and usually not part
+        of the graph.
+
+        Input
+        -----
+        frame_size: int
+            length of interleaver.
+
+        s_min_stop: int
+            Defaults to 0. Enables early stop if already current
+            s_min<``s_min_stop``.
+
+        Output
+        ------
+        : float
+            The S-parameter for the given ``frame_size``.
+        """
+
+        assert isinstance(s_min_stop, int), "s_min_stop must be int."
+        assert isinstance(frame_size, int), "frame_size must be int."
+        assert(frame_size<6145), "Interleaver not defined for this frame_size."
+
+        perm_seq = self._generate_perm_full(frame_size)
+        perm_seq = perm_seq.numpy()
+        s_min = frame_size
+
+        for i in range(len(perm_seq)): # search for all positions in perm_seq
+            for j in range(-s_min,s_min,1): # search dist
+                if j==0: # ignore identity
+                    continue
+                if i+j>=0 and i+j<frame_size:
+                    d = np.abs(perm_seq[i] - perm_seq[i+j])
+                    if d<=np.abs(j):
+                        s_min = np.min([s_min, np.abs(j)])
+                    if d<s_min and np.abs(j)<s_min:
+                        s_min = np.min([s_min, d])
+            # early stop
+            if s_min<=s_min_stop:
+                break
+        return int(s_min)
+
+    def call_inverse(self, inputs):
+        """Implements deinterleaver function corresponding to call().
+
+        Input
+        -----
+         x: tf.DType
+            2+D tensor of arbitrary shape and dtype.
+
+        Output
+        ------
+        : tf.DType
+            2+D tensor of same shape and dtype as the input ``x``.
+
+        Raises
+        ------
+        InvalidArgumentError
+            When rank(``x``)<2.
+        """
+
+        if isinstance(inputs, (tuple, list)):
+            if len(inputs)==1: # if user wants to call with call([x])
+                x = inputs
+            else:
+                raise TypeError("inputs cannot have more than 1 entry.")
+        else:
+            x = inputs
+
+        input_shape = x.shape
+        frame_size = input_shape[self._axis]
+
+        # activate inverse
+        perm_seq = self._generate_perm_full(frame_size, inverse=True)
+        x = tf.gather(x, perm_seq, batch_dims=0, axis=self._axis)
+
+        # set explicitly for keras models
+        x = tf.ensure_shape(x, input_shape)
+        return x
+
+    #########################
+    # Utility methods
+    #########################
+
+    def _generate_perm_full(self, frame_size, inverse=False):
+        """Generates a random permutation for the interleaver.
+        Args:
+            frame_size (int): The length of the sequence to be permuted.
+
+            batch_size (int): The batch size (=number of independent
+                permutations).
+
+            inverse (bool): Defaults to False. If True, the inverse permutation
+                for the given seed is generated.
+        """
+        k = frame_size
+        if k not in self.coeffs_dict:
+            geqk_sizes = sorted([x for x in self.coeffs_dict if x >= k])
+            if len(geqk_sizes)==0:
+                print("Input frame size too large for 3GPP Turbo Interleaver.")
+            else:
+                k = geqk_sizes[0]
+        f1, f2 = self.coeffs_dict[k]
+        perm_seq = [(f1 * i + f2* (i**2))%k for i in range(k)]
+
+        if frame_size < k:
+            perm_seq = [x for x in perm_seq if x < frame_size]
+
+        perm_seq = tf.convert_to_tensor(perm_seq)
+        if inverse:
+            # cast to tf.float32 due to improved sorting performance
+            perm_seq = tf.cast(perm_seq, tf.float32)
+            perm_seq = tf.argsort(perm_seq, axis=-1)
+
+        return perm_seq
+
+    #########################
+    # Keras layer functions
+    #########################
+
+    def build(self, input_shape):
+        """Build Keras layer and check consistency of dimensions."""
+        if isinstance(input_shape, list):
+            input_shape=input_shape[0]
+
+        assert self.axis < len(input_shape), "Axis does not match input shape."
+        assert len(input_shape) > 1, "At least two dims are required."
+
+        frame_size = input_shape[self._axis]
+        assert(frame_size< 6145), \
+            "3GPP Turbo Interleaver is defined for block lengths up to 6144."
+
+    def call(self, inputs):
+        """Interleaving function.
+
+        This function returns the permuted version of ``inputs``.
+        """
+
+        if isinstance(inputs, (tuple, list)):
+            if len(inputs)==1: # if user wants to call with call([x])
+                x = inputs
+            else:
+                raise TypeError("inputs cannot have more than 1 entry.")
+        else:
+            x = inputs
+
+        input_shape = x.shape
+        frame_size = input_shape[self._axis]
+
+        perm_seq = self._generate_perm_full(frame_size, self._inverse)
+        x = tf.gather(x, perm_seq, batch_dims=0, axis=self._axis)
+
+        # set explicitly for keras models
+        x = tf.ensure_shape(x, input_shape)
         return x

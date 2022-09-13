@@ -20,7 +20,9 @@ class TDL(ChannelModel):
     # pylint: disable=line-too-long
     r"""TDL(model, delay_spread, carrier_frequency, num_sinusoids=20, los_angle_of_arrival=PI/4., min_speed=0., max_speed=None, dtype=tf.complex64)
 
-    Tapped delay line (TDL) channel model from 3GPP [TR38901]_ specification.
+    Tapped delay line (TDL) channel model from the 3GPP [TR38901]_ specification.
+
+    The power delay profiles (PDPs) are normalized to have a total energy of one.
 
     Channel coefficients are generated using a sum-of-sinusoids model [SoS]_.
     Channel aging is simulated in the event of mobility.
@@ -233,7 +235,7 @@ class TDL(ChannelModel):
     def k_factor(self):
         r"""K-factor in linear scale. Only available with LoS models."""
         assert self._los, "This property is only available for LoS models"
-        return tf.math.real(self._k_factor)
+        return tf.math.real(self._los_power/self._mean_powers[0])
 
     @property
     def delays(self):
@@ -243,14 +245,19 @@ class TDL(ChannelModel):
     @property
     def mean_powers(self):
         r"""Path powers in linear scale"""
-        return tf.math.real(self._mean_powers)
+        if self._los:
+            mean_powers = tf.concat([self._mean_powers[:1] + self._los_power,
+                                      self._mean_powers[1:]], axis=0)
+        else:
+            mean_powers = self._mean_powers
+        return tf.math.real(mean_powers)
 
     @property
     def mean_power_los(self):
         r"""LoS component power in linear scale.
         Only available with LoS models."""
         assert self._los, "This property is only available for LoS models"
-        return tf.math.real(self._mean_power_los)
+        return tf.math.real(self._los_power)
 
     @property
     def delay_spread(self):
@@ -328,7 +335,7 @@ class TDL(ChannelModel):
 
         # Add specular component to first tap Eq. (11) in [SoS] if LoS
         if self._los:
-            # The first tap has a total power of 0dB and follows a Rician
+            # The first tap follows a Rician
             # distribution
 
             # Specular component phase shift
@@ -350,8 +357,7 @@ class TDL(ChannelModel):
             h_spec = tf.complex(tf.cos(arg_spec), tf.sin(arg_spec))
 
             # Update the first tap with the specular component
-            h = tf.concat([ (h_spec*tf.sqrt(self._k_factor) + h[:,:,:,:,:,:1,:])
-                            /tf.sqrt(tf.cast(1, self._dtype) + self._k_factor),
+            h = tf.concat([ h_spec*tf.sqrt(self._los_power) + h[:,:,:,:,:,:1,:],
                             h[:,:,:,:,:,1:,:]],
                             axis=5) # Path dims
 
@@ -436,23 +442,23 @@ class TDL(ChannelModel):
         mean_powers = tf.constant(mean_powers, self._dtype)
 
         if self._los:
-            # The first tap has a mean power of 1 (0 dB) and follows a Rician
-            # distribution.
-            # K-factor of this Rician distribution
-            k_factor = mean_powers[0]/mean_powers[1]
-            self._k_factor = k_factor
-
-            # We remove the delays and powers of the specular component of the
-            # first tap as it is added separately
+            # The power of the specular component of the first path is stored
+            # separately
+            self._los_power = mean_powers[0]
             mean_powers = mean_powers[1:]
-            # Set the power of the non-specular component of the first tap to
-            # one. The specular and non-specular components are scaled
-            # accordingly using the K-factor when generating the channel
-            # coefficients
-            mean_powers = tf.tensor_scatter_nd_update(mean_powers,
-                                                      [[0]],
-                                                      tf.ones([1], self._dtype))
+            # The first two paths have 0 delays as they correspond to the
+            # specular and reflected components of the first path.
+            # We need to keep only one.
             delays = delays[1:]
+
+        # Normalize the PDP if requested
+        if self._los:
+            norm_factor = tf.reduce_sum(mean_powers) + self._los_power
+            self._los_power = self._los_power / norm_factor
+            mean_powers = mean_powers / norm_factor
+        else:
+            norm_factor = tf.reduce_sum(mean_powers)
+            mean_powers = mean_powers / norm_factor
 
         self._delays = delays
         self._mean_powers = mean_powers

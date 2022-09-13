@@ -505,8 +505,6 @@ class Mapper(Layer):
 
         self._return_indices = return_indices
 
-        self._return_indices = return_indices
-
         self._binary_base = 2**tf.constant(
                         range(self.constellation.num_bits_per_symbol-1,-1,-1))
 
@@ -915,7 +913,8 @@ class DemapperWithPrior(Layer):
         self._constellation = Constellation.create_or_check_constellation(
                                                         constellation_type,
                                                         num_bits_per_symbol,
-                                                        constellation)
+                                                        constellation,
+                                                        dtype=dtype)
         num_bits_per_symbol = self._constellation.num_bits_per_symbol
 
         self._logits2llrs = SymbolLogits2LLRsWithPrior( demapping_method,
@@ -1145,7 +1144,8 @@ class SymbolDemapperWithPrior(Layer):
         self._constellation = Constellation.create_or_check_constellation(
                                                         constellation_type,
                                                         num_bits_per_symbol,
-                                                        constellation)
+                                                        constellation,
+                                                        dtype=dtype)
 
     def call(self, inputs):
         y, prior, no = inputs
@@ -1237,6 +1237,101 @@ class SymbolDemapper(SymbolDemapperWithPrior):
 
         return super().call([y, null_prior, no])
 
+class LLRs2SymbolLogits(Layer):
+    # pylint: disable=line-too-long
+    r"""
+    LLRs2SymbolLogits(num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)
+
+    Computes logits (i.e., unnormalized log-probabilities) or hard decisions
+    on constellation points from a tensor of log-likelihood ratios (LLRs) on bits.
+
+    Parameters
+    ----------
+    num_bits_per_symbol : int
+        The number of bits per constellation symbol, e.g., 4 for QAM16.
+
+    hard_out : bool
+        If `True`, the layer provides hard-decided constellation points instead of soft-values.
+        Defaults to `False`.
+
+    dtype : One of [tf.float32, tf.float64] tf.DType (dtype)
+        The dtype for the input and output.
+        Defaults to `tf.float32`.
+
+    Input
+    -----
+    llrs : [..., n, num_bits_per_symbol], tf.float
+        LLRs for every bit.
+
+    Output
+    ------
+    : [...,n, num_points], tf.float or [..., n], tf.int32
+        Logits or hard-decisions on constellation points.
+
+    Note
+    ----
+    The logit for the constellation :math:`c` point
+    is computed according to
+
+    .. math::
+        \begin{align}
+            \log{\left(\Pr\left(c\lvert LLRs \right)\right)}
+                &= \log{\left(\prod_{k=0}^{K-1} \Pr\left(b_k = \ell(c)_k \lvert LLRs \right)\right)}\\
+                &= \log{\left(\prod_{k=0}^{K-1} \text{sigmoid}\left(LLR(k) \ell(c)_k\right)\right)}\\
+                &= \sum_{k=0}^{K-1} \log{\left(\text{sigmoid}\left(LLR(k) \ell(c)_k\right)\right)}
+        \end{align}
+
+    where :math:`\ell(c)_k` is the :math:`k^{th}` bit label of :math:`c`, where 0 is
+    replaced by -1.
+    The definition of the LLR has been
+    chosen such that it is equivalent with that of logits. This is
+    different from many textbooks in communications, where the LLR is
+    defined as :math:`LLR(i) = \ln\left(\frac{\Pr\left(b_i=0\lvert y\right)}{\Pr\left(b_i=1\lvert y\right)}\right)`.
+    """
+
+    def __init__(self,
+                 num_bits_per_symbol,
+                 hard_out=False,
+                 dtype=tf.float32,
+                 **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
+
+        self._hard_out = hard_out
+        self._num_bits_per_symbol = num_bits_per_symbol
+        num_points = int(2**num_bits_per_symbol)
+
+        # Array composed of binary representations of all symbols indices
+        a = np.zeros([num_points, num_bits_per_symbol])
+        for i in range(0, num_points):
+            a[i,:] = np.array(list(np.binary_repr(i, num_bits_per_symbol)),
+                              dtype=np.int16)
+
+        # Array of labels from {-1, 1} of all symbols
+        # [num_points, num_bits_per_symbol]
+        a = 2*a-1
+        self._a = tf.constant(a, dtype=dtype)
+
+    @property
+    def num_bits_per_symbol(self):
+        return self._num_bits_per_symbol
+
+    def call(self, inputs):
+        llrs = inputs
+
+        # Expand the symbol labeling to be broadcastable with prior
+        # shape [1, ..., 1, num_points, num_bits_per_symbol]
+        a = sn.utils.expand_to_rank(self._a, tf.rank(llrs), axis=0)
+
+        # Compute the prior probabilities on symbols exponents
+        # shape [..., 1, num_points]
+        llrs = tf.expand_dims(llrs, axis=-2)
+        logits = tf.reduce_sum(tf.math.log_sigmoid(a*llrs), axis=-1)
+
+        if self._hard_out:
+            return tf.argmax(logits, axis=-1, output_type=tf.int32)
+        else:
+            return logits
+
 class SymbolLogits2Moments(Layer):
     # pylint: disable=line-too-long
     r"""
@@ -1301,20 +1396,22 @@ class SymbolLogits2Moments(Layer):
         super().__init__(dtype=dtype, **kwargs)
 
         # Create constellation object
+        const_dtype = tf.complex64 if dtype is tf.float32 else tf.complex128
         self._constellation = Constellation.create_or_check_constellation(
                                                         constellation_type,
                                                         num_bits_per_symbol,
-                                                        constellation)
+                                                        constellation,
+                                                        dtype=const_dtype)
 
     def call(self, logits):
 
         p = tf.math.softmax(logits, axis=-1)
-        p = tf.complex(p, 0.0)
+        p_c = tf.complex(p, tf.cast(0.0, self.dtype))
         points = self._constellation.points
         points = sn.utils.expand_to_rank(points, tf.rank(p), axis=0)
 
-        mean = tf.reduce_sum(p*points, axis=-1, keepdims=True)
-        var = tf.reduce_sum(p*tf.square(points - mean), axis=-1)
+        mean = tf.reduce_sum(p_c*points, axis=-1, keepdims=True)
+        var = tf.reduce_sum(p*tf.square(tf.abs(points - mean)), axis=-1)
         mean = tf.squeeze(mean, axis=-1)
 
         return mean, var

@@ -24,7 +24,9 @@ class CDL(ChannelModel):
     # pylint: disable=line-too-long
     r"""CDL(model, delay_spread, carrier_frequency, ut_array, bs_array, direction, min_speed=0., max_speed=None, dtype=tf.complex64)
 
-    Clustered delay line (CDL) channel model from 3GPP [TR38901]_ specification.
+    Clustered delay line (CDL) channel model from the 3GPP [TR38901]_ specification.
+
+    The power delay profiles (PDPs) are normalized to have a total energy of one.
 
     If a minimum speed and a maximum speed are specified such that the
     maximum speed is greater than the minimum speed, then UTs speeds are
@@ -352,7 +354,9 @@ class CDL(ChannelModel):
     def k_factor(self):
         r"""K-factor in linear scale. Only available with LoS models."""
         assert self._los, "This property is only available for LoS models"
-        return self._k_factor[0,0,0]
+        # We return the K-factor for the path with zero-delay, and not for the
+        # entire PDP.
+        return self._k_factor[0,0,0]/self._powers[0,0,0,0]
 
     @property
     def delays(self):
@@ -363,12 +367,13 @@ class CDL(ChannelModel):
     def powers(self):
         r"""Path powers in linear scale"""
         if self.los:
-            returned_powers = self._powers/(1.+self._k_factor)
-            returned_powers = returned_powers[0,0,0]
-            returned_powers = tf.tensor_scatter_nd_update(returned_powers,
-                                                        [[0]],
-                                                        [tf.constant(1.0,
-                                                        self._real_dtype)])
+            k_factor = self._k_factor[0,0,0]
+            nlos_powers = self._powers[0,0,0]
+            # Power of the LoS path
+            p0 = k_factor + nlos_powers[0]
+            returned_powers = tf.tensor_scatter_nd_update(nlos_powers,
+                                                            [[0]], [p0])
+            returned_powers = returned_powers / (k_factor+1.)
         else:
             returned_powers = self._powers[0,0,0]
         return returned_powers
@@ -435,6 +440,10 @@ class CDL(ChannelModel):
         powers = tf.constant(np.power(10.0, np.array(params['powers'])/10.0),
                                                             self._real_dtype)
 
+        # Normalize powers
+        norm_fact = tf.reduce_sum(powers)
+        powers = powers / norm_fact
+
         # Loading the angles and angle spreads of arrivals and departure
         c_aod = tf.constant(params['cASD'], self._real_dtype)
         aod = tf.constant(params['aod'], self._real_dtype)
@@ -450,6 +459,8 @@ class CDL(ChannelModel):
         # We remove the specular component from the arrays, as it will be added
         # separately when computing the channel coefficients
         if self._los:
+            # Extract the specular component, as it will be added separately by
+            # the CIR generator.
             los_power = powers[0]
             powers = powers[1:]
             delays = delays[1:]
@@ -462,8 +473,26 @@ class CDL(ChannelModel):
             los_zoa = zoa[0]
             zoa = zoa[1:]
 
-            k_factor = los_power / (1.-los_power)
-            powers = powers*(k_factor+1)
+            # The CIR generator scales all NLoS powers by 1/(K+1),
+            # where K = k_factor, and adds to the path with zero delay a
+            # specular component with power K/(K+1).
+            # Note that all the paths are scaled by 1/(K+1), including the ones
+            # with non-zero delays.
+            # We re-normalized the NLoS power paths to ensure total unit energy
+            # after scaling
+            norm_fact = tf.reduce_sum(powers)
+            powers = powers / norm_fact
+            # To ensure that the path with zero delay the ratio between the
+            # specular component and the NLoS component has the same ratio as
+            # in the CDL PDP, we need to set the K-factor to to the value of
+            # the specular component. The ratio between the other paths is
+            # preserved as all paths are scaled by 1/(K+1).
+            # Note that because of the previous normalization of the NLoS paths'
+            # powers, which ensured that their total power is 1,
+            # this is equivalent to defining the K factor as done in 3GPP
+            # specifications (see step 11):
+            # K = (power of specular component)/(total power of the NLoS paths)
+            k_factor = los_power/norm_fact
 
             los_aod = deg_2_rad(los_aod)
             los_aoa = deg_2_rad(los_aoa)
@@ -488,6 +517,10 @@ class CDL(ChannelModel):
         zod = deg_2_rad(zod) # [num clusters, num rays]
         zoa = self._generate_rays(zoa, c_zoa) # [num clusters, num rays]
         zoa = deg_2_rad(zoa) # [num clusters, num rays]
+
+        # Store LoS power
+        if self._los:
+            self._los_power = los_power
 
         # Reshape the as expected by the channel impulse response generator
         self._k_factor = self._reshape_for_cir_computation(k_factor)

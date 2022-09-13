@@ -112,19 +112,24 @@ class RaysGenerator:
         delays, delays_unscaled = self._cluster_delays(lsp.ds, lsp.k_factor)
 
         # Sample cluster powers
-        powers = self._cluster_powers(lsp.ds, lsp.k_factor, delays_unscaled)
+        powers, powers_for_angles_gen = self._cluster_powers(lsp.ds,
+                                            lsp.k_factor, delays_unscaled)
 
         # Sample AoA
-        aoa = self._azimuth_angles_of_arrival(lsp.asa, lsp.k_factor, powers)
+        aoa = self._azimuth_angles_of_arrival(lsp.asa, lsp.k_factor,
+                                                powers_for_angles_gen)
 
         # Sample AoD
-        aod = self._azimuth_angles_of_departure(lsp.asd, lsp.k_factor, powers)
+        aod = self._azimuth_angles_of_departure(lsp.asd, lsp.k_factor,
+                                                powers_for_angles_gen)
 
         # Sample ZoA
-        zoa = self._zenith_angles_of_arrival(lsp.zsa, lsp.k_factor, powers)
+        zoa = self._zenith_angles_of_arrival(lsp.zsa, lsp.k_factor,
+                                                powers_for_angles_gen)
 
         # Sample ZoD
-        zod = self._zenith_angles_of_departure(lsp.zsd, lsp.k_factor, powers)
+        zod = self._zenith_angles_of_departure(lsp.zsd, lsp.k_factor,
+                                                powers_for_angles_gen)
 
         # XPRs
         xpr = self._cross_polarization_power_ratios()
@@ -351,12 +356,12 @@ class RaysGenerator:
             (delay_scaling_parameter*delay_spread))*tf.math.pow(tf.constant(10.,
             self._scenario.dtype.real_dtype), -z/10.0))
 
+        # Force the power of unused cluster to zero
+        powers_unnormalized = powers_unnormalized*(1.-self._cluster_mask)
+
         # Normalizing cluster powers
         powers = (powers_unnormalized/
             tf.reduce_sum(powers_unnormalized, axis=3, keepdims=True))
-
-        # Force the power of unused cluster to zero
-        powers = powers*(1.-self._cluster_mask)
 
         # Additional specular component for LoS
         rician_k_factor = tf.expand_dims(rician_k_factor, axis=3)
@@ -364,10 +369,10 @@ class RaysGenerator:
         p_1_los = rician_k_factor*p_nlos_scaling
         powers_1 = p_nlos_scaling*powers[:,:,:,:1] + p_1_los
         powers_n = p_nlos_scaling*powers[:,:,:,1:]
-        powers = tf.where(tf.expand_dims(scenario.los, axis=3),
+        powers_for_angles_gen = tf.where(tf.expand_dims(scenario.los, axis=3),
             tf.concat([powers_1, powers_n], axis=3), powers)
 
-        return powers
+        return powers, powers_for_angles_gen
 
     def _azimuth_angles(self, azimuth_spread, rician_k_factor, cluster_powers,
                         angle_type):

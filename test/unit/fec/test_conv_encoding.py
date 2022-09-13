@@ -70,11 +70,11 @@ class TestConvEncoding(unittest.TestCase):
             for mu in constraint_length_valid:
                 with self.assertRaises(AssertionError):
                     enc = ConvEncoder(rate=rate, constraint_length= mu)
-        
+
         gmat = [['101', '111', '000'], ['000', '010', '011']]
         with self.assertRaises(AssertionError):
             enc = ConvEncoder(gen_poly=gmat)
-            
+
     def test_polynomial_input(self):
         r"""Test that different formats of input polynomials are accepted and raises exceptions when the generator polynomials fail assertions."""
 
@@ -128,7 +128,7 @@ class TestConvEncoding(unittest.TestCase):
         # call twice to see that bs can change
         b2 = source([bs+1, k])
         model(b2)
-        
+
         model.summary()
 
         source = BinarySource()
@@ -176,11 +176,11 @@ class TestConvEncoding(unittest.TestCase):
             ['101', '111', '111'],
             ['101', '111', '111', '111']]
         gen_strs = [
-            'conv_rate_half_57_', 
+            'conv_rate_half_57_',
             'conv_rate_half_6474_',
             'conv_rate_onethird_577_',
-            'conv_rate_onefourth_5777_'] 
-        rs=[1/2, 1/2, 1/3, 1/4]   
+            'conv_rate_onefourth_5777_']
+        rs=[1/2, 1/2, 1/3, 1/4]
         mus = [3, 4, 3, 3]
         for idx, gen_poly in enumerate(gs):
             enc = ConvEncoder(gen_poly=gen_poly)
@@ -189,12 +189,12 @@ class TestConvEncoding(unittest.TestCase):
             cref = np.load(ref_path + gen_str + 'ref_x.npy')
             c = enc(u).numpy()
             self.assertTrue(np.array_equal(c, cref))
-            
+
             if idx in [0, 2]:
-                enc = ConvEncoder(rate=rs[idx], constraint_length=mus[idx])            
+                enc = ConvEncoder(rate=rs[idx], constraint_length=mus[idx])
                 c = enc(u).numpy()
-                self.assertTrue(np.array_equal(c, cref))       
-        
+                self.assertTrue(np.array_equal(c, cref))
+
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
         """

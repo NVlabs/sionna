@@ -132,8 +132,8 @@ Window
 
 .. _utility:
 
-Utility functions and layers
-==============================
+Utility Functions
+=================
 
 convolve
 ---------

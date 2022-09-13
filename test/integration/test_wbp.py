@@ -79,7 +79,7 @@ class WeightedBP(tf.keras.Model):
         # init components
         self.decoder = LDPCBPDecoder(pcm,
                                      num_iter=1,
-                                     keep_state=True,
+                                     stateful=True,
                                      hard_out=False,
                                      cn_type="boxplus",
                                      trainable=True)
@@ -100,12 +100,12 @@ class WeightedBP(tf.keras.Model):
         c = tf.zeros([batch_size, self._n])
         llr = self.llr_source([[batch_size, self._n], noise_var])
         loss = 0
+        msg_vn = None # no msg_vn for first iteration available
         for i in range(self._num_iter):
-            c_hat = self.decoder(llr)
+            c_hat, msg_vn = self.decoder([llr, msg_vn])
             loss += self._bce(c, c_hat)  # add loss after each iteration
 
         loss /= self._num_iter # scale loss by number of iterations
-        self.decoder.reset_state() # prepare decoder for next batch of codewords
 
         return c, c_hat, loss
 
@@ -158,7 +158,7 @@ class WeightedBP5G(tf.keras.Model):
         self.encoder = LDPC5GEncoder(k, n)
         self.decoder = LDPC5GDecoder(self.encoder,
                                      num_iter=1,
-                                     keep_state=True,
+                                     stateful=True,
                                      hard_out=False,
                                      cn_type="boxplus",
                                      trainable=True)
@@ -179,11 +179,10 @@ class WeightedBP5G(tf.keras.Model):
         c = tf.zeros([batch_size, self._k]) # decoder only returns info bits
         llr = self.llr_source([[batch_size, self._n], noise_var])
         loss = 0
+        msg_vn = None # no msg_vn for first iteration available
         for i in range(self._num_iter):
-            c_hat = self.decoder(llr)
+            c_hat, msg_vn = self.decoder([llr, msg_vn])
             loss += self._bce(c, c_hat)  # add loss after each iteration
-
-        self.decoder.reset_state()
 
         return c, c_hat, loss
 

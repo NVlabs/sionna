@@ -21,25 +21,52 @@ class SSFM(Layer):
 
     Layer implementing the split-step Fourier method (SSFM).
 
-    The SSFM (first mentioned in [SSFM]_) is implemented as
-    symmetrized SSFM according to Eq. (7) of [SymSSFM]_ and can be written as
+    The SSFM (first mentioned in [SSFM]_) numerically solves the nonlinear
+    Schrödinger equation (NLSE)
+
+    .. math::
+
+        \frac{\partial E(t,z)}{\partial z}= -\frac{\alpha}{2}E(t,z) + j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |E(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
+
+    with attenuation coefficient :math:`\alpha`, group velocity dispersion
+    parameters :math:`\beta_2`, and nonlinearity coefficient :math:`\gamma`.
+    Further, :math:`n(n_{\text{sp}};\,t,\,z)` denotes the noise due to an
+    optional ideally distributed Raman amplification with spontaneous emission
+    factor :math:`n_\text{sp}`.
+    The optical signal :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`.
+
+    By now, the SSFM is implemented for a single polarization only and as a
+    symmetrized SSFM according to Eq. (7) of [SymSSFM]_ which can be written as
 
     .. math::
 
         E(z+\Delta_z,t) \approx \exp\left(\frac{\Delta_z}{2}\hat{D}\right)\exp\left(\int^{z+\Delta_z}_z \hat{N}(z')dz'\right)\exp\left(\frac{\Delta_z}{2}\hat{D}\right)E(z,\,t)
 
-    The integral is approximated by :math:`\Delta_z\hat{N}`.
+    The integral is approximated by :math:`\Delta_z\hat{N}` with
+    :math:`\Delta_z` denoting the (small) simulation step size. Further,
+    :math:`\hat{D}` and :math:`\hat{N}` denote the linear and nonlinear SSFM
+    operator, respectively [A2012]_.
 
-    Additionally, ideally distributed Raman amplification may be applied, which
-    is implemented as in [RamanASE]_.
+    Additionally, ideally distributed Raman amplification can be applied, which
+    is implemented as in [RamanASE]_. Note that, currently, the implemented
+    Raman amplification will always result in a transparent fiber link. Hence,
+    the introduced gain cannot be parametrized.
 
-    The SSFM operates on normalized time :math:`T_\text{norm}` (e.g., 1 ps) and
-    distance units :math:`L_\text{norm}` (e.g., 1 km). Hence, all parameters as
-    well as the signal itself have to be given with the same unit prefix for the
+    The SSFM operates on normalized time :math:`T_\text{norm}`
+    (e.g., :math:`T_\text{norm}=1\,\text{ps}=1\cdot 10^{-12}\,\text{s}`) and
+    distance units :math:`L_\text{norm}`
+    (e.g., :math:`L_\text{norm}=1\,\text{km}=1\cdot 10^{3}\,\text{m}`).
+    Hence, all parameters as well as the signal itself have to be given with the
+    same unit prefix for the
     same unit (e.g., always pico for time, or kilo for distance). Note
     that, despite the normalization, the SSFM is implemented with physical units
     different from the normalization, e.g., used for the nonlinear
-    Fourier transform.
+    Fourier transform. For simulations only :math:`T_\text{norm}` has to be
+    provided.
+
+    To avoid reflections at the signal boundaries during simulation, a Hamming
+    window can be applied in each SSFM-step where the length can be defined by
+    ``half_window_length``.
 
     This class inherits from the Keras `Layer` class and can be used as layer in
     a Keras model.
@@ -49,60 +76,69 @@ class SSFM(Layer):
 
     Setting-up:
 
-    >>> ssfm = SSFM(
-    >>>     alpha=0.046, beta_2=-21.67, f_c=193.55, gamma=1.27,
-    >>>     half_window_length=100, ell=80, n_ssfm=200, n_sp=1.0, dt=1.0,
-    >>>     t_norm=1e-12, with_amplification=True, with_attenuation=True,
-    >>>     with_dispersion=True, with_nonlinearity=True)
+    >>> ssfm = SSFM(alpha=0.046,
+    >>>             beta_2=-21.67,
+    >>>             f_c=193.55e12,
+    >>>             gamma=1.27,
+    >>>             half_window_length=100,
+    >>>             length=80,
+    >>>             n_ssfm=200,
+    >>>             n_sp=1.0,
+    >>>             t_norm=1e-12,
+    >>>             with_amplification=False,
+    >>>             with_attenuation=True,
+    >>>             with_dispersion=True,
+    >>>             with_nonlinearity=True)
 
     Running:
 
-    >>> y = ssfm([1.0+1.0j, 1.0+1.0j, 1.0+1.0j])
+    >>> # x is the optical input signal
+    >>> y = ssfm(x)
 
     Parameters
     ----------
         alpha : float
-            Attenuation coefficient :math:`\alpha` in :math:`(1/L_\text{norm})`
+            Attenuation coefficient :math:`\alpha` in :math:`(1/L_\text{norm})`.
 
         beta_2 : float
-            Chromatic dispersion coefficient :math:`\beta_2` in :math:`(T_\text{norm}^2/L_\text{norm})`
+            Group velocity dispersion coefficient :math:`\beta_2` in :math:`(T_\text{norm}^2/L_\text{norm})`.
 
         f_c : float
-            Carrier frequency :math:`f_\mathrm{c}` in :math:`(1/T_\text{norm})`
+            Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`.
 
         gamma : float
-            Kerr-nonlinearity :math:`\gamma` in :math:`(1/L_\text{norm}/W)`
+            Nonlinearity coefficient :math:`\gamma` in :math:`(1/L_\text{norm}/\text{W})`.
 
         half_window_length : int
-            Half of the Hamming window length
+            Half of the Hamming window length.
 
         length : float
-            Fiber length :math:`\ell` in :math:`(L_\text{norm})`
+            Fiber length :math:`\ell` in :math:`(L_\text{norm})`.
 
         n_ssfm : int
-            Number of steps :math:`N_\mathrm{SSFM}`
+            Number of steps :math:`N_\mathrm{SSFM}`.
 
         n_sp : float
-            Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification
+            Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification.
 
         sample_duration : float
-            Normalized time step :math:`\Delta_t` in :math:`(T_\text{norm})`
+            Normalized time step :math:`\Delta_t` in :math:`(T_\text{norm})`.
 
         t_norm : float
-            Time normalization :math:`T_\text{norm}` in :math:`(s)`.
+            Time normalization :math:`T_\text{norm}` in :math:`(\text{s})`.
 
         with_attenuation : bool
-            Enables application of attenuation
+            Enables application of attenuation. Defaults to True.
 
         with_amplification : bool
             Enables application of ideal inline amplification and corresponding
-            noise
+            noise. Defaults to False.
 
         with_dispersion : bool
-            Enables application of chromatic dispersion
+            Enables application of chromatic dispersion. Defaults to True.
 
         with_nonlinearity : bool
-            Enables application of Kerr nonlinearity
+            Enables application of Kerr nonlinearity. Defaults to True.
 
         swap_memory : bool
             Use CPU memory for while loop. Defaults to True.
@@ -114,11 +150,11 @@ class SSFM(Layer):
     Input
     -----
         x : Tensor, tf.complex
-            Input signal in :math:`(W^{\frac12})`
+            Input signal in :math:`(\sqrt{\text{W}})`
 
     Output
-    -------
-        y : Tensor with same shape as ``x``, tf.complex
+    ------
+        y : Tensor with same shape as ``x``, `tf.complex`
             Channel output
     """
     def __init__(self, alpha=0.046, beta_2=-21.67, f_c=193.55e12,
@@ -129,31 +165,33 @@ class SSFM(Layer):
                  swap_memory=True, dtype=tf.complex64, **kwargs):
         super().__init__(dtype=dtype, **kwargs)
 
-        self._alpha = tf.cast(alpha, dtype=dtype.real_dtype)
-        self._beta_2 = tf.cast(beta_2, dtype=dtype.real_dtype)
-        self._f_c = tf.cast(f_c, dtype=dtype.real_dtype)
-        self._gamma = tf.cast(gamma, dtype=dtype.real_dtype)
+        self._dtype = dtype
+        self._cdtype = tf.as_dtype(dtype)
+        self._rdtype = tf.as_dtype(dtype).real_dtype
+
+        self._alpha = tf.cast(alpha, dtype=self._rdtype)
+        self._beta_2 = tf.cast(beta_2, dtype=self._rdtype)
+        self._f_c = tf.cast(f_c, dtype=self._rdtype)
+        self._gamma = tf.cast(gamma, dtype=self._rdtype)
         self._half_window_length = half_window_length
-        self._length = tf.cast(length, dtype=dtype.real_dtype)
+        self._length = tf.cast(length, dtype=self._rdtype)
         self._n_ssfm = tf.cast(n_ssfm, dtype=tf.int32)
-        self._n_sp = tf.cast(n_sp, dtype=dtype.real_dtype)
+        self._n_sp = tf.cast(n_sp, dtype=self._rdtype)
         self._swap_memory = swap_memory
-        self._t_norm = tf.cast(t_norm, dtype=dtype.real_dtype)
+        self._t_norm = tf.cast(t_norm, dtype=self._rdtype)
         self._with_amplification = tf.cast(with_amplification, dtype=tf.bool)
         self._with_attenuation = tf.cast(with_attenuation, dtype=tf.bool)
         self._with_dispersion = tf.cast(with_dispersion, dtype=tf.bool)
         self._with_nonlinearity = tf.cast(with_nonlinearity, dtype=tf.bool)
-        self._cdtype = dtype
-        self._rdtype = dtype.real_dtype
-        self._sample_duration = tf.cast(sample_duration, dtype=dtype.real_dtype)
+        self._sample_duration = tf.cast(sample_duration, dtype=self._rdtype)
 
         self._rho_n = \
-            sionna.constants.H / (self._t_norm ** 2.0) * 2.0 * \
-            sionna.constants.PI * self._f_c * self._alpha * self._length * \
-            self._n_sp
+            sionna.constants.H * self._f_c * self._alpha * self._length * \
+            self._n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
-        self._p_n_ase = self._rho_n / self._sample_duration
+        self._p_n_ase = self._rho_n / self._sample_duration / self._t_norm
+        # in (Ws)
 
         # Precalculate uniform step size
         self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
@@ -228,11 +266,12 @@ class SSFM(Layer):
 
     def _apply_nonlinear_operator(self, q, dz, zeros):
         if self._with_nonlinearity:
-            nonlinearity = tf.complex(
-                zeros,
-                tf.abs(q) ** tf.cast(2.0, self._rdtype) * self._gamma *
-                tf.negative(tf.math.real(dz)))
-            q = q * tf.exp(nonlinearity)
+            q = q * tf.exp(
+                tf.complex(
+                    zeros,
+                    tf.abs(q) ** tf.cast(2.0, self._rdtype) * self._gamma *
+                    tf.negative(tf.math.real(dz)))
+            )
 
         return q
 

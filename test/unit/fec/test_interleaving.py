@@ -22,7 +22,7 @@ if gpus:
         tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
     except RuntimeError as e:
         print(e)
-from sionna.fec.interleaving import RandomInterleaver, RowColumnInterleaver, Deinterleaver
+from sionna.fec.interleaving import RandomInterleaver, RowColumnInterleaver, Deinterleaver, Turbo3GPPInterleaver
 from sionna.utils import BinarySource
 from sionna.fec.scrambling import Scrambler
 
@@ -229,7 +229,7 @@ class TestRandomInterleaver(unittest.TestCase):
         def run_graph_xla(llr):
            return i(llr)
 
-        shapes=[[10,20,30],[10,22,33,44],[20,10,10,10,9]]
+        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,9]]
         modes = [True, False]
         for m in modes:
             for s in shapes:
@@ -681,5 +681,188 @@ class TestDeinterleaver(unittest.TestCase):
             with self.assertRaises(ValueError):
                 x = Deinterleaver(s)
 
+class TestTurbo3GPPInterleaver(unittest.TestCase):
+    """Test Turbo3GPP interleaver for consistency."""
 
+    def test_sequence_dimension(self):
+        """Test against correct dimensions of the sequence."""
 
+        seq_lengths = [1, 100, 256, 1000]
+        batch_sizes = [1, 100, 256, 1000]
+        for inv in [True, False]: # inverse mode
+            i = Turbo3GPPInterleaver(inverse=inv)
+            for seq_length in seq_lengths:
+                for batch_size in batch_sizes:
+                    x = i(tf.zeros([batch_size, seq_length]))
+                    self.assertEqual(x.shape,
+                                    [int(batch_size),int(seq_length)])
+
+    def test_inverse(self):
+        """Test that inverse permutation matches to permutation."""
+        seq_length = int(1e3)
+        batch_size = int(1e2)
+
+        inter = Turbo3GPPInterleaver()
+        inter2 = Turbo3GPPInterleaver(inverse=True)
+        # also test that the deinterleaver can be used
+        deinter = Deinterleaver(inter)
+
+        x = np.arange(seq_length)
+        x = np.expand_dims(x, axis=0)
+        x = np.tile(x, [batch_size, 1])
+        y = inter(x)
+        z = inter2(y)
+        z2 = deinter(y)
+        for i in range(batch_size):
+            # result must be sorted integers
+            self.assertTrue(np.array_equal(z[i,:], np.arange(seq_length)))
+            self.assertTrue(np.array_equal(z2[i,:], np.arange(seq_length)))
+
+    def test_dimension(self):
+        """Test that dimensions can be changed."""
+        seq_length = int(1e1)
+        batch_size = int(1e2)
+
+        cases = np.array([[1e2, 1e1-1], [1e2, 1e1+1]])
+
+        # test that bs can be variable
+        cases = np.array([[1e2+2, 1e1], [1e2+1, 1e1+1]])
+
+        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+                                tf.cast(seq_length, dtype=tf.int32)])
+        for c in cases:
+                i = Turbo3GPPInterleaver()
+                llr = tf.random.uniform([tf.cast(c[0], dtype=tf.int32),
+                                         tf.cast(c[1], dtype=tf.int32)])
+                i(llr)
+
+    def test_multi_dim(self):
+        """Test that 2+D Tensors permutation can be inverted/removed.
+        Inherently tests that the output dimensions match.
+        """
+
+        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,6]]
+
+        for s in shapes:
+            #check soft-value scrambling (flipp sign)
+            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32),
+                                    minval=-100,
+                                    maxval=100)
+            for a in range(0, len(s)):
+                    if a==0: # check that axis=-1 works as well...axis=0 is
+                        # invalid (=batch_dim) and does not need to be checked
+                        i = Turbo3GPPInterleaver(axis=-1)
+                        i2 = Turbo3GPPInterleaver(axis=-1,
+                                                  inverse=True)
+                    else:
+                        i = Turbo3GPPInterleaver(axis=a)
+                        i2 = Turbo3GPPInterleaver(axis=a,
+                                                  inverse=True)
+
+                    x = i(llr)
+                    # after interleaving arrays must be different
+                    self.assertTrue(np.any(np.not_equal(x.numpy(),llr.numpy())))
+
+                    # after deinterleaving arrays should be equal again
+                    x = i2(x)
+                    self.assertIsNone(np.testing.assert_array_equal(x.numpy(), llr.numpy()))
+
+    def test_invalid_shapes(self):
+        """Test that invalid shapes/axis parameter raise error.
+        """
+        # axis 0 not allowed
+        with self.assertRaises(AssertionError):
+            Turbo3GPPInterleaver(axis=0)
+
+        # k>6144
+        i = Turbo3GPPInterleaver(axis=-1)
+        s = [10, 6145]
+        llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+        with self.assertRaises(AssertionError):
+            i(llr)
+
+        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,6]]
+
+        for s in shapes:
+            with self.assertRaises(AssertionError):
+                # axis out bounds...must raise error
+                i = Turbo3GPPInterleaver(axis=len(s))
+                llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+                i(llr)
+
+        # cannot permute batch_dim only
+        with self.assertRaises(AssertionError):
+            i = Turbo3GPPInterleaver(axis=1)
+            llr = tf.random.uniform(tf.constant([10], dtype=tf.int32),
+                                    minval=-10,
+                                    maxval=10)
+            i(llr)
+
+    def test_keras(self):
+        """Test that Keras model can be compiled (supports dynamic shapes)."""
+        bs = 10
+        k = 100
+        source = BinarySource()
+
+        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
+        x = Turbo3GPPInterleaver()(inputs)
+        model = tf.keras.Model(inputs=inputs, outputs=x)
+        # test that output batch dim is none
+        self.assertTrue(model.output_shape[0] is None)
+
+        # test that model can be called
+        b = source([bs, k])
+        model(b)
+        # call twice to see that bs can change
+        b2 = source([bs+1, k])
+        model(b2)
+        model.summary()
+
+    def test_tf_fun(self):
+        """Test that tf.function works as expected and XLA work as expected.
+
+        Also tests that arrays are different.
+        """
+        @tf.function()
+        def run_graph(llr):
+            return i(llr)
+
+        @tf.function(jit_compile=True)
+        def run_graph_xla(llr):
+           return i(llr)
+
+        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,9]]
+        for s in shapes:
+            #check soft-value scrambling (flip sign)
+            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+            i = Turbo3GPPInterleaver()
+            x1 = run_graph(llr)
+            x2 = run_graph_xla(llr)
+            # after interleaving arrays must be different
+            self.assertTrue(np.any(np.not_equal(x1.numpy(),llr.numpy())))
+            self.assertTrue(np.any(np.not_equal(x2.numpy(),llr.numpy())))
+
+            # XLA and graph mode should result in the same array
+            self.assertTrue(np.array_equal(x1.numpy(),x2.numpy()))
+
+        # test for variable lengths
+        i = Turbo3GPPInterleaver()
+        llr = tf.random.uniform(tf.constant((10,100), dtype=tf.int32))
+        x = run_graph(llr)
+        x = run_graph_xla(llr)
+        llr = tf.random.uniform(tf.constant((10,101), dtype=tf.int32))
+        x = run_graph(llr)
+        x = run_graph_xla(llr)
+
+    def test_dtype(self):
+        """Test that variable dtypes are supported."""
+        seq_length = int(1e1)
+        batch_size = int(1e2)
+
+        dt_supported = [tf.float16, tf.float32, tf.float64]
+        for dt in dt_supported:
+            for dt_in in dt_supported:
+                b = tf.zeros([batch_size, seq_length], dtype=dt_in)
+                inter = Turbo3GPPInterleaver(dtype=dt)
+                x = inter(b)
+                assert (x.dtype==dt)

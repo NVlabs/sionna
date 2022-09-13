@@ -66,7 +66,7 @@ class PolarSCDecoder(Layer):
     Note
     ----
         This layer implements the SC decoder as described in
-        [Arikan_Polar]_. However, the implementation follows the`recursive
+        [Arikan_Polar]_. However, the implementation follows the `recursive
         tree` [Gross_Fast_SCL]_ terminology and combines nodes for increased
         throughputs without changing the outcome of the algorithm.
 

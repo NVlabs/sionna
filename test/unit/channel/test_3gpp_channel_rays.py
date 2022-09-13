@@ -384,8 +384,9 @@ class TestRays(unittest.TestCase):
         p = self.powers[model][submodel][:,:num_clusters].flatten()
         unscaled_tau, _ = delays(model, submodel, batch_size, num_clusters,
                                     TestRays.ds, TestRays.k)
-        ref_p = powers(model, submodel, batch_size, num_clusters, unscaled_tau,
-                        self.ds, self.k)[:,:num_clusters].flatten()
+        ref_p,_ = powers(model, submodel, batch_size, num_clusters,
+                unscaled_tau, self.ds, self.k)
+        ref_p = ref_p[:,:num_clusters].flatten()
         D,_ = kstest(ref_p,p)
         self.assertLessEqual(D, TestRays.MAX_ERR, f"{model}:{submodel}")
 
@@ -399,10 +400,11 @@ class TestRays(unittest.TestCase):
             k = TestRays.k
         unscaled_tau, _ = delays(model, submodel, batch_size, num_clusters,
                                     TestRays.ds, TestRays.k)
-        ref_p = powers(model, submodel, batch_size, num_clusters, unscaled_tau,
-                        TestRays.ds, TestRays.k)[:,:num_clusters]
+        _, ref_p_angles = powers(model, submodel, batch_size, num_clusters,
+            unscaled_tau, TestRays.ds, TestRays.k)
+        ref_p_angles = ref_p_angles[:,:num_clusters]
         ref_samples = aoa(model, submodel, batch_size, num_clusters,
-            TestRays.asa, ref_p, TestRays.los_aoa[model][submodel], k)
+            TestRays.asa, ref_p_angles, TestRays.los_aoa[model][submodel], k)
         ref_samples = ref_samples[:,:num_clusters].flatten()
         samples = TestRays.aoa[model][submodel][:,:num_clusters].flatten()
         D,_ = kstest(ref_samples, samples)
@@ -418,10 +420,11 @@ class TestRays(unittest.TestCase):
             k = TestRays.k
         unscaled_tau, _ = delays(model, submodel, batch_size, num_clusters,
                                     TestRays.ds, TestRays.k)
-        ref_p = powers(model, submodel, batch_size, num_clusters, unscaled_tau,
-                        TestRays.ds, TestRays.k)[:,:num_clusters]
+        _, ref_p_angles = powers(model, submodel, batch_size, num_clusters,
+                unscaled_tau, TestRays.ds, TestRays.k)
+        ref_p_angles = ref_p_angles[:,:num_clusters]
         ref_samples = aod(model, submodel, batch_size, num_clusters,
-            TestRays.asd, ref_p, TestRays.los_aod[model][submodel], k)
+            TestRays.asd, ref_p_angles, TestRays.los_aod[model][submodel], k)
         ref_samples = ref_samples[:,:num_clusters].flatten()
         samples = TestRays.aod[model][submodel][:,:num_clusters].flatten()
         D,_ = kstest(ref_samples, samples)
@@ -437,10 +440,11 @@ class TestRays(unittest.TestCase):
             k = TestRays.k
         unscaled_tau, _ = delays(model, submodel, batch_size, num_clusters,
                                     TestRays.ds, TestRays.k)
-        ref_p = powers(model, submodel, batch_size, num_clusters, unscaled_tau,
-                        TestRays.ds, TestRays.k)[:,:num_clusters]
+        _, ref_p_angles = powers(model, submodel, batch_size, num_clusters,
+                    unscaled_tau, TestRays.ds, TestRays.k)
+        ref_p_angles = ref_p_angles[:,:num_clusters]
         ref_samples = zoa(model, submodel, batch_size, num_clusters,
-            TestRays.zsa, ref_p, TestRays.los_zoa[model][submodel], k)
+            TestRays.zsa, ref_p_angles, TestRays.los_zoa[model][submodel], k)
         ref_samples = ref_samples[:,:num_clusters].flatten()
         samples = TestRays.zoa[model][submodel][:,:num_clusters].flatten()
         D,_ = kstest(ref_samples, samples)
@@ -460,12 +464,13 @@ class TestRays(unittest.TestCase):
             k = TestRays.k
         unscaled_tau, _ = delays(model, submodel, batch_size, num_clusters,
                                     TestRays.ds, TestRays.k)
-        ref_p = powers(model, submodel, batch_size, num_clusters, unscaled_tau,
-                        TestRays.ds, TestRays.k)[:,:num_clusters]
+        _, ref_p_angles = powers(model, submodel, batch_size, num_clusters,
+                    unscaled_tau, TestRays.ds, TestRays.k)
+        ref_p_angles = ref_p_angles[:,:num_clusters]
         offset = zod_offset(model, submodel, fc, d_2d, h_ut)
         ref_samples = zod(model, submodel, batch_size, num_clusters,
-            TestRays.zsd, ref_p, TestRays.los_zod[model][submodel], offset,
-            mu_log_zod, k)
+            TestRays.zsd, ref_p_angles, TestRays.los_zod[model][submodel],
+            offset, mu_log_zod, k)
         ref_samples = ref_samples[:,:num_clusters].flatten()
         samples = TestRays.zod[model][submodel][:,:num_clusters].flatten()
         D,_ = kstest(ref_samples, samples)

@@ -292,7 +292,7 @@ class AntennaPanel:
 
 class PanelArray:
     # pylint: disable=line-too-long
-    r"""PanelArray(num_rows_per_panel, num_cols_per_panel, polarization, polarization_type, antenna_pattern, carrier_frequency, num_rows=1 num_cols=1, panel_vertical_spacing=None, panel_horizontal_spacing=None, element_vertical_spacing=None, element_horizontal_spacing=None, dtype=tf.complex64)
+    r"""PanelArray(num_rows_per_panel, num_cols_per_panel, polarization, polarization_type, antenna_pattern, carrier_frequency, num_rows=1, num_cols=1, panel_vertical_spacing=None, panel_horizontal_spacing=None, element_vertical_spacing=None, element_horizontal_spacing=None, dtype=tf.complex64)
 
     Antenna panel array following the [TR38901]_ specification.
 
@@ -613,26 +613,31 @@ class PanelArray:
 
     def show(self):
         """Show the panel array geometry"""
-        marker_vert = MarkerStyle("|")
-        marker_horz = MarkerStyle("_")
-        if self._polarization == 'single' and self._polarization_type == 'H':
-            marker_vert = marker_horz
-        elif self._polarization == 'dual' and self._polarization_type == 'cross':
-            marker_vert._transform.rotate_deg(-45)      # pylint: disable=protected-access
-            marker_horz._transform.rotate_deg(-45)      # pylint: disable=protected-access
+        if self._polarization == 'single':
+            if self._polarization_type == 'H':
+                marker_p1 = MarkerStyle("_").get_marker()
+            else:
+                marker_p1 = MarkerStyle("|")
+        elif self._polarization == 'dual':
+            if self._polarization_type == 'cross':
+                marker_p1 = (2, 0, -45)
+                marker_p2 = (2, 0, 45)
+            else:
+                marker_p1 = MarkerStyle("_").get_marker()
+                marker_p2 = MarkerStyle("|").get_marker()
 
         fig = plt.figure()
         pos_pol1 = self._ant_pos_pol1
-        plt.plot(pos_pol1[:,1], pos_pol1[:,2], marker = marker_vert,
-            markeredgecolor='red', markersize="20", linestyle="None",
-            markeredgewidth="2")
+        plt.plot(pos_pol1[:,1], pos_pol1[:,2],
+            marker=marker_p1, markeredgecolor='red',
+            markersize="20", linestyle="None", markeredgewidth="2")
         for i, p in enumerate(pos_pol1):
             fig.axes[0].annotate(self._ant_ind_pol1[i].numpy()+1, (p[1], p[2]))
         if self._polarization == 'dual':
             pos_pol2 = self._ant_pos_pol2
-            plt.plot(pos_pol2[:,1], pos_pol2[:,2], marker = marker_horz,
-                markeredgecolor='black', markersize="20", linestyle="None",
-                markeredgewidth="1")
+            plt.plot(pos_pol2[:,1], pos_pol2[:,2],
+                marker=marker_p2, markeredgecolor='black',
+                markersize="20", linestyle="None", markeredgewidth="1")
         plt.xlabel("y (m)")
         plt.ylabel("z (m)")
         plt.title("Panel Array")

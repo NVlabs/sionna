@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 class LDPCBPDecoder(Layer):
     # pylint: disable=line-too-long
-    r"""LDPCBPDecoder(pcm, trainable=False, cn_type='boxplus-phi', hard_out=True, track_exit=False, num_iter=20, keep_state=False,output_dtype=tf.float32, **kwargs)
+    r"""LDPCBPDecoder(pcm, trainable=False, cn_type='boxplus-phi', hard_out=True, track_exit=False, num_iter=20, stateful=False,output_dtype=tf.float32, **kwargs)
 
     Iterative belief propagation decoder for low-density parity-check (LDPC)
     codes and other `codes on graphs`.
@@ -100,7 +100,7 @@ class LDPCBPDecoder(Layer):
             update rule [Ryan]_.
 
         hard_out: bool
-            Defaults to False. If True, the decoder provides hard-decided
+            Defaults to True. If True, the decoder provides hard-decided
             codeword bits instead of soft-values.
 
         track_exit: bool
@@ -112,9 +112,11 @@ class LDPCBPDecoder(Layer):
             Defining the number of decoder iteration (no early stopping used at
             the moment!).
 
-        keep_state: bool
-            Defaults to False. If True, the decoder continues with the internal
-            VN messages from the previous decoding iteration (required for IDD).
+        stateful: bool
+            Defaults to False. If True, the internal VN messages ``msg_vn``
+            from the last decoding iteration are returned, and ``msg_vn`` or
+            `None` needs to be given as a second input when calling the decoder.
+            This is required for iterative demapping and decoding.
 
         output_dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
@@ -122,8 +124,15 @@ class LDPCBPDecoder(Layer):
 
     Input
     -----
-        inputs: [...,n], tf.float32
-            2+D tensor containing the channel logits/llr values.
+    llrs_ch or (llrs_ch, msg_vn):
+        Tensor or Tuple (only required if ``stateful`` is True):
+
+    llrs_ch: [...,n], tf.float32
+        2+D tensor containing the channel logits/llr values.
+
+    msg_vn: None or RaggedTensor, tf.float32
+        Ragged tensor of VN messages.
+        Required only if ``stateful`` is True.
 
     Output
     ------
@@ -131,6 +140,10 @@ class LDPCBPDecoder(Layer):
             2+D Tensor of same shape as ``inputs`` containing
             bit-wise soft-estimates (or hard-decided bit-values) of all
             codeword bits.
+
+        : RaggedTensor, tf.float32:
+            Tensor of VN messages.
+            Returned only if ``stateful`` is set to True.
 
     Attributes
     ----------
@@ -219,7 +232,7 @@ class LDPCBPDecoder(Layer):
             If ``hard_out`` is not `bool`.
 
         AssertionError
-            If ``keep_state`` is not `bool`.
+            If ``stateful`` is not `bool`.
 
         AssertionError
             If ``cn_type`` is not `str`.
@@ -265,7 +278,7 @@ class LDPCBPDecoder(Layer):
                  hard_out=True,
                  track_exit=False,
                  num_iter=20,
-                 keep_state=False,
+                 stateful=False,
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -277,7 +290,7 @@ class LDPCBPDecoder(Layer):
         assert isinstance(cn_type, str) , 'cn_type must be str.'
         assert isinstance(num_iter, int), 'num_iter must be int.'
         assert num_iter>=0, 'num_iter cannot be negative.'
-        assert isinstance(keep_state, bool), 'keep_state must be bool.'
+        assert isinstance(stateful, bool), 'stateful must be bool.'
         assert isinstance(output_dtype, tf.DType), \
                                 'output_dtype must be tf.Dtype.'
 
@@ -307,7 +320,7 @@ class LDPCBPDecoder(Layer):
         self._hard_out = hard_out
         self._track_exit = track_exit
         self._num_iter = tf.constant(num_iter, dtype=tf.int32)
-        self._keep_state = keep_state
+        self._stateful = stateful
         self._output_dtype = output_dtype
 
         # clipping value for the atanh function is applied (tf.float32 is used)
@@ -352,9 +365,6 @@ class LDPCBPDecoder(Layer):
             self._cn_update = self._cn_update_minsum
         else:
             raise ValueError('Unknown node type.')
-
-        # incoming VN messages (=internal decoder state for IDD)
-        self._msg_vn = None # initialized during first iteration
 
         # init trainable weights if needed
         self._has_weights = False  # indicates if trainable weights exist
@@ -451,13 +461,8 @@ class LDPCBPDecoder(Layer):
             plt.ylabel('density')
             plt.grid(True, which='both', axis='both')
             plt.title('Weight Distribution')
-
-    def reset_state(self):
-        """Reset internal message state for next codeword
-
-        This function is only needed if ``keep_state`` is True.
-        """
-        self._msg_vn=None
+        else:
+            print("No weights to show.")
 
     #########################
     # Utility methods
@@ -497,7 +502,7 @@ class LDPCBPDecoder(Layer):
             if con[i] != cur_node:
                 node_mask.append(i)
                 cur_node += 1
-        node_mask.append(self._num_edges) # last element must be a number of
+        node_mask.append(self._num_edges) # last element must be the number of
         # elements (delimiter)
         return node_mask
 
@@ -520,8 +525,8 @@ class LDPCBPDecoder(Layer):
         # subtract extrinsic message from node value
         # x = tf.expand_dims(x, axis=1)
         # x = tf.add(-msg, x)
-        add_ragged_tensors = lambda x, y, row_ind : x + tf.gather(y, row_ind)
-        x = tf.ragged.map_flat_values(add_ragged_tensors,
+        x = tf.ragged.map_flat_values(lambda x, y, row_ind :
+                                      x + tf.gather(y, row_ind),
                                       -1.*msg,
                                       x,
                                       msg.value_rowids())
@@ -584,8 +589,7 @@ class LDPCBPDecoder(Layer):
         # for ragged tensors; map to flat tensor first
         msg = tf.ragged.map_flat_values(self._where_ragged, msg)
 
-        msg_prod= tf.reduce_prod(msg, axis=1)
-
+        msg_prod = tf.reduce_prod(msg, axis=1)
 
         # TF2.9 does not support XLA for the multiplication of ragged tensors
         # the following code provides a workaround that supports XLA
@@ -594,8 +598,8 @@ class LDPCBPDecoder(Layer):
         # Note this is (potentially) numerically unstable
         # msg = msg**-1 * tf.expand_dims(msg_prod, axis=1) # remove own edge
 
-        mult_ragged_tensor = lambda x, y, row_ind : x * tf.gather(y, row_ind)
-        msg = tf.ragged.map_flat_values(mult_ragged_tensor,
+        msg = tf.ragged.map_flat_values(lambda x, y, row_ind :
+                                        x * tf.gather(y, row_ind),
                                         msg**-1,
                                         msg_prod,
                                         msg.value_rowids())
@@ -652,8 +656,8 @@ class LDPCBPDecoder(Layer):
         # the following code provides a workaround that supports XLA
 
         # sign_val = sign_val * tf.expand_dims(sign_node, axis=1)
-        mult_ragged_tensor = lambda x, y, row_ind : x * tf.gather(y, row_ind)
-        sign_val = tf.ragged.map_flat_values(mult_ragged_tensor,
+        sign_val = tf.ragged.map_flat_values(lambda x, y, row_ind :
+                                             x * tf.gather(y, row_ind),
                                              sign_val,
                                              sign_node,
                                              sign_val.value_rowids())
@@ -668,8 +672,8 @@ class LDPCBPDecoder(Layer):
         # the following code provides a workaround that supports XLA
 
         # msg = tf.add( -msg, tf.expand_dims(msg_sum, axis=1)) # remove own edge
-        add_ragged_tensor = lambda x, y, row_ind : x + tf.gather(y, row_ind)
-        msg = tf.ragged.map_flat_values(add_ragged_tensor,
+        msg = tf.ragged.map_flat_values(lambda x, y, row_ind :
+                                        x + tf.gather(y, row_ind),
                                         -1.*msg,
                                         msg_sum,
                                         msg.value_rowids())
@@ -760,8 +764,9 @@ class LDPCBPDecoder(Layer):
 
         # sign_val = self._stop_ragged_gradient(sign_val) \
         #             * tf.expand_dims(sign_node, axis=1)
-        mult_rt = lambda x, y, row_ind: tf.multiply(x, tf.gather(y, row_ind))
-        sign_val = tf.ragged.map_flat_values(mult_rt,
+        sign_val = tf.ragged.map_flat_values(
+                                        lambda x, y, row_ind:
+                                        tf.multiply(x, tf.gather(y, row_ind)),
                                         self._stop_ragged_gradient(sign_val),
                                         sign_node,
                                         sign_val.value_rowids())
@@ -785,8 +790,8 @@ class LDPCBPDecoder(Layer):
         # and subtract min; the new array contains zero at the min positions
         # benefits from broadcasting; all other values are positive
         # msg_min1 = msg - min_val
-        sub_ragged_tensor = lambda x, y, row_ind: x- tf.gather(y, row_ind)
-        msg_min1 = tf.ragged.map_flat_values(sub_ragged_tensor,
+        msg_min1 = tf.ragged.map_flat_values(lambda x, y, row_ind:
+                                             x- tf.gather(y, row_ind),
                                              msg,
                                              tf.squeeze(min_val, axis=1),
                                              msg.value_rowids())
@@ -820,9 +825,10 @@ class LDPCBPDecoder(Layer):
 
         # it seems like tf.where does not set the shape of tf.ragged properly
         # we need to ensure the shape manually
-        msg_e = tf.ragged.map_flat_values(lambda x:
+        msg_e = tf.ragged.map_flat_values(
+                                    lambda x:
                                     tf.ensure_shape(x, msg.flat_values.shape),
-                                          msg_e)
+                                    msg_e)
 
         # TF2.9 does not support XLA for the multiplication of ragged tensors
         # the following code provides a workaround that supports XLA
@@ -849,6 +855,11 @@ class LDPCBPDecoder(Layer):
 
     def build(self, input_shape):
         # Raise AssertionError if shape of x is invalid
+        if self._stateful:
+            assert(len(input_shape)==2), \
+                "For stateful decoding, a tuple of two inputs is expected."
+            input_shape = input_shape[0]
+
         assert (input_shape[-1]==self._num_vns), \
                             'Last dimension must be of length n.'
         assert (len(input_shape)>=2), 'The inputs must have at least rank 2.'
@@ -860,8 +871,13 @@ class LDPCBPDecoder(Layer):
         iterations and returns the estimated codeword.
 
         Args:
-            inputs (tf.float32): Tensor of shape `[...,n]` containing the
+        llr_ch or (llr_ch, msg_vn):
+
+            llr_ch (tf.float32): Tensor of shape `[...,n]` containing the
                 channel logits/llr values.
+
+            msg_vn (tf.float32) : Ragged tensor containing the VN
+                messages, or None. Required if ``stateful`` is set to True.
 
         Returns:
             `tf.float32`: Tensor of shape `[...,n]` containing
@@ -874,19 +890,25 @@ class LDPCBPDecoder(Layer):
             InvalidArgumentError: When rank(``inputs``)<2.
         """
 
-        tf.debugging.assert_type(inputs, self.dtype, 'Invalid input dtype.')
+        # Extract inputs
+        if self._stateful:
+            llr_ch, msg_vn = inputs
+        else:
+            llr_ch = inputs
+
+        tf.debugging.assert_type(llr_ch, self.dtype, 'Invalid input dtype.')
 
         # internal calculations still in tf.float32
-        inputs = tf.cast(inputs, tf.float32)
+        llr_ch = tf.cast(llr_ch, tf.float32)
 
         # last dim must be of length n
-        tf.debugging.assert_equal(tf.shape(inputs)[-1],
+        tf.debugging.assert_equal(tf.shape(llr_ch)[-1],
                                   self._num_vns,
                                   'Last dimension must be of length n.')
 
-        input_shape = inputs.get_shape().as_list()
+        llr_ch_shape = llr_ch.get_shape().as_list()
         new_shape = [-1, self._num_vns]
-        llr_ch_reshaped = tf.reshape(inputs, new_shape)
+        llr_ch_reshaped = tf.reshape(llr_ch, new_shape)
 
         # must be done during call, as XLA fails otherwise due to ragged
         # indices placed on the CPU device.
@@ -902,15 +924,15 @@ class LDPCBPDecoder(Layer):
         # init internal decoder state if not explicitly
         # provided (e.g., required to restore decoder state for iterative
         # detection and decoding)
-        if self._msg_vn is None or self._keep_state is False:
+        # load internal state from previous iteration
+        # required for iterative det./dec.
+        if not self._stateful or msg_vn is None:
             msg_shape = tf.stack([tf.constant(self._num_edges),
                                    tf.shape(llr_ch)[1]],
                                    axis=0)
             msg_vn = tf.zeros(msg_shape, dtype=tf.float32)
         else:
-            # load internal state from previous iteration
-            # required for iterative det./dec.
-            msg_vn = self._msg_vn.flat_values
+            msg_vn = msg_vn.flat_values
 
         # track exit decoding trajectory; requires all-zero cw?
         if self._track_exit:
@@ -979,8 +1001,6 @@ class LDPCBPDecoder(Layer):
                         values=msg_vn,
                         row_splits=tf.constant(self._vn_row_splits, tf.int32))
 
-        self._msg_vn = msg_vn # store as attribute for iter. det./dec.
-
         # marginalize and remove ragged Tensor
         x_hat = tf.add(llr_ch, tf.reduce_sum(msg_vn, axis=1))
 
@@ -993,19 +1013,22 @@ class LDPCBPDecoder(Layer):
             x_hat = tf.cast(tf.less(0.0, x_hat), self._output_dtype)
 
         # Reshape c_short so that it matches the original input dimensions
-        output_shape = input_shape
+        output_shape = llr_ch_shape
         output_shape[0] = -1 # overwrite batch dim (can be None in Keras)
 
         x_reshaped = tf.reshape(x_hat, output_shape)
 
         # cast output to output_dtype
         x_out = tf.cast(x_reshaped, self._output_dtype)
-        return x_out
 
+        if not self._stateful:
+            return x_out
+        else:
+            return x_out, msg_vn
 
 class LDPC5GDecoder(LDPCBPDecoder):
     # pylint: disable=line-too-long
-    r"""LDPC5GDecoder(encoder, trainable=False, cn_type='boxplus-phi', hard_out=True, track_exit=False, return_infobits=True, prune_pcm=True, num_iter=20, keep_state=False, output_dtype=tf.float32, **kwargs)
+    r"""LDPC5GDecoder(encoder, trainable=False, cn_type='boxplus-phi', hard_out=True, track_exit=False, return_infobits=True, prune_pcm=True, num_iter=20, stateful=False, output_dtype=tf.float32, **kwargs)
 
     (Iterative) belief propagation decoder for 5G NR LDPC codes.
 
@@ -1044,7 +1067,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
             update rule [Ryan]_.
 
         hard_out: bool
-            Defaults to False. If True, the decoder provides hard-decided
+            Defaults to True. If True, the decoder provides hard-decided
             codeword bits instead of soft-values.
 
         track_exit: bool
@@ -1067,9 +1090,11 @@ class LDPC5GDecoder(LDPCBPDecoder):
             Defining the number of decoder iteration (no early stopping used at
             the moment!).
 
-        keep_state: bool
-            Defaults to False. If True, the decoder continues with the internal
-            VN messages from the previous decoding iteration (required for IDD).
+        stateful: bool
+            Defaults to False. If True, the internal VN messages ``msg_vn``
+            from the last decoding iteration are returned, and ``msg_vn`` or
+            `None` needs to be given as a second input when calling the decoder.
+            This is required for iterative demapping and decoding.
 
         output_dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
@@ -1077,16 +1102,27 @@ class LDPC5GDecoder(LDPCBPDecoder):
 
     Input
     -----
-        inputs: [...,n], tf.float32
-            2+D tensor containing the channel logits/llr values.
+    llrs_ch or (llrs_ch, msg_vn):
+        Tensor or Tuple (only required if ``stateful`` is True):
+
+    llrs_ch: [...,n], tf.float32
+        2+D tensor containing the channel logits/llr values.
+
+    msg_vn: None or RaggedTensor, tf.float32
+        Ragged tensor of VN messages.
+        Required only if ``stateful`` is True.
 
     Output
     ------
-        : [...,n], or [...,k], tf.float32
-            2+D tensor of shape `[...,n]`, or `[...,k]`
-            if ``return_infobits`` is True, containing bit-wise soft-estimates
-            (or hard-decided bit-values) of all codeword bits (or info
-            bits, respectively).
+        : [...,n] or [...,k], tf.float32
+            2+D Tensor of same shape as ``inputs`` containing
+            bit-wise soft-estimates (or hard-decided bit-values) of all
+            codeword bits. If ``return_infobits`` is True, only the `k`
+            information bits are returned.
+
+        : RaggedTensor, tf.float32:
+            Tensor of VN messages.
+            Returned only if ``stateful`` is set to True.
     Raises
     ------
         ValueError
@@ -1153,7 +1189,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
                  return_infobits=True,
                  prune_pcm=True,
                  num_iter=20,
-                 keep_state=False,
+                 stateful=False,
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -1175,8 +1211,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
                 'output_dtype must be {tf.float16, tf.float32, tf.float64}.')
         self._output_dtype = output_dtype
 
-        assert isinstance(keep_state, bool), 'keep_state must be bool.'
-        self._keep_state = keep_state
+        assert isinstance(stateful, bool), 'stateful must be bool.'
+        self._stateful = stateful
 
         assert isinstance(prune_pcm, bool), 'prune_pcm must be bool.'
         # prune punctured degree-1 VNs and connected CNs. A punctured
@@ -1209,6 +1245,10 @@ class LDPC5GDecoder(LDPCBPDecoder):
                         pruned nodes must be positive."
         else:
             self._nb_pruned_nodes = 0
+            # no pruning; same length as before
+            self._n_pruned = encoder._n_ldpc
+
+
 
         super().__init__(pcm,
                          trainable,
@@ -1216,7 +1256,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
                          hard_out,
                          track_exit,
                          num_iter=num_iter,
-                         keep_state=keep_state,
+                         stateful=stateful,
                          output_dtype=output_dtype,
                          **kwargs)
 
@@ -1240,6 +1280,11 @@ class LDPC5GDecoder(LDPCBPDecoder):
 
     def build(self, input_shape):
         """Build model."""
+        if self._stateful:
+            assert(len(input_shape)==2), \
+                "For stateful decoding, a tuple of two inputs is expected."
+            input_shape = input_shape[0]
+
         # check input dimensions for consistency
         assert (input_shape[-1]==self.encoder.n), \
                                 'Last dimension must be of length n.'
@@ -1272,14 +1317,26 @@ class LDPC5GDecoder(LDPCBPDecoder):
             InvalidArgumentError: When rank(``inputs``)<2.
         """
 
-        tf.debugging.assert_type(inputs, self.dtype, 'Invalid input dtype.')
+        # Extract inputs
+        if self._stateful:
+            llr_ch, msg_vn = inputs
+        else:
+            llr_ch = inputs
 
-        if inputs.shape != self._old_shape_5g:
-            self.build(inputs.shape)
-        input_shape = inputs.get_shape().as_list()
-        new_shape = [-1, input_shape[-1]]
-        llr_ch_reshaped = tf.reshape(inputs, new_shape)
+        tf.debugging.assert_type(llr_ch, self.dtype, 'Invalid input dtype.')
+
+        llr_ch_shape = llr_ch.get_shape().as_list()
+        new_shape = [-1, llr_ch_shape[-1]]
+        llr_ch_reshaped = tf.reshape(llr_ch, new_shape)
         batch_size = tf.shape(llr_ch_reshaped)[0]
+
+        # invert if rate-matching output interleaver was applied as defined in
+        # Sec. 5.4.2.2 in 38.212
+        if self._encoder.num_bits_per_symbol is not None:
+            llr_ch_reshaped = tf.gather(llr_ch_reshaped,
+                                        self._encoder.out_int_inv,
+                                        axis=-1)
+
 
         # undo puncturing of the first 2*Z bit positions
         llr_5g = tf.concat(
@@ -1318,20 +1375,27 @@ class LDPC5GDecoder(LDPCBPDecoder):
         llr_5g = tf.concat([x1, z, x2], 1)
 
         # and execute the decoder
-        x_hat = super().call(llr_5g)
+        if not self._stateful:
+            x_hat = super().call(llr_5g)
+        else:
+            x_hat,msg_vn = super().call([llr_5g, msg_vn])
 
         if self._return_infobits: # return only info bits
             # reconstruct u_hat # code is systematic
             u_hat = tf.slice(x_hat, [0,0], [batch_size, self.encoder.k])
             # Reshape u_hat so that it matches the original input dimensions
-            output_shape = input_shape[0:-1] + [self.encoder.k]
+            output_shape = llr_ch_shape[0:-1] + [self.encoder.k]
             # overwrite first dimension as this could be None (Keras)
             output_shape[0] = -1
             u_reshaped = tf.reshape(u_hat, output_shape)
 
             # enable other output datatypes than tf.float32
             u_out = tf.cast(u_reshaped, self._output_dtype)
-            return u_out
+
+            if not self._stateful:
+                return u_out
+            else:
+                return u_out, msg_vn
 
         else: # return all codeword bits
             # the transmitted CW bits are not the same as used during decoding
@@ -1355,11 +1419,20 @@ class LDPC5GDecoder(LDPCBPDecoder):
                                [0, 2*self.encoder.z],
                                [batch_size, self.encoder.n])
 
+            # if used, apply rate-matching output interleaver again as
+            # Sec. 5.4.2.2 in 38.212
+            if self._encoder.num_bits_per_symbol is not None:
+                x_short = tf.gather(x_short, self._encoder.out_int, axis=-1)
+
             # Reshape x_short so that it matches the original input dimensions
             # overwrite first dimension as this could be None (Keras)
-            input_shape[0] = -1
-            x_short= tf.reshape(x_short, input_shape)
+            llr_ch_shape[0] = -1
+            x_short= tf.reshape(x_short, llr_ch_shape)
 
             # enable other output datatypes than tf.float32
             x_out = tf.cast(x_short, self._output_dtype)
-            return x_out
+
+            if not self._stateful:
+                return x_out
+            else:
+                return x_out, msg_vn

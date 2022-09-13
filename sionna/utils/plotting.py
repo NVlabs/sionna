@@ -7,6 +7,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sionna.utils import sim_ber
+from itertools import compress # to "filter" list
 
 def plot_ber(snr_db,
              ber,
@@ -145,7 +146,7 @@ def plot_ber(snr_db,
 ###### Plotting classes #######
 
 class PlotBER():
-    """Provides a plotting object to simulate and store BER curves.
+    """Provides a plotting object to simulate and store BER/BLER curves.
 
     Parameters
     ----------
@@ -169,6 +170,12 @@ class PlotBER():
     is_bler: bool
         A boolean (or list of booleans) defaults to False.
         If True, ``ber`` will be interpreted as BLER.
+
+    show_ber: bool
+        A boolean defaults to True. If True, BER curves will be plotted.
+
+    show_bler: bool
+        A boolean defaults to True. If True, BLER curves will be plotted.
 
     xlim: tuple of floats
         Defaults to None. A tuple of two floats defining x-axis limits.
@@ -202,6 +209,8 @@ class PlotBER():
                  ber=[],
                  legend=[],
                  is_bler=[],
+                 show_ber=True,
+                 show_bler=True,
                  xlim=None,
                  ylim=None,
                  save_fig=False,
@@ -234,6 +243,19 @@ class PlotBER():
             is_bler = self._is_bler + [is_bler]
         else:
             is_bler = self._is_bler + is_bler
+
+        # deactivate BER/BLER
+        if show_ber is False:
+            snrs = list(compress(snrs, is_bler))
+            bers = list(compress(bers, is_bler))
+            legends = list(compress(legends, is_bler))
+            is_bler = list(compress(is_bler, is_bler))
+
+        if show_bler is False:
+            snrs = list(compress(snrs, np.invert(is_bler)))
+            bers = list(compress(bers, np.invert(is_bler)))
+            legends = list(compress(legends, np.invert(is_bler)))
+            is_bler = list(compress(is_bler, np.invert(is_bler)))
 
         # set ylabel
         ylabel = "BER / BLER"

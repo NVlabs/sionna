@@ -37,7 +37,7 @@ class AllZeroEncoder(Layer):
     Input
     -----
         inputs: [...,k], tf.float32
-            2+D tensor contaiming arbitrary values (not used!).
+            2+D tensor containing arbitrary values (not used!).
 
     Output
     ------
@@ -147,7 +147,7 @@ class AllZeroEncoder(Layer):
 
 class LDPC5GEncoder(Layer):
     # pylint: disable=line-too-long
-    """LDPC5GEncoder(k, n, dtype=tf.float32, **kwargs)
+    """LDPC5GEncoder(k, n, num_bits_per_symbol=None, dtype=tf.float32, **kwargs)
 
     5G NR LDPC Encoder following the 3GPP NR Initiative [3GPPTS38212_LDPC]_
     including rate-matching.
@@ -162,6 +162,11 @@ class LDPC5GEncoder(Layer):
 
         n: int
             Defining the desired codeword length.
+
+        num_bits_per_symbol: int or None
+            Defining the number of bits per QAM symbol. If this parameter is
+            explicitly provided, the codeword will be interleaved after
+            rate-matching as specified in Sec. 5.4.2.2 in [3GPPTS38212_LDPC]_.
 
         dtype: tf.DType
             Defaults to `tf.float32`. Defines the output datatype of the layer
@@ -198,6 +203,17 @@ class LDPC5GEncoder(Layer):
             An integer defining the total information bit length
             (before zero removal) of the lifted parity-check matrix. Gap to
             ``k`` must be filled with so-called filler bits.
+
+        num_bits_per_symbol: int or None.
+            Defining the number of bits per QAM symbol. If this parameter is
+            explicitly provided, the codeword will be interleaved after
+            rate-matching as specified in Sec. 5.4.2.2 in [3GPPTS38212_LDPC]_.
+
+        out_int: [n], ndarray of int
+            Defining the rate-matching output interleaver sequence.
+
+        out_int_inv: [n], ndarray of int
+            Defining the inverse rate-matching output interleaver sequence.
 
         _check_input: bool
             A boolean that indicates whether the input vector
@@ -260,6 +276,7 @@ class LDPC5GEncoder(Layer):
     def __init__(self,
                  k,
                  n,
+                 num_bits_per_symbol=None,
                  dtype=tf.float32,
                  **kwargs):
 
@@ -329,6 +346,11 @@ class LDPC5GEncoder(Layer):
         self._pcm_c1_ind = self._mat_to_ind(pcm_c1)
         self._pcm_c2_ind = self._mat_to_ind(pcm_c2)
 
+        self._num_bits_per_symbol = num_bits_per_symbol
+        if num_bits_per_symbol is not None:
+            self._out_int, self._out_int_inv  = self._generate_out_int(self._n,
+                                                    self._num_bits_per_symbol)
+
     #########################################
     # Public methods and properties
     #########################################
@@ -368,9 +390,74 @@ class LDPC5GEncoder(Layer):
         """Lifting factor of the basegraph."""
         return self._z
 
+    @property
+    def num_bits_per_symbol(self):
+        """Modulation order used for the rate-matching output interleaver."""
+        return self._num_bits_per_symbol
+
+    @property
+    def out_int(self):
+        """Output interleaver sequence as defined in 5.4.2.2."""
+        return self._out_int
+    @property
+    def out_int_inv(self):
+        """Inverse output interleaver sequence as defined in 5.4.2.2."""
+        return self._out_int_inv
+
     #########################
     # Utility methods
     #########################
+
+    def _generate_out_int(self, n, num_bits_per_symbol):
+        """"Generates LDPC output interleaver sequence as defined in
+        Sec 5.4.2.2 in [3GPPTS38212_LDPC]_.
+
+        Parameters
+        ----------
+        n: int
+            Desired output sequence length.
+
+        num_bits_per_symbol: int
+            Number of symbols per QAM symbol, i.e., the modulation order.
+
+        Outputs
+        -------
+        (perm_seq, perm_seq_inv):
+            Tuple:
+
+        perm_seq: ndarray of length n
+            Containing the permuted indices.
+
+        perm_seq_inv: ndarray of length n
+            Containing the inverse permuted indices.
+
+        Note
+        ----
+        The interleaver pattern depends on the modulation order and helps to reduce
+        dependencies in bit-interleaved coded modulation (BICM) schemes.
+        """
+        # allow float inputs, but verify that they represent integer
+        assert(n%1==0), "n must be int."
+        assert(num_bits_per_symbol%1==0), "num_bits_per_symbol must be int."
+        n = int(n)
+        assert(n>0), "n must be a positive integer."
+        assert(num_bits_per_symbol>0), \
+                    "num_bits_per_symbol must be a positive integer."
+        num_bits_per_symbol = int(num_bits_per_symbol)
+
+        assert(n%num_bits_per_symbol==0),\
+            "n must be a multiple of num_bits_per_symbol."
+
+        # pattern as defined in Sec 5.4.2.2
+        perm_seq = np.zeros(n, dtype=int)
+        for j in range(int(n/num_bits_per_symbol)):
+            for i in range(num_bits_per_symbol):
+                perm_seq[i + j*num_bits_per_symbol] \
+                    = int(i * int(n/num_bits_per_symbol) + j)
+
+        perm_seq_inv = np.argsort(perm_seq)
+
+        return perm_seq, perm_seq_inv
 
     def _sel_basegraph(self, k, r):
         """Select basegraph according to [3GPPTS38212_LDPC]_."""
@@ -781,6 +868,11 @@ class LDPC5GEncoder(Layer):
         # (remaining parity bits can be used for IR-HARQ)
         c_short = tf.slice(c_no_filler, [0, 2*self._z], [batch_size, self.n])
         # incremental redundancy could be generated by accessing the last bits
+
+        # if num_bits_per_symbol is provided, apply output interleaver as
+        # specified in Sec. 5.4.2.2 in 38.212
+        if self._num_bits_per_symbol is not None:
+            c_short = tf.gather(c_short, self._out_int, axis=-1)
 
         # Reshape c_short so that it matches the original input dimensions
         output_shape = input_shape[0:-1] + [self.n]

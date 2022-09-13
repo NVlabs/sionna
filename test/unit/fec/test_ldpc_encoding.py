@@ -354,3 +354,27 @@ class TestLDPC5GEncoder(unittest.TestCase):
 
             self.assertTrue(np.array_equal(c_ref.numpy(), c_32.numpy()))
 
+    def test_ldpc_interleaver(self):
+        """Test that LDPC output interleaver pattern is correct."""
+
+        enc = LDPC5GEncoder(k=12, n=20)
+        #n,m
+        params = [[12,4], [100,2], [80, 8]]
+        for (n,m) in params:
+            s, s_inv = enc._generate_out_int(n, m)
+
+            idx = np.arange(n)
+            idx_p = idx[s]
+            idx_pp = idx_p[s_inv]
+            # test that interleaved vector is not the same
+            self.assertFalse(np.array_equal(idx, idx_p))
+            # test that interleaver can be inverted
+            self.assertTrue(np.array_equal(idx, idx_pp))
+
+        # test that for m=1 no interleaving happens
+        m = 1
+        for n in [10, 100, 1000]:
+            s, s_inv = enc._generate_out_int(n, m)
+            idx = np.arange(n)
+            self.assertTrue(np.array_equal(idx, s))
+            self.assertTrue(np.array_equal(idx, s_inv))

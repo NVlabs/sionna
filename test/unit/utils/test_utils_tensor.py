@@ -10,7 +10,8 @@ except ImportError as e:
     sys.path.append("../")
     import sionna as sn
 
-from sionna.utils.tensors import matrix_sqrt, matrix_inv, matrix_sqrt_inv, flatten_last_dims, flatten_dims
+from sionna.utils.misc import complex_normal
+from sionna.utils.tensors import matrix_sqrt, matrix_inv, matrix_sqrt_inv, matrix_pinv, flatten_last_dims, flatten_dims, expand_to_rank
 from sionna.channel import exp_corr_mat
 
 import unittest
@@ -226,3 +227,37 @@ class TestMatrixSqrtInv(unittest.TestCase):
 
         self.assertTrue(func(R64).dtype==tf.complex64)
         self.assertTrue(func(R128).dtype==tf.complex128)
+
+class TestMatrixPinv(unittest.TestCase):
+    """Unittest for the matrix_pinv function"""
+    def test_single_dim(self):
+        av = [0, 0.2, 0.9, 0.99]
+        n = 64
+        for a in av: 
+            A = complex_normal([n, n//2], dtype=tf.complex128)
+            A_pinv = matrix_pinv(A)
+            I = tf.matmul(A_pinv, A)
+            self.assertTrue(np.allclose(I, tf.eye(n//2, dtype=A.dtype)))
+
+    def test_multi_dim(self):
+        a = [2, 4, 3]
+        n = 32
+        A = complex_normal(a + [n, n//2], dtype=tf.complex128)
+        A_pinv = matrix_pinv(A)
+        I = tf.matmul(A_pinv, A)
+        I_target = tf.eye(n//2, dtype=A.dtype)
+        I_target = expand_to_rank(I_target, tf.rank(I), 0)
+        self.assertTrue(np.allclose(I, I_target))
+
+    def test_xla(self):
+        a = [2, 4, 3]
+        n = 32
+        A64 = complex_normal(a + [n, n//2], dtype=tf.complex64)
+        A128 = complex_normal(a + [n, n//2], dtype=tf.complex128)
+        sn.config.xla_compat=True
+        @tf.function(jit_compile=True)
+        def func(A):
+            return matrix_pinv(A)
+
+        self.assertTrue(func(A64).dtype==tf.complex64)
+        self.assertTrue(func(A128).dtype==tf.complex128)

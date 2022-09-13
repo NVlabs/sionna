@@ -36,3 +36,4 @@ For Experts
     examples/Autoencoder.ipynb
     examples/Weighted_BP_Algorithm.ipynb
     examples/CIR_Dataset.ipynb
+    examples/DeepMIMO.ipynb

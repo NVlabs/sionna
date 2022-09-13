@@ -12,5 +12,5 @@ from .modulator import OFDMModulator
 from .demodulator import OFDMDemodulator
 from .channel_estimation import LSChannelEstimator, NearestNeighborInterpolator, LinearInterpolator
 from .equalization import LMMSEEqualizer
-from .detection import MaximumLikelihoodDetector
+from .detection import MaximumLikelihoodDetector, MaximumLikelihoodDetectorWithPrior
 from .precoding import ZFPrecoder

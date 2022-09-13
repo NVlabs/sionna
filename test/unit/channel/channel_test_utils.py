@@ -1369,9 +1369,11 @@ def powers(model, submodel, batch_size, num_clusters, unscaled_tau, ds, k):
     p = np.exp(-unscaled_tau*(rt-1.)/(rt*ds))*np.power(10.0, -z/10.0)
     p = p / np.sum(p, axis=1, keepdims=True)
     if submodel == 'los':
-        p = p*(1./(k+1.))
-        p[:,:1] = p[:,:1] + k/(k+1.)
-    return p
+        p_angles = p*(1./(k+1.))
+        p_angles[:,:1] = p_angles[:,:1] + k/(k+1.)
+    else:
+        p_angles = p
+    return p, p_angles
 
 def aoa(model, submodel, batch_size, num_clusters, asa, p, los_aoa, k=None):
     """Reference implementation: AoA"""

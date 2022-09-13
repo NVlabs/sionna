@@ -140,16 +140,16 @@ class TestBPDecoding(unittest.TestCase):
         pcm, k, n, _ = load_parity_check_examples(2)
 
         dec = LDPCBPDecoder(pcm, num_iter=Niter)
-        dec2 = LDPCBPDecoder(pcm, num_iter=1, keep_state=True)
+        dec2 = LDPCBPDecoder(pcm, num_iter=1, stateful=True)
 
         llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
 
         res1 = dec(llr)
 
-        res2 = dec2(llr) # iter 0 to init msg_vn
+        res2, msg_vn = dec2([llr, None]) # iter 0 to init msg_vn
 
         for i in range(Niter-1): # remaining iterations
-            res2 = dec2(llr)
+            res2,_ = dec2([llr, msg_vn])
         # results must be the same, otherwise the internal state is not
         # correctly recovered
         self.assertTrue(np.allclose(res1,res2))
@@ -749,6 +749,67 @@ class TestBPDecoding5G(unittest.TestCase):
                 diff = tf.reduce_mean(tf.math.abs(x-x_ref)).numpy()
                 self.assertTrue(diff < 5e-2)
 
+    def test_pruning(self):
+        """Test output interleaver."""
 
+        bs = 10
+        source = BinarySource()
 
+        # k, n, m
+        params = [[12, 20, 1], [200, 250, 2], [345, 544, 4], [231, 808, 8]]
 
+        for (k,n,m) in params:
+            enc_ref = LDPC5GEncoder(k, n) # no mapper
+            enc = LDPC5GEncoder(k, n, m)
+            dec_ref = LDPC5GDecoder(enc_ref, cn_type="minsum")
+            dec = LDPC5GDecoder(enc, cn_type="minsum")
+            dec_cw = LDPC5GDecoder(enc, cn_type="minsum", return_infobits=False)
+
+            u = source([bs, k])
+            c = enc(u)
+            c_ref = enc_ref(u)
+            # emulate tx (no noise/scaling due to minsum required)
+            y = 2*c-1
+            y_ref = 2*c_ref-1
+
+            u_hat = dec(y)
+            c_hat = dec_cw(y)
+            u_hat_ref = dec_ref(y_ref)
+
+            self.assertTrue(np.array_equal(u_hat.numpy(),
+                                           u_hat_ref.numpy()))
+
+            # also verify that codeword is correctly returned
+            self.assertTrue(np.array_equal(c_hat.numpy(),
+                                           c.numpy()))
+
+            # and verify that c and c_ref are different for m>1
+            if m>1:
+                self.assertFalse(np.array_equal(c.numpy(),
+                                                c_ref.numpy()))
+
+    def test_int_state(self):
+        """Test internal state functionality of decoder.
+        This implies that Nx1 iterations yields exact same result as N
+        iterations."""
+        batch_size = 1
+        Niter = 5
+        k = 100
+        n = 200
+
+        enc = LDPC5GEncoder(k,n)
+        dec = LDPC5GDecoder(enc, num_iter=Niter)
+        dec2 = LDPC5GDecoder(enc, num_iter=1, stateful=True)
+
+        llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+
+        res1 = dec(llr)
+
+        res2, msg_vn = dec2([llr, None]) # iter 0 to init msg_vn
+
+        for i in range(Niter-1): # remaining iterations
+            res2, msg_vn = dec2([llr, msg_vn])
+            
+        # results must be the same, otherwise the internal state is not
+        # correctly recovered
+        self.assertTrue(np.allclose(res1,res2))

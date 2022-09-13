@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Layer
 
 class Scrambler(Layer):
     # pylint: disable=line-too-long
-    """Scrambler(seed=None, keep_batch_constant=False, binary=True keep_state=True, dtype=tf.float32, **kwargs)
+    r"""Scrambler(seed=None, keep_batch_constant=False, sequence=None, binary=True keep_state=True, dtype=tf.float32, **kwargs)
 
     Randomly flips the state/sign of a sequence of bits or LLRs, respectively.
 
@@ -29,6 +29,10 @@ class Scrambler(Layer):
             Defaults to False. If True, all samples in the batch are scrambled
             with the same scrambling sequence. Otherwise, per sample a random
             sequence is generated.
+
+        sequence: Array of 0s and 1s or None
+            If provided, the seed will be ignored and the explicit scrambling
+            sequence is used. Shape must be broadcastable to ``x``.
 
         binary: bool
             Defaults to True. Indicates whether bit-sequence should be flipped
@@ -107,12 +111,12 @@ class Scrambler(Layer):
 
         TypeError
             If `dtype` of ``x`` is not as expected.
-
     """
     def __init__(self,
                  seed=None,
                  keep_batch_constant=False,
                  binary=True,
+                 sequence=None,
                  keep_state=True,
                  dtype=tf.float32,
                  **kwargs):
@@ -128,6 +132,9 @@ class Scrambler(Layer):
         self._keep_batch_constant = keep_batch_constant
 
         if seed is not None:
+            if sequence is not None:
+                print("Note: explicit scrambling sequence provided. " \
+                      "Seed will be ignored.")
             assert isinstance(seed, int), "seed must be int."
         else:
             seed = int(np.random.uniform(0, 2**31-1))
@@ -143,6 +150,24 @@ class Scrambler(Layer):
         # if keep_state==True this seed is used to generate scrambling sequences
         self._seed = (1337, seed)
 
+        # if an explicit sequence is provided the above parameters will be
+        # ignored
+        self._sequence = None
+        if sequence is not None:
+            sequence = tf.cast(sequence, self.dtype)
+            # check that sequence is binary
+            tf.debugging.assert_equal(
+                tf.reduce_min(
+                    tf.cast(
+                        tf.logical_or(
+                            tf.equal(sequence, tf.constant(0, self.dtype)),
+                            tf.equal(sequence, tf.constant(1, self.dtype)),),
+                        self.dtype)),
+                tf.constant(1, self.dtype),
+                "Scrambling sequence must be binary.")
+            self._sequence = sequence
+
+
     #########################################
     # Public methods and properties
     #########################################
@@ -157,12 +182,17 @@ class Scrambler(Layer):
         """Indicates if new random sequences are used per call."""
         return self._keep_state
 
+    @property
+    def sequence(self):
+        """Explicit scrambling sequence if provided."""
+        return self._sequence
+
     #########################
     # Utility methods
     #########################
 
     def _generate_scrambling(self, input_shape, seed):
-        """Generates a random sequence of `0`s and `1`s that can be used
+        r"""Generates a random sequence of `0`s and `1`s that can be used
         to initialize a scrambler and updates the internal attributes.
         """
         if self._keep_batch_constant:
@@ -192,7 +222,7 @@ class Scrambler(Layer):
         pass
 
     def call(self, inputs):
-        """scrambling function.
+        r"""scrambling function.
 
         This function returns the scrambled version of ``inputs``.
 
@@ -263,7 +293,11 @@ class Scrambler(Layer):
                                      maxval=2**31-1,
                                      dtype=tf.int32)
 
-        rand_seq = self._generate_scrambling(input_shape, seed)
+        # apply sequence if explicit sequence is provided
+        if self._sequence is not None:
+            rand_seq = self._sequence
+        else:
+            rand_seq = self._generate_scrambling(input_shape, seed)
 
         if is_binary:
             # flipp the bits by substraction and map -1 to 1 via abs(.) operator
@@ -275,7 +309,7 @@ class Scrambler(Layer):
         return x_out
 
 class Descrambler(Layer):
-    """Descrambler(scrambler, binary=True, dtype=None, **kwargs)
+    r"""Descrambler(scrambler, binary=True, dtype=None, **kwargs)
 
     Descrambler for a given scrambler.
 
@@ -380,7 +414,7 @@ class Descrambler(Layer):
         pass
 
     def call(self, inputs):
-        """Descrambling function.
+        r"""Descrambling function.
 
         This function returns the descrambled version of ``inputs``.
 

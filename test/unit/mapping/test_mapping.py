@@ -26,6 +26,7 @@ from sionna.mapping import Constellation, Mapper, Demapper, DemapperWithPrior
 from sionna.mapping import SymbolDemapperWithPrior, SymbolDemapper
 from sionna.mapping import SymbolLogits2LLRsWithPrior, SymbolLogits2LLRs
 from sionna.mapping import SymbolLogits2Moments
+from sionna.mapping import LLRs2SymbolLogits
 from sionna.utils import BinarySource
 from sionna.channel import AWGN
 from scipy.special import softmax
@@ -66,7 +67,20 @@ class TestMapper(unittest.TestCase):
 
     def test_graph_mode(self):
         binary_source = BinarySource()
+
+        # simple precision
+
         mapper = Mapper("qam", 4)
+        @tf.function
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            return mapper(b)
+        self.assertEqual(run(100).shape, [100, 3, 100])
+        self.assertEqual(run(400).shape, [400, 3, 100])
+
+        # double precision
+
+        mapper = Mapper("qam", 4, dtype=tf.complex64)
         @tf.function
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
@@ -76,7 +90,20 @@ class TestMapper(unittest.TestCase):
 
     def test_graph_mode_jit(self):
         binary_source = BinarySource()
+
+        # simple precision
+
         mapper = Mapper("qam", 4)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            return mapper(b)
+        self.assertEqual(run(100).shape, [100, 3, 100])
+        self.assertEqual(run(400).shape, [400, 3, 100])
+
+        # double precision
+
+        mapper = Mapper("qam", 4, dtype=tf.complex64)
         @tf.function(jit_compile=True)
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
@@ -226,16 +253,35 @@ class TestDemapper(unittest.TestCase):
                 self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
 
     def test_graph_mode(self):
-        num_bits_per_symbol = 4
         binary_source = BinarySource()
-        mapper = Mapper("qam", num_bits_per_symbol)
+
+        # simple precision
+
+        constellation = Constellation("qam", 4)
+        mapper = Mapper(constellation=constellation)
         awgn = AWGN()
-        demapper = Demapper("app", "qam", num_bits_per_symbol)
+        demapper = Demapper("app", constellation=constellation)
         @tf.function
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            y = awgn([x, no])
+            return demapper([y, no])
+        self.assertEqual(run(100).shape, [100, 3, 400])
+        self.assertEqual(run(400).shape, [400, 3, 400])
+
+        # double precision
+
+        constellation = Constellation("qam", 4, dtype=tf.complex128)
+        mapper = Mapper(constellation=constellation, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = Demapper("app", constellation=constellation, dtype=tf.complex128)
+        @tf.function
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, no])
         self.assertEqual(run(100).shape, [100, 3, 400])
@@ -243,6 +289,9 @@ class TestDemapper(unittest.TestCase):
 
     def test_graph_mode_jit(self):
         binary_source = BinarySource()
+
+        # simple precision
+
         constellation = Constellation("qam", 4)
         mapper = Mapper(constellation=constellation)
         awgn = AWGN()
@@ -251,7 +300,23 @@ class TestDemapper(unittest.TestCase):
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            y = awgn([x, no])
+            return demapper([y, no])
+        self.assertEqual(run(100).shape, [100, 3, 400])
+        self.assertEqual(run(400).shape, [400, 3, 400])
+
+        # double precision
+
+        constellation = Constellation("qam", 4, dtype=tf.complex128)
+        mapper = Mapper(constellation=constellation, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = Demapper("app", constellation=constellation, dtype=tf.complex128)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, no])
         self.assertEqual(run(100).shape, [100, 3, 400])
@@ -455,17 +520,37 @@ class TestDemapperWithPrior(unittest.TestCase):
                 self.assertTrue(np.allclose(llrnp_maxlog, llrtarget_maxlog, atol=1e-5))
 
     def test_graph_mode(self):
-        num_bits_per_symbol = 4
         binary_source = BinarySource()
-        mapper = Mapper("qam", num_bits_per_symbol)
+
+        # simple precision
+
+        constellation = Constellation("qam", 4)
+        mapper = Mapper(constellation=constellation)
         awgn = AWGN()
-        demapper = DemapperWithPrior("app", "qam", num_bits_per_symbol)
+        demapper = DemapperWithPrior("app", constellation=constellation)
         @tf.function
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
-            prior = tf.random.normal([num_bits_per_symbol])
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            prior = tf.random.normal([4])
+            y = awgn([x, no])
+            return demapper([y, prior, no])
+        self.assertEqual(run(100).shape, [100, 3, 400])
+        self.assertEqual(run(400).shape, [400, 3, 400])
+
+        # double precision
+
+        constellation = Constellation("qam", 4, dtype=tf.complex128)
+        mapper = Mapper(constellation=constellation, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = DemapperWithPrior("app", constellation=constellation, dtype=tf.complex128)
+        @tf.function
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
+            prior = tf.random.normal([4], dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, prior, no])
         self.assertEqual(run(100).shape, [100, 3, 400])
@@ -473,6 +558,9 @@ class TestDemapperWithPrior(unittest.TestCase):
 
     def test_graph_mode_jit(self):
         binary_source = BinarySource()
+
+        # simple precision
+
         constellation = Constellation("qam", 4)
         mapper = Mapper(constellation=constellation)
         awgn = AWGN()
@@ -481,8 +569,25 @@ class TestDemapperWithPrior(unittest.TestCase):
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
             prior = tf.random.normal([4])
+            y = awgn([x, no])
+            return demapper([y, prior, no])
+        self.assertEqual(run(100).shape, [100, 3, 400])
+        self.assertEqual(run(400).shape, [400, 3, 400])
+
+        # double precision
+
+        constellation = Constellation("qam", 4, dtype=tf.complex128)
+        mapper = Mapper(constellation=constellation, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = DemapperWithPrior("app", constellation=constellation, dtype=tf.complex128)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
+            prior = tf.random.normal([4], dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, prior, no])
         self.assertEqual(run(100).shape, [100, 3, 400])
@@ -664,16 +769,36 @@ class TestSymbolDemapperWithPrior(unittest.TestCase):
         num_bits_per_symbol = 4
         num_points = 2**num_bits_per_symbol
         binary_source = BinarySource()
-        c = Constellation("qam", num_bits_per_symbol)
-        mapper = Mapper(constellation=c)
-        awgn = AWGN()
-        demapper = SymbolDemapperWithPrior(constellation=c)
+
+        # simple precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex64)
+        mapper = Mapper(constellation=c, dtype=tf.complex64)
+        awgn = AWGN(dtype=tf.complex64)
+        demapper = SymbolDemapperWithPrior(constellation=c, dtype=tf.complex64)
         @tf.function
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
-            prior = tf.random.normal([num_points])
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            prior = tf.random.normal([num_points], dtype=tf.float32)
+            y = awgn([x, no])
+            return demapper([y, prior, no])
+        self.assertEqual(run(100).shape, [100, 3, 100, 16])
+        self.assertEqual(run(400).shape, [400, 3, 100, 16])
+
+        # double precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex128)
+        mapper = Mapper(constellation=c, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = SymbolDemapperWithPrior(constellation=c, dtype=tf.complex128)
+        @tf.function
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
+            prior = tf.random.normal([num_points], dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, prior, no])
         self.assertEqual(run(100).shape, [100, 3, 100, 16])
@@ -683,16 +808,36 @@ class TestSymbolDemapperWithPrior(unittest.TestCase):
         num_bits_per_symbol = 4
         num_points = 2**num_bits_per_symbol
         binary_source = BinarySource()
-        c = Constellation("qam", num_bits_per_symbol)
-        mapper = Mapper(constellation=c)
-        awgn = AWGN()
-        demapper = SymbolDemapperWithPrior(constellation=c)
+
+        # simple precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex64)
+        mapper = Mapper(constellation=c, dtype=tf.complex64)
+        awgn = AWGN(dtype=tf.complex64)
+        demapper = SymbolDemapperWithPrior(constellation=c, dtype=tf.complex64)
         @tf.function(jit_compile=True)
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
-            prior = tf.random.normal([num_points])
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            prior = tf.random.normal([num_points], dtype=tf.float32)
+            y = awgn([x, no])
+            return demapper([y, prior, no])
+        self.assertEqual(run(100).shape, [100, 3, 100, 16])
+        self.assertEqual(run(400).shape, [400, 3, 100, 16])
+
+        # double precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex128)
+        mapper = Mapper(constellation=c, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = SymbolDemapperWithPrior(constellation=c, dtype=tf.complex128)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
+            prior = tf.random.normal([num_points], dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, prior, no])
         self.assertEqual(run(100).shape, [100, 3, 100, 16])
@@ -834,15 +979,34 @@ class TestSymbolDemapper(unittest.TestCase):
     def test_graph_mode(self):
         num_bits_per_symbol = 4
         binary_source = BinarySource()
-        c = Constellation("qam", num_bits_per_symbol)
-        mapper = Mapper(constellation=c)
-        awgn = AWGN()
-        demapper = SymbolDemapper(constellation=c)
+
+        # simple precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex64)
+        mapper = Mapper(constellation=c, dtype=tf.complex64)
+        awgn = AWGN(dtype=tf.complex64)
+        demapper = SymbolDemapper(constellation=c, dtype=tf.complex64)
         @tf.function
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            y = awgn([x, no])
+            return demapper([y, no])
+        self.assertEqual(run(100).shape, [100, 3, 100, 16])
+        self.assertEqual(run(400).shape, [400, 3, 100, 16])
+
+        # double precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex128)
+        mapper = Mapper(constellation=c, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = SymbolDemapper(constellation=c, dtype=tf.complex128)
+        @tf.function
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, no])
         self.assertEqual(run(100).shape, [100, 3, 100, 16])
@@ -851,15 +1015,34 @@ class TestSymbolDemapper(unittest.TestCase):
     def test_graph_mode_jit(self):
         num_bits_per_symbol = 4
         binary_source = BinarySource()
-        c = Constellation("qam", num_bits_per_symbol)
-        mapper = Mapper(constellation=c)
-        awgn = AWGN()
-        demapper = SymbolDemapper(constellation=c)
+
+        # simple precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex64)
+        mapper = Mapper(constellation=c, dtype=tf.complex64)
+        awgn = AWGN(dtype=tf.complex64)
+        demapper = SymbolDemapper(constellation=c, dtype=tf.complex64)
         @tf.function(jit_compile=True)
         def run(batch_size):
             b = binary_source([batch_size, 3, 400])
             x = mapper(b)
-            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=np.float32)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float32)
+            y = awgn([x, no])
+            return demapper([y, no])
+        self.assertEqual(run(100).shape, [100, 3, 100, 16])
+        self.assertEqual(run(400).shape, [400, 3, 100, 16])
+
+        # double precision
+
+        c = Constellation("qam", num_bits_per_symbol, dtype=tf.complex128)
+        mapper = Mapper(constellation=c, dtype=tf.complex128)
+        awgn = AWGN(dtype=tf.complex128)
+        demapper = SymbolDemapper(constellation=c, dtype=tf.complex128)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            b = binary_source([batch_size, 3, 400])
+            x = mapper(b)
+            no = tf.random.uniform(tf.shape(x), minval=0.01, maxval=100, dtype=tf.float64)
             y = awgn([x, no])
             return demapper([y, no])
         self.assertEqual(run(100).shape, [100, 3, 100, 16])
@@ -979,7 +1162,21 @@ class TestSymbolLogits2LLRsWithPrior(unittest.TestCase):
 
     def test_graph_mode(self):
         num_bits_per_symbol = 4
-        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+
+        # simple precision
+
+        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol, dtype=tf.float32)
+        @tf.function
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            prior = tf.random.normal([num_bits_per_symbol])
+            return l2l([logits, prior])
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+        # double precision
+
+        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol, dtype=tf.float64)
         @tf.function
         def run(batch_size):
             logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
@@ -990,7 +1187,21 @@ class TestSymbolLogits2LLRsWithPrior(unittest.TestCase):
 
     def test_graph_mode_jit(self):
         num_bits_per_symbol = 4
-        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol)
+
+        # simple precision
+
+        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol, dtype=tf.float32)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            prior = tf.random.normal([num_bits_per_symbol])
+            return l2l([logits, prior])
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+        # double precision
+
+        l2l = SymbolLogits2LLRsWithPrior("app", num_bits_per_symbol, dtype=tf.float64)
         @tf.function(jit_compile=True)
         def run(batch_size):
             logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
@@ -1060,7 +1271,20 @@ class TestSymbolLogits2LLRs(unittest.TestCase):
 
     def test_graph_mode(self):
         num_bits_per_symbol = 4
-        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol)
+
+        # simple precision
+
+        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol, dtype=tf.float32)
+        @tf.function
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2l(logits)
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+        # double precision
+
+        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol, dtype=tf.float64)
         @tf.function
         def run(batch_size):
             logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
@@ -1070,7 +1294,20 @@ class TestSymbolLogits2LLRs(unittest.TestCase):
 
     def test_graph_mode_jit(self):
         num_bits_per_symbol = 4
-        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol)
+
+        # simple precision
+
+        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol, dtype=tf.float32)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2l(logits)
+        self.assertEqual(run(100).shape, [100, 150, num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, num_bits_per_symbol])
+
+        # double precision
+
+        l2l = SymbolLogits2LLRs("app", num_bits_per_symbol, dtype=tf.float64)
         @tf.function(jit_compile=True)
         def run(batch_size):
             logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
@@ -1088,6 +1325,102 @@ class TestSymbolLogits2LLRs(unittest.TestCase):
         self.assertEqual(model([in1]).shape, [100, 150, 4])
         in1 = tf.random.normal([256, 150, 16])
         self.assertEqual(model([in1]).shape, [256, 150, 4])
+
+class TestLLRs2SymbolLogits(unittest.TestCase):
+
+    def test_output_dimensions1(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = LLRs2SymbolLogits(num_bits_per_symbol)
+            batch_size = 99
+            dim1 = 10
+            dim2 = 12
+            l = tf.random.uniform([batch_size, dim1, dim2, num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            llr = d(l)
+            self.assertEqual(llr.shape, [batch_size, dim1, dim2, 2**num_bits_per_symbol])
+
+    def test_output_dimensions2(self):
+        for num_bits_per_symbol in [1, 2, 4, 6]:
+            d = LLRs2SymbolLogits(num_bits_per_symbol)
+            batch_size = 99
+            l = tf.random.uniform([batch_size, num_bits_per_symbol],
+                                minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+            llr = d(l)
+            self.assertEqual(llr.shape, [batch_size, 2**num_bits_per_symbol])
+
+    def test_logits_calc(self):
+        "Test logits computation"
+
+        def sigmoid(x):
+            return 1. / (1. + np.exp(-x))
+
+        num_bits_per_symbol = 6
+        num_points = 2**num_bits_per_symbol
+        d = LLRs2SymbolLogits(num_bits_per_symbol)
+        llrs = tf.random.uniform([100, 10, num_bits_per_symbol],
+                                        minval=-20.0, maxval=20.0, dtype=tf.dtypes.float32)
+        logits = d(llrs)
+        for b in range(0, llrs.shape[0]):
+            for i in range(0, llrs.shape[1]):
+                logits_ref = np.sum(np.log(sigmoid(d._a*llrs[b,i])), axis=1)
+                self.assertTrue(np.allclose(logits[b,i].numpy(), logits_ref, atol=1e-5))
+
+    def test_graph_mode(self):
+        num_bits_per_symbol = 4
+
+        # simple precision
+
+        l2l = LLRs2SymbolLogits(num_bits_per_symbol, dtype=tf.float32)
+        @tf.function
+        def run(batch_size):
+            llrs = tf.random.normal([batch_size, 150, num_bits_per_symbol])
+            return l2l(llrs)
+        self.assertEqual(run(100).shape, [100, 150, 2**num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, 2**num_bits_per_symbol])
+
+        # double precision
+
+        l2l = LLRs2SymbolLogits(num_bits_per_symbol, dtype=tf.float64)
+        @tf.function
+        def run(batch_size):
+            llrs = tf.random.normal([batch_size, 150, num_bits_per_symbol])
+            return l2l(llrs)
+        self.assertEqual(run(100).shape, [100, 150, 2**num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, 2**num_bits_per_symbol])
+
+    def test_graph_mode_jit(self):
+        num_bits_per_symbol = 4
+
+        # simple precision
+
+        l2l = LLRs2SymbolLogits(num_bits_per_symbol, dtype=tf.float32)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            llrs = tf.random.normal([batch_size, 150, num_bits_per_symbol])
+            return l2l(llrs)
+        self.assertEqual(run(100).shape, [100, 150, 2**num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, 2**num_bits_per_symbol])
+
+        # double precision
+
+        l2l = LLRs2SymbolLogits(num_bits_per_symbol, dtype=tf.float64)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            llrs = tf.random.normal([batch_size, 150, num_bits_per_symbol])
+            return l2l(llrs)
+        self.assertEqual(run(100).shape, [100, 150, 2**num_bits_per_symbol])
+        self.assertEqual(run(400).shape, [400, 150, 2**num_bits_per_symbol])
+
+    def test_model_mode(self):
+        l2l = LLRs2SymbolLogits(4)
+        llrs = tf.keras.Input(shape=(150, 4), dtype=tf.float32)
+        logits = l2l(llrs)
+        model = tf.keras.Model(inputs=[llrs], outputs=logits)
+        model.compile()
+        in1 = tf.random.normal([100, 150, 4])
+        self.assertEqual(model([in1]).shape, [100, 150, 16])
+        in1 = tf.random.normal([256, 150, 4])
+        self.assertEqual(model([in1]).shape, [256, 150, 16])
 
 class TestSymbolLogits2Moments(unittest.TestCase):
     def test_output_dimensions1(self):
@@ -1127,14 +1460,33 @@ class TestSymbolLogits2Moments(unittest.TestCase):
         for l in range(0, logits.shape[0]):
             p = softmax(logits[l])
             m_ = np.sum(p*points)
-            v_ = np.sum(p*np.square(points-m_))
+            v_ = np.sum(p*np.square(np.abs(points-m_)))
 
             self.assertTrue(np.allclose(m[l], m_, atol=1e-5))
             self.assertTrue(np.allclose(v[l], v_, atol=1e-5))
 
     def test_graph_mode(self):
         num_bits_per_symbol = 4
-        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol)
+
+        # simple precision
+
+        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol, dtype=tf.float32)
+        @tf.function
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2m(logits)
+
+        m,v = run(100)
+        self.assertEqual(m.shape, [100, 150])
+        self.assertEqual(v.shape, [100, 150])
+
+        m,v = run(400)
+        self.assertEqual(m.shape, [400, 150])
+        self.assertEqual(v.shape, [400, 150])
+
+        # double precision
+
+        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol, dtype=tf.float64)
         @tf.function
         def run(batch_size):
             logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
@@ -1150,7 +1502,26 @@ class TestSymbolLogits2Moments(unittest.TestCase):
 
     def test_graph_mode_jit(self):
         num_bits_per_symbol = 4
-        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol)
+
+        # simple precision
+
+        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol, dtype=tf.float32)
+        @tf.function(jit_compile=True)
+        def run(batch_size):
+            logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])
+            return l2m(logits)
+
+        m,v = run(100)
+        self.assertEqual(m.shape, [100, 150])
+        self.assertEqual(v.shape, [100, 150])
+
+        m,v = run(400)
+        self.assertEqual(m.shape, [400, 150])
+        self.assertEqual(v.shape, [400, 150])
+
+        # double precision
+
+        l2m = SymbolLogits2Moments("qam", num_bits_per_symbol, dtype=tf.float64)
         @tf.function(jit_compile=True)
         def run(batch_size):
             logits = tf.random.normal([batch_size, 150, 2**num_bits_per_symbol])

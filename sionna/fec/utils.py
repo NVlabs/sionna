@@ -113,7 +113,8 @@ class GaussianPriorSource(Layer):
             1+D Tensor (``dtype``): Shape as defined by ``output_shape``.
         """
 
-        assert isinstance(inputs, list), "inputs must be a list."
+        assert isinstance(inputs, (list, tuple)), \
+                                "inputs must be a list or tuple."
         assert len(inputs)==2, "inputs must be a list with 2 elements."
         output_shape, noise_var = inputs
 
@@ -1330,7 +1331,7 @@ class LinearEncoder(Layer):
     @property
     def gm(self):
         "Generator matrix used for encoding."
-        return self._gn
+        return self._gm
 
     @property
     def coderate(self):
@@ -1358,3 +1359,214 @@ class LinearEncoder(Layer):
         c = tf.cast(c_bin, self.dtype)
 
         return c
+
+def generate_reg_ldpc(v, c, n, allow_flex_len=True, verbose=True):
+    r"""Generate random regular (v,c) LDPC codes.
+
+    This functions generates a random LDPC parity-check matrix of length ``n``
+    where each variable node (VN) has degree ``v`` and each check node (CN) has
+    degree ``c``. Please note that the LDPC code is not optimized to avoid
+    short cycles and the resulting codes may show a non-negligible error-floor.
+    For encoding, the :class:`~sionna.fec.utils.LinearEncoder` layer can be
+    used, however, the construction does not guarantee that the pcm has full
+    rank.
+
+    Input
+    -----
+    v : int
+        Desired variable node (VN) degree.
+
+    c : int
+        Desired check node (CN) degree.
+
+    n : int
+        Desired codeword length.
+
+    allow_flex_len: bool
+        Defaults to True. If True, the resulting codeword length can be
+        (slightly) increased.
+
+    verbose : bool
+        Defaults to True. If True, code parameters are printed.
+
+    Output
+    ------
+    (pcm, k, n, coderate):
+        Tuple:
+
+    pcm: ndarray
+        NumPy array of shape `[n-k, n]` containing the parity-check matrix.
+
+    k: int
+        Number of information bits per codeword.
+
+    n: int
+        Number of codewords bits.
+
+    coderate: float
+        Coderate of the code.
+
+
+    Note
+    ----
+    This algorithm works only for regular node degrees. For state-of-the-art
+    bit-error-rate performance, usually one needs to optimize irregular degree
+    profiles (see [tenBrink]_).
+    """
+
+    # check input values for consistency
+    assert isinstance(allow_flex_len, bool), \
+                                    'allow_flex_len must be bool.'
+
+    # allow slight change in n to keep num edges
+    # from CN and VN perspective an integer
+    if allow_flex_len:
+        for n_mod in range(n, n+2*c):
+            if np.mod((v/c) * n_mod, 1.)==0:
+                n = n_mod
+                if verbose:
+                    print("Setting n to: ", n)
+                break
+
+    # calculate number of nodes
+    coderate = 1 - (v/c)
+    n_v = n
+    n_c = int((v/c) * n)
+    k = n_v - n_c
+
+    # generate sockets
+    v_socks = np.tile(np.arange(n_v),v)
+    c_socks = np.tile(np.arange(n_c),c)
+    if verbose:
+        print("Number of edges (VN perspective): ", len(v_socks))
+        print("Number of edges (CN perspective): ", len(c_socks))
+    assert len(v_socks) == len(c_socks), "Number of edges from VN and CN " \
+        "perspective does not match. Consider to (slightly) change n."
+
+    # apply random permutations
+    np.random.shuffle(v_socks)
+    np.random.shuffle(c_socks)
+
+    # and generate matrix
+    pcm = np.zeros([n_c, n_v])
+
+    idx = 0
+    shuffle_max = 200 # stop if no success
+    shuffle_counter = 0
+    cont = True
+    while cont:
+        # if edge is available, take it
+        if pcm[c_socks[idx],v_socks[idx]]==0:
+            pcm[c_socks[idx],v_socks[idx]] = 1
+            idx +=1 # and go to next socket
+            shuffle_counter = 0 # reset counter
+            if idx==len(v_socks):
+                cont = False
+        else: # shuffle sockets
+            shuffle_counter+=1
+            if shuffle_counter<shuffle_max:
+                np.random.shuffle(v_socks[idx:])
+                np.random.shuffle(c_socks[idx:])
+            else:
+                print("Stopping - no solution found!")
+                cont=False
+
+    v_deg = np.sum(pcm, axis=0)
+    c_deg = np.sum(pcm, axis=1)
+
+    assert((v_deg==v).all()), "VN degree not always v."
+    assert((c_deg==c).all()), "CN degree not always c."
+
+    if verbose:
+        print(f"Generated regular ({v},{c}) LDPC code of length n={n}")
+        print(f"Code rate is r={coderate:.3f}.")
+        plt.spy(pcm)
+
+    return pcm, k, n, coderate
+
+def generate_prng_seq(length, n_rnti=0, n_id=0, c_init=None):
+    r"""Implements pseudo-random generator as defined in [3GPPTS38211_S]_.
+
+    The implementation follows Sec. 5.2.1 and 6.3.1.1 in [3GPPTS38211_S]_ and,
+    thus, the resulting sequence can be used for PUSCH scrambling.
+
+    Parameters
+    ----------
+    length: int
+        Desired output sequence length.
+
+    n_rnti: int
+        RNTI identifier provided by higher layer. Defaults to 0 and must be in
+        range `[0, 65535]`.
+
+    n_id: int
+        Scrambling ID related to cell id and provided by higher layer. Defaults
+        to 0 and must be in range `[0, 65535]`.
+
+    c_init: int or None
+        Initialization sequence of the PRNG. If explicitly provided, ``n_rnti``
+        and ``n_id`` will be ignored. Defaults to `None`.
+
+    Output
+    ------
+    :[length], ndarray of 0s and 1s
+        Containing the scrambling sequence.
+
+    Note
+    ----
+    The parameters radio network temporary identifier (RNTI) ``n_rnti`` and the
+    cell id ``n_id`` are usually provided be the higher layer protocols.
+    """
+
+    # check inputs for consistency
+    assert(length%1==0), "length must be integer."
+    length = int(length)
+    assert(length>0), "length must be a positive integer."
+
+    if c_init is None:
+        # allow floating inputs, but verify that it represent an integer value
+        assert(n_rnti%1==0), "n_rnti must be integer."
+        assert(n_id%1==0), "n_id must be integer."
+        n_rnti = int(n_rnti)
+        n_id = int(n_id)
+        assert(n_rnti>=0), "n_rnti must be in [0, 65535]."
+        assert(n_rnti<2**16), "n_rnti must be in [0, 65535]."
+        assert(n_id>=0), "n_id must be in [0, 65535]."
+        assert(n_id<2**16), "n_id must be in [0, 65535]."
+
+    # internal parameters
+    n_seq = 31 # length of gold sequence
+    n_c = 1600 # defined in 5.2.1 in 38.211
+
+    # init sequences
+    c = np.zeros(length)
+    x1 = np.zeros(length + n_c + n_seq)
+    x2 = np.zeros(length + n_c + n_seq)
+
+    if c_init is None:
+        # defined in 6.3.1.1 in 38.211
+        c_init = n_rnti * 2**15 + n_id
+    else:
+        assert(c_init%1==0), "c_init must be integer."
+        c_init = int(c_init)
+        assert(c_init<2**32), "c_init must be in [0, 2^32-1]."
+        assert(c_init>=0), "c_init must be in [0, 2^32-1]."
+
+    c_init = int2bin(c_init, n_seq)
+    c_init = np.flip(c_init) # reverse order
+
+    # init x1 and x2
+    x1[0] = 1
+    x2[0:n_seq] = c_init
+
+    # and run the generator
+    for idx in range(length + n_c):
+        # update x1 and x2
+        x1[idx+31] = np.mod(x1[idx+3] + x1[idx], 2)
+        x2[idx+31] = np.mod(x2[idx+3] + x2[idx+2] + x2[idx+1] + x2[idx], 2)
+
+    # and update output sequence
+    for idx in range(length):
+        c[idx] = np.mod(x1[idx+n_c] + x2[idx+n_c], 2)
+
+    return c

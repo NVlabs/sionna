@@ -532,7 +532,7 @@ class Polar5GEncoder(PolarEncoder):
         if k_target<=19:
             #n_pc = 3
             n_pc = 0 # Currently deactivated
-            print("Warning: For 12<=k<=20 additional 3 parity-check bits " \
+            print("Warning: For 12<=k<=19 additional 3 parity-check bits " \
                   "are defined in 38.212. They are currently not " \
                   "implemented by this encoder and, thus, ignored.")
             if n_target-k_target>175:

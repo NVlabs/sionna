@@ -94,3 +94,17 @@ all-tests-tf-2.9.1:
     reports:
       junit: test/report-tf-2.9.1.xml
   when: manual
+all-tests-tf-2.10.0:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.10.0-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.10.0.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.10.0.xml
+  when: manual

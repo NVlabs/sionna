@@ -23,6 +23,7 @@ if gpus:
         print(e)
 from sionna.fec.scrambling import Descrambler, Scrambler
 from sionna.utils import BinarySource
+from sionna.fec.utils import generate_prng_seq
 
 class TestScrambler(unittest.TestCase):
 
@@ -380,7 +381,7 @@ class TestScrambler(unittest.TestCase):
         assert (np.array_equal(b.numpy(), z.numpy()))
 
     def test_scrambler_binary(self):
-        """test that binary flag can be used as input"""
+        """Test that binary flag can be used as input"""
         seq_length = int(1e2)
         batch_size = int(1e1)
 
@@ -400,3 +401,45 @@ class TestScrambler(unittest.TestCase):
         assert (np.array_equal(x2.numpy(), x3.numpy())) # same seed
         # same but "bpsk modulated"
         assert (not np.array_equal(x1.numpy(), 0.5*(1+x4.numpy())))
+
+    def test_explicit_sequence(self):
+        """Test that explicit scrambling sequence can be provided."""
+
+        bs = 10
+        seq_length = 123
+
+        # with/ without implicit broadcasting
+        shapes = [[bs, seq_length], [seq_length]]
+        for s in shapes:
+            seq = np.ones(s)
+
+            x = np.zeros([bs, seq_length])
+            scrambler1 = Scrambler(seed=1245, sequence=seq, binary=True)
+            y1 = scrambler1(x)
+
+            # for all-zero input, output sequence equals scrambling sequence
+            if len(s)==1:
+                y = y1.numpy()[0,:] # if implicit broadcasting is tested
+            else:
+                y = y1
+            self.assertTrue(np.array_equal(seq, y))
+
+            # check that seed has no influence
+            scrambler2 = Scrambler(seed=1323, sequence=seq, binary=True)
+            y2 = scrambler2(x)
+            self.assertTrue(np.array_equal(y1.numpy(), y2.numpy()))
+
+        # test descrambler with new random sequence
+        seq = generate_prng_seq(seq_length, 1, 2)
+
+        for b in [True, False]:
+            scrambler = Scrambler(sequence=seq, binary=b)
+            descrambler = Descrambler(scrambler, binary=b)
+            x = np.ones([bs, seq_length])
+            y = scrambler(x)
+            y2 = scrambler([x, 1337]) # explicit seed should not have any impact
+            z = descrambler(y)
+
+            self.assertFalse(np.array_equal(x, y.numpy()))
+            self.assertTrue(np.array_equal(x, z.numpy()))
+            self.assertTrue(np.array_equal(y.numpy(), y2.numpy()))

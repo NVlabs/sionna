@@ -5,5 +5,5 @@
 """Docstring for the Convolutional codes subpackage.
 """
 from .encoding import ConvEncoder
-from .decoding import ViterbiDecoder
+from .decoding import ViterbiDecoder, BCJRDecoder
 from .utils import polynomial_selector, Trellis

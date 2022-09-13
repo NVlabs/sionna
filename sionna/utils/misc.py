@@ -10,7 +10,7 @@ from tensorflow.keras.layers import Layer
 from tensorflow.experimental.numpy import log10 as _log10
 from tensorflow.experimental.numpy import log2 as _log2
 from sionna.utils.metrics import count_errors, count_block_errors
-from sionna.mapping import Mapper
+from sionna.mapping import Mapper, Constellation
 import time
 from sionna import signal
 
@@ -238,15 +238,18 @@ class SymbolSource(Layer):
                  **kwargs
                 ):
         super().__init__(dtype=dtype, **kwargs)
-        self._num_bits_per_symbol = num_bits_per_symbol
+        constellation = Constellation.create_or_check_constellation(
+            constellation_type,
+            num_bits_per_symbol,
+            constellation,
+            dtype)
+        self._num_bits_per_symbol = constellation.num_bits_per_symbol
         self._return_indices = return_indices
         self._return_bits = return_bits
         self._binary_source = BinarySource(seed=seed, dtype=dtype.real_dtype)
-        self._mapper = Mapper(constellation_type,
-                              num_bits_per_symbol,
-                              constellation,
-                              return_indices,
-                              dtype)
+        self._mapper = Mapper(constellation=constellation,
+                              return_indices=return_indices,
+                              dtype=dtype)
 
     def call(self, inputs):
         shape = tf.concat([inputs, [self._num_bits_per_symbol]], axis=-1)

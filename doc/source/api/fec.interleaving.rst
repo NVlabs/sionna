@@ -3,8 +3,7 @@ Interleaving
 
 The interleaver module allows to permute tensors with either pseudo-random permutations or by row/column swapping.
 
-To simplify distributed graph execution (e.g., by running interleaver and deinterleaver in a different sub-graph/device), the interleavers are implemented stateless. Thus, the internal seed cannot be update on runtime and does not change after the initialization.
-However, if required an explicit random seed can be passed as additional input the interleaver/deinterleaver pair when calling the layer.
+To simplify distributed graph execution (e.g., by running interleaver and deinterleaver in a different sub-graph/device), the interleavers are implemented stateless. Thus, the internal seed cannot be updated on runtime and does not change after the initialization. However, if required, an explicit random seed can be passed as additional input to the interleaver/deinterleaver pair when calling the layer.
 
 The following code snippet shows how to setup and use an instance of the interleaver:
 
@@ -36,7 +35,6 @@ Interleaver
 
 RowColumnInterleaver
 --------------------
-
 .. autoclass:: sionna.fec.interleaving.RowColumnInterleaver
    :members:
    :exclude-members: call, build
@@ -47,8 +45,22 @@ RandomInterleaver
    :members:
    :exclude-members: call, build
 
+Turbo3GPPInterleaver
+--------------------
+.. autoclass:: sionna.fec.interleaving.Turbo3GPPInterleaver
+   :members:
+   :exclude-members: call, build
+
+
 Deinterleaver
 *************
 .. autoclass:: sionna.fec.interleaving.Deinterleaver
    :members:
    :exclude-members: call, build
+
+
+References:
+
+   .. [3GPPTS36212_I] ETSI 3GPP TS 36.212 "Evolved Universal Terrestrial
+      Radio Access (EUTRA); Multiplexing and channel coding", v.15.3.0, 2018-09.
+

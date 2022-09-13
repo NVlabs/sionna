@@ -7,6 +7,7 @@
 from . import ldpc
 from . import polar
 from . import conv
+from . import turbo
 from . import crc
 from . import scrambling
 from . import interleaving

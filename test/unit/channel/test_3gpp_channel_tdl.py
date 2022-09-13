@@ -134,12 +134,13 @@ class TestTDL(unittest.TestCase):
 
 
     @channel_test_on_models(('A', 'B', 'C', 'D', 'E'), ('foo',))
-    def test_pdl(self, model, submodel): # Submodel does not apply to TDL
+    def test_pdp(self, model, submodel): # Submodel does not apply to TDL
         """Test power delay profiles"""
         # Checking powers
         h = TestTDL.channel_coeff[model]
         p = np.mean(np.square(np.abs(h[:,:,0])), axis=0)
         ref_p = np.power(10.0, TDL_POWERS[model]/10.0)
+        ref_p = ref_p / np.sum(ref_p)
         max_err = np.max(np.abs(ref_p - p))
         self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'{model}')
         # Checking delays
@@ -153,13 +154,15 @@ class TestTDL(unittest.TestCase):
     def test_taps_powers_distributions(self, model, submodel):
         """Test the distribution of the taps powers"""
         ref_powers = np.power(10.0, TDL_POWERS[model]/10.0)
+        ref_powers = ref_powers / np.sum(ref_powers)
         h = TestTDL.channel_coeff[model]
         powers = np.abs(h)
         for i,p in enumerate(ref_powers):
             if i == 0 and (model == 'D' or model == 'E'):
                 K = np.power(10.0, TDL_RICIAN_K[model]/10.0)
-                s = np.sqrt(0.5/(1+K))
-                b = np.sqrt(K/(K+1))/s
+                P0 = ref_powers[0]
+                s = np.sqrt(0.5*P0/(1+K))
+                b = np.sqrt(K*2)
                 D,_ = kstest(   powers[:,i,0].flatten(),
                                 rice.cdf,
                                 args=(b, 0.0, s))
@@ -197,6 +200,7 @@ class TestTDL(unittest.TestCase):
         """Test the autocorrelation"""
         max_lag = TestTDL.NUM_TIME_STEPS//2
         ref_powers = np.power(10.0, TDL_POWERS[model]/10.0)
+        ref_powers = ref_powers / np.sum(ref_powers)
         time = np.arange(max_lag)/TestTDL.SAMPLING_FREQUENCY
         #
         for i, p in enumerate(ref_powers):
@@ -207,7 +211,7 @@ class TestTDL(unittest.TestCase):
                 #
                 K = np.power(10.0, TDL_RICIAN_K[model]/10.0)
                 ref_r = self.auto_complex_rice(TestTDL.MAX_DOPPLER, K,
-                                                TestTDL.LoS_AoA, time)
+                                                TestTDL.LoS_AoA, time)*p
                 max_err = np.max(np.abs(r - ref_r))
                 self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'{model}')
             else:
