@@ -221,3 +221,9 @@ MaximumLikelihoodDetector
 .. autoclass:: sionna.ofdm.MaximumLikelihoodDetector
    :exclude-members: call, build
    :members:
+
+MaximumLikelihoodDetectorWithPrior
+------------------------------------
+.. autoclass:: sionna.ofdm.MaximumLikelihoodDetectorWithPrior
+   :exclude-members: call, build
+   :members:

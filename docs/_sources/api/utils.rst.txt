@@ -74,7 +74,9 @@ matrix_inv
 ----------
 .. autofunction:: sionna.utils.matrix_inv
 
-
+matrix_pinv
+-----------
+.. autofunction:: sionna.utils.matrix_pinv
 
 Miscellaneous
 *************

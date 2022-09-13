@@ -62,9 +62,18 @@ SymbolDemapperWithPrior
    :exclude-members: call, build
    :members:
 
+Utility Functions
+*****************
+
 SymbolLogits2LLRs
 ------------------
 .. autoclass:: sionna.mapping.SymbolLogits2LLRs
+   :exclude-members: call, build
+   :members:
+
+LLRs2SymbolLogits
+------------------
+.. autoclass:: sionna.mapping.LLRs2SymbolLogits
    :exclude-members: call, build
    :members:
 

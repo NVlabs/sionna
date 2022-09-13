@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes &mdash; Sionna 0.10.0 documentation</title>
+  <title>5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes &mdash; Sionna 0.11.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -25,7 +25,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Bit-Interleaved Coded Modulation (BICM)" href="Bit_Interleaved_Coded_Modulation.html" />
-    <link rel="prev" title="Pulse-shaping Basics" href="Pulse_shaping_basics.html" /> 
+    <link rel="prev" title="Optical Channel with Lumped Amplification" href="Optical_Lumped_Amplification_Channel.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -129,6 +129,34 @@
 <li class="toctree-l4"><a class="reference internal" href="Pulse_shaping_basics.html#Recovering-the-QAM-symbols-through-matched-filtering-and-downsampling">Recovering the QAM symbols through matched filtering and downsampling</a></li>
 <li class="toctree-l4"><a class="reference internal" href="Pulse_shaping_basics.html#Investigating-the-ACLR">Investigating the ACLR</a></li>
 <li class="toctree-l4"><a class="reference internal" href="Pulse_shaping_basics.html#Windowing">Windowing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html">Optical Channel with Lumped Amplification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Setup">Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Impulse-Generation">Impulse Generation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Attenuation">Attenuation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Amplified-Spontaneous-Emission-Noise">Amplified Spontaneous Emission Noise</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Channel-Configuration">Channel Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Transmission">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Chromatic-Dispersion">Chromatic Dispersion</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#id1">Channel Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#id2">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Kerr-Nonlinearity">Kerr Nonlinearity</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Channel-configuration">Channel configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#id4">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#Split-Step-Fourier-Method">Split-Step Fourier Method</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#id5">Channel Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#id6">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html#References">References</a></li>
 </ul>
 </li>
 </ul>
@@ -252,6 +280,29 @@
 <li class="toctree-l4"><a class="reference internal" href="CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="DeepMIMO.html">Using the DeepMIMO Dataset with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="DeepMIMO.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DeepMIMO.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DeepMIMO.html#Configuration-of-DeepMIMO">Configuration of DeepMIMO</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="DeepMIMO.html#Visualization-of-the-dataset">Visualization of the dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="DeepMIMO.html#Using-DeepMIMO-with-Sionna">Using DeepMIMO with Sionna</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="DeepMIMO.html#Random-Sampling-of-Multi-User-Channels">Random Sampling of Multi-User Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="DeepMIMO.html#Link-level-Simulations-using-Sionna-and-DeepMIMO">Link-level Simulations using Sionna and DeepMIMO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="DeepMIMO.html#DeepMIMO-License-and-Citation">DeepMIMO License and Citation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
 </ul>
@@ -296,9 +347,21 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/fec.conv.html">Convolutional Codes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#bcjr-decoding">BCJR Decoding</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.conv.html#trellis">Trellis</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.turbo.html">Turbo Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.turbo.html#turbo-encoding">Turbo Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.turbo.html#turbo-decoding">Turbo Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/fec.turbo.html#turbo-utility-functions">Turbo Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.turbo.html#turbotermination">TurboTermination</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.turbo.html#polynomial-selector">polynomial_selector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.turbo.html#puncture-pattern">puncture_pattern</a></li>
 </ul>
 </li>
 </ul>
@@ -312,6 +375,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.interleaving.html#turbo3gppinterleaver">Turbo3GPPInterleaver</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
@@ -322,12 +386,13 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.scrambling.html#descrambler">Descrambler</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api/fec.utils.html">FEC Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/fec.utils.html">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#linearencoder">LinearEncoder</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#alist2mat">alist2mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#generate-reg-ldpc">generate_reg_ldpc</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#make-systematic">make_systematic</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#gm2pcm">gm2pcm</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#pcm2gm">pcm2gm</a></li>
@@ -342,6 +407,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#generate-prng-seq">generate_prng_seq</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#bin2int">bin2int</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
@@ -376,60 +442,79 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mapping.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#llrs2symbollogits">LLRs2SymbolLogits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../api/channel.html">Channel</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#awgn">AWGN</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#flat-fading-channel">Flat-fading channel</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#flatfadingchannel">FlatFadingChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#spatialcorrelation">SpatialCorrelation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#kroneckermodel">KroneckerModel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#percolumnmodel">PerColumnModel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.wireless.html">Wireless</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#awgn">AWGN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#percolumnmodel">PerColumnModel</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#channel-model-interface">Channel model interface</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#time-domain-channel">Time domain channel</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#timechannel">TimeChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#generatetimechannel">GenerateTimeChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#applytimechannel">ApplyTimeChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#cir-to-time-channel">cir_to_time_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#cir-to-time-channel">cir_to_time_channel</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#ofdmchannel">OFDMChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#generateofdmchannel">GenerateOFDMChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#applyofdmchannel">ApplyOFDMChannel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#rayleigh-block-fading">Rayleigh block fading</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#panelarray">PanelArray</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#antenna">Antenna</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#antennaarray">AntennaArray</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#panelarray">PanelArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#antenna">Antenna</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#external-datasets">External datasets</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/channel.html#utility-functions">Utility functions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#deg-2-rad">deg_2_rad</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#rad-2-deg">rad_2_deg</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#relocate-uts">relocate_uts</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#exp-corr-mat">exp_corr_mat</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/channel.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#external-datasets">External datasets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.wireless.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.wireless.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/channel.optical.html">Optical</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.optical.html#split-step-fourier-method">Split-step Fourier method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.optical.html#erbium-doped-fiber-amplifier">Erbium-doped fiber amplifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/channel.optical.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/channel.optical.html#time-frequency-vector">time_frequency_vector</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -469,6 +554,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/ofdm.html#detection">Detection</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/ofdm.html#maximumlikelihooddetectorwithprior">MaximumLikelihoodDetectorWithPrior</a></li>
 </ul>
 </li>
 </ul>
@@ -481,6 +567,54 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#zf-equalizer">zf_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#mf-equalizer">mf_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#maximumlikelihooddetectorwithprior">MaximumLikelihoodDetectorWithPrior</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#complex2real-vector">complex2real_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#real2complex-vector">real2complex_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#complex2real-matrix">complex2real_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#real2complex-matrix">real2complex_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#complex2real-covariance">complex2real_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#real2complex-covariance">real2complex_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#complex2real-channel">complex2real_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#real2complex-channel">real2complex_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/mimo.html#whiten-channel">whiten_channel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api/signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../api/signal.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/signal.html#empirical-aclr">empirical_aclr</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/mimo.html#detection">Detection</a><ul>
@@ -538,6 +672,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-inv">matrix_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#matrix-pinv">matrix_pinv</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/utils.html#miscellaneous">Miscellaneous</a><ul>
@@ -560,6 +695,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/config.html">Configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna/discussions">Discussions</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna/issues">Report an Issue</a></li>
 </ul>
 
         </div>
@@ -892,10 +1029,10 @@ div.rendered_html tbody tr:hover {
 </div><div class="section" id="5G-Channel-Coding-and-Rate-Matching:-Polar-vs. LDPC-Codes">
 <h1>5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes<a class="headerlink" href="#5G-Channel-Coding-and-Rate-Matching:-Polar-vs. LDPC-Codes" title="Permalink to this headline"></a></h1>
 <p><em>“For block lengths of about 500, an IBM 7090 computer requires about 0.1 seconds per iteration to decode a block by probabilistic decoding scheme. Consequently, many hours of computation time are necessary to evaluate even a</em> <span class="math notranslate nohighlight">\(P(e)\)</span> <em>in the order of</em> <span class="math notranslate nohighlight">\({10^{-4}}\)</span> <em>.”</em> Robert G. Gallager, 1963 [7]</p>
-<p>In this notebook, you will learn about the different coding schemes in 5G NR and how rate-matching works (cf. 3GPP TS 38.212 [3]). The coding schemes are compared under different length/rate settings and for different decoders. Further, we will demonstrate the basic functionality of the Sionna forward error correction (FEC) module which also includes support for Convolutional codes.</p>
+<p>In this notebook, you will learn about the different coding schemes in 5G NR and how rate-matching works (cf. 3GPP TS 38.212 [3]). The coding schemes are compared under different length/rate settings and for different decoders.</p>
 <p>You will learn about the following components:</p>
 <ul class="simple">
-<li><p>5G Low-density parity-checks (LDPC) codes [7]. These codes support - without further segmentation - up to <em>k=8448</em> information bits per codeword [3] for a wide range of coderates.</p></li>
+<li><p>5G low-density parity-checks (LDPC) codes [7]. These codes support - without further segmentation - up to <em>k=8448</em> information bits per codeword [3] for a wide range of coderates.</p></li>
 <li><p>Polar codes [1] including CRC concatenation and rate-matching for 5G compliant en-/decoding is implemented for the Polar uplink control channel (UCI) [3]. Besides Polar codes, Reed-Muller (RM) codes and several decoders are available:</p>
 <ul>
 <li><p>Successive cancellation (SC) decoding [1]</p></li>
@@ -904,9 +1041,14 @@ div.rendered_html tbody tr:hover {
 <li><p>Iterative belief propagation (BP) decoding [6]</p></li>
 </ul>
 </li>
-<li><p>Convolutional Codes with non-recursive encoding and Viterbi decoding.</p></li>
 </ul>
-<p>For further technical background we refer the interested reader to [4,5,8].</p>
+<p>Further, we will demonstrate the basic functionality of the Sionna forward error correction (FEC) module which also includes support for:</p>
+<ul class="simple">
+<li><p>Convolutional codes with non-recursive encoding and Viterbi/BCJR decoding</p></li>
+<li><p>Turbo codes and iterative BCJR decoding</p></li>
+<li><p>Interleaving and scrambling</p></li>
+</ul>
+<p>For additional technical background we refer the interested reader to [4,5,8].</p>
 <p>Please note that block segmentation is not implemented as it only concatenates multiple code blocks without increasing the effective codewords length (from decoder’s perspective).</p>
 <p>Some simulations in this notebook require severe simulation time, in particular if parameter sweeps are involved (e.g., different length comparisons). Please keep in mind that each cell in this notebook already contains the pre-computed outputs and no new execution is required to understand the examples.</p>
 <div class="section" id="Table-of-Contents">
@@ -984,7 +1126,8 @@ Only GPU number 0 used.
 <span class="kn">from</span> <span class="nn">sionna.fec.polar</span> <span class="kn">import</span> <span class="n">PolarEncoder</span><span class="p">,</span> <span class="n">Polar5GEncoder</span><span class="p">,</span> <span class="n">PolarSCLDecoder</span><span class="p">,</span> <span class="n">Polar5GDecoder</span><span class="p">,</span> <span class="n">PolarSCDecoder</span>
 <span class="kn">from</span> <span class="nn">sionna.fec.ldpc</span> <span class="kn">import</span> <span class="n">LDPC5GEncoder</span><span class="p">,</span> <span class="n">LDPC5GDecoder</span>
 <span class="kn">from</span> <span class="nn">sionna.fec.polar.utils</span> <span class="kn">import</span> <span class="n">generate_5g_ranking</span><span class="p">,</span> <span class="n">generate_rm_code</span>
-<span class="kn">from</span> <span class="nn">sionna.fec.conv</span> <span class="kn">import</span> <span class="n">ConvEncoder</span><span class="p">,</span> <span class="n">ViterbiDecoder</span>
+<span class="kn">from</span> <span class="nn">sionna.fec.conv</span> <span class="kn">import</span> <span class="n">ConvEncoder</span><span class="p">,</span> <span class="n">ViterbiDecoder</span><span class="p">,</span> <span class="n">BCJRDecoder</span>
+<span class="kn">from</span> <span class="nn">sionna.fec.turbo</span> <span class="kn">import</span> <span class="n">TurboEncoder</span><span class="p">,</span> <span class="n">TurboDecoder</span>
 <span class="kn">from</span> <span class="nn">sionna.utils</span> <span class="kn">import</span> <span class="n">BinarySource</span><span class="p">,</span> <span class="n">ebnodb2no</span>
 <span class="kn">from</span> <span class="nn">sionna.utils.metrics</span> <span class="kn">import</span>  <span class="n">count_block_errors</span>
 <span class="kn">from</span> <span class="nn">sionna.channel</span> <span class="kn">import</span> <span class="n">AWGN</span>
@@ -1151,6 +1294,8 @@ Only GPU number 0 used.
 <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;5G Polar SCL-8+CRC&quot;</span>
 <span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
 
+<span class="c1">### non-5G coding schemes</span>
+
 <span class="c1"># RM codes with SCL decoding</span>
 <span class="n">f</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">generate_rm_code</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span> <span class="c1"># equals k=64 and n=128 code</span>
 <span class="n">enc</span> <span class="o">=</span> <span class="n">PolarEncoder</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
@@ -1158,10 +1303,16 @@ Only GPU number 0 used.
 <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Reed Muller (RM) SCL-8&quot;</span>
 <span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
 
-<span class="c1"># Conv. Code with Viterbi decoding can be added here</span>
-<span class="n">enc</span> <span class="o">=</span> <span class="n">ConvEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="c1"># Conv. code with Viterbi decoding</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">ConvEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">dec</span> <span class="o">=</span> <span class="n">ViterbiDecoder</span><span class="p">(</span><span class="n">gen_poly</span><span class="o">=</span><span class="n">enc</span><span class="o">.</span><span class="n">gen_poly</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;soft_llr&quot;</span><span class="p">)</span>
-<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Convolutional (constraint length 8)&quot;</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Conv. Code Viterbi (constraint length 8)&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># Turbo. codes</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">TurboEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># no termination used due to the rate loss</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">TurboDecoder</span><span class="p">(</span><span class="n">enc</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Turbo Code (constraint length 4)&quot;</span>
 <span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -1174,13 +1325,14 @@ Only GPU number 0 used.
 Warning: 5G Polar codes use an integrated CRC that cannot be materialized with SC decoding and, thus, causes a degraded performance. Please consider SCL decoding instead.
 </pre></div></div>
 </div>
+<p><em>Remark</em>: some of the coding schemes are not 5G relevant, but are included in this comparison for the sake of completeness.</p>
 <p>Generate a new BER plot figure to save and plot simulation results efficiently.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">ber_plot128</span> <span class="o">=</span> <span class="n">PlotBER</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BER/BLER Performance of Short Length Codes (k=</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span></span><span class="n">ber_plot128</span> <span class="o">=</span> <span class="n">PlotBER</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Performance of Short Length Codes (k=</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1214,11 +1366,12 @@ Warning: 5G Polar codes use an integrated CRC that cannot be materialized with S
                          <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># the model returns hard-estimates</span>
                          <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># stop simulation if no error has been detected at current SNR point</span>
                          <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># we show the figure after all results are simulated</span>
-                         <span class="n">add_bler</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># in case BLER is also interresting</span>
+                         <span class="n">add_bler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># in case BLER is also interesting</span>
                          <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span> <span class="c1"># should be True in a loop</span>
 
 <span class="c1"># and show the figure</span>
-<span class="n">ber_plot128</span><span class="p">(</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># we set the ylim to 1e-5 as otherwise more extensive simualtions would be required for accurate curves.</span>
+<span class="n">ber_plot128</span><span class="p">(</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">show_bler</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># we set the ylim to 1e-5 as otherwise more extensive simulations would be required for accurate curves.</span>
+
 </pre></div>
 </div>
 </div>
@@ -1231,72 +1384,86 @@ Warning: 5G Polar codes use an integrated CRC that cannot be materialized with S
  Running: 5G LDPC BP-20
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6762e-01 | 8.6230e-01 |      107276 |      640000 |         8623 |       10000 |         3.1 |reached target bit errors
-      0.5 | 1.2668e-01 | 7.0080e-01 |       81072 |      640000 |         7008 |       10000 |         0.2 |reached target bit errors
-      1.0 | 8.8381e-02 | 5.0850e-01 |       56564 |      640000 |         5085 |       10000 |         0.2 |reached target bit errors
-      1.5 | 5.1327e-02 | 3.0140e-01 |       32849 |      640000 |         3014 |       10000 |         0.2 |reached target bit errors
-      2.0 | 2.4441e-02 | 1.5000e-01 |       15642 |      640000 |         1500 |       10000 |         0.2 |reached target bit errors
-      2.5 | 1.1047e-02 | 6.6900e-02 |        7070 |      640000 |          669 |       10000 |         0.2 |reached target bit errors
-      3.0 | 3.1813e-03 | 2.0400e-02 |        2036 |      640000 |          204 |       10000 |         0.2 |reached target bit errors
-      3.5 | 1.1750e-03 | 7.2500e-03 |        1504 |     1280000 |          145 |       20000 |         0.3 |reached target bit errors
-      4.0 | 1.9746e-04 | 1.1500e-03 |        1011 |     5120000 |           92 |       80000 |         1.3 |reached target bit errors
-      4.5 | 4.7335e-05 | 2.7059e-04 |        1030 |    21760000 |           92 |      340000 |         5.7 |reached target bit errors
+      0.0 | 1.6828e-01 | 8.6910e-01 |      107696 |      640000 |         8691 |       10000 |         2.3 |reached target bit errors
+      0.5 | 1.2593e-01 | 6.9640e-01 |       80594 |      640000 |         6964 |       10000 |         0.1 |reached target bit errors
+      1.0 | 8.6875e-02 | 5.0830e-01 |       55600 |      640000 |         5083 |       10000 |         0.1 |reached target bit errors
+      1.5 | 5.0580e-02 | 3.0430e-01 |       32371 |      640000 |         3043 |       10000 |         0.1 |reached target bit errors
+      2.0 | 2.4297e-02 | 1.4930e-01 |       15550 |      640000 |         1493 |       10000 |         0.1 |reached target bit errors
+      2.5 | 1.0675e-02 | 6.6200e-02 |        6832 |      640000 |          662 |       10000 |         0.1 |reached target bit errors
+      3.0 | 3.8984e-03 | 2.5500e-02 |        2495 |      640000 |          255 |       10000 |         0.1 |reached target bit errors
+      3.5 | 8.4609e-04 | 5.7500e-03 |        1083 |     1280000 |          115 |       20000 |         0.2 |reached target bit errors
+      4.0 | 2.6432e-04 | 1.6000e-03 |        1015 |     3840000 |           96 |       60000 |         0.6 |reached target bit errors
+      4.5 | 3.3355e-05 | 2.3061e-04 |        1046 |    31360000 |          113 |      490000 |         4.6 |reached target bit errors
 
  Running: 5G Polar SC
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 4.1174e-01 | 9.5580e-01 |      263513 |      640000 |         9558 |       10000 |         4.5 |reached target bit errors
-      0.5 | 3.6789e-01 | 8.9710e-01 |      235448 |      640000 |         8971 |       10000 |         0.0 |reached target bit errors
-      1.0 | 3.1250e-01 | 7.9800e-01 |      199997 |      640000 |         7980 |       10000 |         0.0 |reached target bit errors
-      1.5 | 2.4535e-01 | 6.5360e-01 |      157021 |      640000 |         6536 |       10000 |         0.0 |reached target bit errors
-      2.0 | 1.7537e-01 | 4.9130e-01 |      112239 |      640000 |         4913 |       10000 |         0.0 |reached target bit errors
-      2.5 | 1.0894e-01 | 3.0680e-01 |       69719 |      640000 |         3068 |       10000 |         0.0 |reached target bit errors
-      3.0 | 5.8573e-02 | 1.7010e-01 |       37487 |      640000 |         1701 |       10000 |         0.0 |reached target bit errors
-      3.5 | 2.7363e-02 | 8.1200e-02 |       17512 |      640000 |          812 |       10000 |         0.0 |reached target bit errors
-      4.0 | 9.6125e-03 | 2.9400e-02 |        6152 |      640000 |          294 |       10000 |         0.0 |reached target bit errors
-      4.5 | 3.5313e-03 | 1.0400e-02 |        2260 |      640000 |          104 |       10000 |         0.0 |reached target bit errors
+      0.0 | 4.0717e-01 | 9.5040e-01 |      260590 |      640000 |         9504 |       10000 |         4.9 |reached target bit errors
+      0.5 | 3.6886e-01 | 8.9410e-01 |      236069 |      640000 |         8941 |       10000 |         0.0 |reached target bit errors
+      1.0 | 3.1433e-01 | 7.9630e-01 |      201171 |      640000 |         7963 |       10000 |         0.0 |reached target bit errors
+      1.5 | 2.4457e-01 | 6.5050e-01 |      156528 |      640000 |         6505 |       10000 |         0.0 |reached target bit errors
+      2.0 | 1.7356e-01 | 4.8280e-01 |      111080 |      640000 |         4828 |       10000 |         0.0 |reached target bit errors
+      2.5 | 1.1146e-01 | 3.1880e-01 |       71335 |      640000 |         3188 |       10000 |         0.0 |reached target bit errors
+      3.0 | 5.9687e-02 | 1.7420e-01 |       38200 |      640000 |         1742 |       10000 |         0.0 |reached target bit errors
+      3.5 | 2.6588e-02 | 7.9800e-02 |       17016 |      640000 |          798 |       10000 |         0.0 |reached target bit errors
+      4.0 | 1.0742e-02 | 3.2900e-02 |        6875 |      640000 |          329 |       10000 |         0.0 |reached target bit errors
+      4.5 | 3.8188e-03 | 1.1600e-02 |        2444 |      640000 |          116 |       10000 |         0.0 |reached target bit errors
 
  Running: 5G Polar SCL-8+CRC
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 3.3803e-01 | 7.8850e-01 |      216338 |      640000 |         7885 |       10000 |        17.9 |reached target bit errors
-      0.5 | 2.6220e-01 | 6.3680e-01 |      167808 |      640000 |         6368 |       10000 |         2.3 |reached target bit errors
-      1.0 | 1.7055e-01 | 4.3020e-01 |      109155 |      640000 |         4302 |       10000 |         2.3 |reached target bit errors
-      1.5 | 9.5353e-02 | 2.4630e-01 |       61026 |      640000 |         2463 |       10000 |         2.3 |reached target bit errors
-      2.0 | 3.8448e-02 | 1.0340e-01 |       24607 |      640000 |         1034 |       10000 |         2.3 |reached target bit errors
-      2.5 | 1.2464e-02 | 3.4400e-02 |        7977 |      640000 |          344 |       10000 |         2.3 |reached target bit errors
-      3.0 | 2.4672e-03 | 6.9000e-03 |        1579 |      640000 |           69 |       10000 |         2.3 |reached target bit errors
-      3.5 | 4.4922e-04 | 1.3000e-03 |        1150 |     2560000 |           52 |       40000 |         9.1 |reached target bit errors
-      4.0 | 3.8986e-05 | 1.2439e-04 |        1023 |    26240000 |           51 |      410000 |        93.9 |reached target bit errors
-      4.5 | 2.3437e-06 | 8.0000e-06 |         150 |    64000000 |            8 |     1000000 |       229.2 |reached max iter
+      0.0 | 3.4099e-01 | 7.9280e-01 |      218235 |      640000 |         7928 |       10000 |        16.5 |reached target bit errors
+      0.5 | 2.6363e-01 | 6.3760e-01 |      168722 |      640000 |         6376 |       10000 |         2.3 |reached target bit errors
+      1.0 | 1.7447e-01 | 4.3760e-01 |      111662 |      640000 |         4376 |       10000 |         2.3 |reached target bit errors
+      1.5 | 9.0636e-02 | 2.4000e-01 |       58007 |      640000 |         2400 |       10000 |         2.3 |reached target bit errors
+      2.0 | 3.9188e-02 | 1.0500e-01 |       25080 |      640000 |         1050 |       10000 |         2.3 |reached target bit errors
+      2.5 | 1.1811e-02 | 3.2800e-02 |        7559 |      640000 |          328 |       10000 |         2.3 |reached target bit errors
+      3.0 | 3.6297e-03 | 1.0300e-02 |        2323 |      640000 |          103 |       10000 |         2.3 |reached target bit errors
+      3.5 | 5.1094e-04 | 1.4250e-03 |        1308 |     2560000 |           57 |       40000 |         9.2 |reached target bit errors
+      4.0 | 4.5402e-05 | 1.4571e-04 |        1017 |    22400000 |           51 |      350000 |        80.6 |reached target bit errors
+      4.5 | 1.8594e-06 | 5.0000e-06 |         119 |    64000000 |            5 |     1000000 |       232.3 |reached max iter
 
  Running: Reed Muller (RM) SCL-8
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 2.6597e-01 | 6.4090e-01 |      170222 |      640000 |         6409 |       10000 |        14.0 |reached target bit errors
-      0.5 | 1.8829e-01 | 4.6790e-01 |      120506 |      640000 |         4679 |       10000 |         2.0 |reached target bit errors
-      1.0 | 1.1390e-01 | 2.8950e-01 |       72893 |      640000 |         2895 |       10000 |         2.0 |reached target bit errors
-      1.5 | 5.7955e-02 | 1.4910e-01 |       37091 |      640000 |         1491 |       10000 |         2.0 |reached target bit errors
-      2.0 | 2.3456e-02 | 6.0100e-02 |       15012 |      640000 |          601 |       10000 |         2.0 |reached target bit errors
-      2.5 | 6.7000e-03 | 1.8800e-02 |        4288 |      640000 |          188 |       10000 |         2.0 |reached target bit errors
-      3.0 | 1.5875e-03 | 4.1000e-03 |        1016 |      640000 |           41 |       10000 |         2.0 |reached target bit errors
-      3.5 | 2.3281e-04 | 7.0000e-04 |        1043 |     4480000 |           49 |       70000 |        13.9 |reached target bit errors
-      4.0 | 3.9258e-05 | 1.0500e-04 |        1005 |    25600000 |           42 |      400000 |        79.8 |reached target bit errors
-      4.5 | 9.6875e-07 | 3.0000e-06 |          62 |    64000000 |            3 |     1000000 |       201.2 |reached max iter
+      0.0 | 2.7252e-01 | 6.4890e-01 |      174412 |      640000 |         6489 |       10000 |        13.0 |reached target bit errors
+      0.5 | 1.9537e-01 | 4.7770e-01 |      125038 |      640000 |         4777 |       10000 |         2.0 |reached target bit errors
+      1.0 | 1.1646e-01 | 2.9560e-01 |       74532 |      640000 |         2956 |       10000 |         2.0 |reached target bit errors
+      1.5 | 5.8455e-02 | 1.5240e-01 |       37411 |      640000 |         1524 |       10000 |         2.0 |reached target bit errors
+      2.0 | 2.3052e-02 | 5.9200e-02 |       14753 |      640000 |          592 |       10000 |         2.0 |reached target bit errors
+      2.5 | 6.8781e-03 | 1.9400e-02 |        4402 |      640000 |          194 |       10000 |         2.0 |reached target bit errors
+      3.0 | 1.7984e-03 | 5.0000e-03 |        1151 |      640000 |           50 |       10000 |         2.0 |reached target bit errors
+      3.5 | 2.7969e-04 | 8.0000e-04 |        1074 |     3840000 |           48 |       60000 |        12.0 |reached target bit errors
+      4.0 | 2.8947e-05 | 8.5965e-05 |        1056 |    36480000 |           49 |      570000 |       116.1 |reached target bit errors
+      4.5 | 2.2188e-06 | 6.0000e-06 |         142 |    64000000 |            6 |     1000000 |       202.1 |reached max iter
 
- Running: Convolutional (constraint length 8)
+ Running: Conv. Code Viterbi (constraint length 8)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6271e-01 | 6.9830e-01 |      104137 |      640000 |         6983 |       10000 |         8.2 |reached target bit errors
-      0.5 | 1.0728e-01 | 5.4720e-01 |       68657 |      640000 |         5472 |       10000 |         0.5 |reached target bit errors
-      1.0 | 6.2152e-02 | 4.0920e-01 |       39777 |      640000 |         4092 |       10000 |         0.5 |reached target bit errors
-      1.5 | 3.2234e-02 | 2.7740e-01 |       20630 |      640000 |         2774 |       10000 |         0.5 |reached target bit errors
-      2.0 | 1.5927e-02 | 1.8470e-01 |       10193 |      640000 |         1847 |       10000 |         0.5 |reached target bit errors
-      2.5 | 8.1156e-03 | 1.2370e-01 |        5194 |      640000 |         1237 |       10000 |         0.5 |reached target bit errors
-      3.0 | 3.9625e-03 | 7.7200e-02 |        2536 |      640000 |          772 |       10000 |         0.5 |reached target bit errors
-      3.5 | 2.0719e-03 | 4.8900e-02 |        1326 |      640000 |          489 |       10000 |         0.5 |reached target bit errors
-      4.0 | 1.1336e-03 | 3.2550e-02 |        1451 |     1280000 |          651 |       20000 |         1.0 |reached target bit errors
-      4.5 | 6.1042e-04 | 1.9833e-02 |        1172 |     1920000 |          595 |       30000 |         1.5 |reached target bit errors
+      0.0 | 1.6722e-01 | 7.0050e-01 |      107019 |      640000 |         7005 |       10000 |         1.9 |reached target bit errors
+      0.5 | 1.0500e-01 | 5.4520e-01 |       67202 |      640000 |         5452 |       10000 |         0.5 |reached target bit errors
+      1.0 | 6.2780e-02 | 4.0730e-01 |       40179 |      640000 |         4073 |       10000 |         0.5 |reached target bit errors
+      1.5 | 3.2813e-02 | 2.7360e-01 |       21000 |      640000 |         2736 |       10000 |         0.5 |reached target bit errors
+      2.0 | 1.6231e-02 | 1.8770e-01 |       10388 |      640000 |         1877 |       10000 |         0.5 |reached target bit errors
+      2.5 | 8.0641e-03 | 1.2020e-01 |        5161 |      640000 |         1202 |       10000 |         0.5 |reached target bit errors
+      3.0 | 4.0719e-03 | 7.8700e-02 |        2606 |      640000 |          787 |       10000 |         0.5 |reached target bit errors
+      3.5 | 1.8828e-03 | 4.7900e-02 |        1205 |      640000 |          479 |       10000 |         0.5 |reached target bit errors
+      4.0 | 1.0883e-03 | 3.1250e-02 |        1393 |     1280000 |          625 |       20000 |         1.0 |reached target bit errors
+      4.5 | 6.1979e-04 | 1.9433e-02 |        1190 |     1920000 |          583 |       30000 |         1.5 |reached target bit errors
+
+ Running: Turbo Code (constraint length 4)
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 1.0993e-01 | 7.9340e-01 |       70355 |      640000 |         7934 |       10000 |         3.8 |reached target bit errors
+      0.5 | 7.7438e-02 | 6.1670e-01 |       49560 |      640000 |         6167 |       10000 |         1.3 |reached target bit errors
+      1.0 | 4.6153e-02 | 3.9800e-01 |       29538 |      640000 |         3980 |       10000 |         1.3 |reached target bit errors
+      1.5 | 2.3166e-02 | 2.0600e-01 |       14826 |      640000 |         2060 |       10000 |         1.3 |reached target bit errors
+      2.0 | 9.9047e-03 | 9.5000e-02 |        6339 |      640000 |          950 |       10000 |         1.3 |reached target bit errors
+      2.5 | 3.1516e-03 | 3.0900e-02 |        2017 |      640000 |          309 |       10000 |         1.3 |reached target bit errors
+      3.0 | 7.6615e-04 | 9.6333e-03 |        1471 |     1920000 |          289 |       30000 |         3.9 |reached target bit errors
+      3.5 | 1.6047e-04 | 2.3900e-03 |        1027 |     6400000 |          239 |      100000 |        12.9 |reached target bit errors
+      4.0 | 2.8964e-05 | 6.4444e-04 |        1001 |    34560000 |          348 |      540000 |        69.6 |reached target bit errors
+      4.5 | 6.6875e-06 | 2.1500e-04 |         428 |    64000000 |          215 |     1000000 |       128.7 |reached max iter
 </pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
@@ -1304,6 +1471,23 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_13_1.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_13_1.png" />
+</div>
+</div>
+<p>And let’s also look at the block-error-rate.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">ber_plot128</span><span class="p">(</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">1e-5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">show_ber</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_15_0.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_15_0.png" />
 </div>
 </div>
 <p>Please keep in mind that the decoding complexity differs significantly and should be also included in a fair comparison as shown in Section <a class="reference external" href="#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a>.</p>
@@ -1390,150 +1574,150 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 Running: 5G LDPC BP-20 (n=128)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.7180e-01 | 8.7500e-01 |       10995 |       64000 |          875 |        1000 |         1.7 |reached target block errors
-     0.25 | 1.4388e-01 | 7.7000e-01 |        9208 |       64000 |          770 |        1000 |         0.1 |reached target block errors
-      0.5 | 1.3167e-01 | 7.2400e-01 |        8427 |       64000 |          724 |        1000 |         0.1 |reached target block errors
-     0.75 | 1.0187e-01 | 5.9600e-01 |        6520 |       64000 |          596 |        1000 |         0.1 |reached target block errors
-      1.0 | 9.3469e-02 | 5.1500e-01 |        5982 |       64000 |          515 |        1000 |         0.1 |reached target block errors
-     1.25 | 7.0898e-02 | 4.1600e-01 |        9075 |      128000 |          832 |        2000 |         0.2 |reached target block errors
-      1.5 | 5.0445e-02 | 3.0850e-01 |        6457 |      128000 |          617 |        2000 |         0.2 |reached target block errors
-     1.75 | 3.5255e-02 | 2.1833e-01 |        6769 |      192000 |          655 |        3000 |         0.4 |reached target block errors
-      2.0 | 2.5977e-02 | 1.6000e-01 |        6650 |      256000 |          640 |        4000 |         0.5 |reached target block errors
-     2.25 | 1.7125e-02 | 1.0080e-01 |        5480 |      320000 |          504 |        5000 |         0.6 |reached target block errors
-      2.5 | 1.0391e-02 | 6.6500e-02 |        5320 |      512000 |          532 |        8000 |         1.0 |reached target block errors
-     2.75 | 6.0770e-03 | 3.7714e-02 |        5445 |      896000 |          528 |       14000 |         1.7 |reached target block errors
-      3.0 | 3.4570e-03 | 2.1500e-02 |        5310 |     1536000 |          516 |       24000 |         2.9 |reached target block errors
-     3.25 | 1.7745e-03 | 1.1364e-02 |        4997 |     2816000 |          500 |       44000 |         5.4 |reached target block errors
-      3.5 | 9.3678e-04 | 5.7586e-03 |        5216 |     5568000 |          501 |       87000 |        10.6 |reached target block errors
-     3.75 | 4.4719e-04 | 2.8700e-03 |        2862 |     6400000 |          287 |      100000 |        12.2 |reached max iter
-      4.0 | 1.9547e-04 | 1.2900e-03 |        1251 |     6400000 |          129 |      100000 |        12.3 |reached max iter
-     4.25 | 9.9844e-05 | 6.0000e-04 |         639 |     6400000 |           60 |      100000 |        12.3 |reached max iter
-      4.5 | 2.5938e-05 | 1.5000e-04 |         166 |     6400000 |           15 |      100000 |        12.2 |reached max iter
-     4.75 | 1.6250e-05 | 1.2000e-04 |         104 |     6400000 |           12 |      100000 |        12.3 |reached max iter
+      0.0 | 1.6914e-01 | 8.6600e-01 |       10825 |       64000 |          866 |        1000 |         1.0 |reached target block errors
+     0.25 | 1.4652e-01 | 7.8400e-01 |        9377 |       64000 |          784 |        1000 |         0.1 |reached target block errors
+      0.5 | 1.2748e-01 | 7.2800e-01 |        8159 |       64000 |          728 |        1000 |         0.1 |reached target block errors
+     0.75 | 1.0242e-01 | 6.0000e-01 |        6555 |       64000 |          600 |        1000 |         0.1 |reached target block errors
+      1.0 | 8.1711e-02 | 4.8800e-01 |       10459 |      128000 |          976 |        2000 |         0.1 |reached target block errors
+     1.25 | 6.5227e-02 | 3.8400e-01 |        8349 |      128000 |          768 |        2000 |         0.1 |reached target block errors
+      1.5 | 5.1398e-02 | 3.0700e-01 |        6579 |      128000 |          614 |        2000 |         0.1 |reached target block errors
+     1.75 | 3.6177e-02 | 2.1933e-01 |        6946 |      192000 |          658 |        3000 |         0.2 |reached target block errors
+      2.0 | 2.5227e-02 | 1.4900e-01 |        6458 |      256000 |          596 |        4000 |         0.2 |reached target block errors
+     2.25 | 1.6531e-02 | 1.0200e-01 |        5290 |      320000 |          510 |        5000 |         0.3 |reached target block errors
+      2.5 | 1.0494e-02 | 6.6250e-02 |        5373 |      512000 |          530 |        8000 |         0.4 |reached target block errors
+     2.75 | 6.5373e-03 | 4.0385e-02 |        5439 |      832000 |          525 |       13000 |         0.7 |reached target block errors
+      3.0 | 3.5675e-03 | 2.2773e-02 |        5023 |     1408000 |          501 |       22000 |         1.2 |reached target block errors
+     3.25 | 1.8422e-03 | 1.2195e-02 |        4834 |     2624000 |          500 |       41000 |         2.3 |reached target block errors
+      3.5 | 9.0968e-04 | 6.1341e-03 |        4774 |     5248000 |          503 |       82000 |         4.8 |reached target block errors
+     3.75 | 4.7891e-04 | 2.9900e-03 |        3065 |     6400000 |          299 |      100000 |         5.6 |reached max iter
+      4.0 | 1.8422e-04 | 1.1300e-03 |        1179 |     6400000 |          113 |      100000 |         5.6 |reached max iter
+     4.25 | 1.1438e-04 | 7.4000e-04 |         732 |     6400000 |           74 |      100000 |         5.6 |reached max iter
+      4.5 | 5.5313e-05 | 3.5000e-04 |         354 |     6400000 |           35 |      100000 |         5.7 |reached max iter
+     4.75 | 1.1094e-05 | 9.0000e-05 |          71 |     6400000 |            9 |      100000 |         5.6 |reached max iter
 Running: 5G LDPC BP-20 (n=256)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6766e-01 | 9.4100e-01 |       21461 |      128000 |          941 |        1000 |         1.7 |reached target block errors
-     0.25 | 1.3638e-01 | 8.5800e-01 |       17457 |      128000 |          858 |        1000 |         0.1 |reached target block errors
-      0.5 | 1.1913e-01 | 7.5800e-01 |       15249 |      128000 |          758 |        1000 |         0.1 |reached target block errors
-     0.75 | 9.3391e-02 | 6.1000e-01 |       11954 |      128000 |          610 |        1000 |         0.1 |reached target block errors
-      1.0 | 7.0117e-02 | 5.0800e-01 |        8975 |      128000 |          508 |        1000 |         0.1 |reached target block errors
-     1.25 | 4.3648e-02 | 3.3750e-01 |       11174 |      256000 |          675 |        2000 |         0.2 |reached target block errors
-      1.5 | 3.2805e-02 | 2.5250e-01 |        8398 |      256000 |          505 |        2000 |         0.3 |reached target block errors
-     1.75 | 1.9049e-02 | 1.5175e-01 |        9753 |      512000 |          607 |        4000 |         0.5 |reached target block errors
-      2.0 | 9.5000e-03 | 7.8000e-02 |        8512 |      896000 |          546 |        7000 |         0.9 |reached target block errors
-     2.25 | 4.7530e-03 | 4.0769e-02 |        7909 |     1664000 |          530 |       13000 |         1.6 |reached target block errors
-      2.5 | 1.9638e-03 | 1.9037e-02 |        6787 |     3456000 |          514 |       27000 |         3.4 |reached target block errors
-     2.75 | 8.6914e-04 | 7.8750e-03 |        7120 |     8192000 |          504 |       64000 |         8.2 |reached target block errors
-      3.0 | 3.1523e-04 | 3.1900e-03 |        4035 |    12800000 |          319 |      100000 |        12.9 |reached max iter
-     3.25 | 1.0836e-04 | 1.0700e-03 |        1387 |    12800000 |          107 |      100000 |        12.7 |reached max iter
-      3.5 | 3.0547e-05 | 3.4000e-04 |         391 |    12800000 |           34 |      100000 |        12.6 |reached max iter
-     3.75 | 7.5781e-06 | 1.1000e-04 |          97 |    12800000 |           11 |      100000 |        12.6 |reached max iter
-      4.0 | 1.6406e-06 | 2.0000e-05 |          21 |    12800000 |            2 |      100000 |        12.7 |reached max iter
-     4.25 | 7.8125e-08 | 1.0000e-05 |           1 |    12800000 |            1 |      100000 |        12.6 |reached max iter
-      4.5 | 0.0000e+00 | 0.0000e+00 |           0 |    12800000 |            0 |      100000 |        12.6 |reached max iter
+      0.0 | 1.6655e-01 | 9.4200e-01 |       21318 |      128000 |          942 |        1000 |         1.0 |reached target block errors
+     0.25 | 1.4567e-01 | 8.8100e-01 |       18646 |      128000 |          881 |        1000 |         0.1 |reached target block errors
+      0.5 | 1.2033e-01 | 7.7200e-01 |       15402 |      128000 |          772 |        1000 |         0.1 |reached target block errors
+     0.75 | 9.4398e-02 | 6.3800e-01 |       12083 |      128000 |          638 |        1000 |         0.1 |reached target block errors
+      1.0 | 6.7824e-02 | 4.9150e-01 |       17363 |      256000 |          983 |        2000 |         0.1 |reached target block errors
+     1.25 | 4.6043e-02 | 3.5300e-01 |       11787 |      256000 |          706 |        2000 |         0.1 |reached target block errors
+      1.5 | 3.1776e-02 | 2.4000e-01 |       12202 |      384000 |          720 |        3000 |         0.2 |reached target block errors
+     1.75 | 1.8992e-02 | 1.5250e-01 |        9724 |      512000 |          610 |        4000 |         0.2 |reached target block errors
+      2.0 | 9.2221e-03 | 8.0857e-02 |        8263 |      896000 |          566 |        7000 |         0.4 |reached target block errors
+     2.25 | 4.7396e-03 | 4.2083e-02 |        7280 |     1536000 |          505 |       12000 |         0.7 |reached target block errors
+      2.5 | 2.2689e-03 | 1.9808e-02 |        7551 |     3328000 |          515 |       26000 |         1.5 |reached target block errors
+     2.75 | 9.2346e-04 | 8.5424e-03 |        6974 |     7552000 |          504 |       59000 |         3.5 |reached target block errors
+      3.0 | 3.2531e-04 | 3.0000e-03 |        4164 |    12800000 |          300 |      100000 |         5.8 |reached max iter
+     3.25 | 1.2242e-04 | 1.1500e-03 |        1567 |    12800000 |          115 |      100000 |         5.9 |reached max iter
+      3.5 | 3.8672e-05 | 4.0000e-04 |         495 |    12800000 |           40 |      100000 |         5.9 |reached max iter
+     3.75 | 8.5938e-06 | 1.2000e-04 |         110 |    12800000 |           12 |      100000 |         5.8 |reached max iter
+      4.0 | 1.5625e-06 | 2.0000e-05 |          20 |    12800000 |            2 |      100000 |         5.8 |reached max iter
+     4.25 | 3.1250e-07 | 1.0000e-05 |           4 |    12800000 |            1 |      100000 |         5.9 |reached max iter
+      4.5 | 0.0000e+00 | 0.0000e+00 |           0 |    12800000 |            0 |      100000 |         5.9 |reached max iter
 
 Simulation stopped as no error occurred @ EbNo = 4.5 dB.
 
 Running: 5G LDPC BP-20 (n=512)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6161e-01 | 9.7900e-01 |       41373 |      256000 |          979 |        1000 |         1.9 |reached target block errors
-     0.25 | 1.4127e-01 | 9.3400e-01 |       36165 |      256000 |          934 |        1000 |         0.1 |reached target block errors
-      0.5 | 1.0675e-01 | 8.2200e-01 |       27329 |      256000 |          822 |        1000 |         0.1 |reached target block errors
-     0.75 | 7.3688e-02 | 6.5800e-01 |       18864 |      256000 |          658 |        1000 |         0.1 |reached target block errors
-      1.0 | 4.8832e-02 | 4.4650e-01 |       25002 |      512000 |          893 |        2000 |         0.3 |reached target block errors
-     1.25 | 2.9234e-02 | 2.8000e-01 |       14968 |      512000 |          560 |        2000 |         0.3 |reached target block errors
-      1.5 | 1.3806e-02 | 1.4800e-01 |       14137 |     1024000 |          592 |        4000 |         0.5 |reached target block errors
-     1.75 | 5.7049e-03 | 6.2222e-02 |       13144 |     2304000 |          560 |        9000 |         1.2 |reached target block errors
-      2.0 | 2.0737e-03 | 2.4429e-02 |       11148 |     5376000 |          513 |       21000 |         2.8 |reached target block errors
-     2.25 | 5.9503e-04 | 7.5075e-03 |       10206 |    17152000 |          503 |       67000 |         9.0 |reached target block errors
-      2.5 | 1.2836e-04 | 1.8300e-03 |        3286 |    25600000 |          183 |      100000 |        13.4 |reached max iter
-     2.75 | 2.4922e-05 | 3.9000e-04 |         638 |    25600000 |           39 |      100000 |        13.5 |reached max iter
-      3.0 | 2.5781e-06 | 5.0000e-05 |          66 |    25600000 |            5 |      100000 |        13.6 |reached max iter
-     3.25 | 1.1719e-06 | 2.0000e-05 |          30 |    25600000 |            2 |      100000 |        13.6 |reached max iter
-      3.5 | 0.0000e+00 | 0.0000e+00 |           0 |    25600000 |            0 |      100000 |        13.5 |reached max iter
+      0.0 | 1.6162e-01 | 9.7100e-01 |       41376 |      256000 |          971 |        1000 |         1.0 |reached target block errors
+     0.25 | 1.3645e-01 | 9.3300e-01 |       34931 |      256000 |          933 |        1000 |         0.1 |reached target block errors
+      0.5 | 1.1016e-01 | 8.3000e-01 |       28202 |      256000 |          830 |        1000 |         0.1 |reached target block errors
+     0.75 | 7.9887e-02 | 6.6900e-01 |       20451 |      256000 |          669 |        1000 |         0.1 |reached target block errors
+      1.0 | 5.1861e-02 | 4.6150e-01 |       26553 |      512000 |          923 |        2000 |         0.1 |reached target block errors
+     1.25 | 2.9461e-02 | 2.8550e-01 |       15084 |      512000 |          571 |        2000 |         0.1 |reached target block errors
+      1.5 | 1.4026e-02 | 1.4900e-01 |       14363 |     1024000 |          596 |        4000 |         0.3 |reached target block errors
+     1.75 | 5.2413e-03 | 5.8667e-02 |       12076 |     2304000 |          528 |        9000 |         0.6 |reached target block errors
+      2.0 | 1.9423e-03 | 2.3810e-02 |       10442 |     5376000 |          500 |       21000 |         1.3 |reached target block errors
+     2.25 | 6.3080e-04 | 7.9063e-03 |       10335 |    16384000 |          506 |       64000 |         4.1 |reached target block errors
+      2.5 | 1.5441e-04 | 2.0400e-03 |        3953 |    25600000 |          204 |      100000 |         6.4 |reached max iter
+     2.75 | 3.3320e-05 | 5.1000e-04 |         853 |    25600000 |           51 |      100000 |         6.3 |reached max iter
+      3.0 | 4.7266e-06 | 1.3000e-04 |         121 |    25600000 |           13 |      100000 |         6.4 |reached max iter
+     3.25 | 2.3438e-07 | 2.0000e-05 |           6 |    25600000 |            2 |      100000 |         6.4 |reached max iter
+      3.5 | 0.0000e+00 | 0.0000e+00 |           0 |    25600000 |            0 |      100000 |         6.4 |reached max iter
 
 Simulation stopped as no error occurred @ EbNo = 3.5 dB.
 
 Running: 5G LDPC BP-20 (n=1000)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6446e-01 | 9.9900e-01 |       82231 |      500000 |          999 |        1000 |         1.8 |reached target block errors
-     0.25 | 1.3742e-01 | 9.8700e-01 |       68708 |      500000 |          987 |        1000 |         0.2 |reached target block errors
-      0.5 | 1.0849e-01 | 9.3000e-01 |       54247 |      500000 |          930 |        1000 |         0.2 |reached target block errors
-     0.75 | 6.5318e-02 | 7.0800e-01 |       32659 |      500000 |          708 |        1000 |         0.2 |reached target block errors
-      1.0 | 3.4620e-02 | 4.7650e-01 |       34620 |     1000000 |          953 |        2000 |         0.3 |reached target block errors
-     1.25 | 1.3432e-02 | 2.2133e-01 |       20148 |     1500000 |          664 |        3000 |         0.5 |reached target block errors
-      1.5 | 3.6594e-03 | 7.4571e-02 |       12808 |     3500000 |          522 |        7000 |         1.1 |reached target block errors
-     1.75 | 8.3038e-04 | 1.9462e-02 |       10795 |    13000000 |          506 |       26000 |         4.0 |reached target block errors
-      2.0 | 1.3702e-04 | 3.5300e-03 |        6851 |    50000000 |          353 |      100000 |        15.4 |reached max iter
-     2.25 | 1.6860e-05 | 5.4000e-04 |         843 |    50000000 |           54 |      100000 |        15.3 |reached max iter
-      2.5 | 7.0000e-07 | 6.0000e-05 |          35 |    50000000 |            6 |      100000 |        15.3 |reached max iter
-     2.75 | 1.8000e-07 | 2.0000e-05 |           9 |    50000000 |            2 |      100000 |        15.4 |reached max iter
-      3.0 | 0.0000e+00 | 0.0000e+00 |           0 |    50000000 |            0 |      100000 |        15.4 |reached max iter
+      0.0 | 1.6359e-01 | 9.9800e-01 |       81793 |      500000 |          998 |        1000 |         1.0 |reached target block errors
+     0.25 | 1.3874e-01 | 9.8100e-01 |       69368 |      500000 |          981 |        1000 |         0.1 |reached target block errors
+      0.5 | 9.9932e-02 | 9.0700e-01 |       49966 |      500000 |          907 |        1000 |         0.1 |reached target block errors
+     0.75 | 6.5646e-02 | 7.0900e-01 |       32823 |      500000 |          709 |        1000 |         0.1 |reached target block errors
+      1.0 | 3.3873e-02 | 4.6600e-01 |       33873 |     1000000 |          932 |        2000 |         0.2 |reached target block errors
+     1.25 | 1.3356e-02 | 2.2533e-01 |       20034 |     1500000 |          676 |        3000 |         0.2 |reached target block errors
+      1.5 | 4.1151e-03 | 7.8000e-02 |       14403 |     3500000 |          546 |        7000 |         0.6 |reached target block errors
+     1.75 | 7.8215e-04 | 1.9308e-02 |       10168 |    13000000 |          502 |       26000 |         2.1 |reached target block errors
+      2.0 | 1.1394e-04 | 3.3300e-03 |        5697 |    50000000 |          333 |      100000 |         7.9 |reached max iter
+     2.25 | 1.1760e-05 | 4.9000e-04 |         588 |    50000000 |           49 |      100000 |         7.9 |reached max iter
+      2.5 | 1.1600e-06 | 5.0000e-05 |          58 |    50000000 |            5 |      100000 |         7.9 |reached max iter
+     2.75 | 8.2000e-07 | 2.0000e-05 |          41 |    50000000 |            2 |      100000 |         7.9 |reached max iter
+      3.0 | 0.0000e+00 | 0.0000e+00 |           0 |    50000000 |            0 |      100000 |         7.9 |reached max iter
 
 Simulation stopped as no error occurred @ EbNo = 3.0 dB.
 
 Running: 5G LDPC BP-20 (n=2000)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6060e-01 | 1.0000e+00 |      160599 |     1000000 |         1000 |        1000 |         1.9 |reached target block errors
-     0.25 | 1.3341e-01 | 9.9900e-01 |      133413 |     1000000 |          999 |        1000 |         0.2 |reached target block errors
-      0.5 | 9.7059e-02 | 9.6300e-01 |       97059 |     1000000 |          963 |        1000 |         0.2 |reached target block errors
-     0.75 | 5.6781e-02 | 8.1700e-01 |       56781 |     1000000 |          817 |        1000 |         0.2 |reached target block errors
-      1.0 | 1.9386e-02 | 4.5700e-01 |       38772 |     2000000 |          914 |        2000 |         0.4 |reached target block errors
-     1.25 | 4.1585e-03 | 1.5250e-01 |       16634 |     4000000 |          610 |        4000 |         0.7 |reached target block errors
-      1.5 | 4.6005e-04 | 2.4524e-02 |        9661 |    21000000 |          515 |       21000 |         3.9 |reached target block errors
-     1.75 | 2.3720e-05 | 2.0000e-03 |        2372 |   100000000 |          200 |      100000 |        18.1 |reached max iter
-      2.0 | 8.2000e-07 | 1.3000e-04 |          82 |   100000000 |           13 |      100000 |        18.0 |reached max iter
-     2.25 | 0.0000e+00 | 0.0000e+00 |           0 |   100000000 |            0 |      100000 |        18.1 |reached max iter
+      0.0 | 1.5922e-01 | 1.0000e+00 |      159218 |     1000000 |         1000 |        1000 |         1.3 |reached target block errors
+     0.25 | 1.3586e-01 | 1.0000e+00 |      135862 |     1000000 |         1000 |        1000 |         0.1 |reached target block errors
+      0.5 | 9.8168e-02 | 9.7100e-01 |       98168 |     1000000 |          971 |        1000 |         0.1 |reached target block errors
+     0.75 | 5.4171e-02 | 8.0800e-01 |       54171 |     1000000 |          808 |        1000 |         0.1 |reached target block errors
+      1.0 | 1.9121e-02 | 4.5550e-01 |       38243 |     2000000 |          911 |        2000 |         0.2 |reached target block errors
+     1.25 | 4.1725e-03 | 1.5675e-01 |       16690 |     4000000 |          627 |        4000 |         0.4 |reached target block errors
+      1.5 | 4.1236e-04 | 2.3000e-02 |        9072 |    22000000 |          506 |       22000 |         2.4 |reached target block errors
+     1.75 | 2.9270e-05 | 2.3000e-03 |        2927 |   100000000 |          230 |      100000 |        11.0 |reached max iter
+      2.0 | 8.2000e-07 | 1.7000e-04 |          82 |   100000000 |           17 |      100000 |        11.0 |reached max iter
+     2.25 | 1.0000e-08 | 1.0000e-05 |           1 |   100000000 |            1 |      100000 |        10.9 |reached max iter
+      2.5 | 0.0000e+00 | 0.0000e+00 |           0 |   100000000 |            0 |      100000 |        10.9 |reached max iter
 
-Simulation stopped as no error occurred @ EbNo = 2.2 dB.
+Simulation stopped as no error occurred @ EbNo = 2.5 dB.
 
 Running: 5G LDPC BP-20 (n=4000)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.6137e-01 | 1.0000e+00 |      322747 |     2000000 |         1000 |        1000 |         2.2 |reached target block errors
-     0.25 | 1.3826e-01 | 1.0000e+00 |      276521 |     2000000 |         1000 |        1000 |         0.2 |reached target block errors
-      0.5 | 9.9494e-02 | 9.9800e-01 |      198988 |     2000000 |          998 |        1000 |         0.3 |reached target block errors
-     0.75 | 5.1064e-02 | 9.2600e-01 |      102129 |     2000000 |          926 |        1000 |         0.2 |reached target block errors
-      1.0 | 1.2627e-02 | 5.4100e-01 |       25253 |     2000000 |          541 |        1000 |         0.2 |reached target block errors
-     1.25 | 8.3508e-04 | 9.7667e-02 |       10021 |    12000000 |          586 |        6000 |         1.5 |reached target block errors
-      1.5 | 2.2270e-05 | 4.9600e-03 |        4454 |   200000000 |          496 |      100000 |        25.0 |reached max iter
-     1.75 | 6.5000e-07 | 1.1000e-04 |         130 |   200000000 |           11 |      100000 |        25.0 |reached max iter
-      2.0 | 0.0000e+00 | 0.0000e+00 |           0 |   200000000 |            0 |      100000 |        25.0 |reached max iter
+      0.0 | 1.6200e-01 | 1.0000e+00 |      323995 |     2000000 |         1000 |        1000 |         1.3 |reached target block errors
+     0.25 | 1.3757e-01 | 1.0000e+00 |      275132 |     2000000 |         1000 |        1000 |         0.2 |reached target block errors
+      0.5 | 9.8322e-02 | 9.9800e-01 |      196644 |     2000000 |          998 |        1000 |         0.2 |reached target block errors
+     0.75 | 4.9637e-02 | 9.1400e-01 |       99274 |     2000000 |          914 |        1000 |         0.2 |reached target block errors
+      1.0 | 1.0812e-02 | 5.2700e-01 |       21624 |     2000000 |          527 |        1000 |         0.2 |reached target block errors
+     1.25 | 9.5500e-04 | 1.0020e-01 |        9550 |    10000000 |          501 |        5000 |         0.9 |reached target block errors
+      1.5 | 2.3473e-05 | 5.5385e-03 |        4272 |   182000000 |          504 |       91000 |        16.1 |reached target block errors
+     1.75 | 2.3500e-07 | 7.0000e-05 |          47 |   200000000 |            7 |      100000 |        17.6 |reached max iter
+      2.0 | 0.0000e+00 | 0.0000e+00 |           0 |   200000000 |            0 |      100000 |        17.6 |reached max iter
 
 Simulation stopped as no error occurred @ EbNo = 2.0 dB.
 
 Running: 5G LDPC BP-20 (n=8000)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.3771e-01 | 1.0000e+00 |      550851 |     4000000 |         1000 |        1000 |         2.6 |reached target block errors
-     0.25 | 1.1157e-01 | 1.0000e+00 |      446266 |     4000000 |         1000 |        1000 |         0.5 |reached target block errors
-      0.5 | 7.4160e-02 | 9.9900e-01 |      296639 |     4000000 |          999 |        1000 |         0.5 |reached target block errors
-     0.75 | 2.6825e-02 | 9.5000e-01 |      107301 |     4000000 |          950 |        1000 |         0.5 |reached target block errors
-      1.0 | 2.8053e-03 | 4.1600e-01 |       22442 |     8000000 |          832 |        2000 |         0.9 |reached target block errors
-     1.25 | 3.2990e-05 | 1.9308e-02 |        3431 |   104000000 |          502 |       26000 |        12.1 |reached target block errors
-      1.5 | 8.5000e-08 | 1.4000e-04 |          34 |   400000000 |           14 |      100000 |        46.6 |reached max iter
-     1.75 | 2.0000e-08 | 1.0000e-05 |           8 |   400000000 |            1 |      100000 |        46.6 |reached max iter
-      2.0 | 0.0000e+00 | 0.0000e+00 |           0 |   400000000 |            0 |      100000 |        46.6 |reached max iter
+      0.0 | 1.3612e-01 | 1.0000e+00 |      544473 |     4000000 |         1000 |        1000 |         1.8 |reached target block errors
+     0.25 | 1.1098e-01 | 1.0000e+00 |      443911 |     4000000 |         1000 |        1000 |         0.4 |reached target block errors
+      0.5 | 7.1998e-02 | 1.0000e+00 |      287993 |     4000000 |         1000 |        1000 |         0.4 |reached target block errors
+     0.75 | 2.5447e-02 | 9.4400e-01 |      101788 |     4000000 |          944 |        1000 |         0.4 |reached target block errors
+      1.0 | 2.5708e-03 | 4.1150e-01 |       20566 |     8000000 |          823 |        2000 |         0.8 |reached target block errors
+     1.25 | 4.0510e-05 | 1.9346e-02 |        4213 |   104000000 |          503 |       26000 |        10.0 |reached target block errors
+      1.5 | 9.7500e-08 | 1.4000e-04 |          39 |   400000000 |           14 |      100000 |        38.6 |reached max iter
+     1.75 | 1.0000e-08 | 1.0000e-05 |           4 |   400000000 |            1 |      100000 |        38.6 |reached max iter
+      2.0 | 0.0000e+00 | 0.0000e+00 |           0 |   400000000 |            0 |      100000 |        38.6 |reached max iter
 
 Simulation stopped as no error occurred @ EbNo = 2.0 dB.
 
 Running: 5G LDPC BP-20 (n=16000)
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.3697e-01 | 1.0000e+00 |     1095737 |     8000000 |         1000 |        1000 |         3.8 |reached target block errors
-     0.25 | 1.1110e-01 | 1.0000e+00 |      888824 |     8000000 |         1000 |        1000 |         0.9 |reached target block errors
-      0.5 | 7.0302e-02 | 1.0000e+00 |      562417 |     8000000 |         1000 |        1000 |         0.9 |reached target block errors
-     0.75 | 2.4275e-02 | 9.9300e-01 |      194197 |     8000000 |          993 |        1000 |         0.9 |reached target block errors
-      1.0 | 1.2136e-03 | 4.6400e-01 |       19418 |    16000000 |          928 |        2000 |         1.8 |reached target block errors
-     1.25 | 1.5875e-06 | 4.1200e-03 |        1270 |   800000000 |          412 |      100000 |        89.6 |reached max iter
-      1.5 | 5.0000e-09 | 1.0000e-05 |           4 |   800000000 |            1 |      100000 |        89.5 |reached max iter
-     1.75 | 0.0000e+00 | 0.0000e+00 |           0 |   800000000 |            0 |      100000 |        89.6 |reached max iter
+      0.0 | 1.3777e-01 | 1.0000e+00 |     1102186 |     8000000 |         1000 |        1000 |         2.8 |reached target block errors
+     0.25 | 1.1079e-01 | 1.0000e+00 |      886359 |     8000000 |         1000 |        1000 |         0.8 |reached target block errors
+      0.5 | 7.1611e-02 | 1.0000e+00 |      572892 |     8000000 |         1000 |        1000 |         0.8 |reached target block errors
+     0.75 | 2.4264e-02 | 9.9300e-01 |      194114 |     8000000 |          993 |        1000 |         0.8 |reached target block errors
+      1.0 | 1.1114e-03 | 4.4550e-01 |       17783 |    16000000 |          891 |        2000 |         1.6 |reached target block errors
+     1.25 | 1.4387e-06 | 3.6800e-03 |        1151 |   800000000 |          368 |      100000 |        79.6 |reached max iter
+      1.5 | 0.0000e+00 | 0.0000e+00 |           0 |   800000000 |            0 |      100000 |        79.6 |reached max iter
 
-Simulation stopped as no error occurred @ EbNo = 1.8 dB.
+Simulation stopped as no error occurred @ EbNo = 1.5 dB.
 
 </pre></div></div>
 </div>
@@ -1541,7 +1725,7 @@ Simulation stopped as no error occurred @ EbNo = 1.8 dB.
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_17_1.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_17_1.png" />
+<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_19_1.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_19_1.png" />
 </div>
 </div>
 </div>
@@ -1647,11 +1831,11 @@ Frozen codeword positions:  [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 16 17 
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Information bits:  [[1. 0. 0. 0. 1. 0. 0. 1. 1. 0. 1. 0. 0. 1. 1. 1. 0. 0. 1. 0. 0. 1. 1. 0.
-  1. 0. 1. 1. 1. 1. 0. 1.]]
-Polar encoded bits:  [[1. 0. 1. 0. 0. 0. 0. 1. 1. 1. 0. 0. 1. 1. 0. 1. 1. 1. 0. 1. 1. 0. 1. 0.
-  0. 0. 0. 1. 1. 1. 0. 0. 0. 0. 1. 0. 1. 0. 0. 1. 0. 1. 0. 0. 0. 1. 0. 1.
-  1. 0. 1. 0. 1. 1. 0. 1. 0. 1. 1. 0. 1. 0. 1. 1.]]
+Information bits:  [[1. 0. 1. 1. 1. 1. 0. 1. 0. 1. 0. 1. 1. 0. 1. 1. 0. 1. 1. 1. 1. 0. 1. 1.
+  0. 0. 0. 0. 0. 0. 0. 1.]]
+Polar encoded bits:  [[0. 0. 1. 1. 0. 0. 0. 0. 0. 1. 1. 1. 1. 1. 0. 1. 0. 0. 0. 0. 0. 1. 1. 0.
+  1. 0. 1. 1. 0. 1. 0. 0. 0. 1. 1. 1. 1. 0. 1. 1. 1. 1. 0. 0. 1. 0. 0. 1.
+  1. 0. 1. 1. 0. 0. 1. 0. 1. 1. 1. 1. 1. 1. 1. 1.]]
 </pre></div></div>
 </div>
 <p>As can be seen, the length of the resulting code must be a power of 2. This brings us to the problem of rate-matching and we will now have a closer look how we can adapt the length of the code.</p>
@@ -1723,8 +1907,8 @@ Polar encoded bits:  [[1. 0. 1. 0. 0. 0. 0. 1. 1. 1. 0. 0. 1. 1. 0. 1. 1. 1. 0. 
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1758,111 +1942,8 @@ Polar encoded bits:  [[1. 0. 1. 0. 0. 0. 0. 1. 1. 1. 0. 0. 1. 1. 0. 1. 1. 1. 0. 
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Finding threshold of k = 12, n = 160
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -4.434814453125
-Finding threshold of k = 16, n = 160
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -3.468017578125
-Finding threshold of k = 32, n = 160
-Found threshold at:  -0.443115234375
-Finding threshold of k = 64, n = 160
-Found threshold at:  2.464599609375
-Finding threshold of k = 128, n = 160
-Found threshold at:  6.917724609375
-Finding threshold of k = 140, n = 160
-Found threshold at:  8.184814453125
-Finding threshold of k = 12, n = 240
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -6.236572265625
-Finding threshold of k = 16, n = 240
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -5.452880859375
-Finding threshold of k = 32, n = 240
-Found threshold at:  -2.574462890625
-Finding threshold of k = 64, n = 240
-Found threshold at:  0.010986328125
-Finding threshold of k = 128, n = 240
-Found threshold at:  3.240966796875
-Finding threshold of k = 140, n = 240
-Found threshold at:  3.819580078125
-Finding threshold of k = 210, n = 240
-Found threshold at:  7.716064453125
-Finding threshold of k = 220, n = 240
-Found threshold at:  8.675537109375
-Finding threshold of k = 12, n = 480
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -9.407958984375
-Finding threshold of k = 16, n = 480
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -8.441162109375
-Finding threshold of k = 32, n = 480
-Found threshold at:  -5.841064453125
-Finding threshold of k = 64, n = 480
-Found threshold at:  -3.541259765625
-Finding threshold of k = 128, n = 480
-Found threshold at:  -0.633544921875
-Finding threshold of k = 140, n = 480
-Found threshold at:  -0.296630859375
-Finding threshold of k = 210, n = 480
-Found threshold at:  1.680908203125
-Finding threshold of k = 220, n = 480
-Found threshold at:  2.010498046875
-Finding threshold of k = 256, n = 480
-Found threshold at:  2.860107421875
-Finding threshold of k = 300, n = 480
-Found threshold at:  3.900146484375
-Finding threshold of k = 400, n = 480
-Found threshold at:  6.507568359375
-Finding threshold of k = 450, n = 480
-Found threshold at:  8.624267578125
-Finding threshold of k = 460, n = 480
-Found threshold at:  9.312744140625
-Finding threshold of k = 12, n = 960
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -9.583740234375
-Finding threshold of k = 16, n = 960
-Warning: For 12&lt;=k&lt;=20 additional 3 parity-check bits are defined in 38.212. They are currently not implemented by this encoder and, thus, ignored.
-Found threshold at:  -8.734130859375
-Finding threshold of k = 32, n = 960
-Found threshold at:  -8.909912109375
-Finding threshold of k = 64, n = 960
-Found threshold at:  -6.661376953125
-Finding threshold of k = 128, n = 960
-Found threshold at:  -4.039306640625
-Finding threshold of k = 140, n = 960
-Found threshold at:  -3.643798828125
-Finding threshold of k = 210, n = 960
-Found threshold at:  -1.981201171875
-Finding threshold of k = 220, n = 960
-Found threshold at:  -1.805419921875
-Finding threshold of k = 256, n = 960
-Found threshold at:  -1.131591796875
-Finding threshold of k = 300, n = 960
-Found threshold at:  -0.421142578125
-Finding threshold of k = 400, n = 960
-Found threshold at:  1.175537109375
-Finding threshold of k = 450, n = 960
-Found threshold at:  1.776123046875
-Finding threshold of k = 460, n = 960
-Found threshold at:  1.878662109375
-Finding threshold of k = 512, n = 960
-Found threshold at:  2.501220703125
-Finding threshold of k = 800, n = 960
-Found threshold at:  6.185302734375
-Finding threshold of k = 880, n = 960
-Found threshold at:  7.738037109375
-Finding threshold of k = 940, n = 960
-Found threshold at:  10.081787109375
-</pre></div></div>
-</div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1893,7 +1974,7 @@ Found threshold at:  10.081787109375
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_30_0.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_30_0.png" />
+<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_32_0.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_32_0.png" />
 </div>
 </div>
 <p>This figure equals [Fig. 13a, 4] with a few small exception for extreme low-rate codes. This can be explained by the fact that the 3 explicit parity-bits bits are not implemented, however, these bits are only relevant for for <span class="math notranslate nohighlight">\(12\leq k \leq20\)</span>. It also explains the degraded performance of the n=960, k=16 code.</p>
@@ -1908,7 +1989,7 @@ Found threshold at:  10.081787109375
 <p>We want to emphasize that the results strongly depend on the exact implementation and may differ for different implementations/optimizations. Implementing the SCL decoder in Tensorflow is a delicate task and requires several design trade-offs to enable a graph implementation which can lead to degraded throughput mainly caused by the missing <em>lazy copy-mechanism</em>. However, - inspired by [10] - the SCL decoder layer supports <code class="docutils literal notranslate"><span class="pre">hybrid</span> <span class="pre">SC</span></code> decoding meaning that SC decoding is done first and a
 second stage SCL decoder operates as afterburner iff the outer CRC check fails. Please note that this modus uses <em>‘tf.py_function’</em> (due to the control flow and the dynamic shape of the decoding graph) and, thus, does not support XLA compilation.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1959,7 +2040,7 @@ second stage SCL decoder operates as afterburner iff the outer CRC check fails. 
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2013,7 +2094,7 @@ Running: 5G LDPC BP-20 (n=16000)
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2037,8 +2118,7 @@ Running: 5G LDPC BP-20 (n=16000)
 </div>
 </div>
 <div class="nboutput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
@@ -2049,13 +2129,13 @@ Running: 5G LDPC BP-20 (n=16000)
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_35_1.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_35_1.png" />
+<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_37_1.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_37_1.png" />
 </div>
 </div>
 <p>As expected the throughput of BP decoding is (relatively) constant as the complexity scales linearly with <span class="math notranslate nohighlight">\(\mathcal{O}(n)\)</span> and, thus, the complexity <em>per</em> decoded bit remains constant. It is instructive to realize that the above plot is in the log-domain for the x-axis.</p>
 <p>Let us have a look at what happens for different SNR values.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2098,7 +2178,7 @@ Throughput @ 5.0 dB: 10.90 Mbit/s
 <p>For most Sionna decoders the throughput is not SNR dependent as early stopping of individual samples within a batch is difficult to realize.</p>
 <p>However, the <code class="docutils literal notranslate"><span class="pre">hybrid</span> <span class="pre">SCL</span></code> decoder uses an internal NumPy SCL decoder only if the SC decoder failed similar to [10]. We will now benchmark this decoder for different SNR values.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2152,7 +2232,7 @@ Throughput @ 4.5 dB: 1.469 Mbit/s
 </ul>
 <p>Thus, the throughput directly depends on the BLER of the internal SC decoder.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2231,7 +2311,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 <p>Let us visualize the results.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2248,7 +2328,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_43_0.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_43_0.png" />
+<img alt="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_45_0.png" src="../_images/examples_5G_Channel_Coding_Polar_vs_LDPC_Codes_45_0.png" />
 </div>
 </div>
 <p>You can also try:</p>
@@ -2278,7 +2358,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="Pulse_shaping_basics.html" class="btn btn-neutral float-left" title="Pulse-shaping Basics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Optical_Lumped_Amplification_Channel.html" class="btn btn-neutral float-left" title="Optical Channel with Lumped Amplification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="Bit_Interleaved_Coded_Modulation.html" class="btn btn-neutral float-right" title="Bit-Interleaved Coded Modulation (BICM)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

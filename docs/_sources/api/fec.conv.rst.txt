@@ -1,9 +1,11 @@
 Convolutional Codes
 ###################
 
-This module supports encoding and Viterbi decoding for convolutional codes.
+This module supports encoding of convolutional codes and provides layers for Viterbi [Viterbi]_ and BCJR [BCJR]_ decoding.
 
-The following code snippet shows how to setup a rate-1/2, constraint-length-3 encoder in two alternate ways and a corresponding Viterbi decoder.
+While the :class:`~sionna.fec.conv.decoding.ViterbiDecoder` decoding algorithm produces maximum likelihood *sequence* estimations, the :class:`~sionna.fec.conv.decoding.BCJRDecoder` produces the a posterior probability (APP) bit-estimates.
+
+The following code snippet shows how to set up a rate-1/2, constraint-length-3 :class:`~sionna.fec.conv.encoding.ConvEncoder` in two alternate ways and a corresponding :class:`~sionna.fec.conv.decoding.ViterbiDecoder` or :class:`~sionna.fec.conv.decoding.BCJRDecoder`. You can find further examples in the `Channel Coding Tutorial Notebook <../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html>`_.
 
 Setting-up:
 
@@ -11,12 +13,14 @@ Setting-up:
 
    encoder = ConvEncoder(rate=1/2, # rate of the desired code
                          constraint_length=3) # constraint length of the code
-   or
-   encoder = ConvEncoder(gen_poly=['101', '111']) # or polynomial can be input directly
+   # or
+   encoder = ConvEncoder(gen_poly=['101', '111']) # or polynomial can be used as input directly
 
+   # Viterbi decoding
+   decoder = ViterbiDecoder(gen_poly=encoder.gen_poly) # polynomial used in encoder
 
-   decoder = ViterbiDecoder(gen_poly=encoder.gen_poly, # polynomial used in encoder
-                            method="soft_llr") # can be "soft" or "hard"
+   # or BCJR decoding
+   decoder = BCJRDecoder(gen_poly=encoder.gen_poly) # polynomial used in encoder
 
 
 Running the encoder / decoder:
@@ -49,6 +53,13 @@ Viterbi Decoding
    :members:
    :exclude-members: call, build
 
+BCJR Decoding
+*************
+
+.. autoclass:: sionna.fec.conv.BCJRDecoder
+   :members:
+   :exclude-members: call, build
+
 
 Convolutional Code Utility Functions
 ************************************
@@ -65,5 +76,12 @@ polynomial_selector
 
 
 References:
-   .. [Moon] Todd. K. Moon, "Error correction coding: Mathematical
-      methods and algorithms"
+   .. [Viterbi] A. Viterbi "Error bounds for convolutional codes and an
+      asymptotically optimum decoding algorithm", IEEE Trans Inf Theory, 1967.
+
+   .. [BCJR]  L. Bahl, J. Cocke, F. Jelinek, und J. Raviv "Optimal Decoding
+      of Linear Codes for Minimizing Symbol Error Rate", IEEE Trans Inf
+      Theory, March 1974.
+
+   .. [Moon] Todd. K. Moon, "Error Correction Coding: Mathematical
+      Methods and Algorithms", John Wiley & Sons, 2020.

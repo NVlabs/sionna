@@ -1,5 +1,5 @@
-FEC Utility Functions
-=====================
+Utility Functions
+=================
 
 This module provides utility functions for the FEC package. It also provides serval functions to simplify EXIT analysis of iterative receivers.
 
@@ -65,6 +65,10 @@ alist2mat
 load_alist
 ----------
 .. autofunction:: sionna.fec.utils.load_alist
+
+generate_reg_ldpc
+-----------------
+.. autofunction:: sionna.fec.utils.generate_reg_ldpc
 
 make_systematic
 ---------------
@@ -159,6 +163,10 @@ GaussianPriorSource
 -------------------
 .. autoclass:: sionna.fec.utils.GaussianPriorSource
 
+generate_prng_seq
+-----------------
+.. autofunction:: sionna.fec.utils.generate_prng_seq
+
 bin2int
 -------
 .. autofunction:: sionna.fec.utils.bin2int
@@ -217,3 +225,9 @@ References:
    .. [MacKay] http://www.inference.org.uk/mackay/codes/alist.html
 
    .. [UniKL] https://www.uni-kl.de/en/channel-codes/
+
+   .. [3GPPTS38211_S] ETSI 3GPP TS 38.211 "Physical channels and modulation",
+      v.16.2.0, 2020-07.
+
+   .. [3GPPTS38212_I] ETSI 3GPP TS 38.212 "5G NR Multiplexing and channel
+      coding", v.16.5.0, 2021-03.

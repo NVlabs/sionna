@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sionna.channel.optical.fiber &mdash; Sionna 0.11.0 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/sionna.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/clipboard.min.js"></script>
+        <script src="../../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> Sionna
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../installation.html#installation-using-pip">Installation using pip</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../installation.html#docker-based-installation">Docker-based Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../installation.html#installation-from-source">Installation from source</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Hello_World.html">“Hello, world!”</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/Discover_Sionna.html">Discover Sionna</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Load-Required-Packages">Load Required Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Let’s-Get-Started---The-First-Layers-(Eager-Mode)">Let’s Get Started - The First Layers (<em>Eager Mode</em>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Batches-and-Multi-dimensional-Tensors">Batches and Multi-dimensional Tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#First-Link-level-Simulation">First Link-level Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Setting-up-the-End-to-end-Model">Setting up the End-to-end Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Run-some-Throughput-Tests-(Graph-Mode)">Run some Throughput Tests (Graph Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Bit-Error-Rate-(BER)-Monte-Carlo-Simulations">Bit-Error Rate (BER) Monte-Carlo Simulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../examples/Discover_Sionna.html#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../tutorials.html#for-beginners">For Beginners</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Imports-&amp;-Basics">Imports &amp; Basics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Sionna-Data-flow-and-Design-Paradigms">Sionna Data-flow and Design Paradigms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Hello,-Sionna!">Hello, Sionna!</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Communication-Systems-as-Keras-Models">Communication Systems as Keras Models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Forward-Error-Correction-(FEC)">Forward Error Correction (FEC)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Eager-vs-Graph-Mode">Eager vs Graph Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part1.html#Exercise">Exercise</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Gradient-Computation-Through-End-to-end-Systems">Gradient Computation Through End-to-end Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Creating-Custom-Layers">Creating Custom Layers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part2.html#Setting-up-Training-Loops">Setting up Training Loops</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#OFDM-Resource-Grid">OFDM Resource Grid</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Channel-Model">Channel Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part3.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Imports">Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Implemention-of-an-Advanced-Neural-Receiver">Implemention of an Advanced Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Benchmarking-the-Neural-Receiver">Benchmarking the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#Conclusion">Conclusion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_tutorial_part4.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Simple-uncoded-transmission">Simple uncoded transmission</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Adding-spatial-correlation">Adding spatial correlation</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#Extension-to-channel-coding">Extension to channel coding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Simple_MIMO_Simulation.html#BER-simulations-using-a-Keras-model">BER simulations using a Keras model</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html">Pulse-shaping Basics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html#Pulse-shaping-of-a-sequence-of-QAM-symbols">Pulse-shaping of a sequence of QAM symbols</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html#Recovering-the-QAM-symbols-through-matched-filtering-and-downsampling">Recovering the QAM symbols through matched filtering and downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html#Investigating-the-ACLR">Investigating the ACLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Pulse_shaping_basics.html#Windowing">Windowing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html">Optical Channel with Lumped Amplification</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Setup">Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Impulse-Generation">Impulse Generation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Attenuation">Attenuation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Amplified-Spontaneous-Emission-Noise">Amplified Spontaneous Emission Noise</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Channel-Configuration">Channel Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Transmission">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Chromatic-Dispersion">Chromatic Dispersion</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#id1">Channel Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#id2">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Kerr-Nonlinearity">Kerr Nonlinearity</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Channel-configuration">Channel configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#id4">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#Split-Step-Fourier-Method">Split-Step Fourier Method</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#id5">Channel Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#id6">Transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../tutorials.html#for-experts">For Experts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#System-Block-Diagram">System Block Diagram</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#A-Simple-BICM-System">A Simple BICM System</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Constellations-and-Bit-Channels">Constellations and Bit-Channels</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Simple-BER-Simulations">Simple BER Simulations</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#All-zero-Codeword-Simulations">All-zero Codeword Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-Encoder:-Simulate-QPSK-with-All-zero-Codeword-Transmission">Remove Encoder: Simulate QPSK with All-zero Codeword Transmission</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Remove-(De-)Mapping:-Approximate-the-LLR-Distribution-of-the-All-zero-Codeword-(and-BPSK/QPSK)">Remove (De-)Mapping: Approximate the LLR Distribution of the All-zero Codeword (and BPSK/QPSK)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#The-Role-of-the-Scrambler">The Role of the Scrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#EXIT-Charts">EXIT Charts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#Mismatched-Demapping-and-the-Advantages-of-Min-sum-Decoding">Mismatched Demapping and the Advantages of Min-sum Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Bit_Interleaved_Coded_Modulation.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Table-of-Contents">Table of Contents</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#System-Setup">System Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Stream-Management">Stream Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#OFDM-Resource-Grid-&amp;-Pilot-Pattern">OFDM Resource Grid &amp; Pilot Pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#CDL-Channel-Model">CDL Channel Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Other-Physical-Layer-Components">Other Physical Layer Components</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Simulations">Simulations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Uplink-Transmission-in-the-Time-Domain">Uplink Transmission in the Time Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Downlink-Transmission-in-the-Frequency-Domain">Downlink Transmission in the Frequency Domain</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Understand-the-Difference-Between-the-CDL-Models">Understand the Difference Between the CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Create-an-End-to-End-Keras-Model">Create an End-to-End Keras Model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Uplink-Performance-Over-the-Different-CDL-Models">Compare Uplink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Compare-Downlink-Performance-Over-the-Different-CDL-Models">Compare Downlink Performance Over the Different CDL Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Mobility">Evaluate the Impact of Mobility</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/MIMO_OFDM_Transmissions_over_CDL.html#Evaluate-the-Impact-of-Insufficient-Cyclic-Prefix-Length">Evaluate the Impact of Insufficient Cyclic Prefix Length</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Neural-Receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#End-to-end-System">End-to-end System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#End-to-end-System-as-a-Keras-Model">End-to-end System as a Keras Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Evaluation-of-the-Baselines">Evaluation of the Baselines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Training-the-Neural-Receiver">Training the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Evaluation-of-the-Neural-Receiver">Evaluation of the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#Pre-computed-Results">Pre-computed Results</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Neural_Receiver.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#System-Setup">System Setup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Uplink-Transmissions-in-the-Frequency-Domain">Uplink Transmissions in the Frequency Domain</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Compare-Estimated-and-Actual-Frequency-Responses">Compare Estimated and Actual Frequency Responses</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Understand-the-Difference-Between-the-Channel-Models">Understand the Difference Between the Channel Models</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Realistic_Multiuser_MIMO_Simulations.html#Setup-a-Keras-Model-for-BER-simulations">Setup a Keras Model for BER simulations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Neural-Demapper">Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Trainable-End-to-end-System:-Conventional-Training">Trainable End-to-end System: Conventional Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Trainable-End-to-end-System:-RL-based-Training">Trainable End-to-end System: RL-based Training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Evaluation">Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#Visualizing-the-Learned-Constellations">Visualizing the Learned Constellations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Autoencoder.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Weighted-BP-for-BCH-Codes">Weighted BP for BCH Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Weights-before-Training-and-Simulation-of-BER">Weights <em>before</em> Training and Simulation of BER</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Training">Training</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Further-Experiments">Further Experiments</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Damped-BP">Damped BP</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#Learning-the-5G-LDPC-Code">Learning the 5G LDPC Code</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Weighted_BP_Algorithm.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/CIR_Dataset.html">Channel Models from Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Simulation-Parameters">Simulation Parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Creating-a-Simple-Dataset">Creating a Simple Dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Generators">Generators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/CIR_Dataset.html#Use-the-Channel-Model-for-OFDM-Transmissions">Use the Channel Model for OFDM Transmissions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/DeepMIMO.html">Using the DeepMIMO Dataset with Sionna</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/DeepMIMO.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/DeepMIMO.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/DeepMIMO.html#Configuration-of-DeepMIMO">Configuration of DeepMIMO</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/DeepMIMO.html#Visualization-of-the-dataset">Visualization of the dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/DeepMIMO.html#Using-DeepMIMO-with-Sionna">Using DeepMIMO with Sionna</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../examples/DeepMIMO.html#Random-Sampling-of-Multi-User-Channels">Random Sampling of Multi-User Channels</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/DeepMIMO.html#Link-level-Simulations-using-Sionna-and-DeepMIMO">Link-level Simulations using Sionna and DeepMIMO</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/DeepMIMO.html#DeepMIMO-License-and-Citation">DeepMIMO License and Citation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/sionna.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/fec.html">Forward Error Correction (FEC)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.ldpc.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.polar.html">Polar Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.polar.html#polar-encoding">Polar Encoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polar5gencoder">Polar5GEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarencoder">PolarEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.polar.html#polar-decoding">Polar Decoding</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polar5gdecoder">Polar5GDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarscdecoder">PolarSCDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarscldecoder">PolarSCLDecoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#polarbpdecoder">PolarBPDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.polar.html#polar-utility-functions">Polar Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-5g-ranking">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-polar-transform-mat">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-rm-code">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.polar.html#generate-dense-polar">generate_dense_polar</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.conv.html">Convolutional Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#convolutional-encoding">Convolutional Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#viterbi-decoding">Viterbi Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#bcjr-decoding">BCJR Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.conv.html#convolutional-code-utility-functions">Convolutional Code Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.conv.html#trellis">Trellis</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.conv.html#polynomial-selector">polynomial_selector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.turbo.html">Turbo Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.turbo.html#turbo-encoding">Turbo Encoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.turbo.html#turbo-decoding">Turbo Decoding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.turbo.html#turbo-utility-functions">Turbo Utility Functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.turbo.html#turbotermination">TurboTermination</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.turbo.html#polynomial-selector">polynomial_selector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.turbo.html#puncture-pattern">puncture_pattern</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.crc.html">Cyclic Redundancy Check (CRC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.crc.html#crcencoder">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.crc.html#crcdecoder">CRCDecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.interleaving.html">Interleaving</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.interleaving.html#interleaver">Interleaver</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.interleaving.html#rowcolumninterleaver">RowColumnInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.interleaving.html#randominterleaver">RandomInterleaver</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.interleaving.html#turbo3gppinterleaver">Turbo3GPPInterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.interleaving.html#deinterleaver">Deinterleaver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.scrambling.html">Scrambling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.scrambling.html#scrambler">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.scrambling.html#descrambler">Descrambler</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/fec.utils.html">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#alist2mat">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#load-alist">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#generate-reg-ldpc">generate_reg_ldpc</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#make-systematic">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#gm2pcm">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#pcm2gm">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#verify-gm-pcm">verify_gm_pcm</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#exit-analysis">EXIT Analysis</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#plot-exit-chart">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#get-exit-analytic">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#plot-trajectory">plot_trajectory</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/fec.utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#gaussianpriorsource">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#generate-prng-seq">generate_prng_seq</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#bin2int">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#int2bin">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#llr2mi">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun-tf">j_fun_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/fec.utils.html#j-fun-inv-tf">j_fun_inv_tf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/mapping.html">Mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#constellations">Constellations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#constellation">Constellation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#qam">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#pam">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#pam-gray">pam_gray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#mapper">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#demapping">Demapping</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#demapper">Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#demapperwithprior">DemapperWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symboldemapper">SymbolDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symboldemapperwithprior">SymbolDemapperWithPrior</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mapping.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symbollogits2llrs">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#llrs2symbollogits">LLRs2SymbolLogits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/channel.html">Channel</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.wireless.html">Wireless</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#awgn">AWGN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#flat-fading-channel">Flat-fading channel</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#flatfadingchannel">FlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#generateflatfadingchannel">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#applyflatfadingchannel">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#spatialcorrelation">SpatialCorrelation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#kroneckermodel">KroneckerModel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#percolumnmodel">PerColumnModel</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#channel-model-interface">Channel model interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#time-domain-channel">Time domain channel</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#timechannel">TimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#generatetimechannel">GenerateTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#applytimechannel">ApplyTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#cir-to-time-channel">cir_to_time_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#channel-with-ofdm-waveform">Channel with OFDM waveform</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#ofdmchannel">OFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#generateofdmchannel">GenerateOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#applyofdmchannel">ApplyOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#cir-to-ofdm-channel">cir_to_ofdm_channel</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#rayleigh-block-fading">Rayleigh block fading</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#gpp-38-901-channel-models">3GPP 38.901 channel models</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#panelarray">PanelArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#antenna">Antenna</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#tapped-delay-line-tdl">Tapped delay line (TDL)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#clustered-delay-line-cdl">Clustered delay line (CDL)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#urban-microcell-umi">Urban microcell (UMi)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#urban-macrocell-uma">Urban macrocell (UMa)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#rural-macrocell-rma">Rural macrocell (RMa)</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#external-datasets">External datasets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.wireless.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#subcarrier-frequencies">subcarrier_frequencies</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#time-lag-discrete-time-channel">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#deg-2-rad">deg_2_rad</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#rad-2-deg">rad_2_deg</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#wrap-angle-0-360">wrap_angle_0_360</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#drop-uts-in-sector">drop_uts_in_sector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#relocate-uts">relocate_uts</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#set-3gpp-scenario-parameters">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#gen-single-sector-topology">gen_single_sector_topology</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#gen-single-sector-topology-interferers">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#exp-corr-mat">exp_corr_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.wireless.html#one-ring-corr-mat">one_ring_corr_mat</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/channel.optical.html">Optical</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.optical.html#split-step-fourier-method">Split-step Fourier method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.optical.html#erbium-doped-fiber-amplifier">Erbium-doped fiber amplifier</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/channel.optical.html#utility-functions">Utility functions</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../api/channel.optical.html#time-frequency-vector">time_frequency_vector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/ofdm.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#resource-grid">Resource Grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#resourcegrid">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#resourcegridmapper">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#resourcegriddemapper">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#removenulledsubcarriers">RemoveNulledSubcarriers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#modulation-demodulation">Modulation &amp; Demodulation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#ofdmmodulator">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#ofdmdemodulator">OFDMDemodulator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#pilot-pattern">Pilot Pattern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#pilotpattern">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#emptypilotpattern">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#kroneckerpilotpattern">KroneckerPilotPattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#linearinterpolator">LinearInterpolator</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#zfprecoder">ZFPrecoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/ofdm.html#maximumlikelihooddetectorwithprior">MaximumLikelihoodDetectorWithPrior</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/mimo.html">Multiple-Input Multiple-Output (MIMO)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#stream-management">Stream Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#precoding">Precoding</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#zero-forcing-precoder">zero_forcing_precoder</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#zf-equalizer">zf_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#mf-equalizer">mf_equalizer</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#maximumlikelihooddetectorwithprior">MaximumLikelihoodDetectorWithPrior</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/mimo.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#complex2real-vector">complex2real_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#real2complex-vector">real2complex_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#complex2real-matrix">complex2real_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#real2complex-matrix">real2complex_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#complex2real-covariance">complex2real_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#real2complex-covariance">real2complex_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#complex2real-channel">complex2real_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#real2complex-channel">real2complex_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/mimo.html#whiten-channel">whiten_channel</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/signal.html">Signal</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#filters">Filters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#sincfilter">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#raisedcosinefilter">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#rootraisedcosinefilter">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#customfilter">CustomFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#id1">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#window-functions">Window functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#hannwindow">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#hammingwindow">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#blackmanwindow">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#customwindow">CustomWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#id2">Window</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#convolve">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#fft">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#ifft">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#upsampling">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#downsampling">Downsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#empirical-psd">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#empirical-aclr">empirical_aclr</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/utils.html">Utility Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#metrics">Metrics</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#biterrorrate">BitErrorRate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#bitwisemutualinformation">BitwiseMutualInformation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#compute-ber">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#compute-bler">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#compute-ser">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#count-errors">count_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#count-block-errors">count_block_errors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#tensors">Tensors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#expand-to-rank">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#flatten-dims">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#flatten-last-dims">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#insert-dims">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#split-dims">split_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-sqrt">matrix_sqrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-sqrt-inv">matrix_sqrt_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-inv">matrix_inv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#matrix-pinv">matrix_pinv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/utils.html#miscellaneous">Miscellaneous</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#binarysource">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#symbolsource">SymbolSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#qamsource">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#pamsource">PAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#plotber">PlotBER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#sim-ber">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#ebnodb2no">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#hard-decisions">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#plot-ber">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#complex-normal">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#log2">log2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/utils.html#log10">log10</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/config.html">Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna/discussions">Discussions</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna/issues">Report an Issue</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Sionna</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+      <li>sionna.channel.optical.fiber</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for sionna.channel.optical.fiber</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="c1"># Author: Tim Alexander Uhlemann &lt;uhlemann@ieee.org&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines the split-step Fourier method to approximate the solution of</span>
+<span class="sd">the nonlinear Schroedinger equation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.layers</span> <span class="kn">import</span> <span class="n">Layer</span>
+<span class="kn">import</span> <span class="nn">sionna</span>
+<span class="kn">from</span> <span class="nn">sionna.channel</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+<div class="viewcode-block" id="SSFM"><a class="viewcode-back" href="../../../../api/channel.optical.html#sionna.channel.SSFM">[docs]</a><span class="k">class</span> <span class="nc">SSFM</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SSFM(alpha, beta_2, f_c, gamma, half_window_length, length, n_ssfm, n_sp=1.0,  dt=1.0, t_norm=1e-12, with_amplification=False, with_attenuation=True, with_dispersion=True, with_nonlinearity=True, swap_memory=True, dtype=tf.complex64, **kwargs)</span>
+
+<span class="sd">    Layer implementing the split-step Fourier method (SSFM).</span>
+
+<span class="sd">    The SSFM (first mentioned in [SSFM]_) numerically solves the nonlinear</span>
+<span class="sd">    Schrödinger equation (NLSE)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \frac{\partial E(t,z)}{\partial z}= -\frac{\alpha}{2}E(t,z) + j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |E(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)</span>
+
+<span class="sd">    with attenuation coefficient :math:`\alpha`, group velocity dispersion</span>
+<span class="sd">    parameters :math:`\beta_2`, and nonlinearity coefficient :math:`\gamma`.</span>
+<span class="sd">    Further, :math:`n(n_{\text{sp}};\,t,\,z)` denotes the noise due to an</span>
+<span class="sd">    optional ideally distributed Raman amplification with spontaneous emission</span>
+<span class="sd">    factor :math:`n_\text{sp}`.</span>
+<span class="sd">    The optical signal :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`.</span>
+
+<span class="sd">    By now, the SSFM is implemented for a single polarization only and as a</span>
+<span class="sd">    symmetrized SSFM according to Eq. (7) of [SymSSFM]_ which can be written as</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        E(z+\Delta_z,t) \approx \exp\left(\frac{\Delta_z}{2}\hat{D}\right)\exp\left(\int^{z+\Delta_z}_z \hat{N}(z&#39;)dz&#39;\right)\exp\left(\frac{\Delta_z}{2}\hat{D}\right)E(z,\,t)</span>
+
+<span class="sd">    The integral is approximated by :math:`\Delta_z\hat{N}` with</span>
+<span class="sd">    :math:`\Delta_z` denoting the (small) simulation step size. Further,</span>
+<span class="sd">    :math:`\hat{D}` and :math:`\hat{N}` denote the linear and nonlinear SSFM</span>
+<span class="sd">    operator, respectively [A2012]_.</span>
+
+<span class="sd">    Additionally, ideally distributed Raman amplification can be applied, which</span>
+<span class="sd">    is implemented as in [RamanASE]_. Note that, currently, the implemented</span>
+<span class="sd">    Raman amplification will always result in a transparent fiber link. Hence,</span>
+<span class="sd">    the introduced gain cannot be parametrized.</span>
+
+<span class="sd">    The SSFM operates on normalized time :math:`T_\text{norm}`</span>
+<span class="sd">    (e.g., :math:`T_\text{norm}=1\,\text{ps}=1\cdot 10^{-12}\,\text{s}`) and</span>
+<span class="sd">    distance units :math:`L_\text{norm}`</span>
+<span class="sd">    (e.g., :math:`L_\text{norm}=1\,\text{km}=1\cdot 10^{3}\,\text{m}`).</span>
+<span class="sd">    Hence, all parameters as well as the signal itself have to be given with the</span>
+<span class="sd">    same unit prefix for the</span>
+<span class="sd">    same unit (e.g., always pico for time, or kilo for distance). Note</span>
+<span class="sd">    that, despite the normalization, the SSFM is implemented with physical units</span>
+<span class="sd">    different from the normalization, e.g., used for the nonlinear</span>
+<span class="sd">    Fourier transform. For simulations only :math:`T_\text{norm}` has to be</span>
+<span class="sd">    provided.</span>
+
+<span class="sd">    To avoid reflections at the signal boundaries during simulation, a Hamming</span>
+<span class="sd">    window can be applied in each SSFM-step where the length can be defined by</span>
+<span class="sd">    ``half_window_length``.</span>
+
+<span class="sd">    This class inherits from the Keras `Layer` class and can be used as layer in</span>
+<span class="sd">    a Keras model.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Setting-up:</span>
+
+<span class="sd">    &gt;&gt;&gt; ssfm = SSFM(alpha=0.046,</span>
+<span class="sd">    &gt;&gt;&gt;             beta_2=-21.67,</span>
+<span class="sd">    &gt;&gt;&gt;             f_c=193.55e12,</span>
+<span class="sd">    &gt;&gt;&gt;             gamma=1.27,</span>
+<span class="sd">    &gt;&gt;&gt;             half_window_length=100,</span>
+<span class="sd">    &gt;&gt;&gt;             length=80,</span>
+<span class="sd">    &gt;&gt;&gt;             n_ssfm=200,</span>
+<span class="sd">    &gt;&gt;&gt;             n_sp=1.0,</span>
+<span class="sd">    &gt;&gt;&gt;             t_norm=1e-12,</span>
+<span class="sd">    &gt;&gt;&gt;             with_amplification=False,</span>
+<span class="sd">    &gt;&gt;&gt;             with_attenuation=True,</span>
+<span class="sd">    &gt;&gt;&gt;             with_dispersion=True,</span>
+<span class="sd">    &gt;&gt;&gt;             with_nonlinearity=True)</span>
+
+<span class="sd">    Running:</span>
+
+<span class="sd">    &gt;&gt;&gt; # x is the optical input signal</span>
+<span class="sd">    &gt;&gt;&gt; y = ssfm(x)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        alpha : float</span>
+<span class="sd">            Attenuation coefficient :math:`\alpha` in :math:`(1/L_\text{norm})`.</span>
+
+<span class="sd">        beta_2 : float</span>
+<span class="sd">            Group velocity dispersion coefficient :math:`\beta_2` in :math:`(T_\text{norm}^2/L_\text{norm})`.</span>
+
+<span class="sd">        f_c : float</span>
+<span class="sd">            Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`.</span>
+
+<span class="sd">        gamma : float</span>
+<span class="sd">            Nonlinearity coefficient :math:`\gamma` in :math:`(1/L_\text{norm}/\text{W})`.</span>
+
+<span class="sd">        half_window_length : int</span>
+<span class="sd">            Half of the Hamming window length.</span>
+
+<span class="sd">        length : float</span>
+<span class="sd">            Fiber length :math:`\ell` in :math:`(L_\text{norm})`.</span>
+
+<span class="sd">        n_ssfm : int</span>
+<span class="sd">            Number of steps :math:`N_\mathrm{SSFM}`.</span>
+
+<span class="sd">        n_sp : float</span>
+<span class="sd">            Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification.</span>
+
+<span class="sd">        sample_duration : float</span>
+<span class="sd">            Normalized time step :math:`\Delta_t` in :math:`(T_\text{norm})`.</span>
+
+<span class="sd">        t_norm : float</span>
+<span class="sd">            Time normalization :math:`T_\text{norm}` in :math:`(\text{s})`.</span>
+
+<span class="sd">        with_attenuation : bool</span>
+<span class="sd">            Enables application of attenuation. Defaults to True.</span>
+
+<span class="sd">        with_amplification : bool</span>
+<span class="sd">            Enables application of ideal inline amplification and corresponding</span>
+<span class="sd">            noise. Defaults to False.</span>
+
+<span class="sd">        with_dispersion : bool</span>
+<span class="sd">            Enables application of chromatic dispersion. Defaults to True.</span>
+
+<span class="sd">        with_nonlinearity : bool</span>
+<span class="sd">            Enables application of Kerr nonlinearity. Defaults to True.</span>
+
+<span class="sd">        swap_memory : bool</span>
+<span class="sd">            Use CPU memory for while loop. Defaults to True.</span>
+
+<span class="sd">        dtype : Complex tf.DType</span>
+<span class="sd">            Defines the datatype for internal calculations and the output</span>
+<span class="sd">            dtype. Defaults to `tf.complex64`.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">        x : Tensor, tf.complex</span>
+<span class="sd">            Input signal in :math:`(\sqrt{\text{W}})`</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">        y : Tensor with same shape as ``x``, `tf.complex`</span>
+<span class="sd">            Channel output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.046</span><span class="p">,</span> <span class="n">beta_2</span><span class="o">=-</span><span class="mf">21.67</span><span class="p">,</span> <span class="n">f_c</span><span class="o">=</span><span class="mf">193.55e12</span><span class="p">,</span>
+                 <span class="n">gamma</span><span class="o">=</span><span class="mf">1.27</span><span class="p">,</span> <span class="n">half_window_length</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
+                 <span class="n">n_ssfm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_sp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">sample_duration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">t_norm</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span>
+                 <span class="n">with_amplification</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">with_attenuation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">with_dispersion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_nonlinearity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">swap_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cdtype</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">as_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">real_dtype</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_beta_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">beta_2</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_f_c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">f_c</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span> <span class="o">=</span> <span class="n">half_window_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_ssfm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">n_ssfm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_sp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">n_sp</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_swap_memory</span> <span class="o">=</span> <span class="n">swap_memory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_t_norm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">t_norm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_with_amplification</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">with_amplification</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_with_attenuation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">with_attenuation</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_with_dispersion</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">with_dispersion</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_with_nonlinearity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">with_nonlinearity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_duration</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">sample_duration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rho_n</span> <span class="o">=</span> \
+            <span class="n">sionna</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">H</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f_c</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">*</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_sp</span>  <span class="c1"># in (W/Hz)</span>
+
+        <span class="c1"># Calculate noise power depending on simulation bandwidth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_p_n_ase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rho_n</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_duration</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_norm</span>
+        <span class="c1"># in (Ws)</span>
+
+        <span class="c1"># Precalculate uniform step size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_ssfm</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_window</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">hamming_window</span><span class="p">(</span>
+                <span class="n">window_length</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span>
+            <span class="p">),</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_apply_linear_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">frequency_vector</span><span class="p">):</span>
+        <span class="c1"># Chromatic dispersion</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_dispersion</span><span class="p">:</span>
+            <span class="n">dispersion</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span>
+                    <span class="n">zeros</span><span class="p">,</span>
+                    <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_beta_2</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">*</span> <span class="n">dz</span> <span class="o">*</span>
+                    <span class="p">(</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">*</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">PI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">*</span>
+                            <span class="n">frequency_vector</span>
+                    <span class="p">)</span> <span class="o">**</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">dispersion</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">dispersion</span><span class="p">,</span> <span class="n">axes</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">ifft</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="n">dispersion</span><span class="p">)</span>
+
+        <span class="c1"># Attenuation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_attenuation</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">dz</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdtype</span><span class="p">)</span>
+
+        <span class="c1"># Amplification (Raman)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_amplification</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_alpha</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">dz</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cdtype</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">q</span>
+
+    <span class="k">def</span> <span class="nf">_apply_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">dz</span><span class="p">):</span>
+        <span class="c1"># Noise due to Amplification (Raman)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_amplification</span><span class="p">:</span>
+            <span class="n">q_n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                    <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">),</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_p_n_ase</span> <span class="o">*</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">dz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">/</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">/</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">),</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span>
+                    <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">),</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_p_n_ase</span> <span class="o">/</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">dz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">/</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">/</span>
+                        <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">+</span> <span class="n">q_n</span>
+
+        <span class="k">return</span> <span class="n">q</span>
+
+    <span class="k">def</span> <span class="nf">_apply_nonlinear_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_with_nonlinearity</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span>
+                    <span class="n">zeros</span><span class="p">,</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">**</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gamma</span> <span class="o">*</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">dz</span><span class="p">)))</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">q</span>
+
+    <span class="k">def</span> <span class="nf">_apply_window</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">window</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">q</span> <span class="o">*</span> <span class="n">window</span>
+
+    <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">precalculations</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">step_counter</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="o">=</span> <span class="n">precalculations</span>
+
+        <span class="c1"># Apply window-function</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_window</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_nonlinear_operator</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>  <span class="c1"># N</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_noise</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_linear_operator</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>  <span class="c1"># D</span>
+
+        <span class="n">step_counter</span> <span class="o">=</span> <span class="n">step_counter</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">q</span><span class="p">,</span> <span class="n">precalculations</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">step_counter</span>
+
+    <span class="k">def</span> <span class="nf">_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">precalculations</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="n">step_counter</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">step_counter</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">inputs</span>
+
+        <span class="c1"># Calculate support parameters</span>
+        <span class="n">input_shape</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+
+        <span class="c1"># Generate frequency vectors</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">time_frequency_vector</span><span class="p">(</span>
+            <span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_duration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+
+        <span class="c1"># Window function calculation (depends on length of the signal)</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_window</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span><span class="p">],</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span><span class="p">],</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span>
+                    <span class="p">),</span>
+                    <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span><span class="p">],</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_window</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_half_window_length</span><span class="p">::]</span>
+            <span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
+
+        <span class="c1"># All-zero vector</span>
+        <span class="n">zeros</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+
+        <span class="c1"># Spatial step size</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dz</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+
+        <span class="n">dz_half</span> <span class="o">=</span> <span class="n">dz</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+
+        <span class="c1"># SSFM step counter</span>
+        <span class="n">iterator</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;step_counter&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Symmetric SSFM</span>
+        <span class="c1"># Start with half linear propagation</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_linear_operator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dz_half</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="c1"># Proceed with N_SSFM-1 steps applying nonlinear and linear operator</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">while_loop</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cond</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ssfm</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterator</span><span class="p">),</span>
+            <span class="n">swap_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_swap_memory</span><span class="p">,</span>
+            <span class="n">parallel_iterations</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="c1"># Final nonlinear operator</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_nonlinear_operator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dz</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>
+        <span class="c1"># Final noise application</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_noise</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dz</span><span class="p">)</span>
+        <span class="c1"># End with half linear propagation</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_linear_operator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dz_half</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021-2022 NVIDIA CORPORATION.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>
