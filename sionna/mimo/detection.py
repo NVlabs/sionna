@@ -7,8 +7,10 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
-from sionna.utils import expand_to_rank, matrix_sqrt_inv
-from sionna.mapping import Constellation, SymbolLogits2LLRs, LLRs2SymbolLogits
+
+from sionna.mimo import real2complex_vector, complex2real_vector, complex2real_matrix, whiten_channel
+from sionna.utils import expand_to_rank, matrix_sqrt_inv, hard_decisions, insert_dims
+from sionna.mapping import Constellation, SymbolLogits2LLRs, LLRs2SymbolLogits, DemapperWithPrior, SymbolLogits2Moments
 
 
 class MaximumLikelihoodDetectorWithPrior(Layer):
@@ -637,3 +639,187 @@ class MaximumLikelihoodDetector(MaximumLikelihoodDetectorWithPrior):
         prior = tf.zeros(prior_shape, tf.as_dtype(self._dtype).real_dtype)
         return super().call([y, h, prior, s])
 
+"""
+This layer implements the soft-input soft-output minimum mean squared error (MMSE) parallel interference cancellation 
+detector (SISO MMSE PIC), as proposed in [CST2011]_. For num_iter>1, this implementation performs MMSE PIC self-iterations,
+which can lead to (minor) additional performance gains. MMSE PIC self-iterations can be understood as a concatenation of 
+MMSE PIC detectors from [CST2011]_, which forward intrinsic LLRs to the next (self-)iteration.
+
+In addition to [CST2011]_, this implementation also accepts symbol logit priors. However, for consistency,
+the input symbol logits are mapped to LLRs and the symbol logit outputs are also computed from the MMSE PIC output LLRs.
+
+Based on previous results, classical iterative detection and decoding (IDD) showed best performance, if the MMSE PIC
+data detector outputs extrinsic LLRs to the decoder (also implemented here) and the decoder provides the MMSE PIC with
+intrinsic LLRs.
+
+[CST2011]_ C. Studer, S. Fateh, and D. Seethaler, "ASIC Implementation of Soft-Input Soft-Output
+MIMO Detection Using MMSE Parallel Interference Cancellation," IEEE Journal of Solid-State Circuits,
+vol. 46, no. 7, pp. 1754–1765, July 2011. https://ieeexplore.ieee.org/document/5779722
+"""
+
+class SiSoMmsePicDetector(Layer):
+    def __init__(self,
+                 demapping_method="maxlog",
+                 num_iter=1,
+                 output="bit",
+                 constellation_type=None,
+                 num_bits_per_symbol=None,
+                 constellation=None,
+                 hard_out=False,
+                 dtype=tf.complex64,
+                 epsilon = 1e-4,
+                 **kwargs):
+        super().__init__(dtype=dtype, **kwargs)
+
+        assert type(num_iter) is int, "num_iter must be an integer"
+        assert output in ("bit", "symbol"), "Unknown output"
+        assert demapping_method in ("app", "maxlog"), "Unknown demapping method"
+
+        assert dtype in [tf.complex64, tf.complex128], \
+            "dtype must be tf.complex64 or tf.complex128"
+
+        self._num_iter = num_iter
+        self._output = output
+
+        # Create constellation object
+        self._constellation = Constellation.create_or_check_constellation(
+            constellation_type,
+            num_bits_per_symbol,
+            constellation,
+            dtype=dtype)
+
+        self._epsilon = epsilon
+        self._realdtype = dtype.real_dtype
+
+        self._demapping_method = demapping_method
+        self._hard_out = hard_out
+
+        # soft symbol mapping
+        self._llr2symbolLogits = LLRs2SymbolLogits(self._constellation.num_bits_per_symbol, dtype=self._realdtype)  # soft
+        if self._output == "symbol":
+            self._llr2symbolLogits_output = LLRs2SymbolLogits(self._constellation.num_bits_per_symbol, dtype=self._realdtype, hard_out=hard_out)   # soft or hard
+            self._symbolLogits2LLRs = SymbolLogits2LLRs(method=demapping_method, num_bits_per_symbol=self._constellation.num_bits_per_symbol)
+        self._symbolLogits2moments = SymbolLogits2Moments(constellation=self._constellation, dtype=self._realdtype)
+
+        # soft output demapping
+        self._bit_demapper = DemapperWithPrior(demapping_method=demapping_method, constellation=constellation, dtype=dtype)
+
+
+    def call(self, inputs):
+        y, h, prior, s = inputs
+        # y is unwhitened receive signal [..., M]
+        # h the channel estimate [..., M, K]
+        # prior is either the soft input LLRs [..., K, num_bits_per_symbol] or symbol logits [..., K, Q]
+        # s the noise covariance matrix [..., M, M]
+
+        ## preprocessing
+        # Whiten channel
+        y, h = whiten_channel(y, h, s, return_s=False)  # pylint: disable=unbalanced-tuple-unpacking
+
+        # matched filtering of y
+        y_mf = insert_dims(tf.linalg.matvec(h, y, adjoint_a=True), num_dims=1, axis=-1)      # y_mf is [..., K, 1]
+
+        ## Step 1: compute Gramm matrix
+        g = tf.matmul(h, h, adjoint_a=True)     # g is [..., K, K]
+
+        # For XLA compatibility, this implementation performs the MIMO equalization in the real-valued domain
+        hr = complex2real_matrix(h)     # hr is [..., 2M, 2K]
+        gr = tf.matmul(hr, hr, adjoint_a=True)      # gr is [..., 2K, 2K]
+
+        # compute a priori LLRs
+        if self._output == "symbol":
+            llr_a = self._symbolLogits2LLRs(prior)
+        else:
+            llr_a = prior
+        # llr_a is [..., K, num_bits_per_symbol]
+        llr_shape = tf.shape(llr_a)
+
+        def mmse_pic_self_iteration(llr_d, llr_a, it):
+            # MMSE PIC takes in a priori LLRs
+            llr_a = llr_d
+
+            # Step 2: compute soft symbol estimates and variances using built-in Sionna utility functions
+            # Notice that there are more efficient direct computation approaches available
+            # For an example, refer to https://ieeexplore.ieee.org/abstract/document/4025128 or to
+            # https://github.com/rwiesmayr/sionna/blob/main/sionna/ofdm/equalization.py for a Sionna implementation
+            x_hat, var_x = self._symbolLogits2moments(self._llr2symbolLogits(llr_a))  # both are [..., K]
+
+            # Step 3: perform parallel interference cancellation
+            # H^H y_hat_i = y_mf - sum_j!=i gj x_hat_j = y + g_i x_hat_i - sum_j g_j x_hat_j
+            y_mf_pic = y_mf + g * insert_dims(x_hat, num_dims=1, axis=-2) \
+                       - tf.linalg.matmul(g, insert_dims(x_hat, num_dims=1, axis=-1))
+            # y_mf_pic is [..., K, K]
+
+            # Step 4: compute A^-1 matrix
+            # Calculate MMSE Filter (efficiently)
+            # W^H = A^-1 H^H
+            # A = H^H H \Lambda + N_0 I_Mt
+            # \Lambda_ii is a diagonal matrix with \Lambda_ii = E_i = error_var
+
+            # stack error variances and make it real (imaginary part is zero anyway)
+            var_x = tf.cast(tf.concat([var_x, var_x], axis=-1), dtype=self._realdtype)
+            var_x_row_vec = insert_dims(var_x, num_dims=1, axis=-2)
+            a = gr * var_x_row_vec
+            # a is [..., 2K, 2K]
+
+            i = expand_to_rank(tf.eye(tf.shape(a)[-1], dtype=a.dtype), tf.rank(a), 0)
+            a = a + i
+
+            a_inv = tf.linalg.inv(a)    # a is non-hermitian! that's why we can't use sn.utils.matrix_inv
+            # XLA can't invert complex matrices, that's why we work with the real valued domain
+
+            # Step 5: compute unbiased MMSE filter and outputs, calculate A\H^H
+
+            # calculate bias mu_i = diag(A^-1 H^H H) = diag(A^-1 G)
+            # diagonal elements of matrix matrix multiplication simplified to sum and dot-product
+            mu = tf.reduce_sum(a_inv * tf.linalg.matrix_transpose(gr), axis=-1)
+            # mu is [..., 2K]
+
+            # make y_mf_pic columns real (after transposition, the last dimension corresponds to vectors)
+            y_mf_pic_trans = complex2real_vector(tf.linalg.matrix_transpose(y_mf_pic)) # is [..., K, 2K]
+            # stack them such that y_mf_pic_trans is [..., 2K, 2K]
+            y_mf_pic_trans = tf.concat([y_mf_pic_trans, y_mf_pic_trans], axis=-2)
+
+            # efficient parallel equalization after PIC (z_i = i'th row of a_inv * y_MF_PIC_i)
+            # boils down to tf.reduce_sum(a_inv * y_mf_pic_trans, axis=-1)
+            # divide by mu_i for unbiasedness
+            x_hat = real2complex_vector(tf.reduce_sum(a_inv * y_mf_pic_trans, axis=-1) / tf.cast(mu, dtype=a_inv.dtype))
+            # x_hat is [..., K]
+
+            # compute post equalization signal error estimate: rho_i = mu_i / (1 - var_x_i * mu_i)
+            # 1 - var_x_i * mu_i can become numerically 0 (or even slightly smaller than zero due to limited numerical precision)
+            var_x = tf.divide(mu, tf.maximum(1 - var_x * mu, self._epsilon)) # is [..., 2K]
+            var_x, _ = tf.split(var_x, 2, -1)   # real variances map to the same complex valued variances in this model
+
+            no_eff = 1. / var_x
+
+            # Step 6: LLR demapping (extrinsic LLRs)
+            # notice that there are more efficient direct computation approaches available
+            # For an example, refer to https://ieeexplore.ieee.org/document/1371654 or to
+            # https://github.com/rwiesmayr/sionna/blob/main/sionna/ofdm/equalization.py for a Sionna implementation
+            llr_d = tf.reshape(self._bit_demapper([x_hat, llr_a, no_eff]), llr_shape)
+            # llr_d is [..., K, num_bits_per_symbols]
+
+            return llr_d, llr_a, it
+
+        # stopping condition (required for tf.while_loop)
+        def dec_stop(llr_d, llr_a, it):  # pylint: disable=W0613
+            return tf.less(it, self._num_iter)
+
+        # start decoding iterations
+        it = tf.constant(0)
+        null_prior = tf.zeros(llr_shape, dtype=self._realdtype)
+        llr_d, llr_a, _ = tf.while_loop(dec_stop, mmse_pic_self_iteration, (llr_a, null_prior, it),
+                                 parallel_iterations=1,
+                                 maximum_iterations=self._num_iter)
+        llr_e = llr_d - llr_a
+        if self._output == "symbol":
+            # convert back to symbols if requested. This llr2symbol mapper also performs hard-decisions, if specified
+            out = self._llr2symbolLogits_output(llr_e)      # output symbol logits computed on extrinsic LLRs
+        else:
+            # output extrinsic LLRs
+            out = llr_e
+            if self._hard_out:
+                out = hard_decisions(out)
+
+        return out
