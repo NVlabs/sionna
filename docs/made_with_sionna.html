@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>“Made with Sionna” &mdash; Sionna 0.11.0 documentation</title>
+  <title>“Made with Sionna” &mdash; Sionna 0.12.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -163,7 +163,11 @@
 <li class="toctree-l3"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
-<li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#BER-Performance-of-5G-Coding-Schemes">BER Performance of 5G Coding Schemes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Performance-under-Optimal-Decoding">Performance under Optimal Decoding</a></li>
+<li class="toctree-l5"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Performance-of-Longer-LDPC-Codes">Performance of Longer LDPC Codes</a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#A-Deeper-Look-into-the-Polar-Code-Module">A Deeper Look into the Polar Code Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Rate-Matching-and-Rate-Recovery">Rate-Matching and Rate-Recovery</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html#Throughput-and-Decoding-Complexity">Throughput and Decoding Complexity</a></li>
@@ -242,6 +246,22 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html">OFDM MIMO Channel Estimation and Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#Simulation-parameters">Simulation parameters</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#Estimation-of-the-channel-time,-frequency,-and-spatial-covariance-matrices">Estimation of the channel time, frequency, and spatial covariance matrices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#Loading-the-channel-covariance-matrices">Loading the channel covariance matrices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#Comparison-of-OFDM-estimators">Comparison of OFDM estimators</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#End-to-end-model">End-to-end model</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#Comparison-of-MIMO-detectors">Comparison of MIMO detectors</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="examples/OFDM_MIMO_Detection.html#id1">End-to-end model</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="examples/Autoencoder.html">End-to-end Learning with Autoencoders</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/Autoencoder.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Autoencoder.html#Simulation-Parameters">Simulation Parameters</a></li>
@@ -299,6 +319,7 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
@@ -307,13 +328,24 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/sionna.html">API Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/fec.html">Forward Error Correction (FEC)</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/fec.ldpc.html#encoder">Encoder</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
-<li class="toctree-l5"><a class="reference internal" href="api/fec.ldpc.html#allzeroencoder">AllZeroEncoder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/fec.linear.html">Linear Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/fec.linear.html#encoder">Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/fec.linear.html#linearencoder">LinearEncoder</a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/fec.linear.html#allzeroencoder">AllZeroEncoder</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="api/fec.ldpc.html#decoder">Decoder</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/fec.linear.html#decoder">Decoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/fec.linear.html#osdecoder">OSDecoder</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/fec.ldpc.html">Low-Density Parity-Check (LDPC)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/fec.ldpc.html#ldpc-encoder">LDPC Encoder</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="api/fec.ldpc.html#ldpc5gencoder">LDPC5GEncoder</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="api/fec.ldpc.html#ldpc-decoder">LDPC Decoder</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.ldpc.html#ldpcbpdecoder">LDPCBPDecoder</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.ldpc.html#ldpc5gdecoder">LDPC5GDecoder</a></li>
 </ul>
@@ -386,7 +418,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/fec.utils.html">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/fec.utils.html#binary-linear-codes">(Binary) Linear Codes</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#linearencoder">LinearEncoder</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#load-parity-check-examples">load_parity_check_examples</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#alist2mat">alist2mat</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#load-alist">load_alist</a></li>
@@ -410,6 +441,7 @@
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#int2bin">int2bin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#bin2int-tf">bin2int_tf</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#int2bin-tf">int2bin_tf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#int-mod-2">int_mod_2</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#llr2mi">llr2mi</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#j-fun">j_fun</a></li>
 <li class="toctree-l5"><a class="reference internal" href="api/fec.utils.html#j-fun-inv">j_fun_inv</a></li>
@@ -442,6 +474,9 @@
 <li class="toctree-l4"><a class="reference internal" href="api/mapping.html#llrs2symbollogits">LLRs2SymbolLogits</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mapping.html#symbollogits2llrswithprior">SymbolLogits2LLRsWithPrior</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mapping.html#symbollogits2moments">SymbolLogits2Moments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mapping.html#symbolinds2bits">SymbolInds2Bits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mapping.html#pam2qam">PAM2QAM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mapping.html#qam2pam">QAM2PAM</a></li>
 </ul>
 </li>
 </ul>
@@ -534,9 +569,14 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/ofdm.html#channel-estimation">Channel Estimation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#basechannelestimator">BaseChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#basechannelinterpolator">BaseChannelInterpolator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#lschannelestimator">LSChannelEstimator</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#linearinterpolator">LinearInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#lmmseinterpolator">LMMSEInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#nearestneighborinterpolator">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#tdl-time-cov-mat">tdl_time_cov_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#tdl-freq-cov-mat">tdl_freq_cov_mat</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/ofdm.html#precoding">Precoding</a><ul>
@@ -544,12 +584,21 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/ofdm.html#equalization">Equalization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#ofdmequalizer">OFDMEqualizer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#lmmseequalizer">LMMSEEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#mfequalizer">MFEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#zfequalizer">ZFEqualizer</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/ofdm.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#ofdmdetector">OFDMDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#ofdmdetectorwithprior">OFDMDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#epdetector">EPDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#kbestdetector">KBestDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#lineardetector">LinearDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#maximumlikelihooddetectorwithprior">MaximumLikelihoodDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/ofdm.html#mmsepicdetector">MMSEPICDetector</a></li>
 </ul>
 </li>
 </ul>
@@ -562,16 +611,22 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/mimo.html#equalization">Equalization</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#lmmse-equalizer">lmmse_equalizer</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#zf-equalizer">zf_equalizer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#mf-equalizer">mf_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#zf-equalizer">zf_equalizer</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/mimo.html#detection">Detection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#epdetector">EPDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#kbestdetector">KBestDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#lineardetector">LinearDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#maximumlikelihooddetector">MaximumLikelihoodDetector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#maximumlikelihooddetectorwithprior">MaximumLikelihoodDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#mmse-pic">MMSE-PIC</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/mimo.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#list2llr">List2LLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/mimo.html#list2llrsimple">List2LLRSimple</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#complex2real-vector">complex2real_vector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#real2complex-vector">real2complex_vector</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/mimo.html#complex2real-matrix">complex2real_matrix</a></li>
@@ -714,6 +769,20 @@
 <div class="section" id="list-of-projects">
 <h2>List of Projects<a class="headerlink" href="#list-of-projects" title="Permalink to this headline"></a></h2>
 <p>If you want your paper and code be listed here, please send an email to <a class="reference external" href="mailto:sionna&#37;&#52;&#48;nvidia&#46;com">sionna<span>&#64;</span>nvidia<span>&#46;</span>com</a> with links to the paper (e.g., <a class="reference external" href="https://arxiv.org">arXiv</a>) and code repository (e.g., <a class="reference external" href="https://github.com">GitHub</a>).</p>
+<div class="section" id="bit-error-and-block-error-rate-training-for-ml-assisted-communication">
+<h3>Bit Error and Block Error Rate Training for ML-Assisted Communication<a class="headerlink" href="#bit-error-and-block-error-rate-training-for-ml-assisted-communication" title="Permalink to this headline"></a></h3>
+<embed><h2  style="margin-bottom:0; font-size:19px;">Bit Error and Block Error Rate Training for ML-Assisted Communication</h2><i style="margin-bottom:0; font-size:16px;">Reinhard Wiesmayr, Gian Marti, Chris Dick, Haochuan Song, Christoph Studer</i><p style="margin-top: 1; margin-bottom:0; padding-top:0;">Released in 2022 and based on Sionna v0.11.</p><div style="margin-top:2; margin-bottom:10px;"><table><td style="padding: 4px 0px;"><a href="https://arxiv.org/pdf/2210.14103.pdf" style="vertical-align:text-bottom"><img alt="Arxiv logo" src="_static/arxiv_logo.png" style="width: 40px; min-width: 40px"></a></td><td style="padding: 4px 4px;"><a href="https://arxiv.org/pdf/2210.14103.pdf" style="vertical-align:text-bottom">Read on arXiv</a></td><td class="wy-breadcrumbs-aside" style="padding: 0 30px;"><a href="https://github.com/IIP-Group/BLER_Training" style="vertical-align:text-bottom"><i class="fa fa-github" style="font-size:24px;"></i> View on GitHub</a></td></table></div><p>Even though machine learning (ML) techniques are being
+widely used in communications, the question of how to train
+communication systems has received surprisingly little
+attention. In this paper, we show that the commonly used binary
+cross-entropy (BCE) loss is a sensible choice in uncoded
+systems, e.g., for training ML-assisted data detectors, but may
+not be optimal in coded systems. We propose new loss functions
+targeted at minimizing the block error rate and SNR deweighting,
+a novel method that trains communication systems for optimal
+performance over a range of signal-to-noise ratios. The utility
+of the proposed loss functions as well as of SNR deweighting is
+shown through simulations in NVIDIA Sionna.</p></embed></div>
 <div class="section" id="gnns-for-channel-decoding">
 <h3>GNNs for Channel Decoding<a class="headerlink" href="#gnns-for-channel-decoding" title="Permalink to this headline"></a></h3>
 <embed><h2  style="margin-bottom:0; font-size:19px;">Graph Neural Networks for Channel Decoding</h2><i style="margin-bottom:0; font-size:16px;">Sebastian Cammerer, Jakob Hoydis, Fayçal Aït Aoudia, Alexander Keller</i><p style="margin-top: 1; margin-bottom:0; padding-top:0;">Released in 2022 and based on Sionna v0.11.</p><div style="margin-top:2; margin-bottom:10px;"><table><td style="padding: 4px 0px;"><a href="https://arxiv.org/pdf/2207.14742.pdf" style="vertical-align:text-bottom"><img alt="Arxiv logo" src="_static/arxiv_logo.png" style="width: 40px; min-width: 40px"></a></td><td style="padding: 4px 4px;"><a href="https://arxiv.org/pdf/2207.14742.pdf" style="vertical-align:text-bottom">Read on arXiv</a></td><td class="wy-breadcrumbs-aside" style="padding: 0 30px;"><a href="https://github.com/NVlabs/gnn-decoder" style="vertical-align:text-bottom"><i class="fa fa-github" style="font-size:24px;"></i> View on GitHub</a></td><td style="padding: 0px 0px;"><a href="https://colab.research.google.com/github/NVlabs/gnn-decoder/blob/master/GNN_decoder_standalone.ipynb"style="vertical-align:text-bottom"><img alt="Colab logo" src="_static/colab_logo.svg" style="width: 40px; min-width: 40px"></a></td><td style="padding: 4px 0px;"><a href="https://colab.research.google.com/github/NVlabs/gnn-decoder/blob/master/GNN_decoder_standalone.ipynb" style="vertical-align:text-bottom">Run in Google Colab</a></td></table></div><p>We propose a fully differentiable graph neural network (GNN)-based architecture for channel decoding and showcase competitive decoding performance for various coding schemes, such as low-density parity-check (LDPC) and BCH codes. The idea is to let a neural network (NN) learn a generalized message passing algorithm over a given graph that represents the forward error correction code structure by replacing node and edge message updates with trainable functions.</p></embed></div>

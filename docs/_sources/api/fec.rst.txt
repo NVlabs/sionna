@@ -41,6 +41,7 @@ All this--and much more--can be explored within the Sionna FEC module.
 .. toctree::
    :maxdepth: 3
 
+   fec.linear
    fec.ldpc
    fec.polar
    fec.conv

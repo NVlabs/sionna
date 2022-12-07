@@ -32,8 +32,8 @@ Now, the encoder and decoder can be used by:
    # u_hat contains the estimated information bits and has shape [...,k].
    u_hat = decoder(llr)
 
-Encoder
-*******
+LDPC Encoder
+************
 
 LDPC5GEncoder
 -------------
@@ -42,15 +42,8 @@ LDPC5GEncoder
    :members:
    :exclude-members: call, build
 
-AllZeroEncoder
---------------
-
-.. autoclass:: sionna.fec.ldpc.encoding.AllZeroEncoder
-   :members:
-   :exclude-members: call, build
-
-Decoder
-*******
+LDPC Decoder
+************
 
 LDPCBPDecoder
 -------------

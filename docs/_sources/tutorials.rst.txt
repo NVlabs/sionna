@@ -33,6 +33,7 @@ For Experts
     examples/MIMO_OFDM_Transmissions_over_CDL.ipynb
     examples/Neural_Receiver.ipynb
     examples/Realistic_Multiuser_MIMO_Simulations.ipynb
+    examples/OFDM_MIMO_Detection.ipynb
     examples/Autoencoder.ipynb
     examples/Weighted_BP_Algorithm.ipynb
     examples/CIR_Dataset.ipynb

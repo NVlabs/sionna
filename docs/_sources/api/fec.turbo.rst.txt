@@ -9,7 +9,7 @@ decoders are composed of the :class:`~sionna.fec.conv.encoding.ConvEncoder` and
 Please note that various notations are used in literature to represent the
 generator polynomials for the underlying convolutional codes. For simplicity,
 :class:`~sionna.fec.turbo.encoding.TurboEncoder` only accepts the binary
-format, i.e., `10011` for the generator polynomial which corresponds to the
+format, i.e., `10011`, for the generator polynomial which corresponds to the
 polynomial :math:`1 + D^3 + D^4`.
 
 The following code snippet shows how to set-up a rate-1/3, constraint-length-4 :class:`~sionna.fec.turbo.encoding.TurboEncoder` and the corresponding :class:`~sionna.fec.turbo.decoding.TurboDecoder`.
@@ -27,10 +27,11 @@ Setting-up:
                           rate=1/3, # Rate of the desired Turbo code
                           terminate=False) # Do not terminate the constituent convolutional encoders
 
+   # the decoder can be initialized with a reference to the encoder
    decoder = TurboDecoder(encoder,
                           num_iter=6, # Number of iterations between component BCJR decoders
+                          algorithm="map", # can be also "maxlog"
                           hard_out=True) # hard_decide output
-
 
 Running the encoder / decoder:
 

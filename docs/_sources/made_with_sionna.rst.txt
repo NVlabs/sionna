@@ -10,6 +10,28 @@ List of Projects
 If you want your paper and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
 
+Bit Error and Block Error Rate Training for ML-Assisted Communication
+*********************************************************************
+.. made-with-sionna::
+    :title: Bit Error and Block Error Rate Training for ML-Assisted Communication
+    :authors: Reinhard Wiesmayr, Gian Marti, Chris Dick, Haochuan Song, Christoph Studer
+    :year: 2022
+    :version: 0.11
+    :link_arxiv: https://arxiv.org/pdf/2210.14103.pdf
+    :link_github: https://github.com/IIP-Group/BLER_Training
+    :abstract: Even though machine learning (ML) techniques are being
+               widely used in communications, the question of how to train
+               communication systems has received surprisingly little
+               attention. In this paper, we show that the commonly used binary
+               cross-entropy (BCE) loss is a sensible choice in uncoded
+               systems, e.g., for training ML-assisted data detectors, but may
+               not be optimal in coded systems. We propose new loss functions
+               targeted at minimizing the block error rate and SNR deweighting,
+               a novel method that trains communication systems for optimal
+               performance over a range of signal-to-noise ratios. The utility
+               of the proposed loss functions as well as of SNR deweighting is
+               shown through simulations in NVIDIA Sionna.
+
 GNNs for Channel Decoding
 *************************
 .. made-with-sionna::
@@ -32,3 +54,5 @@ DL-based Synchronization of NB-IoT
     :link_arxiv: https://arxiv.org/pdf/2205.10805.pdf
     :link_github: https://github.com/NVlabs/nprach_synch
     :abstract: We propose a neural network (NN)-based algorithm for device detection and time of arrival (ToA) and carrier frequency offset (CFO) estimation for the narrowband physical random-access channel (NPRACH) of narrowband internet of things (NB-IoT). The introduced NN architecture leverages residual convolutional networks as well as knowledge of the preamble structure of the 5G New Radio (5G NR) specifications.
+
+
