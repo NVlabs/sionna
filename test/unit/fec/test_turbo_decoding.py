@@ -8,10 +8,10 @@ except ImportError as e:
     import sys
     sys.path.append("../")
 
+from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-
 
 gpus = tf.config.list_physical_devices('GPU')
 print('Number of GPUs available :', len(gpus))
@@ -25,46 +25,9 @@ if gpus:
         print(e)
 from sionna.fec.turbo import TurboEncoder, TurboDecoder
 from sionna.fec.utils import GaussianPriorSource
-from sionna.utils import BinarySource, compute_ber, compute_bler, sim_ber, ebnodb2no
+from sionna.utils import BinarySource, sim_ber, ebnodb2no
 from sionna.channel import AWGN
 from sionna.mapping import Mapper, Demapper, Constellation
-
-class TurboExample(tf.keras.Model):
-    def __init__(self,
-                 k,
-                 gen_poly,
-                 turbo_iter=10,
-                 terminate=False,
-                 rate=1/3):
-        super().__init__()
-
-        self.k = k
-        self.rate = rate
-        self.binary_source = BinarySource()
-        self.encoder = TurboEncoder(gen_poly=gen_poly,
-                                    rate=rate,
-                                    terminate=terminate)
-        self.channel = AWGN()
-        self.decoder = TurboDecoder(self.encoder, num_iter=turbo_iter)
-
-    def call(self, ebno, batch_size):
-        # Generate a batch of random bit vectors
-        no = tf.cast((1/self.rate) * (10 ** (-ebno / 10)),tf.float32)
-        msg = tf.cast(self.binary_source([batch_size, self.k]), tf.int32)
-        cw = self.encoder(msg)
-        x = 2 * cw - 1
-        x_cpx = tf.complex(tf.cast(x, tf.float32), tf.zeros(x.shape))
-        y_cpx = self.channel((x_cpx, no))
-        y = tf.math.real(y_cpx)
-        llr = 4.*y/no
-        msghat = self.decoder(llr)
-        msghat = tf.cast(msghat, tf.int32)
-
-        diff = tf.abs(msghat-msg)
-        blerrs_ = int(tf.math.count_nonzero(tf.reduce_sum(diff, axis=1)))
-        biterrs_ = int(tf.math.count_nonzero(diff))
-        return blerrs_, biterrs_
-
 
 class TestTurboDecoding(unittest.TestCase):
 
@@ -73,10 +36,10 @@ class TestTurboDecoding(unittest.TestCase):
          codeword.
 
         Further, test numerical stability (no nan or infty as output)."""
-        bs = 10
+        bs = 6
 
         coderates = [1/2, 1/3]
-        ks = [10, 40, 400]
+        ks = [12, 60]
 
         source = GaussianPriorSource()
 
@@ -85,6 +48,7 @@ class TestTurboDecoding(unittest.TestCase):
                 n = int(k/rate)
                 dec = TurboDecoder(rate=rate,
                                    constraint_length=5,
+                                   num_iter=3,
                                    terminate=False)
 
                 # --- test output dimensions ---
@@ -135,37 +99,17 @@ class TestTurboDecoding(unittest.TestCase):
 
             return
 
-        bs = 10
-        coderates = [1/2, 1/3]
+        bs = 5
         k = 50
-        cls = [3, 4, 5, 6] # constraint length
+        cl = 4 # constraint length
+        coderates = [1/3, 1/2]
 
-        for terminate in [False, True]:
+        for terminate, alg in product([True, False], ("map", "log", "maxlog")):
             for rate in coderates:
-                for cl in cls:
-                    u = BinarySource()([bs, k])
-                    enc = TurboEncoder(
-                                constraint_length=cl,
-                                rate=rate,
-                                terminate=terminate)
-                    dec = TurboDecoder(
-                                gen_poly=enc.gen_poly,
-                                rate=rate,
-                                terminate=terminate)
-                    test_identity_(enc, dec, u)
-
-            u = BinarySource()([bs, k])
-            for rate in coderates:
-                enc = TurboEncoder(gen_poly=['101', '111'],
-                                   rate=rate,
-                                   terminate=terminate)
-                dec = TurboDecoder(enc)
-                test_identity_(enc, dec, u)
-
-                enc = TurboEncoder(gen_poly=['1101', '1111'],
-                                   rate=rate,
-                                   terminate=terminate)
-                dec = TurboDecoder(enc)
+                u = BinarySource()([bs, k])
+                enc = TurboEncoder(
+                    constraint_length=cl, rate=rate, terminate=terminate)
+                dec = TurboDecoder(enc, algorithm=alg, num_iter=2)
                 test_identity_(enc, dec, u)
 
     def test_keras(self):
@@ -174,7 +118,7 @@ class TestTurboDecoding(unittest.TestCase):
         n = 64
         source = BinarySource()
         inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
-        x = TurboDecoder(rate=1/2, constraint_length=3, terminate=False)(inputs)
+        x = TurboDecoder(rate=1/2, constraint_length=3, terminate=False, num_iter=3)(inputs)
         model = tf.keras.Model(inputs=inputs, outputs=x)
 
         b = source([bs, n])
@@ -190,7 +134,7 @@ class TestTurboDecoding(unittest.TestCase):
         n = 200
 
         source = BinarySource()
-        dec = TurboDecoder(rate=1/2, constraint_length=3, terminate=False)
+        dec = TurboDecoder(rate=1/2, constraint_length=3, num_iter=2, terminate=False)
 
         b = source([30, n])
         b_res = tf.reshape(b, [2, 3, 5, n])
@@ -216,7 +160,7 @@ class TestTurboDecoding(unittest.TestCase):
         n = 240
 
         source = GaussianPriorSource()
-        dec = TurboDecoder(rate=1/2, constraint_length=3, terminate=False)
+        dec = TurboDecoder(rate=1/2, constraint_length=3, terminate=False, num_iter=2)
 
         b = source([[1, n], 1.])
         b_rep = tf.tile(b, [bs, 1])
@@ -228,7 +172,7 @@ class TestTurboDecoding(unittest.TestCase):
         for i in range(bs):
             self.assertTrue(np.array_equal(c[0,:], c[i,:]))
 
-    def test_ref_implementation(self):
+    def test_ber_match(self):
         """Test against results from reference implementation.
         """
         def simulation(k, num_iter, snrs):
@@ -253,13 +197,13 @@ class TestTurboDecoding(unittest.TestCase):
                 return u, u_hat
 
             ber, _ = sim_ber(run_graph,
-                                ebno_dbs=snrs,
-                                max_mc_iter=20,
-                                num_target_bit_errors=1000,
-                                batch_size=10000,
-                                soft_estimates=False,
-                                early_stop=True,
-                                forward_keyboard_interrupt=False)
+                            ebno_dbs=snrs,
+                            max_mc_iter=20,
+                            num_target_bit_errors=500,
+                            batch_size=10000,
+                            soft_estimates=False,
+                            early_stop=True,
+                            forward_keyboard_interrupt=False)
             return ber
         k = 512
         snrs = [0, 0.5, 1, 1.5, 2]
@@ -274,9 +218,26 @@ class TestTurboDecoding(unittest.TestCase):
                 snrs = snrs[:-1]
             ber = simulation(k, num_iters, snrs)
             for idx in range(len(snrs)):
-                print(idx)
                 self.assertTrue(np.less_equal(ber[idx], ber_ub[num_iters][idx]))
                 self.assertTrue(np.greater_equal(ber[idx], ber_lb[num_iters][idx]))
+
+    def test_ref_implementation(self):
+        r"""Test against pre-decoded noisy codewords from reference
+        implementation.
+        """
+        ref_path = 'codes/turbo/'
+        r = 1/3
+        ks = [40, 112, 168]
+        enc = TurboEncoder(rate=1/3, terminate=True, constraint_length=4)
+        dec = TurboDecoder(enc, num_iter=10)
+        ebno = 0.0
+        no = 1/(r* (10 ** (-ebno / 10)))
+
+        for k in ks:
+            uhatref = np.load(ref_path + 'ref_k{}_uhat.npy'.format(k))
+            yref = np.load(ref_path + 'ref_k{}_y.npy'.format(k))
+            uhat = dec(-4.*yref/no).numpy()
+            self.assertTrue(np.array_equal(uhat, uhatref))
 
     def test_dtype_flexible(self):
         """Test that output_dtype can be flexible."""
@@ -304,6 +265,7 @@ class TestTurboDecoding(unittest.TestCase):
         llr_c = tf.complex(llr, tf.zeros_like(llr))
         dec = TurboDecoder(rate=1/2,
                            constraint_length=3,
+                           num_iter=1,
                            output_dtype=tf.float32)
 
         with self.assertRaises(TypeError):
@@ -318,7 +280,7 @@ class TestTurboDecoding(unittest.TestCase):
 
         for t in [False, True]:
 
-            dec = TurboDecoder(rate=1/3, constraint_length=3, terminate=t)
+            dec = TurboDecoder(rate=1/3, constraint_length=3, terminate=t, num_iter=3)
 
             @tf.function
             def run_graph(u):
@@ -346,3 +308,18 @@ class TestTurboDecoding(unittest.TestCase):
             # and change the batch_size again
             u = source([bs+1, n])
             x = run_graph_xla(u).numpy()
+
+    def test_dynamic_shapes(self):
+        """Test for dynamic (=unknown) batch-sizes"""
+
+        n = 1536
+        enc = TurboEncoder(gen_poly=('1101', '1011'), rate=1/3, terminate=False)
+        dec = TurboDecoder(enc, num_iter=3)
+
+        @tf.function(jit_compile=True)
+        def run_graph(batch_size):
+            llr_ch = tf.zeros((batch_size, n))
+            u_hat = dec(llr_ch)
+            return u_hat
+
+        run_graph(tf.constant(1))

@@ -12,138 +12,7 @@ from importlib_resources import files, as_file
 from . import codes # pylint: disable=relative-beyond-top-level
 import numbers # to check if n, k are numbers
 
-class AllZeroEncoder(Layer):
-    """AllZeroEncoder(k, n, dtype=tf.float32, **kwargs)
-
-    Dummy encoder that always outputs the all-zero codeword of length ``n``.
-    Note that this encoder is a dummy encoder and does NOT perform real
-    encoding!
-
-    The class inherits from the Keras layer class and can be used as layer in a
-    Keras model.
-
-    Parameters
-    ----------
-        k: int
-            Defining the number of information bit per codeword.
-
-        n: int
-            Defining the desired codeword length.
-
-        dtype: tf.DType
-            Defaults to `tf.float32`. Defines the datatype for internal
-            calculations and the output dtype.
-
-    Input
-    -----
-        inputs: [...,k], tf.float32
-            2+D tensor containing arbitrary values (not used!).
-
-    Output
-    ------
-        : [...,n], tf.float32
-            2+D tensor containing all-zero codewords.
-
-    Raises
-    ------
-        AssertionError
-            ``k`` and ``n`` must be positive integers and ``k`` must be smaller
-            (or equal) than ``n``.
-
-        AssertionError
-            If ``k`` is not `int`.
-
-        AssertionError
-            If ``n`` is not `int`.
-
-    Note
-    ----
-        As the all-zero codeword is part of any linear code, it is often used
-        to simulate BER curves of arbitrary (LDPC) codes without the need of
-        having access to the actual generator matrix. However, this `"all-zero
-        codeword trick"` requires symmetric channels (such as BPSK), otherwise
-        scrambling is required (cf. [Pfister]_ for further details).
-
-        This encoder is a dummy encoder that is needed for some all-zero
-        codeword simulations independent of the input. It does NOT perform
-        real encoding although the information bits are taken as input.
-        This is just to ensure compatibility with other encoding layers.
-    """
-
-    def __init__(self,
-                 k,
-                 n,
-                 dtype=tf.float32,
-                 **kwargs):
-
-        super().__init__(dtype=dtype, **kwargs)
-
-        #assert error if r>1 or k,n are negativ
-        assert isinstance(k, numbers.Number), "k must be a number."
-        assert isinstance(n, numbers.Number), "n must be a number."
-        k = int(k) # k or n can be float (e.g. as result of n=k*r)
-        n = int(n) # k or n can be float (e.g. as result of n=k*r)
-        assert k>-1, "k cannot be negative."
-        assert n>-1, "n cannot be negative."
-        assert n>=k, "Invalid coderate (>1)."
-        # init encoder parameters
-        self._k = k
-        self._n = n
-        self._coderate = k / n
-
-    #########################################
-    # Public methods and properties
-    #########################################
-
-    @property
-    def k(self):
-        """Number of information bits per codeword."""
-        return self._k
-
-    @property
-    def n(self):
-        "Codeword length."
-        return self._n
-
-    @property
-    def coderate(self):
-        """Coderate of the LDPC code."""
-        return self._coderate
-
-    #########################
-    # Keras layer functions
-    #########################
-
-    def build(self, input_shape):
-        """Nothing to build."""
-        pass
-
-    def call(self, inputs):
-        """Encoding function that outputs the all-zero codeword.
-
-        This function returns the all-zero codeword of shape `[..., n]`.
-        Note that this encoder is a dummy encoder and does NOT perform real
-        encoding!
-
-        Args:
-            inputs (tf.float32): Tensor of arbitrary shape.
-
-        Returns:
-            `tf.float32`: Tensor of shape `[...,n]`.
-
-        Note:
-            This encoder is a dummy encoder that is needed for some all-zero
-            codeword simulations independent of the input. It does NOT perform
-            real encoding although the information bits are taken as input.
-            This is just to ensure compatibility with other encoding layers.
-        """
-        # keep shape of first dimensions
-        # return an all-zero tensor of shape [..., n]
-        output_shape = tf.concat([tf.shape(inputs)[:-1],
-                                  tf.constant(self._n, shape=[1])],
-                                  0)
-        c = tf.zeros(output_shape, dtype=super().dtype)
-        return c
+from sionna.fec.linear import AllZeroEncoder as AllZeroEncoder_new
 
 class LDPC5GEncoder(Layer):
     # pylint: disable=line-too-long
@@ -880,3 +749,20 @@ class LDPC5GEncoder(Layer):
         c_reshaped = tf.reshape(c_short, output_shape)
 
         return tf.cast(c_reshaped, self._dtype)
+
+
+###########################################################
+# Deprecated aliases that will not be included in the next
+# major release
+###########################################################
+
+def AllZeroEncoder(k,
+                   n,
+                   dtype=tf.float32,
+                   **kwargs):
+    print("Warning: The alias fec.ldpc.AllZeroEncoder will not be included in "\
+          "Sionna 1.0. Please use sionna.fec.linear.AllZeroEncoder instead.")
+    return AllZeroEncoder_new(k=k,
+                              n=n,
+                              dtype=dtype,
+                              **kwargs)

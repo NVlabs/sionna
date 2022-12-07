@@ -4,18 +4,14 @@ Utility Functions
 This module provides utility functions for the FEC package. It also provides serval functions to simplify EXIT analysis of iterative receivers.
 
 (Binary) Linear Codes
-**************************
+***********************
 
 Several functions are provided to convert parity-check matrices into generator matrices and vice versa. Please note that currently only binary codes are supported.
-Further, a universal linear encoder is available and can be initialized either with a generator or with a parity-check matrix, respectively.
 
 .. code-block:: Python
 
    # load example parity-check matrix
    pcm, k, n, coderate = load_parity_check_examples(pcm_id=3)
-
-   # the encoder can be directly initialized with a parity-check matrix
-   encoder = LinearEncoder(pcm, is_pcm=True)
 
 Note that many research projects provide their parity-check matrices in the  `alist` format [MacKay]_ (e.g., see [UniKL]_). The follwing code snippet provides an example of how to import an external LDPC parity-check matrix from an `alist` file and how to set-up an encoder/decoder.
 
@@ -25,7 +21,7 @@ Note that many research projects provide their parity-check matrices in the  `al
    al = load_alist(path=filename)
    pcm, k, n, coderate = alist2mat(al)
 
-   # the encoder can be directly initialized with a parity-check matrix
+   # the linear encoder can be directly initialized with a parity-check matrix
    encoder = LinearEncoder(pcm, is_pcm=True)
 
    # initalize BP decoder for the given parity-check matrix
@@ -47,12 +43,6 @@ Note that many research projects provide their parity-check matrices in the  `al
    y = channel([x, no])
    llr = demapper([y, no])
    c_hat = decoder(llr)
-
-LinearEncoder
--------------
-.. autoclass:: sionna.fec.utils.LinearEncoder
-   :members:
-   :exclude-members: call, build
 
 load_parity_check_examples
 --------------------------
@@ -182,6 +172,10 @@ bin2int_tf
 int2bin_tf
 ----------
 .. autofunction:: sionna.fec.utils.int2bin_tf
+
+int_mod_2
+---------
+.. autofunction:: sionna.fec.utils.int_mod_2
 
 llr2mi
 ------

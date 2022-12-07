@@ -18,7 +18,7 @@ Here is a short video showing Sionna in action:
    <center>
    <iframe width="560" height="315" src="https://www.youtube.com/embed/cYUNE4i4Q4E" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
    </center>
-|
+
 
 The Benefits of using Sionna
 ###################################
@@ -79,5 +79,3 @@ If you use this software, please cite it as:
     journal = {arXiv preprint},
     online = {https://arxiv.org/abs/2203.11854}
    }
-
-

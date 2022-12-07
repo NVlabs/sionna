@@ -11,14 +11,14 @@ import numpy as np
 import tensorflow as tf
 
 from sionna import PI, SPEED_OF_LIGHT
-from sionna.utils import insert_dims
+from sionna.utils import insert_dims, expand_to_rank, matrix_sqrt, split_dim, flatten_last_dims
 from sionna.channel import ChannelModel
 
 from . import models # pylint: disable=relative-beyond-top-level
 
 class TDL(ChannelModel):
     # pylint: disable=line-too-long
-    r"""TDL(model, delay_spread, carrier_frequency, num_sinusoids=20, los_angle_of_arrival=PI/4., min_speed=0., max_speed=None, dtype=tf.complex64)
+    r"""TDL(model, delay_spread, carrier_frequency, num_sinusoids=20, los_angle_of_arrival=PI/4., min_speed=0., max_speed=None, num_rx_ant=1, num_tx_ant=1, spatial_corr_mat=None, rx_corr_mat=None, tx_corr_mat=None, dtype=tf.complex64)
 
     Tapped delay line (TDL) channel model from the 3GPP [TR38901]_ specification.
 
@@ -32,9 +32,41 @@ class TDL(ChannelModel):
     and uniformly sampled from the specified interval for each link and each
     batch example.
 
-    The TDL model only works for single-input single-output (SISO) systems.
-    One can conduct simulations for multiple-input multiple-output (MIMO)
-    systems using the other channel models available in Sionna.
+    The TDL model only works for systems with a single transmitter and a single
+    receiver. The transmitter and receiver can be equipped with multiple
+    antennas. Spatial correlation is simulated through filtering by specified
+    correlation matrices.
+
+    The ``spatial_corr_mat`` parameter can be used to specify an arbitrary
+    spatial correlation matrix. In particular, it can be used to model
+    correlated cross-polarized transmit and receive antennas as follows
+    (see, e.g., Annex G.2.3.2.1 [TS38141-1]_):
+
+    .. math::
+
+        \mathbf{R} = \mathbf{R}_{\text{rx}} \otimes \mathbf{\Gamma} \otimes \mathbf{R}_{\text{tx}}
+
+    where :math:`\mathbf{R}` is the spatial correlation matrix ``spatial_corr_mat``,
+    :math:`\mathbf{R}_{\text{rx}}` the spatial correlation matrix at the receiver
+    with same polarization, :math:`\mathbf{R}_{\text{tx}}` the spatial correlation
+    matrix at the transmitter with same polarization, and :math:`\mathbf{\Gamma}`
+    the polarization correlation matrix. :math:`\mathbf{\Gamma}` is 1x1 for single-polarized
+    antennas, 2x2 when only the transmit or receive antennas are cross-polarized, and 4x4 when
+    transmit and receive antennas are cross-polarized.
+
+    It is also possible not to specify ``spatial_corr_mat``, but instead the correlation matrices
+    at the receiver and transmitter, using the ``rx_corr_mat`` and ``tx_corr_mat``
+    parameters, respectively.
+    This can be useful when single polarized antennas are simulated, and it is also
+    more computationally efficient.
+    This is equivalent to setting ``spatial_corr_mat`` to :
+
+    .. math::
+        \mathbf{R} = \mathbf{R}_{\text{rx}} \otimes \mathbf{R}_{\text{tx}}
+
+    where :math:`\mathbf{R}_{\text{rx}}` is the correlation matrix at the receiver
+    ``rx_corr_mat`` and  :math:`\mathbf{R}_{\text{tx}}` the correlation matrix at
+    the transmitter ``tx_corr_mat``.
 
     Example
     --------
@@ -111,10 +143,12 @@ class TDL(ChannelModel):
     -----------
 
     model : str
-        TDL model to use. Must be one of "A", "B", "C", "D" or "E".
+        TDL model to use. Must be one of "A", "B", "C", "D", "E", "A30", "B100", or "C300".
 
     delay_spread : float
-        RMS delay spread [s]
+        RMS delay spread [s].
+        For the "A30", "B100", and "C300" models, the delay spread must be set
+        to 10ns, 100ns, and 300ns, respectively.
 
     carrier_frequency : float
         Carrier frequency [Hz]
@@ -132,6 +166,34 @@ class TDL(ChannelModel):
     max_speed : None or float
         Maximum speed [m/s]. If set to `None`,
         then ``max_speed`` takes the same value as ``min_speed``.
+        Defaults to `None`.
+
+    num_rx_ant : int
+        Number of receive antennas.
+        Defaults to 1.
+
+    num_tx_ant : int
+        Number of transmit antennas.
+        Defaults to 1.
+
+    spatial_corr_mat : [num_rx_ant*num_tx_ant,num_rx_ant*num_tx_ant], tf.complex or `None`
+        Spatial correlation matrix.
+        If not set to `None`, then ``rx_corr_mat`` and ``tx_corr_mat`` are ignored and
+        this matrix is used for spatial correlation.
+        If set to `None` and ``rx_corr_mat`` and ``tx_corr_mat`` are also set to `None`,
+        then no correlation is applied.
+        Defaults to `None`.
+
+    rx_corr_mat : [num_rx_ant,num_rx_ant], tf.complex or `None`
+        Spatial correlation matrix for the receiver.
+        If set to `None` and ``spatial_corr_mat`` is also set to `None`, then no receive
+        correlation is applied.
+        Defaults to `None`.
+
+    tx_corr_mat : [num_tx_ant,num_tx_ant], tf.complex or `None`
+        Spatial correlation matrix for the transmitter.
+        If set to `None` and ``spatial_corr_mat`` is also set to `None`, then no transmit
+        correlation is applied.
         Defaults to `None`.
 
     dtype : Complex tf.DType
@@ -168,6 +230,11 @@ class TDL(ChannelModel):
                     los_angle_of_arrival=PI/4.,
                     min_speed=0.,
                     max_speed=None,
+                    num_rx_ant=1,
+                    num_tx_ant=1,
+                    spatial_corr_mat=None,
+                    rx_corr_mat=None,
+                    tx_corr_mat=None,
                     dtype=tf.complex64):
 
         assert dtype.is_complex, "dtype must be a complex datatype"
@@ -176,7 +243,8 @@ class TDL(ChannelModel):
         self._real_dtype = real_dtype
 
         # Set the file from which to load the model
-        assert model in ('A', 'B', 'C', 'D', 'E'), "Invalid TDL model"
+        assert model in ('A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'),\
+            "Invalid TDL model"
         if model == 'A':
             parameters_fname = "TDL-A.json"
         elif model == 'B':
@@ -187,10 +255,27 @@ class TDL(ChannelModel):
             parameters_fname = "TDL-D.json"
         elif model == 'E':
             parameters_fname = "TDL-E.json"
+        elif model == 'A30':
+            parameters_fname = "TDL-A30.json"
+            if delay_spread != 30e-9:
+                print("Warning: Delay spread is set to 30ns with this model")
+                delay_spread = 30e-9
+        elif model == 'B100':
+            parameters_fname = "TDL-B100.json"
+            if delay_spread != 100e-9:
+                print("Warning: Delay spread is set to 100ns with this model")
+                delay_spread = 100e-9
+        elif model == 'C300':
+            parameters_fname = "TDL-C300.json"
+            if delay_spread != 300e-9:
+                print("Warning: Delay spread is set to 300ns with this model")
+                delay_spread = 300e-9
 
         # Load model parameters
         self._load_parameters(parameters_fname)
 
+        self._num_rx_ant = num_rx_ant
+        self._num_tx_ant = num_tx_ant
         self._carrier_frequency = tf.constant(carrier_frequency, real_dtype)
         self._num_sinusoids = tf.constant(num_sinusoids, tf.int32)
         self._los_angle_of_arrival = tf.constant(   los_angle_of_arrival,
@@ -221,6 +306,29 @@ class TDL(ChannelModel):
                                             1, # num time steps
                                             num_sinusoids])
 
+        # Precompute square root of spatial covariance matrices
+        if spatial_corr_mat is not None:
+            spatial_corr_mat = tf.cast(spatial_corr_mat, self._dtype)
+            spatial_corr_mat_sqrt = matrix_sqrt(spatial_corr_mat)
+            spatial_corr_mat_sqrt = expand_to_rank(spatial_corr_mat_sqrt, 7, 0)
+            self._spatial_corr_mat_sqrt = spatial_corr_mat_sqrt
+        else:
+            self._spatial_corr_mat_sqrt = None
+            if rx_corr_mat is not None:
+                rx_corr_mat = tf.cast(rx_corr_mat, self._dtype)
+                rx_corr_mat_sqrt = matrix_sqrt(rx_corr_mat)
+                rx_corr_mat_sqrt = expand_to_rank(rx_corr_mat_sqrt, 7, 0)
+                self._rx_corr_mat_sqrt = rx_corr_mat_sqrt
+            else:
+                self._rx_corr_mat_sqrt = None
+            if tx_corr_mat is not None:
+                tx_corr_mat = tf.cast(tx_corr_mat, self._dtype)
+                tx_corr_mat_sqrt = matrix_sqrt(tx_corr_mat)
+                tx_corr_mat_sqrt = expand_to_rank(tx_corr_mat_sqrt, 7, 0)
+                self._tx_corr_mat_sqrt = tx_corr_mat_sqrt
+            else:
+                self._tx_corr_mat_sqrt = None
+
     @property
     def num_clusters(self):
         r"""Number of paths (:math:`M`)"""
@@ -240,7 +348,10 @@ class TDL(ChannelModel):
     @property
     def delays(self):
         r"""Path delays [s]"""
-        return self._delays*self._delay_spread
+        if self._scale_delays:
+            return self._delays*self._delay_spread
+        else:
+            return self._delays*1e-9 # ns to s
 
     @property
     def mean_powers(self):
@@ -266,7 +377,10 @@ class TDL(ChannelModel):
 
     @delay_spread.setter
     def delay_spread(self, value):
-        self._delay_spread = value
+        if self._scale_delays:
+            self._delay_spread = value
+        else:
+            print("Warning: The delay spread cannot be set with this model")
 
     def __call__(self, batch_size, num_time_steps, sampling_frequency):
 
@@ -310,9 +424,9 @@ class TDL(ChannelModel):
         # Eq. (6a)-(6c) in the paper [TDL] (see class docstring)
         phi = tf.random.uniform([   batch_size,
                                     1, # 1 RX
-                                    1, # 1 RX antenna
+                                    self._num_rx_ant, # 1 RX antenna
                                     1, # 1 TX
-                                    1, # 1 TX antenna
+                                    self._num_tx_ant, # 1 TX antenna
                                     self._num_clusters,
                                     1, # Phase shift is shared by all time steps
                                     self._num_sinusoids],
@@ -346,8 +460,8 @@ class TDL(ChannelModel):
                                         1, # 1 TX antenna
                                         1, # only the first tap is concerned
                                         1], # Shared by all time steps
-                                        PI,
                                         -PI,
+                                        PI,
                                         self._real_dtype)
             # Remove the sinusoids dim
             doppler = tf.squeeze(doppler, axis=-1)
@@ -362,9 +476,33 @@ class TDL(ChannelModel):
                             axis=5) # Path dims
 
         # Delays
-        delays = self._delays*self._delay_spread
+        if self._scale_delays:
+            delays = self._delays*self._delay_spread
+        else:
+            delays = self._delays*1e-9 # ns to s
         delays = insert_dims(delays, 3, 0)
         delays = tf.tile(delays, [batch_size, 1, 1, 1])
+
+        # Apply spatial correlation if required
+        if self._spatial_corr_mat_sqrt is not None:
+            h = tf.transpose(h, [0,1,3,5,6,2,4]) # [..., num_rx_ant, num_tx_ant]
+            #h = flatten_dims(h, 2, tf.rank(h)-2)  # [..., num_rx_ant*num_tx_ant]
+            h = flatten_last_dims(h, 2) # [..., num_rx_ant*num_tx_ant]
+            h = tf.expand_dims(h, axis=-1) # [..., num_rx_ant*num_tx_ant, 1]
+            h = tf.matmul(self._spatial_corr_mat_sqrt, h)
+            h = tf.squeeze(h, axis=-1)
+            h = split_dim(h, [self._num_rx_ant, self._num_tx_ant],
+                            tf.rank(h)-1)  # [..., num_rx_ant, num_tx_ant]
+            h = tf.transpose(h, [0,1,5,2,6,3,4])
+        else:
+            if ( (self._rx_corr_mat_sqrt is not None)
+                    or (self._tx_corr_mat_sqrt is not None) ):
+                h = tf.transpose(h, [0,1,3,5,6,2,4])
+                if self._rx_corr_mat_sqrt is not None:
+                    h = tf.matmul(self._rx_corr_mat_sqrt, h)
+                if self._tx_corr_mat_sqrt is not None:
+                    h = tf.matmul(h, self._tx_corr_mat_sqrt)
+                h = tf.transpose(h, [0,1,5,2,6,3,4])
 
         # Stop gadients to avoid useless backpropagation
         h = tf.stop_gradient(h)
@@ -433,6 +571,9 @@ class TDL(ChannelModel):
         # LoS scenario ?
         self._los = bool(params['los'])
 
+        # Scale the delays
+        self._scale_delays = bool(params['scale_delays'])
+
         # Loading cluster delays and mean powers
         self._num_clusters = tf.constant(params['num_clusters'], tf.int32)
 
@@ -451,7 +592,7 @@ class TDL(ChannelModel):
             # We need to keep only one.
             delays = delays[1:]
 
-        # Normalize the PDP if requested
+        # Normalize the PDP
         if self._los:
             norm_factor = tf.reduce_sum(mean_powers) + self._los_power
             self._los_power = self._los_power / norm_factor

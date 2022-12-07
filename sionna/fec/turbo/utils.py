@@ -57,7 +57,7 @@ def puncture_pattern(turbo_coderate, conv_coderate):
         Desired coderate of the Turbo code
 
     conv_coderate: float
-        Coderate of the underlying convolutional encoder.
+        Coderate of the underlying convolutional encoder
 
     Output
     ------
@@ -91,13 +91,13 @@ class TurboTermination(object):
 
     conv_n: int
         Number of output bits for one state transition in the underlying
-        convolutional encoder.
+        convolutional encoder
 
     num_conv_encs: int
-        Number of parallel convolutional encoders used in the Turbo code.
+        Number of parallel convolutional encoders used in the Turbo code
 
     num_bit_streams: int
-        Number of output bit streams from Turbo code.
+        Number of output bit streams from Turbo code
     """
 
     def __init__(self,
@@ -186,10 +186,10 @@ class TurboTermination(object):
         Input
         -----
         term_bits1: tf.int32
-            2+D Tensor containing termination bits from convolutional encoder 1.
+            2+D Tensor containing termination bits from convolutional encoder 1
 
         term_bits2: tf.int32
-            2+D Tensor containing termination bits from convolutional encoder 2.
+            2+D Tensor containing termination bits from convolutional encoder 2
 
         Output
         ------
@@ -209,7 +209,7 @@ class TurboTermination(object):
                                   tf.constant(extra_bits)],
                                    axis=0)
             term_bits = tf.concat(
-                        [term_bits, tf.zeros(zer_shape, tf.int32)], axis=-1)
+                        [term_bits, tf.zeros(zer_shape, tf.float32)], axis=-1)
         return term_bits
 
     def term_bits_turbo2conv(self, term_bits):
@@ -256,13 +256,13 @@ class TurboTermination(object):
         -----
         term_bits: tf.float32
             Channel output of the Turbo codeword, corresponding to the
-            termination part.
+            termination part
 
         Output
         ------
         : tf.float32
             Two tensors of channel outputs, corresponding to encoders 1 and 2,
-            respectively.
+            respectively
         """
         input_len = tf.shape(term_bits)[-1]
         divisible = tf.math.floormod(input_len, self.num_bitstreams)

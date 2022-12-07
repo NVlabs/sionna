@@ -580,7 +580,11 @@ one_ring_corr_mat
 
 References:
    .. [TR38901] 3GPP TR 38.901,
-      “Study on channel model for frequencies from 0.5 to 100 GHz“, Release 16.1
+      "Study on channel model for frequencies from 0.5 to 100 GHz", Release 16.1
+
+   .. [TS38141-1] 3GPP TS 38.141-1
+      "Base Station (BS) conformance testing Part 1: Conducted conformance testing",
+      Release 17
 
    .. [Tse] D. Tse and P. Viswanath, “Fundamentals of wireless communication“,
       Cambridge university press, 2005.

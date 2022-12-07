@@ -8,6 +8,7 @@ except ImportError as e:
     import sys
     sys.path.append("../")
 
+from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
@@ -28,40 +29,6 @@ from sionna.fec.utils import GaussianPriorSource
 from sionna.utils import BinarySource
 from sionna.channel import AWGN
 
-class ConvExample(tf.keras.Model):
-    def __init__(self,
-                 k,
-                 rate,
-                 constraint_length):
-        super().__init__()
-        self.rate = rate
-        self.k = k
-
-        self.binary_source = BinarySource()
-        self.encoder = ConvEncoder(rate=rate,
-                                   constraint_length=constraint_length)
-        self.channel = AWGN()
-        self.decoder = ViterbiDecoder(self.encoder.gen_poly, method='soft_llr')
-
-    def call(self, ebno, batch_size):
-        # Generate a batch of random bit vectors
-        no = tf.cast((1/self.rate) * (10 ** (-ebno / 10)),tf.float32)
-
-        msg = tf.cast(self.binary_source([batch_size, self.k]), tf.int32)
-        cw = self.encoder(msg)
-        x = 2 * cw - 1
-
-        x_cpx = tf.complex(tf.cast(x, tf.float32), tf.zeros(x.shape))
-
-        y_cpx = self.channel((x_cpx, no))
-        y = tf.math.real(y_cpx)
-        llr = 2.*y/no
-
-        msghat = tf.cast(self.decoder(llr), tf.int32)
-
-        errs_ = int(tf.math.count_nonzero(msghat-msg))
-        return errs_
-
 
 class TestViterbiDecoding(unittest.TestCase):
 
@@ -71,17 +38,24 @@ class TestViterbiDecoding(unittest.TestCase):
         bs = 10
 
         coderates = [1/2, 1/3]
-        ks = [10, 20, 40, 100, 1000]
+        ks = [10, 22, 40]
+        muterm = 3
+        for k, rate in product(ks, coderates):
+            for dec in (
+                ViterbiDecoder(rate=rate, constraint_length=5),
+                ViterbiDecoder(rate=rate, constraint_length=3, rsc=True),
+                ViterbiDecoder(rate=rate, constraint_length=muterm+1, terminate=True)):
 
-        for rate in coderates:
-            for k in ks:
                 n = int(k/rate)
-                dec = ViterbiDecoder(rate=rate, constraint_length=5)
+                if dec.terminate:
+                    n += int((muterm)/rate)
+
                 # all-zero with BPSK (no noise);logits
                 c = -10. * np.ones([bs, n])
                 u = dec(c).numpy()
-                self.assertTrue(u.shape[-1]==k)
                 # also check that all-zero input yields all-zero output
+                self.assertTrue(u.shape[-1]==k)
+
                 u_hat = np.zeros([bs, k])
                 self.assertTrue(np.array_equal(u, u_hat))
 
@@ -92,116 +66,175 @@ class TestViterbiDecoding(unittest.TestCase):
         source = GaussianPriorSource()
 
         coderates = [1/2, 1/3]
-        ks = [10, 20, 40, 100, 1000]
+        ks = [10, 20, 60]
 
-        for rate in coderates:
-            for k in ks:
-                n = int(k/rate)
-                dec = ViterbiDecoder(rate=rate, constraint_length=5)
+        for k, rate in product(ks, coderates):
+            n = int(k/rate)
+            dec = ViterbiDecoder(rate=rate, constraint_length=5)
 
-                # case 1: extremely large inputs
-                c = source([[bs, n], 0.0001])
-                # llrs
-                u1 = dec(c).numpy()
-                # no nan
-                self.assertFalse(np.any(np.isnan(u1)))
-                #no inftfy
-                self.assertFalse(np.any(np.isinf(u1)))
-                self.assertFalse(np.any(np.isneginf(u1)))
+            # case 1: extremely large inputs
+            c = source([[bs, n], 0.0001])
+            # llrs
+            u1 = dec(c).numpy()
+            # no nan
+            self.assertFalse(np.any(np.isnan(u1)))
+            #no inftfy
+            self.assertFalse(np.any(np.isinf(u1)))
+            self.assertFalse(np.any(np.isneginf(u1)))
 
-                # case 2: zero input
-                c = tf.zeros([bs, n])
-                # llrs
-                u2 = dec(c).numpy()
-                # no nan
-                self.assertFalse(np.any(np.isnan(u2)))
-                #no inftfy
-                self.assertFalse(np.any(np.isinf(u2)))
-                self.assertFalse(np.any(np.isneginf(u2)))
+            # case 2: zero input
+            c = tf.zeros([bs, n])
+            # llrs
+            u2 = dec(c).numpy()
+            # no nan
+            self.assertFalse(np.any(np.isnan(u2)))
+            #no inftfy
+            self.assertFalse(np.any(np.isinf(u2)))
+            self.assertFalse(np.any(np.isneginf(u2)))
 
-    def test_identity(self):
-        """test that info bits can be recovered if no noise is added"""
-
-        def test_identity_(enc, msg):
-            cw = enc(msg)
-            # BPSK modulation, no noise
-            code_syms = 20. * (2. * cw - 1)
-            u_hat = ViterbiDecoder(gen_poly=enc.gen_poly, method='soft_llr')(code_syms)
-            self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
-
-            # No modulation, 0, 1 bits
-            code_syms = cw
-            u_hat = ViterbiDecoder(gen_poly=enc.gen_poly, method='hard')(code_syms)
-            self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
-
-            # BPSK symbols with AWGN noise
-            bs, n = cw.get_shape().as_list()
-            code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
-            u_hat = ViterbiDecoder(gen_poly=enc.gen_poly, method='soft_llr')(code_syms)
-            self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
-
-            return
+    def test_init(self):
+        """Test different init methods as described in the docstring.
+        Also test that both implementations lead to the same result."""
 
         bs = 10
+        n = 120
+        no = 0.1
+        source = GaussianPriorSource()
+
+        coderates = [1/3, 1/2]
+        constraint_lengths = [3, 4, 5, 6]
+        for r, cs in product(coderates, constraint_lengths):
+
+            enc = ConvEncoder(rate=r, constraint_length=cs)
+
+            # method 1: explicitly provide enc
+            dec1 = ViterbiDecoder(gen_poly=enc.gen_poly)
+
+            # method 2: provide rate and constraint length
+            dec2 = ViterbiDecoder(rate=r, constraint_length=cs)
+
+            llr = source([[bs, n], no])
+
+            x_hat1 = dec1(llr)
+            x_hat2 = dec2(llr)
+
+            #verify that both decoders produce the same result
+            self.assertTrue(np.array_equal(x_hat1.numpy(), x_hat2.numpy()))
+
+    def test_identity(self):
+        """Test that info bits can be recovered if no noise is added."""
+
+        def test_identity_(enc, msg, rsc=False):
+            cw = enc(msg)
+
+            # test that encoder can be directly provided
+            for api_mode in ("poly", "enc"):
+
+                # BPSK modulation, no noise
+                code_syms = 20. * (2. * cw - 1)
+                if api_mode=="poly":
+                    u_hat = ViterbiDecoder(
+                        gen_poly=enc.gen_poly, method='soft_llr', rsc=rsc)(code_syms)
+                else:
+                    u_hat = ViterbiDecoder(encoder=enc, method='soft_llr')(code_syms)
+                self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
+
+                # No modulation, 0, 1 bits
+                code_syms = cw
+                if api_mode=="poly":
+                    u_hat = ViterbiDecoder(
+                        gen_poly=enc.gen_poly, method='hard', rsc=rsc)(code_syms)
+                else:
+                    u_hat = ViterbiDecoder(encoder=enc, method='hard')(code_syms)
+                self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
+
+                # BPSK symbols with AWGN noise
+                bs, n = cw.get_shape().as_list()
+                code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
+                if api_mode=="poly":
+                    u_hat = ViterbiDecoder(
+                        gen_poly=enc.gen_poly, method='soft_llr', rsc=rsc)(code_syms)
+                else:
+                    u_hat = ViterbiDecoder(encoder=enc, method='soft_llr')(code_syms)
+                self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
+
+        bs = 10
+        k = 35
         coderates = [1/2, 1/3]
-        ks = [10, 50, 100, 100]
-        mus = [3, 4, 5, 6 ,7, 8] # constraint length
+        mus = [3, 8] # constraint length
 
-        for k in ks:
-            for rate in coderates:
-                for mu in mus:
-                    u = BinarySource()([bs, k])
-                    enc = ConvEncoder(rate=rate, constraint_length=mu)
-                    test_identity_(enc, u)
-
+        for rate, mu in product(coderates, mus):
             u = BinarySource()([bs, k])
-
-            enc = ConvEncoder(gen_poly=['101', '111', '111', '111'])
+            enc = ConvEncoder(rate=rate, constraint_length=mu)
             test_identity_(enc, u)
 
-            enc = ConvEncoder(gen_poly=['1101', '1111'])
+            enc = ConvEncoder(rate=rate, constraint_length=mu, rsc=True)
+            test_identity_(enc, u, rsc=True)
+
+        for gp in (['101', '111', '111', '111'], ['1101', '1111']):
+            u = BinarySource()([bs, k])
+            enc = ConvEncoder(gen_poly=gp)
             test_identity_(enc, u)
 
     def test_keras(self):
         """Test that Keras model can be compiled (supports dynamic shapes)"""
         bs = 10
-        n = 64
+        n1 = 64
+
+        muterm = 3
+        rterm = 1/3
+        n2 = 96 + int(muterm/rterm)
+
         source = BinarySource()
-        inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
+
+        inputs = tf.keras.Input(shape=(n1), dtype=tf.float32)
         x = ViterbiDecoder(rate=1/2, constraint_length=3)(inputs)
         model = tf.keras.Model(inputs=inputs, outputs=x)
 
-        b = source([bs,n])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1,n])
-        model(b2)
-        model.summary()
+        # Keras Model using termination
+        inputs = tf.keras.Input(shape=(n2), dtype=tf.float32)
+        xterm = ViterbiDecoder(
+            rate=rterm, constraint_length=muterm+1, terminate=True)(inputs)
+        modelterm = tf.keras.Model(inputs=inputs, outputs=xterm)
+
+        for n, mod in zip((n1,n2),(model, modelterm)):
+            b = source([bs, n])
+            mod(b)
+            # call twice to see that bs can change
+            b2 = source([bs+1,n])
+            mod(b2)
+            mod.summary()
 
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
         k = 100
-        n = 200
+        rate = 1/2
+        mu = 3
 
         source = BinarySource()
-        dec = ViterbiDecoder(rate=1/2, constraint_length=3)
+        for term in (True, False):
+            dec = ViterbiDecoder(rate=rate, constraint_length=mu+1, terminate=term)
 
-        b = source([100, n])
-        b_res = tf.reshape(b, [4, 5, 5, n])
+            n = int(k/rate)
+            if dec.terminate:
+                n += int(mu/rate)
 
-        # encode 2D Tensor
-        c = dec(b).numpy()
-        # encode 4D Tensor
-        c_res = dec(b_res).numpy()
+            b = source([100, n])
+            b_res = tf.reshape(b, [4, 5, 5, n])
 
-        # test that shape was preserved
-        self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+            # encode 2D Tensor
+            c = dec(b).numpy()
+            # encode 4D Tensor
+            c_res = dec(b_res).numpy()
 
-        # and reshape to 2D shape
-        c_res = tf.reshape(c_res, [100, k])
-        # both version should yield same result
-        self.assertTrue(np.array_equal(c, c_res))
+            # test that shape was preserved
+            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+
+            # and reshape to 2D shape
+            c_res = tf.reshape(c_res, [100, k])
+            # both version should yield same result
+            self.assertTrue(np.array_equal(c, c_res))
 
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
@@ -296,7 +329,7 @@ class TestViterbiDecoding(unittest.TestCase):
         k = 100
         n = 128
         source = BinarySource()
-        dec = ViterbiDecoder(rate=1/2, constraint_length=3)
+        dec = ViterbiDecoder(rate=1/2, constraint_length=5)
 
         # test that for arbitrary input only 0,1 values are outputed
         u = source([bs, n])
@@ -324,13 +357,20 @@ class TestBCJRDecoding(unittest.TestCase):
          codeword."""
 
         bs = 10
-        coderates = [1/3, 1/3]
-        ks = [10, 20, 40, 100, 1000]
+        coderates = [1/2, 1/3]
+        ks = [10, 45]
+        muterm = 5
 
-        for rate in coderates:
-            for k in ks:
+        for k, rate in product(ks, coderates):
+            for dec in (
+                BCJRDecoder(rate=rate, constraint_length=5),
+                BCJRDecoder(rate=rate, constraint_length=3, rsc=True),
+                BCJRDecoder(rate=rate, constraint_length=muterm+1, terminate=True)):
+
                 n = int(k/rate)
-                dec = BCJRDecoder(rate=rate, constraint_length=5)
+                if dec.terminate:
+                    n += int((muterm)/rate)
+
                 # all-zero with BPSK (no noise);logits
                 c = -10. * np.ones([bs, n])
                 u1 = dec(c).numpy()
@@ -338,6 +378,39 @@ class TestBCJRDecoding(unittest.TestCase):
                 # also check that all-zero input yields all-zero output
                 u_hat = np.zeros([bs, k])
                 self.assertTrue(np.array_equal(u1, u_hat))
+
+    def test_numerical_stab(self):
+        """Test for numerical stability (no nan or infty as output)"""
+
+        bs = 10
+        coderates = [1/2, 1/3]
+        ks = [22, 55]
+
+        source = GaussianPriorSource()
+
+        for k, rate in product(ks, coderates):
+            n = int(k/rate)
+            dec = BCJRDecoder(rate=rate, constraint_length=5)
+
+            # case 1: extremely large inputs
+            c = source([[bs, n], 0.0001])
+            # llrs
+            u1 = dec(c).numpy()
+            # no nan
+            self.assertFalse(np.any(np.isnan(u1)))
+            #no inftfy
+            self.assertFalse(np.any(np.isinf(u1)))
+            self.assertFalse(np.any(np.isneginf(u1)))
+
+            # case 2: zero input
+            c = tf.zeros([bs, n])
+            # llrs
+            u2 = dec(c).numpy()
+            # no nan
+            self.assertFalse(np.any(np.isnan(u2)))
+            #no inftfy
+            self.assertFalse(np.any(np.isinf(u2)))
+            self.assertFalse(np.any(np.isneginf(u2)))
 
     def test_init(self):
         """Test different init methods as described in the docstring.
@@ -350,136 +423,132 @@ class TestBCJRDecoding(unittest.TestCase):
 
         coderates = [1/3, 1/2]
         constraint_lengths = [3, 4, 5, 6]
-        for r in coderates:
-            for cs in constraint_lengths:
-                enc = ConvEncoder(rate=r, constraint_length=cs)
+        for r, cs in product(coderates, constraint_lengths):
 
-                # method 1: explicitly provide enc
-                dec1 = BCJRDecoder(gen_poly=enc.gen_poly)
+            enc = ConvEncoder(rate=r, constraint_length=cs)
 
-                # method 2: provide rate and constraint length
-                dec2 = BCJRDecoder(rate=r, constraint_length=cs)
+            # method 1: explicitly provide enc
+            dec1 = BCJRDecoder(gen_poly=enc.gen_poly)
 
-                llr = source([[bs, n], no])
+            # method 2: provide rate and constraint length
+            dec2 = BCJRDecoder(rate=r, constraint_length=cs)
 
-                x_hat1 = dec1(llr)
-                x_hat2 = dec2(llr)
+            llr = source([[bs, n], no])
 
-                #verify that both decoders produce the same result
-                self.assertTrue(np.array_equal(x_hat1.numpy(), x_hat2.numpy()))
+            x_hat1 = dec1(llr)
+            x_hat2 = dec2(llr)
 
-    def test_numerical_stab(self):
-        """Test for numerical stability (no nan or infty as output)"""
-
-        bs = 10
-        coderates = [1/2, 1/3]
-        ks = [10, 20, 40, 100, 1000]
-
-        source = GaussianPriorSource()
-
-        for rate in coderates:
-            for k in ks:
-                n = int(k/rate)
-                dec = BCJRDecoder(rate=rate, constraint_length=5)
-
-                # case 1: extremely large inputs
-                c = source([[bs, n], 0.0001])
-                # llrs
-                u1 = dec(c).numpy()
-                # no nan
-                self.assertFalse(np.any(np.isnan(u1)))
-                #no inftfy
-                self.assertFalse(np.any(np.isinf(u1)))
-                self.assertFalse(np.any(np.isneginf(u1)))
-
-                # case 2: zero input
-                c = tf.zeros([bs, n])
-                # llrs
-                u2 = dec(c).numpy()
-                # no nan
-                self.assertFalse(np.any(np.isnan(u2)))
-                #no inftfy
-                self.assertFalse(np.any(np.isinf(u2)))
-                self.assertFalse(np.any(np.isneginf(u2)))
+            #verify that both decoders produce the same result
+            self.assertTrue(np.array_equal(x_hat1.numpy(), x_hat2.numpy()))
 
     def test_identity(self):
         """test that info bits can be recovered if no noise is added"""
 
-        def test_identity_(enc, msg):
+        def test_identity_(enc, msg, rsc=False):
             cw = enc(msg)
-            # BPSK modulation, no noise
-            code_syms = 20. * (2. * cw - 1)
-            u_hat = BCJRDecoder(gen_poly=enc.gen_poly)(code_syms)
-            self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
 
-            # BPSK symbols with AWGN noise
-            bs, n = cw.get_shape().as_list()
-            code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
-            u_hat = BCJRDecoder(gen_poly=enc.gen_poly)(code_syms)
-            self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
+            # test that encoder can be directly provided
+            for api_mode, alg in product(
+                ("poly", "enc"), ("map", "log", "maxlog")):
 
-            return
+                # BPSK modulation, no noise
+                code_syms = 20. * (2. * cw - 1)
+                if api_mode=="poly":
+                    u_hat = BCJRDecoder(gen_poly=enc.gen_poly,
+                                        algorithm=alg, rsc=rsc)(code_syms)
+                else:
+                    u_hat = BCJRDecoder(encoder=enc, algorithm=alg)(code_syms)
+                self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
 
-        bs = 10
+                # BPSK symbols with AWGN noise
+                bs, n = cw.get_shape().as_list()
+                code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
+                if api_mode=="poly":
+                    u_hat = BCJRDecoder(gen_poly=enc.gen_poly,
+                                        algorithm=alg, rsc=rsc)(code_syms)
+                else:
+                    u_hat = BCJRDecoder(encoder=enc, algorithm=alg)(code_syms)
+                self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
+
+        bs = 5
         coderates = [1/2, 1/3]
-        ks = [10, 50, 100, 100]
-        mus = [3, 4, 5, 6 ,7, 8] # constraint length
+        k = 40
+        mus = [3, 8] # constraint length
 
-        for k in ks:
-            for rate in coderates:
-                for mu in mus:
-                    u = BinarySource()([bs, k])
-                    enc = ConvEncoder(rate=rate, constraint_length=mu)
-                    test_identity_(enc, u)
-
+        for rate, mu in product(coderates, mus):
             u = BinarySource()([bs, k])
-
-            enc = ConvEncoder(gen_poly=['101', '111', '111', '111'])
+            enc = ConvEncoder(rate=rate, constraint_length=mu)
             test_identity_(enc, u)
 
-            enc = ConvEncoder(gen_poly=['1101', '1111'])
+            enc = ConvEncoder(rate=rate, constraint_length=mu, rsc=True)
+            test_identity_(enc, u, rsc=True)
+
+        for gp in (
+            ['101', '111', '111'],
+            ['1101', '1111']):
+            u = BinarySource()([bs, k])
+            enc = ConvEncoder(gen_poly=gp)
             test_identity_(enc, u)
 
     def test_keras(self):
         """Test that Keras model can be compiled (supports dynamic shapes)"""
         bs = 10
-        n = 64
+        n1 = 64
+
+        muterm = 3
+        rterm = 1/3
+        n2 = 96 + int(muterm/rterm)
+
         source = BinarySource()
-        inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
+
+        inputs = tf.keras.Input(shape=(n1), dtype=tf.float32)
         x = BCJRDecoder(rate=1/2, constraint_length=3)(inputs)
         model = tf.keras.Model(inputs=inputs, outputs=x)
 
-        b = source([bs,n])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1,n])
-        model(b2)
-        model.summary()
+        # Keras Model using termination
+        inputs = tf.keras.Input(shape=(n2), dtype=tf.float32)
+        xterm = BCJRDecoder(
+            rate=rterm, constraint_length=muterm+1, terminate=True)(inputs)
+        modelterm = tf.keras.Model(inputs=inputs, outputs=xterm)
+
+        for n, mod in zip((n1,n2),(model, modelterm)):
+            b = source([bs,n])
+            mod(b)
+            # call twice to see that bs can change
+            b2 = source([bs+1,n])
+            mod(b2)
+            mod.summary()
 
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
-        k = 100
-        n = 200
+        k = 40
+        rate = 1/2
+        mu = 3
 
         source = BinarySource()
-        dec = BCJRDecoder(rate=1/2, constraint_length=3)
+        for term in (True, False):
+            dec = BCJRDecoder(rate=rate, constraint_length=mu+1, terminate=term)
 
-        b = source([100, n])
-        b_res = tf.reshape(b, [4, 5, 5, n])
+            n = int(k/rate)
+            if dec.terminate:
+                n += int(mu/rate)
 
-        # encode 2D Tensor
-        c = dec(b).numpy()
-        # encode 4D Tensor
-        c_res = dec(b_res).numpy()
+            b = source([100, n])
+            b_res = tf.reshape(b, [4, 5, 5, n])
 
-        # test that shape was preserved
-        self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+            # encode 2D Tensor
+            c = dec(b).numpy()
+            # encode 4D Tensor
+            c_res = dec(b_res).numpy()
 
-        # and reshape to 2D shape
-        c_res = tf.reshape(c_res, [100, k])
-        # both version should yield same result
-        self.assertTrue(np.array_equal(c, c_res))
+            # test that shape was preserved
+            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+
+            # and reshape to 2D shape
+            c_res = tf.reshape(c_res, [100, k])
+            # both version should yield same result
+            self.assertTrue(np.array_equal(c, c_res))
 
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
@@ -570,10 +639,9 @@ class TestBCJRDecoding(unittest.TestCase):
             return dec(u)
 
         bs = 10
-        k = 100
         n = 128
         source = BinarySource()
-        dec = BCJRDecoder(rate=1/2, constraint_length=3)
+        dec = BCJRDecoder(rate=1/2, constraint_length=5)
 
         # test that for arbitrary input only 0,1 values are outputed
         u = source([bs, n])
@@ -592,3 +660,18 @@ class TestBCJRDecoding(unittest.TestCase):
         x = run_graph_xla(u).numpy()
         u = source([bs+1, n])
         x = run_graph_xla(u).numpy()
+
+    def test_dynamic_shapes(self):
+        """Test for dynamic (=unknown) batch-sizes"""
+
+        n = 1536
+        enc = ConvEncoder(gen_poly=('1101', '1011'), rate=1/3, terminate=False)
+        dec = BCJRDecoder(enc)
+
+        @tf.function(jit_compile=True)
+        def run_graph(batch_size):
+            llr_ch = tf.zeros((batch_size, n))
+            u_hat = dec(llr_ch)
+            return u_hat
+
+        run_graph(tf.constant(1))

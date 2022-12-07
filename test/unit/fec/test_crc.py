@@ -214,6 +214,10 @@ class TestCRC(unittest.TestCase):
 
             self.assertTrue(np.array_equal(x_crc, x_ref_np))
 
+            # test properties k,n
+            self.assertTrue(crc_enc.k==u.shape[-1])
+            self.assertTrue(crc_enc.n==x.shape[-1])
+
     def test_keras(self):
         """Test that Keras model can be compiled (=supports dynamic shapes)."""
 

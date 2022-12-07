@@ -8,37 +8,54 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 import sionna
 from sionna.utils import flatten_dims, split_dim, flatten_last_dims, expand_to_rank
-from sionna.mimo import lmmse_equalizer
+from sionna.mimo import lmmse_equalizer, zf_equalizer, mf_equalizer
 from sionna.ofdm import RemoveNulledSubcarriers
 
 
-class LMMSEEqualizer(Layer):
+class OFDMEqualizer(Layer):
     # pylint: disable=line-too-long
-    """LMMSEEqualizer(resource_grid, stream_management, whiten_interference=True, dtype=tf.complex64, **kwargs)
+    r"""OFDMEqualizer(equalizer, resource_grid, stream_management, dtype=tf.complex64, **kwargs)
 
-    LMMSE equalization for OFDM MIMO transmissions.
+    Layer that wraps a MIMO equalizer for use with the OFDM waveform.
 
-    This layer computes linear minimum mean squared error (LMMSE) estimation
-    for OFDM MIMO transmissions. The OFDM and stream configuration are provided
-    by a :class:`~sionna.ofdm.ResourceGrid` and
-    :class:`~sionna.mimo.StreamManagement` instance, respectively. The
-    detection algorithm is the :meth:`~sionna.mimo.lmmse_equalizer`. The layer
-    computes soft-symbol estimates together with effective noise variances
-    for all streams which can, e.g., be used by a
+    The parameter ``equalizer`` is a callable (e.g., a function) that
+    implements a MIMO equalization algorithm for arbitrary batch dimensions.
+
+    This class pre-processes the received resource grid ``y`` and channel
+    estimate ``h_hat``, and computes for each receiver the
+    noise-plus-interference covariance matrix according to the OFDM and stream
+    configuration provided by the ``resource_grid`` and
+    ``stream_management``, which also accounts for the channel
+    estimation error variance ``err_var``. These quantities serve as input
+    to the equalization algorithm that is implemented by the callable ``equalizer``.
+    This layer computes soft-symbol estimates together with effective noise
+    variances for all streams which can, e.g., be used by a
     :class:`~sionna.mapping.Demapper` to obtain LLRs.
+
+    Note
+    -----
+    The callable ``equalizer`` must take three inputs:
+
+    * **y** ([...,num_rx_ant], tf.complex) -- 1+D tensor containing the received signals.
+    * **h** ([...,num_rx_ant,num_streams_per_rx], tf.complex) -- 2+D tensor containing the channel matrices.
+    * **s** ([...,num_rx_ant,num_rx_ant], tf.complex) -- 2+D tensor containing the noise-plus-interference covariance matrices.
+
+    It must generate two outputs:
+
+    * **x_hat** ([...,num_streams_per_rx], tf.complex) -- 1+D tensor representing the estimated symbol vectors.
+    * **no_eff** (tf.float) -- Tensor of the same shape as ``x_hat`` containing the effective noise variance estimates.
 
     Parameters
     ----------
+    equalizer : Callable
+        Callable object (e.g., a function) that implements a MIMO equalization
+        algorithm for arbitrary batch dimensions
+
     resource_grid : ResourceGrid
-        An instance of :class:`~sionna.ofdm.ResourceGrid`.
+        Instance of :class:`~sionna.ofdm.ResourceGrid`
 
     stream_management : StreamManagement
-        An instance of :class:`~sionna.mimo.StreamManagement`.
-
-    whiten_interference : bool
-        If `True` (default), the interference is first whitened before equalization.
-        In this case, an alternative expression for the receive filter is used which
-        can be numerically more stable.
+        Instance of :class:`~sionna.mimo.StreamManagement`
 
     dtype : tf.Dtype
         Datatype for internal calculations and the output dtype.
@@ -50,44 +67,38 @@ class LMMSEEqualizer(Layer):
         Tuple:
 
     y : [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex
-        The received OFDM resource grid after cyclic prefix removal and FFT.
+        Received OFDM resource grid after cyclic prefix removal and FFT
 
     h_hat : [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex
-        The channel estimates for all streams from all transmitters.
+        Channel estimates for all streams from all transmitters
 
     err_var : [Broadcastable to shape of ``h_hat``], tf.float
-        The variance of the channel estimation error.
+        Variance of the channel estimation error
 
     no : [batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float
-        The variance of the AWGN noise.
+        Variance of the AWGN
 
     Output
     ------
     x_hat : [batch_size, num_tx, num_streams, num_data_symbols], tf.complex
-        The estimated symbols.
+        Estimated symbols
 
     no_eff : [batch_size, num_tx, num_streams, num_data_symbols], tf.float
-        The effective noise variance for each estimated symbol.
-
-    Note
-    ----
-    If you want to use this layer in Graph mode with XLA, i.e., within
-    a function that is decorated with ``@tf.function(jit_compile=True)``,
-    you must set ``sionna.Config.xla_compat=true``.
-    See :py:attr:`~sionna.Config.xla_compat`.
+        Effective noise variance for each estimated symbol
     """
     def __init__(self,
+                 equalizer,
                  resource_grid,
                  stream_management,
-                 whiten_interference=True,
                  dtype=tf.complex64,
                  **kwargs):
         super().__init__(dtype=dtype, **kwargs)
+        assert callable(equalizer)
         assert isinstance(resource_grid, sionna.ofdm.ResourceGrid)
         assert isinstance(stream_management, sionna.mimo.StreamManagement)
+        self._equalizer = equalizer
         self._resource_grid = resource_grid
         self._stream_management = stream_management
-        self._whiten_interference = whiten_interference
         self._removed_nulled_scs = RemoveNulledSubcarriers(self._resource_grid)
 
         # Precompute indices to extract data symbols
@@ -160,8 +171,12 @@ class LMMSEEqualizer(Layer):
         # Split first dimension to separate RX and TX:
         # [num_rx, num_streams_per_rx, batch_size, num_rx_ant, ...
         #  ..., num_ofdm_symbols, num_effective_subcarriers]
-        h_dt_desired = split_dim(h_dt_desired, [self._stream_management.num_rx, -1], 0)
-        h_dt_undesired = split_dim(h_dt_undesired, [self._stream_management.num_rx, -1], 0)
+        h_dt_desired = split_dim(h_dt_desired,
+                                 [self._stream_management.num_rx,
+                                  self._stream_management.num_streams_per_rx],
+                                 0)
+        h_dt_undesired = split_dim(h_dt_undesired,
+                                   [self._stream_management.num_rx, -1], 0)
 
         # Permutate dims to
         # [batch_size, num_rx, num_ofdm_symbols, num_effective_subcarriers,..
@@ -205,12 +220,11 @@ class LMMSEEqualizer(Layer):
         s = tf.cast(s, self._dtype)
 
         ############################################################
-        #### Compute LMMSE estimate and effective noise variance ###
+        ### Compute symbol estimate and effective noise variance ###
         ############################################################
         # [batch_size, num_rx, num_ofdm_symbols, num_effective_subcarriers,...
         #  ..., num_stream_per_rx]
-        x_hat, no_eff = lmmse_equalizer(y_dt, h_dt_desired,
-                                        s, self._whiten_interference)
+        x_hat, no_eff = self._equalizer(y_dt, h_dt_desired, s)
 
         ################################################
         ### Extract data symbols for all detected TX ###
@@ -261,3 +275,223 @@ class LMMSEEqualizer(Layer):
         no_eff = tf.transpose(no_eff, [3, 0, 1, 2])
 
         return (x_hat, no_eff)
+
+
+class LMMSEEqualizer(OFDMEqualizer):
+    # pylint: disable=line-too-long
+    """LMMSEEqualizer(resource_grid, stream_management, whiten_interference=True, dtype=tf.complex64, **kwargs)
+
+    LMMSE equalization for OFDM MIMO transmissions.
+
+    This layer computes linear minimum mean squared error (LMMSE) equalization
+    for OFDM MIMO transmissions. The OFDM and stream configuration are provided
+    by a :class:`~sionna.ofdm.ResourceGrid` and
+    :class:`~sionna.mimo.StreamManagement` instance, respectively. The
+    detection algorithm is the :meth:`~sionna.mimo.lmmse_equalizer`. The layer
+    computes soft-symbol estimates together with effective noise variances
+    for all streams which can, e.g., be used by a
+    :class:`~sionna.mapping.Demapper` to obtain LLRs.
+
+    Parameters
+    ----------
+    resource_grid : ResourceGrid
+        Instance of :class:`~sionna.ofdm.ResourceGrid`
+
+    stream_management : StreamManagement
+        Instance of :class:`~sionna.mimo.StreamManagement`
+
+    whiten_interference : bool
+        If `True` (default), the interference is first whitened before equalization.
+        In this case, an alternative expression for the receive filter is used which
+        can be numerically more stable.
+
+    dtype : tf.Dtype
+        Datatype for internal calculations and the output dtype.
+        Defaults to `tf.complex64`.
+
+    Input
+    -----
+    (y, h_hat, err_var, no) :
+        Tuple:
+
+    y : [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex
+        Received OFDM resource grid after cyclic prefix removal and FFT
+
+    h_hat : [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex
+        Channel estimates for all streams from all transmitters
+
+    err_var : [Broadcastable to shape of ``h_hat``], tf.float
+        Variance of the channel estimation error
+
+    no : [batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float
+        Variance of the AWGN
+
+    Output
+    ------
+    x_hat : [batch_size, num_tx, num_streams, num_data_symbols], tf.complex
+        Estimated symbols
+
+    no_eff : [batch_size, num_tx, num_streams, num_data_symbols], tf.float
+        Effective noise variance for each estimated symbol
+
+    Note
+    ----
+    If you want to use this layer in Graph mode with XLA, i.e., within
+    a function that is decorated with ``@tf.function(jit_compile=True)``,
+    you must set ``sionna.Config.xla_compat=true``.
+    See :py:attr:`~sionna.Config.xla_compat`.
+    """
+    def __init__(self,
+                 resource_grid,
+                 stream_management,
+                 whiten_interference=True,
+                 dtype=tf.complex64,
+                 **kwargs):
+
+        def equalizer(y, h, s):
+            return lmmse_equalizer(y, h, s, whiten_interference)
+
+        super().__init__(equalizer=equalizer,
+                         resource_grid=resource_grid,
+                         stream_management=stream_management,
+                         dtype=dtype, **kwargs)
+
+
+class ZFEqualizer(OFDMEqualizer):
+    # pylint: disable=line-too-long
+    """ZFEqualizer(resource_grid, stream_management, dtype=tf.complex64, **kwargs)
+
+    ZF equalization for OFDM MIMO transmissions.
+
+    This layer computes zero-forcing (ZF) equalization
+    for OFDM MIMO transmissions. The OFDM and stream configuration are provided
+    by a :class:`~sionna.ofdm.ResourceGrid` and
+    :class:`~sionna.mimo.StreamManagement` instance, respectively. The
+    detection algorithm is the :meth:`~sionna.mimo.zf_equalizer`. The layer
+    computes soft-symbol estimates together with effective noise variances
+    for all streams which can, e.g., be used by a
+    :class:`~sionna.mapping.Demapper` to obtain LLRs.
+
+    Parameters
+    ----------
+    resource_grid : ResourceGrid
+        An instance of :class:`~sionna.ofdm.ResourceGrid`.
+
+    stream_management : StreamManagement
+        An instance of :class:`~sionna.mimo.StreamManagement`.
+
+    dtype : tf.Dtype
+        Datatype for internal calculations and the output dtype.
+        Defaults to `tf.complex64`.
+
+    Input
+    -----
+    (y, h_hat, err_var, no) :
+        Tuple:
+
+    y : [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex
+        Received OFDM resource grid after cyclic prefix removal and FFT
+
+    h_hat : [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex
+        Channel estimates for all streams from all transmitters
+
+    err_var : [Broadcastable to shape of ``h_hat``], tf.float
+        Variance of the channel estimation error
+
+    no : [batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float
+        Variance of the AWGN
+
+    Output
+    ------
+    x_hat : [batch_size, num_tx, num_streams, num_data_symbols], tf.complex
+        Estimated symbols
+
+    no_eff : [batch_size, num_tx, num_streams, num_data_symbols], tf.float
+        Effective noise variance for each estimated symbol
+
+    Note
+    ----
+    If you want to use this layer in Graph mode with XLA, i.e., within
+    a function that is decorated with ``@tf.function(jit_compile=True)``,
+    you must set ``sionna.Config.xla_compat=true``.
+    See :py:attr:`~sionna.Config.xla_compat`.
+    """
+    def __init__(self,
+                 resource_grid,
+                 stream_management,
+                 dtype=tf.complex64,
+                 **kwargs):
+        super().__init__(equalizer=zf_equalizer,
+                         resource_grid=resource_grid,
+                         stream_management=stream_management,
+                         dtype=dtype, **kwargs)
+
+
+class MFEqualizer(OFDMEqualizer):
+    # pylint: disable=line-too-long
+    """MFEqualizer(resource_grid, stream_management, dtype=tf.complex64, **kwargs)
+
+    MF equalization for OFDM MIMO transmissions.
+
+    This layer computes matched filter (MF) equalization
+    for OFDM MIMO transmissions. The OFDM and stream configuration are provided
+    by a :class:`~sionna.ofdm.ResourceGrid` and
+    :class:`~sionna.mimo.StreamManagement` instance, respectively. The
+    detection algorithm is the :meth:`~sionna.mimo.mf_equalizer`. The layer
+    computes soft-symbol estimates together with effective noise variances
+    for all streams which can, e.g., be used by a
+    :class:`~sionna.mapping.Demapper` to obtain LLRs.
+
+    Parameters
+    ----------
+    resource_grid : ResourceGrid
+        An instance of :class:`~sionna.ofdm.ResourceGrid`.
+
+    stream_management : StreamManagement
+        An instance of :class:`~sionna.mimo.StreamManagement`.
+
+    dtype : tf.Dtype
+        Datatype for internal calculations and the output dtype.
+        Defaults to `tf.complex64`.
+
+    Input
+    -----
+    (y, h_hat, err_var, no) :
+        Tuple:
+
+    y : [batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size], tf.complex
+        Received OFDM resource grid after cyclic prefix removal and FFT
+
+    h_hat : [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], tf.complex
+        Channel estimates for all streams from all transmitters
+
+    err_var : [Broadcastable to shape of ``h_hat``], tf.float
+        Variance of the channel estimation error
+
+    no : [batch_size, num_rx, num_rx_ant] (or only the first n dims), tf.float
+        Variance of the AWGN
+
+    Output
+    ------
+    x_hat : [batch_size, num_tx, num_streams, num_data_symbols], tf.complex
+        Estimated symbols
+
+    no_eff : [batch_size, num_tx, num_streams, num_data_symbols], tf.float
+        Effective noise variance for each estimated symbol
+
+    Note
+    ----
+    If you want to use this layer in Graph mode with XLA, i.e., within
+    a function that is decorated with ``@tf.function(jit_compile=True)``,
+    you must set ``sionna.Config.xla_compat=true``.
+    See :py:attr:`~sionna.Config.xla_compat`.
+    """
+    def __init__(self,
+                 resource_grid,
+                 stream_management,
+                 dtype=tf.complex64,
+                 **kwargs):
+        super().__init__(equalizer=mf_equalizer,
+                         resource_grid=resource_grid,
+                         stream_management=stream_management,
+                         dtype=dtype, **kwargs)

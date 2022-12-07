@@ -190,7 +190,6 @@ class TestTurboEncoding(unittest.TestCase):
         # both version should yield same result
         self.assertTrue(np.array_equal(c, c_res))
 
-
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
         """
@@ -275,3 +274,15 @@ class TestTurboEncoding(unittest.TestCase):
             u = source([bs, k])
             x = run_graph_xla(u).numpy()
 
+    def test_ref_implementation(self):
+        r"""Test against pre-encoded codewords from reference implementation.
+        """
+        ref_path = 'codes/turbo/'
+        ks = [40, 112, 168, 432]
+        enc = TurboEncoder(rate=1/3, terminate=True, constraint_length=4)
+
+        for k in ks:
+            uref = np.load(ref_path + 'ref_k{}_u.npy'.format(k))
+            cref = np.load(ref_path + 'ref_k{}_x.npy'.format(k))
+            c = enc(uref).numpy()
+            self.assertTrue(np.array_equal(c, cref))

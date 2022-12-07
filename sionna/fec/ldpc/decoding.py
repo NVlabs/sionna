@@ -75,6 +75,8 @@ class LDPCBPDecoder(Layer):
 
         Fig. 1: Weighted BP as proposed in [Nachmani]_.
 
+    For numerical stability, the decoder applies LLR clipping of
+    +/- 20 to the input LLRs.
 
     The class inherits from the Keras layer class and can be used as layer in a
     Keras model.
@@ -325,8 +327,8 @@ class LDPCBPDecoder(Layer):
 
         # clipping value for the atanh function is applied (tf.float32 is used)
         self._atanh_clip_value = 1 - 1e-7
-        # clipping for min-sum decoding
-        self._llr_max_minsum = 20
+        # internal value for llr clipping
+        self._llr_max = 20
 
         # init code parameters
         self._num_cns = pcm.shape[0] # total number of check nodes
@@ -751,8 +753,8 @@ class LDPCBPDecoder(Layer):
 
         # clip values for numerical stability
         msg = tf.clip_by_value(msg,
-                               clip_value_min=-self._llr_max_minsum,
-                               clip_value_max=self._llr_max_minsum)
+                               clip_value_min=-self._llr_max,
+                               clip_value_max=self._llr_max)
 
         # calculate sign of outgoing msg
         sign_val = tf.ragged.map_flat_values(self._sign_val_minsum, msg)
@@ -901,6 +903,11 @@ class LDPCBPDecoder(Layer):
         # internal calculations still in tf.float32
         llr_ch = tf.cast(llr_ch, tf.float32)
 
+        # clip llrs for numerical stability
+        llr_ch = tf.clip_by_value(llr_ch,
+                                  clip_value_min=-self._llr_max,
+                                  clip_value_max=self._llr_max)
+
         # last dim must be of length n
         tf.debugging.assert_equal(tf.shape(llr_ch)[-1],
                                   self._num_vns,
@@ -1043,6 +1050,9 @@ class LDPC5GDecoder(LDPCBPDecoder):
     If required the decoder can be made trainable and is differentiable
     (the training of some check node types may be not supported) following the
     concept of "weighted BP" [Nachmani]_.
+
+    For numerical stability, the decoder applies LLR clipping of
+    +/- 20 to the input LLRs.
 
     The class inherits from the Keras layer class and can be used as layer in a
     Keras model.

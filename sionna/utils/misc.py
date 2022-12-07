@@ -407,6 +407,7 @@ def sim_ber(mc_fun,
             num_target_bit_errors=None,
             num_target_block_errors=None,
             early_stop=True,
+            graph_mode=None,
             verbose=True,
             forward_keyboard_interrupt=True,
             dtype=tf.complex64):
@@ -420,7 +421,7 @@ def sim_ber(mc_fun,
     Input
     -----
     mc_fun:
-        Function that yields the transmitted bits `b` and the
+        Callable that yields the transmitted bits `b` and the
         receiver's estimate `b_hat` for a given ``batch_size`` and
         ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as
         logit.
@@ -451,6 +452,10 @@ def sim_ber(mc_fun,
         A boolean defaults to True. If True, the simulation stops after the
         first error-free SNR point (i.e., no error occurred after
         ``max_mc_iter`` Monte-Carlo iterations).
+
+    graph_mode: One of ["graph", "xla"], str
+        A string describing the execution mode of ``mc_fun``.
+        Defaults to `None`. In this case, ``mc_fun`` is executed as is.
 
     verbose: bool
         A boolean defaults to True. If True, the current progress will be
@@ -569,6 +574,28 @@ def sim_ber(mc_fun,
     assert isinstance(soft_estimates, bool), "soft_estimates must be bool."
     assert dtype.is_complex, "dtype must be a complex type."
     assert isinstance(verbose, bool), "verbose must be bool."
+
+    if graph_mode is None:
+        graph_mode="default" # applies default graph mode
+    assert isinstance(graph_mode, str), "graph_mode must be str."
+
+    if graph_mode=="default":
+        pass # nothing to do
+    elif graph_mode=="graph":
+        # avoid retracing -> check if mc_fun is already a function
+        if not isinstance(mc_fun, tf.types.experimental.GenericFunction):
+            mc_fun = tf.function(mc_fun,
+                                 jit_compile=False,
+                                 experimental_follow_type_hints=True)
+    elif graph_mode=="xla":
+        # avoid retracing -> check if mc_fun is already a function
+        if not isinstance(mc_fun, tf.types.experimental.GenericFunction) or \
+           not mc_fun.function_spec.jit_compile:
+            mc_fun = tf.function(mc_fun,
+                                 jit_compile=True,
+                                 experimental_follow_type_hints=True)
+    else:
+        raise TypeError("Unknown graph_mode selected.")
 
     ebno_dbs = tf.cast(ebno_dbs, dtype.real_dtype)
     batch_size = tf.cast(batch_size, tf.int32)

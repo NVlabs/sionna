@@ -13,7 +13,6 @@ from importlib_resources import files, as_file
 from sionna.fec.ldpc import codes
 from sionna.utils.misc import log2
 
-
 class GaussianPriorSource(Layer):
     r"""GaussianPriorSource(specified_by_mi=False, dtype=tf.float32, **kwargs)
 
@@ -25,8 +24,6 @@ class GaussianPriorSource(Layer):
     approximation).
 
     .. image:: ../figures/GaussianPriorSource.png
-
-
 
     The generated LLRs are drawn from a Gaussian distribution with
 
@@ -1225,141 +1222,6 @@ def verify_gm_pcm(gm, pcm):
     s = np.mod(np.matmul(pcm, np.transpose(gm)), 2) # mod2 to account for GF(2)
     return np.sum(s)==0 # Check for Non-zero syndrom of H*G'
 
-class LinearEncoder(Layer):
-    # pylint: disable=line-too-long
-    r"""LinearEncoder(enc_mat, is_pcm=False, dtype=tf.float32, **kwargs)
-
-    Linear binary encoder for a given encoding matrix ``enc_mat``.
-
-    If ``is_pcm`` is True, ``enc_mat`` is interpreted as parity-check
-    matrix and internally converted to a corresponding generator matrix.
-
-    The class inherits from the Keras layer class and can be used as layer in a
-    Keras model.
-
-    Parameters
-    ----------
-    enc_mat : [k, n] or [n-k, n], ndarray
-        Binary generator matrix of shape `[k, n]`. If ``is_pcm`` is
-        True, ``enc_mat`` is interpreted as parity-check matrix of shape
-        `[n-k, n]`.
-
-    dtype: tf.DType
-        Defaults to `tf.float32`. Defines the datatype for the output dtype.
-
-    Input
-    -----
-    inputs: [...,k], tf.float32
-        2+D tensor containing information bits.
-
-    Output
-    ------
-    : [...,n], tf.float32
-        2+D tensor containing codewords with same shape as inputs, except the
-        last dimension changes to `[...,n]`.
-
-    Raises
-    ------
-    AssertionError
-        If the encoding matrix is not a valid binary 2-D matrix.
-
-    Note
-    ----
-        If ``is_pcm`` is True, this layer uses
-        :class:`~sionna.fec.utils.pcm2gm` to find the generator matrix for
-        encoding. Please note that this imposes a few constraints on the
-        provided parity-check matrix such as full rank and it must be binary.
-
-        Note that this encoder is generic for all binary linear block codes
-        and, thus, cannot implement any code specifc optimizations. As a
-        result, the encoding complexity is :math:`O(k^2)`. Please consider code
-        specific encoders such as the
-        :class:`~sionna.fec.polar.encoding.Polar5GEncoder` or
-        :class:`~sionna.fec.ldpc.encoding.LDPC5GEncoder` for an improved
-        encoding performance.
-    """
-
-    def __init__(self,
-                 enc_mat,
-                 is_pcm=False,
-                 dtype=tf.float32,
-                 **kwargs):
-
-        super().__init__(dtype=dtype, **kwargs)
-
-        # tf.int8 currently not supported by tf.matmult
-        assert (dtype in
-               (tf.float16, tf.float32, tf.float64, tf.int32, tf.int64)), \
-               "Unsupported dtype."
-
-        # check input values for consistency
-        assert isinstance(is_pcm, bool), \
-                                    'is_parity_check must be bool.'
-
-        # verify that enc_mat is binary
-        assert ((enc_mat==0) | (enc_mat==1)).all(), "enc_mat is not binary."
-        assert (len(enc_mat.shape)==2), "enc_mat must be 2-D array."
-
-        # in case parity-check matrix is provided, convert to generator matrix
-        if is_pcm:
-            self._gm = pcm2gm(enc_mat, verify_results=True)
-        else:
-            self._gm = enc_mat
-
-        self._k = self._gm.shape[0]
-        self._n = self._gm.shape[1]
-        self._coderate = self._k / self._n
-
-        assert (self._k<=self._n), "Invalid matrix dimensions."
-
-        self._gm = tf.cast(self._gm, dtype=self.dtype)
-
-    #########################################
-    # Public methods and properties
-    #########################################
-
-    @property
-    def k(self):
-        """Number of information bits per codeword."""
-        return self._k
-
-    @property
-    def n(self):
-        "Codeword length."
-        return self._n
-
-    @property
-    def gm(self):
-        "Generator matrix used for encoding."
-        return self._gm
-
-    @property
-    def coderate(self):
-        """Coderate of the code."""
-        return self._coderate
-
-    #########################
-    # Keras layer functions
-    #########################
-
-    def build(self, input_shape):
-        """Nothing to build, but check for valid shapes."""
-        assert input_shape[-1]==self._k, "Invalid input shape."
-        assert (len(input_shape)>=2), 'The inputs must have at least rank 2.'
-
-    def call(self, inputs):
-        """Generic encoding function based on generator matrix multiplication.
-        """
-
-        c = tf.linalg.matmul(inputs, self._gm)
-
-        # faster implementation of tf.math.mod(c, 2)
-        c_uint8 = tf.cast(c, tf.uint8)
-        c_bin = tf.bitwise.bitwise_and(c_uint8, tf.constant(1, tf.uint8))
-        c = tf.cast(c_bin, self.dtype)
-
-        return c
-
 def generate_reg_ldpc(v, c, n, allow_flex_len=True, verbose=True):
     r"""Generate random regular (v,c) LDPC codes.
 
@@ -1570,3 +1432,43 @@ def generate_prng_seq(length, n_rnti=0, n_id=0, c_init=None):
         c[idx] = np.mod(x1[idx+n_c] + x2[idx+n_c], 2)
 
     return c
+
+
+def int_mod_2(x):
+    r"""Efficient implementation of modulo 2 operation for integer inputs.
+
+    This function assumes integer inputs or implicitly casts to int.
+
+    Remark: the function `tf.math.mod(x, 2)` is placed on the CPU and, thus,
+    causes unnecessary memory copies.
+
+    Parameters
+    ----------
+    x: tf.Tensor
+        Tensor to which the modulo 2 operation is applied.
+
+    """
+
+    x_int8 = tf.cast(x, tf.int8)
+    y_int8 = tf.bitwise.bitwise_and(x_int8, tf.constant(1, tf.int8))
+    return tf.cast(y_int8, x.dtype)
+
+###########################################################
+# Deprecated aliases that will not be included in the next
+# major release
+###########################################################
+
+# ignore invalid name as this is required for legacy reasons
+# pylint: disable=C0103
+def LinearEncoder(enc_mat,
+                  is_pcm=False,
+                  dtype=tf.float32,
+                  **kwargs):
+    # import here as circular import is generated otherwise
+    from sionna.fec.linear import LinearEncoder as LE # pylint: disable=C0415
+    print("Warning: The alias fec.utils.LinearEncoder will not be included in "\
+          "Sionna 1.0. Please use fec.linear.LinearEncoder instead.")
+    return LE(enc_mat=enc_mat,
+                             is_pcm=is_pcm,
+                             dtype=dtype,
+                             **kwargs)

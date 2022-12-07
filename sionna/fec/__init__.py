@@ -4,6 +4,7 @@
 #
 """FEC sub-package of the Sionna library"""
 
+
 from . import ldpc
 from . import polar
 from . import conv
@@ -12,3 +13,7 @@ from . import crc
 from . import scrambling
 from . import interleaving
 from . import utils
+from . import linear
+
+
+

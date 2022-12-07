@@ -71,6 +71,9 @@ class CRCEncoder(Layer):
         # init 5G CRC polynomial
         self._crc_pol, self._crc_length = self._select_crc_pol(self._crc_degree)
 
+        self._k = None
+        self._n = None
+
     #########################################
     # Public methods and properties
     #########################################
@@ -89,6 +92,16 @@ class CRCEncoder(Layer):
     def crc_pol(self):
         """CRC polynomial in binary representation."""
         return self._crc_pol
+
+    @property
+    def k(self):
+        """Number of information bits per codeword."""
+        return self._k
+
+    @property
+    def n(self):
+        """Number of codeword bits."""
+        return self._n
 
     #########################
     # Utility methods
@@ -169,6 +182,9 @@ class CRCEncoder(Layer):
         assert k is not None, "Shape of last dimension cannot be None."
         g_mat_crc = self._gen_crc_mat(k, self.crc_pol)
         self._g_mat_crc = tf.constant(g_mat_crc, dtype=tf.float32)
+
+        self._k = k
+        self._n = k + g_mat_crc.shape[1]
 
     def call(self, inputs):
         """cyclic redundancy check function.

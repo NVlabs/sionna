@@ -395,6 +395,26 @@ class Polar5GEncoder(PolarEncoder):
         """Codeword length including rate-matching."""
         return self._n_target
 
+    @property
+    def k_polar(self):
+        """Number of information bits of the underlying Polar code."""
+        return self._k
+
+    @property
+    def n_polar(self):
+        """Codeword length of the underlying Polar code."""
+        return self._n
+
+    @property
+    def k(self):
+        """Number of information bits including rate-matching."""
+        return self._k_target
+
+    @property
+    def n(self):
+        """Codeword length including rate-matching."""
+        return self._n_target
+
     def subblock_interleaving(self, u):
         """Input bit interleaving as defined in Sec 5.4.1.1 [3GPPTS38212]_.
 

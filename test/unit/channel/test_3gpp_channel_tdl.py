@@ -23,6 +23,7 @@ import sionna
 import unittest
 import numpy as np
 from sionna.channel.tr38901 import TDL
+from sionna.channel import exp_corr_mat
 from channel_test_utils import *
 from scipy.stats import kstest, rayleigh, rice
 from scipy.special import jv
@@ -132,8 +133,47 @@ class TestTDL(unittest.TestCase):
         TestTDL.channel_coeff['E'] = h.numpy()[:,0,0,0,0,:,:]
         TestTDL.delays['E'] = tau.numpy()[:,0,0,:]
 
+        ########## TDL-A30
+        tdl = TDL(  "A30",
+                    delay_spread=30e-9,
+                    carrier_frequency=TestTDL.CARRIER_FREQUENCY,
+                    num_sinusoids=TestTDL.NUM_SINUSOIDS,
+                    los_angle_of_arrival=TestTDL.LoS_AoA,
+                    min_speed=TestTDL.SPEED)
+        h,tau = tdl(batch_size=TestTDL.BATCH_SIZE,
+                    num_time_steps=TestTDL.NUM_TIME_STEPS,
+                    sampling_frequency=TestTDL.SAMPLING_FREQUENCY)
+        TestTDL.channel_coeff['A30'] = h.numpy()[:,0,0,0,0,:,:]
+        TestTDL.delays['A30'] = tau.numpy()[:,0,0,:]
 
-    @channel_test_on_models(('A', 'B', 'C', 'D', 'E'), ('foo',))
+        ########## TDL-B100
+        tdl = TDL(  "B100",
+                    delay_spread=100e-9,
+                    carrier_frequency=TestTDL.CARRIER_FREQUENCY,
+                    num_sinusoids=TestTDL.NUM_SINUSOIDS,
+                    los_angle_of_arrival=TestTDL.LoS_AoA,
+                    min_speed=TestTDL.SPEED)
+        h,tau = tdl(batch_size=TestTDL.BATCH_SIZE,
+                    num_time_steps=TestTDL.NUM_TIME_STEPS,
+                    sampling_frequency=TestTDL.SAMPLING_FREQUENCY)
+        TestTDL.channel_coeff['B100'] = h.numpy()[:,0,0,0,0,:,:]
+        TestTDL.delays['B100'] = tau.numpy()[:,0,0,:]
+
+        ########## TDL-C300
+        tdl = TDL(  "C300",
+                    delay_spread=300e-9,
+                    carrier_frequency=TestTDL.CARRIER_FREQUENCY,
+                    num_sinusoids=TestTDL.NUM_SINUSOIDS,
+                    los_angle_of_arrival=TestTDL.LoS_AoA,
+                    min_speed=TestTDL.SPEED)
+        h,tau = tdl(batch_size=TestTDL.BATCH_SIZE,
+                    num_time_steps=TestTDL.NUM_TIME_STEPS,
+                    sampling_frequency=TestTDL.SAMPLING_FREQUENCY)
+        TestTDL.channel_coeff['C300'] = h.numpy()[:,0,0,0,0,:,:]
+        TestTDL.delays['C300'] = tau.numpy()[:,0,0,:]
+
+
+    @channel_test_on_models(('A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'), ('foo',))
     def test_pdp(self, model, submodel): # Submodel does not apply to TDL
         """Test power delay profiles"""
         # Checking powers
@@ -144,13 +184,17 @@ class TestTDL(unittest.TestCase):
         max_err = np.max(np.abs(ref_p - p))
         self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'{model}')
         # Checking delays
-        tau = TestTDL.delays[model]/TestTDL.DELAY_SPREAD
-        ref_tau = np.expand_dims(TDL_DELAYS[model], axis=0)
+        if model in ('A30', 'B100', 'C300'):
+            tau = TestTDL.delays[model]
+            ref_tau = np.expand_dims(TDL_DELAYS[model], axis=0)*1e-9 # ns to s
+        else:
+            tau = TestTDL.delays[model]/TestTDL.DELAY_SPREAD
+            ref_tau = np.expand_dims(TDL_DELAYS[model], axis=0)
         max_err = np.max(np.abs(ref_tau - tau))
         self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'{model}')
 
     # Submodel does not apply to TDL
-    @channel_test_on_models(('A', 'B', 'C', 'D', 'E'), ('foo',))
+    @channel_test_on_models(('A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'), ('foo',))
     def test_taps_powers_distributions(self, model, submodel):
         """Test the distribution of the taps powers"""
         ref_powers = np.power(10.0, TDL_POWERS[model]/10.0)
@@ -195,7 +239,7 @@ class TestTDL(unittest.TestCase):
         return (a + b+ c)/(1+K)
 
     # Submodel does not apply to TDL
-    @channel_test_on_models(('A', 'B', 'C', 'D', 'E'), ('foo',))
+    @channel_test_on_models(('A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'), ('foo',))
     def test_autocorrelation(self, model, submodel):
         """Test the autocorrelation"""
         max_lag = TestTDL.NUM_TIME_STEPS//2
@@ -237,3 +281,290 @@ class TestTDL(unittest.TestCase):
                 #                             TestTDL.NUM_SINUSOIDS, time, p)
                 # max_err = np.max(np.abs(r_abs2 - ref_r_abs2))
                 # self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'{model}')
+
+    # No need to test on evey channel model for spatial correlation
+    def test_spatial_correlation_separate_rx_tx(self):
+        """Test spatial Correlation with separate RX and TX correlation"""
+        # Forcing the seed to make the tests deterministic
+        tf.random.set_seed(42)
+        np.random.seed(42)
+
+        # Instantiate the model
+        num_rx_ant = 16
+        num_tx_ant = 16
+        rx_corr_mat = exp_corr_mat(0.9, num_rx_ant)
+        tx_corr_mat = exp_corr_mat(0.5, num_tx_ant)
+        tdl = TDL(model = "A",
+                 delay_spread = 100e-9,
+                 carrier_frequency = 3.5e9,
+                 min_speed = 0.0, max_speed = 0.0,
+                 num_rx_ant=num_rx_ant,num_tx_ant=num_tx_ant,
+                 rx_corr_mat=rx_corr_mat, tx_corr_mat=tx_corr_mat)
+
+        # Empirical estimation of the correlation matrices
+        est_rx_cov = np.zeros([num_rx_ant,num_rx_ant], complex)
+        est_tx_cov = np.zeros([num_tx_ant,num_tx_ant], complex)
+        num_it = 1000
+        batch_size = 1000
+        for _ in range(num_it):
+            h, _ = tdl(batch_size, 1, 1)
+
+            h = np.transpose(h, [0,1,3,5,6,2,4]) # [..., rx ant, tx ant]
+            h = h[:,0,0,0,0,:,:]/np.sqrt(tdl.mean_powers[0].numpy()) # [batch size, rx ant, tx ant]
+
+            # RX correlation
+            h_ = np.expand_dims(h[:,:,0], axis=-1) # [batch size, rx ant, 1]
+            est_rx_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_rx_cov_ = np.mean(est_rx_cov_, axis=0) # [rx ant, rx ant]
+            est_rx_cov += est_rx_cov_
+
+            # TX correlation
+            h_ = np.expand_dims(h[:,0,:], axis=-1) # [batch size, rx ant, 1]
+            est_tx_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_tx_cov_ = np.mean(est_tx_cov_, axis=0) # [rx ant, rx ant]
+            est_tx_cov += est_tx_cov_
+        est_rx_cov /= num_it
+        est_tx_cov /= num_it
+
+        # Test
+        max_err = np.max(np.abs(est_rx_cov - rx_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'Receiver correlation')
+        max_err = np.max(np.abs(est_tx_cov - tx_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'Transmitter correlation')
+
+    # No need to test on evey channel model for spatial correlation
+    def test_spatial_correlation_joint_rx_tx(self):
+        """Test spatial Correlation with joint filtering"""
+        # Forcing the seed to make the tests deterministic
+        tf.random.set_seed(42)
+        np.random.seed(42)
+
+        # Instantiate the model
+        num_rx_ant = 16
+        num_tx_ant = 16
+        rx_corr_mat = exp_corr_mat(0.9, num_rx_ant//2).numpy()
+        pol_corr_mat = np.array([[1.0, 0.8, 0.0, 0.0],
+                                 [0.8, 1.0, 0.0, 0.0],
+                                 [0.0, 0.0, 1.0, 0.8],
+                                 [0.0, 0.0, 0.8, 1.0]])
+        tx_corr_mat = exp_corr_mat(0.5, num_tx_ant//2).numpy()
+        spatial_corr_mat = np.kron(pol_corr_mat, tx_corr_mat)
+        spatial_corr_mat = np.kron(rx_corr_mat, spatial_corr_mat)
+        tdl = TDL(model = "A",
+                 delay_spread = 100e-9,
+                 carrier_frequency = 3.5e9,
+                 min_speed = 0.0, max_speed = 0.0,
+                 num_rx_ant=num_rx_ant,num_tx_ant=num_tx_ant,
+                 spatial_corr_mat=spatial_corr_mat)
+
+        # Empirical estimation of the correlation matrices
+        est_spatial_cov = np.zeros([num_tx_ant*num_rx_ant,
+                                    num_tx_ant*num_rx_ant], complex)
+        num_it = 1000
+        batch_size = 1000
+        for _ in range(num_it):
+            h, _ = tdl(batch_size, 1, 1)
+
+            h = np.transpose(h, [0,1,3,5,6,2,4]) # [..., rx ant, tx ant]
+            h = h[:,0,0,0,0,:,:]/np.sqrt(tdl.mean_powers[0].numpy()) # [batch size, rx ant, tx ant]
+            h = np.reshape(h, [batch_size, -1]) # [batch size, rx ant*tx ant]
+
+            # Spatial correlation
+            h_ = np.expand_dims(h, axis=-1) # [batch size, rx ant*tx ant, 1]
+            est_spatial_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_spatial_cov_ = np.mean(est_spatial_cov_, axis=0) # [rx ant, rx ant]
+            est_spatial_cov += est_spatial_cov_
+        est_spatial_cov /= num_it
+
+        # Test
+        max_err = np.max(np.abs(est_spatial_cov - spatial_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR)
+
+    # No need to test on evey channel model for spatial correlation
+    def test_no_spatial_correlation(self):
+        """No spatial correlation specified leads to no spatial correlation observed"""
+        # Forcing the seed to make the tests deterministic
+        tf.random.set_seed(42)
+        np.random.seed(42)
+
+        # Instantiate the model
+        num_rx_ant = 16
+        num_tx_ant = 16
+        tdl = TDL(model = "A",
+                 delay_spread = 100e-9,
+                 carrier_frequency = 3.5e9,
+                 min_speed = 0.0, max_speed = 0.0,
+                 num_rx_ant=num_rx_ant,num_tx_ant=num_tx_ant)
+
+        # Empirical estimation of the correlation matrices
+        est_spatial_cov = np.zeros([num_tx_ant*num_rx_ant,
+                                    num_tx_ant*num_rx_ant], complex)
+        num_it = 1000
+        batch_size = 1000
+        for _ in range(num_it):
+            h, _ = tdl(batch_size, 1, 1)
+
+            h = np.transpose(h, [0,1,3,5,6,2,4]) # [..., rx ant, tx ant]
+            h = h[:,0,0,0,0,:,:]/np.sqrt(tdl.mean_powers[0].numpy()) # [batch size, rx ant, tx ant]
+            h = np.reshape(h, [batch_size, -1]) # [batch size, rx ant*tx ant]
+
+            # Spatial correlation
+            h_ = np.expand_dims(h, axis=-1) # [batch size, rx ant*tx ant, 1]
+            est_spatial_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_spatial_cov_ = np.mean(est_spatial_cov_, axis=0) # [rx ant, rx ant]
+            est_spatial_cov += est_spatial_cov_
+        est_spatial_cov /= num_it
+
+        # Test
+        spatial_corr_mat = np.eye(num_rx_ant*num_rx_ant)
+        max_err = np.max(np.abs(est_spatial_cov - spatial_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR)
+
+    # No need to test on evey channel model for spatial correlation
+    def test_rx_corr_only(self):
+        """Test with RX spatial correlation only"""
+        # Forcing the seed to make the tests deterministic
+        tf.random.set_seed(42)
+        np.random.seed(42)
+
+        # Instantiate the model
+        num_rx_ant = 16
+        num_tx_ant = 16
+        rx_corr_mat = exp_corr_mat(0.9, num_rx_ant)
+        tx_corr_mat = np.eye(num_tx_ant)
+        tdl = TDL(model = "A",
+                 delay_spread = 100e-9,
+                 carrier_frequency = 3.5e9,
+                 min_speed = 0.0, max_speed = 0.0,
+                 num_rx_ant=num_rx_ant,num_tx_ant=num_tx_ant,
+                 rx_corr_mat=rx_corr_mat)
+
+        # Empirical estimation of the correlation matrices
+        est_rx_cov = np.zeros([num_rx_ant,num_rx_ant], complex)
+        est_tx_cov = np.zeros([num_tx_ant,num_tx_ant], complex)
+        num_it = 1000
+        batch_size = 1000
+        for _ in range(num_it):
+            h, _ = tdl(batch_size, 1, 1)
+
+            h = np.transpose(h, [0,1,3,5,6,2,4]) # [..., rx ant, tx ant]
+            h = h[:,0,0,0,0,:,:]/np.sqrt(tdl.mean_powers[0].numpy()) # [batch size, rx ant, tx ant]
+
+            # RX correlation
+            h_ = np.expand_dims(h[:,:,0], axis=-1) # [batch size, rx ant, 1]
+            est_rx_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_rx_cov_ = np.mean(est_rx_cov_, axis=0) # [rx ant, rx ant]
+            est_rx_cov += est_rx_cov_
+
+            # TX correlation
+            h_ = np.expand_dims(h[:,0,:], axis=-1) # [batch size, rx ant, 1]
+            est_tx_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_tx_cov_ = np.mean(est_tx_cov_, axis=0) # [rx ant, rx ant]
+            est_tx_cov += est_tx_cov_
+        est_rx_cov /= num_it
+        est_tx_cov /= num_it
+
+        # Test
+        max_err = np.max(np.abs(est_rx_cov - rx_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'Receiver correlation')
+        max_err = np.max(np.abs(est_tx_cov - tx_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'Transmitter correlation')
+
+    # No need to test on evey channel model for spatial correlation
+    def test_tx_corr_only(self):
+        """Test with TX spatial Correlation only"""
+        # Forcing the seed to make the tests deterministic
+        tf.random.set_seed(42)
+        np.random.seed(42)
+
+        # Instantiate the model
+        num_rx_ant = 16
+        num_tx_ant = 16
+        rx_corr_mat = np.eye(num_tx_ant)
+        tx_corr_mat = exp_corr_mat(0.9, num_rx_ant)
+        tdl = TDL(model = "A",
+                 delay_spread = 100e-9,
+                 carrier_frequency = 3.5e9,
+                 min_speed = 0.0, max_speed = 0.0,
+                 num_rx_ant=num_rx_ant,num_tx_ant=num_tx_ant,
+                 tx_corr_mat=tx_corr_mat)
+
+        # Empirical estimation of the correlation matrices
+        est_rx_cov = np.zeros([num_rx_ant,num_rx_ant], complex)
+        est_tx_cov = np.zeros([num_tx_ant,num_tx_ant], complex)
+        num_it = 1000
+        batch_size = 1000
+        for _ in range(num_it):
+            h, _ = tdl(batch_size, 1, 1)
+
+            h = np.transpose(h, [0,1,3,5,6,2,4]) # [..., rx ant, tx ant]
+            h = h[:,0,0,0,0,:,:]/np.sqrt(tdl.mean_powers[0].numpy()) # [batch size, rx ant, tx ant]
+
+            # RX correlation
+            h_ = np.expand_dims(h[:,:,0], axis=-1) # [batch size, rx ant, 1]
+            est_rx_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_rx_cov_ = np.mean(est_rx_cov_, axis=0) # [rx ant, rx ant]
+            est_rx_cov += est_rx_cov_
+
+            # TX correlation
+            h_ = np.expand_dims(h[:,0,:], axis=-1) # [batch size, rx ant, 1]
+            est_tx_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_tx_cov_ = np.mean(est_tx_cov_, axis=0) # [rx ant, rx ant]
+            est_tx_cov += est_tx_cov_
+        est_rx_cov /= num_it
+        est_tx_cov /= num_it
+
+        # Test
+        max_err = np.max(np.abs(est_rx_cov - rx_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'Receiver correlation')
+        max_err = np.max(np.abs(est_tx_cov - tx_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR, f'Transmitter correlation')
+
+    # No need to test on evey channel model for spatial correlation
+    def test_spatial_correlation_all_three_inputs(self):
+        """Test spatial correlation with all three inputs"""
+        # Forcing the seed to make the tests deterministic
+        tf.random.set_seed(42)
+        np.random.seed(42)
+
+        # Instantiate the model
+        num_rx_ant = 16
+        num_tx_ant = 16
+        rx_corr_mat = exp_corr_mat(0.9, num_rx_ant//2).numpy()
+        pol_corr_mat = np.array([[1.0, 0.8, 0.0, 0.0],
+                                 [0.8, 1.0, 0.0, 0.0],
+                                 [0.0, 0.0, 1.0, 0.8],
+                                 [0.0, 0.0, 0.8, 1.0]])
+        tx_corr_mat = exp_corr_mat(0.5, num_tx_ant//2).numpy()
+        spatial_corr_mat = np.kron(pol_corr_mat, tx_corr_mat)
+        spatial_corr_mat = np.kron(rx_corr_mat, spatial_corr_mat)
+        tdl = TDL(model = "A",
+                 delay_spread = 100e-9,
+                 carrier_frequency = 3.5e9,
+                 min_speed = 0.0, max_speed = 0.0,
+                 num_rx_ant=num_rx_ant,num_tx_ant=num_tx_ant,
+                 spatial_corr_mat=spatial_corr_mat,
+                 rx_corr_mat=np.eye(num_rx_ant), tx_corr_mat=np.eye(num_tx_ant))
+
+        # Empirical estimation of the correlation matrices
+        est_spatial_cov = np.zeros([num_tx_ant*num_rx_ant,
+                                    num_tx_ant*num_rx_ant], complex)
+        num_it = 1000
+        batch_size = 1000
+        for _ in range(num_it):
+            h, _ = tdl(batch_size, 1, 1)
+
+            h = np.transpose(h, [0,1,3,5,6,2,4]) # [..., rx ant, tx ant]
+            h = h[:,0,0,0,0,:,:]/np.sqrt(tdl.mean_powers[0].numpy()) # [batch size, rx ant, tx ant]
+            h = np.reshape(h, [batch_size, -1]) # [batch size, rx ant*tx ant]
+
+            # Spatial correlation
+            h_ = np.expand_dims(h, axis=-1) # [batch size, rx ant*tx ant, 1]
+            est_spatial_cov_ = np.matmul(h_, np.conj(np.transpose(h_, [0,2,1])))
+            est_spatial_cov_ = np.mean(est_spatial_cov_, axis=0) # [rx ant, rx ant]
+            est_spatial_cov += est_spatial_cov_
+        est_spatial_cov /= num_it
+
+        # Test
+        max_err = np.max(np.abs(est_spatial_cov - spatial_corr_mat))
+        self.assertLessEqual(max_err, TestTDL.MAX_ERR)

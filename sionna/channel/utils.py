@@ -1015,7 +1015,8 @@ def gen_single_sector_topology( batch_size,
     # of the sector
     sector_center = (min_bs_ut_dist + 0.5*isd)*0.5
     bs_downtilt = 0.5*PI - tf.math.atan(sector_center/bs_height)
-    bs_orientation = tf.stack([ tf.zeros([batch_size, 1], real_dtype),
+    bs_yaw = tf.constant(0.25*PI, real_dtype)
+    bs_orientation = tf.stack([ tf.fill([batch_size, 1], bs_yaw),
                                 tf.fill([batch_size, 1], bs_downtilt),
                                 tf.zeros([batch_size, 1], real_dtype)], axis=-1)
 
@@ -1218,7 +1219,8 @@ def gen_single_sector_topology_interferers( batch_size,
     # of the sector
     sector_center = (min_bs_ut_dist + 0.5*isd)*0.5
     bs_downtilt = 0.5*PI - tf.math.atan(sector_center/bs_height)
-    bs_orientation = tf.stack([ tf.zeros([batch_size, 1], real_dtype),
+    bs_yaw = tf.constant(0.25*PI, real_dtype)
+    bs_orientation = tf.stack([ tf.fill([batch_size, 1], bs_yaw),
                                 tf.fill([batch_size, 1], bs_downtilt),
                                 tf.zeros([batch_size, 1], real_dtype)], axis=-1)
 

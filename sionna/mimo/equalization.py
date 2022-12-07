@@ -119,7 +119,7 @@ def lmmse_equalizer(y, h, s, whiten_interference=True):
         y, h  = whiten_channel(y, h, s, return_s=False) # pylint: disable=unbalanced-tuple-unpacking
 
         # Compute G
-        i = expand_to_rank(tf.eye(tf.shape(h)[-1], dtype=s.dtype), tf.rank(s), 0)
+        i = expand_to_rank(tf.eye(h.shape[-1], dtype=s.dtype), tf.rank(s), 0)
         g = tf.matmul(h, h, adjoint_a=True) + i
         g = tf.matmul(matrix_inv(g), h, adjoint_b=True)
 
@@ -349,7 +349,7 @@ def mf_equalizer(y, h, s):
     # Compute residual error variance
     gsg = tf.matmul(tf.matmul(g, s), g, adjoint_b=True)
     gh = tf.matmul(g, h)
-    i = expand_to_rank(tf.eye(tf.shape(gsg)[-2], dtype=gsg.dtype), tf.rank(gsg), 0)
+    i = expand_to_rank(tf.eye(gsg.shape[-2], dtype=gsg.dtype), tf.rank(gsg), 0)
 
     no_eff = tf.abs(tf.linalg.diag_part(tf.matmul(i-gh, i-gh, adjoint_b=True) + gsg))
     return x_hat, no_eff

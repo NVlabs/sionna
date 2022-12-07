@@ -14,7 +14,7 @@ class StreamManagement():
     ----------
     rx_tx_association : [num_rx, num_tx], np.int
         A binary NumPy array where ``rx_tx_association[i,j]=1`` means
-        that receiver `i` gets one ore multiple streams from
+        that receiver `i` gets one or multiple streams from
         transmitter `j`.
 
     num_streams_per_tx : int

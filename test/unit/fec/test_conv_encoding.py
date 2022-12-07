@@ -7,6 +7,7 @@ try:
 except ImportError as e:
     import sys
     sys.path.append("../")
+from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
@@ -29,13 +30,20 @@ class TestConvEncoding(unittest.TestCase):
         r"""Test with allzero codeword that output dims are correct (=n) and output also equals all-zero."""
 
         bs = 10
+        mu = 4
         coderates = [1/2, 1/3]
         ks = [10, 20, 50, 100]
 
-        for rate in coderates:
-            for k in ks:
-                n = int(k/rate) # calculate coderate
-                enc = ConvEncoder(rate=rate, constraint_length=5)
+        for rate, k in product(coderates, ks):
+            n = int(k/rate) # calculate coderate
+            for enc in (
+                ConvEncoder(rate=rate, constraint_length=mu+1),
+                ConvEncoder(rate=rate, constraint_length=mu+1, rsc=True),
+                ConvEncoder(rate=rate, constraint_length=mu+1, terminate=True)):
+
+                if enc.terminate:
+                    n+= int(mu/rate)
+
                 u = np.zeros([bs, k])
                 c = enc(u).numpy()
                 self.assertTrue(c.shape[-1]==n)
@@ -46,9 +54,12 @@ class TestConvEncoding(unittest.TestCase):
                 # test that output dim can change (in eager mode)
                 k = k+1 # increase length
                 n = int(k/rate) # calculate coderate
+                if enc.terminate is True:
+                    n+= int(mu/rate)
                 u = np.zeros([bs, k])
                 c = enc(u).numpy()
                 self.assertTrue(c.shape[-1]==n)
+
                 # also check that all-zero input yields all-zero output
                 c_hat = np.zeros([bs, n])
                 self.assertTrue(np.array_equal(c, c_hat))
@@ -70,13 +81,22 @@ class TestConvEncoding(unittest.TestCase):
             for mu in constraint_length_valid:
                 with self.assertRaises(AssertionError):
                     enc = ConvEncoder(rate=rate, constraint_length= mu)
+                    enc = ConvEncoder(rate=rate, rsc=True)
+                    enc = ConvEncoder(rate=rate, terminate=True)
+                    enc = ConvEncoder(rate=rate, rsc=True, terminate=True)
 
         gmat = [['101', '111', '000'], ['000', '010', '011']]
         with self.assertRaises(AssertionError):
             enc = ConvEncoder(gen_poly=gmat)
+            enc = ConvEncoder(gen_poly=gmat, rsc=True)
 
     def test_polynomial_input(self):
         r"""Test that different formats of input polynomials are accepted and raises exceptions when the generator polynomials fail assertions."""
+
+        def util_check_assertion_err(gen_poly_, msg_):
+            with self.assertRaises(AssertionError) as exception_context:
+                enc = ConvEncoder(gen_poly=gen_poly_)
+                self.assertEqual(str(exception_context.exception), msg_)
 
         bs = 10
         k = 100
@@ -89,17 +109,15 @@ class TestConvEncoding(unittest.TestCase):
 
         g = [g1, g2]
         for gen_poly in g:
-            enc = ConvEncoder(gen_poly=gen_poly)
-            c = enc(u).numpy()
-            self.assertTrue(c.shape[-1]==n)
-            # also check that all-zero input yields all-zero output
-            c_hat = np.zeros([bs, n])
-            self.assertTrue(np.array_equal(c, c_hat))
+            for enc in (
+                ConvEncoder(gen_poly=gen_poly),
+                ConvEncoder(gen_poly=gen_poly, rsc=True)):
 
-        def util_check_assertion_err(gen_poly_, msg_):
-            with self.assertRaises(AssertionError) as exception_context:
-                enc = ConvEncoder(gen_poly=gen_poly_)
-                self.assertEqual(str(exception_context.exception), msg_)
+                c = enc(u).numpy()
+                self.assertTrue(c.shape[-1]==n)
+                # also check that all-zero input yields all-zero output
+                c_hat = np.zeros([bs, n])
+                self.assertTrue(np.array_equal(c, c_hat))
 
         gs = [
             ['1001', '111'],
@@ -107,8 +125,8 @@ class TestConvEncoding(unittest.TestCase):
             ('1211', '1101')]
         msg_s = [
             "Each polynomial must be of same length.",
-                 "Each polynomial must be a string.",
-                 "Each Polynomial must be a string of 0/1 s."
+            "Each polynomial must be a string.",
+            "Each Polynomial must be a string of 0/1 s."
                  ]
         for idx, g in enumerate(gs):
             util_check_assertion_err(g,msg_s[idx])
@@ -120,51 +138,66 @@ class TestConvEncoding(unittest.TestCase):
 
         source = BinarySource()
         inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
+
         x = ConvEncoder(rate=0.5, constraint_length=4)(inputs)
         model = tf.keras.Model(inputs=inputs, outputs=x)
 
+        xterm = ConvEncoder(rate=1/3, constraint_length=3, terminate=True)(inputs)
+        modelterm = tf.keras.Model(inputs=inputs, outputs=xterm)
+
         b = source([bs, k])
         model(b)
+        modelterm(b)
+
         # call twice to see that bs can change
         b2 = source([bs+1, k])
         model(b2)
+        modelterm(b2)
 
         model.summary()
+        modelterm.summary()
 
         source = BinarySource()
-        enc = ConvEncoder(rate=0.5, constraint_length=8)
+        enc = ConvEncoder(rate=0.5, constraint_length=6)
         u = source([1, 32])
         x = enc(u)
-        print(x.shape)
+        self.assertTrue(x.shape == [1,64])
+
         u = source([2, 30])
         x = enc(u)
-        print(x.shape)
+        self.assertTrue(x.shape == [2,60])
 
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
         k = 120
-        n = 240 # rate must be 1/2 or 1/3
+        rate = 1/2
+        n = int(k/rate)
+        mu = 4
 
         source = BinarySource()
-        enc = ConvEncoder(rate=k/n, constraint_length=5)
+        for enc in (
+            ConvEncoder(rate=rate, constraint_length=mu+1),
+            ConvEncoder(rate=rate, constraint_length=mu+1, terminate=True)):
 
-        b = source([100, k])
-        b_res = tf.reshape(b, [4, 5, 5, k])
+            if enc.terminate:
+                n += int(mu/rate)
 
-        # encode 2D Tensor
-        c = enc(b).numpy()
-        # encode 4D Tensor
-        c_res = enc(b_res).numpy()
+            b = source([100, k])
+            b_res = tf.reshape(b, [4, 5, 5, k])
 
-        # test that shape was preserved
-        self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+            # encode 2D Tensor
+            c = enc(b).numpy()
+            # encode 4D Tensor
+            c_res = enc(b_res).numpy()
 
+            # test that shape was preserved
+            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
 
-        # and reshape to 2D shape
-        c_res = tf.reshape(c_res, [100,n])
-        # both version should yield same result
-        self.assertTrue(np.array_equal(c, c_res))
+            # and reshape to 2D shape
+            c_res = tf.reshape(c_res, [100, n])
+            # both version should yield same result
+            self.assertTrue(np.array_equal(c, c_res))
 
     def test_ref_implementation(self):
         r"""Test against pre-encoded codewords from reference implementation.
@@ -199,19 +232,21 @@ class TestConvEncoding(unittest.TestCase):
         """Test that all samples in batch yield same output (for same input).
         """
         bs = 100
-        k = 120
+        k = 117
 
         source = BinarySource()
-        enc = ConvEncoder(rate=0.5, constraint_length=7)
+        for enc in (
+            ConvEncoder(rate=0.5, constraint_length=8),
+            ConvEncoder(rate=0.5, constraint_length=7, terminate=True)):
 
-        b = source([1, 15, k])
-        b_rep = tf.tile(b, [bs, 1, 1])
+            b = source([1, 15, k])
+            b_rep = tf.tile(b, [bs, 1, 1])
 
-        # and run tf version (to be tested)
-        c = enc(b_rep).numpy()
+            # and run tf version (to be tested)
+            c = enc(b_rep).numpy()
 
-        for i in range(bs):
-            self.assertTrue(np.array_equal(c[0,:,:], c[i,:,:]))
+            for i in range(bs):
+                self.assertTrue(np.array_equal(c[0,:,:], c[i,:,:]))
 
     def test_dtypes_flexible(self):
         """Test that encoder supports variable dtypes and
@@ -227,6 +262,7 @@ class TestConvEncoding(unittest.TestCase):
 
         enc_ref = ConvEncoder(rate=0.5,
                               constraint_length=7,
+                              rsc=True,
                               output_dtype=tf.float32)
 
         u = source([bs, k])
@@ -235,6 +271,7 @@ class TestConvEncoding(unittest.TestCase):
         for dt in dt_supported:
             enc = ConvEncoder(rate=0.5,
                               constraint_length=7,
+                              rsc=True,
                               output_dtype=dt)
             u_dt = tf.cast(u, dt)
             c = enc(u_dt)
@@ -258,21 +295,23 @@ class TestConvEncoding(unittest.TestCase):
         k = 100
 
         source = BinarySource()
-        enc = ConvEncoder(rate=0.5, constraint_length=7)
+        for enc in (
+            ConvEncoder(rate=0.5, constraint_length=7),
+            ConvEncoder(rate=0.5, constraint_length=4, terminate=True)):
 
-        # test that for arbitrary input only 0,1 values are outputed
-        u = source([bs, k])
-        x = run_graph(u).numpy()
+            # test that for arbitrary input only 0,1 values are outputed
+            u = source([bs, k])
+            x = run_graph(u).numpy()
 
-        # execute the graph twice
-        x = run_graph(u).numpy()
+            # execute the graph twice
+            x = run_graph(u).numpy()
 
-        # and change batch_size
-        u = source([bs+1, k])
-        x = run_graph(u).numpy()
+            # and change batch_size
+            u = source([bs+1, k])
+            x = run_graph(u).numpy()
 
-        #check XLA
-        x = run_graph_xla(u).numpy()
-        u = source([bs, k])
-        x = run_graph_xla(u).numpy()
+            #check XLA
+            x = run_graph_xla(u).numpy()
+            u = source([bs, k])
+            x = run_graph_xla(u).numpy()
 

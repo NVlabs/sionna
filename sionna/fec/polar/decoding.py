@@ -1974,8 +1974,8 @@ class Polar5GDecoder(Layer):
         # Store internal attributes
         self._n_target = enc_polar.n_target
         self._k_target = enc_polar.k_target
-        self._n_polar = enc_polar.n
-        self._k_polar = enc_polar.k
+        self._n_polar = enc_polar.n_polar
+        self._k_polar = enc_polar.k_polar
         self._k_crc = enc_polar.enc_crc.crc_length
         self._llr_max = 100 # Internal max LLR value (for punctured positions)
         self._enc_polar = enc_polar

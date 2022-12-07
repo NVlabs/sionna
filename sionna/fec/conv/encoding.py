@@ -11,11 +11,10 @@ from sionna.fec.conv.utils import polynomial_selector, Trellis
 
 class ConvEncoder(Layer):
     # pylint: disable=line-too-long
-    r"""ConvEncoder(gen_poly=None, rate= 1/2, constraint_length=3, output_dtype=tf.float32, **kwargs)
+    r"""ConvEncoder(gen_poly=None, rate= 1/2, constraint_length=3, rsc=False, terminate=False, output_dtype=tf.float32, **kwargs)
 
-    Encodes an information binary tensor to a convolutional codeword.
-    Only non-recursive encoding is available. Currently, only generator
-    polynomials for codes of rate=1/n for n=2,3,4,... are allowed.
+    Encodes an information binary tensor to a convolutional codeword. Currently,
+    only generator polynomials for codes of rate=1/n for n=2,3,4,... are allowed.
 
     The class inherits from the Keras layer class and can be used as layer in a
     Keras model.
@@ -34,6 +33,17 @@ class ConvEncoder(Layer):
             Valid values are between 3 and 8 inclusive. Only required if
             ``gen_poly`` is `None`.
 
+        rsc: boolean
+            Boolean flag indicating whether the Trellis generated is recursive
+            systematic or not. If `True`, the encoder is recursive-systematic.
+            In this case first polynomial in ``gen_poly`` is used as the
+            feedback polynomial. Defaults to `False`.
+
+        terminate: boolean
+            Encoder is terminated to all zero state if `True`.
+            If terminated, the `true` rate of the code is slightly lower than
+            ``rate``.
+
         output_dtype: tf.DType
             Defaults to `tf.float32`. Defines the output datatype of the layer.
 
@@ -41,14 +51,14 @@ class ConvEncoder(Layer):
     -----
         inputs : [...,k], tf.float32
             2+D tensor containing the information bits where `k` is the
-            information length.
+            information length
 
     Output
     ------
         : [...,k/rate], tf.float32
             2+D tensor containing the encoded codeword for the given input
             information tensor where `rate` is
-            :math:`\frac{1}{len\left(\textrm{gen_poly}\right)}`
+            :math:`\frac{1}{\textrm{len}\left(\textrm{gen_poly}\right)}`
             (if ``gen_poly`` is provided).
 
     Note
@@ -77,12 +87,21 @@ class ConvEncoder(Layer):
         polynomial `10011` has a ``constraint_length`` of 5, however its
         ``memory`` is only 4.
 
+        When ``terminate`` is `True`, the true rate of the convolutional
+        code is slightly lower than ``rate``. It equals
+        :math:`\frac{r*k}{k+\mu}` where `r` denotes ``rate`` and
+        :math:`\mu` is ``constraint_length`` - 1. For example when
+        ``terminate`` is `True`, ``k=100``,
+        :math:`\mu=4` and ``rate`` =0.5, true rate equals
+        :math:`\frac{0.5*100}{104}=0.481`.
     """
 
     def __init__(self,
                  gen_poly=None,
                  rate=1/2,
                  constraint_length=3,
+                 rsc=False,
+                 terminate=False,
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -107,8 +126,15 @@ class ConvEncoder(Layer):
                 "Rate must be 1/3 or 1/2."
             self._gen_poly = polynomial_selector(rate, constraint_length)
 
-        self._coderate = 1/len(self.gen_poly)
-        self._trellis = Trellis(self.gen_poly,rsc=False)
+        self._rsc = rsc
+        self._terminate = terminate
+
+        self._coderate_desired = 1/len(self.gen_poly)
+        # Differ when terminate is True
+        self._coderate = self._coderate_desired
+
+        self._trellis = Trellis(self.gen_poly,rsc=self._rsc)
+        self._mu = self.trellis._mu
 
         # conv_k denotes number of input bit streams.
         # Only 1 allowed in current implementation
@@ -131,18 +157,47 @@ class ConvEncoder(Layer):
 
     @property
     def gen_poly(self):
-        """The generator polynomial used by the encoder."""
+        """Generator polynomial used by the encoder"""
         return self._gen_poly
 
     @property
     def coderate(self):
-        """Rate of the code used in the encoder."""
+        """Rate of the code used in the encoder"""
+        if self.terminate and self._k is None:
+            print("Note that, due to termination, the true coderate is lower "\
+                  "than the returned design rate. "\
+                  "The exact true rate is dependent on the value of k and "\
+                  "hence cannot be computed before the first call().")
+        elif self.terminate and self._k is not None:
+            term_factor = (self._k/(self._k + self._mu))
+            self._coderate = self._coderate_desired*term_factor
         return self._coderate
 
     @property
     def trellis(self):
-        """Trellis object used during encoding."""
+        """Trellis object used during encoding"""
         return self._trellis
+
+    @property
+    def terminate(self):
+        """Indicates if the convolutional encoder is terminated"""
+        return self._terminate
+
+    @property
+    def k(self):
+        """Number of information bits per codeword"""
+        if self._k is None:
+            print("Note: The value of k cannot be computed before the first " \
+                  "call().")
+        return self._k
+
+    @property
+    def n(self):
+        """Number of codeword bits"""
+        if self._n is None:
+            print("Note: The value of n cannot be computed before the first " \
+                  "call().")
+        return self._n
 
     #########################
     # Keras layer functions
@@ -178,9 +233,10 @@ class ConvEncoder(Layer):
         msg = tf.cast(inputs, tf.int32)
         output_shape = msg.get_shape().as_list()
         output_shape[0] = -1 # overwrite batch dim (can be none in keras)
-        output_shape[-1] = self._n # assign n to the last dimension
+        output_shape[-1] = self._n # assign n to the last dim
 
         msg_reshaped = tf.reshape(msg, [-1, self._k])
+        term_syms = int(self._mu) if self._terminate else 0
 
         prev_st = tf.zeros([tf.shape(msg_reshaped)[0]], tf.int32)
         ta = tf.TensorArray(tf.int32, size=self.num_syms, dynamic_size=False)
@@ -201,8 +257,36 @@ class ConvEncoder(Layer):
             idx_bits = int2bin_tf(idx_syms, self._conv_n)
             ta = ta.write(idx//self._conv_k, idx_bits)
             prev_st = new_st
-
         cw = tf.concat(tf.unstack(ta.stack()), axis=1)
+
+        ta_term = tf.TensorArray(tf.int32, size=term_syms, dynamic_size=False)
+        # Termination
+        if self._terminate:
+            if self._rsc:
+                fb_poly = tf.constant([int(x) for x in self.gen_poly[0][1:]])
+                fb_poly_tiled = tf.tile(
+                        tf.expand_dims(fb_poly,0),[tf.shape(prev_st)[0],1])
+
+            for idx in tf.range(0, term_syms, self._conv_k):
+                prev_st_bits = int2bin_tf(prev_st, self._mu)
+                if self._rsc:
+                    msg_idx = tf.math.reduce_sum(
+                                        tf.multiply(fb_poly_tiled, prev_st_bits),-1)
+                    msg_idx = tf.squeeze(int2bin_tf(msg_idx,1),-1)
+                else:
+                    msg_idx = tf.zeros((tf.shape(prev_st)[0],), dtype=tf.int32)
+
+                indices = tf.stack([prev_st, msg_idx], -1)
+                new_st = tf.gather_nd(self._trellis.to_nodes, indices=indices)
+                idx_syms = tf.gather_nd(self._trellis.op_mat,
+                                        tf.stack([prev_st, new_st], -1))
+                idx_bits = int2bin_tf(idx_syms, self._conv_n)
+                ta_term = ta_term.write(idx//self._conv_k, idx_bits)
+                prev_st = new_st
+
+            term_bits = tf.concat(tf.unstack(ta_term.stack()), axis=1)
+            cw = tf.concat([cw, term_bits], axis=-1)
+
         cw = tf.cast(cw, self.output_dtype)
         cw_reshaped = tf.reshape(cw, output_shape)
 

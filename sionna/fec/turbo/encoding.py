@@ -9,19 +9,19 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 from sionna.fec import interleaving
 from sionna.fec.utils import bin2int_tf, int2bin_tf
+from sionna.fec.conv.encoding import ConvEncoder
 from sionna.fec.conv.utils import Trellis
 from sionna.fec.turbo.utils import polynomial_selector, puncture_pattern, TurboTermination
-
 
 class TurboEncoder(Layer):
     # pylint: disable=line-too-long
     r"""TurboEncoder(gen_poly=None, constraint_length=3, rate=1/3, terminate=False, interleaver_type='3GPP', output_dtype=tf.float32, **kwargs)
 
-    Encodes a binary information tensor to a Turbo codeword [Berrou]_.
+    Performs encoding of information bits to a Turbo code codeword [Berrou]_.
     Implements the standard Turbo code framework [Berrou]_: Two identical
     rate-1/2 convolutional encoders :class:`~sionna.fec.conv.encoding.ConvEncoder`
-    are combined to produce a rate-1/3 Turbo code. Further, puncturing to attain a
-    rate-1/2 Turbo code is supported.
+    are combined to produce a rate-1/3 Turbo code. Further,
+    puncturing to attain a rate-1/2 Turbo code is supported.
 
     The class inherits from the Keras layer class and can be used as layer in a
     Keras model.
@@ -29,7 +29,7 @@ class TurboEncoder(Layer):
     Parameters
     ----------
     gen_poly: tuple
-        Sequence of strings with each string being a 0,1 sequence. If
+        Tuple of strings with each string being a 0,1 sequence. If
         `None`, ``constraint_length`` must be provided.
 
     constraint_length: int
@@ -38,12 +38,12 @@ class TurboEncoder(Layer):
 
     rate: float
         Valid values are 1/3 and 1/2. Note that ``rate`` here denotes
-        the `design` rate of the Turbo code. If ``terminate`` is `"True"`, a
+        the `design` rate of the Turbo code. If ``terminate`` is `True`, a
         small rate-loss occurs.
 
     terminate: boolean
         Underlying convolutional encoders are terminated to all zero state
-        if `"True"`. If terminated, the true rate of the code is slightly lower
+        if `True`. If terminated, the true rate of the code is slightly lower
         than ``rate``.
 
     interleaver_type: str
@@ -59,22 +59,22 @@ class TurboEncoder(Layer):
     Input
     -----
     inputs : [...,k], tf.float32
-        2+D tensor of information bits where `k` is the information length.
+        2+D tensor of information bits where `k` is the information length
 
     Output
     ------
     : `[...,k/rate]`, tf.float32
         2+D tensor where `rate` is provided as input
         parameter. The output is the encoded codeword for the input
-        information tensor. When `terminate` is `"True"`, the effective rate
-        of the Turbo code is slightly less than `rate`.
+        information tensor. When ``terminate`` is `True`, the effective rate
+        of the Turbo code is slightly less than ``rate``.
 
     Note
     ----
         Various notations are used in literature to represent the generator
         polynomials for convolutional codes. For simplicity
         :class:`~sionna.fec.turbo.encoding.TurboEncoder` only
-        accepts the binary format, i.e., `10011` for the ``gen_poly`` argument
+        accepts the binary format, i.e., `10011`, for the ``gen_poly`` argument
         which corresponds to the polynomial :math:`1 + D^3 + D^4`.
 
         Note that Turbo codes require the underlying convolutional encoders
@@ -88,11 +88,11 @@ class TurboEncoder(Layer):
         `10011` has a ``constraint_length`` of 5, however its ``memory`` is
         only 4.
 
-        When ``terminate`` is `"True"`, the true rate of the Turbo code is
+        When ``terminate`` is `True`, the true rate of the Turbo code is
         slightly lower than ``rate``. It can be computed as
         :math:`\frac{k}{\frac{k}{r}+\frac{4\mu}{3r}}` where `r` denotes
         ``rate`` and :math:`\mu` is the ``constraint_length`` - 1. For example, in
-        3GPP, ``constraint_length`` = 4, ``terminate`` = `"True"`, for
+        3GPP, ``constraint_length`` = 4, ``terminate`` = `True`, for
         ``rate`` = 1/3, true rate is equal to  :math:`\frac{k}{3k+12}` .
     """
 
@@ -135,11 +135,13 @@ class TurboEncoder(Layer):
         self._terminate = terminate
         self._interleaver_type = interleaver_type
         self.output_dtype = output_dtype
+        # Underlying convolutional encoders to be rsc or not
+        rsc = True
 
         self._coderate_conv = 1/len(self.gen_poly)
         self._punct_pattern = puncture_pattern(rate, self._coderate_conv)
 
-        self._trellis = Trellis(self.gen_poly, rsc=True)
+        self._trellis = Trellis(self.gen_poly, rsc=rsc)
         self._mu = self.trellis._mu
 
         # conv_n denotes number of output bits for conv_k input bits.
@@ -167,23 +169,27 @@ class TurboEncoder(Layer):
         if self.punct_pattern is not None:
             self.punct_idx = tf.where(self.punct_pattern)
 
+        self.convencoder = ConvEncoder(gen_poly=self._gen_poly,
+                                       rsc=rsc,
+                                       terminate=self._terminate)
+
     #########################################
     # Public methods and properties
     #########################################
 
     @property
     def gen_poly(self):
-        """The generator polynomial used by the encoder."""
+        """Generator polynomial used by the encoder"""
         return self._gen_poly
 
     @property
     def constraint_length(self):
-        """The constraint length of the encoder."""
+        """Constraint length of the encoder"""
         return self._mu + 1
 
     @property
     def coderate(self):
-        """Rate of the code used in the encoder."""
+        """Rate of the code used in the encoder"""
         if self.terminate and self._k is None:
             print("Note that, due to termination, the true coderate is lower "\
                   "than the returned design rate. "\
@@ -196,18 +202,34 @@ class TurboEncoder(Layer):
 
     @property
     def trellis(self):
-        """Trellis object used during encoding."""
+        """Trellis object used during encoding"""
         return self._trellis
 
     @property
     def terminate(self):
-        """Indicates if the convolutional encoders are terminated."""
+        """Indicates if the convolutional encoders are terminated"""
         return self._terminate
 
     @property
     def punct_pattern(self):
-        """Puncturing pattern for the Turbo codeword."""
+        """Puncturing pattern for the Turbo codeword"""
         return self._punct_pattern
+
+    @property
+    def k(self):
+        """Number of information bits per codeword"""
+        if self._k is None:
+            print("Note: The value of k cannot be computed before the first " \
+                  "call().")
+        return self._k
+
+    @property
+    def n(self):
+        """Number of codeword bits"""
+        if self._n is None:
+            print("Note: The value of n cannot be computed before the first " \
+                  "call().")
+        return self._n
 
     def _conv_enc(self, info_vec, terminate):
         """
@@ -352,43 +374,41 @@ class TurboEncoder(Layer):
 
         if self._terminate:
             num_term_bits_ = int(
-                self.turbo_term.get_num_term_syms()/self._coderate_desired)
+                self.turbo_term.get_num_term_syms()/self._coderate_conv)
+            num_term_bits_punct = int(
+                num_term_bits_*self._coderate_conv/self._coderate_desired)
         else:
             num_term_bits_ = 0
+            num_term_bits_punct = 0
 
         output_shape = inputs.get_shape().as_list()
         output_shape[0] = -1
-        output_shape[-1] = self._n + num_term_bits_
+        output_shape[-1] = self._n + num_term_bits_punct
 
+        preterm_n = int(self._k/self._coderate_conv)
         msg = tf.cast(tf.reshape(inputs, [-1, self._k]), tf.int32)
         msg2 = self.internal_interleaver(msg)
 
-        ta1, ta1_term = self._conv_enc(msg, terminate=self._terminate)
-        ta2, ta2_term = self._conv_enc(msg2, terminate=self._terminate)
+        cw1_ = self.convencoder(msg)
+        cw2_ = self.convencoder(msg2)
 
-        cw1 = tf.concat(tf.unstack(ta1.stack()),axis=1)
-        cw2 = tf.concat(tf.unstack(ta2.stack()),axis=1)
+        cw1, term1 = cw1_[:, :preterm_n], cw1_[:, preterm_n:]
+        cw2, term2 = cw2_[:, :preterm_n], cw2_[:, preterm_n:]
 
         # Gather parity stream from 2nd enc
-        parity_idx = tf.range(1,
-                              int(self._k/self._coderate_conv),
-                              delta=self._conv_n)
-        cw2_parity = tf.gather(cw2, indices=parity_idx, axis=-1)
+        par_idx = tf.range(1, preterm_n, delta=self._conv_n)
+        cw2_par = tf.gather(cw2, indices=par_idx, axis=-1)
 
-        # Concatenate to _conv_n streams from first encoder
-        cw = tf.concat([tf.reshape(cw1[:,:,None],(-1, self._k, self._conv_n)),
-                        cw2_parity[:,:,None]],
-                       axis=-1)
+        cw1 = tf.reshape(cw1,(-1, self._k, self._conv_n))
+        cw2_par = tf.reshape(cw2_par, (-1, self._k, 1))
+
+        # Concatenate 2nd enc parity to _conv_n streams from first encoder
+        cw = tf.concat([cw1, cw2_par], axis=-1)
 
         if self.terminate:
-            term_bits1 = tf.concat(tf.unstack(ta1_term.stack()), axis=1)
-            term_bits2 = tf.concat(tf.unstack(ta2_term.stack()), axis=1)
-
-            term_syms_turbo = self.turbo_term.termbits_conv2turbo(term_bits1,
-                                                                  term_bits2)
-
-            term_syms_turbo = tf.reshape(term_syms_turbo,
-                                    (-1, tf.shape(term_syms_turbo)[-1]/3, 3))
+            term_syms_turbo = self.turbo_term.termbits_conv2turbo(term1, term2)
+            term_syms_turbo = tf.reshape(
+                term_syms_turbo, (-1, num_term_bits_//2, 3))
             cw = tf.concat([cw, term_syms_turbo], axis=-2)
 
         if self.punct_pattern is not None:

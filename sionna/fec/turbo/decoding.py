@@ -14,9 +14,9 @@ from sionna.fec.turbo.utils import TurboTermination, polynomial_selector, punctu
 
 class TurboDecoder(Layer):
     # pylint: disable=line-too-long
-    r"""TurboDecoder(encoder=None, gen_poly=None, rate=1/3, constraint_length=None, interleaver='3GPP', terminate=False, num_iter=6, hard_out=True, output_dtype=tf.float32,**kwargs)
+    r"""TurboDecoder(encoder=None, gen_poly=None, rate=1/3, constraint_length=None, interleaver='3GPP', terminate=False, num_iter=6, hard_out=True, algorithm='map', output_dtype=tf.float32,**kwargs)
 
-    Decodes a noisy Turbo codeword to the information tensor [Berrou]_.
+    Turbo code decoder based on BCJR component decoders [Berrou]_.
     Takes as input LLRs and returns LLRs or hard decided bits, i.e., an
     estimate of the information tensor.
 
@@ -30,10 +30,11 @@ class TurboDecoder(Layer):
     Parameters
     ----------
     encoder: :class:`~sionna.fec.turbo.encoding.TurboEncoder`
-        If ``encoder`` is provided as input, the following parameters need not
-        be provided: `gen_poly`, `rate`, `constraint_length`, `terminate`,
-        `interleaver`. They will be inferred from the ``encoder`` object itself.
-        If ``encoder`` is `"None"`, the above parameters must be provided
+        If ``encoder`` is provided as input, the following input parameters
+        are not required and will be ignored: `gen_poly`, `rate`,
+        `constraint_length`, `terminate`, `interleaver`. They will be inferred
+        from the ``encoder`` object itself.
+        If ``encoder`` is `None`, the above parameters must be provided
         explicitly.
 
     gen_poly: tuple
@@ -50,12 +51,12 @@ class TurboDecoder(Layer):
         ``encoder`` and ``gen_poly`` are `None`.
 
     interleaver: str
-        `"3GPP"` or `Random`. If `"3GPP"`, the internal interleaver for Turbo
+        `"3GPP"` or `"Random"`. If `"3GPP"`, the internal interleaver for Turbo
         codes as specified in [3GPPTS36212_Turbo]_ will be used. Only required
-        if ``encoder`` is None.
+        if ``encoder`` is `None`.
 
     terminate: bool
-        If `"True"`, the two underlying convolutional encoders are assumed
+        If `True`, the two underlying convolutional encoders are assumed
         to have terminated to all zero state.
 
     num_iter: int
@@ -64,10 +65,17 @@ class TurboDecoder(Layer):
         convolutional code components.
 
     hard_out: boolean
-        Boolean flag indicating whether to output hard or soft decisions on
-        the decoded information vector. `"True"` implies a hard- decoded
-        information vector of 0/1's is output. `"False"` implies decoded LLRs
-        of the information is output.
+        Defaults to `True` and indicates whether to output hard or soft
+        decisions on the decoded information vector. `True` implies a hard-
+        decoded information vector of 0/1's is output. `False` implies
+        decoded LLRs of the information is output.
+
+    algorithm: str
+        Defaults to `map`. Indicates the implemented BCJR algorithm,
+        where `map` denotes the exact MAP algorithm, `log` indicates the
+        exact MAP implementation, but in log-domain, and
+        `maxlog` indicates the approximated MAP implementation in log-domain,
+        where :math:`\log(e^{a}+e^{b}) \sim \max(a,b)`.
 
     output_dtype: tf.DType
         Defaults to `tf.float32`. Defines the output datatype of the layer.
@@ -76,13 +84,13 @@ class TurboDecoder(Layer):
     -----
     inputs: tf.float32
         2+D tensor of shape `[...,n]` containing the (noisy) channel
-        output symbols where `n` is the codeword length.
+        output symbols where `n` is the codeword length
 
     Output
     ------
     : tf.float32
-        2+D tensor of shape `[...,rate*n]` containing the estimates of the
-        information bit tensor.
+        2+D tensor of shape `[...,coderate*n]` containing the estimates of the
+        information bit tensor
 
     Note
     ----
@@ -102,6 +110,7 @@ class TurboDecoder(Layer):
                  terminate=False,
                  num_iter=6,
                  hard_out=True,
+                 algorithm='map',
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -181,10 +190,12 @@ class TurboDecoder(Layer):
         self._output_dtype = output_dtype
         self.num_iter = num_iter
         self._hard_out = hard_out
-        self.bcjrdecoder = BCJRDecoder(self._gen_poly,
-                                       rsc=self.rsc,
-                                       hard_out=False,
-                                       terminate=self._terminate)
+
+        self.bcjrdecoder = BCJRDecoder(gen_poly=self._gen_poly,
+                                        rsc=self.rsc,
+                                        hard_out=False,
+                                        terminate=self._terminate,
+                                        algorithm=algorithm)
 
     #########################################
     # Public methods and properties
@@ -192,23 +203,39 @@ class TurboDecoder(Layer):
 
     @property
     def gen_poly(self):
-        """The generator polynomial used by the encoder."""
+        """Generator polynomial used by the encoder"""
         return self._gen_poly
 
     @property
     def constraint_length(self):
-        """The constraint length of the encoder."""
+        """Constraint length of the encoder"""
         return self._mu + 1
 
     @property
     def coderate(self):
-        """Rate of the code used in the encoder."""
+        """Rate of the code used in the encoder"""
         return self._coderate
 
     @property
     def trellis(self):
-        """Trellis object used during encoding."""
+        """Trellis object used during encoding"""
         return self._trellis
+
+    @property
+    def k(self):
+        """Number of information bits per codeword"""
+        if self._k is None:
+            print("Note: The value of k cannot be computed before the first " \
+                  "call().")
+        return self._k
+
+    @property
+    def n(self):
+        """Number of codeword bits"""
+        if self._n is None:
+            print("Note: The value of n cannot be computed before the first " \
+                  "call().")
+        return self._n
 
     #########################
     # Utility functions
@@ -284,9 +311,14 @@ class TurboDecoder(Layer):
         tf.debugging.assert_greater_equal(len(input_shape), 2)
 
         self._n = input_shape[-1]
+        if self.coderate == 1/2:
+            assert self._n%2 == 0, "Codeword length should be a multiple of 2"
 
-        turbo_n = int(self._n * self.coderate * 3)
+        codefactor = self.coderate * 3
+        turbo_n = int(self._n * codefactor)
         turbo_n_preterm = turbo_n - self._num_term_bits
+        assert turbo_n_preterm%3 == 0, "Invalid codeword length for a terminated Turbo code"
+
         self._k = int(turbo_n_preterm/3)
 
         # num of symbols for the convolutional codes.

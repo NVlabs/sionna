@@ -60,31 +60,69 @@ lmmse_equalizer
 ---------------
 .. autofunction:: sionna.mimo.lmmse_equalizer
 
-zf_equalizer
----------------
-.. autofunction:: sionna.mimo.zf_equalizer
-
 mf_equalizer
 ---------------
 .. autofunction:: sionna.mimo.mf_equalizer
 
+zf_equalizer
+---------------
+.. autofunction:: sionna.mimo.zf_equalizer
+
+
 Detection
 **********
 
+EPDetector
+----------
+.. autoclass:: sionna.mimo.EPDetector
+   :exclude-members: call, build, compute_sigma_mu, compute_v_x, compute_v_x_obs, update_lam_gam
+   :members:
+
+KBestDetector
+-------------
+.. autoclass:: sionna.mimo.KBestDetector
+   :exclude-members: call, build
+   :members:
+
+LinearDetector
+--------------
+.. autoclass:: sionna.mimo.LinearDetector
+   :exclude-members: call, build
+   :members:
+
 MaximumLikelihoodDetector
----------------------------------
+-------------------------
 .. autoclass:: sionna.mimo.MaximumLikelihoodDetector
    :exclude-members: call, build
    :members:
 
 MaximumLikelihoodDetectorWithPrior
-------------------------------------
+----------------------------------
 .. autoclass:: sionna.mimo.MaximumLikelihoodDetectorWithPrior
+   :exclude-members: call, build
+   :members:
+
+MMSE-PIC
+----------
+.. autoclass:: sionna.mimo.MMSEPICDetector
    :exclude-members: call, build
    :members:
 
 Utility Functions
 *****************
+
+
+List2LLR
+--------
+.. autoclass:: sionna.mimo.List2LLR
+   :exclude-members: __call__
+   :members:
+
+List2LLRSimple
+--------------
+.. autoclass:: sionna.mimo.List2LLRSimple
+   :exclude-members: call, build
+   :members:
 
 complex2real_vector
 -------------------
@@ -131,10 +169,21 @@ References:
 
    .. [ProperRV] `Proper complex random variables <https://en.wikipedia.org/wiki/Complex_random_variable#Proper_complex_random_variables>`_,
       Wikipedia, accessed 11 September, 2022.
-   
+
    .. [CovProperRV] `Covariance matrices of real and imaginary parts <https://en.wikipedia.org/wiki/Complex_random_vector#Covariance_matrices_of_real_and_imaginary_parts>`_,
       Wikipedia, accessed 11 September, 2022.
 
    .. [YH2015] S. Yang and L. Hanzo, `"Fifty Years of MIMO Detection: The Road to Large-Scale MIMOs"
       <https://ieeexplore.ieee.org/abstract/document/7244171>`_,
       IEEE Communications Surveys & Tutorials, vol. 17, no. 4, pp. 1941-1988, 2015.
+
+   .. [FT2015] W. Fu and J. S. Thompson, `"Performance analysis of K-best detection with adaptive modulation"
+      <https://ieeexplore.ieee.org/abstract/document/7454351>`_, IEEE Int. Symp. Wirel. Commun. Sys. (ISWCS), 2015.
+
+   .. [EP2014] J. Céspedes, P. M. Olmos, M. Sánchez-Fernández, and F. Perez-Cruz,
+      `"Expectation Propagation Detection for High-Order High-Dimensional MIMO Systems" <https://ieeexplore.ieee.org/abstract/document/6841617>`_,
+      IEEE Trans. Commun., vol. 62, no. 8, pp. 2840-2849, Aug. 2014.
+
+   .. [CST2011] C. Studer, S. Fateh, and D. Seethaler,
+      `"ASIC Implementation of Soft-Input Soft-Output MIMO Detection Using MMSE Parallel Interference Cancellation" <https://ieeexplore.ieee.org/abstract/document/5779722>`_,
+      IEEE Journal of Solid-State Circuits, vol. 46, no. 7, pp. 1754–1765, July 2011.

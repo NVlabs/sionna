@@ -17,11 +17,11 @@ def polynomial_selector(rate, constraint_length):
     Input
     -----
         rate: float
-            A float defining the desired rate of the code.
-            Currently, only r=1/3 and r=1/2 is supported.
+            Desired rate of the code.
+            Currently, only r=1/3 and r=1/2 are supported.
 
         constraint_length: int
-            An integer defining the desired constraint length of the encoder.
+            Desired constraint length of the encoder
 
     Output
     ------
@@ -64,7 +64,7 @@ def polynomial_selector(rate, constraint_length):
 
 
 class Trellis(object):
-    """Trellis(gen_poly)
+    """Trellis(gen_poly, rsc=True)
 
     Trellis structure for a given generator polynomial. Defines
     state transitions and output symbols (and bits) for each current
@@ -73,19 +73,20 @@ class Trellis(object):
     Parameters
     ----------
         gen_poly: tuple
-            sequence of strings with each string being a 0,1 sequence. If None,
-            ``rate`` and ``constraint_length`` must be provided.
-            If `rsc` is True, then first polynomial will act as denominator
-            for the remaining generator polynomials.
-            For e.g., ('111', '101', '011') the generator matrix equals to
-            [1, 1+D^2/(1+D+D^2), D+D^2/(1+D+D^2)].
-            Currently Trellis is only implemented for Generator matrices
-            of size 1/n.
+            Sequence of strings with each string being a 0,1 sequence.
+            If `None`, ``rate`` and ``constraint_length`` must be provided. If
+            `rsc` is True, then first polynomial will act as denominator for
+            the remaining generator polynomials. For e.g., ``rsc`` = `True` and
+            ``gen_poly`` = (`111`, `101`, `011`) implies generator matrix equals
+            :math:`G(D)=[\\frac{1+D^2}{1+D+D^2}, \\frac{D+D^2}{1+D+D^2}]`.
+            Currently Trellis is only implemented for generator matrices of
+            size :math:`\\frac{1}{n}`.
+
         rsc: boolean
             Boolean flag indicating whether the Trellis is recursive systematic
-            or not. If `"True"`, the encoder is recursive systematic. In this
+            or not. If `True`, the encoder is recursive systematic in which
             case first polynomial in ``gen_poly`` is used as the feedback
-            polynomial. Default is `"True"`.
+            polynomial. Default is `True`.
 
     """
     def __init__(self, gen_poly, rsc=True):
@@ -165,7 +166,6 @@ class Trellis(object):
                     new_bit = int2bin(ip_bit + fb_bit, 1)[0]
                 else:
                     new_bit = ip_bit
-
                 state_bits = [new_bit] + curr_st_bits
                 j_to = bin2int(state_bits[:-1])
 

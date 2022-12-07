@@ -355,18 +355,22 @@ class ResourceGridMapper(Layer):
         which is prefilled with pilots and stores indices
         to scatter data symbols.
         """
-        rg_type = self._resource_grid.build_type_grid()
-        pilot_ind = tf.where(rg_type==1)
-        pilots = flatten_last_dims(self._resource_grid.pilot_pattern.pilots, 3)
-        self._template = tf.scatter_nd(pilot_ind, pilots, rg_type.shape)
-        self._template = tf.expand_dims(self._template, -1)
-        self._data_ind = tf.where(rg_type==0)
+        self._rg_type = self._resource_grid.build_type_grid()
+        self._pilot_ind = tf.where(self._rg_type==1)
+        self._data_ind = tf.where(self._rg_type==0)
 
     def call(self, inputs):
+        # Map pilots on empty resource grid
+        pilots = flatten_last_dims(self._resource_grid.pilot_pattern.pilots, 3)
+        template = tf.scatter_nd(self._pilot_ind,
+                                 pilots,
+                                 self._rg_type.shape)
+        template = tf.expand_dims(template, -1)
+
         # Broadcast the resource grid template to batch_size
         batch_size = tf.shape(inputs)[0]
-        new_shape = tf.concat([tf.shape(self._template)[:-1], [batch_size]], 0)
-        template = tf.broadcast_to(self._template, new_shape)
+        new_shape = tf.concat([tf.shape(template)[:-1], [batch_size]], 0)
+        template = tf.broadcast_to(template, new_shape)
 
         # Flatten the inputs and put batch_dim last for scatter update
         inputs = tf.transpose(flatten_last_dims(inputs, 3))

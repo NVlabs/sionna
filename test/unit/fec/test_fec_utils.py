@@ -23,7 +23,7 @@ if gpus:
         tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
     except RuntimeError as e:
         print(e)
-from sionna.fec.utils import bin2int_tf, j_fun, j_fun_inv, j_fun_tf, j_fun_inv_tf, GaussianPriorSource, llr2mi, bin2int, int2bin, int2bin_tf, alist2mat, load_alist, gm2pcm, pcm2gm, verify_gm_pcm, make_systematic, load_parity_check_examples, LinearEncoder, generate_reg_ldpc, generate_prng_seq
+from sionna.fec.utils import bin2int_tf, j_fun, j_fun_inv, j_fun_tf, j_fun_inv_tf, GaussianPriorSource, llr2mi, bin2int, int2bin, int2bin_tf, alist2mat, load_alist, gm2pcm, pcm2gm, verify_gm_pcm, make_systematic, load_parity_check_examples, LinearEncoder, generate_reg_ldpc, generate_prng_seq, int_mod_2
 from sionna.utils import log2, log10, BinarySource
 from sionna.fec.polar.utils import generate_dense_polar, generate_5g_ranking
 from sionna.fec.polar import PolarEncoder
@@ -497,179 +497,23 @@ class TestFECUtils(unittest.TestCase):
         s = generate_prng_seq(l, n_rnti, n_id, c_init+1)
         self.assertFalse(np.array_equal(s, s_ref))
 
+    def test_mod2(self):
+        """Test modulo 2 operation."""
 
-class TestGenericLinearEncoder(unittest.TestCase):
-    """Test Generic Linear Encoder."""
+        s = [10, 20, 30]
 
-    def test_dim_mismatch(self):
-        """Test against inconsistent inputs. """
-        id = 2
-        pcm, k, _, _ = load_parity_check_examples(id)
-        bs = 20
-        enc = LinearEncoder(pcm, is_pcm=True)
+        # int inputs
+        x = tf.random.uniform(s, minval=-1000, maxval=1000, dtype=tf.int32)
 
-        # test for non-invalid input shape
-        with self.assertRaises(BaseException):
-            x = enc(tf.zeros([bs, k+1]))
+        y = int_mod_2(x)
+        y_ref = tf.math.mod(tf.cast(x, tf.float32), 2.)
+        self.assertTrue(np.array_equal(y.numpy(), y_ref.numpy()))
 
-        # test for non-binary matrix
-        with self.assertRaises(BaseException):
-            pcm[0,0]=2
-            enc = LinearEncoder(pcm) # we interpret the pcm as gm for this test
+        # float inputs
+        x = tf.random.uniform(s, minval=-1000, maxval=1000, dtype=tf.float32)
 
-        # test for non-binary matrix
-        with self.assertRaises(BaseException):
-            pcm[0,0]=2
-            enc = LinearEncoder(pcm, is_pcm=True)
-
-    def test_tf_fun(self):
-        """Test that tf.function works as expected and XLA is supported."""
-
-        @tf.function
-        def run_graph(u):
-            c = enc(u)
-            return c
-
-        @tf.function(jit_compile=True)
-        def run_graph_xla(u):
-            c = enc(u)
-            return c
-
-        id = 2
-        pcm, k, _, _ = load_parity_check_examples(id)
-        bs = 20
-        enc = LinearEncoder(pcm, is_pcm=True)
-        source = BinarySource()
-
-        u = source([bs,k])
-        run_graph(u)
-        run_graph_xla(u)
-
-    def test_dtypes_flexible(self):
-        """Test that encoder supports variable dtypes and
-        yields same result."""
-
-        dt_supported = (tf.float16, tf.float32, tf.float64, tf.int32, tf.int64)
-
-        id = 2
-        pcm, k, _, _ = load_parity_check_examples(id)
-        bs = 20
-        enc_ref = LinearEncoder(pcm, is_pcm=True, dtype=tf.float32)
-        source = BinarySource()
-
-        u = source([bs, k])
-        c_ref = enc_ref(u)
-
-        for dt in dt_supported:
-            enc = LinearEncoder(pcm, is_pcm=True, dtype=dt)
-            u_dt = tf.cast(u, dt)
-            c = enc(u_dt)
-
-            c_32 = tf.cast(c, tf.float32)
-
-            self.assertTrue(np.array_equal(c_ref.numpy(), c_32.numpy()))
-
-    def test_multi_dimensional(self):
-        """Test against arbitrary input shapes.
-
-        The encoder should only operate on axis=-1.
-        """
-        id = 3
-        pcm, k, n, _ = load_parity_check_examples(id)
-        shapes =[[10, 20, 30, k], [1, 40, k], [10, 2, 3, 4, 3, k]]
-        enc = LinearEncoder(pcm, is_pcm=True)
-        source = BinarySource()
-
-        for s in shapes:
-            u = source(s)
-            u_ref = tf.reshape(u, [-1, k])
-
-            c = enc(u) # encode with shape s
-            c_ref = enc(u_ref) # encode as 2-D array
-            s[-1] = n
-            c_ref = tf.reshape(c_ref, s)
-            self.assertTrue(np.array_equal(c.numpy(), c_ref.numpy()))
-
-        # and verify that wrong last dimension raises an error
-        with self.assertRaises(tf.errors.InvalidArgumentError):
-            s = [10, 2, k-1]
-            u = source(s)
-            x = enc(u)
-
-    def test_against_baseline(self):
-        """Test that PolarEncoder leads to same result.
-        """
-        bs = 1000
-        k = 57
-        n = 128
-
-        # generate polar frozen positions
-        f,_ = generate_5g_ranking(k, n)
-
-        enc_ref = PolarEncoder(f, n) # reference encoder
-
-        # get polar encoding matrix
-        pcm, gm = generate_dense_polar(f, n, verbose=False)
-        enc = LinearEncoder(gm)
-
-        # draw random info bits
-        source = BinarySource()
-        u = source([bs, k])
-
-        # encode u with both encoders
-        c = enc(u)
-        c_ref = enc_ref(u)
-
-        # and compare results
-        self.assertTrue(np.array_equal(c.numpy(), c_ref.numpy()))
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)."""
-        bs = 10
-        id = 2
-        pcm, k, _, _ = load_parity_check_examples(id)
-
-        source = BinarySource()
-
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = LinearEncoder(pcm, is_pcm=True)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        b = source([bs,k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1,k])
-        model(b2)
-        model.summary()
-
-    def test_random_matrices(self):
-        """Test against random parity-check matrices."""
-
-        n_trials = 100 # test against multiple random pcm realizations
-        bs = 100
-        k = 89
-        n = 123
-        source = BinarySource()
-
-        for _ in range(n_trials):
-            # sample a random matrix
-            pcm = np.random.uniform(low=0, high=2, size=(n-k, n)).astype(int)
-
-            # catch internal errors due to non-full rank of pcm (randomly
-            # sampled!)
-            # in this test we only test that if the encoder initalization
-            # succeeds and the resulting encoder object produces valid codewords
-            try:
-                enc = LinearEncoder(pcm, is_pcm=True)
-            except:
-                pass # ignore this pcm realization
-
-            u = source([bs, k])
-            c = enc(u)
-            # verify that all codewords fullfil all parity-checks
-            c = tf.expand_dims(c, axis=2)
-            pcm = tf.expand_dims(tf.cast(pcm, tf.float32),axis=0)
-            s = tf.matmul(pcm,c).numpy()
-            s = np.mod(s, 2)
-            self.assertTrue(np.sum(np.abs(s))==0)
-
+        y = int_mod_2(x)
+        # model implicit cast
+        x_f = tf.sign(x) * tf.math.floor(tf.abs(x))
+        y_ref = tf.math.mod(tf.math.ceil(x_f), 2.)
+        self.assertTrue(np.array_equal(y.numpy(), y_ref.numpy()))

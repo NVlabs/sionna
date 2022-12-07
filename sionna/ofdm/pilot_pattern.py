@@ -51,38 +51,40 @@ class PilotPattern():
 
     @property
     def num_tx(self):
-        """The number of transmitters."""
+        """Number of transmitters"""
         return self._mask.shape[0]
 
     @property
     def num_streams_per_tx(self):
-        """The number of streams per transmitter."""
+        """Number of streams per transmitter"""
         return self._mask.shape[1]
 
     @ property
     def num_ofdm_symbols(self):
-        """The number of OFDM symbols."""
+        """Number of OFDM symbols"""
         return self._mask.shape[2]
 
     @ property
     def num_effective_subcarriers(self):
-        """The number of effectvie subcarriers."""
+        """Number of effectvie subcarriers"""
         return self._mask.shape[3]
 
     @property
     def num_pilot_symbols(self):
-        """Number of pilot symbols per transmit antenna."""
+        """Number of pilot symbols per transmit antenna"""
         return tf.shape(self._pilots)[-1]
 
     @property
     def num_data_symbols(self):
-        """ Number of data symbols per transmit antenna."""
+        """ Number of data symbols per transmit antenna"""
         return tf.shape(self._mask)[-1]*tf.shape(self._mask)[-2] - \
                self.num_pilot_symbols
 
     @property
     def normalize(self):
-        """Indicates if the pilots are normalized or not."""
+        """Returns or sets the flag indicating if the pilots
+           are normalized or not
+        """
         return self._normalize
 
     @normalize.setter
@@ -91,12 +93,16 @@ class PilotPattern():
 
     @property
     def mask(self):
-        """The mask of the pilot pattern."""
+        """Mask of the pilot pattern"""
         return self._mask
 
     @property
     def pilots(self):
-        """Returns the possibly normalized tensor of pilot symbols."""
+        """Returns or sets the possibly normalized tensor of pilot symbols.
+           If pilots are normalized, the normalization will be applied
+           after new values for pilots have been set. If this is
+           not the desired behavior, turn normalization off.
+        """
         def norm_pilots():
             scale = tf.abs(self._pilots)**2
             scale = 1/tf.sqrt(tf.reduce_mean(scale, axis=-1, keepdims=True))
@@ -104,6 +110,10 @@ class PilotPattern():
             return scale*self._pilots
 
         return tf.cond(self.normalize, norm_pilots, lambda: self._pilots)
+
+    @pilots.setter
+    def pilots(self, value):
+        self._pilots.assign(value)
 
     def _check_settings(self):
         """Validate that all properties define a valid pilot pattern."""
@@ -124,6 +134,12 @@ class PilotPattern():
             dimensions of `mask`."""
 
         return True
+
+    @property
+    def trainable(self):
+        """Returns if pilots are trainable or not"""
+        return self._pilots.trainable
+
 
     def show(self, tx_ind=None, stream_ind=None, show_pilot_ind=False):
         """Visualizes the non-zero pilots for some transmitters and streams.

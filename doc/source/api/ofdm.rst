@@ -20,9 +20,11 @@ the module provides the :class:`~sionna.ofdm.KroneckerPilotPattern` class
 that automatically generates orthogonal pilot transmissions for all transmitters
 and streams.
 
-Additionally, the module contains layers for channel estimation, precoding and equalization,
+Additionally, the module contains layers for channel estimation, precoding,
+equalization, and detection,
 such as the :class:`~sionna.ofdm.LSChannelEstimator`, the
-:class:`~sionna.ofdm.ZFPrecoder`, and the :class:`~sionna.ofdm.LMMSEEqualizer`.
+:class:`~sionna.ofdm.ZFPrecoder`, and the :class:`~sionna.ofdm.LMMSEEqualizer` and
+:class:`~sionna.ofdm.LinearDetector`.
 These are good starting points for the development of more advanced algorithms
 and provide robust baselines for benchmarking.
 
@@ -177,10 +179,32 @@ KroneckerPilotPattern
 Channel Estimation
 ******************
 
+BaseChannelEstimator
+--------------------
+.. autoclass:: sionna.ofdm.BaseChannelEstimator
+   :exclude-members: call, build
+   :members:
+
+BaseChannelInterpolator
+------------------------
+.. autoclass:: sionna.ofdm.BaseChannelInterpolator
+   :exclude-members: call, build
+   :members:
+
 LSChannelEstimator
 ------------------
 .. autoclass:: sionna.ofdm.LSChannelEstimator
-   :exclude-members: call, build
+   :exclude-members: call, build, estimate_at_pilot_locations
+   :members:
+
+LinearInterpolator
+-------------------
+.. autoclass:: sionna.ofdm.LinearInterpolator
+   :members:
+
+LMMSEInterpolator
+-------------------
+.. autoclass:: sionna.ofdm.LMMSEInterpolator
    :members:
 
 NearestNeighborInterpolator
@@ -188,10 +212,13 @@ NearestNeighborInterpolator
 .. autoclass:: sionna.ofdm.NearestNeighborInterpolator
    :members:
 
-LinearInterpolator
----------------------------
-.. autoclass:: sionna.ofdm.LinearInterpolator
-   :members:
+tdl_time_cov_mat
+-----------------
+.. autofunction:: sionna.ofdm.tdl_time_cov_mat
+
+tdl_freq_cov_mat
+-----------------
+.. autofunction:: sionna.ofdm.tdl_freq_cov_mat
 
 
 Precoding
@@ -207,14 +234,63 @@ ZFPrecoder
 Equalization
 ************
 
+OFDMEqualizer
+--------------
+.. autoclass:: sionna.ofdm.OFDMEqualizer
+   :exclude-members: call, build
+   :members:
+
 LMMSEEqualizer
 --------------
 .. autoclass:: sionna.ofdm.LMMSEEqualizer
    :exclude-members: call, build
    :members:
 
+MFEqualizer
+------------
+.. autoclass:: sionna.ofdm.MFEqualizer
+   :exclude-members: call, build
+   :members:
+
+ZFEqualizer
+------------
+.. autoclass:: sionna.ofdm.ZFEqualizer
+   :exclude-members: call, build
+   :members:
+
+
 Detection
 **********
+
+OFDMDetector
+-------------
+.. autoclass:: sionna.ofdm.OFDMDetector
+   :exclude-members: call, build
+   :members:
+
+OFDMDetectorWithPrior
+-----------------------
+.. autoclass:: sionna.ofdm.OFDMDetectorWithPrior
+   :exclude-members: call, build
+   :members:
+
+EPDetector
+---------------
+.. autoclass:: sionna.ofdm.EPDetector
+   :exclude-members: call, build
+   :members:
+
+KBestDetector
+---------------
+.. autoclass:: sionna.ofdm.KBestDetector
+   :exclude-members: call, build
+   :members:
+
+LinearDetector
+---------------
+.. autoclass:: sionna.ofdm.LinearDetector
+   :exclude-members: call, build
+   :members:
 
 MaximumLikelihoodDetector
 ----------------------------
@@ -225,5 +301,11 @@ MaximumLikelihoodDetector
 MaximumLikelihoodDetectorWithPrior
 ------------------------------------
 .. autoclass:: sionna.ofdm.MaximumLikelihoodDetectorWithPrior
+   :exclude-members: call, build
+   :members:
+
+MMSEPICDetector
+----------------
+.. autoclass:: sionna.ofdm.MMSEPICDetector
    :exclude-members: call, build
    :members:

@@ -245,17 +245,18 @@ class PlotBER():
             is_bler = self._is_bler + is_bler
 
         # deactivate BER/BLER
-        if show_ber is False:
-            snrs = list(compress(snrs, is_bler))
-            bers = list(compress(bers, is_bler))
-            legends = list(compress(legends, is_bler))
-            is_bler = list(compress(is_bler, is_bler))
+        if len(is_bler)>0: # ignore if object is empty
+            if show_ber is False:
+                snrs = list(compress(snrs, is_bler))
+                bers = list(compress(bers, is_bler))
+                legends = list(compress(legends, is_bler))
+                is_bler = list(compress(is_bler, is_bler))
 
-        if show_bler is False:
-            snrs = list(compress(snrs, np.invert(is_bler)))
-            bers = list(compress(bers, np.invert(is_bler)))
-            legends = list(compress(legends, np.invert(is_bler)))
-            is_bler = list(compress(is_bler, np.invert(is_bler)))
+            if show_bler is False:
+                snrs = list(compress(snrs, np.invert(is_bler)))
+                bers = list(compress(bers, np.invert(is_bler)))
+                legends = list(compress(legends, np.invert(is_bler)))
+                is_bler = list(compress(is_bler, np.invert(is_bler)))
 
         # set ylabel
         ylabel = "BER / BLER"
@@ -320,6 +321,7 @@ class PlotBER():
                  num_target_bit_errors=None,
                  num_target_block_errors=None,
                  early_stop=True,
+                 graph_mode=None,
                  add_results=True,
                  forward_keyboard_interrupt=True,
                  show_fig=True,
@@ -331,7 +333,7 @@ class PlotBER():
         Input
         -----
         mc_fun:
-            Function that yields the transmitted bits `b` and the
+            Callable that yields the transmitted bits `b` and the
             receiver's estimate `b_hat` for a given ``batch_size`` and
             ``ebno_db``. If ``soft_estimates`` is True, b_hat interpreted as
             logit.
@@ -373,6 +375,10 @@ class PlotBER():
             first error-free SNR point (i.e., no error occurred after
             ``max_mc_iter`` Monte-Carlo iterations).
 
+        graph_mode: One of ["graph", "xla"], str
+            A string describing the execution mode of ``mc_fun``.
+            Defaults to `None`. In this case, ``mc_fun`` is executed as is.
+
         add_results: bool
             Defaults to True. If True, the simulation results will be appended
             to the internal list of results.
@@ -410,6 +416,7 @@ class PlotBER():
                             num_target_bit_errors=num_target_bit_errors,
                             num_target_block_errors=num_target_block_errors,
                             early_stop=early_stop,
+                            graph_mode=graph_mode,
                             verbose=verbose,
                         forward_keyboard_interrupt=forward_keyboard_interrupt)
 
