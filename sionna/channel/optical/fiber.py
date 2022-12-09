@@ -237,25 +237,21 @@ class SSFM(Layer):
     def _apply_noise(self, q, dz):
         # Noise due to Amplification (Raman)
         if self._with_amplification:
+            step_noise = self._p_n_ase * tf.cast(dz, self._rdtype) / tf.cast(self._length, self._rdtype) / tf.cast(
+                2.0, self._rdtype)
             q_n = tf.complex(
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
                     tf.sqrt(
-                        self._p_n_ase *
-                        tf.cast(dz, self._rdtype) /
-                        tf.cast(self._length, self._rdtype) /
-                        tf.cast(2.0, self._rdtype)
+                        step_noise
                     ),
                     self._rdtype),
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
                     tf.sqrt(
-                        self._p_n_ase /
-                        tf.cast(dz, self._rdtype) /
-                        tf.cast(self._length, self._rdtype) /
-                        tf.cast(2.0, self._rdtype)
+                        step_noise
                     ),
                     self._rdtype
                 )
