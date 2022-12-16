@@ -21,28 +21,30 @@ class SSFM(Layer):
 
     Layer implementing the split-step Fourier method (SSFM).
 
-    The SSFM (first mentioned in [SSFM]_) numerically solves the generalized
+    The SSFM (first mentioned in [HT1973]_) numerically solves the generalized
     nonlinear Schrödinger equation (NLSE)
 
     .. math::
 
-        \frac{\partial E(t,z)}{\partial z}=-\frac{\alpha}{2} E(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |x(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
+        \frac{\partial E(t,z)}{\partial z}=-\frac{\alpha}{2} E(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |E(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
 
     for an unpolarized (or single polarized) optical signal or the Manakov
-    equation (according to [Mnkv]_)
+    equation (according to [WMC1991]_)
 
     .. math::
 
-        \frac{\partial E(t,z)}{\partial z}=-\frac{\alpha}{2} E(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma \frac{8}{9}||x(t,z)||_2^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
+        \frac{\partial \mathbf{E}(t,z)}{\partial z}=-\frac{\alpha}{2} \mathbf{E}(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 \mathbf{E}(t,z)}{\partial t^2}-j\gamma \frac{8}{9}||\mathbf{E}(t,z)||_2^2 \mathbf{E}(t,z) + n(n_{\text{sp}};\,t,\,z)
 
     for dual polarization, with attenuation coefficient :math:`\alpha`, group
     velocity dispersion parameters :math:`\beta_2`, and nonlinearity
     coefficient :math:`\gamma`. :math:`n(n_{\text{sp}};\,t,\,z)` denotes the
     noise due to an optional ideally distributed Raman amplification with
     spontaneous emission factor :math:`n_\text{sp}`. The optical signal
-    :math:`x(t,\,z)` has the unit :math:`\sqrt{\text{W}}`.
+    :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`. For the dual
+    polarized case :math:`\mathbf{E}(t,\,z)=(\mathbf{E}(t,\,z)_x, \mathbf{E}(t,\,z)_y)`
+    is a vector.
 
-    The symmetrized SSFM is applied according to Eq. (7) of [SymSSFM]_ that
+    The symmetrized SSFM is applied according to Eq. (7) of [FMF1976]_ that
     can be written as
 
     .. math::
@@ -55,7 +57,7 @@ class SSFM(Layer):
     respectively [A2012]_.
 
     Additionally, ideally distributed Raman amplification may be applied, which
-    is implemented as in [RamanASE]_. **Note** that, currently, the implemented
+    is implemented as in [MFFP2009]_. **Note** that, currently, the implemented
     Raman amplification will always result in a transparent fiber link. Hence,
     the introduced gain cannot be parametrized.
 
@@ -209,6 +211,8 @@ class SSFM(Layer):
         # Calculate noise power depending on simulation bandwidth
         self._p_n_ase = self._rho_n / self._sample_duration / self._t_norm
         # in (Ws)
+        if self._with_manakov:
+            self._p_n_ase = self._p_n_ase / 2.0
 
         # Precalculate uniform step size
         tf.assert_greater(self._n_ssfm, 0)

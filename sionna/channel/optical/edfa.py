@@ -26,14 +26,14 @@ class EDFA(Layer):
     _\mathrm{in}}{\mathrm{SNR}_\mathrm{out}}`,
     where ideally the detector is limited by shot noise only, and
     :math:`\text{SNR}` is the signal to noise ratio. Shot noise is
-    neglected here but is required to derive the noise power of the amplifier,
-    as otherwise the input SNR is infinitely large. Hence, for the input SNR
+    neglected here but is required to derive the noise power of the amplifier, as
+    otherwise the input SNR was infinitely large. Hence, for the input SNR
     it follows [A2012]_ that
     :math:`\mathrm{SNR}_\mathrm{in}=\frac{P}{2hf_cW}` where :math:`h` denotes
     Planck's constant, :math:`P` is the signal power and :math:`W` the
     considered bandwidth.
     The output SNR is decreased by ASE noise induced by the amplification.
-    Note that, shot noise is applied after the amplifier and is hence not
+    **Note** that, shot noise is applied after the amplifier and is hence not
     amplified. It results that :math:`\mathrm{SNR}_\mathrm{out}=\frac{GP}{\left
     (4\rho_\mathrm{ASE}+2hf_c\right)W}`, where :math:`G` is the
     parametrized gain.
@@ -53,7 +53,8 @@ class EDFA(Layer):
     At simulation frequency :math:`f_\mathrm{sim}` the noise has a power of
     :math:`P_\mathrm{ASE}^{(1)}=\sigma_\mathrm{n,ASE}^2=2\rho_\mathrm{ASE}^{(1)}
     \cdot f_\mathrm{sim}`
-    where the factor :math:`2` accounts for the unpolarized noise.
+    where the factor :math:`2` accounts for the unpolarized noise (for dual
+    polarization the factor is :math:`1` per polarization).
     Here the :math:`()^{(1)}` means that this is the noise introduced by a
     single EDFA.
 
@@ -65,10 +66,12 @@ class EDFA(Layer):
 
     Setting-up:
 
-    >>> edfa = EDFA(g=4.0,
-    >>>             f=2.0,
-    >>>             f_c=193.55e12,
-    >>>             dt=1.0e-12)
+    >>> edfa = EDFA(
+    >>>     g=4.0,
+    >>>     f=2.0,
+    >>>     f_c=193.55e12,
+    >>>     dt=1.0e-12,
+    >>>     with_dual_polarization=False)
 
     Running:
 
@@ -89,6 +92,10 @@ class EDFA(Layer):
         dt : float
             Time step :math:`\Delta_t` in :math:`(\text{s})`
 
+        with_dual_polarization : bool
+            Considers axis [-2] as x- and y-polarization and applies the noise
+            per polarization. Defaults to False.
+
         dtype : Complex tf.DType
             Defines the datatype for internal calculations and the output
             dtype. Defaults to `tf.complex64`.
@@ -103,7 +110,10 @@ class EDFA(Layer):
         y : Tensor with same shape as ``x``, ``dtype``
             Amplifier output
     """
-    def __init__(self, g, f, f_c, dt, dtype=tf.complex64, **kwargs):
+    def __init__(
+            self, g=4.0, f=7.0, f_c=193.55e12,
+            dt=1e-12, with_dual_polarization=False,
+            dtype=tf.complex64, **kwargs):
         super().__init__(dtype=dtype, **kwargs)
 
         self._dtype = dtype
@@ -114,6 +124,7 @@ class EDFA(Layer):
         self._f = tf.cast(f, self._rdtype)
         self._f_c = tf.cast(f_c, self._rdtype)
         self._dt = tf.cast(dt, self._rdtype)
+        self._with_dual_polarization = with_dual_polarization
 
         # Spontaneous emission factor
         if self._g == 1.0:
@@ -131,7 +142,14 @@ class EDFA(Layer):
             2.0, self._rdtype) * self._rho_n_ase * tf.cast(
             1.0, self._rdtype) / (self._dt)  # Noise power in (W)
 
+        if self._with_dual_polarization:
+            self._p_n_ase = self._p_n_ase / tf.cast(2.0, self._rdtype)
+
+
     def call(self, inputs):
+        if self._with_dual_polarization:
+            tf.assert_equal(tf.shape(inputs)[-2], 2)
+
         x = tf.cast(inputs, self._cdtype)
 
         # Calculate noise signal with given noise power
