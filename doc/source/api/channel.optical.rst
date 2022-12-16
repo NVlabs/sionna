@@ -126,11 +126,11 @@ time_frequency_vector
 
 
 References:
-   .. [SSFM] R. H. Hardin and F. D. Tappert,
+   .. [HT1973] R. H. Hardin and F. D. Tappert,
          "Applications of the Split-Step Fourier Method to the Numerical Solution of Nonlinear and Variable Coefficient Wave Equations.",
          SIAM Review Chronicles, Vol. 15, No. 2, Part 1, p 423, 1973.
 
-   .. [SymSSFM] J. A. Fleck, J. R. Morris, and M. D. Feit,
+   .. [FMF1976] J. A. Fleck, J. R. Morris, and M. D. Feit,
          "Time-dependent propagation of high energy laser beams through the atmosphere",
          Appl. Phys., Vol. 10, pp 129–160, 1976.
 

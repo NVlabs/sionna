@@ -17,38 +17,45 @@ from sionna.channel import utils
 
 class SSFM(Layer):
     # pylint: disable=line-too-long
-    r"""SSFM(alpha, beta_2, f_c, gamma, half_window_length, length, n_ssfm, n_sp=1.0,  dt=1.0, t_norm=1e-12, with_amplification=False, with_attenuation=True, with_dispersion=True, with_nonlinearity=True, swap_memory=True, dtype=tf.complex64, **kwargs)
+    r"""SSFM(alpha, beta_2, f_c, gamma, half_window_length, length, n_ssfm, n_sp=1.0,  dt=1.0, t_norm=1e-12, with_amplification=False, with_attenuation=True, with_dispersion=True, with_nonlinearity=True, with_manakov=False, swap_memory=True, dtype=tf.complex64, **kwargs)
 
     Layer implementing the split-step Fourier method (SSFM).
 
-    The SSFM (first mentioned in [SSFM]_) numerically solves the nonlinear
-    Schrödinger equation (NLSE)
+    The SSFM (first mentioned in [SSFM]_) numerically solves the generalized
+    nonlinear Schrödinger equation (NLSE)
 
     .. math::
 
-        \frac{\partial E(t,z)}{\partial z}= -\frac{\alpha}{2}E(t,z) + j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |E(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
+        \frac{\partial E(t,z)}{\partial z}=-\frac{\alpha}{2} E(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |x(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
 
-    with attenuation coefficient :math:`\alpha`, group velocity dispersion
-    parameters :math:`\beta_2`, and nonlinearity coefficient :math:`\gamma`.
-    Further, :math:`n(n_{\text{sp}};\,t,\,z)` denotes the noise due to an
-    optional ideally distributed Raman amplification with spontaneous emission
-    factor :math:`n_\text{sp}`.
-    The optical signal :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`.
+    for an unpolarized (or single polarized) optical signal or the Manakov
+    equation (according to [Mnkv]_)
 
-    By now, the SSFM is implemented for a single polarization only and as a
-    symmetrized SSFM according to Eq. (7) of [SymSSFM]_ which can be written as
+    .. math::
+
+        \frac{\partial E(t,z)}{\partial z}=-\frac{\alpha}{2} E(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma \frac{8}{9}||x(t,z)||_2^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
+
+    for dual polarization, with attenuation coefficient :math:`\alpha`, group
+    velocity dispersion parameters :math:`\beta_2`, and nonlinearity
+    coefficient :math:`\gamma`. :math:`n(n_{\text{sp}};\,t,\,z)` denotes the
+    noise due to an optional ideally distributed Raman amplification with
+    spontaneous emission factor :math:`n_\text{sp}`. The optical signal
+    :math:`x(t,\,z)` has the unit :math:`\sqrt{\text{W}}`.
+
+    The symmetrized SSFM is applied according to Eq. (7) of [SymSSFM]_ that
+    can be written as
 
     .. math::
 
         E(z+\Delta_z,t) \approx \exp\left(\frac{\Delta_z}{2}\hat{D}\right)\exp\left(\int^{z+\Delta_z}_z \hat{N}(z')dz'\right)\exp\left(\frac{\Delta_z}{2}\hat{D}\right)E(z,\,t)
 
-    The integral is approximated by :math:`\Delta_z\hat{N}` with
-    :math:`\Delta_z` denoting the (small) simulation step size. Further,
-    :math:`\hat{D}` and :math:`\hat{N}` denote the linear and nonlinear SSFM
-    operator, respectively [A2012]_.
+    where only the single-polarized case is shown. The integral is
+    approximated by :math:`\Delta_z\hat{N}` with :math:`\hat{D}` and
+    :math:`\hat{N}` denoting the linear and nonlinear SSFM operator,
+    respectively [A2012]_.
 
-    Additionally, ideally distributed Raman amplification can be applied, which
-    is implemented as in [RamanASE]_. Note that, currently, the implemented
+    Additionally, ideally distributed Raman amplification may be applied, which
+    is implemented as in [RamanASE]_. **Note** that, currently, the implemented
     Raman amplification will always result in a transparent fiber link. Hence,
     the introduced gain cannot be parametrized.
 
@@ -58,15 +65,15 @@ class SSFM(Layer):
     (e.g., :math:`L_\text{norm}=1\,\text{km}=1\cdot 10^{3}\,\text{m}`).
     Hence, all parameters as well as the signal itself have to be given with the
     same unit prefix for the
-    same unit (e.g., always pico for time, or kilo for distance). Note
+    same unit (e.g., always pico for time, or kilo for distance). **Note**
     that, despite the normalization, the SSFM is implemented with physical units
     different from the normalization, e.g., used for the nonlinear
     Fourier transform. For simulations only :math:`T_\text{norm}` has to be
     provided.
 
-    To avoid reflections at the signal boundaries during simulation, a Hamming
-    window can be applied in each SSFM-step where the length can be defined by
-    ``half_window_length``.
+    To avoid reflections at the signal boundaries during simulation a Hamming
+    window can be applied in each SSFM-step, of which the length can be
+    defined by ``half_window_length``.
 
     This class inherits from the Keras `Layer` class and can be used as layer in
     a Keras model.
@@ -76,19 +83,21 @@ class SSFM(Layer):
 
     Setting-up:
 
-    >>> ssfm = SSFM(alpha=0.046,
-    >>>             beta_2=-21.67,
-    >>>             f_c=193.55e12,
-    >>>             gamma=1.27,
-    >>>             half_window_length=100,
-    >>>             length=80,
-    >>>             n_ssfm=200,
-    >>>             n_sp=1.0,
-    >>>             t_norm=1e-12,
-    >>>             with_amplification=False,
-    >>>             with_attenuation=True,
-    >>>             with_dispersion=True,
-    >>>             with_nonlinearity=True)
+    >>> ssfm = SSFM(
+    >>>     alpha=0.046,
+    >>>     beta_2=-21.67,
+    >>>     f_c=193.55e12,
+    >>>     gamma=1.27,
+    >>>     half_window_length=100,
+    >>>     length=80,
+    >>>     n_ssfm=200,
+    >>>     n_sp=1.0,
+    >>>     t_norm=1e-12,
+    >>>     with_amplification=False,
+    >>>     with_attenuation=True,
+    >>>     with_dispersion=True,
+    >>>     with_manakov=False,
+    >>>     with_nonlinearity=True)
 
     Running:
 
@@ -137,6 +146,10 @@ class SSFM(Layer):
         with_dispersion : bool
             Enables application of chromatic dispersion. Defaults to True.
 
+        with_manakov : bool
+            Considers axis [-2] as x- and y-polarization and calculates the
+            nonlinear step as given by the Manakov equation. Defaults to False.
+
         with_nonlinearity : bool
             Enables application of Kerr nonlinearity. Defaults to True.
 
@@ -161,7 +174,8 @@ class SSFM(Layer):
                  gamma=1.27, half_window_length=0, length=80,
                  n_ssfm=1, n_sp=1.0, sample_duration=1.0, t_norm=1e-12,
                  with_amplification=False, with_attenuation=True,
-                 with_dispersion=True, with_nonlinearity=True,
+                 with_dispersion=True, with_manakov=False,
+                 with_nonlinearity=True,
                  swap_memory=True, dtype=tf.complex64, **kwargs):
         super().__init__(dtype=dtype, **kwargs)
 
@@ -179,11 +193,14 @@ class SSFM(Layer):
         self._n_sp = tf.cast(n_sp, dtype=self._rdtype)
         self._swap_memory = swap_memory
         self._t_norm = tf.cast(t_norm, dtype=self._rdtype)
-        self._with_amplification = tf.cast(with_amplification, dtype=tf.bool)
-        self._with_attenuation = tf.cast(with_attenuation, dtype=tf.bool)
-        self._with_dispersion = tf.cast(with_dispersion, dtype=tf.bool)
-        self._with_nonlinearity = tf.cast(with_nonlinearity, dtype=tf.bool)
         self._sample_duration = tf.cast(sample_duration, dtype=self._rdtype)
+
+        # Booleans are not casted to avoid branches in the graph
+        self._with_amplification = with_amplification
+        self._with_attenuation = with_attenuation
+        self._with_dispersion = with_dispersion
+        self._with_manakov = with_manakov
+        self._with_nonlinearity = with_nonlinearity
 
         self._rho_n = \
             sionna.constants.H * self._f_c * self._alpha * self._length * \
@@ -194,6 +211,7 @@ class SSFM(Layer):
         # in (Ws)
 
         # Precalculate uniform step size
+        tf.assert_greater(self._n_ssfm, 0)
         self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
 
         self._window = tf.complex(
@@ -247,12 +265,13 @@ class SSFM(Layer):
                         tf.cast(self._length, self._rdtype) /
                         tf.cast(2.0, self._rdtype)
                     ),
-                    self._rdtype),
+                    self._rdtype
+                ),
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
                     tf.sqrt(
-                        self._p_n_ase /
+                        self._p_n_ase *
                         tf.cast(dz, self._rdtype) /
                         tf.cast(self._length, self._rdtype) /
                         tf.cast(2.0, self._rdtype)
@@ -266,12 +285,23 @@ class SSFM(Layer):
 
     def _apply_nonlinear_operator(self, q, dz, zeros):
         if self._with_nonlinearity:
-            q = q * tf.exp(
-                tf.complex(
-                    zeros,
-                    tf.abs(q) ** tf.cast(2.0, self._rdtype) * self._gamma *
-                    tf.negative(tf.math.real(dz)))
-            )
+            if self._with_manakov:
+                q = q * tf.exp(
+                    tf.complex(
+                        zeros,
+                        tf.cast(8.0/9.0, self._rdtype) * tf.reduce_sum(
+                            tf.abs(q) ** tf.cast(2.0, self._rdtype),
+                            axis=-2,
+                            keepdims=True
+                        ) * self._gamma * tf.negative(tf.math.real(dz)))
+                )
+            else:
+                q = q * tf.exp(
+                    tf.complex(
+                        zeros,
+                        tf.abs(q) ** tf.cast(2.0, self._rdtype) * self._gamma *
+                        tf.negative(tf.math.real(dz)))
+                )
 
         return q
 
@@ -296,6 +326,9 @@ class SSFM(Layer):
         return tf.less(step_counter, n_steps)
 
     def call(self, inputs):
+        if self._with_manakov:
+            tf.assert_equal(tf.shape(inputs)[-2], 2)
+
         x = inputs
 
         # Calculate support parameters
