@@ -134,7 +134,7 @@ References:
          "Time-dependent propagation of high energy laser beams through the atmosphere",
          Appl. Phys., Vol. 10, pp 129–160, 1976.
 
-   .. [RamanASE] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
+   .. [MFFP2009] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
          "ASE Noise Simulation in Raman Amplification Systems",
          Conftele, 2009.
 
@@ -153,3 +153,7 @@ References:
    .. [GD1991] C.R. Giles, and E. Desurvire,
          "Modeling Erbium-Doped Fiber Amplifiers",
          Journal of Lightwave Technology 9, No. 2, 1991.
+
+   .. [WMC1991] P. K. A. Wai, C. R. Menyuk, and H. H. Chen,
+         "Stability of solitons in randomly varying birefringent fibers",
+         Optics Letters, No. 16, 1991.
