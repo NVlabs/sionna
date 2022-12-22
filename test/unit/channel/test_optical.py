@@ -49,14 +49,6 @@ class TestOptical(unittest.TestCase):
         dt = T / N  # timestep(dt)
         (t, f) = utils.time_frequency_vector(
             N, dt, dtype=self._complex_dtype.real_dtype)
-        z = 5.0  # propagation distance
-        N_SSFM = 2000  # number of steps
-        alpha = 0.0  # (1/km) Norm. fiber attenuation
-        beta_2 = 1.0  # (ps^2/km) Norm. fiber chromatic dispersion
-        gamma = 1.0  # (1/km/W) Norm. fiber Kerr nonlinearity
-        f_c = 193.55e12  # (Hz) Carrier frequency
-        t_norm = 1e-12
-        n_sp = 1.0
 
         P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
         # Gaussian pulse
@@ -70,91 +62,18 @@ class TestOptical(unittest.TestCase):
         )
 
         ssfm = fiber.SSFM(
-            alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-            half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000, sample_duration=dt,
             with_amplification=False, with_attenuation=False,
             with_dispersion=True, with_nonlinearity=True,
-            dtype=dtype, t_norm=t_norm, n_sp=n_sp,
+            dtype=dtype, t_norm=1e-12, n_sp=1.0,
         )
 
         u = ssfm(u_0)
-        # U = tf.signal.fftshift(
-        # 	tf.abs(tf.cast(dt, dtype) * tf.signal.fft(u) / tf.cast(
-        # 		tf.math.sqrt(2 * np.pi), dtype))**2)
-
-        # import matplotlib.pyplot as plt
-        # fig, (ax1, ax2) = plt.subplots(2, 1)
-        #
-        # ax1.plot(t.numpy().flatten(), u_ref.flatten()**2)
-        # ax1.plot(t.numpy().flatten(), np.abs(u.numpy().flatten())**2, '--')
-        # ax1.set_xlim(-16, 16)
-        # ax1.set_xlabel(r"$(t-\beta_1 z)/T_0$")
-        # ax1.set_ylabel(r"Normalized power $|u(z,t)|^2/P_0$")
-        # ax1.grid()
-        #
-        # ax2.plot(f.numpy().flatten(), U_ref.flatten())
-        # ax2.plot(f.numpy().flatten(), np.abs(U.numpy().flatten()), '--')
-        # ax2.set_xlim(-0.6, 0.6)
-        # ax2.set_xlabel(r"$(f-f_c) T_0$")
-        # ax2.set_ylabel(r"Normalized power $|U(z,f_c)|^2/P_0$")
-        # ax2.grid()
-        #
-        # plt.show()
 
         self.assertLessEqual(
             np.mean((np.abs(u.numpy().flatten()) - self._u_ref.flatten()) ** 2),
             1e-7, 'incorrect_ssfm'
-        )
-
-    def test_ssfm_amplification(self):
-        dtype = self._complex_dtype
-
-        T = 100  # time window (period)
-        N = 2 ** 12  # number of points
-        dt = T / N  # timestep(dt)
-        t, f = utils.time_frequency_vector(
-            N, dt, dtype=self._complex_dtype.real_dtype)
-        z = 5.0  # propagation distance
-        N_SSFM = 2000  # number of steps
-        alpha = 0.046  # (1/km) Norm. fiber attenuation
-        beta_2 = 1.0  # (ps^2/km) Norm. fiber chromatic dispersion
-        gamma = 1.0  # (1/km/W) Norm. fiber Kerr nonlinearity
-        f_c = 193.55e12  # (Hz) Carrier frequency
-        t_norm = 1e-12
-        n_sp = 0.0
-
-        P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
-        # Gaussian pulse
-        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
-        # scaling of the Gaussian pulse
-
-        u_0 = np.sqrt(P_0) * (np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
-        u_0 = tf.complex(
-            tf.cast(u_0, dtype=dtype.real_dtype),
-            tf.cast(0.0, dtype=dtype.real_dtype)
-        )
-
-        ssfm = fiber.SSFM(
-            alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-            half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
-            with_amplification=True, with_attenuation=True,
-            with_dispersion=False, with_nonlinearity=False,
-            dtype=dtype, t_norm=t_norm, n_sp=n_sp,
-        )
-
-        @tf.function
-        def ssfm_graph(inputs):
-            return ssfm(inputs)
-
-        u = ssfm_graph((u_0))
-
-        self.assertLessEqual(
-            np.mean(
-	            (
-			        np.abs(u.numpy().flatten()) - np.abs(u_0.numpy().flatten())
-	            ) ** 2),
-            1e-10,
-            'incorrect_ssfm_raman_amplification'
         )
 
 
@@ -166,14 +85,6 @@ class TestOptical(unittest.TestCase):
         dt = T / N  # timestep(dt)
         t, f = utils.time_frequency_vector(
             N, dt, dtype=self._complex_dtype.real_dtype)
-        z = 5.0  # propagation distance
-        N_SSFM = 2000  # number of steps
-        alpha = 0.0  # (1/km) Norm. fiber attenuation
-        beta_2 = 1.0  # (ps^2/km) Norm. fiber chromatic dispersion
-        gamma = 1.0  # (1/km/W) Norm. fiber Kerr nonlinearity
-        f_c = 193.55e12  # (Hz) Carrier frequency
-        t_norm = 1e-12
-        n_sp = 1.0
 
         P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
         # Gaussian pulse
@@ -187,11 +98,11 @@ class TestOptical(unittest.TestCase):
         )
 
         ssfm = fiber.SSFM(
-            alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-            half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000, sample_duration=dt,
             with_amplification=False, with_attenuation=False,
             with_dispersion=True, with_nonlinearity=True,
-            dtype=dtype, t_norm=t_norm, n_sp=n_sp,
+            dtype=dtype, t_norm=1e-12, n_sp=1.0,
         )
 
         @tf.function
@@ -206,7 +117,7 @@ class TestOptical(unittest.TestCase):
             'incorrect_ssfm_in_graph_mode'
         )
 
-    def test_ssfm_batch_processing(self):
+    def test_ssfm_reference_batch_graph(self):
         dtype = self._complex_dtype
 
         T = 100  # time window (period)
@@ -214,15 +125,6 @@ class TestOptical(unittest.TestCase):
         dt = T / N  # timestep(dt)
         t, f = utils.time_frequency_vector(
             N, dt, dtype=self._complex_dtype.real_dtype)
-        z = 5.0  # propagation distance
-        N_SSFM = 2000  # number of steps
-        alpha = 0.0  # (1/km) Norm. fiber attenuation
-        beta_2 = 1.0  # (ps^2/km) Norm. fiber chromatic dispersion
-        gamma = 1.0  # (1/km/W) Norm. fiber Kerr nonlinearity
-        rho_n = 0.0  # (1/THz) Norm. noise power density for Raman amplification
-        f_c = 193.55e12  # (Hz) Carrier frequency
-        t_norm = 1e-12
-        n_sp = 1.0
 
         P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
         # Gaussian pulse
@@ -240,11 +142,11 @@ class TestOptical(unittest.TestCase):
         u_0 = tf.tile(u_0, [2, 2, 1])
 
         ssfm = fiber.SSFM(
-            alpha=alpha, beta_2=beta_2, f_c=f_c, gamma=gamma,
-            half_window_length=0, length=z, n_ssfm=N_SSFM, sample_duration=dt,
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000, sample_duration=dt,
             with_amplification=True, with_attenuation=False,
             with_dispersion=True, with_nonlinearity=True,
-            dtype=dtype, t_norm=t_norm, n_sp=n_sp,
+            dtype=dtype, t_norm=1e-12, n_sp=0.0,
         )
 
         @tf.function
@@ -261,39 +163,260 @@ class TestOptical(unittest.TestCase):
         self.assertLessEqual(
             np.mean((np.abs(u.numpy()) - u_ref) ** 2),
             1e-7,
-            'incorrect_batch_processing'
+            'incorrect_ssfm_batch_processing'
         )
 
-    def test_edfa_variance(self):
+    def test_ssfm_reference_batch_dual_polarized_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep
+        t, f = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        # The idea is to have the same power on the fiber by distributing
+        # the power uniformly over both polarizations, further the factor
+        # 8/9 of the Manakov equation has to be accounted for. Then dual
+        # polarized transmission should equal unpolarized tranmission.
+        P_0 = tf.constant(9/8 * 0.5, dtype=dtype.real_dtype)  # (W) Peak power
+        # of the Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * (
+                    np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        u_0 = tf.expand_dims(u_0, axis=0)
+        u_0 = tf.expand_dims(u_0, axis=0)
+        u_0 = tf.tile(u_0, [3, 2, 1])
+
+        ssfm = fiber.SSFM(
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000,
+            sample_duration=dt,
+            with_amplification=False, with_attenuation=False,
+            with_dispersion=True, with_nonlinearity=True,
+            with_manakov=True,
+            dtype=dtype, t_norm=1e-12, n_sp=0.0,
+        )
+
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        # Remove the Manakov factor and geometrically add both polarizations
+        u = ssfm_graph((u_0)) * tf.cast(tf.sqrt(8/9), dtype)
+        u = tf.norm(u, axis=-2, keepdims=True)
+
+        u_ref = tf.expand_dims(self._u_ref, axis=0)
+        u_ref = tf.expand_dims(u_ref, axis=0)
+        u_ref = tf.tile(u_ref, [3, 1, 1])
+
+        self.assertLessEqual(
+            np.mean((np.abs(u.numpy()) - u_ref) ** 2),
+            1e-7,
+            'incorrect_ssfm_dual_polarized_batch_processing'
+        )
+
+
+    def test_ssfm_amplification_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        t, f = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
+        # Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * (np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        ssfm = fiber.SSFM(
+            alpha=0.046, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000, sample_duration=dt,
+            with_amplification=True, with_attenuation=True,
+            with_dispersion=False, with_nonlinearity=False,
+            dtype=dtype, t_norm=1e-12, n_sp=0.0,
+        )
+
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        self.assertLessEqual(
+            np.mean(
+	            (
+			        np.abs(u.numpy().flatten()) - np.abs(u_0.numpy().flatten())
+	            ) ** 2),
+            1e-10,
+            'incorrect_ssfm_amplification'
+        )
+
+
+    def test_ssfm_amplification_noise_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        n_sp = 1.0
+        f_c = 193.55e12
+        alpha = 0.046
+        length = 5.0
+        t_norm = 1e-12
+
+        rho_n = \
+            sionna.constants.H * f_c * alpha * length * \
+            n_sp  # in (W/Hz)
+
+        # Calculate noise power depending on simulation bandwidth
+        p_n_ase = rho_n / dt / t_norm
+
+        ssfm = fiber.SSFM(
+            alpha=alpha, beta_2=1.0, f_c=f_c, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000, sample_duration=dt,
+            with_amplification=True, with_attenuation=True,
+            with_dispersion=False, with_nonlinearity=False,
+            dtype=dtype, t_norm=t_norm, n_sp=n_sp,
+        )
+
+        u_0 = tf.zeros((10, 10, 2000), dtype=self._complex_dtype)
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        sigma_n_ASE_square = np.mean(np.var(u.numpy(), axis=-1))
+        self.assertLessEqual(
+            np.abs((p_n_ase - sigma_n_ASE_square) / p_n_ase), 1e-2,
+            'incorrect_ssfm_amplification_noise'
+        )
+
+
+    def test_ssfm_amplification_noise_dual_polarized_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        n_sp = 1.0
+        f_c = 193.55e12
+        alpha = 0.046
+        length = 5.0
+        t_norm = 1e-12
+
+        rho_n = \
+            sionna.constants.H * f_c * alpha * length * \
+            n_sp  # in (W/Hz)
+
+        # Calculate noise power depending on simulation bandwidth
+        p_n_ase = rho_n / dt / t_norm
+
+        ssfm = fiber.SSFM(
+            alpha=alpha, beta_2=1.0, f_c=f_c, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm=2000, sample_duration=dt,
+            with_amplification=True, with_attenuation=True,
+            with_dispersion=False, with_nonlinearity=False,
+            with_manakov=True,
+            dtype=dtype, t_norm=t_norm, n_sp=n_sp,
+        )
+
+        u_0 = tf.zeros((10, 2, 2000), dtype=self._complex_dtype)
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        sigma_n_ASE_square = np.mean(np.var(u.numpy(), axis=-1))
+        self.assertLessEqual(
+            np.abs((0.5 * p_n_ase - sigma_n_ASE_square) / (0.5 *  p_n_ase)),
+            1e-2,
+            'incorrect_ssfm_amplification_noise_for_dual_polarization'
+        )
+
+
+    def test_edfa_noise(self):
         F = 10 ** (6 / 10)
         G = 2.0
         f_c = 193.55e12
         dt = 1e-12
-        n_sp = F / tf.cast(2.0, self._complex_dtype.real_dtype) * G / (G - tf.cast(
+        n_sp = F / tf.cast(2.0, self._complex_dtype.real_dtype) * G / (
+                G - tf.cast(
             1.0, self._complex_dtype.real_dtype))
         rho_n_ASE = tf.cast(n_sp * (
 		        G - tf.cast(1.0, self._complex_dtype.real_dtype)) *
                             constants.H * f_c,
-                            self._complex_dtype.real_dtype)  # Noise density in (W/Hz)
+                            self._complex_dtype.real_dtype)  # Noise density
+        # in (W/Hz)
         P_n_ASE = tf.cast(
             tf.cast(2.0, self._complex_dtype.real_dtype) * rho_n_ASE *
             (tf.cast(1.0, self._complex_dtype.real_dtype) / dt),
             self._complex_dtype.real_dtype)  # Noise power in (W)
-        amplifier = edfa.EDFA(G, F, f_c, dt, self._complex_dtype)
+        amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
         x = tf.zeros((10, 10, 1000), dtype=self._complex_dtype)
         y = amplifier(x)
         sigma_n_ASE_square = np.mean(np.var(y.numpy(), axis=-1))
         self.assertLessEqual(
             np.abs((P_n_ASE - sigma_n_ASE_square) / P_n_ASE), 1e-2,
-            'incorrect_variance'
+            'incorrect_edfa_noise'
         )
 
-    def test_edfa_gain(self):
+
+    def test_edfa_noise_graph(self):
         F = 10 ** (6 / 10)
+        G = 2.0
+        f_c = 193.55e12
+        dt = 1e-12
+        n_sp = F / tf.cast(2.0, self._complex_dtype.real_dtype) * G / (
+                G - tf.cast(
+            1.0, self._complex_dtype.real_dtype))
+        rho_n_ASE = tf.cast(n_sp * (
+		        G - tf.cast(1.0, self._complex_dtype.real_dtype)) *
+                            constants.H * f_c,
+                            self._complex_dtype.real_dtype)  # Noise density
+        # in (W/Hz)
+        P_n_ASE = tf.cast(
+            tf.cast(2.0, self._complex_dtype.real_dtype) * rho_n_ASE *
+            (tf.cast(1.0, self._complex_dtype.real_dtype) / dt),
+            self._complex_dtype.real_dtype)  # Noise power in (W)
+        amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
+        x = tf.zeros((10, 10, 1000), dtype=self._complex_dtype)
+
+        @tf.function
+        def amplifier_graph(inputs):
+            return amplifier(inputs)
+
+        y = amplifier_graph(x)
+
+        sigma_n_ASE_square = np.mean(np.var(y.numpy(), axis=-1))
+        self.assertLessEqual(
+            np.abs((P_n_ASE - sigma_n_ASE_square) / P_n_ASE), 1e-2,
+            'incorrect_edfa_noise_in_graph_mode'
+        )
+
+    def test_edfa_gain_batch(self):
+        F = 0
         G = 4.0
         f_c = 193.55e12
         dt = 1e-12
-        amplifier = edfa.EDFA(G, F, f_c, dt, self._complex_dtype)
+        amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
         shape = (10, 10, 10000)
         x = tf.complex(
             tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
@@ -302,6 +425,61 @@ class TestOptical(unittest.TestCase):
             tf.ones(shape, dtype=self._complex_dtype.real_dtype)
         )
         y = amplifier(x)
-        mu_n_ASE = np.mean(np.mean(np.abs(y.numpy()) ** 2.0, axis=-1))
-        self.assertLessEqual(np.abs(G - mu_n_ASE), 1e-5, 'incorrect_gain')
+        p = np.mean(np.mean(np.abs(y.numpy()) ** 2.0, axis=-1))
+        self.assertLessEqual(
+            np.abs(G - p), 1e-5,
+            'incorrect_edfa_gain_in_batch_processing')
+
+    def test_edfa_gain_batch_graph(self):
+        F = 0.0
+        G = 4.0
+        f_c = 193.55e12
+        dt = 1e-12
+        amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
+        shape = (10, 10, 10000)
+        x = tf.complex(
+            tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
+            tf.ones(shape, dtype=self._complex_dtype.real_dtype),
+            tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
+            tf.ones(shape, dtype=self._complex_dtype.real_dtype)
+        )
+
+        @tf.function
+        def amplifier_graph(inputs):
+            return amplifier(inputs)
+
+        y = amplifier_graph(x)
+
+        p = np.mean(np.mean(np.abs(y.numpy()) ** 2.0, axis=-1))
+        self.assertLessEqual(
+            np.abs(G - p), 1e-5,
+            'incorrect_edfa_gain_in_graph_mode_and_batch_processing')
+
+    def test_edfa_gain_batch_dual_polarized_graph(self):
+        F = 0
+        G = 4.0
+        f_c = 193.55e12
+        dt = 1e-12
+        amplifier = edfa.EDFA(G, F, f_c, dt, True, self._complex_dtype)
+        shape = (10, 2, 10000)
+        x = tf.cast(tf.sqrt(1.0 / 2.0), self._complex_dtype) * \
+            tf.complex(
+                tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
+                tf.ones(shape, dtype=self._complex_dtype.real_dtype),
+                tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
+                tf.ones(shape, dtype=self._complex_dtype.real_dtype)
+        )
+
+        @tf.function
+        def amplifier_graph(inputs):
+            return amplifier(inputs)
+
+        y = amplifier_graph(x)
+
+        p = np.mean(np.mean(
+            np.sum(np.abs(y.numpy()) ** 2.0, axis=-2), axis=-1)
+        )
+        self.assertLessEqual(
+            np.abs(G - p), 1e-5,
+            'incorrect_edfa_gain_for_batch_graph_dual_polarization_combination')
 

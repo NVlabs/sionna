@@ -3,7 +3,8 @@ Optical
 =======
 
 This module provides layers and functions that implement channel models for (fiber) optical communications.
-The currently only available model is the split-step Fourier method (:class:`~sionna.channel.SSFM`) that can be combined with an Erbium-doped amplifier (:class:`~sionna.channel.EDFA`).
+The currently only available model is the split-step Fourier method (:class:`~sionna.channel.SSFM`, for dual- and
+single-polarization) that can be combined with an Erbium-doped amplifier (:class:`~sionna.channel.EDFA`).
 
 The following code snippets show how to setup and simulate the transmission
 over a single-mode fiber (SMF) by using the split-step Fourier method.
@@ -53,7 +54,7 @@ Running the channel model is done as follows:
       y = simulate_transmission(x, n_span)
 
 
-For further details, the tutorial `"Optical Channel with Lumped Ampflication" <../examples/Optical_Lumped_Amplification_Channel.html>`_  provides more sophisticated examples of how to use this module.
+For further details, the tutorial `"Optical Channel with Lumped Amplification" <../examples/Optical_Lumped_Amplification_Channel.html>`_  provides more sophisticated examples of how to use this module.
 
 For the purpose of the present document, the following symbols apply:
 
@@ -68,7 +69,7 @@ For the purpose of the present document, the following symbols apply:
 +---------------------------------+-----------------------------------------------------------------------------+
 | :math:`\beta_2`                 | Group velocity dispersion coeff. in :math:`(T_\text{norm}^2/L_\text{norm})` |
 +---------------------------------+-----------------------------------------------------------------------------+
-| :math:`f_\mathrm{c}`            | Carrier frequency in  :math:`\text{Hz}`                                     |
+| :math:`f_\mathrm{c}`            | Carrier frequency in  :math:`\text{(Hz)}`                                   |
 +---------------------------------+-----------------------------------------------------------------------------+
 | :math:`\gamma`                  | Nonlinearity coefficient in :math:`(1/L_\text{norm}/\text{W})`              |
 +---------------------------------+-----------------------------------------------------------------------------+
@@ -126,15 +127,15 @@ time_frequency_vector
 
 
 References:
-   .. [SSFM] R. H. Hardin and F. D. Tappert,
+   .. [HT1973] R. H. Hardin and F. D. Tappert,
          "Applications of the Split-Step Fourier Method to the Numerical Solution of Nonlinear and Variable Coefficient Wave Equations.",
          SIAM Review Chronicles, Vol. 15, No. 2, Part 1, p 423, 1973.
 
-   .. [SymSSFM] J. A. Fleck, J. R. Morris, and M. D. Feit,
+   .. [FMF1976] J. A. Fleck, J. R. Morris, and M. D. Feit,
          "Time-dependent propagation of high energy laser beams through the atmosphere",
          Appl. Phys., Vol. 10, pp 129–160, 1976.
 
-   .. [RamanASE] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
+   .. [MFFP2009] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
          "ASE Noise Simulation in Raman Amplification Systems",
          Conftele, 2009.
 
@@ -153,3 +154,7 @@ References:
    .. [GD1991] C.R. Giles, and E. Desurvire,
          "Modeling Erbium-Doped Fiber Amplifiers",
          Journal of Lightwave Technology 9, No. 2, 1991.
+
+   .. [WMC1991] P. K. A. Wai, C. R. Menyuk, and H. H. Chen,
+         "Stability of solitons in randomly varying birefringent fibers",
+         Optics Letters, No. 16, 1991.
