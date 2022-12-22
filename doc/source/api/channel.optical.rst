@@ -3,7 +3,8 @@ Optical
 =======
 
 This module provides layers and functions that implement channel models for (fiber) optical communications.
-The currently only available model is the split-step Fourier method (:class:`~sionna.channel.SSFM`) that can be combined with an Erbium-doped amplifier (:class:`~sionna.channel.EDFA`).
+The currently only available model is the split-step Fourier method (:class:`~sionna.channel.SSFM`, for dual- and
+single-polarization) that can be combined with an Erbium-doped amplifier (:class:`~sionna.channel.EDFA`).
 
 The following code snippets show how to setup and simulate the transmission
 over a single-mode fiber (SMF) by using the split-step Fourier method.
@@ -53,7 +54,7 @@ Running the channel model is done as follows:
       y = simulate_transmission(x, n_span)
 
 
-For further details, the tutorial `"Optical Channel with Lumped Ampflication" <../examples/Optical_Lumped_Amplification_Channel.html>`_  provides more sophisticated examples of how to use this module.
+For further details, the tutorial `"Optical Channel with Lumped Amplification" <../examples/Optical_Lumped_Amplification_Channel.html>`_  provides more sophisticated examples of how to use this module.
 
 For the purpose of the present document, the following symbols apply:
 
@@ -68,7 +69,7 @@ For the purpose of the present document, the following symbols apply:
 +---------------------------------+-----------------------------------------------------------------------------+
 | :math:`\beta_2`                 | Group velocity dispersion coeff. in :math:`(T_\text{norm}^2/L_\text{norm})` |
 +---------------------------------+-----------------------------------------------------------------------------+
-| :math:`f_\mathrm{c}`            | Carrier frequency in  :math:`\text{Hz}`                                     |
+| :math:`f_\mathrm{c}`            | Carrier frequency in  :math:`\text{(Hz)}`                                   |
 +---------------------------------+-----------------------------------------------------------------------------+
 | :math:`\gamma`                  | Nonlinearity coefficient in :math:`(1/L_\text{norm}/\text{W})`              |
 +---------------------------------+-----------------------------------------------------------------------------+
