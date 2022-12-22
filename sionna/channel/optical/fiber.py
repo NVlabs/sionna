@@ -28,21 +28,22 @@ class SSFM(Layer):
 
         \frac{\partial E(t,z)}{\partial z}=-\frac{\alpha}{2} E(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 E(t,z)}{\partial t^2}-j\gamma |E(t,z)|^2 E(t,z) + n(n_{\text{sp}};\,t,\,z)
 
-    for an unpolarized (or single polarized) optical signal or the Manakov
-    equation (according to [WMC1991]_)
+    for an unpolarized (or single polarized) optical signal;
+    or the Manakov equation (according to [WMC1991]_)
 
     .. math::
 
-        \frac{\partial \mathbf{E}(t,z)}{\partial z}=-\frac{\alpha}{2} \mathbf{E}(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 \mathbf{E}(t,z)}{\partial t^2}-j\gamma \frac{8}{9}||\mathbf{E}(t,z)||_2^2 \mathbf{E}(t,z) + n(n_{\text{sp}};\,t,\,z)
+        \frac{\partial \mathbf{E}(t,z)}{\partial z}=-\frac{\alpha}{2} \mathbf{E}(t,z)+j\frac{\beta_2}{2}\frac{\partial^2 \mathbf{E}(t,z)}{\partial t^2}-j\gamma \frac{8}{9}||\mathbf{E}(t,z)||_2^2 \mathbf{E}(t,z) + \mathbf{n}(n_{\text{sp}};\,t,\,z)
 
     for dual polarization, with attenuation coefficient :math:`\alpha`, group
     velocity dispersion parameters :math:`\beta_2`, and nonlinearity
-    coefficient :math:`\gamma`. :math:`n(n_{\text{sp}};\,t,\,z)` denotes the
+    coefficient :math:`\gamma`. :math:`n(n_{\text{sp}};\,t,\,z)`
+    and :math:`\mathbf{n}(n_{\text{sp}};\,t,\,z)` denote the
     noise due to an optional ideally distributed Raman amplification with
     spontaneous emission factor :math:`n_\text{sp}`. The optical signal
     :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`. For the dual
-    polarized case :math:`\mathbf{E}(t,\,z)=(\mathbf{E}(t,\,z)_x, \mathbf{E}(t,\,z)_y)`
-    is a vector.
+    polarized case :math:`\mathbf{E}(t,\,z)=(E_x(t,\,z), E_y(t,\,z))`
+    is a vector consisting of the signal components of both polarizations.
 
     The symmetrized SSFM is applied according to Eq. (7) of [FMF1976]_ that
     can be written as
@@ -68,9 +69,9 @@ class SSFM(Layer):
     Hence, all parameters as well as the signal itself have to be given with the
     same unit prefix for the
     same unit (e.g., always pico for time, or kilo for distance). **Note**
-    that, despite the normalization, the SSFM is implemented with physical units
-    different from the normalization, e.g., used for the nonlinear
-    Fourier transform. For simulations only :math:`T_\text{norm}` has to be
+    that, despite the normalization, the SSFM is implemented with physical
+    units, which is different from the normalization, e.g., used for the
+    nonlinear Fourier transform. For simulations only :math:`T_\text{norm}` has to be
     provided.
 
     To avoid reflections at the signal boundaries during simulation a Hamming
@@ -259,30 +260,22 @@ class SSFM(Layer):
     def _apply_noise(self, q, dz):
         # Noise due to Amplification (Raman)
         if self._with_amplification:
+            step_noise = self._p_n_ase * tf.cast(
+                dz, self._rdtype) / tf.cast(
+                self._length, self._rdtype) / tf.cast(
+                2.0, self._rdtype)
             q_n = tf.complex(
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
-                    tf.sqrt(
-                        self._p_n_ase *
-                        tf.cast(dz, self._rdtype) /
-                        tf.cast(self._length, self._rdtype) /
-                        tf.cast(2.0, self._rdtype)
-                    ),
-                    self._rdtype
-                ),
+                    tf.sqrt(step_noise),
+                    self._rdtype),
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
-                    tf.sqrt(
-                        self._p_n_ase *
-                        tf.cast(dz, self._rdtype) /
-                        tf.cast(self._length, self._rdtype) /
-                        tf.cast(2.0, self._rdtype)
-                    ),
-                    self._rdtype
+                    tf.sqrt(step_noise),
+                    self._rdtype)
                 )
-            )
             q = q + q_n
 
         return q
