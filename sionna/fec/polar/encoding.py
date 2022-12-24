@@ -347,7 +347,9 @@ class Polar5GEncoder(PolarEncoder):
                  k,
                  n,
                  verbose=False,
-                 dtype=tf.float32):
+                 dtype=tf.float32,
+                 bil=True,
+                 iil=False):
 
         if dtype not in (tf.float16, tf.float32, tf.float64, tf.int8,
             tf.int32, tf.int64, tf.uint8, tf.uint16, tf.uint32):
@@ -359,10 +361,14 @@ class Polar5GEncoder(PolarEncoder):
         n = int(n) # k or n can be float (e.g. as result of n=k*r)
         assert n>=k, "Invalid coderate (>1)."
         assert isinstance(verbose, bool), "verbose must be bool."
+        assert isinstance(bil, bool), "bil must be bool."
+        assert isinstance(iil, bool), "bil must be bool."
 
         self._k_target = k
         self._n_target = n
         self._verbose = verbose
+        self._bil = bil
+        self._iil = iil
 
          # Initialize rate-matcher
         crc_degree, n_polar, frozen_pos, idx_rm  = self._init_rate_match(k, n)
@@ -495,6 +501,32 @@ class Polar5GEncoder(PolarEncoder):
                     ind_k += 1
         return c_int
 
+    def interleaver(self, c):
+        """Interleaver following Sec. 5.4.1.1 in [3GPPTS38212]_.
+
+        Input
+        -----
+            c: ndarray
+                1D array to be interleaved.
+
+        Output
+        ------
+            : ndarray
+                Interleaved version of ``c`` with same shape and dtype as ``c``.
+
+        """        
+        # 38.212 Table 5.3.1.1-1
+        p_IL_max_table = [0, 2, 4, 7, 9, 14, 19, 20, 24, 25, 26, 28, 31, 34, 42, 45, 49, 50, 51, 53, 54, 56, 58, 59, 61, 62, 65, 66, 67, 69, 70, 71, 72, 76, 77, 81, 82, 83, 87, 88, 89, 91, 93, 95, 98, 101, 104, 106, 108, 110, 111, 113, 115, 118, 119, 120, 122, 123, 126, 127, 129, 132, 134, 138, 139, 140, 1, 3, 5, 8, 10, 15, 21, 27, 29, 32, 35, 43, 46, 52, 55, 57, 60, 63, 68, 73, 78, 84, 90, 92, 94, 96, 99, 102, 105, 107, 109, 112, 114, 116, 121, 124, 128, 130, 133, 135, 141, 6, 11, 16, 22, 30, 33, 36, 44, 47, 64, 74, 79, 85, 97, 100, 103, 117, 125, 131, 136, 142, 12, 17, 23, 37, 48, 75, 80, 86, 137, 143, 13, 18, 38, 144, 39, 145, 40, 146, 41, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163]
+        K_IL_max = 164
+        K = len(c)
+        c_apo = np.empty(K, 'int')
+        k = 0
+        for p_IL_max in p_IL_max_table:
+            if p_IL_max >= (K_IL_max - K):
+                c_apo[k] = c[p_IL_max - (K_IL_max - K)]
+                k += 1
+        return c_apo            
+
     #########################
     # Utility methods
     #########################
@@ -538,6 +570,9 @@ class Polar5GEncoder(PolarEncoder):
         if 12<=k_target<=19:
             crc_pol = "CRC6"
             k_crc = 6
+        elif k_target == 32: # TODO: this is a hack to make PBCH DL work
+            crc_pol = "CRC24C"
+            k_crc = 24
         elif k_target >=20:
             crc_pol = "CRC11"
             k_crc = 11
