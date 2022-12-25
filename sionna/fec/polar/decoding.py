@@ -1395,7 +1395,7 @@ class PolarSCLDecoder(Layer):
                 msg_pm[ind, :] = msg_pm_hyb[ind_hyb, :]
                 ind_hyb += 1
 
-        return msg_uhat, msg_pm        
+        return msg_uhat, msg_pm
 
     #########################
     # Keras layer functions
@@ -2086,6 +2086,11 @@ class Polar5GDecoder(Layer):
         """Output dtype of decoder."""
         return self._output_dtype
 
+    @property
+    def u_hat_crc(self):
+        """U_hat incl CRC of last decoding"""
+        return self._u_hat_crc
+
     #########################
     # Utility methods
     #########################
@@ -2196,5 +2201,8 @@ class Polar5GDecoder(Layer):
         output_shape[-1] = self._k_target
         output_shape[0] = -1 # First dim can be dynamic (None)
         u_hat_reshape = tf.reshape(u_hat, output_shape)
+
+        output_shape[-1] = self._k_polar
+        self._u_hat_crc = tf.reshape(u_hat_crc, output_shape)
 
         return tf.cast(u_hat_reshape, dtype=self._output_dtype)

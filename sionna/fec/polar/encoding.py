@@ -304,6 +304,12 @@ class Polar5GEncoder(PolarEncoder):
             Defaults to tf.float32. Defines the output datatype of the layer
             (internal precision remains tf.uint8).
 
+        bil: bool
+
+        iil: bool
+
+        crc_pol: string
+
     Input
     -----
         inputs: [...,k], tf.float32
@@ -349,7 +355,8 @@ class Polar5GEncoder(PolarEncoder):
                  verbose=False,
                  dtype=tf.float32,
                  bil=True,
-                 iil=False):
+                 iil=False,
+                 crc_pol=None):
 
         if dtype not in (tf.float16, tf.float32, tf.float64, tf.int8,
             tf.int32, tf.int64, tf.uint8, tf.uint16, tf.uint32):
@@ -362,7 +369,7 @@ class Polar5GEncoder(PolarEncoder):
         assert n>=k, "Invalid coderate (>1)."
         assert isinstance(verbose, bool), "verbose must be bool."
         assert isinstance(bil, bool), "bil must be bool."
-        assert isinstance(iil, bool), "bil must be bool."
+        assert isinstance(iil, bool), "iil must be bool."
 
         self._k_target = k
         self._n_target = n
@@ -371,7 +378,7 @@ class Polar5GEncoder(PolarEncoder):
         self._iil = iil
 
          # Initialize rate-matcher
-        crc_degree, n_polar, frozen_pos, idx_rm  = self._init_rate_match(k, n)
+        crc_degree, n_polar, frozen_pos, idx_rm  = self._init_rate_match(k, n, crc_pol)
 
         self._frozen_pos = frozen_pos # Required for decoder
         self._ind_rate_matching = idx_rm # Index for gather-based rate-matching
@@ -531,7 +538,7 @@ class Polar5GEncoder(PolarEncoder):
     # Utility methods
     #########################
 
-    def _init_rate_match(self, k_target, n_target):
+    def _init_rate_match(self, k_target, n_target, crc_pol):
         """Implementing polar rate matching according to [3GPPTS38212]_.
 
         Currently, only uplink Polar rate-matching is implemented.
@@ -567,19 +574,29 @@ class Polar5GEncoder(PolarEncoder):
             "n too large - no codeword segmentation supported at the moment."
 
         # Select CRC polynomials (see Sec. 6.3.1.2.1 for UL)
-        if 12<=k_target<=19:
-            crc_pol = "CRC6"
-            k_crc = 6
-        elif k_target == 32: # TODO: this is a hack to make PBCH DL work
-            crc_pol = "CRC24C"
-            k_crc = 24
-        elif k_target >=20:
-            crc_pol = "CRC11"
-            k_crc = 11
+        if crc_pol is None:
+            if 12<=k_target<=19:
+                crc_pol = "CRC6"
+                k_crc = 6
+            elif k_target == 32: # TODO: this is a hack to make PBCH DL work
+                crc_pol = "CRC24C"
+                k_crc = 24
+            elif k_target >=20:
+                crc_pol = "CRC11"
+                k_crc = 11
+            else:
+                raise ValueError("k_target<12 is not supported in 5G NR; please " \
+                    "use 'channel coding of small block lengths' scheme from " \
+                    "Sec. 5.3.3 in 3GPP 38.212 instead.")
         else:
-            raise ValueError("k_target<12 is not supported in 5G NR; please " \
-                "use 'channel coding of small block lengths' scheme from " \
-                "Sec. 5.3.3 in 3GPP 38.212 instead.")
+            if crc_pol == "CRC6":
+                k_crc = 6
+            elif crc_pol == "CRC11":
+                k_crc = 11
+            elif crc_pol == "CRC24A" or crc_pol == "CRC24B" or crc_pol == "CRC24C":
+                k_crc = 24
+            else:
+                raise ValueError("unsupported CRC polynomial")
 
         # PC bit for k_target = 12-19 bits (see Sec. 6.3.1.3.1 for UL)
         n_pc = 0
