@@ -27,7 +27,7 @@ class EDFA(Layer):
     where ideally the detector is limited by shot noise only, and
     :math:`\text{SNR}` is the signal to noise ratio. Shot noise is
     neglected here but is required to derive the noise power of the amplifier, as
-    otherwise the input SNR was infinitely large. Hence, for the input SNR
+    otherwise the input SNR is infinitely large. Hence, for the input SNR
     it follows [A2012]_ that
     :math:`\mathrm{SNR}_\mathrm{in}=\frac{P}{2hf_cW}` where :math:`h` denotes
     Planck's constant, :math:`P` is the signal power and :math:`W` the
