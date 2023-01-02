@@ -132,7 +132,7 @@ References:
          SIAM Review Chronicles, Vol. 15, No. 2, Part 1, p 423, 1973.
 
    .. [FMF1976] J. A. Fleck, J. R. Morris, and M. D. Feit,
-         "Time-dependent propagation of high energy laser beams through the atmosphere",
+         "Time-dependent Propagation of High Energy Laser Beams Through the Atmosphere",
          Appl. Phys., Vol. 10, pp 129–160, 1976.
 
    .. [MFFP2009] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
@@ -140,7 +140,7 @@ References:
          Conftele, 2009.
 
    .. [A2012] G. P. Agrawal,
-         "Fiber-optic communication systems",
+         "Fiber-optic Communication Systems",
          4th ed. Wiley series in microwave and optical engineering 222. New York: Wiley, 2010.
 
    .. [EKWFG2010] R. J. Essiambre, G. Kramer, P. J. Winzer, G. J. Foschini, and B. Goebel,
@@ -156,5 +156,5 @@ References:
          Journal of Lightwave Technology 9, No. 2, 1991.
 
    .. [WMC1991] P. K. A. Wai, C. R. Menyuk, and H. H. Chen,
-         "Stability of solitons in randomly varying birefringent fibers",
+         "Stability of Solitons in Randomly Varying Birefringent Fibers",
          Optics Letters, No. 16, 1991.
