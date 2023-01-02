@@ -14,7 +14,7 @@ import sionna
 
 class EDFA(Layer):
     # pylint: disable=line-too-long
-    r"""EDFA(g, f, f_c, dt, dtype=tf.complex64, **kwargs)
+    r"""EDFA(g,f=7.0,f_c=193.55e12,dt=1e-12,with_dual_polarization=False,dtype=tf.complex64,**kwargs)
 
     Layer implementing a model of an Erbium-Doped Fiber Amplifier
 
@@ -111,9 +111,15 @@ class EDFA(Layer):
             Amplifier output
     """
     def __init__(
-            self, g=4.0, f=7.0, f_c=193.55e12,
-            dt=1e-12, with_dual_polarization=False,
-            dtype=tf.complex64, **kwargs):
+            self,
+            g=4.0,
+            f=7.0,
+            f_c=193.55e12,            
+            dt=1e-12,
+            with_dual_polarization=False,            
+            dtype=tf.complex64,
+            **kwargs):
+            
         super().__init__(dtype=dtype, **kwargs)
 
         self._dtype = dtype
@@ -124,6 +130,9 @@ class EDFA(Layer):
         self._f = tf.cast(f, self._rdtype)
         self._f_c = tf.cast(f_c, self._rdtype)
         self._dt = tf.cast(dt, self._rdtype)
+        
+        assert isinstance(with_dual_polarization, bool), \
+                            "with_dual_polarization must be bool."
         self._with_dual_polarization = with_dual_polarization
 
         # Spontaneous emission factor
