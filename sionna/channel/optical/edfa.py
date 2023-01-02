@@ -55,7 +55,7 @@ class EDFA(Layer):
     \cdot f_\mathrm{sim}`
     where the factor :math:`2` accounts for the unpolarized noise (for dual
     polarization the factor is :math:`1` per polarization).
-    Here the :math:`()^{(1)}` means that this is the noise introduced by a
+    Here, the notation :math:`()^{(1)}` means that this is the noise introduced by a
     single EDFA.
 
     This class inherits from the Keras `Layer` class and can be used as layer in
