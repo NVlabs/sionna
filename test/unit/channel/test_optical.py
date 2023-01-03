@@ -5,10 +5,11 @@
 # Author: Tim Alexander Uhlemann <uhlemann@ieee.org>
 
 try:
-    import sionna
+    import sionna as sn
 except ImportError as e:
     import sys
     sys.path.append("../")
+    import sionna as sn
 
 import unittest
 import numpy as np
@@ -16,7 +17,6 @@ import tensorflow as tf
 from sionna.channel import utils
 from sionna.channel.optical import fiber
 from sionna.channel.optical import edfa
-from sionna import constants
 
 gpus = tf.config.list_physical_devices('GPU')
 print('Number of GPUs available :', len(gpus))
@@ -281,7 +281,7 @@ class TestOptical(unittest.TestCase):
         t_norm = 1e-12
 
         rho_n = \
-            sionna.constants.H * f_c * alpha * length * \
+            sn.constants.H * f_c * alpha * length * \
             n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
@@ -322,7 +322,7 @@ class TestOptical(unittest.TestCase):
         t_norm = 1e-12
 
         rho_n = \
-            sionna.constants.H * f_c * alpha * length * \
+            sn.constants.H * f_c * alpha * length * \
             n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
@@ -362,7 +362,7 @@ class TestOptical(unittest.TestCase):
             1.0, self._complex_dtype.real_dtype))
         rho_n_ASE = tf.cast(n_sp * (
 		        G - tf.cast(1.0, self._complex_dtype.real_dtype)) *
-                            constants.H * f_c,
+                            sn.constants.H * f_c,
                             self._complex_dtype.real_dtype)  # Noise density
         # in (W/Hz)
         P_n_ASE = tf.cast(
@@ -389,7 +389,7 @@ class TestOptical(unittest.TestCase):
             1.0, self._complex_dtype.real_dtype))
         rho_n_ASE = tf.cast(n_sp * (
 		        G - tf.cast(1.0, self._complex_dtype.real_dtype)) *
-                            constants.H * f_c,
+                            sn.constants.H * f_c,
                             self._complex_dtype.real_dtype)  # Noise density
         # in (W/Hz)
         P_n_ASE = tf.cast(
