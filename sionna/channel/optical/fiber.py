@@ -37,9 +37,9 @@ class SSFM(Layer):
 
     for dual polarization, with attenuation coefficient :math:`\alpha`, group
     velocity dispersion parameters :math:`\beta_2`, and nonlinearity
-    coefficient :math:`\gamma`. :math:`n(n_{\text{sp}};\,t,\,z)`
-    and :math:`\mathbf{n}(n_{\text{sp}};\,t,\,z)` denote the
-    noise due to an optional ideally distributed Raman amplification with
+    coefficient :math:`\gamma`. The noise term :math:`n(n_{\text{sp}};\,t,\,z)`
+    and :math:`\mathbf{n}(n_{\text{sp}};\,t,\,z)`, respectively, stems from
+    an (optional) ideally distributed Raman amplification with
     spontaneous emission factor :math:`n_\text{sp}`. The optical signal
     :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`. For the dual
     polarized case :math:`\mathbf{E}(t,\,z)=(E_x(t,\,z), E_y(t,\,z))`
@@ -140,21 +140,21 @@ class SSFM(Layer):
             Time normalization :math:`T_\text{norm}` in :math:`(\text{s})`.
 
         with_attenuation : bool
-            Enables application of attenuation. Defaults to True.
+            Enable attenuation. Defaults to True.
 
         with_amplification : bool
-            Enables application of ideal inline amplification and corresponding
+            Enable ideal inline amplification and corresponding
             noise. Defaults to False.
 
         with_dispersion : bool
-            Enables application of chromatic dispersion. Defaults to True.
+            Apply chromatic dispersion. Defaults to True.
 
         with_manakov : bool
             Considers axis [-2] as x- and y-polarization and calculates the
             nonlinear step as given by the Manakov equation. Defaults to False.
 
         with_nonlinearity : bool
-            Enables application of Kerr nonlinearity. Defaults to True.
+            Apply Kerr nonlinearity. Defaults to True.
 
         swap_memory : bool
             Use CPU memory for while loop. Defaults to True.
