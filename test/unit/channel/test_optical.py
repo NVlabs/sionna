@@ -295,7 +295,7 @@ class TestOptical(unittest.TestCase):
             dtype=dtype, t_norm=t_norm, n_sp=n_sp,
         )
 
-        u_0 = tf.zeros((10, 10, 2000), dtype=self._complex_dtype)
+        u_0 = tf.zeros((100, 10, 2000), dtype=self._complex_dtype)
         @tf.function
         def ssfm_graph(inputs):
             return ssfm(inputs)
@@ -337,7 +337,7 @@ class TestOptical(unittest.TestCase):
             dtype=dtype, t_norm=t_norm, n_sp=n_sp,
         )
 
-        u_0 = tf.zeros((10, 2, 2000), dtype=self._complex_dtype)
+        u_0 = tf.zeros((100, 2, 2000), dtype=self._complex_dtype)
         @tf.function
         def ssfm_graph(inputs):
             return ssfm(inputs)
@@ -370,7 +370,7 @@ class TestOptical(unittest.TestCase):
             (tf.cast(1.0, self._complex_dtype.real_dtype) / dt),
             self._complex_dtype.real_dtype)  # Noise power in (W)
         amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
-        x = tf.zeros((10, 10, 1000), dtype=self._complex_dtype)
+        x = tf.zeros((100, 10, 1000), dtype=self._complex_dtype)
         y = amplifier(x)
         sigma_n_ASE_square = np.mean(np.var(y.numpy(), axis=-1))
         self.assertLessEqual(
@@ -397,7 +397,7 @@ class TestOptical(unittest.TestCase):
             (tf.cast(1.0, self._complex_dtype.real_dtype) / dt),
             self._complex_dtype.real_dtype)  # Noise power in (W)
         amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
-        x = tf.zeros((10, 10, 1000), dtype=self._complex_dtype)
+        x = tf.zeros((100, 10, 1000), dtype=self._complex_dtype)
 
         @tf.function
         def amplifier_graph(inputs):
@@ -436,7 +436,7 @@ class TestOptical(unittest.TestCase):
         f_c = 193.55e12
         dt = 1e-12
         amplifier = edfa.EDFA(G, F, f_c, dt, False, self._complex_dtype)
-        shape = (10, 10, 10000)
+        shape = (100, 10, 10000)
         x = tf.complex(
             tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
             tf.ones(shape, dtype=self._complex_dtype.real_dtype),
@@ -461,7 +461,7 @@ class TestOptical(unittest.TestCase):
         f_c = 193.55e12
         dt = 1e-12
         amplifier = edfa.EDFA(G, F, f_c, dt, True, self._complex_dtype)
-        shape = (10, 2, 10000)
+        shape = (100, 2, 10000)
         x = tf.cast(tf.sqrt(1.0 / 2.0), self._complex_dtype) * \
             tf.complex(
                 tf.cast(1.0 / tf.sqrt(2.0), self._complex_dtype.real_dtype) *
