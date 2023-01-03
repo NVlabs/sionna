@@ -165,8 +165,10 @@ class SSFM(Layer):
 
     Input
     -----
-        x : Tensor, tf.complex
-            Input signal in :math:`(\sqrt{\text{W}})`
+        x : [...,n] or [...,2,n], tf.complex
+            Input signal in :math:`(\sqrt{\text{W}})`. If ``with_manakov``=True,
+            the second last dimension is interpreted as x- and y-polarization,
+            respectively.
 
     Output
     ------
