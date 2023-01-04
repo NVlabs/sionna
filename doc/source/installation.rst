@@ -7,7 +7,7 @@ You can alternatively test them on `Google Colab <https://colab.research.google.
 Although not necessary, we recommend running Sionna in a `Docker container <https://www.docker.com>`_.
 
 .. note::
-    Sionna requires `TensorFlow 2.7-2.10 <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
+    Sionna requires `TensorFlow 2.7-2.11 <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
     We recommend Ubuntu 20.04.
 
     We refer to the `TensorFlow GPU support tutorial <https://www.tensorflow.org/install/gpu>`_ for GPU support and the required driver setup.
@@ -37,7 +37,7 @@ e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `ten
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.12.0
+    0.12.1
 
 3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
 
@@ -109,4 +109,4 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.12.0
+    0.12.1

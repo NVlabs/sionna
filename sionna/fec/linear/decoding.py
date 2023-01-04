@@ -338,10 +338,14 @@ class OSDecoder(Layer):
         """
 
         bs = tf.shape(gm)[0]
+        s = gm.shape
         idx_pivot = tf.TensorArray(tf.int64, self._k, dynamic_size=False)
 
         #  bring gm in systematic form (by so-called pivot method)
         for idx_c in tf.range(self._k):
+
+            # ensure shape to avoid XLA incompatibility with TF2.11 in tf.range
+            gm = tf.ensure_shape(gm, s)
 
             # find pivot (i.e., first pos with index 1)
             idx_p = tf.argmax(gm[:, idx_c, :], axis=-1)
@@ -425,7 +429,7 @@ class OSDecoder(Layer):
         # clip inputs
         llr_ch = tf.clip_by_value(llr_ch, -self._llr_max, self._llr_max)
 
-        # Step 1: sort LLRs
+        # step 1: sort LLRs
         idx_sort = tf.argsort(tf.abs(llr_ch), direction="DESCENDING")
 
         # permute gm per batch sample individually
@@ -433,7 +437,7 @@ class OSDecoder(Layer):
                              (bs, self._k,self._n))
         gm_sort = tf.gather(gm, idx_sort, batch_dims=1, axis=-1)
 
-        # Step 2: Find most reliable basis (MRB)
+        # step 2: Find most reliable basis (MRB)
         gm_mrb, idx_mrb = self._find_mrb(gm_sort)
 
         # apply corresponding mrb permutations

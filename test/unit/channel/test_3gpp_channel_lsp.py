@@ -314,7 +314,7 @@ class TestLSP(unittest.TestCase):
         b = (np.log10(104)-mu)/std
         samples_ref = self.limited_normal(TestLSP.BATCH_SIZE, a, b, mu, std)
         # KS-test does not work great with discontinuties.
-        # Therefore, we test only the contunuous part of the CDF, and also test
+        # Therefore, we test only the continuous part of the CDF, and also test
         # that the maximum value allowed is not exceeded
         maxval = np.max(samples)
         samples = samples[samples < np.log10(104)]
@@ -333,7 +333,7 @@ class TestLSP(unittest.TestCase):
         b = (np.log10(104)-mu)/std
         samples_ref = self.limited_normal(TestLSP.BATCH_SIZE, a, b, mu, std)
         # KS-test does not work great with discontinuties.
-        # Therefore, we test only the contunuous part of the CDF, and also test
+        # Therefore, we test only the continuous part of the CDF, and also test
         # that the maximum value allowed is not exceeded
         maxval = np.max(samples)
         samples = samples[samples < np.log10(104)]
@@ -352,7 +352,7 @@ class TestLSP(unittest.TestCase):
         b = (np.log10(52)-mu)/std
         samples_ref = self.limited_normal(TestLSP.BATCH_SIZE, a, b, mu, std)
         # KS-test does not work great with discontinuties.
-        # Therefore, we test only the contunuous part of the CDF, and also test
+        # Therefore, we test only the continuous part of the CDF, and also test
         # that the maximum value allowed is not exceeded
         maxval = np.max(samples)
         samples = samples[samples < np.log10(52)]
@@ -373,7 +373,7 @@ class TestLSP(unittest.TestCase):
         b = (np.log10(52)-mu)/std
         samples_ref = self.limited_normal(TestLSP.BATCH_SIZE, a, b, mu, std)
         # KS-test does not work great with discontinuties.
-        # Therefore, we test only the contunuous part of the CDF, and also test
+        # Therefore, we test only the continuous part of the CDF, and also test
         # that the maximum value allowed is not exceeded
         maxval = np.max(samples)
         samples = samples[samples < np.log10(52)]
