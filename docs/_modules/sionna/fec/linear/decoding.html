@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.linear.decoding &mdash; Sionna 0.12.0 documentation</title>
+  <title>sionna.fec.linear.decoding &mdash; Sionna 0.12.1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -317,6 +317,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
@@ -1079,10 +1080,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">bs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">gm</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">idx_pivot</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">TensorArray</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span> <span class="n">dynamic_size</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1">#  bring gm in systematic form (by so-called pivot method)</span>
         <span class="k">for</span> <span class="n">idx_c</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">):</span>
+
+            <span class="c1"># ensure shape to avoid XLA incompatibility with TF2.11 in tf.range</span>
+            <span class="n">gm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ensure_shape</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
 
             <span class="c1"># find pivot (i.e., first pos with index 1)</span>
             <span class="n">idx_p</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">gm</span><span class="p">[:,</span> <span class="n">idx_c</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -1166,7 +1171,7 @@
         <span class="c1"># clip inputs</span>
         <span class="n">llr_ch</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span><span class="p">)</span>
 
-        <span class="c1"># Step 1: sort LLRs</span>
+        <span class="c1"># step 1: sort LLRs</span>
         <span class="n">idx_sort</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;DESCENDING&quot;</span><span class="p">)</span>
 
         <span class="c1"># permute gm per batch sample individually</span>
@@ -1174,7 +1179,7 @@
                              <span class="p">(</span><span class="n">bs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_n</span><span class="p">))</span>
         <span class="n">gm_sort</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">idx_sort</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="c1"># Step 2: Find most reliable basis (MRB)</span>
+        <span class="c1"># step 2: Find most reliable basis (MRB)</span>
         <span class="n">gm_mrb</span><span class="p">,</span> <span class="n">idx_mrb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_mrb</span><span class="p">(</span><span class="n">gm_sort</span><span class="p">)</span>
 
         <span class="c1"># apply corresponding mrb permutations</span>

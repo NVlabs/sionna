@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.mapping &mdash; Sionna 0.12.0 documentation</title>
+  <title>sionna.mapping &mdash; Sionna 0.12.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -317,6 +317,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
@@ -989,13 +990,16 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainable</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;trainable must be boolean&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">trainable</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>\
+        <span class="c1"># allow float inputs that represent int</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span><span class="nb">int</span><span class="p">)),</span>\
             <span class="s2">&quot;num_bits_per_symbol must be integer&quot;</span>
-
+        <span class="k">assert</span> <span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="o">%</span><span class="mi">1</span><span class="o">==</span><span class="mi">0</span><span class="p">),</span>\
+            <span class="s2">&quot;num_bits_per_symbol must be integer&quot;</span>
+        <span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation_type</span><span class="o">==</span><span class="s2">&quot;qam&quot;</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">num_bits_per_symbol</span><span class="o">%</span><span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">num_bits_per_symbol</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span>\
-                <span class="s2">&quot;num_bits_per_symbol must be a mutliple of 2&quot;</span>
+                <span class="s2">&quot;num_bits_per_symbol must be a multiple of 2&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
 
             <span class="k">assert</span> <span class="n">initial_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;QAM must not have an initial value&quot;</span>
@@ -1315,8 +1319,8 @@
 
 <span class="sd">    prior : [num_bits_per_symbol] or [...n, num_bits_per_symbol], tf.float</span>
 <span class="sd">        Prior for every bit as LLRs.</span>
-<span class="sd">        It can be provided either as a tensor of shape `[num_bits_per_symbol]` for the</span>
-<span class="sd">        entire input batch, or as a tensor that is &quot;broadcastable&quot;</span>
+<span class="sd">        It can be provided either as a tensor of shape `[num_bits_per_symbol]`</span>
+<span class="sd">        for the entire input batch, or as a tensor that is &quot;broadcastable&quot;</span>
 <span class="sd">        to `[..., n, num_bits_per_symbol]`.</span>
 <span class="sd">        Only required if the ``with_prior`` flag is set.</span>
 

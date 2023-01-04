@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.12.0 documentation</title>
+  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.12.1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -317,6 +317,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
@@ -965,21 +966,6 @@
 <span class="sd">            If the shape of ``pcm`` is invalid or contains other values than</span>
 <span class="sd">            `0` or `1` or dtype is not `tf.float32`.</span>
 
-<span class="sd">        AssertionError</span>
-<span class="sd">            If ``trainable`` is not `bool`.</span>
-
-<span class="sd">        AssertionError</span>
-<span class="sd">            If ``track_exit`` is not `bool`.</span>
-
-<span class="sd">        AssertionError</span>
-<span class="sd">            If ``hard_out`` is not `bool`.</span>
-
-<span class="sd">        AssertionError</span>
-<span class="sd">            If ``stateful`` is not `bool`.</span>
-
-<span class="sd">        AssertionError</span>
-<span class="sd">            If ``cn_type`` is not `str`.</span>
-
 <span class="sd">        ValueError</span>
 <span class="sd">            If ``num_iter`` is not an integer greater (or equal) `0`.</span>
 
@@ -1069,7 +1055,7 @@
         <span class="c1"># clipping value for the atanh function is applied (tf.float32 is used)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_atanh_clip_value</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-7</span>
         <span class="c1"># internal value for llr clipping</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">20.</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
         <span class="c1"># init code parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_cns</span> <span class="o">=</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># total number of check nodes</span>
@@ -1184,6 +1170,17 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_iter</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;num_iter must be int.&#39;</span>
         <span class="k">assert</span> <span class="n">num_iter</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;num_iter cannot be negative.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_iter</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">num_iter</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">llr_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Max LLR value used for internal calculations and rate-matching.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span>
+
+    <span class="nd">@llr_max</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">llr_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Max LLR value used for internal calculations and rate-matching.&quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">value</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;llr_max cannot be negative.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LDPCBPDecoder.show_weights"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.decoding.LDPCBPDecoder.show_weights">[docs]</a>    <span class="k">def</span> <span class="nf">show_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Show histogram of trainable weights.</span>
@@ -1953,8 +1950,6 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">return_infobits</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s1">&#39;return_info must be bool.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_return_infobits</span> <span class="o">=</span> <span class="n">return_infobits</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># internal max value for LLR initialization</span>
-
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">output_dtype</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">DType</span><span class="p">),</span> \
                                 <span class="s1">&#39;output_dtype must be tf.DType.&#39;</span>
         <span class="k">if</span> <span class="n">output_dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
@@ -1999,8 +1994,6 @@
             <span class="c1"># no pruning; same length as before</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_pruned</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">_n_ldpc</span>
 
-
-
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span>
                          <span class="n">trainable</span><span class="p">,</span>
                          <span class="n">cn_type</span><span class="p">,</span>
@@ -2014,11 +2007,6 @@
     <span class="c1">#########################################</span>
     <span class="c1"># Public methods and properties</span>
     <span class="c1">#########################################</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">llr_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Max LLR value used for rate-matching.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">encoder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2121,7 +2109,8 @@
                       <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">nb_par_bits</span><span class="p">])</span>
 
         <span class="c1"># negative sign due to logit definition</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">k_filler</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dtype</span><span class="p">)</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dtype</span><span class="p">)</span> \
+            <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">k_filler</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dtype</span><span class="p">)</span>
 
         <span class="n">llr_5g</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">x1</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">x2</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
 

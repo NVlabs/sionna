@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Low-Density Parity-Check (LDPC) &mdash; Sionna 0.12.0 documentation</title>
+  <title>Low-Density Parity-Check (LDPC) &mdash; Sionna 0.12.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -321,6 +321,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
@@ -1085,11 +1086,6 @@ outgoing VN message.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ValueError</strong> – If the shape of <code class="docutils literal notranslate"><span class="pre">pcm</span></code> is invalid or contains other values than
     <cite>0</cite> or <cite>1</cite> or dtype is not <cite>tf.float32</cite>.</p></li>
-<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">trainable</span></code> is not <cite>bool</cite>.</p></li>
-<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">track_exit</span></code> is not <cite>bool</cite>.</p></li>
-<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">hard_out</span></code> is not <cite>bool</cite>.</p></li>
-<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">stateful</span></code> is not <cite>bool</cite>.</p></li>
-<li><p><strong>AssertionError</strong> – If <code class="docutils literal notranslate"><span class="pre">cn_type</span></code> is not <cite>str</cite>.</p></li>
 <li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">num_iter</span></code> is not an integer greater (or equal) <cite>0</cite>.</p></li>
 <li><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">output_dtype</span></code> is not
     {tf.float16, tf.float32, tf.float64}.</p></li>
@@ -1137,6 +1133,12 @@ of the weights.</p>
 <dt class="sig sig-object py" id="sionna.fec.ldpc.decoding.LDPCBPDecoder.ie_v">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ie_v</span></span><a class="headerlink" href="#sionna.fec.ldpc.decoding.LDPCBPDecoder.ie_v" title="Permalink to this definition"></a></dt>
 <dd><p>Extrinsic mutual information at variable node.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.fec.ldpc.decoding.LDPCBPDecoder.llr_max">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">llr_max</span></span><a class="headerlink" href="#sionna.fec.ldpc.decoding.LDPCBPDecoder.llr_max" title="Permalink to this definition"></a></dt>
+<dd><p>Max LLR value used for internal calculations and rate-matching.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -1302,12 +1304,6 @@ of the weights.</p>
 <dt class="sig sig-object py" id="sionna.fec.ldpc.decoding.LDPC5GDecoder.encoder">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">encoder</span></span><a class="headerlink" href="#sionna.fec.ldpc.decoding.LDPC5GDecoder.encoder" title="Permalink to this definition"></a></dt>
 <dd><p>LDPC Encoder used for rate-matching/recovery.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sionna.fec.ldpc.decoding.LDPC5GDecoder.llr_max">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">llr_max</span></span><a class="headerlink" href="#sionna.fec.ldpc.decoding.LDPC5GDecoder.llr_max" title="Permalink to this definition"></a></dt>
-<dd><p>Max LLR value used for rate-matching.</p>
 </dd></dl>
 
 </dd></dl>
