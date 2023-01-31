@@ -7,6 +7,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
+from sionna.fec.utils import int_mod_2
 
 class CRCEncoder(Layer):
     """CRCEncoder(crc_degree, output_dtype=tf.float32, **kwargs)
@@ -223,9 +224,8 @@ class CRCEncoder(Layer):
         x_crc = tf.matmul(x_exp32, self._g_mat_crc) # calculate crc bits
 
         # take modulo 2 of x_crc (bitwise operations instead of tf.mod)
-        x_crc_uint8 = tf.cast(x_crc, tf.uint8)
-        x_bin = tf.bitwise.bitwise_and(x_crc_uint8, tf.constant(1, tf.uint8))
-        x_crc = tf.cast(x_bin, dtype=self.dtype)
+        x_crc = int_mod_2(x_crc)
+        x_crc = tf.cast(x_crc, dtype=self.dtype)
 
         x_conc = tf.concat([x_exp, x_crc], -1)
         x_out = tf.squeeze(x_conc, axis=-2)

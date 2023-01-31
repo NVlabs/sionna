@@ -72,7 +72,7 @@ class TestBPDecoding(unittest.TestCase):
 
 
     def test_CN(self):
-        """Test that CN function works correct (i.e., extrinsic and sign preserving). Must be done for all node types.
+        """Test that CN function works correctly (i.e., extrinsic and sign preserving). Must be done for all node types.
 
         Test CN-degree 2 as well for all types. Must be a forwarding node
         """
@@ -133,7 +133,7 @@ class TestBPDecoding(unittest.TestCase):
 
     def test_int_state(self):
         """Test internal state functionality of decoder.
-        This implies that Nx1 iterations yields exact same result as N
+        This implies that Nx1 iterations yield exact same result as N
         iterations."""
         batch_size = 1
         Niter = 5
@@ -162,7 +162,7 @@ class TestBPDecoding(unittest.TestCase):
         self.assertTrue(np.allclose(x, z))
 
     def test_VN(self):
-        """Test that VN function works correct (i.e., extrinsic).
+        """Test that VN function works correctly (i.e., extrinsic).
         """
         Ntrials = 1000 # nb trials
         k = 12
@@ -185,7 +185,7 @@ class TestBPDecoding(unittest.TestCase):
             self.assertTrue(np.allclose(y_ref, y, atol=1e-5))
 
     def test_batch(self):
-        """Test that batch of codewords yields the same results each batch
+        """Test that batch of codewords yields the same results for each batch
         sample."""
 
         batch_size = 100
@@ -245,7 +245,7 @@ class TestBPDecoding(unittest.TestCase):
                                      "gradient should not exist"
 
     def test_all_erasure(self):
-        """Test that all-erasure (llr=0) cw yields constant all zero output."""
+        """Test that all-erasure (llr=0) cw yields constant all-zero output."""
 
         batch_size = 100
         pcm, k, n, _ = load_parity_check_examples(2)
@@ -307,11 +307,11 @@ class TestBPDecoding(unittest.TestCase):
                 x = dec(llr).numpy()
                 self.assertTrue(np.array_equal(x, np.zeros_like(x)))
 
-                # test that for arbitrary input only 0,1 values are outputed
+                # test that for arbitrary inputs
                 llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
                 x = run_graph(llr).numpy()
 
-                # execute the graph twice
+                # execute the graph twice with same input shape
                 x = run_graph(llr).numpy()
 
                 # and change batch_size
@@ -448,6 +448,26 @@ class TestBPDecoding(unittest.TestCase):
         # results must be the same
         self.assertTrue(np.allclose(res, res_csc))
         self.assertTrue(np.allclose(res, res_csr))
+
+    def test_llrmax(self):
+        """Test that llr_max can be set."""
+        pcm, _, n, _ = load_parity_check_examples(0)
+        # no iteration: decoder returns clipped llrs
+        dec = LDPCBPDecoder(pcm, num_iter=0, hard_out=False)
+
+        # test default value
+        llr_max_def = dec.llr_max.numpy() # get default value
+        x = tf.ones((1,n))*100
+        y = dec(x).numpy() # run 0 iterations
+        np.max(y)==llr_max_def
+
+        # set new llr_max
+        llr_maxs = [17., 45.3, 78]
+        for l in llr_maxs:
+            dec.llr_max = l
+            y = dec(x).numpy() # run 0 iterations
+            print(np.abs(np.max(y)-l)<1e-6)
+
 
 class TestBPDecoding5G(unittest.TestCase):
     """Checks LDPC5GDecoding layer.
@@ -809,7 +829,27 @@ class TestBPDecoding5G(unittest.TestCase):
 
         for i in range(Niter-1): # remaining iterations
             res2, msg_vn = dec2([llr, msg_vn])
-            
+
         # results must be the same, otherwise the internal state is not
         # correctly recovered
         self.assertTrue(np.allclose(res1,res2))
+
+    def test_llrmax(self):
+        """Test that llr_max can be set."""
+        k = 12
+        n = 20
+        enc = LDPC5GEncoder(k,n)
+        dec = LDPC5GDecoder(enc, hard_out=False, num_iter=0)
+
+        # test default value
+        llr_max_def = dec.llr_max.numpy() # get default value
+        x = tf.ones((1,n))*100
+        y = dec(x).numpy() # run 0 iterations
+        np.max(y)==llr_max_def
+
+        # set new llr_max
+        llr_maxs = [17., 45.3, 78]
+        for l in llr_maxs:
+            dec.llr_max = l
+            y = dec(x).numpy() # run 0 iterations
+            print(np.abs(np.max(y)-l)<1e-6)

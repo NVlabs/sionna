@@ -503,10 +503,10 @@ class TestFECUtils(unittest.TestCase):
         s = [10, 20, 30]
 
         # int inputs
-        x = tf.random.uniform(s, minval=-1000, maxval=1000, dtype=tf.int32)
+        x = tf.random.uniform(s, minval=-2**30, maxval=2**30, dtype=tf.int32)
 
         y = int_mod_2(x)
-        y_ref = tf.math.mod(tf.cast(x, tf.float32), 2.)
+        y_ref = tf.math.mod(tf.cast(x, tf.float64), 2.)
         self.assertTrue(np.array_equal(y.numpy(), y_ref.numpy()))
 
         # float inputs

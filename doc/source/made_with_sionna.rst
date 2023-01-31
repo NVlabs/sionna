@@ -9,6 +9,16 @@ List of Projects
 
 If you want your paper and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
+DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems
+*********************************************************************************
+.. made-with-sionna::
+    :title: Bit Error and Block Error Rate Training for ML-Assisted Communication
+    :authors: Reinhard Wiesmayr, Chris Dick, Jakob Hoydis, Christoph Studer
+    :year: 2022
+    :version: 0.11
+    :link_arxiv: https://arxiv.org/abs/2212.07816
+    :link_github: https://github.com/IIP-Group/DUIDD
+    :abstract: Iterative detection and decoding (IDD) is known to achieve near-capacity performance in multi-antenna wireless systems. We propose deep-unfolded interleaved detection and decoding (DUIDD), a new paradigm that reduces the complexity of IDD while achieving even lower error rates. DUIDD interleaves the inner stages of the data detector and channel decoder, which expedites convergence and reduces complexity. Furthermore, DUIDD applies deep unfolding to automatically optimize algorithmic hyperparameters, soft-information exchange, message damping, and state forwarding. We demonstrate the efficacy of DUIDD using NVIDIA's Sionna link-level simulator in a 5G-near multi-user MIMO-OFDM wireless system with a novel low-complexity soft-input soft-output data detector, an optimized low-density parity-check decoder, and channel vectors from a commercial ray-tracer. Our results show that DUIDD outperforms classical IDD both in terms of block error rate and computational complexity.
 
 Bit Error and Block Error Rate Training for ML-Assisted Communication
 *********************************************************************

@@ -248,13 +248,16 @@ class Constellation(Layer):
         assert isinstance(trainable, bool), "trainable must be boolean"
         self._trainable = trainable
 
-        assert isinstance(num_bits_per_symbol, int),\
+        # allow float inputs that represent int
+        assert isinstance(num_bits_per_symbol, (float,int)),\
             "num_bits_per_symbol must be integer"
-
+        assert (num_bits_per_symbol%1==0),\
+            "num_bits_per_symbol must be integer"
+        num_bits_per_symbol = int(num_bits_per_symbol)
 
         if self._constellation_type=="qam":
             assert num_bits_per_symbol%2 == 0 and num_bits_per_symbol>0,\
-                "num_bits_per_symbol must be a mutliple of 2"
+                "num_bits_per_symbol must be a multiple of 2"
             self._num_bits_per_symbol = int(num_bits_per_symbol)
 
             assert initial_value is None, "QAM must not have an initial value"
@@ -574,8 +577,8 @@ class SymbolLogits2LLRs(Layer):
 
     prior : [num_bits_per_symbol] or [...n, num_bits_per_symbol], tf.float
         Prior for every bit as LLRs.
-        It can be provided either as a tensor of shape `[num_bits_per_symbol]` for the
-        entire input batch, or as a tensor that is "broadcastable"
+        It can be provided either as a tensor of shape `[num_bits_per_symbol]`
+        for the entire input batch, or as a tensor that is "broadcastable"
         to `[..., n, num_bits_per_symbol]`.
         Only required if the ``with_prior`` flag is set.
 

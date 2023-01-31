@@ -129,7 +129,7 @@ class TestCRC(unittest.TestCase):
         re-encoding always yields a valid CRC.
         """
 
-        shapes = [[100, 10], [50, 3, 3], [100, 2, 3, 4, 100]]
+        shapes = [[100, 10], [50, 3, 3], [100, 2, 3, 4, 100], [1,int(1e6)]]
         source = BinarySource()
 
         for pol in VALID_POLS:

@@ -224,21 +224,6 @@ class LDPCBPDecoder(Layer):
             If the shape of ``pcm`` is invalid or contains other values than
             `0` or `1` or dtype is not `tf.float32`.
 
-        AssertionError
-            If ``trainable`` is not `bool`.
-
-        AssertionError
-            If ``track_exit`` is not `bool`.
-
-        AssertionError
-            If ``hard_out`` is not `bool`.
-
-        AssertionError
-            If ``stateful`` is not `bool`.
-
-        AssertionError
-            If ``cn_type`` is not `str`.
-
         ValueError
             If ``num_iter`` is not an integer greater (or equal) `0`.
 
@@ -328,7 +313,7 @@ class LDPCBPDecoder(Layer):
         # clipping value for the atanh function is applied (tf.float32 is used)
         self._atanh_clip_value = 1 - 1e-7
         # internal value for llr clipping
-        self._llr_max = 20
+        self._llr_max = tf.constant(20., tf.float32)
 
         # init code parameters
         self._num_cns = pcm.shape[0] # total number of check nodes
@@ -443,6 +428,17 @@ class LDPCBPDecoder(Layer):
         assert isinstance(num_iter, int), 'num_iter must be int.'
         assert num_iter>=0, 'num_iter cannot be negative.'
         self._num_iter = tf.constant(num_iter, dtype=tf.int32)
+
+    @property
+    def llr_max(self):
+        """Max LLR value used for internal calculations and rate-matching."""
+        return self._llr_max
+
+    @llr_max.setter
+    def llr_max(self, value):
+        """Max LLR value used for internal calculations and rate-matching."""
+        assert value>=0, 'llr_max cannot be negative.'
+        self._llr_max = tf.cast(value, dtype=tf.float32)
 
     def show_weights(self, size=7):
         """Show histogram of trainable weights.
@@ -1212,8 +1208,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
         assert isinstance(return_infobits, bool), 'return_info must be bool.'
         self._return_infobits = return_infobits
 
-        self._llr_max = 20 # internal max value for LLR initialization
-
         assert isinstance(output_dtype, tf.DType), \
                                 'output_dtype must be tf.DType.'
         if output_dtype not in (tf.float16, tf.float32, tf.float64):
@@ -1258,8 +1252,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
             # no pruning; same length as before
             self._n_pruned = encoder._n_ldpc
 
-
-
         super().__init__(pcm,
                          trainable,
                          cn_type,
@@ -1273,11 +1265,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
     #########################################
     # Public methods and properties
     #########################################
-
-    @property
-    def llr_max(self):
-        """Max LLR value used for rate-matching."""
-        return self._llr_max
 
     @property
     def encoder(self):
@@ -1380,7 +1367,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
                       [batch_size, nb_par_bits])
 
         # negative sign due to logit definition
-        z = -self._llr_max * tf.ones([batch_size, k_filler], self._output_dtype)
+        z = -tf.cast(self._llr_max, self._output_dtype) \
+            * tf.ones([batch_size, k_filler], self._output_dtype)
 
         llr_5g = tf.concat([x1, z, x2], 1)
 

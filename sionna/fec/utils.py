@@ -1449,9 +1449,9 @@ def int_mod_2(x):
 
     """
 
-    x_int8 = tf.cast(x, tf.int8)
-    y_int8 = tf.bitwise.bitwise_and(x_int8, tf.constant(1, tf.int8))
-    return tf.cast(y_int8, x.dtype)
+    x_int32 = tf.cast(x, tf.int32)
+    y_int32 = tf.bitwise.bitwise_and(x_int32, tf.constant(1, tf.int32))
+    return tf.cast(y_int32, x.dtype)
 
 ###########################################################
 # Deprecated aliases that will not be included in the next
