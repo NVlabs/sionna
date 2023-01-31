@@ -288,19 +288,14 @@ class SSFM(Layer):
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
-                    tf.sqrt(
-                        step_noise
-                    ),
-
+                    tf.sqrt(step_noise),
                     self._rdtype),
                 tf.random.normal(
                     q.shape,
                     tf.cast(0.0, self._rdtype),
-                    tf.sqrt(
-                        step_noise
-                    ),
-                    self._rdtype
-                )
+                    tf.sqrt(step_noise),
+                    self._rdtype)
+            )
             q = q + q_n
 
         return q
