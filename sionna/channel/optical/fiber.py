@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Author: Tim Alexander Uhlemann <uhlemann@ieee.org>
@@ -19,7 +19,7 @@ class SSFM(Layer):
     # pylint: disable=line-too-long
     r"""SSFM(alpha=0.046,beta_2=-21.67,f_c=193.55e12,gamma=1.27,half_window_length=0,length=80,n_ssfm=1,n_sp=1.0,sample_duration=1.0,t_norm=1e-12,with_amplification=False,with_attenuation=True,with_dispersion=True,with_manakov=False,with_nonlinearity=True,swap_memory=True,dtype=tf.complex64,**kwargs)
 
-    Layer implementing the split-step Fourier method (SSFM).
+    Layer implementing the split-step Fourier method (SSFM)
 
     The SSFM (first mentioned in [HT1973]_) numerically solves the generalized
     nonlinear Schrödinger equation (NLSE)
@@ -37,12 +37,12 @@ class SSFM(Layer):
 
     for dual polarization, with attenuation coefficient :math:`\alpha`, group
     velocity dispersion parameters :math:`\beta_2`, and nonlinearity
-    coefficient :math:`\gamma`. The noise term :math:`n(n_{\text{sp}};\,t,\,z)`
-    and :math:`\mathbf{n}(n_{\text{sp}};\,t,\,z)`, respectively, stems from
+    coefficient :math:`\gamma`. The noise terms :math:`n(n_{\text{sp}};\,t,\,z)`
+    and :math:`\mathbf{n}(n_{\text{sp}};\,t,\,z)`, respectively, stem from
     an (optional) ideally distributed Raman amplification with
     spontaneous emission factor :math:`n_\text{sp}`. The optical signal
     :math:`E(t,\,z)` has the unit :math:`\sqrt{\text{W}}`. For the dual
-    polarized case :math:`\mathbf{E}(t,\,z)=(E_x(t,\,z), E_y(t,\,z))`
+    polarized case, :math:`\mathbf{E}(t,\,z)=(E_x(t,\,z), E_y(t,\,z))`
     is a vector consisting of the signal components of both polarizations.
 
     The symmetrized SSFM is applied according to Eq. (7) of [FMF1976]_ that
@@ -58,8 +58,8 @@ class SSFM(Layer):
     respectively [A2012]_.
 
     Additionally, ideally distributed Raman amplification may be applied, which
-    is implemented as in [MFFP2009]_. **Note** that, currently, the implemented
-    Raman amplification will always result in a transparent fiber link. Hence,
+    is implemented as in [MFFP2009]_. Please note that the implemented
+    Raman amplification currently results in a transparent fiber link. Hence,
     the introduced gain cannot be parametrized.
 
     The SSFM operates on normalized time :math:`T_\text{norm}`
@@ -68,18 +68,15 @@ class SSFM(Layer):
     (e.g., :math:`L_\text{norm}=1\,\text{km}=1\cdot 10^{3}\,\text{m}`).
     Hence, all parameters as well as the signal itself have to be given with the
     same unit prefix for the
-    same unit (e.g., always pico for time, or kilo for distance). **Note**
-    that, despite the normalization, the SSFM is implemented with physical
+    same unit (e.g., always pico for time, or kilo for distance). Despite the normalization,
+    the SSFM is implemented with physical
     units, which is different from the normalization, e.g., used for the
-    nonlinear Fourier transform. For simulations only :math:`T_\text{norm}` has to be
+    nonlinear Fourier transform. For simulations, only :math:`T_\text{norm}` has to be
     provided.
 
-    To avoid reflections at the signal boundaries during simulation a Hamming
-    window can be applied in each SSFM-step, of which the length can be
+    To avoid reflections at the signal boundaries during simulation, a Hamming
+    window can be applied in each SSFM-step, whose length can be
     defined by ``half_window_length``.
-
-    This class inherits from the Keras `Layer` class and can be used as layer in
-    a Keras model.
 
     Example
     --------
@@ -111,62 +108,71 @@ class SSFM(Layer):
     ----------
         alpha : float
             Attenuation coefficient :math:`\alpha` in :math:`(1/L_\text{norm})`.
+            Defaults to 0.046.
 
         beta_2 : float
             Group velocity dispersion coefficient :math:`\beta_2` in :math:`(T_\text{norm}^2/L_\text{norm})`.
+            Defaults to -21.67
 
         f_c : float
             Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`.
+            Defaults to 193.55e12.
 
         gamma : float
             Nonlinearity coefficient :math:`\gamma` in :math:`(1/L_\text{norm}/\text{W})`.
+            Defaults to 1.27.
 
         half_window_length : int
-            Half of the Hamming window length.
+            Half of the Hamming window length. Defaults to 0.
 
         length : float
             Fiber length :math:`\ell` in :math:`(L_\text{norm})`.
+            Defaults to 80.0.
 
         n_ssfm : int
             Number of steps :math:`N_\mathrm{SSFM}`.
+            Defaults to 1.
 
         n_sp : float
             Spontaneous emission factor :math:`n_\mathrm{sp}` of Raman amplification.
+            Defaults to 1.0.
 
         sample_duration : float
             Normalized time step :math:`\Delta_t` in :math:`(T_\text{norm})`.
+            Defaults to 1.0.
 
         t_norm : float
             Time normalization :math:`T_\text{norm}` in :math:`(\text{s})`.
-
-        with_attenuation : bool
-            Enable attenuation. Defaults to True.
+            Defaults to 1e-12.
 
         with_amplification : bool
             Enable ideal inline amplification and corresponding
-            noise. Defaults to False.
+            noise. Defaults to `False`.
+
+        with_attenuation : bool
+            Enable attenuation. Defaults to `True`.
 
         with_dispersion : bool
-            Apply chromatic dispersion. Defaults to True.
+            Apply chromatic dispersion. Defaults to `True`.
 
         with_manakov : bool
             Considers axis [-2] as x- and y-polarization and calculates the
-            nonlinear step as given by the Manakov equation. Defaults to False.
+            nonlinear step as given by the Manakov equation. Defaults to `False.`
 
         with_nonlinearity : bool
-            Apply Kerr nonlinearity. Defaults to True.
+            Apply Kerr nonlinearity. Defaults to `True`.
 
         swap_memory : bool
-            Use CPU memory for while loop. Defaults to True.
+            Use CPU memory for while loop. Defaults to `True`.
 
-        dtype : Complex tf.DType
+        dtype : tf.complex
             Defines the datatype for internal calculations and the output
             dtype. Defaults to `tf.complex64`.
 
     Input
     -----
         x : [...,n] or [...,2,n], tf.complex
-            Input signal in :math:`(\sqrt{\text{W}})`. If ``with_manakov``=True,
+            Input signal in :math:`(\sqrt{\text{W}})`. If ``with_manakov`` is `True`,
             the second last dimension is interpreted as x- and y-polarization,
             respectively.
 
