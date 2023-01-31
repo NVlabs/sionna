@@ -18,7 +18,7 @@ from sionna.channel import utils
 class SSFM(Layer):
     # pylint: disable=line-too-long
     r"""SSFM(alpha=0.046,beta_2=-21.67,f_c=193.55e12,gamma=1.27,half_window_length=0,length=80,n_ssfm=1,n_sp=1.0,sample_duration=1.0,t_norm=1e-12,with_amplification=False,with_attenuation=True,with_dispersion=True,with_manakov=False,with_nonlinearity=True,swap_memory=True,dtype=tf.complex64,**kwargs)
-             
+
     Layer implementing the split-step Fourier method (SSFM).
 
     The SSFM (first mentioned in [HT1973]_) numerically solves the generalized
@@ -194,7 +194,7 @@ class SSFM(Layer):
                  swap_memory=True,
                  dtype=tf.complex64,
                  **kwargs):
-                 
+
         super().__init__(dtype=dtype, **kwargs)
 
         self._dtype = dtype

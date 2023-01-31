@@ -14,7 +14,7 @@ import sionna
 
 class EDFA(Layer):
     # pylint: disable=line-too-long
-    r"""EDFA(g,f=7.0,f_c=193.55e12,dt=1e-12,with_dual_polarization=False,dtype=tf.complex64,**kwargs)
+    r"""EDFA(g=4.0,f=7.0,f_c=193.55e12,dt=1e-12,with_dual_polarization=False,dtype=tf.complex64,**kwargs)
 
     Layer implementing a model of an Erbium-Doped Fiber Amplifier
 
@@ -81,22 +81,24 @@ class EDFA(Layer):
     Parameters
     ----------
         g : float
-            Amplifier gain (linear domain)
+            Amplifier gain (linear domain). Defaults to 4.0.
 
         f : float
-            Noise figure (linear domain)
+            Noise figure (linear domain). Defaults to 7.0.
 
         f_c : float
-            Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`
+            Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`.
+            Defaults to 193.55e12.
 
         dt : float
-            Time step :math:`\Delta_t` in :math:`(\text{s})`
+            Time step :math:`\Delta_t` in :math:`(\text{s})`.
+            Defaults to 1e-12.
 
         with_dual_polarization : bool
             Considers axis [-2] as x- and y-polarization and applies the noise
-            per polarization. Defaults to False.
+            per polarization. Defaults to `False`.
 
-        dtype : Complex tf.DType
+        dtype : tf.complex
             Defines the datatype for internal calculations and the output
             dtype. Defaults to `tf.complex64`.
 
@@ -114,12 +116,12 @@ class EDFA(Layer):
             self,
             g=4.0,
             f=7.0,
-            f_c=193.55e12,            
+            f_c=193.55e12,
             dt=1e-12,
-            with_dual_polarization=False,            
+            with_dual_polarization=False,
             dtype=tf.complex64,
             **kwargs):
-            
+
         super().__init__(dtype=dtype, **kwargs)
 
         self._dtype = dtype
@@ -130,7 +132,7 @@ class EDFA(Layer):
         self._f = tf.cast(f, self._rdtype)
         self._f_c = tf.cast(f_c, self._rdtype)
         self._dt = tf.cast(dt, self._rdtype)
-        
+
         assert isinstance(with_dual_polarization, bool), \
                             "with_dual_polarization must be bool."
         self._with_dual_polarization = with_dual_polarization
@@ -153,7 +155,6 @@ class EDFA(Layer):
 
         if self._with_dual_polarization:
             self._p_n_ase = self._p_n_ase / tf.cast(2.0, self._rdtype)
-
 
     def call(self, inputs):
         if self._with_dual_polarization:
