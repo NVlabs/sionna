@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Author: Tim Alexander Uhlemann <uhlemann@ieee.org>
@@ -14,7 +14,7 @@ import sionna
 
 class EDFA(Layer):
     # pylint: disable=line-too-long
-    r"""EDFA(g, f, f_c, dt, dtype=tf.complex64, **kwargs)
+    r"""EDFA(g=4.0,f=7.0,f_c=193.55e12,dt=1e-12,with_dual_polarization=False,dtype=tf.complex64,**kwargs)
 
     Layer implementing a model of an Erbium-Doped Fiber Amplifier
 
@@ -22,18 +22,18 @@ class EDFA(Layer):
     amplified spontaneous emission (ASE) noise.
 
     The noise figure including the noise due to beating of signal and
-    spontaneous emission only is :math:`F_\mathrm{ASE,shot} =\frac{\mathrm{SNR}
+    spontaneous emission is :math:`F_\mathrm{ASE,shot} =\frac{\mathrm{SNR}
     _\mathrm{in}}{\mathrm{SNR}_\mathrm{out}}`,
     where ideally the detector is limited by shot noise only, and
-    :math:`\text{SNR}` is the signal to noise ratio. Shot noise is
-    neglected here but is required to derive the noise power of the amplifier,
-    as otherwise the input SNR is infinitely large. Hence, for the input SNR
+    :math:`\text{SNR}` is the signal-to-noise-ratio. Shot noise is
+    neglected here but is required to derive the noise power of the amplifier, as
+    otherwise the input SNR is infinitely large. Hence, for the input SNR,
     it follows [A2012]_ that
-    :math:`\mathrm{SNR}_\mathrm{in}=\frac{P}{2hf_cW}` where :math:`h` denotes
-    Planck's constant, :math:`P` is the signal power and :math:`W` the
+    :math:`\mathrm{SNR}_\mathrm{in}=\frac{P}{2hf_cW}`, where :math:`h` denotes
+    Planck's constant, :math:`P` is the signal power, and :math:`W` the
     considered bandwidth.
     The output SNR is decreased by ASE noise induced by the amplification.
-    Note that, shot noise is applied after the amplifier and is hence not
+    Note that shot noise is applied after the amplifier and is hence not
     amplified. It results that :math:`\mathrm{SNR}_\mathrm{out}=\frac{GP}{\left
     (4\rho_\mathrm{ASE}+2hf_c\right)W}`, where :math:`G` is the
     parametrized gain.
@@ -42,19 +42,20 @@ class EDFA(Layer):
     Dropping shot noise again results in :math:`F = 2 n_\mathrm{sp} \left(1-G^
     {-1}\right)=2 n_\mathrm{sp} \frac{G-1}{G}`.
 
-    For, e.g., a transparent link, the required gain per span is :math:`G =
+    For a transparent link, e.g., the required gain per span is :math:`G =
     \exp\left(\alpha \ell \right)`.
-    The spontaneous emission factor calculates as :math:`n_\mathrm{sp}=\frac{F}
+    The spontaneous emission factor is :math:`n_\mathrm{sp}=\frac{F}
     {2}\frac{G}{G-1}`.
-    According to [A2012]_, [EKWFG2010]_ combined with [BGT2000]_, and [GD1991]_,
-    for the noise power spectral density of the EDFA per state of
-    polarization one obtains :math:`\rho_\mathrm{ASE}^{(1)} = n_\mathrm{sp}\left
+    According to [A2012]_ and [EKWFG2010]_ combined with [BGT2000]_ and [GD1991]_,
+    the noise power spectral density of the EDFA per state of
+    polarization is obtained as :math:`\rho_\mathrm{ASE}^{(1)} = n_\mathrm{sp}\left
     (G-1\right) h f_c=\frac{1}{2}G F h f_c`.
-    At simulation frequency :math:`f_\mathrm{sim}` the noise has a power of
+    At simulation frequency :math:`f_\mathrm{sim}`, the noise has a power of
     :math:`P_\mathrm{ASE}^{(1)}=\sigma_\mathrm{n,ASE}^2=2\rho_\mathrm{ASE}^{(1)}
-    \cdot f_\mathrm{sim}`
-    where the factor :math:`2` accounts for the unpolarized noise.
-    Here the :math:`()^{(1)}` means that this is the noise introduced by a
+    \cdot f_\mathrm{sim}`,
+    where the factor :math:`2` accounts for the unpolarized noise (for dual
+    polarization the factor is :math:`1` per polarization).
+    Here, the notation :math:`()^{(1)}` means that this is the noise introduced by a
     single EDFA.
 
     This class inherits from the Keras `Layer` class and can be used as layer in
@@ -65,10 +66,12 @@ class EDFA(Layer):
 
     Setting-up:
 
-    >>> edfa = EDFA(g=4.0,
-    >>>             f=2.0,
-    >>>             f_c=193.55e12,
-    >>>             dt=1.0e-12)
+    >>> edfa = EDFA(
+    >>>     g=4.0,
+    >>>     f=2.0,
+    >>>     f_c=193.55e12,
+    >>>     dt=1.0e-12,
+    >>>     with_dual_polarization=False)
 
     Running:
 
@@ -78,18 +81,24 @@ class EDFA(Layer):
     Parameters
     ----------
         g : float
-            Amplifier gain (linear domain)
+            Amplifier gain (linear domain). Defaults to 4.0.
 
         f : float
-            Noise figure (linear domain)
+            Noise figure (linear domain). Defaults to 7.0.
 
         f_c : float
-            Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`
+            Carrier frequency :math:`f_\mathrm{c}` in :math:`(\text{Hz})`.
+            Defaults to 193.55e12.
 
         dt : float
-            Time step :math:`\Delta_t` in :math:`(\text{s})`
+            Time step :math:`\Delta_t` in :math:`(\text{s})`.
+            Defaults to 1e-12.
 
-        dtype : Complex tf.DType
+        with_dual_polarization : bool
+            Considers axis [-2] as x- and y-polarization and applies the noise
+            per polarization. Defaults to `False`.
+
+        dtype : tf.complex
             Defines the datatype for internal calculations and the output
             dtype. Defaults to `tf.complex64`.
 
@@ -103,7 +112,16 @@ class EDFA(Layer):
         y : Tensor with same shape as ``x``, ``dtype``
             Amplifier output
     """
-    def __init__(self, g, f, f_c, dt, dtype=tf.complex64, **kwargs):
+    def __init__(
+            self,
+            g=4.0,
+            f=7.0,
+            f_c=193.55e12,
+            dt=1e-12,
+            with_dual_polarization=False,
+            dtype=tf.complex64,
+            **kwargs):
+
         super().__init__(dtype=dtype, **kwargs)
 
         self._dtype = dtype
@@ -114,6 +132,10 @@ class EDFA(Layer):
         self._f = tf.cast(f, self._rdtype)
         self._f_c = tf.cast(f_c, self._rdtype)
         self._dt = tf.cast(dt, self._rdtype)
+
+        assert isinstance(with_dual_polarization, bool), \
+                            "with_dual_polarization must be bool."
+        self._with_dual_polarization = with_dual_polarization
 
         # Spontaneous emission factor
         if self._g == 1.0:
@@ -131,7 +153,13 @@ class EDFA(Layer):
             2.0, self._rdtype) * self._rho_n_ase * tf.cast(
             1.0, self._rdtype) / (self._dt)  # Noise power in (W)
 
+        if self._with_dual_polarization:
+            self._p_n_ase = self._p_n_ase / tf.cast(2.0, self._rdtype)
+
     def call(self, inputs):
+        if self._with_dual_polarization:
+            tf.assert_equal(tf.shape(inputs)[-2], 2)
+
         x = tf.cast(inputs, self._cdtype)
 
         # Calculate noise signal with given noise power
