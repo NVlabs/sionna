@@ -229,10 +229,11 @@ class SSFM(Layer):
             self._n_ssfm = tf.cast(n_ssfm, dtype=tf.int32)
             # Precalculate uniform step size
             tf.assert_greater(self._n_ssfm, 0)
-            self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
         else:
             raise ValueError("Unsupported parameter for n_ssfm. Either an integer or 'adaptive'.")
 
+        # only used for constant step width -> negative value calculated with adaptive step widths can be ignored
+        self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
         self._n_sp = tf.cast(n_sp, dtype=self._rdtype)
         self._swap_memory = swap_memory
         self._t_norm = tf.cast(t_norm, dtype=self._rdtype)
