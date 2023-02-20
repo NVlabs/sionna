@@ -657,7 +657,6 @@ class TestOptical(unittest.TestCase):
             'incorrect_adaptive_ssfm_amplification_noise_for_dual_polarization'
         )
 
-
     def test_edfa_noise(self):
         F = 10 ** (6 / 10)
         G = 2.0
@@ -683,7 +682,6 @@ class TestOptical(unittest.TestCase):
             np.abs((P_n_ASE - sigma_n_ASE_square) / P_n_ASE), 1e-2,
             'incorrect_edfa_noise'
         )
-
 
     def test_edfa_noise_graph(self):
         F = 10 ** (6 / 10)
@@ -788,4 +786,3 @@ class TestOptical(unittest.TestCase):
         self.assertLessEqual(
             np.abs(G - p), 1e-5,
             'incorrect_edfa_gain_for_batch_graph_dual_polarization_combination')
-

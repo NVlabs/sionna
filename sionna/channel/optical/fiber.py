@@ -129,7 +129,7 @@ class SSFM(Layer):
             Fiber length :math:`\ell` in :math:`(L_\text{norm})`.
             Defaults to 80.0.
 
-        n_ssfm : int
+        n_ssfm : int | "adaptive"
             Number of steps :math:`N_\mathrm{SSFM}`.
             Set to "adaptive" to use nonlinear-phase rotation to calculate
             the step widths adaptively (maxmimum rotation can be set in phase_inc).
@@ -164,9 +164,9 @@ class SSFM(Layer):
         with_nonlinearity : bool
             Apply Kerr nonlinearity. Defaults to `True`.
 
-        phase_inc:
+        phase_inc: float
             Maximum nonlinear-phase rotation in rad allowed during simulation.
-            To be used with n_ssfm="adaptive".
+            To be used with ``n_ssfm`` = "adaptive".
             Defaults to 1e-4.
 
         swap_memory : bool
@@ -230,9 +230,11 @@ class SSFM(Layer):
             # Precalculate uniform step size
             tf.assert_greater(self._n_ssfm, 0)
         else:
-            raise ValueError("Unsupported parameter for n_ssfm. Either an integer or 'adaptive'.")
+            raise ValueError("Unsupported parameter for n_ssfm. \
+                              Either an integer or 'adaptive'.")
 
-        # only used for constant step width -> negative value calculated with adaptive step widths can be ignored
+        # only used for constant step width -> negative value calculated
+        # with adaptive step widths can be ignored
         self._dz = self._length / tf.cast(self._n_ssfm, dtype=self._rdtype)
         self._n_sp = tf.cast(n_sp, dtype=self._rdtype)
         self._swap_memory = swap_memory
@@ -436,8 +438,6 @@ class SSFM(Layer):
 
         # constant step size
         else:
-
-
             # Spatial step size
             dz = tf.cast(self._dz, dtype=self._rdtype)
 
