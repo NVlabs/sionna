@@ -76,6 +76,41 @@ class TestOptical(unittest.TestCase):
             1e-7, 'incorrect_ssfm'
         )
 
+    def test_adaptive_ssfm_reference(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        (t, f) = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
+        # Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * np.exp(-((t / T_0) ** 2.0) / 2.0)
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        ssfm = fiber.SSFM(
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive", sample_duration=dt,
+            with_amplification=False, with_attenuation=False,
+            with_dispersion=True, with_nonlinearity=True,
+            dtype=dtype, t_norm=1e-12, n_sp=1.0,phase_inc=1e-3
+        )
+
+        u = ssfm(u_0)
+
+        self.assertLessEqual(
+            np.mean((np.abs(u.numpy().flatten()) - self._u_ref.flatten()) ** 2),
+            1e-7, 'incorrect_adaptive_ssfm'
+        )
+
 
     def test_ssfm_reference_graph(self):
         dtype = self._complex_dtype
@@ -115,6 +150,46 @@ class TestOptical(unittest.TestCase):
             np.mean((np.abs(u.numpy().flatten()) - self._u_ref.flatten()) ** 2),
             1e-7,
             'incorrect_ssfm_in_graph_mode'
+        )
+
+    def test_adaptive_ssfm_reference_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        t, f = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
+        # Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * (np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        ssfm = fiber.SSFM(
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive", sample_duration=dt,
+            with_amplification=False, with_attenuation=False,
+            with_dispersion=True, with_nonlinearity=True,
+            dtype=dtype, t_norm=1e-12, n_sp=1.0, phase_inc=1e-3
+        )
+
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        self.assertLessEqual(
+            np.mean((np.abs(u.numpy().flatten()) - self._u_ref.flatten()) ** 2),
+            1e-7,
+            'incorrect_adaptive_ssfm_in_graph_mode'
         )
 
     def test_ssfm_reference_batch_graph(self):
@@ -164,6 +239,55 @@ class TestOptical(unittest.TestCase):
             np.mean((np.abs(u.numpy()) - u_ref) ** 2),
             1e-7,
             'incorrect_ssfm_batch_processing'
+        )
+
+    def test_adaptive_ssfm_reference_batch_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        t, f = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
+        # Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * (np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        u_0 = tf.expand_dims(u_0, axis=0)
+        u_0 = tf.expand_dims(u_0, axis=0)
+        u_0 = tf.tile(u_0, [2, 2, 1])
+
+        ssfm = fiber.SSFM(
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive", sample_duration=dt,
+            with_amplification=True, with_attenuation=False,
+            with_dispersion=True, with_nonlinearity=True,
+            dtype=dtype, t_norm=1e-12, n_sp=0.0, phase_inc=1e-3
+        )
+
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        u_ref = np.expand_dims(self._u_ref, axis=0)
+        u_ref = np.expand_dims(u_ref, axis=0)
+        u_ref = np.repeat(u_ref, 2, 0)
+        u_ref = np.repeat(u_ref, 2, 1)
+
+        self.assertLessEqual(
+            np.mean((np.abs(u.numpy()) - u_ref) ** 2),
+            1e-7,
+            'incorrect_adaptive_ssfm_batch_processing'
         )
 
     def test_ssfm_reference_batch_dual_polarized_graph(self):
@@ -223,6 +347,63 @@ class TestOptical(unittest.TestCase):
             'incorrect_ssfm_dual_polarized_batch_processing'
         )
 
+    def test_adaptive_ssfm_reference_batch_dual_polarized_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep
+        t, f = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        # The idea is to have the same power on the fiber by distributing
+        # the power uniformly over both polarizations, further the factor
+        # 8/9 of the Manakov equation has to be accounted for. Then dual
+        # polarized transmission should equal unpolarized tranmission.
+        P_0 = tf.constant(9/8 * 0.5, dtype=dtype.real_dtype)  # (W) Peak power
+        # of the Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * (
+                    np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        u_0 = tf.expand_dims(u_0, axis=0)
+        u_0 = tf.expand_dims(u_0, axis=0)
+        u_0 = tf.tile(u_0, [3, 2, 1])
+
+        ssfm = fiber.SSFM(
+            alpha=0.0, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive",
+            sample_duration=dt,
+            with_amplification=False, with_attenuation=False,
+            with_dispersion=True, with_nonlinearity=True,
+            with_manakov=True,
+            dtype=dtype, t_norm=1e-12, n_sp=0.0, phase_inc=1e-3
+        )
+
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        # Remove the Manakov factor and geometrically add both polarizations
+        u = ssfm_graph((u_0)) * tf.cast(tf.sqrt(8/9), dtype)
+        u = tf.norm(u, axis=-2, keepdims=True)
+
+        u_ref = tf.expand_dims(self._u_ref, axis=0)
+        u_ref = tf.expand_dims(u_ref, axis=0)
+        u_ref = tf.tile(u_ref, [3, 1, 1])
+
+        self.assertLessEqual(
+            np.mean((np.abs(u.numpy()) - u_ref) ** 2),
+            1e-7,
+            'incorrect_adaptive_ssfm_dual_polarized_batch_processing'
+        )
+
 
     def test_ssfm_amplification_graph(self):
         dtype = self._complex_dtype
@@ -267,6 +448,49 @@ class TestOptical(unittest.TestCase):
             'incorrect_ssfm_amplification'
         )
 
+    def test_adaptive_ssfm_amplification_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        t, f = utils.time_frequency_vector(
+            N, dt, dtype=self._complex_dtype.real_dtype)
+
+        P_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (W) Peak power of the
+        # Gaussian pulse
+        T_0 = tf.constant(1.0, dtype=dtype.real_dtype)  # (ps) Norm. temporal
+        # scaling of the Gaussian pulse
+
+        u_0 = np.sqrt(P_0) * (np.sqrt(1.0) * np.exp(-((t / T_0) ** 2.0) / 2.0))
+        u_0 = tf.complex(
+            tf.cast(u_0, dtype=dtype.real_dtype),
+            tf.cast(0.0, dtype=dtype.real_dtype)
+        )
+
+        ssfm = fiber.SSFM(
+            alpha=0.046, beta_2=1.0, f_c=193.55e12, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive", sample_duration=dt,
+            with_amplification=True, with_attenuation=True,
+            with_dispersion=False, with_nonlinearity=False,
+            dtype=dtype, t_norm=1e-12, n_sp=0.0, phase_inc=1e-3
+        )
+
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        self.assertLessEqual(
+            np.mean(
+                (
+                        np.abs(u.numpy().flatten()) - np.abs(u_0.numpy().flatten())
+                ) ** 2),
+            1e-10,
+            'incorrect_adaptive_ssfm_amplification'
+        )
+
 
     def test_ssfm_amplification_noise_graph(self):
         dtype = self._complex_dtype
@@ -306,6 +530,46 @@ class TestOptical(unittest.TestCase):
         self.assertLessEqual(
             np.abs((p_n_ase - sigma_n_ASE_square) / p_n_ase), 1e-2,
             'incorrect_ssfm_amplification_noise'
+        )
+
+    def test_adaptive_ssfm_amplification_noise_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        n_sp = 1.0
+        f_c = 193.55e12
+        alpha = 0.046
+        length = 5.0
+        t_norm = 1e-12
+
+        rho_n = \
+            sn.constants.H * f_c * alpha * length * \
+            n_sp  # in (W/Hz)
+
+        # Calculate noise power depending on simulation bandwidth
+        p_n_ase = rho_n / dt / t_norm
+
+        ssfm = fiber.SSFM(
+            alpha=alpha, beta_2=1.0, f_c=f_c, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive", sample_duration=dt,
+            with_amplification=True, with_attenuation=True,
+            with_dispersion=False, with_nonlinearity=False,
+            dtype=dtype, t_norm=t_norm, n_sp=n_sp, phase_inc=1e-3
+        )
+
+        u_0 = tf.zeros((100, 10, 2000), dtype=self._complex_dtype)
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        sigma_n_ASE_square = np.mean(np.var(u.numpy(), axis=-1))
+        self.assertLessEqual(
+            np.abs((p_n_ase - sigma_n_ASE_square) / p_n_ase), 1e-2,
+            'incorrect_adaptive_ssfm_amplification_noise'
         )
 
 
@@ -351,6 +615,47 @@ class TestOptical(unittest.TestCase):
             'incorrect_ssfm_amplification_noise_for_dual_polarization'
         )
 
+    def test_adaptive_ssfm_amplification_noise_dual_polarized_graph(self):
+        dtype = self._complex_dtype
+
+        T = 100  # time window (period)
+        N = 2 ** 12  # number of points
+        dt = T / N  # timestep(dt)
+        n_sp = 1.0
+        f_c = 193.55e12
+        alpha = 0.046
+        length = 5.0
+        t_norm = 1e-12
+
+        rho_n = \
+            sn.constants.H * f_c * alpha * length * \
+            n_sp  # in (W/Hz)
+
+        # Calculate noise power depending on simulation bandwidth
+        p_n_ase = rho_n / dt / t_norm
+
+        ssfm = fiber.SSFM(
+            alpha=alpha, beta_2=1.0, f_c=f_c, gamma=1.0,
+            half_window_length=0, length=5.0, n_ssfm="adaptive", sample_duration=dt,
+            with_amplification=True, with_attenuation=True,
+            with_dispersion=False, with_nonlinearity=False,
+            with_manakov=True,
+            dtype=dtype, t_norm=t_norm, n_sp=n_sp, phase_inc=1e-3
+        )
+
+        u_0 = tf.zeros((100, 2, 2000), dtype=self._complex_dtype)
+        @tf.function
+        def ssfm_graph(inputs):
+            return ssfm(inputs)
+
+        u = ssfm_graph((u_0))
+
+        sigma_n_ASE_square = np.mean(np.var(u.numpy(), axis=-1))
+        self.assertLessEqual(
+            np.abs((0.5 * p_n_ase - sigma_n_ASE_square) / (0.5 *  p_n_ase)),
+            1e-2,
+            'incorrect_adaptive_ssfm_amplification_noise_for_dual_polarization'
+        )
 
     def test_edfa_noise(self):
         F = 10 ** (6 / 10)
@@ -377,7 +682,6 @@ class TestOptical(unittest.TestCase):
             np.abs((P_n_ASE - sigma_n_ASE_square) / P_n_ASE), 1e-2,
             'incorrect_edfa_noise'
         )
-
 
     def test_edfa_noise_graph(self):
         F = 10 ** (6 / 10)
@@ -482,4 +786,3 @@ class TestOptical(unittest.TestCase):
         self.assertLessEqual(
             np.abs(G - p), 1e-5,
             'incorrect_edfa_gain_for_batch_graph_dual_polarization_combination')
-
