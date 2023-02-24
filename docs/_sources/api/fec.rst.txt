@@ -21,7 +21,7 @@ respectively.
 
 *Remark*: The performance of different coding scheme varies significantly with
 the choice of the exact code and decoding parameters which can be
-found in the notebook `From GSM to 5G - The Evolution of Forward Error Correction <../examples/Evolution_of_FEC.ipynb>`_. Further, the situation also changes for short length codes and results can be found in `5G Channel Coding: Polar vs. LDPC Codes <../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.ipynb>`_.
+found in the notebook `From GSM to 5G - The Evolution of Forward Error Correction <../examples/Evolution_of_FEC.html>`_. Further, the situation also changes for short length codes and results can be found in `5G Channel Coding: Polar vs. LDPC Codes <../examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.html>`_.
 
 .. figure:: ../figures/FEC_evolution.png
    :align: center

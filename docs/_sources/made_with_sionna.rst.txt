@@ -12,7 +12,7 @@ If you want your paper and code be listed here, please send an email to `sionna@
 DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems
 *********************************************************************************
 .. made-with-sionna::
-    :title: Bit Error and Block Error Rate Training for ML-Assisted Communication
+    :title: DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems
     :authors: Reinhard Wiesmayr, Chris Dick, Jakob Hoydis, Christoph Studer
     :year: 2022
     :version: 0.11
