@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 try:
@@ -217,8 +217,6 @@ class TestUtils(unittest.TestCase):
         # test that internal counter is 0
         self.assertTrue(bmi_metric.counter.numpy()==0.)
 
-
-
 class TestComplexNormal(unittest.TestCase):
     """Test cases for the complex_normal function"""
     def test_variance(self):
@@ -267,7 +265,7 @@ class TestComplexNormal(unittest.TestCase):
 
 class TestSources(unittest.TestCase):
 
-    def test_binary_source(self):        
+    def test_binary_source(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
         dtypes = [tf.int16, tf.float64, tf.complex64]
         seeds = [None, 1, 2]
@@ -286,7 +284,7 @@ class TestSources(unittest.TestCase):
                         self.assertTrue(np.array_equal(b, b2))
                         self.assertFalse(np.array_equal(b, b3))
 
-    def test_symbol_source_pam(self):        
+    def test_symbol_source_pam(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
         dtypes = [tf.complex64, tf.complex128]
         seeds = [None, 1, 2]
@@ -309,7 +307,7 @@ class TestSources(unittest.TestCase):
                             # Different seed must lead to different results
                             self.assertFalse(np.array_equal(x, x3))
 
-    def test_symbol_source_qam(self):        
+    def test_symbol_source_qam(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
         dtypes = [tf.complex64, tf.complex128]
         seeds = [None, 1, 2]
@@ -332,7 +330,7 @@ class TestSources(unittest.TestCase):
                             # Different seed must lead to different results
                             self.assertFalse(np.array_equal(x, x3))
 
-    def test_symbol_source_custom(self):        
+    def test_symbol_source_custom(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
         dtypes = [tf.complex64, tf.complex128]
         seeds = [None, 1, 2]

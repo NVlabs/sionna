@@ -326,6 +326,11 @@ cir_to_time_channel
 
 .. autofunction:: sionna.channel.cir_to_time_channel
 
+time_to_ofdm_channel
+--------------------
+
+.. autofunction:: sionna.channel.time_to_ofdm_channel
+
 .. _ofdm-waveform:
 
 Channel with OFDM waveform
@@ -347,7 +352,7 @@ the channel response at the subcarrier frequencies, i.e.,
    \widehat{h}_{u, k, v, l, s, n}
       &= \int_{-\infty}^{+\infty} h_{u, k, v, l}(s,\tau) e^{-j2\pi n \Delta_f \tau} d\tau\\
       &= \sum_{m=0}^{M-1} a_{u, k, v, l, m}(s)
-      e^{j2\pi n \Delta_f \tau_{u, k, v, l, m}}
+      e^{-j2\pi n \Delta_f \tau_{u, k, v, l, m}}
    \end{align}
 
 where :math:`s` is used as time step to indicate that the channel response can

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Utility functions and layers for the Polar code package."""
@@ -199,7 +199,7 @@ def generate_rm_code(r, m):
         x_bin = np.binary_repr(i)
         for x_i in x_bin:
             w[i] += int(x_i)
-    frozen_vec = (w < m-r)
+    frozen_vec = w < m-r
     info_vec = np.invert(frozen_vec)
     k_res = np.sum(info_vec)
     frozen_pos = np.arange(n)[frozen_vec]

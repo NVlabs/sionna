@@ -1,11 +1,13 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layers for scrambling, descrambling and utility functions."""
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
+from sionna.utils import expand_to_rank
+from sionna.nr.utils import generate_prng_seq
 
 
 class Scrambler(Layer):
@@ -123,7 +125,7 @@ class Scrambler(Layer):
 
         if dtype not in (tf.float16, tf.float32, tf.float64, tf.int8,
             tf.int32, tf.int64, tf.uint8, tf.uint16, tf.uint32):
-            raise ValueError("Unsupported dtype.")
+            raise TypeError("Unsupported dtype.")
 
         super().__init__(dtype=dtype, **kwargs)
 
@@ -255,7 +257,7 @@ class Scrambler(Layer):
             elif len(inputs)==2:
                 x, seed = inputs
             elif len(inputs)==3:
-            # allow that flag binary is explicitly provided (for descrambler)
+            # allow that is_binary flag can be explicitly provided (descrambler)
                 x, seed, is_binary = inputs
                 # is binary can be either a tensor or bool
                 if isinstance(is_binary, tf.Tensor):
@@ -300,10 +302,232 @@ class Scrambler(Layer):
             rand_seq = self._generate_scrambling(input_shape, seed)
 
         if is_binary:
-            # flipp the bits by substraction and map -1 to 1 via abs(.) operator
+            # flip the bits by subtraction and map -1 to 1 via abs(.) operator
             x_out = tf.abs(x - rand_seq)
         else:
             rand_seq_bipol = -2 * rand_seq + 1
+            x_out = tf.multiply(x, rand_seq_bipol)
+
+        return x_out
+
+class TB5GScrambler(Layer):
+    # pylint: disable=line-too-long
+    r"""TB5GScrambler(n_rnti=1, n_id=1, binary=True, channel_type="PUSCH", codeword_index=0,  dtype=tf.float32, **kwargs)
+
+    Implements the pseudo-random bit scrambling as defined in
+    [3GPPTS38211_scr]_ Sec. 6.3.1.1 for the "PUSCH" channel and in Sec. 7.3.1.1
+    for the "PDSCH" channel.
+
+    Only for the "PDSCH" channel, the scrambler can be configured for two
+    codeword transmission mode. Hereby, ``codeword_index`` corresponds to the
+    index of the codeword to be scrambled.
+
+    If ``n_rnti`` are a list of ints, the scrambler assumes that the second
+    last axis contains `len(` ``n_rnti`` `)` elements. This allows independent
+    scrambling for multiple independent streams.
+
+    The class inherits from the Keras layer class and can be used as layer in a
+    Keras model.
+
+    Parameters
+    ----------
+        n_rnti: int or list of ints
+            RNTI identifier provided by higher layer. Defaults to 1 and must be
+            in range `[0, 65335]`. If a list is provided, every list element
+            defines a scrambling sequence for multiple independent streams.
+
+        n_id: int or list of ints
+            Scrambling ID related to cell id and provided by higher layer.
+            Defaults to 1 and must be in range `[0, 1023]`. If a list is
+            provided, every list element defines a scrambling sequence for
+            multiple independent streams.
+
+        binary: bool
+            Defaults to True. Indicates whether bit-sequence should be flipped
+            (i.e., binary operations are performed) or the signs should be
+            flipped (i.e., soft-value/LLR domain-based).
+
+        channel_type: str
+            Can be either "PUSCH" or "PDSCH".
+
+        codeword_index: int
+            Scrambler can be configured for two codeword transmission.
+            ``codeword_index`` can be either 0 or 1.
+
+        dtype: tf.DType
+            Defaults to `tf.float32`. Defines the datatype for internal
+            calculations and the output dtype.
+
+    Input
+    -----
+        (x, binary):
+            Either Tuple ``(x, binary)`` or  ``x`` only
+
+        x: tf.float
+            1+D tensor of arbitrary shape. If ``n_rnti`` and ``n_id`` are a
+            list, it is assumed that ``x`` has shape
+            `[...,num_streams, n]` where `num_streams=len(` ``n_rnti`` `)`.
+
+        binary: bool
+            Overrules the init parameter `binary` iff explicitly given.
+            Indicates whether bit-sequence should be flipped
+            (i.e., binary operations are performed) or the signs should be
+            flipped (i.e., soft-value/LLR domain-based).
+
+    Output
+    ------
+        : tf.float
+            1+D tensor of same shape as ``x``.
+
+    Note
+    ----
+        The parameters radio network temporary identifier (RNTI) ``n_rnti`` and
+        the datascrambling ID ``n_id`` are usually provided be the higher layer protocols.
+
+        For inverse scrambling, the same scrambler can be re-used (as the values
+        are flipped again, i.e., result in the original state).
+    """
+    def __init__(self,
+                 n_rnti=1,
+                 n_id=1,
+                 binary=True,
+                 channel_type="PUSCH",
+                 codeword_index=0,
+                 dtype=tf.float32,
+                 **kwargs):
+
+        if dtype not in (tf.float16, tf.float32, tf.float64, tf.int8,
+            tf.int32, tf.int64, tf.uint8, tf.uint16, tf.uint32):
+            raise TypeError("Unsupported dtype.")
+
+        super().__init__(dtype=dtype, **kwargs)
+
+        assert isinstance(binary, bool), "binary must be bool."
+        assert channel_type in ("PDSCH", "PUSCH"), "Unsupported channel_type."
+        assert(codeword_index in (0, 1)), "codeword_index must be 0 or 1."
+
+        self._binary = binary
+        self._check_input = True
+        self._input_shape = None
+
+        # allow list input for independent multi-stream scrambling
+        if isinstance(n_rnti, (list, tuple)):
+            assert isinstance(n_id, (list, tuple)), \
+                                "n_id must be a list of same length as n_rnti."
+
+            assert len(n_rnti)==len(n_id), \
+                        "n_rnti and n_id must be of same length."
+
+            self._multi_stream = True
+        else:
+            n_rnti = [n_rnti]
+            n_id = [n_id]
+            self._multi_stream = False
+
+        # check all entries for consistency
+        for idx, (nr, ni) in enumerate(zip(n_rnti, n_id)):
+            # allow floating inputs, but verify that it represent an int value
+            assert(nr%1==0), "n_rnti must be integer."
+            assert nr in range(2**16), "n_rnti must be in [0, 65535]."
+            n_rnti[idx] = int(nr)
+            assert(ni%1==0), "n_rnti must be integer."
+            assert ni in range(2**10), "n_id must be in [0, 1023]."
+            n_id[idx] = int(ni)
+
+        self._c_init = []
+        if channel_type=="PUSCH":
+            # defined in 6.3.1.1 in 38.211
+            for nr, ni in zip(n_rnti, n_id):
+                self._c_init += [nr * 2**15 + ni]
+        elif channel_type =="PDSCH":
+            # defined in 7.3.1.1 in 38.211
+            for nr, ni in zip(n_rnti, n_id):
+                self._c_init += [nr * 2**15 + codeword_index * 2**14 + ni]
+
+    #########################################
+    # Public methods and properties
+    #########################################
+
+    @property
+    def keep_state(self):
+        """Required for descrambler, is always `True` for the TB5GScrambler."""
+        return True
+
+    #########################
+    # Utility methods
+    #########################
+
+    def _generate_scrambling(self, input_shape):
+        r"""Returns random sequence of `0`s and `1`s following
+        [3GPPTS38211_scr]_ ."""
+
+        seq = generate_prng_seq(input_shape[-1], self._c_init[0])
+        seq = tf.constant(seq, self.dtype) # enable flexible dtypes
+        seq = expand_to_rank(seq, len(input_shape), axis=0)
+
+        if self._multi_stream:
+            for c in self._c_init[1:]:
+                s = generate_prng_seq(input_shape[-1], c)
+                s = tf.constant(s, self.dtype) # enable flexible dtypes
+                s = expand_to_rank(s, len(input_shape), axis=0)
+                seq = tf.concat([seq, s], axis=-2)
+
+        return seq
+
+    #########################
+    # Keras layer functions
+    #########################
+
+    def build(self, input_shape):
+        """Initialize pseudo-random scrambling sequence."""
+
+        # input can be also a list, we are only interested in the shape of x
+        if isinstance(input_shape, (tuple)):
+            if len(input_shape)==1: # if user wants to call with call([x])
+                input_shape = input_shape(0)
+            elif len(input_shape)==2:
+                # allow that flag binary is explicitly provided (descrambler)
+                input_shape, _ = input_shape
+        self._input_shape = input_shape
+
+        # in multi-stream mode, the axis=-2 must have dimension=len(c_init)
+        if self._multi_stream:
+            assert input_shape[-2]==len(self._c_init), \
+                "Dimension of axis=-2 must be equal to len(n_rnti)."
+
+        self._sequence = self._generate_scrambling(input_shape)
+
+    def call(self, inputs):
+        r"""This function returns the scrambled version of ``inputs``.
+        """
+        is_binary = self._binary # can be overwritten if explicitly provided
+
+        if isinstance(inputs, (tuple, list)):
+            if len(inputs)==1: # if user wants to call with call([x])
+                x, = inputs
+            elif len(inputs)==2:
+                # allow that binary flag is explicitly provided (descrambler)
+                x, is_binary = inputs
+                # is_binary can be either a tensor or bool
+                if isinstance(is_binary, tf.Tensor):
+                    if not is_binary.dtype.is_bool:
+                        raise TypeError("binary must be bool.")
+                else: # is boolean
+                    assert isinstance(is_binary.dtype, bool), \
+                    "binary must be bool."
+            else:
+                raise TypeError("inputs cannot have more than 3 entries.")
+        else:
+            x = inputs
+
+        if not x.shape[-1]==self._input_shape:
+            self.build((x.shape))
+
+        if is_binary:
+            # flip the bits by subtraction and map -1 to 1 via abs(.) operator
+            x_out = tf.abs(x - self._sequence)
+        else:
+            rand_seq_bipol = -2 * self._sequence + 1
             x_out = tf.multiply(x, rand_seq_bipol)
 
         return x_out
@@ -318,8 +542,9 @@ class Descrambler(Layer):
 
     Parameters
     ----------
-        scrambler: Scrambler
-            Associated :class:`~sionna.fec.scrambling.Scrambler` instance which
+        scrambler: Scrambler, TB5GScrambler
+            Associated :class:`~sionna.fec.scrambling.Scrambler` or
+            :class:`~sionna.fec.scrambling.TB5GScrambler` instance which
             should be descrambled.
 
         binary: bool
@@ -370,7 +595,7 @@ class Descrambler(Layer):
                  dtype=None,
                  **kwargs):
 
-        assert isinstance(scrambler, Scrambler), \
+        assert isinstance(scrambler, (Scrambler, TB5GScrambler)), \
             "scrambler must be an instance of Scrambler."
         self._scrambler = scrambler
 
@@ -436,14 +661,26 @@ class Descrambler(Layer):
             AssertionError: If ``seed`` is not `None` or `int`.
         """
 
-        if isinstance(inputs, (tuple, list)):
-            if len(inputs)>2:
-                raise TypeError("inputs cannot have more than 2 entries.")
-            else: # seed explicitly given
-                inputs.append(self._binary)
-        else: # seed not given
-            s = self._scrambler.seed # use seed from associated scrambler
-            inputs = (inputs, s, self._binary)
+        # Scrambler
+        if isinstance(self._scrambler, Scrambler):
+            if isinstance(inputs, (tuple, list)):
+                if len(inputs)>2:
+                    raise TypeError("inputs cannot have more than 2 entries.")
+                else: # seed explicitly given
+                    inputs.append(self._binary)
+            else: # seed not given
+                s = self._scrambler.seed # use seed from associated scrambler
+                inputs = (inputs, s, self._binary)
+        elif isinstance(self._scrambler, TB5GScrambler):
+            if isinstance(inputs, (tuple, list)):
+                if len(inputs)>1:
+                    raise TypeError("inputs cannot have more than 1 entries.")
+                else: # seed explicitly given
+                    inputs.append(self._binary)
+            else: # not list as input
+                inputs = (inputs, self._binary)
+        else:
+            raise TypeError("Unknown Scrambler type.")
 
         x_out = self._scrambler(inputs)
 

@@ -2,7 +2,6 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Author: Tim Alexander Uhlemann <uhlemann@ieee.org>
 
 """
 This module defines the split-step Fourier method to approximate the solution of

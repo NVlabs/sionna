@@ -48,7 +48,7 @@ The following code snippet shows how to setup and visualize an instance of
                      pilot_ofdm_symbol_indices = [2, 11])
    rg.show();
 
-.. image:: ../figures/resource-grid.png
+.. image:: ../figures/resource_grid.png
 
 This code creates a resource grid consisting of 14 OFDM symbols with 64
 subcarriers. The first five and last six subcarriers as well as the DC
@@ -153,8 +153,9 @@ carriers or a nulled DC carrier, this number can be smaller than the
    pp.show(show_pilot_ind=True);
 
 .. image:: ../figures/pilot_pattern.png
+.. image:: ../figures/pilot_pattern_2.png
 
-As shown in the figure above, the pilots are mapped onto the mask from
+As shown in the figures above, the pilots are mapped onto the mask from
 the smallest effective subcarrier and OFDM symbol index to the highest
 effective subcarrier and OFDM symbol index. Here, boths stream have 24
 pilot symbols, out of which only 12 are nonzero. It is important to keep

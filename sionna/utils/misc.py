@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Miscellaneous utility functions of the Sionna package."""
@@ -777,7 +777,6 @@ def complex_normal(shape, var=1.0, dtype=tf.complex64):
 
     return x
 
-
 ###########################################################
 # Deprecated aliases that will not be included in the next
 # major release
@@ -799,3 +798,5 @@ def empirical_psd(x, show=True, oversampling=1.0, ylim=(-30,3)):
     print(  "Warning: The alias utils.empirical_psd will not be included in"
             " Sionna 1.0. Please use signal.empirical_psd instead.")
     return signal.empirical_psd(x, show, oversampling, ylim)
+
+

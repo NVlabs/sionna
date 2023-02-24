@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Channel sub-package of the Sionna library"""
@@ -21,4 +21,4 @@ from .time_channel import TimeChannel
 from .rayleigh_block_fading import RayleighBlockFading
 from .cir_dataset import CIRDataset
 from .constants import *
-from .utils import deg_2_rad, rad_2_deg, wrap_angle_0_360, drop_uts_in_sector, relocate_uts, set_3gpp_scenario_parameters, gen_single_sector_topology, gen_single_sector_topology_interferers, subcarrier_frequencies, cir_to_ofdm_channel, cir_to_time_channel, time_lag_discrete_time_channel, exp_corr_mat, one_ring_corr_mat, time_frequency_vector
+from .utils import deg_2_rad, rad_2_deg, wrap_angle_0_360, drop_uts_in_sector, relocate_uts, set_3gpp_scenario_parameters, gen_single_sector_topology, gen_single_sector_topology_interferers, subcarrier_frequencies, cir_to_ofdm_channel, cir_to_time_channel, time_to_ofdm_channel, time_lag_discrete_time_channel, exp_corr_mat, one_ring_corr_mat, time_frequency_vector

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -24,7 +24,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = "Sionna"
-copyright = "2021-2022 NVIDIA CORPORATION"
+copyright = "2021-2023 NVIDIA CORPORATION"
 
 # Read version number from sionna.__init__
 from importlib.machinery import SourceFileLoader

@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: Apache-2.0
 -->
 # Sionna: An Open-Source Library for Next-Generation Physical Layer Research
@@ -14,7 +14,7 @@ In order to run the tutorial notebooks on your machine, you also need [Jupyter](
 You can alternatively test them on [Google Colab](https://colab.research.google.com/).
 Although not necessary, we recommend running Sionna in a [Docker container](https://www.docker.com).
 
-Sionna requires [TensorFlow 2.7-2.11](https://www.tensorflow.org/install) and Python 3.6-3.9. We recommend Ubuntu 20.04. TensorFlow 2.6 still works but is not recommended because of known, unpatched CVEs.
+Sionna requires [TensorFlow 2.8-2.11](https://www.tensorflow.org/install) and Python 3.6-3.9. We recommend Ubuntu 20.04. Earlier versions of TensorFlow (2.7+) still work but are not recommended because of known, unpatched CVEs.
 
 We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/install/gpu) for GPU support and the required driver setup.
 
@@ -35,7 +35,7 @@ On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensor
 ```
     >>> import sionna
     >>> print(sionna.__version__)
-    0.12.1
+    0.13.0
 ```
 
 3.) Once Sionna is installed, you can run the [Sionna "Hello, World!" example](https://nvlabs.github.io/sionna/examples/Hello_World.html), have a look at the [quick start guide](https://nvlabs.github.io/sionna/quickstart.html), or at the [tutorials](https://nvlabs.github.io/sionna/tutorials.html).
@@ -94,7 +94,7 @@ We recommend to do this within a [virtual environment](https://docs.python.org/3
 ```
     >>> import sionna
     >>> print(sionna.__version__)
-    0.12.1
+    0.13.0
 ```
 
 ## License and Citation

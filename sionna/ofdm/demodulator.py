@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Class definition for the OFDM Demodulator"""
@@ -51,7 +51,7 @@ class OFDMDemodulator(Layer):
     sparse pilot patterns that needs to interpolate the channel frequency
     response accross subcarriers. It also ensures that the
     channel frequency response `seen` by the time-domain channel
-    is close to the :class:`~fcomm.channel.OFDMChannel`.
+    is close to the :class:`~sionna.channel.OFDMChannel`.
 
     Parameters
     ----------
@@ -93,7 +93,7 @@ class OFDMDemodulator(Layer):
     @fft_size.setter
     def fft_size(self, value):
         assert value>0, "`fft_size` must be positive."
-        self._fft_size = value
+        self._fft_size = int(value)
 
     @property
     def l_min(self):
@@ -102,7 +102,7 @@ class OFDMDemodulator(Layer):
     @l_min.setter
     def l_min(self, value):
         assert value<=0, "l_min must be nonpositive."
-        self._l_min = value
+        self._l_min = int(value)
 
     @property
     def cyclic_prefix_length(self):
@@ -111,7 +111,7 @@ class OFDMDemodulator(Layer):
     @cyclic_prefix_length.setter
     def cyclic_prefix_length(self, value):
         assert value >=0, "`cyclic_prefix_length` must be nonnegative."
-        self._cyclic_prefix_length = value
+        self._cyclic_prefix_length = int(value)
 
     def build(self, input_shape): # pylint: disable=unused-argument
         tmp = -2 * PI * tf.cast(self.l_min, tf.float32) \
@@ -154,12 +154,12 @@ class OFDMDemodulator(Layer):
         # Compute FFT
         x = fft(x)
 
-        # Shift DC subcarrier to the middle
-        x = fftshift(x, axes=-1)
-
         # Apply phase shift compensation to all subcarriers
         rot = tf.cast(self._phase_compensation, x.dtype)
         rot = expand_to_rank(rot, tf.rank(x), 0)
         x = x * rot
+
+        # Shift DC subcarrier to the middle
+        x = fftshift(x, axes=-1)
 
         return x

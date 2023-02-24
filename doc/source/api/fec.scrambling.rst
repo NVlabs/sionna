@@ -1,12 +1,22 @@
 Scrambling
 **********
 
-The scrambler module allows to (pseudo) randomly flip bits in a binary sequence or the signs of a real-valued sequence, respectively.
+The :class:`~sionna.fec.scrambling.Scrambler` module allows to (pseudo)
+randomly flip bits in a binary sequence or the signs of a real-valued sequence,
+respectively. The :class:`~sionna.fec.scrambling.Descrambler` implement the corresponding descrambling operation.
 
-To simplify distributed graph execution (e.g., by running scrambler and descrambler in a different sub-graph/device), the scramblers are implemented stateless. Thus, the internal seed cannot be update on runtime and does not change after the initialization.
-However, if required an explicit random seed can be passed as additional input the scrambler/descrambler pair when calling the layer.
+To simplify distributed graph execution (e.g., by running scrambler and
+descrambler in a different sub-graph/device), the scramblers are implemented
+stateless. Thus, the internal seed cannot be update on runtime and does not
+change after the initialization.
+However, if required an explicit random seed can be passed as additional input
+the scrambler/descrambler pair when calling the layer.
 
-The following code snippet shows how to setup and use an instance of the scrambler:
+Further, the :class:`~sionna.fec.scrambling.TB5GScrambler` enables 5G NR compliant
+scrambling as specified in [3GPPTS38211_scr]_.
+
+The following code snippet shows how to setup and use an instance of the
+scrambler:
 
 .. code-block:: Python
 
@@ -36,6 +46,12 @@ Scrambler
    :members:
    :exclude-members: call, build
 
+TB5GScrambler
+-------------
+.. autoclass:: sionna.fec.scrambling.TB5GScrambler
+   :members:
+   :exclude-members: call, build
+
 Descrambler
 -----------
 .. autoclass:: sionna.fec.scrambling.Descrambler
@@ -47,3 +63,6 @@ References:
       approaching bandwidth-efficient coded modulation schemes
       based on low-density parity-check codes," IEEE Trans. Inf. Theory,
       Sep. 2003.
+
+   .. [3GPPTS38211_scr] ETSI 3GPP TS 38.211 "Physical channels and modulation",
+      v.16.2.0, 2020-07.
