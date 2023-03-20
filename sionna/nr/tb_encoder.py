@@ -105,7 +105,7 @@ class TBEncoder(Layer):
     Note
     ----
     The parameters ``tb_size`` and ``num_coded_bits`` can be derived by the
-    :class:`~sionna.nr.calculate_tb_size` function or
+    :meth:`~sionna.nr.calculate_tb_size` function or
     by accessing the corresponding :class:`~sionna.nr.PUSCHConfig` attributes.
     """
 

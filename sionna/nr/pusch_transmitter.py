@@ -39,9 +39,9 @@ class PUSCHTransmitter(Layer):
     which are then mapped onto OFDM resource grids by the :class:`~sionna.ofdm.ResourceGridMapper`.
     If precoding is enabled in the :class:`~sionna.nr.PUSCHConfig`, the resource grids
     are further precoded so that there is one for each transmitter and antenna port.
-    If ``output_domain`` equals "freq", these are the ouputs :math:`\mathbf{x}`.
+    If ``output_domain`` equals "freq", these are the outputs :math:`\mathbf{x}`.
     If ``output_domain`` is chosen to be "time", the resource grids are transformed into
-    time-domain signals by the :class:`~sionna.nr.ofmd.OFDMModulator`.
+    time-domain signals by the :class:`~sionna.ofdm.OFDMModulator`.
 
     Parameters
     ----------

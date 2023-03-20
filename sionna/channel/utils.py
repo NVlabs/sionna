@@ -191,7 +191,7 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
     a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex
         Path coefficients
 
-    tau : [batch size, num_rx, num_tx, num_paths], tf.float
+    tau : [batch size, num_rx, num_tx, num_paths] or [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths], tf.float
         Path delays
 
     normalize : bool
@@ -206,25 +206,27 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
 
     real_dtype = tau.dtype
 
-    # Expand dims to broadcast with h. Add the following dimensions:
-    #  - number of rx antennas (2)
-    #  - number of tx antennas (4)
-    #  - number of time samples (6)
-    tau = tf.expand_dims(tf.expand_dims(tf.expand_dims(tau, axis=2),
-                    axis=4), axis=6)
+    if len(tau.shape) == 4:
+        # Expand dims to broadcast with h. Add the following dimensions:
+        #  - number of rx antennas (2)
+        #  - number of tx antennas (4)
+        tau = tf.expand_dims(tf.expand_dims(tau, axis=2), axis=4)
+        # Broadcast is not supported yet by TF for such high rank tensors.
+        # We therefore do part of it manually
+        tau = tf.tile(tau, [1, 1, 1, 1, a.shape[4], 1])
+
+    # Add a time samples dimension for broadcasting
+    tau = tf.expand_dims(tau, axis=6)
 
     # Bring all tensors to broadcastable shapes
     tau = tf.expand_dims(tau, axis=-1)
     h = tf.expand_dims(a, axis=-1)
-    frequencies = expand_to_rank(frequencies, tau.shape.rank, axis=0)
+    frequencies = expand_to_rank(frequencies, tf.rank(tau), axis=0)
 
     ## Compute the Fourier transforms of all cluster taps
     # Exponential component
     e = tf.exp(tf.complex(tf.constant(0, real_dtype),
         -2*PI*frequencies*tau))
-    # Broadcast is not supported yet by TF for such high rank tensors.
-    # We therefore do part of it manually
-    e = tf.tile(e, [1, 1, 1, 1, h.shape[4], 1, 1, 1])
     h_f = h*e
     # Sum over all clusters to get the channel frequency responses
     h_f = tf.reduce_sum(h_f, axis=-3)
@@ -236,7 +238,8 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
         # subcarriers.
         c = tf.reduce_mean( tf.square(tf.abs(h_f)), axis=(2,4,5,6),
                             keepdims=True)
-        h_f = h_f / tf.complex(tf.sqrt(c), tf.constant(0., real_dtype))
+        c = tf.complex(tf.sqrt(c), tf.constant(0., real_dtype))
+        h_f = tf.math.divide_no_nan(h_f, c)
 
     return h_f
 
@@ -268,7 +271,7 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
     a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex
         Path coefficients
 
-    tau : [batch size, num_rx, num_tx, num_paths], tf.float
+    tau : [batch size, num_rx, num_tx, num_paths] or [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths], tf.float
         Path delays [s]
 
     l_min : int
@@ -289,12 +292,17 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
 
     real_dtype = tau.dtype
 
-    # Expand dims to broadcast with h. Add the following dimensions:
-    #  - number of rx antennas (2)
-    #  - number of tx antennas (4)
-    #  - number of time samples (6)
-    tau = tf.expand_dims(tf.expand_dims(tf.expand_dims(tau, axis=2),
-                    axis=4), axis=6)
+    if len(tau.shape) == 4:
+        # Expand dims to broadcast with h. Add the following dimensions:
+        #  - number of rx antennas (2)
+        #  - number of tx antennas (4)
+        tau = tf.expand_dims(tf.expand_dims(tau, axis=2), axis=4)
+        # Broadcast is not supported by TF for such high rank tensors.
+        # We therefore do part of it manually
+        tau = tf.tile(tau, [1, 1, 1, 1, a.shape[4], 1])
+
+    # Add a time samples dimension for broadcasting
+    tau = tf.expand_dims(tau, axis=6)
 
     # Time lags for which to compute the channel taps
     l = tf.range(l_min, l_max+1, dtype=real_dtype)
@@ -309,9 +317,6 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
     a = tf.expand_dims(a, axis=-1)
 
     # For every tap, sum the sinc-weighted coefficients
-    # Broadcast is not supported by TF for such high rank tensors.
-    # We therefore do part of it manually
-    g = tf.tile(g, [1, 1, 1, 1, a.shape[4], 1, 1, 1])
     hm = tf.reduce_sum(a*g, axis=-3)
 
     if normalize:
@@ -323,8 +328,8 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
         c = tf.reduce_mean(tf.reduce_sum(tf.square(tf.abs(hm)),
                                          axis=6, keepdims=True),
                            axis=(2,4,5), keepdims=True)
-        hm = hm / tf.complex(tf.sqrt(c),
-                             tf.constant(0., real_dtype))
+        c = tf.complex(tf.sqrt(c), tf.constant(0., real_dtype))
+        hm = tf.math.divide_no_nan(hm, c)
 
     return hm
 

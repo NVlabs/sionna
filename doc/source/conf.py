@@ -48,7 +48,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_copybutton",
     "made_with_sionna",
-    ]
+]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -95,6 +95,8 @@ napoleon_custom_sections = [("Input shape", "params_style"),
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
 
+numfig = True
+
 # do not re-execute jupyter notebooks when building the docs
 nbsphinx_execute = 'never'
 exclude_patterns = ['_build', '**.ipynb_checkpoints']
@@ -140,3 +142,13 @@ nbsphinx_prolog = r"""
 
     </div>
 """
+
+# Make sure that nbsphinx picks the HTML output rather
+# than trying to auto-expose the widgets (too complicated).
+import nbsphinx
+nbsphinx.DISPLAY_DATA_PRIORITY_HTML = tuple(
+    m for m in nbsphinx.DISPLAY_DATA_PRIORITY_HTML
+    if not m.startswith('application/')
+)
+# Avoid duplicate display of widgets, see: https://github.com/spatialaudio/nbsphinx/issues/378#issuecomment-573599835
+nbsphinx_widgets_path = ''

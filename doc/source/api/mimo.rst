@@ -161,12 +161,6 @@ whiten_channel
 .. autofunction:: sionna.mimo.whiten_channel
 
 References:
-   .. [BHS2017] Emil Björnson, Jakob Hoydis and Luca Sanguinetti (2017),
-      `“Massive MIMO Networks: Spectral, Energy, and Hardware Efficiency”
-      <https://massivemimobook.com>`_,
-      Foundations and Trends in Signal Processing:
-      Vol. 11, No. 3-4, pp 154–655.
-
    .. [ProperRV] `Proper complex random variables <https://en.wikipedia.org/wiki/Complex_random_variable#Proper_complex_random_variables>`_,
       Wikipedia, accessed 11 September, 2022.
 

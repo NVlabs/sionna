@@ -114,7 +114,7 @@ def log10(x):
 
     Simple extension to `tf.experimental.numpy.log10`
     which casts the result to the `dtype` of the input.
-    For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10>`_ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log10.html>`_ documentation.
+    For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10>`__ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log10.html>`__ documentation.
     """
     return tf.cast(_log10(x), x.dtype)
 

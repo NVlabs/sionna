@@ -5,7 +5,7 @@
 """This is the Sionna library.
 """
 
-__version__ = '0.13.0'
+__version__ = '0.14.0'
 
 from . import utils
 from .constants import *
@@ -16,6 +16,7 @@ from . import ofdm
 from . import mimo
 from . import channel
 from . import signal
+from . import rt
 from .config import *
 
 # Instantiate global configuration object

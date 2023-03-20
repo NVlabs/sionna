@@ -1,0 +1,186 @@
+Scene
+*****
+
+The scene contains everything that is needed for radio propagation simulation
+and rendering.
+
+A scene is a collection of multiple instances of :class:`~sionna.rt.SceneObject` which define
+the geometry and materials of the objects in the scene.
+The scene also includes transmitters (:class:`~sionna.rt.Transmitter`) and receivers (:class:`~sionna.rt.Receiver`)
+for which propagation :class:`~sionna.rt.Paths` or  channel impulse responses (CIRs) can be computed,
+as well as cameras (:class:`~sionna.rt.Camera`) for rendering.
+
+A scene is loaded from a file using the :func:`~sionna.rt.load_scene`
+function. Sionna contains a few `Example Scenes`_.
+The following code snippet shows how to load one of them and
+render it through the lens of the preconfigured scene :class:`~sionna.rt.Camera` "scene-cam-0":
+
+.. code-block:: Python
+
+   scene = load_scene(sionna.rt.scene.munich)
+   scene.render(camera="scene-cam-0")
+
+.. figure:: ../figures/munich.png
+   :align: center
+
+You can preview a scene in an interactive 3D viewer within a Jupyter notebook using :meth:`~sionna.rt.Scene.preview`:
+
+.. code-block:: Python
+
+   scene.preview()
+
+In the code snippet above, the :func:`~sionna.rt.load_scene` function returns the :class:`~sionna.rt.Scene` instance which can be used
+to access scene objects, transmitters, receivers, cameras, and to set the
+frequency for radio wave propagation simulation. Note that you can load only a single scene at a time.
+
+It is important to understand that all transmitters in a scene share the same :class:`~sionna.rt.AntennaArray` which can be set
+through the scene property :py:obj:`~sionna.rt.Scene.tx_array`. The same holds for all receivers whose :class:`~sionna.rt.AntennaArray`
+can be set through :py:obj:`~sionna.rt.Scene.rx_array`. However, each transmitter and receiver can have a different position and orientation.
+
+The code snippet below shows how to configure the :py:obj:`~sionna.rt.Scene.tx_array` and :py:obj:`~sionna.rt.Scene.rx_array` and
+to instantiate a transmitter and receiver.
+
+.. code-block:: Python
+
+   # Configure antenna array for all transmitters
+   scene.tx_array = PlanarArray(num_rows=8,
+                             num_cols=2,
+                             vertical_spacing=0.7,
+                             horizontal_spacing=0.5,
+                             pattern="tr38901",
+                             polarization="VH")
+
+   # Configure antenna array for all receivers
+   scene.rx_array = PlanarArray(num_rows=1,
+                             num_cols=1,
+                             vertical_spacing=0.5,
+                             horizontal_spacing=0.5,
+                             pattern="dipole",
+                             polarization="cross")
+
+   # Create transmitter
+   tx = Transmitter(name="tx",
+                 position=[8.5,21,27],
+                 orientation=[0,0,0])
+   scene.add(tx)
+
+   # Create a receiver
+   rx = Receiver(name="rx",
+              position=[45,90,1.5],
+              orientation=[0,0,0])
+   scene.add(rx)
+
+   # TX points towards RX
+   tx.look_at(rx) 
+
+   print(scene.transmitters)
+   print(scene.receivers)
+
+.. code-block:: console
+
+      {'tx': <sionna.rt.transmitter.Transmitter object at 0x7f83d0555d30>}
+      {'rx': <sionna.rt.receiver.Receiver object at 0x7f81f00ef0a0>}
+
+Once you have loaded a scene and configured transmitters and receivers, you can use the scene method
+:meth:`~sionna.rt.Scene.compute_paths` to compute propagation paths:
+
+.. code-block:: Python
+
+   paths = scene.compute_paths()
+
+The output of this function is an instance of :class:`~sionna.rt.Paths` and can be used to compute channel
+impulse responses (CIRs) using the layer :class:`~sionna.rt.Paths2CIR`.
+You can visualize the paths within a scene by one of the following commands:
+
+.. code-block:: Python
+
+   scene.preview(paths=paths) # Open preview showing paths
+   scene.render(camera="preview", paths=paths) # Render scene with paths from previev camera
+   scene.render_to_file(camera="preview",
+                        filename="scene.png",
+                        paths=paths) # Render scene with paths to file
+
+.. figure:: ../figures/paths_visualization.png
+   :align: center
+
+Note that the calls to the render functions in the code above use the "preview" camera which is configured through
+:meth:`~sionna.rt.Scene.preview`. You can use any other :class:`~sionna.rt.Camera` that you create here as well. 
+
+The function :meth:`~sionna.rt.Scene.coverage_map` computes a :class:`~sionna.rt.CoverageMap` for every transmitter in a scene:
+
+.. code-block:: Python
+
+   cm = scene.coverage_map(max_depth=8)
+
+Coverage maps can be visualized in the same way as propagation paths:
+
+.. code-block:: Python
+
+   scene.preview(coverage_map=cm) # Open preview showing coverage map
+   scene.render(camera="preview", coverage_map=cm) # Render scene with coverage map
+   scene.render_to_file(camera="preview",
+                        filename="scene.png",
+                        coverage_map=cm) # Render scene with coverage map to file
+
+.. figure:: ../figures/coverage_map_visualization.png
+   :align: center
+
+Scene
+-----
+.. autoclass:: sionna.rt.Scene
+   :members:
+   :exclude-members: _ready_for_paths_computation, _load_cameras, _load_scene_objects, _is_name_used, register_radio_device, unregister_radio_device, register_radio_material, register_scene_object, compute_paths, render, render_to_file, preview, mi_scene, preview_widget, coverage_map
+
+compute_paths
+-------------
+.. autofunction:: sionna.rt.Scene.compute_paths
+
+coverage_map
+-------------
+.. autofunction:: sionna.rt.Scene.coverage_map
+
+load_scene
+----------
+.. autofunction:: sionna.rt.load_scene
+
+preview
+--------
+.. autofunction:: sionna.rt.Scene.preview
+
+render
+------
+.. autofunction:: sionna.rt.Scene.render
+
+render_to_file
+---------------
+.. autofunction:: sionna.rt.Scene.render_to_file
+
+Example Scenes
+**************
+Sionna has several integrated scenes that are listed below.
+They can be loaded and used as follows:
+
+.. code-block:: Python
+
+   scene = load_scene(sionna.rt.scene.etoile)
+   scene.preview()
+
+floor_wall
+----------
+.. autodata:: sionna.rt.scene.floor_wall
+   :annotation:
+
+simple_street_canyon
+--------------------
+.. autodata:: sionna.rt.scene.simple_street_canyon
+   :annotation:
+
+etoile
+------
+.. autodata:: sionna.rt.scene.etoile
+   :annotation:
+
+munich
+------
+.. autodata:: sionna.rt.scene.munich
+   :annotation:
