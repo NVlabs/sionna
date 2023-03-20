@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -820,7 +924,7 @@
 
 <div class="viewcode-block" id="LDPCBPDecoder"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.decoding.LDPCBPDecoder">[docs]</a><span class="k">class</span> <span class="nc">LDPCBPDecoder</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;LDPCBPDecoder(pcm, trainable=False, cn_type=&#39;boxplus-phi&#39;, hard_out=True, track_exit=False, num_iter=20, stateful=False,output_dtype=tf.float32, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;LDPCBPDecoder(pcm, trainable=False, cn_type=&#39;boxplus-phi&#39;, hard_out=True, track_exit=False, num_iter=20, stateful=False,output_dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Iterative belief propagation decoder for low-density parity-check (LDPC)</span>
 <span class="sd">    codes and other `codes on graphs`.</span>
@@ -1177,32 +1281,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pcm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parity-check matrix of LDPC code.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parity-check matrix of LDPC code.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pcm</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_cns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of check nodes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of check nodes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cns</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_vns</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of variable nodes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of variable nodes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_vns</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of edges in decoding graph.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of edges in decoding graph.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_edges</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indicates if decoder has trainable weights.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indicates if decoder has trainable weights.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_weights</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">edge_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Trainable weights of the BP decoder.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trainable weights of the BP decoder.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_weights</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1210,7 +1314,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">output_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Output dtype of decoder.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Output dtype of decoder.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_dtype</span>
 
     <span class="nd">@property</span>
@@ -1237,17 +1341,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">llr_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Max LLR value used for internal calculations and rate-matching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Max LLR value used for internal calculations and rate-matching.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span>
 
     <span class="nd">@llr_max</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">llr_max</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Max LLR value used for internal calculations and rate-matching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Max LLR value used for internal calculations and rate-matching.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="n">value</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;llr_max cannot be negative.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LDPCBPDecoder.show_weights"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.decoding.LDPCBPDecoder.show_weights">[docs]</a>    <span class="k">def</span> <span class="nf">show_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">7</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Show histogram of trainable weights.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show histogram of trainable weights.</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        -----</span>
@@ -1273,7 +1377,7 @@
     <span class="c1">#########################</span>
 
     <span class="k">def</span> <span class="nf">_gen_node_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">con</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Generates internal node masks indicating which msg index belongs</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Generates internal node masks indicating which msg index belongs</span>
 <span class="sd">        to which node index.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">con</span><span class="p">)</span>
@@ -1294,7 +1398,7 @@
         <span class="k">return</span> <span class="n">node_mask</span>
 
     <span class="k">def</span> <span class="nf">_gen_node_mask_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">con</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Defining the row split positions of a 1D vector consisting of all</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Defining the row split positions of a 1D vector consisting of all</span>
 <span class="sd">        edges messages.</span>
 
 <span class="sd">        Used to build a ragged Tensor of incoming node messages.</span>
@@ -1311,7 +1415,7 @@
         <span class="k">return</span> <span class="n">node_mask</span>
 
     <span class="k">def</span> <span class="nf">_vn_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">llr_ch</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Variable node update function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Variable node update function.</span>
 
 <span class="sd">        This function implements the (extrinsic) variable node update</span>
 <span class="sd">        function. It takes the sum over all incoming messages ``msg`` excluding</span>
@@ -1337,7 +1441,7 @@
         <span class="k">return</span> <span class="n">x</span>
 
     <span class="k">def</span> <span class="nf">_extrinsic_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Provides the extrinsic min operation for the minsum approximation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Provides the extrinsic min operation for the minsum approximation</span>
 <span class="sd">        of the CN function.</span>
 
 <span class="sd">        This function implements the extrinsic min operation, i.e.,</span>
@@ -1360,12 +1464,12 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_where_ragged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper to replace 0 elements from ragged tensor (called with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to replace 0 elements from ragged tensor (called with</span>
 <span class="sd">        map_flat_values).&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e-12</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_where_ragged_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper to replace small elements from ragged tensor (called with</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to replace small elements from ragged tensor (called with</span>
 <span class="sd">        map_flat_values) with exact `0`.&quot;&quot;&quot;</span>
         <span class="n">msg_mod</span> <span class="o">=</span>  <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">less</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="mf">1e-7</span><span class="p">),</span>
                             <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span>
@@ -1373,7 +1477,7 @@
         <span class="k">return</span> <span class="n">msg_mod</span>
 
     <span class="k">def</span> <span class="nf">_cn_update_tanh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check node update function implementing the exact boxplus operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check node update function implementing the exact boxplus operation.</span>
 
 <span class="sd">        This function implements the (extrinsic) check node update</span>
 <span class="sd">        function. It calculates the boxplus function over all incoming messages</span>
@@ -1423,7 +1527,7 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function for the check node update.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function for the check node update.</span>
 
 <span class="sd">        This function implements the (element-wise) `&quot;_phi&quot;` function as defined</span>
 <span class="sd">        in [Ryan]_.</span>
@@ -1433,7 +1537,7 @@
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_cn_update_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check node update function implementing the exact boxplus operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check node update function implementing the exact boxplus operation.</span>
 
 <span class="sd">        This function implements the (extrinsic) check node update function</span>
 <span class="sd">        based on the numerically more stable `&quot;_phi&quot;` function (cf. [Ryan]_).</span>
@@ -1488,12 +1592,12 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_stop_ragged_gradient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rt</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper function as TF 2.5 does not support ragged gradient</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function as TF 2.5 does not support ragged gradient</span>
 <span class="sd">        stopping&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">rt</span><span class="o">.</span><span class="n">with_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">stop_gradient</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">flat_values</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_sign_val_minsum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper to replace find sign-value during min-sum decoding.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to replace find sign-value during min-sum decoding.</span>
 <span class="sd">        Must be called with `map_flat_values`.&quot;&quot;&quot;</span>
 
         <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -1503,7 +1607,7 @@
         <span class="k">return</span> <span class="n">sign_val</span>
 
     <span class="k">def</span> <span class="nf">_cn_update_minsum_mapfn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check node update function implementing the min-sum approximation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check node update function implementing the min-sum approximation.</span>
 
 <span class="sd">        This function approximates the (extrinsic) check node update</span>
 <span class="sd">        function based on the min-sum approximation (cf. [Ryan]_).</span>
@@ -1540,7 +1644,7 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_cn_update_minsum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Check node update function implementing the min-sum approximation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check node update function implementing the min-sum approximation.</span>
 
 <span class="sd">        This function approximates the (extrinsic) check node update</span>
 <span class="sd">        function based on the min-sum approximation (cf. [Ryan]_).</span>
@@ -1646,7 +1750,7 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_mult_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Multiply messages with trainable weights for weighted BP.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Multiply messages with trainable weights for weighted BP.&quot;&quot;&quot;</span>
         <span class="c1"># transpose for simpler broadcasting of training variables</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_weights</span><span class="p">)</span>
@@ -1669,7 +1773,7 @@
         <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;The inputs must have at least rank 2.&#39;</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Iterative BP decoding function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterative BP decoding function.</span>
 
 <span class="sd">        This function performs ``num_iter`` belief propagation decoding</span>
 <span class="sd">        iterations and returns the estimated codeword.</span>
@@ -1837,7 +1941,7 @@
 
 <div class="viewcode-block" id="LDPC5GDecoder"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.decoding.LDPC5GDecoder">[docs]</a><span class="k">class</span> <span class="nc">LDPC5GDecoder</span><span class="p">(</span><span class="n">LDPCBPDecoder</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;LDPC5GDecoder(encoder, trainable=False, cn_type=&#39;boxplus-phi&#39;, hard_out=True, track_exit=False, return_infobits=True, prune_pcm=True, num_iter=20, stateful=False, output_dtype=tf.float32, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;LDPC5GDecoder(encoder, trainable=False, cn_type=&#39;boxplus-phi&#39;, hard_out=True, track_exit=False, return_infobits=True, prune_pcm=True, num_iter=20, stateful=False, output_dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    (Iterative) belief propagation decoder for 5G NR LDPC codes.</span>
 
@@ -2074,7 +2178,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">encoder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;LDPC Encoder used for rate-matching/recovery.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;LDPC Encoder used for rate-matching/recovery.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span>
 
     <span class="c1">#########################</span>
@@ -2082,7 +2186,7 @@
     <span class="c1">#########################</span>
 
     <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Build model.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build model.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stateful</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span><span class="p">),</span> \
                 <span class="s2">&quot;For stateful decoding, a tuple of two inputs is expected.&quot;</span>
@@ -2096,7 +2200,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_shape_5g</span> <span class="o">=</span> <span class="n">input_shape</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Iterative BP decoding function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterative BP decoding function.</span>
 
 <span class="sd">        This function performs ``num_iter`` belief propagation decoding</span>
 <span class="sd">        iterations and returns the estimated codeword.</span>

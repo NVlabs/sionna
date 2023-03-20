@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.nr.pusch_config &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.nr.pusch_config &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -819,7 +923,7 @@
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">calculate_tb_size</span>
 
 <div class="viewcode-block" id="PUSCHConfig"><a class="viewcode-back" href="../../../api/nr.html#sionna.nr.PUSCHConfig">[docs]</a><span class="k">class</span> <span class="nc">PUSCHConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The PUSCHConfig objects sets parameters for a physical uplink shared</span>
 <span class="sd">    channel (PUSCH), as described in Sections 6.3 and 6.4 [3GPP38211]_.</span>
 
@@ -863,7 +967,7 @@
     <span class="c1">#---carrier---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">carrier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :class:`~sionna.nr.CarrierConfig` : Carrier configuration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_carrier</span>
@@ -880,7 +984,7 @@
     <span class="c1">#---dmrs---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dmrs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :class:`~sionna.nr.PUSCHDMRSConfig` : PUSCH DMRS configuration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dmrs</span>
@@ -897,7 +1001,7 @@
     <span class="c1">#---transport block---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :class:`~sionna.nr.TBConfig` : Transport block configuration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tb</span>
@@ -916,7 +1020,7 @@
     <span class="c1">#---n_size_bwp---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_size_bwp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, None (default), [1,...,275] : Number of resource blocks in the</span>
 <span class="sd">            bandwidth part (BWP) :math:`N^{\text{size},\mu}_{\text{BWP},i}`</span>
 
@@ -937,7 +1041,7 @@
     <span class="c1">#---n_start_bwp---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_start_bwp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, 0 (default) | [0,...,2199] : Start of BWP relative to</span>
 <span class="sd">            common resource block (CRB) 0</span>
 <span class="sd">            :math:`N^{\text{start},\mu}_{\text{BWP},i}`</span>
@@ -955,7 +1059,7 @@
     <span class="c1">#---num-layers---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, 1 (default) | 2 | 3 | 4: Number of transmission layers</span>
 <span class="sd">            :math:`\nu`</span>
 
@@ -973,7 +1077,7 @@
     <span class="c1">#---num-antenna-ports---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_antenna_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, 1 (default) | 2 | 4: Number of antenna ports</span>
 
 <span class="sd">            Must be larger than or equal to</span>
@@ -990,7 +1094,7 @@
     <span class="c1">#---mapping_type---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mapping_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        string, &quot;A&quot; (default) | &quot;B&quot;: Mapping type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ifndef</span><span class="p">(</span><span class="s2">&quot;mapping_type&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">)</span>
@@ -1004,7 +1108,7 @@
     <span class="c1">#---symbol_allocation---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">symbol_allocation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        2-tuple, int, [0, 14] (default) : PUSCH symbol allocation</span>
 
 <span class="sd">            The first elements denotes the start of the symbol allocation.</span>
@@ -1026,7 +1130,7 @@
     <span class="c1">#---n_rnti---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_rnti</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, 1 (default), [0,...,65535] : Radio network temporary identifier</span>
 <span class="sd">            :math:`n_\text{RNTI}`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1042,7 +1146,7 @@
     <span class="c1">#---transform_precoding---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">precoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        str, &quot;non-codebook&quot; (default), &quot;codebook&quot; : PUSCH</span>
 <span class="sd">            transmission scheme</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1058,7 +1162,7 @@
     <span class="c1">#---transform_precoding---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">transform_precoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        bool, False (default): Use transform precoding</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ifndef</span><span class="p">(</span><span class="s2">&quot;transform_precoding&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -1067,13 +1171,13 @@
     <span class="nd">@transform_precoding</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">transform_precoding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> \
-            <span class="sd">&quot;&quot;&quot;transform_precoding must be bool&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;transform_precoding must be bool&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_transform_precoding</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="c1">#---tpmi---#</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tpmi</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int,  0 (default) | [0,...,27] : Transmit precoding matrix indicator</span>
 
 <span class="sd">            The allowed value depends on the number of layers and</span>
@@ -1094,14 +1198,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">frequency_hopping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        str, &quot;neither&quot; (default), read-only : Frequency hopping configuration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;neither&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">l_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only : Position of the first DMRS symbol :math:`l_0`</span>
 <span class="sd">            relative to the reference `l_ref`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1112,14 +1216,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">l_d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only : Length of the symbol allocation :math:`l_\text{d}`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbol_allocation</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">l_ref</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only: Reference OFDM symbol index  used for DMRS</span>
 <span class="sd">            generation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1130,7 +1234,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">l_prime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        list, elements in [0,1], read-only : List of possible values of</span>
 <span class="sd">            :math:`l&#39;` used for DMRS generation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1141,7 +1245,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">l_bar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        list, elements in [0,...,11], read-only : List of possible values of</span>
 <span class="sd">            :math:`\bar{l}` used for DMRS generation</span>
 
@@ -1216,7 +1320,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">l</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        list, int, read-only : List of possible values of the OFDM symbol</span>
 <span class="sd">            indices :math:`l` carrying DMRS relative to :math:`l_0`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1228,7 +1332,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        list, int, read-only: List of possible values of n</span>
 <span class="sd">            used for DMRS generation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1240,14 +1344,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dmrs_symbol_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        list, int, read-only: Indices of DMRS symbols within a slot</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">l</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">l_ref</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">l</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_resource_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only : Number of allocated resource blocks for the</span>
 <span class="sd">            PUSCH transmissions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1258,7 +1362,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_subcarriers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only : Number of allocated subcarriers for the</span>
 <span class="sd">            PUSCH transmissions</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1266,7 +1370,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_res_per_prb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only : Number of resource elements per PRB</span>
 <span class="sd">            available for data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1289,7 +1393,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dmrs_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        bool, [num_subcarriers, num_symbols_per_slot], read-only : Masked</span>
 <span class="sd">            resource elements in the resource grid. `True` corresponds to</span>
 <span class="sd">            resource elements on which no data is transmitted.</span>
@@ -1317,7 +1421,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dmrs_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        complex, [num_dmrs_ports, num_subcarriers, num_symbols_per_slot], read-only : Empty</span>
 <span class="sd">            resource grid for each DMRS port, filled with DMRS signals</span>
 
@@ -1406,7 +1510,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">precoding_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        nd_array, complex, [num_antenna_ports, numLayers] : Precoding matrix</span>
 <span class="sd">            :math:`\mathbf{W}` as defined in</span>
 <span class="sd">            Tables 6.3.1.5-1 to 6.3.1.5-7 [3GPP38211]_.</span>
@@ -1618,13 +1722,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_ov</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, 0 (default), read-only:  Number of unused resource elements due to additional overhead as specified by higher layer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_coded_bits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only: Number of coded bits that fit into one PUSCH slot.&quot;&quot;&quot;</span>
 
         <span class="c1"># compute number of data symbols</span>
@@ -1641,7 +1745,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tb_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int, read-only: Transport block size, i.e., how many information bits can be encoded into a slot for the given slot configuration.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;int, read-only: Transport block size, i.e., how many information bits can be encoded into a slot for the given slot configuration.&quot;&quot;&quot;</span>
 
         <span class="c1"># compute number of data symbols per prb</span>
         <span class="n">n_re_per_prb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_res_per_prb</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_ov</span>
@@ -1670,7 +1774,7 @@
 
 <div class="viewcode-block" id="PUSCHConfig.c_init"><a class="viewcode-back" href="../../../api/nr.html#sionna.nr.PUSCHConfig.c_init">[docs]</a>    <span class="k">def</span> <span class="nf">c_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute RNG initialization :math:`c_\text{init}` as in Section 6.4.1.1.1.1 [3GPP38211]_</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute RNG initialization :math:`c_\text{init}` as in Section 6.4.1.1.1.1 [3GPP38211]_</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        -----</span>
@@ -1701,14 +1805,14 @@
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">c_init</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PUSCHConfig.show"><a class="viewcode-back" href="../../../api/nr.html#sionna.nr.PUSCHConfig.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Print all properties of the PUSCHConfig and children&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print all properties of the PUSCHConfig and children&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">carrier</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="n">Config</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dmrs</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tb</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Test if the compound configuration is valid&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if the compound configuration is valid&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">carrier</span><span class="o">.</span><span class="n">check_config</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dmrs</span><span class="o">.</span><span class="n">check_config</span><span class="p">()</span>
@@ -1821,12 +1925,12 @@
 
     <span class="c1"># Check that pusch_configs is a list</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pusch_configs</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> \
-        <span class="sd">&quot;&quot;&quot;pusch_configs must be a Sequence of instances of PUSCHConfig&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;pusch_configs must be a Sequence of instances of PUSCHConfig&quot;&quot;&quot;</span>
 
     <span class="c1"># Iterate through all pusch_configs and check their type and validity</span>
     <span class="k">for</span> <span class="n">pusch_config</span> <span class="ow">in</span> <span class="n">pusch_configs</span><span class="p">:</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pusch_config</span><span class="p">,</span> <span class="n">PUSCHConfig</span><span class="p">),</span> \
-        <span class="sd">&quot;&quot;&quot;All elements of pusch_configs must be instances of PUSCHConfig&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;All elements of pusch_configs must be instances of PUSCHConfig&quot;&quot;&quot;</span>
 
         <span class="n">pusch_config</span><span class="o">.</span><span class="n">check_config</span><span class="p">()</span>
 

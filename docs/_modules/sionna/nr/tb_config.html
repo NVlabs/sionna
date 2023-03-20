@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.nr.tb_config &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.nr.tb_config &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -816,7 +920,7 @@
 
 <div class="viewcode-block" id="TBConfig"><a class="viewcode-back" href="../../../api/nr.html#sionna.nr.TBConfig">[docs]</a><span class="k">class</span> <span class="nc">TBConfig</span><span class="p">(</span><span class="n">Config</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The TBConfig objects sets parameters related to the transport block</span>
 <span class="sd">    encoding, as described in TS 38.214 [3GPP38214]_.</span>
 
@@ -1108,7 +1212,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mcs_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Modulation and coding scheme (MCS) index (denoted as :math:`I_{MCS}`</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Modulation and coding scheme (MCS) index (denoted as :math:`I_{MCS}`</span>
 <span class="sd">        in [3GPP38214]_)&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ifndef</span><span class="p">(</span><span class="s2">&quot;mcs_index&quot;</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span> <span class="c1"># 16-QAM, r=0.54</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mcs_index</span>
@@ -1121,7 +1225,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mcs_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Indicates which MCS table from [3GPP38214]_ to use. Starts with &quot;1&quot;.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Indicates which MCS table from [3GPP38214]_ to use. Starts with &quot;1&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ifndef</span><span class="p">(</span><span class="s2">&quot;mcs_table&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mcs_table</span>
@@ -1134,7 +1238,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">channel_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;5G NR physical channel type. Valid choices are &quot;PDSCH&quot; and &quot;PUSCH&quot;.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;5G NR physical channel type. Valid choices are &quot;PDSCH&quot; and &quot;PUSCH&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ifndef</span><span class="p">(</span><span class="s2">&quot;channel_type&quot;</span><span class="p">,</span> <span class="s2">&quot;PUSCH&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel_type</span>
@@ -1147,7 +1251,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, None (default), [0, 1023] : Data scrambling initialization</span>
 <span class="sd">            :math:`n_\text{ID}`. Data Scrambling ID related to cell id and</span>
 <span class="sd">            provided by higher layer. If `None`, the</span>
@@ -1176,7 +1280,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">target_coderate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        float, read-only: Target coderate of the TB as defined by the selected</span>
 <span class="sd">        MCS&quot;&quot;&quot;</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">select_mcs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mcs_index</span><span class="p">,</span>
@@ -1186,7 +1290,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_bits_per_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        int, read-only: Modulation order as defined by the selected MCS&quot;&quot;&quot;</span>
         <span class="n">m</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">select_mcs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mcs_index</span><span class="p">,</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">_mcs_table</span><span class="p">,</span>
@@ -1195,7 +1299,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tb_scaling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;float, 1. (default), read-only: TB scaling factor for PDSCH as</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;float, 1. (default), read-only: TB scaling factor for PDSCH as</span>
 <span class="sd">        defined in [3GPP38214]_ Tab. 5.1.3.2-2.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mf">1.</span> <span class="c1"># only 1. supported at the moment</span>
 
@@ -1204,7 +1308,7 @@
     <span class="c1">#-------------------#</span>
 
 <div class="viewcode-block" id="TBConfig.check_config"><a class="viewcode-back" href="../../../api/nr.html#sionna.nr.TBConfig.check_config">[docs]</a>    <span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Test if configuration is valid&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test if configuration is valid&quot;&quot;&quot;</span>
         <span class="n">attr_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mcs_index&quot;</span><span class="p">,</span>
                      <span class="s2">&quot;mcs_table&quot;</span><span class="p">,</span>
                      <span class="s2">&quot;channel_type&quot;</span><span class="p">,</span>

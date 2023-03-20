@@ -21,6 +21,7 @@ For Beginners
     examples/Simple_MIMO_Simulation.ipynb
     examples/Pulse_shaping_basics.ipynb
     examples/Optical_Lumped_Amplification_Channel.ipynb
+    examples/Sionna_Ray_Tracing_Introduction.ipynb
 
 For Experts
 -----------

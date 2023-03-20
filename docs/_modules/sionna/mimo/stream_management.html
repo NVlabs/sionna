@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.mimo.stream_management &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.mimo.stream_management &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -814,7 +918,7 @@
 
 
 <div class="viewcode-block" id="StreamManagement"><a class="viewcode-back" href="../../../api/mimo.html#sionna.mimo.StreamManagement">[docs]</a><span class="k">class</span> <span class="nc">StreamManagement</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Class for management of streams in multi-cell MIMO networks.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for management of streams in multi-cell MIMO networks.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -846,7 +950,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rx_tx_association</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Association between receivers and transmitters.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Association between receivers and transmitters.</span>
 
 <span class="sd">        A binary NumPy array of shape `[num_rx, num_tx]`,</span>
 <span class="sd">        where ``rx_tx_association[i,j]=1`` means that receiver `i`</span>
@@ -892,7 +996,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">precoding_ind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indices needed to gather channels for precoding.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices needed to gather channels for precoding.</span>
 
 <span class="sd">        A NumPy array of shape `[num_tx, num_rx_per_tx]`,</span>
 <span class="sd">        where ``precoding_ind[i,:]`` contains the indices of the</span>
@@ -902,7 +1006,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stream_association</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Association between receivers, transmitters, and streams.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Association between receivers, transmitters, and streams.</span>
 
 <span class="sd">        A binary NumPy array of shape</span>
 <span class="sd">        `[num_rx, num_tx, num_streams_per_tx]`, where</span>
@@ -913,7 +1017,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">detection_desired_ind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indices needed to gather desired channels for receive processing.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices needed to gather desired channels for receive processing.</span>
 
 <span class="sd">        A NumPy array of shape `[num_rx*num_streams_per_rx]` that</span>
 <span class="sd">        can be used to gather desired channels from the flattened</span>
@@ -926,7 +1030,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">detection_undesired_ind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indices needed to gather undesired channels for receive processing.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices needed to gather undesired channels for receive processing.</span>
 
 <span class="sd">        A NumPy array of shape `[num_rx*num_streams_per_rx]` that</span>
 <span class="sd">        can be used to gather undesired channels from the flattened</span>
@@ -938,7 +1042,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tx_stream_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Mapping of streams to transmitters.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping of streams to transmitters.</span>
 
 <span class="sd">        A NumPy array of shape `[num_tx, num_streams_per_tx]`.</span>
 <span class="sd">        Streams are numbered from 0,1,... and assiged to transmitters in</span>
@@ -949,7 +1053,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rx_stream_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Mapping of streams to receivers.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping of streams to receivers.</span>
 
 <span class="sd">        A Numpy array of shape `[num_rx, num_streams_per_rx]`.</span>
 <span class="sd">        This array is obtained from ``tx_stream_ids`` together with</span>
@@ -960,7 +1064,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stream_ind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indices needed to gather received streams in the correct order.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices needed to gather received streams in the correct order.</span>
 
 <span class="sd">        A NumPy array of shape `[num_rx*num_streams_per_rx]` that can be</span>
 <span class="sd">        used to gather streams from the flattened tensor of received streams</span>
@@ -972,7 +1076,7 @@
 
     <span class="nd">@rx_tx_association</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">rx_tx_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rx_tx_association</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Sets the rx_tx_association and derives related properties. &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the rx_tx_association and derives related properties. &quot;&quot;&quot;</span>
 
         <span class="c1"># Make sure that rx_tx_association is a binary NumPy array</span>
         <span class="n">rx_tx_association</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rx_tx_association</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
@@ -985,14 +1089,14 @@
         <span class="c1"># Each receiver must be associated with the same number of transmitters</span>
         <span class="n">num_tx_per_rx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rx_tx_association</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">num_tx_per_rx</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_tx_per_rx</span><span class="p">),</span> \
-            <span class="sd">&quot;&quot;&quot;Each receiver needs to be associated with the same number</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Each receiver needs to be associated with the same number</span>
 <span class="sd">               of transmitters.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx_per_rx</span> <span class="o">=</span> <span class="n">num_tx_per_rx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Each transmitter must be associated with the same number of receivers</span>
         <span class="n">num_rx_per_tx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rx_tx_association</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">num_rx_per_tx</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_rx_per_tx</span><span class="p">),</span> \
-            <span class="sd">&quot;&quot;&quot;Each transmitter needs to be associated with the same number</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Each transmitter needs to be associated with the same number</span>
 <span class="sd">               of receivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx_per_tx</span> <span class="o">=</span> <span class="n">num_rx_per_tx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 

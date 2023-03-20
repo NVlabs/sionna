@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.utils.misc &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.utils.misc &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -822,7 +926,7 @@
 
 
 <div class="viewcode-block" id="ebnodb2no"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.ebnodb2no">[docs]</a><span class="k">def</span> <span class="nf">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">coderate</span><span class="p">,</span> <span class="n">resource_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the noise variance `No` for a given `Eb/No` in dB.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the noise variance `No` for a given `Eb/No` in dB.</span>
 
 <span class="sd">    The function takes into account the number of coded bits per constellation</span>
 <span class="sd">    symbol, the coderate, as well as possible additional overheads related to</span>
@@ -894,7 +998,7 @@
 
 
 <div class="viewcode-block" id="hard_decisions"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.hard_decisions">[docs]</a><span class="k">def</span> <span class="nf">hard_decisions</span><span class="p">(</span><span class="n">llr</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Transforms LLRs into hard decisions.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transforms LLRs into hard decisions.</span>
 
 <span class="sd">    Positive values are mapped to :math:`1`.</span>
 <span class="sd">    Nonpositive values are mapped to :math:`0`.</span>
@@ -916,18 +1020,18 @@
 
 <div class="viewcode-block" id="log10"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.log10">[docs]</a><span class="k">def</span> <span class="nf">log10</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="c1"># pylint: disable=C0301</span>
-    <span class="sd">&quot;&quot;&quot;TensorFlow implementation of NumPy&#39;s `log10` function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TensorFlow implementation of NumPy&#39;s `log10` function.</span>
 
 <span class="sd">    Simple extension to `tf.experimental.numpy.log10`</span>
 <span class="sd">    which casts the result to the `dtype` of the input.</span>
-<span class="sd">    For more details see the `TensorFlow &lt;https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10&gt;`_ and `NumPy &lt;https://numpy.org/doc/1.16/reference/generated/numpy.log10.html&gt;`_ documentation.</span>
+<span class="sd">    For more details see the `TensorFlow &lt;https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10&gt;`__ and `NumPy &lt;https://numpy.org/doc/1.16/reference/generated/numpy.log10.html&gt;`__ documentation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">_log10</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="log2"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.log2">[docs]</a><span class="k">def</span> <span class="nf">log2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="c1"># pylint: disable=C0301</span>
-    <span class="sd">&quot;&quot;&quot;TensorFlow implementation of NumPy&#39;s `log2` function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TensorFlow implementation of NumPy&#39;s `log2` function.</span>
 
 <span class="sd">    Simple extension to `tf.experimental.numpy.log2`</span>
 <span class="sd">    which casts the result to the `dtype` of the input.</span>
@@ -937,7 +1041,7 @@
 
 
 <div class="viewcode-block" id="BinarySource"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.BinarySource">[docs]</a><span class="k">class</span> <span class="nc">BinarySource</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;BinarySource(dtype=tf.float32, seed=None, **kwargs)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;BinarySource(dtype=tf.float32, seed=None, **kwargs)</span>
 
 <span class="sd">    Layer generating random binary tensors.</span>
 
@@ -977,7 +1081,7 @@
 
 <div class="viewcode-block" id="SymbolSource"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.SymbolSource">[docs]</a><span class="k">class</span> <span class="nc">SymbolSource</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SymbolSource(constellation_type=None, num_bits_per_symbol=None, constellation=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;SymbolSource(constellation_type=None, num_bits_per_symbol=None, constellation=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Layer generating a tensor of arbitrary shape filled with random constellation symbols.</span>
 <span class="sd">    Optionally, the symbol indices and/or binary representations of the</span>
@@ -1078,7 +1182,7 @@
 
 <div class="viewcode-block" id="QAMSource"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.QAMSource">[docs]</a><span class="k">class</span> <span class="nc">QAMSource</span><span class="p">(</span><span class="n">SymbolSource</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;QAMSource(num_bits_per_symbol=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;QAMSource(num_bits_per_symbol=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Layer generating a tensor of arbitrary shape filled with random QAM symbols.</span>
 <span class="sd">    Optionally, the symbol indices and/or binary representations of the</span>
@@ -1142,7 +1246,7 @@
 
 <div class="viewcode-block" id="PAMSource"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.PAMSource">[docs]</a><span class="k">class</span> <span class="nc">PAMSource</span><span class="p">(</span><span class="n">SymbolSource</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;PAMSource(num_bits_per_symbol=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;PAMSource(num_bits_per_symbol=None, return_indices=False, return_bits=False, seed=None, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Layer generating a tensor of arbitrary shape filled with random PAM symbols.</span>
 <span class="sd">    Optionally, the symbol indices and/or binary representations of the</span>
@@ -1217,7 +1321,7 @@
             <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Simulates until target number of errors is reached and returns BER/BLER.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates until target number of errors is reached and returns BER/BLER.</span>
 
 <span class="sd">    The simulation continues with the next SNR point if either</span>
 <span class="sd">    ``num_target_bit_errors`` bit errors or ``num_target_block_errors`` block</span>
@@ -1306,7 +1410,7 @@
 
     <span class="c1"># utility function to print progress</span>
     <span class="k">def</span> <span class="nf">_print_progress</span><span class="p">(</span><span class="n">is_final</span><span class="p">,</span> <span class="n">rt</span><span class="p">,</span> <span class="n">idx_snr</span><span class="p">,</span> <span class="n">idx_it</span><span class="p">,</span> <span class="n">header_text</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Print summary of current simulation progress.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print summary of current simulation progress.</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        -----</span>
@@ -1553,7 +1657,7 @@
 
 
 <div class="viewcode-block" id="complex_normal"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.complex_normal">[docs]</a><span class="k">def</span> <span class="nf">complex_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a tensor of complex normal random variables.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a tensor of complex normal random variables.</span>
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
@@ -1604,8 +1708,6 @@
     <span class="nb">print</span><span class="p">(</span>  <span class="s2">&quot;Warning: The alias utils.empirical_psd will not be included in&quot;</span>
             <span class="s2">&quot; Sionna 1.0. Please use signal.empirical_psd instead.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">signal</span><span class="o">.</span><span class="n">empirical_psd</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">show</span><span class="p">,</span> <span class="n">oversampling</span><span class="p">,</span> <span class="n">ylim</span><span class="p">)</span>
-
-
 </pre></div>
 
            </div>

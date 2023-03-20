@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.channel.utils &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.channel.utils &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -820,7 +924,7 @@
 <div class="viewcode-block" id="subcarrier_frequencies"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.subcarrier_frequencies">[docs]</a><span class="k">def</span> <span class="nf">subcarrier_frequencies</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="p">,</span> <span class="n">subcarrier_spacing</span><span class="p">,</span>
                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the baseband frequencies of ``num_subcarrier`` subcarriers spaced by</span>
 <span class="sd">    ``subcarrier_spacing``, i.e.,</span>
 
@@ -873,7 +977,7 @@
 
 <div class="viewcode-block" id="time_frequency_vector"><a class="viewcode-back" href="../../../api/channel.optical.html#sionna.channel.utils.time_frequency_vector">[docs]</a><span class="k">def</span> <span class="nf">time_frequency_vector</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">sample_duration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the time and frequency vector for a given number of samples</span>
 <span class="sd">    and duration per sample in normalized time unit.</span>
 
@@ -923,7 +1027,7 @@
 
 <div class="viewcode-block" id="time_lag_discrete_time_channel"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.time_lag_discrete_time_channel">[docs]</a><span class="k">def</span> <span class="nf">time_lag_discrete_time_channel</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">,</span> <span class="n">maximum_delay_spread</span><span class="o">=</span><span class="mf">3e-6</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the smallest and largest time-lag for the descrete complex baseband</span>
 <span class="sd">    channel, i.e., :math:`L_{\text{min}}` and :math:`L_{\text{max}}`.</span>
 
@@ -978,7 +1082,7 @@
 
 <div class="viewcode-block" id="cir_to_ofdm_channel"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.cir_to_ofdm_channel">[docs]</a><span class="k">def</span> <span class="nf">cir_to_ofdm_channel</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the frequency response of the channel at ``frequencies``.</span>
 
 <span class="sd">    Given a channel impulse response</span>
@@ -997,7 +1101,7 @@
 <span class="sd">    a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex</span>
 <span class="sd">        Path coefficients</span>
 
-<span class="sd">    tau : [batch size, num_rx, num_tx, num_paths], tf.float</span>
+<span class="sd">    tau : [batch size, num_rx, num_tx, num_paths] or [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths], tf.float</span>
 <span class="sd">        Path delays</span>
 
 <span class="sd">    normalize : bool</span>
@@ -1012,25 +1116,27 @@
 
     <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">dtype</span>
 
-    <span class="c1"># Expand dims to broadcast with h. Add the following dimensions:</span>
-    <span class="c1">#  - number of rx antennas (2)</span>
-    <span class="c1">#  - number of tx antennas (4)</span>
-    <span class="c1">#  - number of time samples (6)</span>
-    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-                    <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="c1"># Expand dims to broadcast with h. Add the following dimensions:</span>
+        <span class="c1">#  - number of rx antennas (2)</span>
+        <span class="c1">#  - number of tx antennas (4)</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># Broadcast is not supported yet by TF for such high rank tensors.</span>
+        <span class="c1"># We therefore do part of it manually</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Add a time samples dimension for broadcasting</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 
     <span class="c1"># Bring all tensors to broadcastable shapes</span>
     <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">tau</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1">## Compute the Fourier transforms of all cluster taps</span>
     <span class="c1"># Exponential component</span>
     <span class="n">e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">),</span>
         <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="o">*</span><span class="n">frequencies</span><span class="o">*</span><span class="n">tau</span><span class="p">))</span>
-    <span class="c1"># Broadcast is not supported yet by TF for such high rank tensors.</span>
-    <span class="c1"># We therefore do part of it manually</span>
-    <span class="n">e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">h_f</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">e</span>
     <span class="c1"># Sum over all clusters to get the channel frequency responses</span>
     <span class="n">h_f</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">h_f</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
@@ -1042,13 +1148,14 @@
         <span class="c1"># subcarriers.</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span> <span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h_f</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span>
                             <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">h_f</span> <span class="o">=</span> <span class="n">h_f</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+        <span class="n">h_f</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">(</span><span class="n">h_f</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">h_f</span></div>
 
 <div class="viewcode-block" id="cir_to_time_channel"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.cir_to_time_channel">[docs]</a><span class="k">def</span> <span class="nf">cir_to_time_channel</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the channel taps forming the discrete complex-baseband</span>
 <span class="sd">    representation of the channel from the channel impulse response</span>
 <span class="sd">    (``a``, ``tau``).</span>
@@ -1074,7 +1181,7 @@
 <span class="sd">    a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex</span>
 <span class="sd">        Path coefficients</span>
 
-<span class="sd">    tau : [batch size, num_rx, num_tx, num_paths], tf.float</span>
+<span class="sd">    tau : [batch size, num_rx, num_tx, num_paths] or [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths], tf.float</span>
 <span class="sd">        Path delays [s]</span>
 
 <span class="sd">    l_min : int</span>
@@ -1095,12 +1202,17 @@
 
     <span class="n">real_dtype</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">dtype</span>
 
-    <span class="c1"># Expand dims to broadcast with h. Add the following dimensions:</span>
-    <span class="c1">#  - number of rx antennas (2)</span>
-    <span class="c1">#  - number of tx antennas (4)</span>
-    <span class="c1">#  - number of time samples (6)</span>
-    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-                    <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="c1"># Expand dims to broadcast with h. Add the following dimensions:</span>
+        <span class="c1">#  - number of rx antennas (2)</span>
+        <span class="c1">#  - number of tx antennas (4)</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># Broadcast is not supported by TF for such high rank tensors.</span>
+        <span class="c1"># We therefore do part of it manually</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># Add a time samples dimension for broadcasting</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 
     <span class="c1"># Time lags for which to compute the channel taps</span>
     <span class="n">l</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">real_dtype</span><span class="p">)</span>
@@ -1115,9 +1227,6 @@
     <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># For every tap, sum the sinc-weighted coefficients</span>
-    <span class="c1"># Broadcast is not supported by TF for such high rank tensors.</span>
-    <span class="c1"># We therefore do part of it manually</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
     <span class="n">hm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">g</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">3</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
@@ -1129,14 +1238,14 @@
         <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">hm</span><span class="p">)),</span>
                                          <span class="n">axis</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
                            <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">hm</span> <span class="o">=</span> <span class="n">hm</span> <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
-                             <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">real_dtype</span><span class="p">))</span>
+        <span class="n">hm</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">(</span><span class="n">hm</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">hm</span></div>
 
 <div class="viewcode-block" id="time_to_ofdm_channel"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.time_to_ofdm_channel">[docs]</a><span class="k">def</span> <span class="nf">time_to_ofdm_channel</span><span class="p">(</span><span class="n">h_t</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">l_min</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the channel frequency response from the discrete complex-baseband</span>
 <span class="sd">    channel impulse response.</span>
 
@@ -1242,7 +1351,7 @@
 
 
 <div class="viewcode-block" id="deg_2_rad"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.deg_2_rad">[docs]</a><span class="k">def</span> <span class="nf">deg_2_rad</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert degree to radian</span>
 
 <span class="sd">    Input</span>
@@ -1258,7 +1367,7 @@
     <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">PI</span><span class="o">/</span><span class="mf">180.0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="rad_2_deg"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.rad_2_deg">[docs]</a><span class="k">def</span> <span class="nf">rad_2_deg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert radian to degree</span>
 
 <span class="sd">    Input</span>
@@ -1274,7 +1383,7 @@
     <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">180.0</span><span class="o">/</span><span class="n">PI</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="wrap_angle_0_360"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.wrap_angle_0_360">[docs]</a><span class="k">def</span> <span class="nf">wrap_angle_0_360</span><span class="p">(</span><span class="n">angle</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Wrap ``angle`` to (0,360)</span>
 
 <span class="sd">    Input</span>
@@ -1290,7 +1399,7 @@
     <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="mf">360.</span><span class="p">)</span></div>
 
 <span class="k">def</span> <span class="nf">sample_bernoulli</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sample a tensor with shape ``shape`` from a Bernoulli distribution with</span>
 <span class="sd">    probability ``p``</span>
 
@@ -1316,7 +1425,7 @@
 
 <div class="viewcode-block" id="drop_uts_in_sector"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.drop_uts_in_sector">[docs]</a><span class="k">def</span> <span class="nf">drop_uts_in_sector</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">,</span> <span class="n">min_bs_ut_dist</span><span class="p">,</span> <span class="n">isd</span><span class="p">,</span>
                        <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Uniformly sample UT locations from a sector.</span>
 
 <span class="sd">    The sector from which UTs are sampled is shown in the following figure.</span>
@@ -1412,7 +1521,7 @@
                                     <span class="n">min_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                     <span class="n">max_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                     <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set valid parameters for a specified 3GPP system level ``scenario``</span>
 <span class="sd">    (RMa, UMi, or UMa).</span>
 
@@ -1558,7 +1667,7 @@
 
 <div class="viewcode-block" id="relocate_uts"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.relocate_uts">[docs]</a><span class="k">def</span> <span class="nf">relocate_uts</span><span class="p">(</span><span class="n">ut_loc</span><span class="p">,</span> <span class="n">sector_id</span><span class="p">,</span> <span class="n">cell_loc</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Relocate the UTs by rotating them into the sector with index ``sector_id``</span>
 <span class="sd">    and transposing them to the cell centered on ``cell_loc``.</span>
 
@@ -1642,7 +1751,7 @@
                             <span class="n">max_ut_velocity</span><span class="p">,</span>
                             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sample UTs location from a sector or a cell</span>
 
 <span class="sd">    Input</span>
@@ -1785,7 +1894,7 @@
                                 <span class="n">max_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a batch of topologies consisting of a single BS located at the</span>
 <span class="sd">    origin and ``num_ut`` UTs randomly and uniformly dropped in a cell sector.</span>
 
@@ -1969,7 +2078,7 @@
                                             <span class="n">max_ut_velocity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a batch of topologies consisting of a single BS located at the</span>
 <span class="sd">    origin, ``num_ut`` UTs randomly and uniformly dropped in a cell sector, and</span>
 <span class="sd">    ``num_interferer`` interfering UTs randomly dropped in the adjacent cells.</span>
@@ -2194,7 +2303,7 @@
 
 
 <div class="viewcode-block" id="exp_corr_mat"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.exp_corr_mat">[docs]</a><span class="k">def</span> <span class="nf">exp_corr_mat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate exponential correlation matrices.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate exponential correlation matrices.</span>
 
 <span class="sd">    This function computes for every element :math:`a` of a complex-valued</span>
 <span class="sd">    tensor :math:`\mathbf{a}` the corresponding :math:`n\times n` exponential</span>
@@ -2259,7 +2368,7 @@
 
 <div class="viewcode-block" id="one_ring_corr_mat"><a class="viewcode-back" href="../../../api/channel.wireless.html#sionna.channel.utils.one_ring_corr_mat">[docs]</a><span class="k">def</span> <span class="nf">one_ring_corr_mat</span><span class="p">(</span><span class="n">phi_deg</span><span class="p">,</span> <span class="n">num_ant</span><span class="p">,</span> <span class="n">d_h</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sigma_phi_deg</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
                       <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate covariance matrices from the one-ring model.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate covariance matrices from the one-ring model.</span>
 
 <span class="sd">    This function generates approximate covariance matrices for the</span>
 <span class="sd">    so-called `one-ring` model (Eq. 2.24) [BHS2017]_. A uniform</span>

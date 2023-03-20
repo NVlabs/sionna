@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.mapping &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.mapping &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -819,7 +923,7 @@
 
 <div class="viewcode-block" id="pam_gray"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.pam_gray">[docs]</a><span class="k">def</span> <span class="nf">pam_gray</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Maps a vector of bits to a PAM constellation points with Gray labeling.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Maps a vector of bits to a PAM constellation points with Gray labeling.</span>
 
 <span class="sd">    This recursive function maps a binary vector to Gray-labelled PAM</span>
 <span class="sd">    constellation points. It can be used to generated QAM constellations.</span>
@@ -847,7 +951,7 @@
     <span class="k">return</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="qam"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.qam">[docs]</a><span class="k">def</span> <span class="nf">qam</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a QAM constellation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a QAM constellation.</span>
 
 <span class="sd">    This function generates a complex-valued vector, where each element is</span>
 <span class="sd">    a constellation point of an M-ary QAM constellation. The bit</span>
@@ -911,7 +1015,7 @@
     <span class="k">return</span> <span class="n">c</span></div>
 
 <div class="viewcode-block" id="pam"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.pam">[docs]</a><span class="k">def</span> <span class="nf">pam</span><span class="p">(</span><span class="n">num_bits_per_symbol</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a PAM constellation.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a PAM constellation.</span>
 
 <span class="sd">    This function generates a real-valued vector, where each element is</span>
 <span class="sd">    a constellation point of an M-ary PAM constellation. The bit</span>
@@ -975,7 +1079,7 @@
 
 <div class="viewcode-block" id="Constellation"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Constellation">[docs]</a><span class="k">class</span> <span class="nc">Constellation</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constellation(constellation_type, num_bits_per_symbol, initial_value=None, normalize=True, center=False, trainable=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Constellation that can be used by a (de)mapper.</span>
@@ -1116,7 +1220,7 @@
                                         <span class="n">constellation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                         <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Static method for conviently creating a constellation object or checking that an existing one</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Static method for conviently creating a constellation object or checking that an existing one</span>
 <span class="sd">        is consistent with requested settings.</span>
 
 <span class="sd">        If ``constellation`` is `None`, then this method creates a :class:`~sionna.mapping.Constellation`</span>
@@ -1147,10 +1251,10 @@
         <span class="n">constellation_object</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">constellation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">constellation_type</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;`constellation_type` must be &quot;custom&quot;.&quot;&quot;&quot;</span>
             <span class="k">assert</span> <span class="n">num_bits_per_symbol</span> <span class="ow">in</span> \
                      <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">constellation</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">],</span> \
-                <span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;`Wrong value of `num_bits_per_symbol.`&quot;&quot;&quot;</span>
             <span class="k">assert</span> <span class="n">constellation</span><span class="o">.</span><span class="n">dtype</span><span class="o">==</span><span class="n">dtype</span><span class="p">,</span> \
                 <span class="s2">&quot;Constellation has wrong dtype.&quot;</span>
             <span class="n">constellation_object</span> <span class="o">=</span> <span class="n">constellation</span>
@@ -1177,7 +1281,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indicates if the constellation is normalized or not.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indicates if the constellation is normalized or not.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize</span>
 
     <span class="nd">@normalize</span><span class="o">.</span><span class="n">setter</span>
@@ -1187,7 +1291,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indicates if the constellation is centered.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indicates if the constellation is centered.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_center</span>
 
     <span class="nd">@center</span><span class="o">.</span><span class="n">setter</span>
@@ -1197,16 +1301,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_bits_per_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The number of bits per constellation symbol.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of bits per constellation symbol.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The (possibly) centered and normalized constellation points.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The (possibly) centered and normalized constellation points.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Constellation.show"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Constellation.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">7</span><span class="p">)):</span>
-        <span class="sd">&quot;&quot;&quot;Generate a scatter-plot of the constellation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a scatter-plot of the constellation.</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        -----</span>
@@ -1243,7 +1347,7 @@
 
 <div class="viewcode-block" id="Mapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Mapper">[docs]</a><span class="k">class</span> <span class="nc">Mapper</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, return_indices=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Maps binary tensors to points of a constellation.</span>
@@ -1319,7 +1423,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">constellation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The Constellation used by the Mapper.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Constellation used by the Mapper.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constellation</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
@@ -1345,7 +1449,7 @@
 
 <div class="viewcode-block" id="SymbolLogits2LLRs"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolLogits2LLRs">[docs]</a><span class="k">class</span> <span class="nc">SymbolLogits2LLRs</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SymbolLogits2LLRs(method, num_bits_per_symbol, hard_out=False, with_prior=False, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
@@ -1535,7 +1639,7 @@
 
 <div class="viewcode-block" id="SymbolLogits2LLRsWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolLogits2LLRsWithPrior">[docs]</a><span class="k">class</span> <span class="nc">SymbolLogits2LLRsWithPrior</span><span class="p">(</span><span class="n">SymbolLogits2LLRs</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SymbolLogits2LLRsWithPrior(method, num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
@@ -1642,7 +1746,7 @@
 
 <div class="viewcode-block" id="Demapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.Demapper">[docs]</a><span class="k">class</span> <span class="nc">Demapper</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Demapper(demapping_method, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, with_prior=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
@@ -1826,7 +1930,7 @@
 
 <div class="viewcode-block" id="DemapperWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.DemapperWithPrior">[docs]</a><span class="k">class</span> <span class="nc">DemapperWithPrior</span><span class="p">(</span><span class="n">Demapper</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    DemapperWithPrior(demapping_method, constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Computes log-likelihood ratios (LLRs) or hard-decisions on bits</span>
@@ -1957,7 +2061,7 @@
 
 <div class="viewcode-block" id="SymbolDemapper"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolDemapper">[docs]</a><span class="k">class</span> <span class="nc">SymbolDemapper</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SymbolDemapper(constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, with_prior=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Computes normalized log-probabilities (logits) or hard-decisions on symbols</span>
@@ -2076,7 +2180,7 @@
 
 <div class="viewcode-block" id="SymbolDemapperWithPrior"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolDemapperWithPrior">[docs]</a><span class="k">class</span> <span class="nc">SymbolDemapperWithPrior</span><span class="p">(</span><span class="n">SymbolDemapper</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SymbolDemapperWithPrior(constellation_type=None, num_bits_per_symbol=None, constellation=None, hard_out=False, dtype=tf.complex64, **kwargs)</span>
 
 <span class="sd">    Computes normalized log-probabilities (logits) or hard-decisions on symbols</span>
@@ -2163,7 +2267,7 @@
 
 <div class="viewcode-block" id="LLRs2SymbolLogits"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.LLRs2SymbolLogits">[docs]</a><span class="k">class</span> <span class="nc">LLRs2SymbolLogits</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    LLRs2SymbolLogits(num_bits_per_symbol, hard_out=False, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Computes logits (i.e., unnormalized log-probabilities) or hard decisions</span>
@@ -2258,7 +2362,7 @@
 
 <div class="viewcode-block" id="SymbolLogits2Moments"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolLogits2Moments">[docs]</a><span class="k">class</span> <span class="nc">SymbolLogits2Moments</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    SymbolLogits2Moments(constellation_type=None, num_bits_per_symbol=None, constellation=None, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Computes the mean and variance of a constellation from logits (unnormalized log-probabilities) on the</span>
@@ -2340,7 +2444,7 @@
         <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">var</span></div>
 
 <div class="viewcode-block" id="QAM2PAM"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.QAM2PAM">[docs]</a><span class="k">class</span> <span class="nc">QAM2PAM</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transforms QAM symbol indices to PAM symbol indices.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transforms QAM symbol indices to PAM symbol indices.</span>
 
 <span class="sd">    For indices in a QAM constellation, computes the corresponding indices</span>
 <span class="sd">    for the two PAM constellations corresponding the real and imaginary</span>
@@ -2385,7 +2489,7 @@
         <span class="k">return</span> <span class="n">ind_pam1</span><span class="p">,</span> <span class="n">ind_pam2</span></div>
 
 <div class="viewcode-block" id="PAM2QAM"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.PAM2QAM">[docs]</a><span class="k">class</span> <span class="nc">PAM2QAM</span><span class="p">:</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transforms PAM symbol indices/logits to QAM symbol indices/logits.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transforms PAM symbol indices/logits to QAM symbol indices/logits.</span>
 
 <span class="sd">    For two PAM constellation symbol indices or logits, corresponding to</span>
 <span class="sd">    the real and imaginary components of a QAM constellation,</span>
@@ -2460,7 +2564,7 @@
 
 <div class="viewcode-block" id="SymbolInds2Bits"><a class="viewcode-back" href="../../api/mapping.html#sionna.mapping.SymbolInds2Bits">[docs]</a><span class="k">class</span> <span class="nc">SymbolInds2Bits</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SymbolInds2Bits(num_bits_per_symbol, dtype=tf.float32, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;SymbolInds2Bits(num_bits_per_symbol, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Transforms symbol indices to their binary representations.</span>
 

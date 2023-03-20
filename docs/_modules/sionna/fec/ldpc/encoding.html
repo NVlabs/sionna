@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.encoding &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.fec.ldpc.encoding &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -822,7 +926,7 @@
 
 <div class="viewcode-block" id="LDPC5GEncoder"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.encoding.LDPC5GEncoder">[docs]</a><span class="k">class</span> <span class="nc">LDPC5GEncoder</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sd">&quot;&quot;&quot;LDPC5GEncoder(k, n, num_bits_per_symbol=None, dtype=tf.float32, **kwargs)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;LDPC5GEncoder(k, n, num_bits_per_symbol=None, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    5G NR LDPC Encoder following the 3GPP NR Initiative [3GPPTS38212_LDPC]_</span>
 <span class="sd">    including rate-matching.</span>
@@ -1032,7 +1136,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">k</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of input information bits.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of input information bits.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k</span>
 
     <span class="nd">@property</span>
@@ -1042,41 +1146,41 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">coderate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Coderate of the LDPC code after rate-matching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coderate of the LDPC code after rate-matching.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coderate</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">k_ldpc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of LDPC information bits after rate-matching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of LDPC information bits after rate-matching.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_k_ldpc</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_ldpc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of LDPC codeword bits before rate-matching.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of LDPC codeword bits before rate-matching.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_ldpc</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pcm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Parity-check matrix for given code parameters.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parity-check matrix for given code parameters.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pcm</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Lifting factor of the basegraph.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lifting factor of the basegraph.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_bits_per_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Modulation order used for the rate-matching output interleaver.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modulation order used for the rate-matching output interleaver.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_bits_per_symbol</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">out_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Output interleaver sequence as defined in 5.4.2.2.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Output interleaver sequence as defined in 5.4.2.2.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_int</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">out_int_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Inverse output interleaver sequence as defined in 5.4.2.2.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inverse output interleaver sequence as defined in 5.4.2.2.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_int_inv</span>
 
     <span class="c1">#########################</span>
@@ -1084,7 +1188,7 @@
     <span class="c1">#########################</span>
 
 <div class="viewcode-block" id="LDPC5GEncoder.generate_out_int"><a class="viewcode-back" href="../../../../api/fec.ldpc.html#sionna.fec.ldpc.encoding.LDPC5GEncoder.generate_out_int">[docs]</a>    <span class="k">def</span> <span class="nf">generate_out_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&quot;Generates LDPC output interleaver sequence as defined in</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&quot;Generates LDPC output interleaver sequence as defined in</span>
 <span class="sd">        Sec 5.4.2.2 in [3GPPTS38212_LDPC]_.</span>
 
 <span class="sd">        Parameters</span>
@@ -1135,7 +1239,7 @@
         <span class="k">return</span> <span class="n">perm_seq</span><span class="p">,</span> <span class="n">perm_seq_inv</span></div>
 
     <span class="k">def</span> <span class="nf">_sel_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Select basegraph according to [3GPPTS38212_LDPC]_.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select basegraph according to [3GPPTS38212_LDPC]_.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="mi">292</span><span class="p">:</span>
             <span class="n">bg</span> <span class="o">=</span> <span class="s2">&quot;bg2&quot;</span>
@@ -1165,7 +1269,7 @@
         <span class="k">return</span> <span class="n">bg</span>
 
     <span class="k">def</span> <span class="nf">_load_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_ls</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper to load basegraph from csv files.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to load basegraph from csv files.</span>
 
 <span class="sd">        ``i_ls`` is sub_index of the basegraph and fixed during lifting</span>
 <span class="sd">        selection.</span>
@@ -1203,7 +1307,7 @@
         <span class="k">return</span> <span class="n">bm</span>
 
     <span class="k">def</span> <span class="nf">_lift_basegraph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bm</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Lift basegraph with lifting factor ``z`` and shifted identities as</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lift basegraph with lifting factor ``z`` and shifted identities as</span>
 <span class="sd">        defined by the entries of ``bm``.&quot;&quot;&quot;</span>
 
         <span class="n">num_nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">bm</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># num of non-neg elements in bm</span>
@@ -1235,7 +1339,7 @@
         <span class="k">return</span> <span class="n">pcm</span>
 
     <span class="k">def</span> <span class="nf">_sel_lifting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Select lifting as defined in Sec. 5.2.2 in [3GPPTS38212_LDPC]_.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select lifting as defined in Sec. 5.2.2 in [3GPPTS38212_LDPC]_.</span>
 
 <span class="sd">        We assume B &lt; K_cb, thus B&#39;= B and C = 1, i.e., no</span>
 <span class="sd">        additional CRC is appended. Thus, K&#39; = B&#39;/C = B and B is our K.</span>
@@ -1292,7 +1396,7 @@
         <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">i_ls</span><span class="p">,</span> <span class="n">k_b</span>
 
     <span class="k">def</span> <span class="nf">_gen_submat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bm</span><span class="p">,</span> <span class="n">k_b</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Split the basegraph into multiple sub-matrices such that efficient</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split the basegraph into multiple sub-matrices such that efficient</span>
 <span class="sd">        encoding is possible.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">g</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># code property (always fixed for 5G)</span>
@@ -1317,7 +1421,7 @@
         <span class="k">return</span> <span class="n">hm_a</span><span class="p">,</span> <span class="n">hm_b_inv</span><span class="p">,</span> <span class="n">hm_c1</span><span class="p">,</span> <span class="n">hm_c2</span>
 
     <span class="k">def</span> <span class="nf">_find_hm_b_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bm_b</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">bg</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; For encoding we need to find the inverse of `hm_b` such that</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; For encoding we need to find the inverse of `hm_b` such that</span>
 <span class="sd">        `hm_b^-1 * hm_b = I`.</span>
 
 <span class="sd">        Could be done sparse</span>
@@ -1405,7 +1509,7 @@
         <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">hm_b_inv</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_mat_to_ind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Helper to transform matrix into index representation for</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to transform matrix into index representation for</span>
 <span class="sd">        tf.gather. An index pointing to the `last_ind+1` is used for non-existing edges due to irregular degrees.&quot;&quot;&quot;</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1434,7 +1538,7 @@
         <span class="k">return</span> <span class="n">gat_idx</span>
 
     <span class="k">def</span> <span class="nf">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">,</span> <span class="n">vec</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Implements a fast sparse matmul via gather function.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements a fast sparse matmul via gather function.&quot;&quot;&quot;</span>
 
         <span class="c1"># add 0 entry for gather-reduce_sum operation</span>
         <span class="c1"># (otherwise ragged Tensors are required)</span>
@@ -1447,7 +1551,7 @@
         <span class="k">return</span> <span class="n">retval</span>
 
     <span class="k">def</span> <span class="nf">_encode_fast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Main encoding function based on gathering function.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main encoding function based on gathering function.&quot;&quot;&quot;</span>
         <span class="n">p_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcm_a_ind</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
         <span class="n">p_a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matmul_gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pcm_b_inv_ind</span><span class="p">,</span> <span class="n">p_a</span><span class="p">)</span>
 
@@ -1472,13 +1576,13 @@
     <span class="c1">#########################</span>
 
     <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_shape</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;&quot;Build layer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;&quot;Build layer.&quot;&quot;&quot;</span>
         <span class="c1"># check if k and input shape match</span>
         <span class="k">assert</span> <span class="p">(</span><span class="n">input_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="bp">self</span><span class="o">.</span><span class="n">_k</span><span class="p">),</span> <span class="s2">&quot;Last dimension must be of length k.&quot;</span>
         <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_shape</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot;Rank of input must be at least 2.&quot;</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;5G LDPC encoding function including rate-matching.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;5G LDPC encoding function including rate-matching.</span>
 
 <span class="sd">        This function returns the encoded codewords as specified by the 3GPP NR Initiative [3GPPTS38212_LDPC]_ including puncturing and shortening.</span>
 

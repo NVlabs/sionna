@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.channel.tr38901.antenna &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.channel.tr38901.antenna &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -823,7 +927,7 @@
 
 
 <span class="k">class</span> <span class="nc">AntennaElement</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Antenna element following the [TR38901]_ specification</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Antenna element following the [TR38901]_ specification</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -861,7 +965,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
 
     <span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Field pattern in the vertical and horizontal polarization (7.3-4/5)</span>
 
 <span class="sd">        Inputs</span>
@@ -878,7 +982,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">f_theta</span><span class="p">,</span> <span class="n">f_phi</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shows the field pattern of an antenna element</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">theta</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">PI</span><span class="p">,</span> <span class="mi">361</span><span class="p">)</span>
@@ -923,7 +1027,7 @@
 
     <span class="c1"># pylint: disable=unused-argument</span>
     <span class="k">def</span> <span class="nf">_radiation_pattern_omni</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Radiation pattern of an omnidirectional 3D radiation pattern</span>
 
 <span class="sd">        Inputs</span>
@@ -937,7 +1041,7 @@
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_radiation_pattern_38901</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Radiation pattern from TR38901 (Table 7.3-1)</span>
 
 <span class="sd">        Inputs</span>
@@ -957,7 +1061,7 @@
         <span class="k">return</span> <span class="mi">10</span><span class="o">**</span><span class="p">(</span><span class="n">a_db</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_compute_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute antenna gain and directivity through numerical integration</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create angular meshgrid</span>
@@ -983,7 +1087,7 @@
 
 
 <span class="k">class</span> <span class="nc">AntennaPanel</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Antenna panel following the [TR38901]_ specification</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Antenna panel following the [TR38901]_ specification</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
@@ -1051,35 +1155,35 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Antenna positions in the local coordinate system&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Antenna positions in the local coordinate system&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of rows&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of rows&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span>
 
     <span class="k">def</span> <span class="nf">num_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of columns&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of columns&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">porlarization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Polarization (&quot;single&quot; or &quot;dual&quot;)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Polarization (&quot;single&quot; or &quot;dual&quot;)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vertical_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vertical spacing between elements [multiple of wavelength]&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vertical spacing between elements [multiple of wavelength]&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertical_spacing</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">horizontal_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vertical spacing between elements [multiple of wavelength]&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vertical spacing between elements [multiple of wavelength]&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_horizontal_spacing</span>
 
     <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Shows the panel geometry&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shows the panel geometry&quot;&quot;&quot;</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span><span class="p">]</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos</span><span class="p">[:,</span><span class="mi">2</span><span class="p">],</span> <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
@@ -1098,7 +1202,7 @@
 
 <div class="viewcode-block" id="PanelArray"><a class="viewcode-back" href="../../../../api/channel.wireless.html#sionna.channel.tr38901.PanelArray">[docs]</a><span class="k">class</span> <span class="nc">PanelArray</span><span class="p">:</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;PanelArray(num_rows_per_panel, num_cols_per_panel, polarization, polarization_type, antenna_pattern, carrier_frequency, num_rows=1, num_cols=1, panel_vertical_spacing=None, panel_horizontal_spacing=None, element_vertical_spacing=None, element_horizontal_spacing=None, dtype=tf.complex64)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;PanelArray(num_rows_per_panel, num_cols_per_panel, polarization, polarization_type, antenna_pattern, carrier_frequency, num_rows=1, num_cols=1, panel_vertical_spacing=None, panel_horizontal_spacing=None, element_vertical_spacing=None, element_horizontal_spacing=None, dtype=tf.complex64)</span>
 
 <span class="sd">    Antenna panel array following the [TR38901]_ specification.</span>
 
@@ -1306,80 +1410,80 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of rows of panels&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of rows of panels&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of columns of panels&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of columns of panels&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_rows_per_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of rows of elements per panel&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of rows of elements per panel&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rows_per_panel</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_cols_per_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of columns of elements per panel&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of columns of elements per panel&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_cols_per_panel</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">polarization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Polarization (&quot;single&quot; or &quot;dual&quot;)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Polarization (&quot;single&quot; or &quot;dual&quot;)&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">polarization_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Polarization type. &quot;V&quot; or &quot;H&quot; for single polarization.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Polarization type. &quot;V&quot; or &quot;H&quot; for single polarization.</span>
 <span class="sd">        &quot;VH&quot; or &quot;cross&quot; for dual polarization.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">panel_vertical_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vertical spacing between the panels [multiple of wavelength]&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vertical spacing between the panels [multiple of wavelength]&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_vertical_spacing</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">panel_horizontal_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Horizontal spacing between the panels [multiple of wavelength]&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Horizontal spacing between the panels [multiple of wavelength]&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_panel_horizontal_spacing</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">element_vertical_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Vertical spacing between the antenna elements within a panel</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Vertical spacing between the antenna elements within a panel</span>
 <span class="sd">        [multiple of wavelength]&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_element_vertical_spacing</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">element_horizontal_spacing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Horizontal spacing between the antenna elements within a panel</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Horizontal spacing between the antenna elements within a panel</span>
 <span class="sd">        [multiple of wavelength]&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_element_horizontal_spacing</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_panels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of panels&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of panels&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_panels</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_panels_ant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Number of antenna elements per panel&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of antenna elements per panel&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_panel_ant</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_ant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Total number of antenna elements&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Total number of antenna elements&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_ant</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_pol1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Field of an antenna element with the first polarization direction&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Field of an antenna element with the first polarization direction&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pol1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_pol2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Field of an antenna element with the second polarization direction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Field of an antenna element with the second polarization direction.</span>
 <span class="sd">        Only defined with dual polarization.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;dual&#39;</span><span class="p">,</span>\
             <span class="s2">&quot;This property is not defined with single polarization&quot;</span>
@@ -1387,17 +1491,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Positions of the antennas&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Positions of the antennas&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_ind_pol1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indices of antenna elements with the first polarization direction&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices of antenna elements with the first polarization direction&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_ind_pol1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_ind_pol2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Indices of antenna elements with the second polarization direction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Indices of antenna elements with the second polarization direction.</span>
 <span class="sd">        Only defined with dual polarization.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;dual&#39;</span><span class="p">,</span>\
             <span class="s2">&quot;This property is not defined with single polarization&quot;</span>
@@ -1405,20 +1509,20 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_pos_pol1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Positions of the antenna elements with the first polarization</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Positions of the antenna elements with the first polarization</span>
 <span class="sd">        direction&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos_pol1</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ant_pos_pol2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Positions of antenna elements with the second polarization direction.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Positions of antenna elements with the second polarization direction.</span>
 <span class="sd">        Only defined with dual polarization.&quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;dual&#39;</span><span class="p">,</span>\
             <span class="s2">&quot;This property is not defined with single polarization&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pos_pol2</span>
 
 <div class="viewcode-block" id="PanelArray.show"><a class="viewcode-back" href="../../../../api/channel.wireless.html#sionna.channel.tr38901.PanelArray.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Show the panel array geometry&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show the panel array geometry&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization</span> <span class="o">==</span> <span class="s1">&#39;single&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_polarization_type</span> <span class="o">==</span> <span class="s1">&#39;H&#39;</span><span class="p">:</span>
                 <span class="n">marker_p1</span> <span class="o">=</span> <span class="n">MarkerStyle</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_marker</span><span class="p">()</span>
@@ -1450,12 +1554,12 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;Polarization 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Polarization 2&quot;</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PanelArray.show_element_radiation_pattern"><a class="viewcode-back" href="../../../../api/channel.wireless.html#sionna.channel.tr38901.PanelArray.show_element_radiation_pattern">[docs]</a>    <span class="k">def</span> <span class="nf">show_element_radiation_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Show the radiation field of antenna elements forming the panel&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Show the radiation field of antenna elements forming the panel&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ant_pol1</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="Antenna"><a class="viewcode-back" href="../../../../api/channel.wireless.html#sionna.channel.tr38901.Antenna">[docs]</a><span class="k">class</span> <span class="nc">Antenna</span><span class="p">(</span><span class="n">PanelArray</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Antenna(polarization, polarization_type, antenna_pattern, carrier_frequency, dtype=tf.complex64)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Antenna(polarization, polarization_type, antenna_pattern, carrier_frequency, dtype=tf.complex64)</span>
 
 <span class="sd">    Single antenna following the [TR38901]_ specification.</span>
 
@@ -1498,7 +1602,7 @@
 
 <div class="viewcode-block" id="AntennaArray"><a class="viewcode-back" href="../../../../api/channel.wireless.html#sionna.channel.tr38901.AntennaArray">[docs]</a><span class="k">class</span> <span class="nc">AntennaArray</span><span class="p">(</span><span class="n">PanelArray</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;AntennaArray(num_rows, num_cols, polarization, polarization_type, antenna_pattern, carrier_frequency, vertical_spacing, horizontal_spacing, dtype=tf.complex64)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;AntennaArray(num_rows, num_cols, polarization, polarization_type, antenna_pattern, carrier_frequency, vertical_spacing, horizontal_spacing, dtype=tf.complex64)</span>
 
 <span class="sd">    Antenna array following the [TR38901]_ specification.</span>
 

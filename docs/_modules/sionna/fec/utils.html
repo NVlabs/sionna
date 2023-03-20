@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.utils &mdash; Sionna 0.13.0 documentation</title>
+  <title>sionna.fec.utils &mdash; Sionna 0.14.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -153,6 +153,20 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Optical_Lumped_Amplification_Channel.html#References">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html">Sionna Ray Tracing Tutorial</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Loading-Scenes">Loading Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Ray-Tracing-for-Radio-Propagation">Ray Tracing for Radio Propagation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#From-Paths-to-Channel-Impulse-Responses">From Paths to Channel Impulse Responses</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#BER-Evaluation">BER Evaluation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Runtime-vs-Depth">Runtime vs Depth</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Coverage-Map">Coverage Map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Site-specifc-Link-Level-Simulations">Site-specifc Link-Level Simulations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Introduction.html#Conclusion-and-Outlook">Conclusion and Outlook</a></li>
 </ul>
 </li>
 </ul>
@@ -346,12 +360,23 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#far-field-of-a-transmitting-antenna">Far Field of a Transmitting Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#modelling-of-a-receiving-antenna">Modelling of a Receiving Antenna</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#general-propagation-path">General Propagation Path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#frequency-impulse-response">Frequency &amp; Impulse Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and refraction</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -703,6 +728,85 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/rt.html">Ray Tracing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render">render</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#render-to-file">render_to_file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#paths">Paths</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id10">Paths</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#channel-impulse-responses">Channel Impulse Responses</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#paths2cir">Paths2CIR</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#camera">Camera</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene-objects">Scene Objects</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sceneobject">SceneObject</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-materials">Radio Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#radiomaterial">RadioMaterial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#radio-devices">Radio Devices</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#transmitter">Transmitter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#receiver">Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antenna-arrays">Antenna Arrays</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antennaarray">AntennaArray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#planararray">PlanarArray</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#antennas">Antennas</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#antenna">Antenna</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-gain">compute_gain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#visualize">visualize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dipole-pattern">dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#hw-dipole-pattern">hw_dipole_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#iso-pattern">iso_pattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#tr38901-pattern">tr38901_pattern</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotation-matrix">rotation_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#r-hat">r_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-hat">theta_hat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#theta-phi-from-unit-vec">theta_phi_from_unit_vec</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/signal.html">Signal</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/signal.html#filters">Filters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/signal.html#sincfilter">SincFilter</a></li>
@@ -822,7 +926,7 @@
 
 
 <div class="viewcode-block" id="GaussianPriorSource"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.GaussianPriorSource">[docs]</a><span class="k">class</span> <span class="nc">GaussianPriorSource</span><span class="p">(</span><span class="n">Layer</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;GaussianPriorSource(specified_by_mi=False, dtype=tf.float32, **kwargs)</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;GaussianPriorSource(specified_by_mi=False, dtype=tf.float32, **kwargs)</span>
 
 <span class="sd">    Generates `fake` LLRs as if the all-zero codeword was transmitted</span>
 <span class="sd">    over an Bi-AWGN channel with noise variance ``no`` or mutual information</span>
@@ -903,7 +1007,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_specified_by_mi</span> <span class="o">=</span> <span class="n">specified_by_mi</span>
 
     <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Generate Gaussian distributed fake LLRs as if the all-zero codeword</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Gaussian distributed fake LLRs as if the all-zero codeword</span>
 <span class="sd">        was transmitted over an Bi-AWGN channel.</span>
 
 <span class="sd">        Args:</span>
@@ -956,7 +1060,7 @@
 
 <div class="viewcode-block" id="llr2mi"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.llr2mi">[docs]</a><span class="k">def</span> <span class="nf">llr2mi</span><span class="p">(</span><span class="n">llr</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reduce_dims</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implements an approximation of the mutual information based on LLRs.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implements an approximation of the mutual information based on LLRs.</span>
 
 <span class="sd">    The function approximates the mutual information for given ``llr`` as</span>
 <span class="sd">    derived in [Hagenauer]_ assuming an `all-zero codeword` transmission</span>
@@ -1027,7 +1131,7 @@
 
 <div class="viewcode-block" id="j_fun"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.j_fun">[docs]</a><span class="k">def</span> <span class="nf">j_fun</span><span class="p">(</span><span class="n">mu</span><span class="p">):</span>
        <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the `J-function` in NumPy.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the `J-function` in NumPy.</span>
 
 <span class="sd">    The so-called `J-function` relates mutual information to the mean of</span>
 <span class="sd">    Gaussian distributed LLRs (cf. Gaussian approximation). We use the</span>
@@ -1064,7 +1168,7 @@
 
 <div class="viewcode-block" id="j_fun_inv"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.j_fun_inv">[docs]</a><span class="k">def</span> <span class="nf">j_fun_inv</span><span class="p">(</span><span class="n">mi</span><span class="p">):</span>
      <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the inverse `J-function` in NumPy.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the inverse `J-function` in NumPy.</span>
 
 <span class="sd">    The so-called `J-function` relates mutual information to the mean of</span>
 <span class="sd">    Gaussian distributed LLRs (cf. Gaussian approximation). We use the</span>
@@ -1107,7 +1211,7 @@
 
 <div class="viewcode-block" id="j_fun_tf"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.j_fun_tf">[docs]</a><span class="k">def</span> <span class="nf">j_fun_tf</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">verify_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
      <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the `J-function` in Tensorflow.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the `J-function` in Tensorflow.</span>
 
 <span class="sd">    The so-called `J-function` relates mutual information to the mean of</span>
 <span class="sd">    Gaussian distributed LLRs (cf. Gaussian approximation). We use the</span>
@@ -1155,7 +1259,7 @@
 
 <div class="viewcode-block" id="j_fun_inv_tf"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.j_fun_inv_tf">[docs]</a><span class="k">def</span> <span class="nf">j_fun_inv_tf</span><span class="p">(</span><span class="n">mi</span><span class="p">,</span> <span class="n">verify_inputs</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the inverse `J-function` in Tensorflow.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Calculates the inverse `J-function` in Tensorflow.</span>
 
 <span class="sd">    The so-called `J-function` relates mutual information to the mean of</span>
 <span class="sd">    Gaussian distributed LLRs (cf. Gaussian approximation). We use the</span>
@@ -1205,7 +1309,7 @@
     <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span> <span class="c1"># clipp the output to mu_max =20</span></div>
 
 <div class="viewcode-block" id="plot_trajectory"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.plot_trajectory">[docs]</a><span class="k">def</span> <span class="nf">plot_trajectory</span><span class="p">(</span><span class="n">plot</span><span class="p">,</span> <span class="n">mi_v</span><span class="p">,</span> <span class="n">mi_c</span><span class="p">,</span> <span class="n">ebno</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Utility function to plot the trajectory of an EXIT-chart.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function to plot the trajectory of an EXIT-chart.</span>
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
@@ -1255,7 +1359,7 @@
     <span class="n">plot</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span> <span class="c1"># and show the legend</span></div>
 
 <div class="viewcode-block" id="plot_exit_chart"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.plot_exit_chart">[docs]</a><span class="k">def</span> <span class="nf">plot_exit_chart</span><span class="p">(</span><span class="n">mi_a</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mi_ev</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mi_ec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;EXIT-Chart&quot;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Utility function to plot EXIT-Charts [tenBrinkEXIT]_.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function to plot EXIT-Charts [tenBrinkEXIT]_.</span>
 
 <span class="sd">    If all inputs are `None` an empty EXIT chart is generated. Otherwise,</span>
 <span class="sd">    the mutual information curves are plotted.</span>
@@ -1321,7 +1425,7 @@
     <span class="k">return</span> <span class="n">plt</span></div>
 
 <div class="viewcode-block" id="get_exit_analytic"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.get_exit_analytic">[docs]</a><span class="k">def</span> <span class="nf">get_exit_analytic</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculate the analytic EXIT-curves for a given parity-check matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the analytic EXIT-curves for a given parity-check matrix.</span>
 
 <span class="sd">    This function extracts the degree profile from ``pcm`` and calculates the</span>
 <span class="sd">    variable (VN) and check node (CN) decoder EXIT curves. Please note that</span>
@@ -1421,7 +1525,7 @@
 
 <div class="viewcode-block" id="load_parity_check_examples"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.load_parity_check_examples">[docs]</a><span class="k">def</span> <span class="nf">load_parity_check_examples</span><span class="p">(</span><span class="n">pcm_id</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sd">&quot;&quot;&quot;Utility function to load example codes stored in sub-folder LDPC/codes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility function to load example codes stored in sub-folder LDPC/codes.</span>
 
 <span class="sd">    The following codes are available</span>
 
@@ -1474,7 +1578,7 @@
     <span class="k">return</span> <span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">coderate</span></div>
 
 <div class="viewcode-block" id="bin2int"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.bin2int">[docs]</a><span class="k">def</span> <span class="nf">bin2int</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Convert binary array to integer.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert binary array to integer.</span>
 
 <span class="sd">    For example ``arr`` = `[1, 0, 1]` is converted to `5`.</span>
 
@@ -1493,7 +1597,7 @@
     <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="bin2int_tf"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.bin2int_tf">[docs]</a><span class="k">def</span> <span class="nf">bin2int_tf</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts binary tensor to int tensor. Binary representation in ``arr``</span>
 <span class="sd">    is across the last dimension from most significant to least significant.</span>
 
@@ -1518,7 +1622,7 @@
     <span class="k">return</span> <span class="n">op</span></div>
 
 <div class="viewcode-block" id="int2bin"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.int2bin">[docs]</a><span class="k">def</span> <span class="nf">int2bin</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">len_</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert ``num`` of int type to list of length ``len_`` with 0&#39;s and 1&#39;s.</span>
 <span class="sd">    ``num`` and ``len_`` have to non-negative.</span>
 
@@ -1547,7 +1651,7 @@
     <span class="k">return</span> <span class="n">binary_vals</span></div>
 
 <div class="viewcode-block" id="int2bin_tf"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.int2bin_tf">[docs]</a><span class="k">def</span> <span class="nf">int2bin_tf</span><span class="p">(</span><span class="n">ints</span><span class="p">,</span> <span class="n">len_</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts (int) tensor to (int) tensor with 0&#39;s and 1&#39;s. `len_` should be</span>
 <span class="sd">    to non-negative. Additional dimension of size `len_` is inserted at end.</span>
 
@@ -1576,7 +1680,7 @@
 
 <div class="viewcode-block" id="alist2mat"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.alist2mat">[docs]</a><span class="k">def</span> <span class="nf">alist2mat</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert `alist` [MacKay]_ code definition to `full` parity-check matrix.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert `alist` [MacKay]_ code definition to `full` parity-check matrix.</span>
 
 <span class="sd">    Many code examples can be found in [UniKL]_.</span>
 
@@ -1686,7 +1790,7 @@
     <span class="k">return</span> <span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">coderate</span></div>
 
 <div class="viewcode-block" id="load_alist"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.load_alist">[docs]</a><span class="k">def</span> <span class="nf">load_alist</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Read `alist`-file [MacKay]_ and return nested list describing the</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read `alist`-file [MacKay]_ and return nested list describing the</span>
 <span class="sd">    parity-check matrix of a code.</span>
 
 <span class="sd">    Many code examples can be found in [UniKL]_.</span>
@@ -1716,7 +1820,7 @@
     <span class="k">return</span> <span class="n">alist</span></div>
 
 <div class="viewcode-block" id="make_systematic"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.make_systematic">[docs]</a><span class="k">def</span> <span class="nf">make_systematic</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">is_pcm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bring binary matrix in its systematic form.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bring binary matrix in its systematic form.</span>
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
@@ -1822,7 +1926,7 @@
     <span class="k">return</span> <span class="n">mat</span><span class="p">,</span> <span class="n">column_swaps</span></div>
 
 <div class="viewcode-block" id="gm2pcm"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.gm2pcm">[docs]</a><span class="k">def</span> <span class="nf">gm2pcm</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">verify_results</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the parity-check matrix for a given generator matrix.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the parity-check matrix for a given generator matrix.</span>
 
 <span class="sd">    This function brings ``gm`` :math:`\mathbf{G}` in its systematic form and</span>
 <span class="sd">    uses the following relation to find the parity-check matrix</span>
@@ -1900,7 +2004,7 @@
     <span class="k">return</span> <span class="n">pcm</span></div>
 
 <div class="viewcode-block" id="pcm2gm"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.pcm2gm">[docs]</a><span class="k">def</span> <span class="nf">pcm2gm</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">verify_results</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the generator matrix for a given parity-check matrix.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate the generator matrix for a given parity-check matrix.</span>
 
 <span class="sd">    This function brings ``pcm`` :math:`\mathbf{H}` in its systematic form and</span>
 <span class="sd">    uses the following relation to find the generator matrix</span>
@@ -1976,7 +2080,7 @@
     <span class="k">return</span> <span class="n">gm</span></div>
 
 <div class="viewcode-block" id="verify_gm_pcm"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.verify_gm_pcm">[docs]</a><span class="k">def</span> <span class="nf">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">pcm</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Verify that generator matrix :math:`\mathbf{G}` ``gm`` and parity-check</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Verify that generator matrix :math:`\mathbf{G}` ``gm`` and parity-check</span>
 <span class="sd">    matrix :math:`\mathbf{H}` ``pcm`` are orthogonal in GF(2).</span>
 
 <span class="sd">    For an all-zero syndrome, it must hold that</span>
@@ -2028,7 +2132,7 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span> <span class="c1"># Check for Non-zero syndrom of H*G&#39;</span></div>
 
 <div class="viewcode-block" id="generate_reg_ldpc"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.generate_reg_ldpc">[docs]</a><span class="k">def</span> <span class="nf">generate_reg_ldpc</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">allow_flex_len</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate random regular (v,c) LDPC codes.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generate random regular (v,c) LDPC codes.</span>
 
 <span class="sd">    This functions generates a random LDPC parity-check matrix of length ``n``</span>
 <span class="sd">    where each variable node (VN) has degree ``v`` and each check node (CN) has</span>
@@ -2153,7 +2257,7 @@
 
 
 <div class="viewcode-block" id="int_mod_2"><a class="viewcode-back" href="../../../api/fec.utils.html#sionna.fec.utils.int_mod_2">[docs]</a><span class="k">def</span> <span class="nf">int_mod_2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Efficient implementation of modulo 2 operation for integer inputs.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Efficient implementation of modulo 2 operation for integer inputs.</span>
 
 <span class="sd">    This function assumes integer inputs or implicitly casts to int.</span>
 
