@@ -16,7 +16,7 @@ Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling
     :authors: Jakob Hoydis, Fayçal Aït Aoudia, Sebastian Cammerer, Merlin Nimier-David, Nikolaus Binder, Guillermo Marcus, Alexander Keller
     :year: 2023
     :version: 0.14
-    :link_pdf: https://drive.google.com/file/d/1fTbTC6ogj9p8lPevvrFUu8tyOhsNArJm/view?usp=share_link
+    :link_arxiv: https://arxiv.org/abs/2303.11103
     :link_github: https://github.com/NVlabs/diff-rt
     :link_colab: https://colab.research.google.com/github/NVlabs/diff-rt/blob/master/Learning_Materials.ipynb
     :abstract: Sionna is a GPU-accelerated open-source library for link-level simulations based on TensorFlow. Its latest release (v0.14) integrates a differentiable ray tracer (RT) for the simulation of radio wave propagation. This unique feature allows for the computation of gradients of the channel impulse response and other related quantities with respect to many system  and environment parameters, such as material properties, antenna patterns, array geometries, as well as transmitter and receiver orientations and positions. In this paper, we outline the key components of Sionna RT and showcase example applications such as learning of radio materials and optimizing transmitter orientations by gradient descent. While classic ray tracing is a crucial tool for 6G research topics like reconfigurable intelligent surfaces, integrated sensing and communications, as well as user localization, differentiable ray tracing is a key enabler for many novel and exciting research directions, for example, digital twins.
