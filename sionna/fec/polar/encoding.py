@@ -337,8 +337,9 @@ class Polar5GEncoder(PolarEncoder):
 
     Note
     ----
-        We implement the `uplink` Polar coding (`UCI`) scheme from
-        [3GPPTS38212]_. Downlink is currently not supported.
+        The encoder supports the `uplink` Polar coding (`UCI`) scheme from
+        [3GPPTS38212]_ and the downlink Polar coding (`DCI`)[3GPPTS38212]_,
+        respectively.
 
         For `12 <= k <= 19` the 3 additional parity bits as defined in
         [3GPPTS38212]_ are not implemented as it would also require a
@@ -352,11 +353,9 @@ class Polar5GEncoder(PolarEncoder):
     def __init__(self,
                  k,
                  n,
+                 channel_type="uplink",
                  verbose=False,
-                 dtype=tf.float32,
-                 bil=True,
-                 iil=False,
-                 crc_pol=None):
+                 dtype=tf.float32,):
 
         if dtype not in (tf.float16, tf.float32, tf.float64, tf.int8,
             tf.int32, tf.int64, tf.uint8, tf.uint16, tf.uint32):
@@ -368,21 +367,22 @@ class Polar5GEncoder(PolarEncoder):
         n = int(n) # k or n can be float (e.g. as result of n=k*r)
         assert n>=k, "Invalid coderate (>1)."
         assert isinstance(verbose, bool), "verbose must be bool."
-        assert isinstance(bil, bool), "bil must be bool."
-        assert isinstance(iil, bool), "iil must be bool."
+
+        assert channel_type in ("uplink","downlink"), \
+                                         "Unsupported channel_type."
+        self._channel_type = channel_type
 
         self._k_target = k
         self._n_target = n
         self._verbose = verbose
-        self._bil = bil
-        self._iil = iil
 
          # Initialize rate-matcher
-        crc_degree, n_polar, frozen_pos, idx_rm  = \
-            self._init_rate_match(k, n, crc_pol)
+        crc_degree, n_polar, frozen_pos, idx_rm, idx_input  = \
+            self._init_rate_match(k, n)
 
         self._frozen_pos = frozen_pos # Required for decoder
         self._ind_rate_matching = idx_rm # Index for gather-based rate-matching
+        self._ind_input_int = idx_input # Index for input interleaver
 
         # Initialize CRC encoder
         self._enc_crc = CRCEncoder(crc_degree, dtype=dtype)
@@ -509,8 +509,8 @@ class Polar5GEncoder(PolarEncoder):
                     ind_k += 1
         return c_int
 
-    def interleaver(self, c):
-        """Interleaver following Sec. 5.4.1.1 in [3GPPTS38212]_.
+    def input_interleaver(self, c):
+        """Input interleaver following Sec. 5.4.1.1 in [3GPPTS38212]_.
 
         Input
         -----
@@ -550,10 +550,8 @@ class Polar5GEncoder(PolarEncoder):
     # Utility methods
     #########################
 
-    def _init_rate_match(self, k_target, n_target, crc_pol):
+    def _init_rate_match(self, k_target, n_target):
         """Implementing polar rate matching according to [3GPPTS38212]_.
-
-        Currently, only uplink Polar rate-matching is implemented.
 
         Please note that this part of the code only runs during the
         initialization and, thus, is not performance critical. For easier
@@ -586,13 +584,10 @@ class Polar5GEncoder(PolarEncoder):
             "n too large - no codeword segmentation supported at the moment."
 
         # Select CRC polynomials (see Sec. 6.3.1.2.1 for UL)
-        if crc_pol is None:
+        if self._channel_type=="uplink":
             if 12<=k_target<=19:
                 crc_pol = "CRC6"
                 k_crc = 6
-            elif k_target == 32: # TODO: this is a hack to make PBCH DL work
-                crc_pol = "CRC24C"
-                k_crc = 24
             elif k_target >=20:
                 crc_pol = "CRC11"
                 k_crc = 11
@@ -600,15 +595,9 @@ class Polar5GEncoder(PolarEncoder):
                 raise ValueError("k_target<12 is not supported in 5G NR; " \
                     "please use 'channel coding of small block lengths' " \
                     "scheme from Sec. 5.3.3 in 3GPP 38.212 instead.")
-        else:
-            if crc_pol == "CRC6":
-                k_crc = 6
-            elif crc_pol == "CRC11":
-                k_crc = 11
-            elif crc_pol in ("CRC24A", "CRC24B", "CRC24C"):
-                k_crc = 24
-            else:
-                raise ValueError("unsupported CRC polynomial")
+        else: # downlink channel
+            crc_pol = "CRC24C"
+            k_crc = 24
 
         # PC bit for k_target = 12-19 bits (see Sec. 6.3.1.3.1 for UL)
         n_pc = 0
@@ -694,6 +683,14 @@ class Polar5GEncoder(PolarEncoder):
                                   info_pos,
                                   assume_unique=True)
 
+        # For downlink only: generate input bit interleaver
+        if self._channel_type=="downlink":
+            if self._verbose:
+                print("Using input bit interleaver for downlink.")
+            ind_input_int = self.input_interleaving(np.arange(k_polar))
+        else:
+            ind_input_int = None
+
         # Generate tf.gather indices for sub-block interleaver
         ind_sub_int = self.subblock_interleaving(np.arange(n_polar))
 
@@ -716,12 +713,17 @@ class Polar5GEncoder(PolarEncoder):
                 for ind in range(n_target):
                     idx_c_matched[ind] = c_int[ind]
 
-        ind_channel_int = self.channel_interleaver(np.arange(n_target))
+        # For uplink only: generate input bit interleaver
+        if self._channel_type=="uplink":
+            if self._verbose:
+                print("Using channel interleaver for uplink.")
+            ind_channel_int = self.channel_interleaver(np.arange(n_target))
 
-
-        # Combine indices for single tf.gather operation
-        ind_t = idx_c_matched[ind_channel_int].astype(int)
-        idx_rate_matched= ind_sub_int[ind_t]
+            # Combine indices for single tf.gather operation
+            ind_t = idx_c_matched[ind_channel_int].astype(int)
+            idx_rate_matched= ind_sub_int[ind_t]
+        else: # no channel interleaver for downlink
+            idx_rate_matched= ind_sub_int[idx_c_matched.astype(int)]
 
         if self._verbose:
             print("Code parameters after rate-matching: " \
@@ -730,8 +732,9 @@ class Polar5GEncoder(PolarEncoder):
                   f"n_polar = {n_polar}")
             print("Using", crc_pol)
             print("Frozen positions: ", frozen_pos)
+            print("Channel type: " + self._channel_type)
 
-        return crc_pol, n_polar, frozen_pos, idx_rate_matched
+        return crc_pol, n_polar, frozen_pos, idx_rate_matched, ind_input_int
 
     #########################
     # Keras layer functions
@@ -762,7 +765,6 @@ class Polar5GEncoder(PolarEncoder):
 
             InvalidArgumentError: When shape of last dim is not ``k``.
         """
-        # dtype check will be done by super() layer
 
         # Reshape inputs to [...,k]
         tf.debugging.assert_greater(tf.rank(inputs), 1)
@@ -775,13 +777,18 @@ class Polar5GEncoder(PolarEncoder):
         # CRC encode
         u_crc = self._enc_crc(u)
 
+        # For downlink only: apply input bit interleaver
+        if self._channel_type=="downlink":
+            u_crc = tf.gather(u_crc, self._ind_input_int, axis=1)
+
         # Encode bits (= channel allocation + Polar transform)
         c = super().call(u_crc)
 
         # Sub-block interleaving with 32 sub-blocks as in Sec. 5.4.1.1
         # Rate matching via circular buffer as defined in Sec. 5.4.1.2
-        # Channel interleaving for uplink (i_bil=True)
+        # For uplink only: channel interleaving (i_bil=True)
         c_matched = tf.gather(c, self._ind_rate_matching, axis=1)
+
 
         # Restore original shape
         input_shape_list = input_shape.as_list()
