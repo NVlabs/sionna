@@ -29,6 +29,12 @@ On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensor
     pip install sionna
 ```
 
+Optionally, you may want to install it with the `notebook` extra so that you can run the examples locally.
+
+```
+    pip install sionna[notebook]
+```
+
 2.) Test the installation in Python
 ```
     python
@@ -85,7 +91,7 @@ This will immediately launch a Docker image with Sionna installed, running Jupyt
 
 ### Installation from source
 
-We recommend to do this within a [virtual environment](https://docs.python.org/3/tutorial/venv.html), e.g., using [conda](https://docs.conda.io).
+You can build from source using [Poetry](https://python-poetry.org/docs/), so make sure to install it first. It will automatically create a virtual environment that you can activate with `poetry shell`.
 
 1.) Clone this repository and execute from within its root folder
 ```

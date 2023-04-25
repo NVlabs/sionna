@@ -2,10 +2,9 @@ FROM tensorflow/tensorflow:2.11.0-gpu-jupyter
 EXPOSE 8888
 COPY . /tmp/
 WORKDIR /tmp/
-RUN make install
+RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN poetry install --extras notebook
 RUN apt-get install llvm -y
-RUN pip install --upgrade jupyter
-RUN pip install --upgrade ipykernel
 RUN rm -R /tf/* && cp /tmp/examples/* /tf
 RUN rm -R /tmp
 RUN chmod 777 -R /tf

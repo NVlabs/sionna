@@ -1,6 +1,65 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.poetry]
+authors = ["The Sionna contributors <sionna@nvidia.com>"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Telecommunications Industry",
+  "Operating System :: OS Independent",
+  "License :: OSI Approved :: Apache Software License"
 ]
-build-backend = "setuptools.build_meta"
+description = "Sionna -- A TensorFlow-based open-source library for simulating the physical layer of wireless communication systems"
+documentation = "https://nvlabs.github.io/sionna/"
+homepage = "https://nvlabs.github.io/sionna/"
+license = "Apache 2.0"
+name = "sionna"
+readme = "README.md"
+repository = "https://github.com/NVlabs/sionna"
+version = "0.14.0"
+
+[tool.poetry.dependencies]
+importlib-resources = "^5.12.0"
+ipydatawidgets = "4.3.3"
+ipykernel = {version = "6.21.2", optional = true}
+ipython = {version = "7.34.0", optional = true}
+ipywidgets = {version = "8.0.4", optional = true}
+jupyter = {version = "1.0.0", optional = true}
+jupyter-contrib-nbextensions = {version = "0.7.0", optional = true}
+jupyter-core = {version = "5.2.0", optional = true}
+jupyterlab = {version = "3.6.1", optional = true}
+jupyterlab-widgets = {version = "3.0.5", optional = true}
+matplotlib = "^3.7.1"
+mitsuba = ">=3.2.0"
+notebook = {version = "6.5.2", optional = true}
+numpy = "^1.24.3"
+python = ">=3.8,<3.12"
+pythreejs = "2.4.2"
+scipy = ">=1.6.0"
+tensorflow = {version = ">=2.8.4,!=2.9.0,!=2.9.1,!=2.9.2,!=2.10.0", markers = "sys_platform != 'darwin'"}
+tensorflow-macos = {version = ">=2.8", platform = "darwin"}
+
+[tool.poetry.extras]
+notebook = ["ipykernel", "ipython", "ipywidgets", "jupyter", "jupyter-core", "jupyterlab", "jupyterlab-widgets", "jupyter-contrib-nbextensions", "notebook"]
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^2.17.3"
+
+[tool.poetry.group.doc.dependencies]
+docutils = "0.16"
+markupsafe = "2.0.1"
+nbsphinx = "0.8.7"
+numpydoc = "1.1.0"
+sphinx = "4.0.2"
+sphinx-copybutton = "0.5.1"
+sphinx-rtd-theme = "1.0.0"
+sphinxcontrib-napoleon = "0.7"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.3.1"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/NVlabs/sionna/issues"
+"Download" = "https://github.com/NVlabs/sionna/releases"

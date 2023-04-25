@@ -11,7 +11,7 @@ docker:
 	docker build -t sionna -f DOCKERFILE .
 
 install: FORCE
-	pip install .
+	poetry install
 
 lint:
 	pylint sionna/
