@@ -918,7 +918,7 @@ class Scene:
 
         return output
 
-    def preview(self, paths=None, show_paths=True, show_devices=True,
+    def preview(self, paths=None, show_paths=True, show_devices=True, show_orientations=False,
                 coverage_map=None, cm_tx=0,
                 cm_vmin=None, cm_vmax=None,
                 resolution=(655, 500), fov=45, background='#ffffff'):
@@ -969,6 +969,10 @@ class Scene:
         show_devices : bool
             If `paths` is not `None`, shows the radio devices.
             Defaults to `True`.
+
+        show_orientations : bool
+            If `show_devices` is `True`, shows the transmitters' orientations.
+            Defaults to `False`.
 
         coverage_map : :class:`~sionna.rt.CoverageMap` | `None`
             An optional coverage map to overlay in the scene for visualization.
@@ -1023,7 +1027,7 @@ class Scene:
         if show_paths and (paths is not None):
             fig.plot_paths(paths)
         if show_devices:
-            fig.plot_radio_devices()
+            fig.plot_radio_devices(show_orientations=show_orientations)
         if coverage_map is not None:
             fig.plot_coverage_map(
                 coverage_map, tx=cm_tx, db_scale=True,

@@ -13,7 +13,7 @@ from ipywidgets.embed import embed_snippet
 import pythreejs as p3s
 import matplotlib
 
-from .utils import paths_to_segments, scene_scale
+from .utils import paths_to_segments, scene_scale, rotate
 from .renderer import coverage_map_color_mapping, resample_to_corners
 
 
@@ -110,9 +110,15 @@ class InteractiveDisplay:
         self._orbit.exec_three_obj_method('update')
         self._camera.exec_three_obj_method('updateProjectionMatrix')
 
-    def plot_radio_devices(self):
+    def plot_radio_devices(self, show_orientations=False):
         """
         Plots the radio devices.
+
+        Input
+        -----
+        show_orientations : bool
+            Shows the transmitters' orientations.
+            Defaults to `False`.
         """
         scene = self._scene
         sc, tx_positions, rx_positions, _ = scene_scale(scene)
@@ -129,6 +135,13 @@ class InteractiveDisplay:
             radius = max(0.005 * sc, 1)
             self._plot_points(p, persist=False, colors=albedo,
                               radius=radius)
+        if show_orientations:
+            for tx in scene.transmitters.values():
+                end = rotate([[0.02 * sc,0.0,0.0]], tx.orientation)
+                self._plot_lines(tx.position[None,:],
+                                 tx.position[None,:]+end,
+                                 width=2,
+                                 color='red')
 
     def plot_paths(self, paths):
         """
