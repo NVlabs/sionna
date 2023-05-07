@@ -296,6 +296,9 @@ class Polar5GEncoder(PolarEncoder):
         n: int
             Defining the codeword length.
 
+        channel_type: string
+            can be "uplink" or "downlink"
+            
         verbose: bool
             Defaults to False. If True, rate-matching parameters will be
             printed.
@@ -303,10 +306,6 @@ class Polar5GEncoder(PolarEncoder):
         dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
             (internal precision remains tf.uint8).
-
-        bil: bool
-
-        iil: bool
 
         crc_pol: string
 

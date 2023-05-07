@@ -1985,8 +1985,8 @@ class Polar5GDecoder(Layer):
         self._n_polar = enc_polar.n_polar
         self._k_polar = enc_polar.k_polar
         self._k_crc = enc_polar.enc_crc.crc_length
-        self._bil = enc_polar._bil
-        self._iil = enc_polar._iil
+        self._bil = enc_polar._channel_type == "uplink"
+        self._iil = enc_polar._channel_type == "downlink"
         self._llr_max = 100 # Internal max LLR value (for punctured positions)
         self._enc_polar = enc_polar
         self._dec_type = dec_type
