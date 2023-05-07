@@ -2109,7 +2109,7 @@ class Polar5GDecoder(Layer):
         self.ind_sub_int_inv = np.argsort(ind_sub_int) # Find inverse perm
 
         # Sub-block interleaver
-        self.ind_int = np.argsort(self._enc_polar.interleaver(
+        self.ind_int = np.argsort(self._enc_polar.input_interleaver(
                                                 np.arange(self._k_polar)))
 
     #########################

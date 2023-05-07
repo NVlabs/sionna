@@ -686,7 +686,7 @@ class Polar5GEncoder(PolarEncoder):
         if self._channel_type=="downlink":
             if self._verbose:
                 print("Using input bit interleaver for downlink.")
-            ind_input_int = self.input_interleaving(np.arange(k_polar))
+            ind_input_int = self.input_interleaver(np.arange(k_polar))
         else:
             ind_input_int = None
 
