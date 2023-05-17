@@ -382,7 +382,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
                         u_hat = np.zeros([bs, k])
                         self.assertTrue(np.array_equal(u, u_hat))
 
-    # Filter warnings related to large ressource allocation
+    # Filter warnings related to large resource allocation
     @pytest.mark.filterwarnings("ignore: Required ressource allocation")
     def test_numerical_stab(self):
         """Test for numerical stability (no nan or infty as output)"""
@@ -409,7 +409,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
                         u1 = dec(c).numpy()
                         # no nan
                         self.assertFalse(np.any(np.isnan(u1)))
-                        #no inftfy
+                        #no infty
                         self.assertFalse(np.any(np.isinf(u1)))
                         self.assertFalse(np.any(np.isneginf(u1)))
 
@@ -419,7 +419,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
                         u2 = dec(c).numpy()
                         # no nan
                         self.assertFalse(np.any(np.isnan(u2)))
-                        #no inftfy
+                        # no infty
                         self.assertFalse(np.any(np.isinf(u2)))
                         self.assertFalse(np.any(np.isneginf(u2)))
 
@@ -440,7 +440,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
             enc = PolarEncoder(frozen_pos, p[1])
             u = source([bs, p[0]])
             c = enc(u)
-            llr_ch = 200.*(2.*c-1) # demod BPSK witout noise
+            llr_ch = 200.*(2.*c-1) # demod BPSK without noise
             for use_fast_scl in [False, True]:
                 for cpu_only in [False, True]:
                     for use_scatter in [False, True]:
@@ -1088,23 +1088,38 @@ class TestPolarDecoding5G(unittest.TestCase):
 
         bs = 10
 
+        # Uplink scenario
         # (k,n)
-        param_valid = [[12, 32], [20, 32], [100, 257], [123, 897],
-                      [1013, 1088]]
+        param_valid_ul = [[12, 20], [20, 44], [100, 257], [123, 897],
+                       [1013, 1088]]
+        # Uplink scenario
+        # (k,n)
+        param_valid_dl = [[1, 25], [20, 44], [140, 576]]
+
         dec_types = ["SC", "SCL", "hybSCL", "BP"]
-        for p in param_valid:
-            for dec_type in dec_types:
-                source = BinarySource()
-                enc = Polar5GEncoder(p[0], p[1])
-                dec = Polar5GDecoder(enc, dec_type=dec_type)
+        ch_types = ["uplink", "downlink"]
 
-                u = source([bs, p[0]])
-                c = enc(u)
-                self.assertTrue(c.numpy().shape[-1]==p[1])
-                llr_ch = 20.*(2.*c-1) # demod BPSK witout noise
-                u_hat = dec(llr_ch)
+        for ch_type in ch_types:
+            if ch_type=="uplink":
+                param_valid = param_valid_ul
+            else:
+                param_valid = param_valid_dl
 
-                self.assertTrue(np.array_equal(u.numpy(), u_hat.numpy()))
+            for p in param_valid:
+                for dec_type in dec_types:
+                    source = BinarySource()
+                    enc = Polar5GEncoder(p[0], p[1], channel_type=ch_type)
+                    dec = Polar5GDecoder(enc, dec_type=dec_type)
+
+                    u = source([bs, p[0]])
+                    c = enc(u)
+                    self.assertTrue(c.numpy().shape[-1]==p[1])
+                    llr_ch = 20.*(2.*c-1) # demod BPSK witout noise
+                    u_hat = dec(llr_ch)
+
+                    self.assertTrue(np.array_equal(u.numpy(), u_hat.numpy()))
+                    # Uplink scenario
+
 
     # Filter warnings related to large ressource allocation
     @pytest.mark.filterwarnings("ignore: Required ressource allocation")
@@ -1142,20 +1157,25 @@ class TestPolarDecoding5G(unittest.TestCase):
         source = BinarySource()
 
         dec_types = ["SC", "SCL", "hybSCL", "BP"]
+        # also verify that interleaver support n-dimensions
+        channel_types = ["uplink", "downlink"]
         for dec_type in dec_types:
-            dec = Polar5GDecoder(enc, dec_type=dec_type)
+            for ch_type in channel_types:
 
-            b = source([100, n])
-            b_res = tf.reshape(b, [4, 5, 5, n])
+                enc = Polar5GEncoder(k, n, channel_type=ch_type)
+                dec = Polar5GDecoder(enc, dec_type=dec_type)
 
-            # encode 2D Tensor
-            c = dec(b).numpy()
-            # encode 4D Tensor
-            c_res = dec(b_res).numpy()
-            # and reshape to 2D shape
-            c_res = tf.reshape(c_res, [100, k])
-            # both version should yield same result
-            self.assertTrue(np.array_equal(c, c_res))
+                b = source([100, n])
+                b_res = tf.reshape(b, [4, 5, 5, n])
+
+                # encode 2D Tensor
+                c = dec(b).numpy()
+                # encode 4D Tensor
+                c_res = dec(b_res).numpy()
+                # and reshape to 2D shape
+                c_res = tf.reshape(c_res, [100, k])
+                # both version should yield same result
+                self.assertTrue(np.array_equal(c, c_res))
 
     # Filter warnings related to large ressource allocation
     @pytest.mark.filterwarnings("ignore: Required ressource allocation")

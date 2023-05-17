@@ -262,10 +262,11 @@ class PolarEncoder(Layer):
         return tf.cast(c_reshaped, self.dtype)
 
 class Polar5GEncoder(PolarEncoder):
-    """Polar5GEncoder(k, n, verbose=False, dtype=tf.float32)
+    # pylint: disable=line-too-long
+    """Polar5GEncoder(k, n, verbose=False, channel_type="uplink", dtype=tf.float32)
 
     5G compliant Polar encoder including rate-matching following [3GPPTS38212]_
-    for the uplink scenario (`UCI`).
+    for the uplink scenario (`UCI`) and downlink scenario (`DCI`).
 
     This layer performs polar encoding for ``k`` information bits and
     rate-matching such that the codeword lengths is ``n``. This includes the CRC
@@ -273,16 +274,15 @@ class Polar5GEncoder(PolarEncoder):
 
     Note: `block segmentation` is currently not supported (`I_seq=False`).
 
-    We follow the basic structure from Fig. 6 in [Bioglio_Design]_ with disabled
-    downlink interleaver (`I_IL=False`).
+    We follow the basic structure from Fig. 6 in [Bioglio_Design]_.
 
     ..  figure:: ../figures/PolarEncoding5G.png
 
         Fig. 1: Implemented 5G Polar encoding chain following Fig. 6 in
-        [Bioglio_Design]_ for the uplink scenario without `block segmentation`.
+        [Bioglio_Design]_ for the uplink (`I_BIL` = `True`) and the downlink
+        (`I_IL` = `True`) scenario without `block segmentation`.
 
-
-    For further details we refer to [3GPPTS38212]_, [Bioglio_Design]_ and
+    For further details, we refer to [3GPPTS38212]_, [Bioglio_Design]_ and
     [Hui_ChannelCoding]_.
 
     The class inherits from the Keras layer class and can be used as layer in a
@@ -296,9 +296,9 @@ class Polar5GEncoder(PolarEncoder):
         n: int
             Defining the codeword length.
 
-        channel_type: string
-            can be "uplink" or "downlink"
-            
+        channel_type: str
+            Defaults to "uplink". Can be "uplink" or "downlink".
+
         verbose: bool
             Defaults to False. If True, rate-matching parameters will be
             printed.
@@ -306,8 +306,6 @@ class Polar5GEncoder(PolarEncoder):
         dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
             (internal precision remains tf.uint8).
-
-        crc_pol: string
 
     Input
     -----
@@ -337,7 +335,7 @@ class Polar5GEncoder(PolarEncoder):
     Note
     ----
         The encoder supports the `uplink` Polar coding (`UCI`) scheme from
-        [3GPPTS38212]_ and the downlink Polar coding (`DCI`)[3GPPTS38212]_,
+        [3GPPTS38212]_ and the `downlink` Polar coding (`DCI`) [3GPPTS38212]_,
         respectively.
 
         For `12 <= k <= 19` the 3 additional parity bits as defined in
@@ -347,6 +345,13 @@ class Polar5GEncoder(PolarEncoder):
         `Code segmentation` is currently not supported and, thus, ``n`` is
         limited to a maximum length of 1088 codeword bits.
 
+        For the downlink scenario, the input length is limited to `k <= 140`
+        information bits due to the limited input bit interleaver size
+        [3GPPTS38212]_.
+
+        For simplicity, the implementation does not exactly re-implement the
+        `DCI` scheme from [3GPPTS38212]_. This implementation neglects the
+        `all-one` initialization of the CRC shift register and the scrambling of the CRC parity bits with the `RNTI`.
     """
 
     def __init__(self,
@@ -395,7 +400,7 @@ class Polar5GEncoder(PolarEncoder):
 
     @property
     def enc_crc(self):
-        """CRC Encoder layer used for CRC concatenation."""
+        """CRC encoder layer used for CRC concatenation."""
         return self._enc_crc
 
     @property
@@ -537,6 +542,7 @@ class Polar5GEncoder(PolarEncoder):
             163]
         k_il_max = 164
         k = len(c)
+        assert k<=k_il_max, "Input interleaver only defined for length of 164."
         c_apo = np.empty(k, 'int')
         i = 0
         for p_il_max in p_il_max_table:
@@ -572,9 +578,7 @@ class Polar5GEncoder(PolarEncoder):
         # assert k_target<=1706, "Maximum supported codeword length for" \
         # "Polar  coding is 1706."
 
-        assert n_target >=k_target, "n must be larger or equal k."
-        assert k_target >= 12, \
-                        "k<12 is not supported by the 5G Polar coding scheme."
+        assert n_target >= k_target, "n must be larger or equal k."
         assert n_target >= 18, \
                         "n<18 is not supported by the 5G Polar coding scheme."
         assert k_target <= 1013, \
@@ -584,6 +588,7 @@ class Polar5GEncoder(PolarEncoder):
 
         # Select CRC polynomials (see Sec. 6.3.1.2.1 for UL)
         if self._channel_type=="uplink":
+
             if 12<=k_target<=19:
                 crc_pol = "CRC6"
                 k_crc = 6
@@ -591,32 +596,44 @@ class Polar5GEncoder(PolarEncoder):
                 crc_pol = "CRC11"
                 k_crc = 11
             else:
-                raise ValueError("k_target<12 is not supported in 5G NR; " \
-                    "please use 'channel coding of small block lengths' " \
-                    "scheme from Sec. 5.3.3 in 3GPP 38.212 instead.")
-        else: # downlink channel
-            crc_pol = "CRC24C"
-            k_crc = 24
+                raise ValueError("k_target<12 is not supported in 5G NR for " \
+                    "the uplink; please use 'channel coding of small block  " \
+                    "lengths' scheme from Sec. 5.3.3 in 3GPP 38.212 instead.")
 
-        # PC bit for k_target = 12-19 bits (see Sec. 6.3.1.3.1 for UL)
-        n_pc = 0
-        #n_pc_wm = 0
-        if k_target<=19:
-            #n_pc = 3
-            n_pc = 0 # Currently deactivated
-            print("Warning: For 12<=k<=19 additional 3 parity-check bits " \
-                  "are defined in 38.212. They are currently not " \
-                  "implemented by this encoder and, thus, ignored.")
-            if n_target-k_target>175:
-                #n_pc_wm = 1
-                pass
+            # PC bit for k_target = 12-19 bits (see Sec. 6.3.1.3.1 for UL)
+            n_pc = 0
+            #n_pc_wm = 0
+            if k_target<=19:
+                #n_pc = 3
+                n_pc = 0 # Currently deactivated
+                print("Warning: For 12<=k<=19 additional 3 parity-check bits " \
+                    "are defined in 38.212. They are currently not " \
+                    "implemented by this encoder and, thus, ignored.")
+                if n_target-k_target>175:
+                    #n_pc_wm = 1 # not implemented
+                    pass
+
+        else: # downlink channel
+            # for downlink CRC24 is used
+            # remark: in PDCCH messages are limited to k=140
+            # as the input interleaver does not support longer sequences
+            assert k_target <= 140, \
+               "k too large for downlink channel configuration."
+            assert n_target >= 25, \
+                "n too small for downlink channel configuration with 24 bit " \
+                "CRC."
+            assert n_target <= 576, \
+            "n too large for downlink channel configuration."
+            crc_pol = "CRC24C" # following 7.3.2
+            k_crc = 24
+            n_pc = 0
 
         # No input interleaving for uplink needed
 
         # Calculate Polar payload length (CRC bits are treated as info bits)
         k_polar = k_target + k_crc + n_pc
 
-        assert k_polar <= n_target, "UE is not expected to be configured " \
+        assert k_polar <= n_target, "Device is not expected to be configured " \
                                     "with k_polar + k_crc + n_pc > n_target."
 
         # Select polar mother code length n_polar
@@ -720,9 +737,9 @@ class Polar5GEncoder(PolarEncoder):
 
             # Combine indices for single tf.gather operation
             ind_t = idx_c_matched[ind_channel_int].astype(int)
-            idx_rate_matched= ind_sub_int[ind_t]
+            idx_rate_matched = ind_sub_int[ind_t]
         else: # no channel interleaver for downlink
-            idx_rate_matched= ind_sub_int[idx_c_matched.astype(int)]
+            idx_rate_matched = ind_sub_int[idx_c_matched.astype(int)]
 
         if self._verbose:
             print("Code parameters after rate-matching: " \
@@ -778,7 +795,7 @@ class Polar5GEncoder(PolarEncoder):
 
         # For downlink only: apply input bit interleaver
         if self._channel_type=="downlink":
-            u_crc = tf.gather(u_crc, self._ind_input_int, axis=1)
+            u_crc = tf.gather(u_crc, self._ind_input_int, axis=-1)
 
         # Encode bits (= channel allocation + Polar transform)
         c = super().call(u_crc)
@@ -787,7 +804,6 @@ class Polar5GEncoder(PolarEncoder):
         # Rate matching via circular buffer as defined in Sec. 5.4.1.2
         # For uplink only: channel interleaving (i_bil=True)
         c_matched = tf.gather(c, self._ind_rate_matching, axis=1)
-
 
         # Restore original shape
         input_shape_list = input_shape.as_list()
