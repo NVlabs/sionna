@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 try:
@@ -23,10 +23,8 @@ if gpus:
         tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
     except RuntimeError as e:
         print(e)
-from sionna.fec.utils import bin2int_tf, j_fun, j_fun_inv, j_fun_tf, j_fun_inv_tf, GaussianPriorSource, llr2mi, bin2int, int2bin, int2bin_tf, alist2mat, load_alist, gm2pcm, pcm2gm, verify_gm_pcm, make_systematic, load_parity_check_examples, LinearEncoder, generate_reg_ldpc, generate_prng_seq, int_mod_2
-from sionna.utils import log2, log10, BinarySource
-from sionna.fec.polar.utils import generate_dense_polar, generate_5g_ranking
-from sionna.fec.polar import PolarEncoder
+from sionna.fec.utils import bin2int_tf, j_fun, j_fun_inv, j_fun_tf, j_fun_inv_tf, GaussianPriorSource, llr2mi, bin2int, int2bin, int2bin_tf, alist2mat, load_alist, gm2pcm, pcm2gm, verify_gm_pcm, make_systematic, load_parity_check_examples, generate_reg_ldpc, int_mod_2
+from sionna.utils import log2, log10
 
 class TestFECUtils(unittest.TestCase):
     """Test FEC utilities."""
@@ -427,86 +425,17 @@ class TestFECUtils(unittest.TestCase):
             self.assertTrue(pcm.shape[0]==n-k)
             self.assertTrue(pcm.shape[1]==n)
 
-    def test_gen_rand_seq(self):
-        """Test random sequence generator."""
-
-        l = 100
-        # check valid inputs
-        n_rs = [0, 10, 65535]
-        n_ids = [0, 10, 65535]
-        s_old = None
-        for n_r in n_rs:
-            for n_id  in n_ids:
-                s = generate_prng_seq(l, n_r, n_id)
-                # verify that new sequence is unique
-                if s_old is not None:
-                    self.assertFalse(np.array_equal(s,s_old))
-                s_old = s
-
-        # test against invalid inputs
-        l = -1
-        with self.assertRaises(AssertionError):
-            generate_prng_seq(l, n_r, n_id)
-
-        n_rs = [-0, 1.2, 65536] # invalid
-        n_ids = [0, 10, 65535] # valid
-        for n_r in n_rs:
-            for n_id  in n_ids:
-                with self.assertRaises(AssertionError):
-                    generate_prng_seq(l, n_r, n_id)
-
-        n_rs = [0, 10, 65535] # valid
-        n_ids = [-0, 1.2, 65536] # invalid
-        for n_r in n_rs:
-            for n_id  in n_ids:
-                with self.assertRaises(AssertionError):
-                    generate_prng_seq(l, n_r, n_id)
-
-        # test against reference example
-        n_rnti = 20001
-        n_id = 41
-        l = 100
-        s_ref = np.array([0., 1., 1., 1., 1., 0., 0., 0., 0., 1., 0., 1., 0.,
-                          1., 1., 1., 0., 0., 0., 1., 1., 1., 0., 0., 0., 1.,
-                          1., 0., 0., 1., 1., 1., 0., 1., 0., 0., 1., 1., 1.,
-                          0., 1., 0., 0., 0., 0., 0., 1., 1., 1., 0., 1., 1.,
-                          0., 1., 1., 0., 0., 0., 1., 0., 0., 1., 0., 0., 1.,
-                          0., 0., 0., 0., 0., 0., 1., 1., 1., 0., 1., 0., 0.,
-                          1., 1., 0., 1., 1., 1., 0., 0., 0., 0., 0., 1., 0.,
-                          1., 1., 1., 1., 1., 1., 1., 0., 0.])
-        s = generate_prng_seq(l, n_rnti, n_id)
-        self.assertTrue(np.array_equal(s, s_ref))
-
-        # and test against wrong parameters
-        s = generate_prng_seq(l, n_rnti, n_id+1)
-        self.assertFalse(np.array_equal(s, s_ref))
-        s = generate_prng_seq(l, n_rnti+1, n_id)
-        self.assertFalse(np.array_equal(s, s_ref))
-
-        # test that explicit value of c_init overwrites other parameters
-        c_init = 1337
-        s_ref = generate_prng_seq(l, c_init=c_init)
-        # no effect expected (c_init overwrites other inputs)
-        s = generate_prng_seq(l, n_rnti, n_id, c_init)
-        self.assertTrue(np.array_equal(s, s_ref))
-        s = generate_prng_seq(l, n_rnti+1, n_id, c_init)
-        self.assertTrue(np.array_equal(s, s_ref))
-        s = generate_prng_seq(l, n_rnti, n_id+2, c_init)
-        self.assertTrue(np.array_equal(s, s_ref))
-        # different sequence expected as c_init changes
-        s = generate_prng_seq(l, n_rnti, n_id, c_init+1)
-        self.assertFalse(np.array_equal(s, s_ref))
-
+    
     def test_mod2(self):
         """Test modulo 2 operation."""
 
         s = [10, 20, 30]
 
         # int inputs
-        x = tf.random.uniform(s, minval=-1000, maxval=1000, dtype=tf.int32)
+        x = tf.random.uniform(s, minval=-2**30, maxval=2**30, dtype=tf.int32)
 
         y = int_mod_2(x)
-        y_ref = tf.math.mod(tf.cast(x, tf.float32), 2.)
+        y_ref = tf.math.mod(tf.cast(x, tf.float64), 2.)
         self.assertTrue(np.array_equal(y.numpy(), y_ref.numpy()))
 
         # float inputs

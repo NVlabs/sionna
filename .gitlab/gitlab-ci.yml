@@ -1,0 +1,209 @@
+##
+## SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+## SPDX-License-Identifier: Apache-2.0
+##
+stages:
+  - build
+  - test
+docker-test-sionna-tf-2.8:
+  stage: build
+  image: 
+    name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://dockerhost:2375
+  services:
+    - name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1-dind
+      alias: dockerhost
+  before_script:
+    - mkdir -p /root/.docker || IGNORE_FAILURE=true
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+  script:
+    - cd ${CI_PROJECT_DIR}/.gitlab/docker/test-sionna/tf-2.8.4
+    - docker build -t gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.8.4-gpu-jupyter -f Dockerfile .
+    - docker push gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.8.4-gpu-jupyter
+  tags:
+    - dind
+  rules:
+    - changes:
+        - .gitlab/docker/test-sionna/tf-2.8.4/*
+  when: manual
+
+docker-test-sionna-tf-2.9:
+  stage: build
+  image: 
+    name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://dockerhost:2375
+  services:
+    - name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1-dind
+      alias: dockerhost
+  before_script:
+    - mkdir -p /root/.docker || IGNORE_FAILURE=true
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+  script:
+    - cd ${CI_PROJECT_DIR}/.gitlab/docker/test-sionna/tf-2.9.3
+    - docker build -t gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.9.3-gpu-jupyter -f Dockerfile .
+    - docker push gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.9.3-gpu-jupyter
+  tags:
+    - dind
+  rules:
+    - changes:
+        - .gitlab/docker/test-sionna/tf-2.9.3/*
+  when: manual
+
+docker-test-sionna-tf-2.10:
+  stage: build
+  image: 
+    name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://dockerhost:2375
+  services:
+    - name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1-dind
+      alias: dockerhost
+  before_script:
+    - mkdir -p /root/.docker || IGNORE_FAILURE=true
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+  script:
+    - cd ${CI_PROJECT_DIR}/.gitlab/docker/test-sionna/tf-2.10.1
+    - docker build -t gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.10.1-gpu-jupyter -f Dockerfile .
+    - docker push gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.10.1-gpu-jupyter
+  tags:
+    - dind
+  rules:
+    - changes:
+        - .gitlab/docker/test-sionna/tf-2.10.1/*
+  when: manual
+
+docker-test-sionna-tf-2.11:
+  stage: build
+  image: 
+    name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://dockerhost:2375
+  services:
+    - name: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/docker:23.0.1-dind
+      alias: dockerhost
+  before_script:
+    - mkdir -p /root/.docker || IGNORE_FAILURE=true
+    - echo "$DOCKER_AUTH_CONFIG" > ~/.docker/config.json
+  script:
+    - cd ${CI_PROJECT_DIR}/.gitlab/docker/test-sionna/tf-2.11.0
+    - docker build -t gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.11.0-gpu-jupyter -f Dockerfile .
+    - docker push gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.11.0-gpu-jupyter
+  tags:
+    - dind
+  rules:
+    - changes:
+        - .gitlab/docker/test-sionna/tf-2.11.0/*
+  when: manual
+
+documentation:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/python-doc:latest
+  stage: build
+  before_script:
+  - echo 'Cleanup environment...'
+  - git branch -D $CI_DOCUMENTATION_BRANCH || IGNORE_FAILURE=true
+  - git remote remove origin-rw || IGNORE_FAILURE=true
+  - git config --local --replace-all user.name "${CI_GIT_USER_NAME}" || IGNORE_FAILURE=true
+  - git config --local --replace-all user.email "${CI_GIT_USER_EMAIL}" || IGNORE_FAILURE=true
+  script:
+  - echo 'Building documentation...'
+  - make doc
+  - echo 'Fetch current state of documentation branch...'
+  - REPO_URL=`echo $CI_REPOSITORY_URL | cut -d'@' -f 2`
+  - git remote add origin-rw https://$CI_GIT_RW_NAME:$CI_GIT_RW_TOKEN@$REPO_URL 
+  - git remote -v
+  - git fetch origin-rw $CI_DOCUMENTATION_BRANCH
+  - git checkout -b $CI_DOCUMENTATION_BRANCH --track origin-rw/${CI_DOCUMENTATION_BRANCH}
+  - echo 'Replace website folders with updated version...'
+  - rm -rf docs
+  - mv doc/build/html docs
+  - echo 'Commit changes to git'
+  - git add docs
+  - git status
+  - |
+    if git diff --cached --quiet
+    then
+      echo 'No changes detected.'
+    else
+      git commit -m "update Documentation from commit ${CI_COMMIT_SHORT_SHA}"
+      git log -n 1
+      git push origin-rw $CI_DOCUMENTATION_BRANCH
+    fi
+  - echo 'Done.'
+  tags:
+  artifacts:
+    name: "$CI_PROJECT_NAME-docs-$CI_COMMIT_SHORT_SHA"
+    paths:
+    - docs
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+
+all-tests-tf-2.8:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.8.4-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.8.4.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.8.4.xml
+  when: manual
+
+all-tests-tf-2.9:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.9.3-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.9.3.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.9.3.xml
+  when: manual
+
+all-tests-tf-2.10:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.10.1-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.10.1.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.10.1.xml
+#  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+
+all-tests-tf-2.11.0:
+  image: gitlab-master.nvidia.com:5005/nvresearch-gcml/sionna/test-sionna-tensorflow:2.11.0-gpu-jupyter
+  stage: test
+  script:
+  - nvidia-smi
+  - cd test
+  - pytest --junitxml=report-tf-2.11.0.xml
+  tags: 
+  - test
+  artifacts:
+    when: always
+    reports:
+      junit: test/report-tf-2.11.0.xml
+  when: manual
+

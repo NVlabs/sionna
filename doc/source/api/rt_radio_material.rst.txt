@@ -1,0 +1,142 @@
+Radio Materials
+***************
+
+A :class:`~sionna.rt.RadioMaterial` contains everything that is needed to enable the simulation
+of the interaction of a radio wave with an object made of a particular material.
+More precisely, it consists of the real-valued relative permittivity :math:`\varepsilon_r`,
+the conductivity :math:`\sigma`, and the relative 
+permeability :math:`\mu_r`. For more details, see :eq:`epsilon`, :eq:`mu`, :eq:`eta`.
+These quantities can possibly depend on the frequency of the incident radio
+wave. Note that Sionna currently only allows non-magnetic materials with :math:`\mu_r=1`.
+
+Similarly to scene objects (:class:`~sionna.rt.SceneObject`), all radio
+materials are uniquely identified by their name.
+For example, specifying that a scene object named `"wall"` is made of the
+material named `"itu-brick"` is done as follows:
+
+.. code-block:: Python
+
+   obj = scene.get("wall") # obj is a SceneObject
+   obj.radio_material = "itu_brick" # "wall" is made of "itu_brick"
+
+Sionna provides the
+:ref:`ITU models of several materials <provided-materials>` whose properties
+are automatically updated according to the configured :attr:`~sionna.rt.Scene.frequency`.
+It is also possible to
+:ref:`define custom radio materials <custom-radio-materials>`.
+
+.. _provided-materials:
+
+**Radio materials provided with Sionna**
+
+Sionna provides the models of all of the materials defined in the ITU-R P.2040-2
+recommendation [ITUR_P2040_2]_. These models are based on curve fitting to
+measurement results and assume non-ionized and non-magnetic materials
+(:math:`\mu_r = 1`).
+Frequency dependence is modeled by
+
+.. math::
+   \begin{align}
+      \varepsilon_r &= a f_{\text{GHz}}^b\\
+      \sigma &= c f_{\text{GHz}}^d
+   \end{align}
+
+where :math:`f_{\text{GHz}}` is the frequency in GHz, and the constants
+:math:`a`, :math:`b`, :math:`c`, and :math:`d` characterize the material.
+The table below provides their values which are used in Sionna
+(from [ITUR_P2040_2]_).
+Note that the relative permittivity :math:`\varepsilon_r` and
+conductivity :math:`\sigma` of all materials are updated automatically when
+the frequency is set through the scene's property :class:`~sionna.rt.Scene.frequency`.
+
++---------------------------+------------------------------------+--------------------------+-----------------------+
+| Material name             | Real part of relative permittivity | Conductivity [S/m]       | Frequency range (GHz) |
++                           +-------------------+----------------+---------------+----------+                       +
+|                           | a                 | b              | c             | d        |                       |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| vacuum                    | 1                 | 0              | 0             | 0        | 0.001 -- 100          |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_concrete              | 5.24              | 0              | 0.0462        | 0.7822   | 1 -- 100              |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_brick                 | 3.91              | 0              | 0.0238        | 0.16     | 1 -- 40               |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_plasterboard          | 2.73              | 0              | 0.0085        | 0.9395   | 1 -- 100              |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_wood                  | 1.99              | 0              | 0.0047        | 1.0718   | 0.001 -- 100          |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_glass                 | 6.31              | 0              | 0.0036        | 1.3394   | 0.1 -- 100            |
++                           +-------------------+----------------+---------------+----------+-----------------------+
+|                           | 5.79              | 0              | 0.0004        | 1.658    | 220 -- 450            |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_ceiling_board         | 1.48              | 0              | 0.0011        | 1.0750   | 1 -- 100              |
++                           +-------------------+----------------+---------------+----------+-----------------------+
+|                           | 1.52              | 0              | 0.0029        | 1.029    | 220 -- 450            |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_chipboard             | 2.58              | 0              | 0.0217        | 0.7800   | 1 -- 100              |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_plywood               | 2.71              | 0              | 0.33          | 0        | 1 -- 40               |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_marble                | 7.074             | 0              | 0.0055        | 0.9262   | 1 -- 60               |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_floorboard            | 3.66              | 0              | 0.0044        | 1.3515   | 50 -- 100             |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_metal                 | 1                 | 0              | :math:`10^7`  | 0        | 1 -- 100              |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_very_dry_ground       | 3                 | 0              | 0.00015       | 2.52     | 1 -- 10               |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_medium_dry_ground     | 15                | -0.1           | 0.035         | 1.63     | 1 -- 10               |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+| itu_wet_ground            | 30                | -0.4           | 0.15          | 1.30     | 1 -- 10               |
++---------------------------+-------------------+----------------+---------------+----------+-----------------------+
+
+
+.. _custom-radio-materials:
+
+**Defining custom radio materials**
+
+Custom radio materials can be implemented using the
+:class:`~sionna.rt.RadioMaterial` class by specifying a relative permittivity
+:math:`\varepsilon_r`  and a conductivity
+:math:`\sigma`. Note that only non-magnetic materials with :math:`\mu_r=1` are currently allowed. 
+The following code snippet shows how to create a custom radio material:
+
+.. code-block:: Python
+   
+   custom_material = RadioMaterial("my_material",
+                                   relative_permittivity=2.0,
+                                   conductivity=5.0)
+
+It is also possible to define the properties of a material through a callback
+function that computes the material properties
+:math:`(\varepsilon_r, \sigma)` from the frequency:
+
+.. code-block:: Python
+
+   def my_material_callback(f_hz):
+      relative_permittivity = compute_relative_permittivity(f_hz)
+      conductivity = compute_conductivity(f_hz)
+      return (relative_permittivity, conductivity)
+   
+   custom_material = RadioMaterial("my_material",
+                                   frequency_update_callback=my_material_callback)
+   scene.add(custom_material)
+
+Once defined, the custom material can be assigned to a :class:`~sionna.rt.SceneObject` using its name:
+
+.. code-block:: Python
+
+   obj = scene.get("my_object") # obj is a SceneObject
+   obj.radio_material = "my_material" # "my_object" is made of "my_material"
+
+or the material instance:
+
+.. code-block:: Python
+
+   obj = scene.get("my_object") # obj is a SceneObject
+   obj.radio_material = custom_material # "my_object" is made of "my_material"
+
+RadioMaterial
+-------------
+.. autoclass:: sionna.rt.RadioMaterial
+   :members:
+   :exclude-members: core_material, frequency_update, decrease_use, increase_use, scene, is_placeholder

@@ -7,8 +7,11 @@ You can alternatively test them on `Google Colab <https://colab.research.google.
 Although not necessary, we recommend running Sionna in a `Docker container <https://www.docker.com>`_.
 
 .. note::
-    Sionna requires `TensorFlow 2.7-2.10 <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
+    Sionna requires `TensorFlow 2.8-2.11 <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
     We recommend Ubuntu 20.04.
+
+    To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required.
+    The ray tracing preview requires `ipykernel>6.0` and a recent version of `Jupyter` or `JupyterLab`. You can upgrade to the latest version via ``pip install --upgrade ipykernel`` (requires restart of `Jupyter`).
 
     We refer to the `TensorFlow GPU support tutorial <https://www.tensorflow.org/install/gpu>`_ for GPU support and the required driver setup.
 
@@ -16,8 +19,6 @@ Installation using pip
 ----------------------
 We recommend to do this within a `virtual environment <https://docs.python.org/3/tutorial/venv.html>`_,
 e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `tensorflow-macos <https://github.com/apple/tensorflow_macos>`_ first.
-
-
 
 
 1.) Install the package
@@ -37,7 +38,7 @@ e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `ten
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.12.0
+    0.14.0
 
 3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
 
@@ -109,4 +110,4 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.12.0
+    0.14.0

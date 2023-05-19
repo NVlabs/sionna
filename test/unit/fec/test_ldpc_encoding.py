@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 try:
@@ -267,7 +267,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
         #n,m
         params = [[12,4], [100,2], [80, 8]]
         for (n,m) in params:
-            s, s_inv = enc._generate_out_int(n, m)
+            s, s_inv = enc.generate_out_int(n, m)
 
             idx = np.arange(n)
             idx_p = idx[s]
@@ -280,7 +280,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
         # test that for m=1 no interleaving happens
         m = 1
         for n in [10, 100, 1000]:
-            s, s_inv = enc._generate_out_int(n, m)
+            s, s_inv = enc.generate_out_int(n, m)
             idx = np.arange(n)
             self.assertTrue(np.array_equal(idx, s))
             self.assertTrue(np.array_equal(idx, s_inv))

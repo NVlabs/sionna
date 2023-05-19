@@ -9,6 +9,8 @@ API Documentation
    channel
    ofdm
    mimo
+   nr
+   rt
    signal
    utils
    config

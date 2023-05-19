@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Class definition and functions related to the resource grid"""
@@ -76,7 +76,7 @@ class ResourceGrid():
         self._num_ofdm_symbols = num_ofdm_symbols
         self._fft_size = fft_size
         self._subcarrier_spacing = subcarrier_spacing
-        self._cyclic_prefix_length = cyclic_prefix_length
+        self._cyclic_prefix_length = int(cyclic_prefix_length)
         self._num_tx = num_tx
         self._num_streams_per_tx = num_streams_per_tx
         self._num_guard_carriers = np.array(num_guard_carriers)
@@ -278,7 +278,7 @@ class ResourceGrid():
         return rg_type
 
     def show(self, tx_ind=0, tx_stream_ind=0):
-        """Visualizes the resource grid for a specific transmitter and antenna.
+        """Visualizes the resource grid for a specific transmitter and stream.
 
         Input
         -----
@@ -293,7 +293,7 @@ class ResourceGrid():
         : `matplotlib.figure`
             A handle to a matplot figure object.
         """
-        fig = plt.figure(figsize=(10,4))
+        fig = plt.figure()
         data = self.build_type_grid()[tx_ind, tx_stream_ind]
         cmap = colors.ListedColormap([[60/256,8/256,72/256],
                               [45/256,91/256,128/256],
@@ -301,15 +301,16 @@ class ResourceGrid():
                               [250/256,228/256,62/256]])
         bounds=[0,1,2,3,4]
         norm = colors.BoundaryNorm(bounds, cmap.N)
-        img = plt.imshow(data, interpolation="nearest",
+        img = plt.imshow(np.transpose(data), interpolation="nearest",
                          origin="lower", cmap=cmap, norm=norm,
                          aspect="auto")
         cbar = plt.colorbar(img, ticks=[0.5, 1.5, 2.5,3.5],
                             orientation="vertical", shrink=0.8)
         cbar.set_ticklabels(["Data", "Pilot", "Guard carrier", "DC carrier"])
         plt.title("OFDM Resource Grid")
-        plt.ylabel("OFDM Symbol")
-        plt.xlabel("Subcarrier Index")
+        plt.ylabel("Subcarrier Index")
+        plt.xlabel("OFDM Symbol")
+        plt.xticks(range(0, data.shape[0]))
 
         return fig
 

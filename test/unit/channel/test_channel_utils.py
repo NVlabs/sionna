@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -9,7 +9,11 @@ except ImportError as e:
     import sys
     sys.path.append("../")
 
-from sionna.channel import exp_corr_mat, one_ring_corr_mat
+from sionna.channel import exp_corr_mat, one_ring_corr_mat, cir_to_time_channel, cir_to_ofdm_channel, time_to_ofdm_channel, ApplyTimeChannel
+from sionna.channel.tr38901 import TDL
+from sionna.ofdm import ResourceGrid, ResourceGridMapper, OFDMModulator, OFDMDemodulator, LSChannelEstimator
+from sionna.mimo import StreamManagement
+from sionna.utils import QAMSource
 
 import pytest
 import unittest
@@ -114,3 +118,52 @@ class TestOneRingCorrMat(unittest.TestCase):
         sigma_phi_deg = 16
         with self.assertWarns(Warning):
             one_ring_corr_mat(phi_deg, num_ant, d_h, sigma_phi_deg)
+
+
+def run_time_to_ofdm_channel_test(l_min, l_max, cyclic_prefix_length):
+    """Test that the theoretical channel frequency response matches the perfectly estimated one"""
+    sm = StreamManagement(np.array([[1]]), 1)
+    rg = ResourceGrid(num_ofdm_symbols=5,
+                  fft_size=128,
+                  subcarrier_spacing=15e3,
+                  pilot_pattern="kronecker",
+                  pilot_ofdm_symbol_indices=[0,2,4],
+                  cyclic_prefix_length=cyclic_prefix_length)
+    batch_size = 16
+    l_tot = l_max-l_min+1
+    tdl = TDL("A", 100e-9, 3.5e9, min_speed=0, max_speed=0)
+    cir = tdl(batch_size=batch_size, num_time_steps=rg.num_time_samples+l_tot-1, sampling_frequency=rg.bandwidth)
+    h_time = cir_to_time_channel(rg.bandwidth, *cir, l_min=l_min, l_max=l_max, normalize=True)
+    
+    # Compute theoretical channel frequency response
+    h_freq = time_to_ofdm_channel(h_time, rg, l_min)
+
+    # Compute channel estimates from time-domain OFDM simulations
+    qam = QAMSource(4)
+    rg_mapper = ResourceGridMapper(rg)
+    mod = OFDMModulator(rg.cyclic_prefix_length)
+    demod = OFDMDemodulator(fft_size=rg.fft_size,
+                l_min=l_min,
+                cyclic_prefix_length=rg.cyclic_prefix_length)
+    time_channel = ApplyTimeChannel(rg.num_time_samples, l_tot, add_awgn=False)
+    chest = LSChannelEstimator(rg, interpolation_type="lin")
+
+    x = qam([batch_size, 1, 1, rg.num_data_symbols])
+    x_map = rg_mapper(x)
+    x_time = mod(x_map)
+    y_time = time_channel([x_time, h_time])
+    y_freq = demod(y_time)
+    h_freq_hat, no_var = chest([y_freq, 0.0001])
+
+    return np.allclose(h_freq, h_freq_hat, atol=1e-6)
+ 
+class TestTimeToOFDMChannel(unittest.TestCase):
+    def test_different_taps(self):
+        """Test that the theoretical channel frequency response
+           matches the perfectly estimated one for different numbers
+           of positive and negative taps
+        """
+        cyclic_prefix_length = 10
+        for l_max in range(0, cyclic_prefix_length+1):
+            for l_min in range(l_max-cyclic_prefix_length, 1):
+                self.assertTrue(run_time_to_ofdm_channel_test(l_min, l_max, cyclic_prefix_length))

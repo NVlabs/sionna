@@ -1,0 +1,23 @@
+Paths
+******
+
+A propagation path :math:`i` starts at a transmit antenna and ends at a receive antenna. It is described by
+its transfer matrix :math:`\mathbf{T}_i` and delay :math:`\tau_i`, as well as the
+angles of departure :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})`
+and arrival :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})`.
+For more detail, see :eq:`H_final`. Antenna patterns are not applied.
+
+In Sionna, paths are computed with the help of the function :meth:`~sionna.rt.Scene.compute_paths` which returns an instance of
+:class:`~sionna.rt.Paths`. Paths can be visualized by providing them as arguments to the functions :meth:`~sionna.rt.Scene.render`, 
+:meth:`~sionna.rt.Scene.render_to_file`, or :meth:`~sionna.rt.Scene.preview`.
+
+Paths can be transformed to channel impulse responses (CIRs) with :class:`~sionna.rt.Paths2CIR` which can
+then be used for link-level simulations. This is for example done in the `Sionna Ray Tracing Tutorial <../examples/Sionna_Ray_Tracing_Introduction.html>`_.
+Transmitter and receiver orientations as well as antenna patterns will be applied during this step.
+
+Paths
+-------
+.. autoclass:: sionna.rt.Paths
+   :members:
+   :inherited-members:
+   :exclude-members: mask, vertices, normals, objects

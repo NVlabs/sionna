@@ -1,8 +1,11 @@
-FROM tensorflow/tensorflow:2.10.0-gpu-jupyter
+FROM tensorflow/tensorflow:2.11.0-gpu-jupyter
 EXPOSE 8888
 COPY . /tmp/
 WORKDIR /tmp/
 RUN make install
+RUN apt-get install llvm -y
+RUN pip install --upgrade jupyter
+RUN pip install --upgrade ipykernel
 RUN rm -R /tf/* && cp /tmp/examples/* /tf
 RUN rm -R /tmp
 RUN chmod 777 -R /tf

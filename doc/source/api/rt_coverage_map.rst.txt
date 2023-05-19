@@ -1,0 +1,38 @@
+Coverage Maps
+***************
+
+A coverage map describes the average received power from a specific transmitter at every point on a plane.
+In other words, for a given transmitter, it associates every point on a surface  with the sum of the
+squared amplitudes of the path coefficients :math:`a_i` :eq:`H_final` that a receiver with
+a specific orientation would observe at this point. A coverage map is not uniquely defined as it depends on
+the transmit and receive arrays and their respective antenna patterns, the transmitter and receiver orientations, as well as
+transmit precoding and receive combining vectors. Moreover, a coverage map is not continuous but discrete because the plane
+needs to be quantized into small rectangular bins.
+
+In Sionna, coverage maps are computed with the help of the function :meth:`~sionna.rt.Scene.coverage_map` which returns an instance of
+:class:`~sionna.rt.CoverageMap`. They can be visualized by providing them either as arguments to the functions :meth:`~sionna.rt.Scene.render`,
+:meth:`~sionna.rt.Scene.render_to_file`, and :meth:`~sionna.rt.Scene.preview`, or by using the class method :meth:`~sionna.rt.CoverageMap.show`.
+
+A very useful feature is :meth:`~sionna.rt.CoverageMap.sample_positions` which allows sampling
+of random positions within the scene that have sufficient coverage from a specific transmitter.
+This feature is used in the `Sionna Ray Tracing Tutorial <../examples/Sionna_Ray_Tracing_Introduction.html>`_ to generate a dataset of channel impulse responses
+for link-level simulations.
+
+CoverageMap
+-----------
+.. autoclass:: sionna.rt.CoverageMap
+   :members:
+   :inherited-members:
+   :exclude-members: as_tensor, sample_positions, show
+
+as_tensor
+---------
+.. autofunction:: sionna.rt.CoverageMap.as_tensor
+
+sample_positions
+----------------
+.. autofunction:: sionna.rt.CoverageMap.sample_positions
+
+show
+----
+.. autofunction:: sionna.rt.CoverageMap.show

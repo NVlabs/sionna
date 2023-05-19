@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Utility functions and layers for the FEC package."""
@@ -11,7 +11,9 @@ import matplotlib.pyplot as plt
 import warnings
 from importlib_resources import files, as_file
 from sionna.fec.ldpc import codes
-from sionna.utils.misc import log2
+from sionna.utils import log2
+from sionna.nr.utils import generate_prng_seq as generate_prng_seq_utils
+
 
 class GaussianPriorSource(Layer):
     r"""GaussianPriorSource(specified_by_mi=False, dtype=tf.float32, **kwargs)
@@ -217,7 +219,6 @@ def llr2mi(llr, s=None, reduce_dims=True):
         x = 1. - tf.reduce_mean(x, axis=-1)
     return x
 
-
 def j_fun(mu):
        # pylint: disable=line-too-long
     r"""Calculates the `J-function` in NumPy.
@@ -254,7 +255,6 @@ def j_fun(mu):
     mu = np.maximum(mu, 1e-10) # input must be positive for numerical stability
     mi = (1-2**(-h1*(2*mu)**h2))**h3
     return mi
-
 
 def j_fun_inv(mi):
      # pylint: disable=line-too-long
@@ -298,7 +298,6 @@ def j_fun_inv(mi):
     # add small value to avoid log(0)
     mu = 0.5*((-1/h1)*np.log2((1-mi**(1/h3)) + 1e-12))**(1/(h2))
     return np.minimum(mu, 20) # clipp the output to mu_max =20
-
 
 def j_fun_tf(mu, verify_inputs=True):
      # pylint: disable=line-too-long
@@ -1346,93 +1345,6 @@ def generate_reg_ldpc(v, c, n, allow_flex_len=True, verbose=True):
 
     return pcm, k, n, coderate
 
-def generate_prng_seq(length, n_rnti=0, n_id=0, c_init=None):
-    r"""Implements pseudo-random generator as defined in [3GPPTS38211_S]_.
-
-    The implementation follows Sec. 5.2.1 and 6.3.1.1 in [3GPPTS38211_S]_ and,
-    thus, the resulting sequence can be used for PUSCH scrambling.
-
-    Parameters
-    ----------
-    length: int
-        Desired output sequence length.
-
-    n_rnti: int
-        RNTI identifier provided by higher layer. Defaults to 0 and must be in
-        range `[0, 65535]`.
-
-    n_id: int
-        Scrambling ID related to cell id and provided by higher layer. Defaults
-        to 0 and must be in range `[0, 65535]`.
-
-    c_init: int or None
-        Initialization sequence of the PRNG. If explicitly provided, ``n_rnti``
-        and ``n_id`` will be ignored. Defaults to `None`.
-
-    Output
-    ------
-    :[length], ndarray of 0s and 1s
-        Containing the scrambling sequence.
-
-    Note
-    ----
-    The parameters radio network temporary identifier (RNTI) ``n_rnti`` and the
-    cell id ``n_id`` are usually provided be the higher layer protocols.
-    """
-
-    # check inputs for consistency
-    assert(length%1==0), "length must be integer."
-    length = int(length)
-    assert(length>0), "length must be a positive integer."
-
-    if c_init is None:
-        # allow floating inputs, but verify that it represent an integer value
-        assert(n_rnti%1==0), "n_rnti must be integer."
-        assert(n_id%1==0), "n_id must be integer."
-        n_rnti = int(n_rnti)
-        n_id = int(n_id)
-        assert(n_rnti>=0), "n_rnti must be in [0, 65535]."
-        assert(n_rnti<2**16), "n_rnti must be in [0, 65535]."
-        assert(n_id>=0), "n_id must be in [0, 65535]."
-        assert(n_id<2**16), "n_id must be in [0, 65535]."
-
-    # internal parameters
-    n_seq = 31 # length of gold sequence
-    n_c = 1600 # defined in 5.2.1 in 38.211
-
-    # init sequences
-    c = np.zeros(length)
-    x1 = np.zeros(length + n_c + n_seq)
-    x2 = np.zeros(length + n_c + n_seq)
-
-    if c_init is None:
-        # defined in 6.3.1.1 in 38.211
-        c_init = n_rnti * 2**15 + n_id
-    else:
-        assert(c_init%1==0), "c_init must be integer."
-        c_init = int(c_init)
-        assert(c_init<2**32), "c_init must be in [0, 2^32-1]."
-        assert(c_init>=0), "c_init must be in [0, 2^32-1]."
-
-    c_init = int2bin(c_init, n_seq)
-    c_init = np.flip(c_init) # reverse order
-
-    # init x1 and x2
-    x1[0] = 1
-    x2[0:n_seq] = c_init
-
-    # and run the generator
-    for idx in range(length + n_c):
-        # update x1 and x2
-        x1[idx+31] = np.mod(x1[idx+3] + x1[idx], 2)
-        x2[idx+31] = np.mod(x2[idx+3] + x2[idx+2] + x2[idx+1] + x2[idx], 2)
-
-    # and update output sequence
-    for idx in range(length):
-        c[idx] = np.mod(x1[idx+n_c] + x2[idx+n_c], 2)
-
-    return c
-
 
 def int_mod_2(x):
     r"""Efficient implementation of modulo 2 operation for integer inputs.
@@ -1449,9 +1361,10 @@ def int_mod_2(x):
 
     """
 
-    x_int8 = tf.cast(x, tf.int8)
-    y_int8 = tf.bitwise.bitwise_and(x_int8, tf.constant(1, tf.int8))
-    return tf.cast(y_int8, x.dtype)
+    x_int32 = tf.cast(x, tf.int32)
+    y_int32 = tf.bitwise.bitwise_and(x_int32, tf.constant(1, tf.int32))
+    return tf.cast(y_int32, x.dtype)
+
 
 ###########################################################
 # Deprecated aliases that will not be included in the next
@@ -1464,7 +1377,7 @@ def LinearEncoder(enc_mat,
                   is_pcm=False,
                   dtype=tf.float32,
                   **kwargs):
-    # import here as circular import is generated otherwise
+    # defer import as circular dependency is generated otherwise
     from sionna.fec.linear import LinearEncoder as LE # pylint: disable=C0415
     print("Warning: The alias fec.utils.LinearEncoder will not be included in "\
           "Sionna 1.0. Please use fec.linear.LinearEncoder instead.")
@@ -1472,3 +1385,21 @@ def LinearEncoder(enc_mat,
                              is_pcm=is_pcm,
                              dtype=dtype,
                              **kwargs)
+
+# Scrambling has been refactored and c_init is now directly calculated during
+# the initialization of the Scrambler
+def generate_prng_seq(length, n_rnti=None, n_id=None, c_init=None):
+
+    print("Warning: The alias sionna.fec.utils.generate_prng_seq will not be " \
+          "included in Sionna 1.0. Please use " \
+          "sionna.nr.utils.generate_prng_seq instead.")
+
+    # n_rnti and n_id have been integrated in the TB5GScrambler
+    assert (n_rnti is None), \
+        "The parameter n_rnti is deprecated and has been removed. Please " \
+        "refer to the TB5GScrambler for the Scrambler initialization."
+    assert (n_id is None), \
+        "The parameter n_id is deprecated and has been removed. Please " \
+        "refer to the TB5GScrambler for the Scrambler initialization."
+
+    return generate_prng_seq_utils(length, c_init=c_init)

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Class definition and functions related to pilot patterns"""
@@ -23,7 +23,7 @@ class PilotPattern():
     mask : [num_tx, num_streams_per_tx, num_ofdm_symbols, num_effective_subcarriers], bool
         Tensor indicating resource elements that are reserved for pilot transmissions.
 
-    pilots : [num_tx, num_txt_ant, num_pilots], tf.complex
+    pilots : [num_tx, num_streams_per_tx, num_pilots], tf.complex
         The pilot symbols to be mapped onto the ``mask``.
 
     trainable : bool
@@ -71,12 +71,12 @@ class PilotPattern():
 
     @property
     def num_pilot_symbols(self):
-        """Number of pilot symbols per transmit antenna"""
+        """Number of pilot symbols per transmit stream."""
         return tf.shape(self._pilots)[-1]
 
     @property
     def num_data_symbols(self):
-        """ Number of data symbols per transmit antenna"""
+        """ Number of data symbols per transmit stream."""
         return tf.shape(self._mask)[-1]*tf.shape(self._mask)[-2] - \
                self.num_pilot_symbols
 
@@ -126,7 +126,7 @@ class PilotPattern():
         num_pilots = tf.reduce_sum(self._mask, axis=(-2,-1))
         assert tf.reduce_min(num_pilots)==tf.reduce_max(num_pilots), \
             """The number of nonzero elements in the masks for all transmitters
-            and antennas must be identical."""
+            and streams must be identical."""
 
         assert self.num_pilot_symbols==tf.reduce_max(num_pilots), \
             """The shape of the last dimension of `pilots` must equal
@@ -142,11 +142,7 @@ class PilotPattern():
 
 
     def show(self, tx_ind=None, stream_ind=None, show_pilot_ind=False):
-        """Visualizes the non-zero pilots for some transmitters and streams.
-
-        The function only produces correct results for non-overlapping
-        pilot sequences. In order to inspect overlapping sequences, one can
-        simply call the function with different transmitter and stream indices.
+        """Visualizes the pilot patterns for some transmitters and streams.
 
         Input
         -----
@@ -159,12 +155,13 @@ class PilotPattern():
             Defaults to `None`, i.e., all streams included.
 
         show_pilot_ind : bool
-            Indicates if the indices of the pilot symbols should be shhown.
+            Indicates if the indices of the pilot symbols should be shown.
 
         Output
         ------
-        : matplotlib.figure.Figure
-            A handle to a matplot figure object.
+        list : matplotlib.figure.Figure
+            List of matplot figure objects showing each the pilot pattern
+            from a specific transmitter and stream.
         """
         mask = self.mask.numpy()
         pilots = self.pilots.numpy()
@@ -179,40 +176,36 @@ class PilotPattern():
         elif not isinstance(stream_ind, list):
             stream_ind = [stream_ind]
 
-        legend = ["Data"]
-        q = np.zeros_like(mask[0,0])
+        figs = []
         for i in tx_ind:
             for j in stream_ind:
-                legend.append(f"TX {i}, Stream {j}")
-                m = mask[i,j]
-                p = np.sign(np.abs(pilots[i,j]))*(i*len(stream_ind)+j+1)
-                m[np.where(m)] = p
-                q += m
+                q = np.zeros_like(mask[0,0])
+                q[np.where(mask[i,j])] = (np.abs(pilots[i,j])==0) + 1
+                legend = ["Data", "Pilots", "Masked"]
+                fig = plt.figure()
+                plt.title(f"TX {i} - Stream {j}")
+                plt.xlabel("OFDM Symbol")
+                plt.ylabel("Subcarrier Index")
+                plt.xticks(range(0, q.shape[1]))
+                cmap = plt.cm.tab20c
+                b = np.arange(0, 4)
+                norm = colors.BoundaryNorm(b, cmap.N)
+                im = plt.imshow(np.transpose(q), origin="lower", aspect="auto", norm=norm, cmap=cmap)
+                cbar = plt.colorbar(im)
+                cbar.set_ticks(b[:-1]+0.5)
+                cbar.set_ticklabels(legend)
 
-        fig = plt.figure(figsize=(10,4))
-        plt.title("Non-Zero Pilots")
-        plt.ylabel("OFDM Symbol")
-        plt.xlabel("Effective Subcarrier Index")
-        cmap = plt.cm.tab20c
-        b = np.arange(0, np.max(q)+2)
-        norm = colors.BoundaryNorm(b, cmap.N)
-        im = plt.imshow(q, origin="lower", aspect="auto", norm=norm, cmap=cmap)
-        cbar = plt.colorbar(im)
-        cbar.set_ticks(b[:-1]+0.5)
-        cbar.set_ticklabels(legend)
-
-        if show_pilot_ind:
-            for t in tx_ind:
-                for k in stream_ind:
+                if show_pilot_ind:
                     c = 0
-                    for i in range(self.num_ofdm_symbols):
-                        for j in range(self.num_effective_subcarriers):
-                            if self.mask[t,k,i,j]==1:
-                                if np.abs(pilots[t,k,c])>0:
-                                    plt.annotate(c, [j,i])
+                    for t in range(self.num_ofdm_symbols):
+                        for k in range(self.num_effective_subcarriers):
+                            if mask[i,j][t,k]:
+                                if np.abs(pilots[i,j,c])>0:
+                                    plt.annotate(c, [t, k])
                                 c+=1
+                figs.append(fig)
 
-        return fig
+        return figs
 
 class EmptyPilotPattern(PilotPattern):
     """Creates an empty pilot pattern.
@@ -301,8 +294,8 @@ class KroneckerPilotPattern(PilotPattern):
     It is required that the ``resource_grid``'s property
     ``num_effective_subcarriers`` is an
     integer multiple of ``num_tx * num_streams_per_tx``. This condition is
-    required to ensure that all transmitters and transmit antennas get
-    non-overlapping pilot sequences. For a large number of antennas and/or
+    required to ensure that all transmitters and streams get
+    non-overlapping pilot sequences. For a large number of streams and/or
     transmitters, the pilot pattern becomes very sparse in the frequency
     domain.
 

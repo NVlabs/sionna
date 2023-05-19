@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Class definition and functions related to OFDM channel equalization"""
@@ -446,7 +446,10 @@ class OFDMDetectorWithPrior(OFDMDetector):
 
         # Precompute indices to map priors to a resource grid
         rg_type = resource_grid.build_type_grid()
-        self._data_ind_scatter = tf.where(rg_type==0)
+        # The nulled subcarriers (nulled DC and guard carriers) are removed to
+        # get the correct indices of data-carrying resource elements.
+        remove_nulled_sc = RemoveNulledSubcarriers(resource_grid)
+        self._data_ind_scatter = tf.where(remove_nulled_sc(rg_type)==0)
 
     # Overwrite the call() method of baseclass `BaseDetector`
     def call(self, inputs):
@@ -878,7 +881,7 @@ class LinearDetector(OFDMDetector):
                  dtype=tf.complex64,
                  **kwargs):
 
-        # Instantiate the maximum-likelihood detector
+        # Instantiate the linear detector
         detector = LinearDetector_(equalizer=equalizer,
                                    output=output,
                                    demapping_method=demapping_method,

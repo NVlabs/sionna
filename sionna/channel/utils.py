@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Utility functions for the channel module"""
@@ -137,10 +137,14 @@ def time_lag_discrete_time_channel(bandwidth, maximum_delay_spread=3e-6):
     to be large enough to include most significant paths with all channel models
     included in Sionna assuming a nominal delay spread of 100ns.
 
-    *Warining:* The values of :math:`L_{\text{min}}` and :math:`L_{\text{max}}` computed
+    Note
+    ----
+    The values of :math:`L_{\text{min}}` and :math:`L_{\text{max}}` computed
     by this function are only recommended values.
     :math:`L_{\text{min}}` and :math:`L_{\text{max}}` should be set according to
-    the considered channel model.
+    the considered channel model. For OFDM systems, one also needs to be careful
+    that the effective length of the complex baseband channel is not larger than
+    the cyclic prefix length.
 
     Input
     ------
@@ -177,7 +181,7 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
     is computed as follows:
 
     .. math::
-        \widehat{h}(f) = \sum_{m=0}^{M-1} a_{m} e^{j2\pi f \tau_{m}}
+        \widehat{h}(f) = \sum_{m=0}^{M-1} a_{m} e^{-j2\pi f \tau_{m}}
 
     Input
     ------
@@ -187,7 +191,7 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
     a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex
         Path coefficients
 
-    tau : [batch size, num_rx, num_tx, num_paths], tf.float
+    tau : [batch size, num_rx, num_tx, num_paths] or [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths], tf.float
         Path delays
 
     normalize : bool
@@ -202,25 +206,27 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
 
     real_dtype = tau.dtype
 
-    # Expand dims to broadcast with h. Add the following dimensions:
-    #  - number of rx antennas (2)
-    #  - number of tx antennas (4)
-    #  - number of time samples (6)
-    tau = tf.expand_dims(tf.expand_dims(tf.expand_dims(tau, axis=2),
-                    axis=4), axis=6)
+    if len(tau.shape) == 4:
+        # Expand dims to broadcast with h. Add the following dimensions:
+        #  - number of rx antennas (2)
+        #  - number of tx antennas (4)
+        tau = tf.expand_dims(tf.expand_dims(tau, axis=2), axis=4)
+        # Broadcast is not supported yet by TF for such high rank tensors.
+        # We therefore do part of it manually
+        tau = tf.tile(tau, [1, 1, 1, 1, a.shape[4], 1])
+
+    # Add a time samples dimension for broadcasting
+    tau = tf.expand_dims(tau, axis=6)
 
     # Bring all tensors to broadcastable shapes
     tau = tf.expand_dims(tau, axis=-1)
     h = tf.expand_dims(a, axis=-1)
-    frequencies = expand_to_rank(frequencies, tau.shape.rank, axis=0)
+    frequencies = expand_to_rank(frequencies, tf.rank(tau), axis=0)
 
     ## Compute the Fourier transforms of all cluster taps
     # Exponential component
     e = tf.exp(tf.complex(tf.constant(0, real_dtype),
         -2*PI*frequencies*tau))
-    # Broadcast is not supported yet by TF for such high rank tensors.
-    # We therefore do part of it manually
-    e = tf.tile(e, [1, 1, 1, 1, h.shape[4], 1, 1, 1])
     h_f = h*e
     # Sum over all clusters to get the channel frequency responses
     h_f = tf.reduce_sum(h_f, axis=-3)
@@ -232,7 +238,8 @@ def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
         # subcarriers.
         c = tf.reduce_mean( tf.square(tf.abs(h_f)), axis=(2,4,5,6),
                             keepdims=True)
-        h_f = h_f / tf.complex(tf.sqrt(c), tf.constant(0., real_dtype))
+        c = tf.complex(tf.sqrt(c), tf.constant(0., real_dtype))
+        h_f = tf.math.divide_no_nan(h_f, c)
 
     return h_f
 
@@ -243,7 +250,7 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
     representation of the channel from the channel impulse response
     (``a``, ``tau``).
 
-    This function assumes sinc filter is used for pulse shaping and receive
+    This function assumes that a sinc filter is used for pulse shaping and receive
     filtering. Therefore, given a channel impulse response
     :math:`(a_{m}(t), \tau_{m}), 0 \leq m \leq M-1`, the channel taps
     are computed as follows:
@@ -264,7 +271,7 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
     a : [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps], tf.complex
         Path coefficients
 
-    tau : [batch size, num_rx, num_tx, num_paths], tf.float
+    tau : [batch size, num_rx, num_tx, num_paths] or [batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths], tf.float
         Path delays [s]
 
     l_min : int
@@ -285,12 +292,17 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
 
     real_dtype = tau.dtype
 
-    # Expand dims to broadcast with h. Add the following dimensions:
-    #  - number of rx antennas (2)
-    #  - number of tx antennas (4)
-    #  - number of time samples (6)
-    tau = tf.expand_dims(tf.expand_dims(tf.expand_dims(tau, axis=2),
-                    axis=4), axis=6)
+    if len(tau.shape) == 4:
+        # Expand dims to broadcast with h. Add the following dimensions:
+        #  - number of rx antennas (2)
+        #  - number of tx antennas (4)
+        tau = tf.expand_dims(tf.expand_dims(tau, axis=2), axis=4)
+        # Broadcast is not supported by TF for such high rank tensors.
+        # We therefore do part of it manually
+        tau = tf.tile(tau, [1, 1, 1, 1, a.shape[4], 1])
+
+    # Add a time samples dimension for broadcasting
+    tau = tf.expand_dims(tau, axis=6)
 
     # Time lags for which to compute the channel taps
     l = tf.range(l_min, l_max+1, dtype=real_dtype)
@@ -305,9 +317,6 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
     a = tf.expand_dims(a, axis=-1)
 
     # For every tap, sum the sinc-weighted coefficients
-    # Broadcast is not supported by TF for such high rank tensors.
-    # We therefore do part of it manually
-    g = tf.tile(g, [1, 1, 1, 1, a.shape[4], 1, 1, 1])
     hm = tf.reduce_sum(a*g, axis=-3)
 
     if normalize:
@@ -319,10 +328,117 @@ def cir_to_time_channel(bandwidth, a, tau, l_min, l_max, normalize=False):
         c = tf.reduce_mean(tf.reduce_sum(tf.square(tf.abs(hm)),
                                          axis=6, keepdims=True),
                            axis=(2,4,5), keepdims=True)
-        hm = hm / tf.complex(tf.sqrt(c),
-                             tf.constant(0., real_dtype))
+        c = tf.complex(tf.sqrt(c), tf.constant(0., real_dtype))
+        hm = tf.math.divide_no_nan(hm, c)
 
     return hm
+
+def time_to_ofdm_channel(h_t, rg, l_min):
+    # pylint: disable=line-too-long
+    r"""
+    Compute the channel frequency response from the discrete complex-baseband
+    channel impulse response.
+
+    Given a discrete complex-baseband channel impulse response
+    :math:`\bar{h}_{b,\ell}`, for :math:`\ell` ranging from :math:`L_\text{min}\le 0`
+    to :math:`L_\text{max}`, the discrete channel frequency response is computed as
+
+    .. math::
+
+        \hat{h}_{b,n} = \sum_{k=0}^{L_\text{max}} \bar{h}_{b,k} e^{-j \frac{2\pi kn}{N}} + \sum_{k=L_\text{min}}^{-1} \bar{h}_{b,k} e^{-j \frac{2\pi n(N+k)}{N}}, \quad n=0,\dots,N-1
+
+    where :math:`N` is the FFT size and :math:`b` is the time step.
+
+    This function only produces one channel frequency response per OFDM symbol, i.e.,
+    only values of :math:`b` corresponding to the start of an OFDM symbol (after
+    cyclic prefix removal) are considered.
+
+    Input
+    ------
+    h_t : [...num_time_steps,l_max-l_min+1], tf.complex
+        Tensor of discrete complex-baseband channel impulse responses
+
+    resource_grid : :class:`~sionna.ofdm.ResourceGrid`
+        Resource grid
+
+    l_min : int
+        Smallest time-lag for the discrete complex baseband
+        channel impulse response (:math:`L_{\text{min}}`)
+
+    Output
+    ------
+    h_f : [...,num_ofdm_symbols,fft_size], tf.complex
+        Tensor of discrete complex-baseband channel frequency responses
+
+    Note
+    ----
+    Note that the result of this function is generally different from the
+    output of :meth:`~sionna.channel.utils.cir_to_ofdm_channel` because
+    the discrete complex-baseband channel impulse response is truncated
+    (see :meth:`~sionna.channel.utils.cir_to_time_channel`). This effect
+    can be observed in the example below.
+
+    Examples
+    --------
+    .. code-block:: Python
+
+        # Setup resource grid and channel model
+        tf.random.set_seed(4)
+        sm = StreamManagement(np.array([[1]]), 1)
+        rg = ResourceGrid(num_ofdm_symbols=1,
+                          fft_size=1024,
+                          subcarrier_spacing=15e3)
+        tdl = TDL("A", 100e-9, 3.5e9)
+
+        # Generate CIR
+        cir = tdl(batch_size=1, num_time_steps=1, sampling_frequency=rg.bandwidth)
+
+        # Generate OFDM channel from CIR
+        frequencies = subcarrier_frequencies(rg.fft_size, rg.subcarrier_spacing)
+        h_freq = tf.squeeze(cir_to_ofdm_channel(frequencies, *cir, normalize=True))
+
+        # Generate time channel from CIR
+        l_min, l_max = time_lag_discrete_time_channel(rg.bandwidth)
+        h_time = cir_to_time_channel(rg.bandwidth, *cir, l_min=l_min, l_max=l_max, normalize=True)
+
+        # Generate OFDM channel from time channel
+        h_freq_hat = tf.squeeze(time_to_ofdm_channel(h_time, rg, l_min))
+
+        # Visualize results
+        plt.figure()
+        plt.plot(np.real(h_freq), "-")
+        plt.plot(np.real(h_freq_hat), "--")
+        plt.plot(np.imag(h_freq), "-")
+        plt.plot(np.imag(h_freq_hat), "--")
+        plt.xlabel("Subcarrier index")
+        plt.ylabel(r"Channel frequency response")
+        plt.legend(["OFDM Channel (real)", "OFDM Channel from time (real)", "OFDM Channel (imag)", "OFDM Channel from time (imag)"])
+
+    .. image:: ../figures/time_to_ofdm_channel.png
+    """
+    # Totla length of an OFDM symbol including cyclic prefix
+    ofdm_length = rg.fft_size + rg.cyclic_prefix_length
+
+    # Downsample the impulse respons to one sample per OFDM symbol
+    h_t = h_t[...,rg.cyclic_prefix_length:rg.num_time_samples:ofdm_length, :]
+
+    # Pad channel impulse response with zeros to the FFT size
+    pad_dims = rg.fft_size - tf.shape(h_t)[-1]
+    pad_shape = tf.concat([tf.shape(h_t)[:-1], [pad_dims]], axis=-1)
+    h_t = tf.concat([h_t, tf.zeros(pad_shape, dtype=h_t.dtype)], axis=-1)
+
+    # Circular shift of negative time lags so that the channel impulse reponse
+    # starts with h_{b,0}
+    h_t = tf.roll(h_t, l_min, axis=-1)
+
+    # Compute FFT
+    h_f = tf.signal.fft(h_t)
+
+    # Move the zero subcarrier to the center of the spectrum
+    h_f = tf.signal.fftshift(h_f, axes=-1)
+
+    return h_f
+
 
 def deg_2_rad(x):
     r"""
@@ -1015,7 +1131,7 @@ def gen_single_sector_topology( batch_size,
     # of the sector
     sector_center = (min_bs_ut_dist + 0.5*isd)*0.5
     bs_downtilt = 0.5*PI - tf.math.atan(sector_center/bs_height)
-    bs_yaw = tf.constant(0.25*PI, real_dtype)
+    bs_yaw = tf.constant(PI/3.0, real_dtype)
     bs_orientation = tf.stack([ tf.fill([batch_size, 1], bs_yaw),
                                 tf.fill([batch_size, 1], bs_downtilt),
                                 tf.zeros([batch_size, 1], real_dtype)], axis=-1)
@@ -1219,7 +1335,7 @@ def gen_single_sector_topology_interferers( batch_size,
     # of the sector
     sector_center = (min_bs_ut_dist + 0.5*isd)*0.5
     bs_downtilt = 0.5*PI - tf.math.atan(sector_center/bs_height)
-    bs_yaw = tf.constant(0.25*PI, real_dtype)
+    bs_yaw = tf.constant(PI/3.0, real_dtype)
     bs_orientation = tf.stack([ tf.fill([batch_size, 1], bs_yaw),
                                 tf.fill([batch_size, 1], bs_downtilt),
                                 tf.zeros([batch_size, 1], real_dtype)], axis=-1)

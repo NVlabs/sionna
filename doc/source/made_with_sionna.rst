@@ -9,6 +9,29 @@ List of Projects
 
 If you want your paper and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
+Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling
+********************************************************************
+.. made-with-sionna::
+    :title: Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling
+    :authors: Jakob Hoydis, Fayçal Aït Aoudia, Sebastian Cammerer, Merlin Nimier-David, Nikolaus Binder, Guillermo Marcus, Alexander Keller
+    :year: 2023
+    :version: 0.14
+    :link_pdf: https://drive.google.com/file/d/1fTbTC6ogj9p8lPevvrFUu8tyOhsNArJm/view?usp=share_link
+    :link_github: https://github.com/NVlabs/diff-rt
+    :link_colab: https://colab.research.google.com/github/NVlabs/diff-rt/blob/master/Learning_Materials.ipynb
+    :abstract: Sionna is a GPU-accelerated open-source library for link-level simulations based on TensorFlow. Its latest release (v0.14) integrates a differentiable ray tracer (RT) for the simulation of radio wave propagation. This unique feature allows for the computation of gradients of the channel impulse response and other related quantities with respect to many system  and environment parameters, such as material properties, antenna patterns, array geometries, as well as transmitter and receiver orientations and positions. In this paper, we outline the key components of Sionna RT and showcase example applications such as learning of radio materials and optimizing transmitter orientations by gradient descent. While classic ray tracing is a crucial tool for 6G research topics like reconfigurable intelligent surfaces, integrated sensing and communications, as well as user localization, differentiable ray tracing is a key enabler for many novel and exciting research directions, for example, digital twins.
+
+
+DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems
+*********************************************************************************
+.. made-with-sionna::
+    :title: DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems
+    :authors: Reinhard Wiesmayr, Chris Dick, Jakob Hoydis, Christoph Studer
+    :year: 2022
+    :version: 0.11
+    :link_arxiv: https://arxiv.org/abs/2212.07816
+    :link_github: https://github.com/IIP-Group/DUIDD
+    :abstract: Iterative detection and decoding (IDD) is known to achieve near-capacity performance in multi-antenna wireless systems. We propose deep-unfolded interleaved detection and decoding (DUIDD), a new paradigm that reduces the complexity of IDD while achieving even lower error rates. DUIDD interleaves the inner stages of the data detector and channel decoder, which expedites convergence and reduces complexity. Furthermore, DUIDD applies deep unfolding to automatically optimize algorithmic hyperparameters, soft-information exchange, message damping, and state forwarding. We demonstrate the efficacy of DUIDD using NVIDIA's Sionna link-level simulator in a 5G-near multi-user MIMO-OFDM wireless system with a novel low-complexity soft-input soft-output data detector, an optimized low-density parity-check decoder, and channel vectors from a commercial ray-tracer. Our results show that DUIDD outperforms classical IDD both in terms of block error rate and computational complexity.
 
 Bit Error and Block Error Rate Training for ML-Assisted Communication
 *********************************************************************

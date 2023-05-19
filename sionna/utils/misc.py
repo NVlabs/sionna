@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Miscellaneous utility functions of the Sionna package."""
@@ -114,7 +114,7 @@ def log10(x):
 
     Simple extension to `tf.experimental.numpy.log10`
     which casts the result to the `dtype` of the input.
-    For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10>`_ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log10.html>`_ documentation.
+    For more details see the `TensorFlow <https://www.tensorflow.org/api_docs/python/tf/experimental/numpy/log10>`__ and `NumPy <https://numpy.org/doc/1.16/reference/generated/numpy.log10.html>`__ documentation.
     """
     return tf.cast(_log10(x), x.dtype)
 
@@ -777,7 +777,6 @@ def complex_normal(shape, var=1.0, dtype=tf.complex64):
 
     return x
 
-
 ###########################################################
 # Deprecated aliases that will not be included in the next
 # major release
@@ -799,3 +798,5 @@ def empirical_psd(x, show=True, oversampling=1.0, ylim=(-30,3)):
     print(  "Warning: The alias utils.empirical_psd will not be included in"
             " Sionna 1.0. Please use signal.empirical_psd instead.")
     return signal.empirical_psd(x, show, oversampling, ylim)
+
+

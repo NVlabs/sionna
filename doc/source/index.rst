@@ -59,6 +59,7 @@ Where to find detailed information?
    examples/Discover_Sionna.ipynb
    tutorials
    made_with_sionna
+   em_primer
    api/sionna
    Discussions <https://github.com/NVlabs/sionna/discussions>
    Report an Issue <https://github.com/NVlabs/sionna/issues>

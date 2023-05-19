@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -597,7 +597,7 @@ class RaysGenerator:
         # Inverse Laplacian function
         z = cluster_powers/tf.reduce_max(cluster_powers, axis=3, keepdims=True)
         z = tf.clip_by_value(z, 1e-6, 1.0)
-        zenith_angles_prime = (-zenith_spread*tf.math.log(z)/c_theta)
+        zenith_angles_prime = -zenith_spread*tf.math.log(z)/c_theta
 
         # Random component
         random_sign = tf.random.uniform(shape=[batch_size, num_bs, 1,

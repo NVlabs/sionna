@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 try:
@@ -248,7 +248,7 @@ class TestOSD(unittest.TestCase):
         _, bler = sim_ber(model,
                           ebno_dbs=snrs_ref,
                           batch_size=1000,
-                          max_mc_iter=100,
+                          max_mc_iter=500,
                           num_target_block_errors=10000)
         # we allow 20% tolerance to ML;
         self.assertTrue(np.all(np.isclose(bler.numpy(), blers_ref, rtol=0.2)))

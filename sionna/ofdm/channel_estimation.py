@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Functions related to OFDM channel estimation"""
@@ -1690,7 +1690,7 @@ class LMMSEInterpolator(BaseChannelInterpolator):
         err_var_masks = []
         for i, o in enumerate(order):
             # Is it the last one?
-            last_step = (i == len(order)-1)
+            last_step = i == len(order)-1
             # Frequency
             if o == "f":
                 interpolator = LMMSEInterpolator1D(pilot_mask, cov_mat_freq,

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layer for Turbo Code Encoding."""
@@ -196,7 +196,7 @@ class TurboEncoder(Layer):
                   "The exact true rate is dependent on the value of k and "\
                   "hence cannot be computed before the first call().")
         elif self.terminate and self._k is not None:
-            term_factor = (1+math.ceil(4*self._mu/3)/self._k)
+            term_factor = 1+math.ceil(4*self._mu/3)/self._k
             self._coderate = self._coderate_desired/term_factor
         return self._coderate
 

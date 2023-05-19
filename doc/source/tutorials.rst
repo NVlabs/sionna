@@ -21,6 +21,7 @@ For Beginners
     examples/Simple_MIMO_Simulation.ipynb
     examples/Pulse_shaping_basics.ipynb
     examples/Optical_Lumped_Amplification_Channel.ipynb
+    examples/Sionna_Ray_Tracing_Introduction.ipynb
 
 For Experts
 -----------
@@ -29,11 +30,13 @@ For Experts
     :maxdepth: 1
 
     examples/5G_Channel_Coding_Polar_vs_LDPC_Codes.ipynb
+    examples/5G_NR_PUSCH.ipynb
     examples/Bit_Interleaved_Coded_Modulation.ipynb
     examples/MIMO_OFDM_Transmissions_over_CDL.ipynb
     examples/Neural_Receiver.ipynb
     examples/Realistic_Multiuser_MIMO_Simulations.ipynb
     examples/OFDM_MIMO_Detection.ipynb
+    examples/Introduction_to_Iterative_Detection_and_Decoding.ipynb
     examples/Autoencoder.ipynb
     examples/Weighted_BP_Algorithm.ipynb
     examples/CIR_Dataset.ipynb

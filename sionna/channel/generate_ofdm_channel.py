@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Class for generating channel frequency responses"""
@@ -21,7 +21,7 @@ class GenerateOFDMChannel:
     :math:`n^{th}` subcarrier is computed as follows:
 
     .. math::
-        \widehat{h}_{s, n} = \sum_{m=0}^{M-1} a_{m}(s) e^{j2\pi n \Delta_f \tau_{m}}
+        \widehat{h}_{s, n} = \sum_{m=0}^{M-1} a_{m}(s) e^{-j2\pi n \Delta_f \tau_{m}}
 
     where :math:`\Delta_f` is the subcarrier spacing, and :math:`s` is used as time
     step to indicate that the channel impulse response can change from one OFDM symbol to the

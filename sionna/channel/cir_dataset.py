@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Class for creating a CIR sampler, usuable as a channel model, from a CIR
@@ -46,15 +46,20 @@ class CIRDataset(ChannelModel):
     ...         ...
     ...         yield a, tau
 
-    that returns complex-valued path coefficients ``a`` with shape `[batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps]`
-    and real-valued path delays ``tau`` (in second) `[batch size, num_rx, num_tx, num_paths]`.
+    that returns complex-valued path coefficients ``a`` with shape
+    `[num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps]`
+    and real-valued path delays ``tau`` (in second)
+    `[num_rx, num_tx, num_paths]`.
 
     Parameters
     ----------
     cir_generator : `generator <https://wiki.python.org/moin/Generators>`_
-        Generator that returns channel impulse responses ``(a, tau)`` where ``a`` is the tensor of channel coefficients of shape
-        `[batch size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps]` and dtype ``dtype``, and ``tau`` the tensor of path delays
-        of shape  `[batch size, num_rx, num_tx, num_paths]` and dtype ``dtype.real_dtype``.
+        Generator that returns channel impulse responses ``(a, tau)`` where
+        ``a`` is the tensor of channel coefficients of shape
+        `[num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps]`
+        and dtype ``dtype``, and ``tau`` the tensor of path delays
+        of shape  `[num_rx, num_tx, num_paths]` and dtype ``dtype.
+        real_dtype``.
 
     batch_size : int
         Batch size

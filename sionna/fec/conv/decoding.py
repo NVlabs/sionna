@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layer for Convolutional Code Viterbi Decoding."""
@@ -178,7 +178,7 @@ class ViterbiDecoder(Layer):
                   "hence cannot be computed before the first call().")
             self._coderate = self._coderate_desired
         elif self.terminate and self._n is not None:
-            k = (self._coderate_desired*self._n - self._mu)
+            k = self._coderate_desired*self._n - self._mu
             self._coderate = k/self._n
         return self._coderate
 
@@ -627,7 +627,7 @@ class BCJRDecoder(Layer):
                   "hence cannot be computed before the first call().")
             self._coderate = self._coderate_desired
         elif self.terminate and self._n is not None:
-            k = (self._coderate_desired*self._n - self._mu)
+            k = self._coderate_desired*self._n - self._mu
             self._coderate = k/self._n
         return self._coderate
 

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layers for LDPC channel encoding and utility functions."""
@@ -217,7 +217,7 @@ class LDPC5GEncoder(Layer):
 
         self._num_bits_per_symbol = num_bits_per_symbol
         if num_bits_per_symbol is not None:
-            self._out_int, self._out_int_inv  = self._generate_out_int(self._n,
+            self._out_int, self._out_int_inv  = self.generate_out_int(self._n,
                                                     self._num_bits_per_symbol)
 
     #########################################
@@ -277,7 +277,7 @@ class LDPC5GEncoder(Layer):
     # Utility methods
     #########################
 
-    def _generate_out_int(self, n, num_bits_per_symbol):
+    def generate_out_int(self, n, num_bits_per_symbol):
         """"Generates LDPC output interleaver sequence as defined in
         Sec 5.4.2.2 in [3GPPTS38212_LDPC]_.
 
