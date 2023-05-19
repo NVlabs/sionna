@@ -165,7 +165,14 @@ class TestFEC(unittest.TestCase):
         # The CRC is automatically added by the layer.
         enc = Polar5GEncoder(k=k, n=n)
         dec = Polar5GDecoder(enc, dec_type="SCL", list_size=8)
-        name = "5G Polar SCL-8+CRC"
+        name = "5G Polar SCL-8+CRC UL configuration"
+        codes_under_test.append([enc, dec, name])
+
+        # Polar Codes (SCL decoding) with list size 8.
+        # The CRC is automatically added by the layer.
+        enc = Polar5GEncoder(k=k, n=n, channel_type="downlink")
+        dec = Polar5GDecoder(enc, dec_type="SCL", list_size=8)
+        name = "5G Polar SCL-8+CRC DL configuration"
         codes_under_test.append([enc, dec, name])
 
         # RM codes with SCL decoding
