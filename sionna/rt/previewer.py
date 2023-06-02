@@ -144,17 +144,19 @@ class InteractiveDisplay:
 
             for devices, color in [(scene.transmitters.values(), tr_color),
                                    (scene.receivers.values(), rc_color)]:
-                color = 'rgb({})'.format(', '.join([str(int(v * 255)) for v in color]))
+                color = f'rgb({", ".join([str(int(v * 255)) for v in color])})'
                 starts, ends = [], []
                 for rd in devices:
                     # Arrow line
                     starts.append(rd.position)
-                    endpoint = rd.position + rotate([line_length, 0., 0.], rd.orientation)
+                    endpoint = rd.position + rotate([line_length, 0., 0.],
+                                                    rd.orientation)
                     ends.append(endpoint)
 
-                    geo = p3s.CylinderGeometry(radiusTop=0, radiusBottom=0.3 * head_length,
-                                               height=head_length,
-                                               radialSegments=8, heightSegments=0, openEnded=False)
+                    geo = p3s.CylinderGeometry(
+                        radiusTop=0, radiusBottom=0.3 * head_length,
+                        height=head_length, radialSegments=8,
+                        heightSegments=0, openEnded=False)
                     mat = p3s.MeshLambertMaterial(color=color)
                     mesh = p3s.Mesh(geo, mat)
                     mesh.position = tuple(endpoint)
