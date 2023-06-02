@@ -117,17 +117,19 @@ class InteractiveDisplay:
         Input
         -----
         show_orientations : bool
-            Shows the transmitters' orientations.
+            Shows the radio devices' orientations.
             Defaults to `False`.
         """
         scene = self._scene
         sc, tx_positions, rx_positions, _ = scene_scale(scene)
+        tr_color = [0.160, 0.502, 0.725]
+        rc_color = [0.153, 0.682, 0.375]
 
         # Radio emitters, shown as points
         p = np.array(list(tx_positions.values()) + list(rx_positions.values()))
         albedo = np.array(
-            [[0.160, 0.502, 0.725]] * len(scene.transmitters)
-            + [[0.153, 0.682, 0.375]] * len(scene.receivers)
+            [tr_color] * len(scene.transmitters)
+            + [rc_color] * len(scene.receivers)
         )
 
         if p.shape[0] > 0:
@@ -136,12 +138,34 @@ class InteractiveDisplay:
             self._plot_points(p, persist=False, colors=albedo,
                               radius=radius)
         if show_orientations:
-            for tx in scene.transmitters.values():
-                end = rotate([[0.02 * sc,0.0,0.0]], tx.orientation)
-                self._plot_lines(tx.position[None,:],
-                                 tx.position[None,:]+end,
-                                 width=2,
-                                 color='red')
+            line_length = 0.0075 * sc
+            head_length = 0.15 * line_length
+            zeros = np.zeros((1, 3))
+
+            for devices, color in [(scene.transmitters.values(), tr_color),
+                                   (scene.receivers.values(), rc_color)]:
+                color = 'rgb({})'.format(', '.join([str(int(v * 255)) for v in color]))
+                starts, ends = [], []
+                for rd in devices:
+                    # Arrow line
+                    starts.append(rd.position)
+                    endpoint = rd.position + rotate([line_length, 0., 0.], rd.orientation)
+                    ends.append(endpoint)
+
+                    geo = p3s.CylinderGeometry(radiusTop=0, radiusBottom=0.3 * head_length,
+                                               height=head_length,
+                                               radialSegments=8, heightSegments=0, openEnded=False)
+                    mat = p3s.MeshLambertMaterial(color=color)
+                    mesh = p3s.Mesh(geo, mat)
+                    mesh.position = tuple(endpoint)
+                    angles = rd.orientation.numpy()
+                    mesh.rotateZ(angles[0] - np.pi/2)
+                    mesh.rotateY(angles[2])
+                    mesh.rotateX(-angles[1])
+                    self._add_child(mesh, zeros, zeros, persist=False)
+
+                self._plot_lines(np.array(starts), np.array(ends),
+                                 width=2, color=color)
 
     def plot_paths(self, paths):
         """
