@@ -255,7 +255,7 @@ class TestPolarEncoding5G(unittest.TestCase):
                          [100, 110]] # k+k_crc>n
 
         for p in param_invalid:
-            with self.assertRaises(AssertionError):
+            with self.assertRaises((AssertionError, ValueError)):
                 Polar5GEncoder(p[0], p[1])
 
         # no complex-valued input allowed

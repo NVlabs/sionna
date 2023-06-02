@@ -312,7 +312,7 @@ class PolarSCDecoder(Layer):
 
 class PolarSCLDecoder(Layer):
     # pylint: disable=line-too-long
-    """PolarSCLDecoder(frozen_pos, n, list_size=8, crc_degree=None, use_hybrid_sc=False, use_fast_scl=True, cpu_only=False, use_scatter=False, output_dtype=tf.float32, **kwargs)
+    """PolarSCLDecoder(frozen_pos, n, list_size=8, crc_degree=None, use_hybrid_sc=False, use_fast_scl=True, cpu_only=False, use_scatter=False, ind_iil_inv=None, output_dtype=tf.float32, **kwargs)
 
     Successive cancellation list (SCL) decoder [Tal_SCL]_ for Polar codes
     and Polar-like codes.
@@ -359,7 +359,13 @@ class PolarSCLDecoder(Layer):
             tensor updates. This option is usually slower, but more memory
             efficient.
 
-       output_dtype: tf.DType
+        ind_iil_inv : None or [k+k_crc], int or tf.int
+            Defaults to None. If not `None`, the sequence is used as inverse
+            input bit interleaver before evaluating the CRC.
+            Remark: this only effects the CRC evaluation but the output
+            sequence is not permuted.
+
+        output_dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
             (internal precision remains tf.float32).
 
@@ -457,6 +463,7 @@ class PolarSCLDecoder(Layer):
                  use_fast_scl=True,
                  cpu_only=False,
                  use_scatter=False,
+                 ind_iil_inv=None,
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -488,12 +495,12 @@ class PolarSCLDecoder(Layer):
 
         # CPU mode is recommended for larger values of n
         if n>128 and cpu_only is False and use_hybrid_sc is False:
-            warnings.warn("Required ressource allocation is large " \
+            warnings.warn("Required resource allocation is large " \
             "for the selected blocklength. Consider option `cpu_only=True`.")
 
         # CPU mode is recommended for larger values of L
         if list_size>32 and cpu_only is False and use_hybrid_sc is False:
-            warnings.warn("Ressource allocation is high for the " \
+            warnings.warn("Resource allocation is high for the " \
             "selected list_size. Consider option `cpu_only=True`.")
 
         # internal decoder parameters
@@ -510,7 +517,7 @@ class PolarSCLDecoder(Layer):
         self._info_pos = np.setdiff1d(np.arange(self._n), self._frozen_pos)
         self._llr_max = 30. # internal max LLR value (not very critical for SC)
         assert self._k==len(self._info_pos), "Internal error: invalid " \
-                                              "info_pos generated."
+                                             "info_pos generated."
         # create a frozen bit vector
         self._frozen_ind = np.zeros(self._n)
         self._frozen_ind[self._frozen_pos] = 1
@@ -527,6 +534,15 @@ class PolarSCLDecoder(Layer):
             self._k_crc = 0
         assert self._k>=self._k_crc, "Value of k is too small for \
             given CRC_degree."
+
+        # store the inverse interleaver patter
+        if ind_iil_inv is not None:
+            assert (ind_iil_inv.shape[0]==self._k), \
+                    "ind_int must be of length k+k_crc."
+            self._ind_iil_inv = ind_iil_inv
+            self._iil = True
+        else:
+            self._iil = False
 
         # use SC decoder first and use numpy-based SCL as "afterburner"
         if self._use_hybrid_sc:
@@ -588,8 +604,8 @@ class PolarSCLDecoder(Layer):
 
         See eq. (26) in [Hashemi_SSCL]_.
 
-        Remark: bits are not explicitly set to `0` as ``msg_uhat`` is initalized
-        with `0` already.
+        Remark: bits are not explicitly set to `0` as ``msg_uhat`` is
+        initialized with `0` already.
         """
         n = len(cw_ind)
         stage_ind = int(np.log2(n))
@@ -612,7 +628,7 @@ class PolarSCLDecoder(Layer):
         See Eq. (31) in [Hashemi_SSCL]_.
 
         Remark: bits are not explicitly set to `0` as ``msg_uhat`` is
-        initalized with `0` already.
+        initialized with `0` already.
         """
         n = len(cw_ind)
         stage_ind = int(np.log2(n))
@@ -663,7 +679,7 @@ class PolarSCLDecoder(Layer):
         """Update single bit at position ``ind_u`` for all decoders.
 
         Remark: bits are not explicitly set to `0` as ``msg_uhat`` is
-        initalized with `0` already.
+        initialized with `0` already.
 
         Remark: Two versions are implemented (throughput vs. graph complexity):
         1.) use tensor_scatter_nd_update
@@ -692,7 +708,7 @@ class PolarSCLDecoder(Layer):
                 # and restore original order
                 msg_uhat = tf.transpose(msg_uhat_s, [3, 0, 2, 1])
             else:
-                # alternative solution with split/concantenation of graph
+                # alternative solution with split/concatenation of graph
                 msg_uhat1 = msg_uhat[:, :self._list_size, :, :]
                 msg_uhat21 = tf.expand_dims(
                                 msg_uhat[:, self._list_size:, 0, :ind_u[0]],
@@ -951,7 +967,7 @@ class PolarSCLDecoder(Layer):
             # and restore original order
             msg_uhat = tf.transpose(msg_uhat_s, [3, 2, 0, 1])
         else:
-            # alternative solution with split/concantenation of graph
+            # alternative solution with split/concatenation of graph
             u_hat_left_0 = tf.gather(msg_uhat[:, :, stage_ind, :],
                                      np.arange(0, cw_ind_left[0]),
                                      axis=2)
@@ -1361,7 +1377,7 @@ class PolarSCLDecoder(Layer):
         SCL+CRC may also yield the wrong results.
 
         Remark 2: Due to the excessive control flow (if/else) and the
-        varying batch-sizes, this function is only availabe as Numpy
+        varying batch-sizes, this function is only available as Numpy
         decoder (i.e., runs on the CPU).
         """
 
@@ -1470,11 +1486,21 @@ class PolarSCLDecoder(Layer):
             else:
                 msg_uhat, msg_pm = self._decode_tf(llr_ch)
 
-        # check crc (and remove CRC parity bits)
+        # check CRC (and remove CRC parity bits)
         if self._use_crc:
-            u_hat_list = tf.gather(msg_uhat[:, :, 0, :], self._info_pos,
+            u_hat_list = tf.gather(msg_uhat[:, :, 0, :],
+                                   self._info_pos,
                                    axis=-1)
-            u_hat_list, crc_valid = self._crc_decoder(u_hat_list)
+            # undo input bit interleaving
+            # remark: the output is not interleaved for compatibility with SC
+            if self._iil:
+                u_hat_list_crc = tf.gather(u_hat_list,
+                                           self._ind_iil_inv,
+                                           axis=-1)
+            else: # no interleaving applied
+                u_hat_list_crc = u_hat_list
+
+            _, crc_valid = self._crc_decoder(u_hat_list_crc)
             # add penalty to pm if CRC fails
             pm_penalty = ((1. - tf.cast(crc_valid, tf.float32))
                        * self._llr_max * self.k)
@@ -1935,8 +1961,8 @@ class Polar5GDecoder(Layer):
 
     Note
     ----
-        This layer only supports the uplink polar rate-matching scheme without
-        `codeword segmentation`.
+        This layer supports the uplink and downlink Polar rate-matching scheme
+        without `codeword segmentation`.
 
         Although the decoding `list size` is not provided by 3GPP
         [3GPPTS38212]_, the consortium has agreed on a `list size` of 8 for the
@@ -1977,6 +2003,8 @@ class Polar5GDecoder(Layer):
         self._n_polar = enc_polar.n_polar
         self._k_polar = enc_polar.k_polar
         self._k_crc = enc_polar.enc_crc.crc_length
+        self._bil = enc_polar._channel_type == "uplink"
+        self._iil = enc_polar._channel_type == "downlink"
         self._llr_max = 100 # Internal max LLR value (for punctured positions)
         self._enc_polar = enc_polar
         self._dec_type = dec_type
@@ -1996,13 +2024,15 @@ class Polar5GDecoder(Layer):
             self._polar_dec = PolarSCLDecoder(self._enc_polar.frozen_pos,
                                 self._n_polar,
                                 crc_degree=self._enc_polar.enc_crc.crc_degree,
-                                list_size=list_size)
+                                list_size=list_size,
+                                ind_iil_inv = self.ind_iil_inv)
         elif dec_type=="hybSCL":
             self._polar_dec = PolarSCLDecoder(self._enc_polar.frozen_pos,
                                 self._n_polar,
                                 crc_degree=self._enc_polar.enc_crc.crc_degree,
                                 list_size=list_size,
-                                use_hybrid_sc=True)
+                                use_hybrid_sc=True,
+                                ind_iil_inv = self.ind_iil_inv)
         elif dec_type=="BP":
             print("Warning: 5G Polar codes use an integrated CRC that " \
                   "cannot be materialized with BP decoding and, thus, " \
@@ -2016,7 +2046,7 @@ class Polar5GDecoder(Layer):
                                              num_iter=num_iter,
                                              hard_out=True)
         else:
-            raise ValueError("Unkown value for dec_type.")
+            raise ValueError("Unknown value for dec_type.")
 
     #########################################
     # Public methods and properties
@@ -2089,6 +2119,12 @@ class Polar5GDecoder(Layer):
                                                 np.arange(self._n_polar))
         self.ind_sub_int_inv = np.argsort(ind_sub_int) # Find inverse perm
 
+        # input bit interleaver
+        if self._iil:
+            self.ind_iil_inv = np.argsort(self._enc_polar.input_interleaver(
+                                                np.arange(self._k_polar)))
+        else:
+            self.ind_iil_inv = None
     #########################
     # Keras layer functions
     #########################
@@ -2130,7 +2166,10 @@ class Polar5GDecoder(Layer):
         # Note: logits are not inverted here; this is done in the decoder itself
 
         # 1.) Undo channel interleaving
-        llr_deint = tf.gather(llr_ch, self.ind_ch_int_inv, axis=1)
+        if self._bil:
+            llr_deint = tf.gather(llr_ch, self.ind_ch_int_inv, axis=1)
+        else:
+            llr_deint = llr_ch
 
         # 2.) Remove puncturing, shortening, repetition (see Sec. 5.4.1.2)
         # a) Puncturing: set LLRs to 0
@@ -2161,12 +2200,17 @@ class Polar5GDecoder(Layer):
 
         # 3.) Remove subblock interleaving
         llr_dec = tf.gather(llr_dematched, self.ind_sub_int_inv, axis=1)
+
         # 4.) Run main decoder
         u_hat_crc = self._polar_dec(llr_dec)
 
-        # 5.) Shortening should be implicitely recovered by decoder
+        # 5.) Shortening should be implicitly recovered by decoder
 
-        # 6.) Remove CRC (and PC)
+        # 6.) Remove input bit interleaving for downlink channels only
+        if self._iil:
+            u_hat_crc = tf.gather(u_hat_crc, self.ind_iil_inv, axis=1)
+
+        # 7.) Remove CRC (and PC)
         u_hat = u_hat_crc[:,:-self._k_crc]
 
         # And reconstruct input shape
