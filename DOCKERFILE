@@ -4,10 +4,10 @@ COPY . /tmp/
 WORKDIR /tmp/
 RUN make install
 RUN apt-get install llvm -y
-RUN pip install --upgrade jupyter
 RUN pip install --upgrade ipykernel
+RUN pip install --upgrade jupyterlab
 RUN rm -R /tf/* && cp /tmp/examples/* /tf
 RUN rm -R /tmp
 RUN chmod 777 -R /tf
 WORKDIR /tf
-CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--NotebookApp.token=''", "--ip=0.0.0.0", "--allow-root", "--NotebookApp.allow_origin='*'"]
+CMD ["jupyter", "lab", "--port=8888", "--no-browser", "--NotebookApp.token=''", "--ip=0.0.0.0", "--allow-root", "--NotebookApp.allow_origin='*'"]
