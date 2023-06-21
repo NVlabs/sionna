@@ -66,7 +66,7 @@ class RadioDevice(OrientedObject):
                  dtype=tf.complex64):
 
         if dtype not in (tf.complex64, tf.complex128):
-            raise ValueError("`dtype` must be tf.complex64 or tf.complex64`")
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._dtype = dtype
         self._rdtype = dtype.real_dtype
 

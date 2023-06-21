@@ -54,7 +54,7 @@ class Antenna:
                 ):
 
         if dtype not in (tf.complex64, tf.complex128):
-            raise ValueError("`dtype` must be tf.complex64 or tf.complex64`")
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._dtype = dtype = dtype
 
         # Pattern is provided as string
@@ -157,7 +157,7 @@ def compute_gain(pattern, dtype=tf.complex64):
     """
 
     if dtype not in (tf.complex64, tf.complex128):
-        raise ValueError("`dtype` must be tf.complex64 or tf.complex64`")
+        raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
 
     # Create angular meshgrid
     theta = tf.linspace(0.0, PI, 1810)

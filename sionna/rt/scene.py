@@ -107,7 +107,7 @@ class Scene:
         if env_filename:
 
             if dtype not in (tf.complex64, tf.complex128):
-                msg = "`dtype` must be tf.complex64 or tf.complex64`"
+                msg = "`dtype` must be tf.complex64 or tf.complex128`"
                 raise ValueError(msg)
             self._dtype = dtype
             self._rdtype = dtype.real_dtype

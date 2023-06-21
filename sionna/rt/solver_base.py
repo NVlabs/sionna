@@ -65,7 +65,7 @@ class SolverBase:
         #    _prim_offsets
 
         assert dtype in (tf.complex64, tf.complex128),\
-            "`dtype` must be tf.complex64 or tf.complex64`"
+            "`dtype` must be tf.complex64 or tf.complex128`"
         self._dtype = dtype
         self._rdtype = dtype.real_dtype
 

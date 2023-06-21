@@ -47,7 +47,7 @@ class AntennaArray():
         super().__init__()
 
         if dtype not in (tf.complex64, tf.complex128):
-            raise ValueError("`dtype` must be tf.complex64 or tf.complex64`")
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._rdtype = dtype.real_dtype
 
         self.antenna = antenna
@@ -206,7 +206,7 @@ class PlanarArray(AntennaArray):
                  dtype=tf.complex64):
 
         if dtype not in (tf.complex64, tf.complex128):
-            raise ValueError("`dtype` must be tf.complex64 or tf.complex64`")
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
 
         # Create list of antennas
         array_size = num_rows*num_cols
