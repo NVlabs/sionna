@@ -330,7 +330,7 @@ class Paths2CIR(Layer):
                        dtype=tf.complex64):
 
         if dtype not in (tf.complex64, tf.complex128):
-            raise ValueError("`dtype` must be tf.complex64 or tf.complex64`")
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
 
         if scene is not None:
             if not isinstance(scene, Scene):
