@@ -9,3 +9,4 @@ This module provides layers and functions that implement channel models for `wir
 
    channel.wireless
    channel.optical
+   channel.discrete

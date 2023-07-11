@@ -2,16 +2,17 @@ Installation
 ############
 
 Sionna requires `Python <https://www.python.org/>`_ and `Tensorflow <https://www.tensorflow.org/>`_.
-In order to run the tutorial notebooks on your machine, you also need `Jupyter <https://jupyter.org/>`_.
+In order to run the tutorial notebooks on your machine, you also need `JupyterLab <https://jupyter.org/>`_.
 You can alternatively test them on `Google Colab <https://colab.research.google.com/github/nvlabs/sionna/blob/main/examples/Discover_Sionna.ipynb>`_.
 Although not necessary, we recommend running Sionna in a `Docker container <https://www.docker.com>`_.
 
 .. note::
-    Sionna requires `TensorFlow 2.8-2.11 <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
+    Sionna requires `TensorFlow 2.10 or newer <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
     We recommend Ubuntu 20.04.
+    Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
 
-    To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required.
-    The ray tracing preview requires `ipykernel>6.0` and a recent version of `Jupyter` or `JupyterLab`. You can upgrade to the latest version via ``pip install --upgrade ipykernel`` (requires restart of `Jupyter`).
+    To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required by DrJit. Please check the `installation instructions for the LLVM backend <https://drjit.readthedocs.io/en/latest/firststeps-py.html#llvm-backend>`_.
+    The ray tracing preview requires a recent version of `JupyterLab`. You can upgrade to the latest version via ``pip install --upgrade ipykernel jupyterlab`` (requires restart of `JupyterLab`).
 
     We refer to the `TensorFlow GPU support tutorial <https://www.tensorflow.org/install/gpu>`_ for GPU support and the required driver setup.
 
@@ -38,7 +39,7 @@ e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `ten
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.14.0
+    0.15.0
 
 3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
 
@@ -82,7 +83,7 @@ or without GPU:
 
     make run-docker
 
-This will immediately launch a Docker image with Sionna installed, running Jupyter on port 8888.
+This will immediately launch a Docker image with Sionna installed, running JupyterLab on port 8888.
 
 4.) Browse through the example notebook by connecting to `http://127.0.0.1:8888 <http://127.0.0.1:8888>`_ in your browser.
 
@@ -110,4 +111,4 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.14.0
+    0.15.0

@@ -21,7 +21,6 @@ For Beginners
     examples/Simple_MIMO_Simulation.ipynb
     examples/Pulse_shaping_basics.ipynb
     examples/Optical_Lumped_Amplification_Channel.ipynb
-    examples/Sionna_Ray_Tracing_Introduction.ipynb
 
 For Experts
 -----------
@@ -41,3 +40,14 @@ For Experts
     examples/Weighted_BP_Algorithm.ipynb
     examples/CIR_Dataset.ipynb
     examples/DeepMIMO.ipynb
+
+Ray Tracing
+-----------
+
+.. toctree::
+    :maxdepth: 1
+
+    examples/Sionna_Ray_Tracing_Introduction.ipynb
+    examples/Sionna_Ray_Tracing_Diffraction.ipynb
+    examples/Sionna_Ray_Tracing_Scattering.ipynb
+
