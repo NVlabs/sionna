@@ -45,6 +45,7 @@ class TestEmptyScene(unittest.TestCase):
         for d in distances:
             scene.add(Receiver(f"rx_{d}", [d,0,0], [0, 0, 0], dtype=dtype))
         paths = scene.compute_paths()
+        paths.normalize_delays = False
         tau = tf.squeeze(paths.tau)
         tau_theo = distances/SPEED_OF_LIGHT
         self.assertTrue(np.array_equal(tau, tau_theo))
@@ -62,7 +63,6 @@ class TestEmptyScene(unittest.TestCase):
             rx = Receiver("rx", [10,0,0], [0, 0, 0], dtype=dtype)
             scene.add(tx)
             scene.add(rx)
-            p2c = Paths2CIR(1, scene=scene, dtype=dtype)
             r = 200.
             thetas = tf.cast(tf.linspace(0., PI, 10), dtype.real_dtype)
             phis = tf.cast(tf.linspace(0., 2*PI, 10), dtype.real_dtype)
@@ -71,8 +71,9 @@ class TestEmptyScene(unittest.TestCase):
                     rx.position = r_hat(theta, phi)*r + tx.position
                     rx.look_at("tx")
                     tx.look_at("rx")
-                    paths = scene.compute_paths(method="exhaustive")
-                    a, _ = p2c(paths.as_tuple())
+                    paths = scene.compute_paths(method="exhaustive",
+                                                scattering=False)
+                    a = paths.a
                     sim = 10*np.log10(np.abs(np.squeeze(a))**2)
                     theo = 10*np.log10((scene.wavelength/4/PI/r)**2*g_tx*g_rx)
                     self.assertTrue(np.abs(sim-theo)< 1e-3)
@@ -108,8 +109,7 @@ class TestEmptyScene(unittest.TestCase):
         paths = scene.compute_paths()
 
         # Compute normalized channel gain
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype)
-        a, _ = [tf.squeeze(tensor).numpy() for tensor in p2c(paths.as_tuple())]
+        a = tf.squeeze(paths.a).numpy()
         a /= tf.cast(scene.wavelength/4/PI/r, a.dtype)
 
         # Compute transmitted pattern
@@ -128,6 +128,5 @@ class TestEmptyScene(unittest.TestCase):
         scene.rx_array = PlanarArray(1, 1, 0.5, 0.5, pattern="iso", polarization="V")
         scene.add(Transmitter("tx", [0,0,0], [0, 0, 0]))
         scene.add(Receiver("rx", [0,0,0], [0, 0, 0]))
-        p2c = Paths2CIR(1, scene=scene)
         paths = scene.compute_paths()
         self.assertTrue(paths.tau.numpy().size == 0)

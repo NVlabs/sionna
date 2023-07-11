@@ -90,8 +90,8 @@ def flatten_last_dims(tensor, num_dims=2):
     Args:
         tensor : A tensor.
         num_dims (int): The number of dimensions
-            to combine. Must be larger than two and less or equal than the
-            rank of ``tensor``.
+            to combine. Must be greater than or equal to two and less or equal
+            than the rank of ``tensor``.
 
     Returns:
         A tensor of the same type as ``tensor`` with ``num_dims``-1 lesser

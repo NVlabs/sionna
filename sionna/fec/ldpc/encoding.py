@@ -180,9 +180,12 @@ class LDPC5GEncoder(Layer):
         self._coderate = k / n
         self._check_input = True # check input for consistency (i.e., binary)
 
-        if self._coderate>(11/12):
-            raise ValueError(
-                    f"Unsupported coderate (r>11/12); n={n}, k={k}.")
+        # allow actual code rates slightly larger than 948/1024
+        # to account for the quantization procedure in 38.214 5.1.3.1
+        if self._coderate>(948/1024): # as specified in 38.212 5.4.2.1
+            print(f"Warning: effective coderate r>948/1024 for n={n}, k={k}.")
+        if self._coderate>(0.95): # as specified in 38.212 5.4.2.1
+            raise ValueError(f"Unsupported coderate (r>0.95) for n={n}, k={k}.")
         if self._coderate<(1/5):
             # outer rep. coding currently not supported
             raise ValueError("Unsupported coderate (r<1/5).")
@@ -302,8 +305,8 @@ class LDPC5GEncoder(Layer):
 
         Note
         ----
-        The interleaver pattern depends on the modulation order and helps to reduce
-        dependencies in bit-interleaved coded modulation (BICM) schemes.
+        The interleaver pattern depends on the modulation order and helps to
+        reduce dependencies in bit-interleaved coded modulation (BICM) schemes.
         """
         # allow float inputs, but verify that they represent integer
         assert(n%1==0), "n must be int."
@@ -423,7 +426,7 @@ class LDPC5GEncoder(Layer):
                     c_idx[idx*z:(idx+1)*z] = c*z + c_roll
                     idx += 1
 
-        # generate lifted sparse matrix from incides
+        # generate lifted sparse matrix from indices
         pcm = sp.sparse.csr_matrix((data,(r_idx, c_idx)),
                                    shape=(z*bm.shape[0], z*bm.shape[1]))
         return pcm

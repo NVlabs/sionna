@@ -19,8 +19,8 @@ class SpatialCorrelation(ABC):
     Input
     -----
     h : tf.complex
-        Tensor of arbitray shape containing spatially uncorrelated
-        channel coeffficients
+        Tensor of arbitrary shape containing spatially uncorrelated
+        channel coefficients
 
     Output
     ------

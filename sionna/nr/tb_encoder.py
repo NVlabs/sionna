@@ -144,7 +144,8 @@ class TBEncoder(Layer):
         assert(num_coded_bits%1==0), "num_coded_bits must be int."
         self._num_coded_bits = int(num_coded_bits)
 
-        assert(0.<target_coderate<1.), "target_coderate must be in range(0,1)."
+        assert(0.<target_coderate <= 948/1024), \
+                    "target_coderate must be in range(0,0.925)."
         self._target_coderate = target_coderate
 
         assert(num_bits_per_symbol%1==0), "num_bits_per_symbol must be int."

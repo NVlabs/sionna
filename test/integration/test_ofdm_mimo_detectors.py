@@ -25,20 +25,21 @@ except ImportError as e:
     sys.path.append("../")
     import sionna
 
-from sionna.mimo import StreamManagement
+from sionna.mimo import StreamManagement, lmmse_equalizer
 from sionna.ofdm import ResourceGrid, ResourceGridMapper, RemoveNulledSubcarriers, LinearDetector, EPDetector, KBestDetector, MaximumLikelihoodDetector
 from sionna.channel.tr38901 import AntennaArray, CDL
 from sionna.channel import OFDMChannel
 from sionna.fec.ldpc.encoding import LDPC5GEncoder
 from sionna.fec.ldpc.decoding import LDPC5GDecoder
 from sionna.mapping import Mapper
-from sionna.utils import BinarySource, ebnodb2no, compute_ber
+from sionna.utils import BinarySource, compute_ber
 
 class OFDMModel(tf.keras.Model):
     def __init__(self,
                 detector,
-                output):
-        super().__init__()
+                output,
+                dtype=tf.complex128):
+        super().__init__(dtype=dtype)
         self.num_tx_ant = 4
         self.num_rx_ant = 8
         self.num_streams_per_tx = self.num_tx_ant
@@ -50,7 +51,8 @@ class OFDMModel(tf.keras.Model):
                                fft_size=12,
                                subcarrier_spacing=15e3,
                                num_tx=1,
-                               num_streams_per_tx=self.num_tx_ant)
+                               num_streams_per_tx=self.num_tx_ant,
+                               dtype=dtype)
         self.n = int(self.rg.num_data_symbols * self.num_bits_per_symbol)
         self.k = int(self.n * self.coderate)
 
@@ -59,14 +61,16 @@ class OFDMModel(tf.keras.Model):
                                      polarization="dual",
                                      polarization_type="cross",
                                      antenna_pattern="38.901",
-                                     carrier_frequency=self.carrier_frequency)
+                                     carrier_frequency=self.carrier_frequency,
+                                     dtype=dtype)
 
         self.bs_array = AntennaArray(num_rows=1,
                                      num_cols=int(self.num_rx_ant/2),
                                      polarization="dual",
                                      polarization_type="cross",
                                      antenna_pattern="38.901",
-                                     carrier_frequency=self.carrier_frequency)
+                                     carrier_frequency=self.carrier_frequency,
+                                     dtype=dtype)
 
         self.cdl = CDL(model="A",
                        delay_spread=100e-9,
@@ -74,15 +78,18 @@ class OFDMModel(tf.keras.Model):
                        ut_array=self.ut_array,
                        bs_array=self.bs_array,
                        direction="uplink",
-                       min_speed=3.0)
+                       min_speed=3.0,
+                       dtype=dtype)
 
-        self.channel = OFDMChannel(self.cdl, self.rg, normalize_channel=True, add_awgn=False, return_channel=True)
+        self.channel = OFDMChannel(self.cdl, self.rg, normalize_channel=True,
+                                   add_awgn=False, return_channel=True,
+                                   dtype=dtype)
 
-        self.binary_source = BinarySource()
-        self.encoder = LDPC5GEncoder(self.k, self.n)
-        self.decoder = LDPC5GDecoder(self.encoder, hard_out=True)
-        self.mapper = Mapper("qam", self.num_bits_per_symbol, return_indices=True)
-        self.rg_mapper = ResourceGridMapper(self.rg)
+        self.binary_source = BinarySource(dtype=dtype.real_dtype)
+        self.encoder = LDPC5GEncoder(self.k, self.n, dtype=dtype.real_dtype)
+        self.decoder = LDPC5GDecoder(self.encoder, hard_out=True, output_dtype=dtype.real_dtype)
+        self.mapper = Mapper("qam", self.num_bits_per_symbol, return_indices=True, dtype=dtype)
+        self.rg_mapper = ResourceGridMapper(self.rg, dtype=dtype)
         self.remove_nulled_scs = RemoveNulledSubcarriers(self.rg)
 
         if output=="symbol":
@@ -93,22 +100,22 @@ class OFDMModel(tf.keras.Model):
         self._output = output
 
         if detector in ["mf", "zf", "lmmse"]:
-            self.detector = LinearDetector(detector, output, "maxlog", self.rg, self.sm, "qam", self.num_bits_per_symbol, hard_out=hard_out)
+            self.detector = LinearDetector(detector, output, "maxlog", self.rg, self.sm, "qam", self.num_bits_per_symbol, hard_out=hard_out, dtype=dtype)
         elif detector=="ep":
-            self.detector = EPDetector(output, self.rg, self.sm, self.num_bits_per_symbol, hard_out=hard_out)
+            self.detector = EPDetector(output, self.rg, self.sm, self.num_bits_per_symbol, hard_out=hard_out, dtype=dtype)
         elif detector=="kbest":
-            self.detector = KBestDetector(output, self.num_tx_ant, 16, self.rg, self.sm, "qam", self.num_bits_per_symbol, hard_out=hard_out)
+            self.detector = KBestDetector(output, self.num_tx_ant, 16, self.rg, self.sm, "qam", self.num_bits_per_symbol, hard_out=hard_out, dtype=dtype)
         elif detector=="ml":
-            self.detector = MaximumLikelihoodDetector(output, "maxlog", self.rg, self.sm, "qam", self.num_bits_per_symbol, hard_out=hard_out)
+            self.detector = MaximumLikelihoodDetector(output, "maxlog", self.rg, self.sm, "qam", self.num_bits_per_symbol, hard_out=hard_out, dtype=dtype)
 
     def call(self, batch_size):
-        no = 1e-4
         b = self.binary_source([batch_size, 1, self.num_streams_per_tx, self.k])
         c = self.encoder(b)
         x, x_ind = self.mapper(c)
         x_rg = self.rg_mapper(x)
         y, h_hat = self.channel(x_rg)
-        err_var = 0.0
+        err_var = tf.cast(0.0, y.dtype.real_dtype)
+        no = tf.cast(1e-4, y.dtype.real_dtype)
         llr = self.detector([y, h_hat, err_var, no])
 
         if self._output=="symbol":

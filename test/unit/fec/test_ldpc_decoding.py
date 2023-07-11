@@ -475,14 +475,15 @@ class TestBPDecoding5G(unittest.TestCase):
     previous tests."""
 
     def test_encoding(self):
-        """Test that encoded info bits can be reconstruced after decoding
+        """Test that encoded info bits can be reconstructed after decoding
         (assuming no/little noise)."""
 
         batch_size = 100
 
         # k, n
-        params =[[64, 128], [64, 180], [167, 201], [439, 800], [3893, 7940],
-                 [6530, 10023], [8448, 23000]]
+        params =[[64, 128], [64, 180], [167, 201], [439, 800], [948, 1024],
+                 [3893, 7940], [6530, 10023], [8448, 23000], [955,1024],
+                 [1900, 2000]]
 
         # generate random bits
         for ret_info in [True, False]:
@@ -618,8 +619,8 @@ class TestBPDecoding5G(unittest.TestCase):
         We test this for zero iterations, to see if all internal reshapes are correctly recovered before returning the estimate.
         """
         batch_size = 100
-        params =[[64,128], [64, 180], [167, 201], [439, 800], [3893, 7940],
-                 [6530, 10023], [8448, 23000]]
+        params =[[64,128], [64, 180], [167, 201], [439, 800], [948, 1024],
+                 [3893, 7940], [6530, 10023], [8448, 23000]]
 
         for p in params:
             k = p[0]

@@ -30,6 +30,8 @@ from sionna.fec.crc import CRCEncoder
 from sionna.fec.utils import GaussianPriorSource
 from sionna.utils import BinarySource
 from sionna.fec.polar.utils import generate_5g_ranking
+from sionna.channel import AWGN
+from sionna.mapping import Mapper, Demapper
 
 class TestPolarDecodingSC(unittest.TestCase):
 
@@ -77,7 +79,8 @@ class TestPolarDecodingSC(unittest.TestCase):
         for p in param_valid:
             frozen_pos, _ = generate_5g_ranking(p[0],p[1])
             dec = PolarSCDecoder(frozen_pos, p[1])
-            c = -10. * np.ones([bs, p[1]]) # all-zero with BPSK (no noise);logits
+            # all-zero with BPSK (no noise);logits
+            c = -10. * np.ones([bs, p[1]])
             u = dec(c).numpy()
             self.assertTrue(u.shape[-1]==p[0])
             # also check that all-zero input yields all-zero output
@@ -294,7 +297,7 @@ class TestPolarDecodingSC(unittest.TestCase):
 class TestPolarDecodingSCL(unittest.TestCase):
 
     # Filter warnings related to large ressource allocation
-    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
+    @pytest.mark.filterwarnings("ignore: Required resource allocation")
     def test_invalid_inputs(self):
         """Test against invalid values of n and frozen_pos."""
 
@@ -326,8 +329,8 @@ class TestPolarDecodingSCL(unittest.TestCase):
             frozen_pos,_ = generate_5g_ranking(32, 64)
             PolarSCLDecoder(frozen_pos, 64, output_dtype=tf.complex64)
 
-    # Filter warnings related to large ressource allocation
-    @pytest.mark.filterwarnings("ignore: Required ressource allocation")
+    # Filter warnings related to large resource allocation
+    @pytest.mark.filterwarnings("ignore: Required resource allocation")
     def test_output_dim(self):
         """Test that output dims are correct (=n) and output is the all-zero
          codeword."""
@@ -718,6 +721,39 @@ class TestPolarDecodingSCL(unittest.TestCase):
         with self.assertRaises(TypeError):
             x = dec(llr_c)
 
+    def test_return_crc(self):
+        """Test that correct CRC status is returned."""
+
+        k = 32
+        n = 64
+        bs = 100
+        no = 1.
+        num_mc_iter = 10
+
+        channel = AWGN()
+        source = BinarySource()
+        mapper = Mapper("qam", 2)
+        demapper = Demapper("app", "qam", 2)
+
+        frozen_pos, _ = generate_5g_ranking(k, n)
+        enc = PolarEncoder(frozen_pos, n)
+        crc_enc = CRCEncoder("CRC24A")
+        dec = PolarSCLDecoder(frozen_pos, n, crc_degree="CRC24A", return_crc_status=True)
+        for _ in range(num_mc_iter):
+            u = source((bs, 3, k-24))
+            u_crc = crc_enc(u)
+            c = enc(u_crc)
+            x = mapper(c)
+            y = channel((x, no))
+            llr_ch = demapper((y, no))
+            u_hat, crc_status = dec(llr_ch)
+
+            # test for individual error patterns
+            err_patt = tf.reduce_any(tf.not_equal(u_hat, u_crc), axis=-1)
+            diffs = tf.cast(err_patt, tf.float32) - (1. - crc_status)
+            num_diffs = tf.reduce_sum(tf.abs(diffs))
+            self.assertTrue(num_diffs < 3) # allow a few CRC mis-detections
+
 class TestPolarDecodingBP(unittest.TestCase):
     """Test Polar BP decoder."""
 
@@ -1096,17 +1132,14 @@ class TestPolarDecoding5G(unittest.TestCase):
         # (k,n)
         param_valid_dl = [[1, 25], [20, 44], [140, 576]]
 
-        dec_types = ["SC", "SCL", "hybSCL", "BP"]
-        ch_types = ["uplink", "downlink"]
-
-        for ch_type in ch_types:
+        for ch_type in ["uplink", "downlink"]:
             if ch_type=="uplink":
                 param_valid = param_valid_ul
             else:
                 param_valid = param_valid_dl
 
             for p in param_valid:
-                for dec_type in dec_types:
+                for dec_type in ["SC", "SCL", "hybSCL", "BP"]:
                     source = BinarySource()
                     enc = Polar5GEncoder(p[0], p[1], channel_type=ch_type)
                     dec = Polar5GDecoder(enc, dec_type=dec_type)
@@ -1114,7 +1147,7 @@ class TestPolarDecoding5G(unittest.TestCase):
                     u = source([bs, p[0]])
                     c = enc(u)
                     self.assertTrue(c.numpy().shape[-1]==p[1])
-                    llr_ch = 20.*(2.*c-1) # demod BPSK witout noise
+                    llr_ch = 20.*(2.*c-1) # demod BPSK without noise
                     u_hat = dec(llr_ch)
 
                     self.assertTrue(np.array_equal(u.numpy(), u_hat.numpy()))
@@ -1132,8 +1165,7 @@ class TestPolarDecoding5G(unittest.TestCase):
         source = BinarySource()
         enc = Polar5GEncoder(k, n)
 
-        dec_types = ["SC", "SCL", "hybSCL", "BP"]
-        for dec_type in dec_types:
+        for dec_type in ["SC", "SCL", "hybSCL", "BP"]:
             inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
             x = Polar5GDecoder(enc, dec_type=dec_type)(inputs)
             model = tf.keras.Model(inputs=inputs, outputs=x)
@@ -1156,11 +1188,9 @@ class TestPolarDecoding5G(unittest.TestCase):
         enc = Polar5GEncoder(k, n)
         source = BinarySource()
 
-        dec_types = ["SC", "SCL", "hybSCL", "BP"]
-        # also verify that interleaver support n-dimensions
-        channel_types = ["uplink", "downlink"]
-        for dec_type in dec_types:
-            for ch_type in channel_types:
+        # also verifies that interleaver support n-dimensions
+        for dec_type in ["SC", "SCL", "hybSCL", "BP"]:
+            for ch_type in ["uplink", "downlink"]:
 
                 enc = Polar5GEncoder(k, n, channel_type=ch_type)
                 dec = Polar5GDecoder(enc, dec_type=dec_type)
@@ -1189,8 +1219,7 @@ class TestPolarDecoding5G(unittest.TestCase):
         enc = Polar5GEncoder(k, n)
         source = GaussianPriorSource()
 
-        dec_types = ["SC", "SCL", "hybSCL", "BP"]
-        for dec_type in dec_types:
+        for dec_type in ["SC", "SCL", "hybSCL", "BP"]:
             dec = Polar5GDecoder(enc, dec_type=dec_type)
 
             llr = source([[1,4,n], 0.5])
@@ -1201,7 +1230,6 @@ class TestPolarDecoding5G(unittest.TestCase):
 
             for i in range(bs):
                 self.assertTrue(np.array_equal(c[0,:,:], c[i,:,:]))
-
 
     def test_tf_fun(self):
         """Test that tf.function decorator works
@@ -1214,9 +1242,7 @@ class TestPolarDecoding5G(unittest.TestCase):
         source = GaussianPriorSource()
 
         # hybSCL does not support graph mode!
-        dec_types = ["SC", "SCL", "BP"]
-        for dec_type in dec_types:
-            print(dec_type)
+        for dec_type in ["SC", "SCL", "BP"]:
             dec = Polar5GDecoder(enc, dec_type=dec_type)
 
             @tf.function
@@ -1247,7 +1273,6 @@ class TestPolarDecoding5G(unittest.TestCase):
                 u = source([[bs+1, n], 0.5])
                 x = run_graph_xla(u).numpy()
 
-
     def test_dtype_flexible(self):
         """Test that output dtype can be variable."""
 
@@ -1276,4 +1301,36 @@ class TestPolarDecoding5G(unittest.TestCase):
 
         with self.assertRaises(TypeError):
             x = dec(llr_c)
+
+    def test_return_crc(self):
+        """Test that correct CRC status is returned."""
+
+        k = 32
+        n = 64
+        bs = 100
+        no = 1.
+        num_mc_iter = 10
+
+        channel = AWGN()
+        source = BinarySource()
+        mapper = Mapper("qam", 2)
+        demapper = Demapper("app", "qam", 2)
+
+        for channel_type in ("downlink", "uplink"):
+            enc = Polar5GEncoder(k, n, channel_type=channel_type)
+            dec = Polar5GDecoder(enc, "SCL", return_crc_status=True)
+            for it in range(num_mc_iter):
+                u = source((bs, 3, k))
+                c = enc(u)
+                x = mapper(c)
+                y = channel((x, no))
+                llr_ch = demapper((y, no))
+                u_hat, crc_status = dec(llr_ch)
+
+                # test for individual error patterns
+                err_patt = tf.reduce_any(tf.not_equal(u_hat, u), axis=-1)
+                diffs = tf.cast(err_patt, tf.float32) - (1. - crc_status)
+                num_diffs = tf.reduce_sum(tf.abs(diffs)).numpy()
+                self.assertTrue(num_diffs < 5) # allow a few CRC mis-detections
+
 

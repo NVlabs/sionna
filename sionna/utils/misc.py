@@ -798,5 +798,3 @@ def empirical_psd(x, show=True, oversampling=1.0, ylim=(-30,3)):
     print(  "Warning: The alias utils.empirical_psd will not be included in"
             " Sionna 1.0. Please use signal.empirical_psd instead.")
     return signal.empirical_psd(x, show, oversampling, ylim)
-
-

@@ -312,7 +312,7 @@ class PolarSCDecoder(Layer):
 
 class PolarSCLDecoder(Layer):
     # pylint: disable=line-too-long
-    """PolarSCLDecoder(frozen_pos, n, list_size=8, crc_degree=None, use_hybrid_sc=False, use_fast_scl=True, cpu_only=False, use_scatter=False, ind_iil_inv=None, output_dtype=tf.float32, **kwargs)
+    """PolarSCLDecoder(frozen_pos, n, list_size=8, crc_degree=None, use_hybrid_sc=False, use_fast_scl=True, cpu_only=False, use_scatter=False, ind_iil_inv=None, return_crc_status=False, output_dtype=tf.float32, **kwargs)
 
     Successive cancellation list (SCL) decoder [Tal_SCL]_ for Polar codes
     and Polar-like codes.
@@ -365,6 +365,11 @@ class PolarSCLDecoder(Layer):
             Remark: this only effects the CRC evaluation but the output
             sequence is not permuted.
 
+        return_crc_status: bool
+            Defaults to False. If True, the decoder additionally returns the
+            CRC status indicating if a codeword was (most likely) correctly
+            recovered. This is only available if ``crc_degree`` is not None.
+
         output_dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
             (internal precision remains tf.float32).
@@ -376,9 +381,14 @@ class PolarSCLDecoder(Layer):
 
     Output
     ------
-        : [...,k], tf.float32
+        b_hat : [...,k], tf.float32
             2+D tensor containing hard-decided estimations of all `k`
             information bits.
+
+        crc_status : [...], tf.bool
+            CRC status indicating if a codeword was (most likely) correctly
+            recovered. This is only returned if ``return_crc_status`` is True.
+            Note that false positives are possible.
 
     Raises:
         AssertionError
@@ -464,6 +474,7 @@ class PolarSCLDecoder(Layer):
                  cpu_only=False,
                  use_scatter=False,
                  ind_iil_inv=None,
+                 return_crc_status=False,
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -485,6 +496,8 @@ class PolarSCLDecoder(Layer):
         assert isinstance(use_scatter, bool), "use_scatter must be bool."
         assert isinstance(use_fast_scl, bool), "use_fast_scl must be bool."
         assert isinstance(use_hybrid_sc, bool), "use_hybrid_sc must be bool."
+        assert isinstance(return_crc_status, bool), \
+                                            "return_crc_status must be bool."
 
         assert issubdtype(frozen_pos.dtype, int), "frozen_pos contains non int."
         assert len(frozen_pos)<=n, "Num. of elements in frozen_pos cannot " \
@@ -534,6 +547,14 @@ class PolarSCLDecoder(Layer):
             self._k_crc = 0
         assert self._k>=self._k_crc, "Value of k is too small for \
             given CRC_degree."
+
+
+        if (crc_degree is None) and return_crc_status:
+            self._return_crc_status = False
+            raise ValueError("Returning CRC status requires given crc_degree.")
+        else:
+            self._return_crc_status = return_crc_status
+
 
         # store the inverse interleaver patter
         if ind_iil_inv is not None:
@@ -616,7 +637,7 @@ class PolarSCLDecoder(Layer):
                                   clip_value_max=self._llr_max)
 
         # update path metric for complete sub-block of length n
-        pm_val = tf.math.log(1 + tf.math.exp(-1.*llr_in))
+        pm_val = tf.math.softplus(-1.*llr_in)
         msg_pm += tf.reduce_sum(pm_val, axis=-1)
 
         return msg_pm, msg_uhat, msg_llr
@@ -643,7 +664,7 @@ class PolarSCLDecoder(Layer):
         llr_low =  llr_in[:, :self._list_size, :]
         llr_up = - llr_in[:, self._list_size:, :]
         llr_pm = tf.concat([llr_low, llr_up], 1)
-        pm_val = tf.math.log(1 + tf.math.exp(-1.*llr_pm))
+        pm_val = tf.math.softplus(-1.*llr_pm)
         msg_pm += tf.reduce_sum(pm_val, axis=-1)
 
         msg_uhat1 = msg_uhat[:, :self._list_size, :, :]
@@ -742,8 +763,8 @@ class PolarSCLDecoder(Layer):
                                   clip_value_min=-self._llr_max,
                                   clip_value_max=self._llr_max)
 
-        pm_inner = tf.math.exp(-tf.multiply((1 - 2*u_hat), llr_in))
-        msg_pm += tf.math.log(1 + pm_inner)
+        # Numerically more stable implementation of log(1 + exp(-x))
+        msg_pm += tf.math.softplus(-tf.multiply((1 - 2*u_hat), llr_in))
         return msg_pm
 
     def _sort_decoders(self, msg_pm, msg_uhat, msg_llr):
@@ -771,9 +792,12 @@ class PolarSCLDecoder(Layer):
                                 clip_value_min=-self._llr_max,
                                 clip_value_max=self._llr_max)
 
-        # avoid division for numerical stability
-        llr_out = tf.math.log(1 + tf.math.exp(x_in + y_in))
-        llr_out -= tf.math.log(tf.math.exp(x_in) + tf.math.exp(y_in))
+        # Avoid division for numerical stability
+        # Implements log(1+e^(x+y))
+        llr_out = tf.math.softplus((x_in + y_in))
+        # Implements log(e^x+e^y)
+        llr_out -= tf.math.reduce_logsumexp(tf.stack([x_in, y_in], axis=-1),
+                                            axis=-1)
 
         return llr_out
 
@@ -1219,7 +1243,6 @@ class PolarSCLDecoder(Layer):
 
         return llr_out
 
-
     def _vn_op_np(self, x, y, u_hat):
         """Variable node update (boxplus) for LLRs in Numpy."""
         return np.multiply((1-2*u_hat), x) + y
@@ -1516,7 +1539,19 @@ class PolarSCLDecoder(Layer):
         output_shape[-1] = self.k
         output_shape[0] = -1 # first dim can be dynamic (None)
         u_hat_reshape = tf.reshape(u_hat, output_shape)
-        return tf.cast(u_hat_reshape, self._output_dtype)
+
+        if self._return_crc_status:
+            # reconstruct CRC status
+            crc_status = tf.gather(crc_valid, cand_ind, axis=1, batch_dims=1)
+            # reconstruct shape
+            output_shape.pop() # remove last dimension
+            crc_status = tf.reshape(crc_status, output_shape)
+
+            crc_status = tf.cast(crc_status, self._output_dtype)
+            # return info bits and CRC status
+            return tf.cast(u_hat_reshape, self._output_dtype), crc_status
+        else: # return only info bits
+            return tf.cast(u_hat_reshape, self._output_dtype)
 
 
 class PolarBPDecoder(Layer):
@@ -1900,7 +1935,7 @@ class PolarBPDecoder(Layer):
 
 class Polar5GDecoder(Layer):
     # pylint: disable=line-too-long
-    """Polar5GDecoder(enc_polar, dec_type="SC", list_size=8, num_iter=20, output_dtype=tf.float32, **kwargs)
+    """Polar5GDecoder(enc_polar, dec_type="SC", list_size=8, num_iter=20,return_crc_status=False, output_dtype=tf.float32, **kwargs)
 
     Wrapper for 5G compliant decoding including rate-recovery and CRC removal.
 
@@ -1925,6 +1960,11 @@ class Polar5GDecoder(Layer):
             Defaults to 20. Defining the number of BP iterations. Only required
             for ``dec_type`` `"BP"`.
 
+        return_crc_status: bool
+            Defaults to False. If True, the decoder additionally returns the
+            CRC status indicating if a codeword was (most likely) correctly
+            recovered.
+
         output_dtype: tf.DType
             Defaults to tf.float32. Defines the output datatype of the layer
             (internal precision remains tf.float32).
@@ -1936,10 +1976,15 @@ class Polar5GDecoder(Layer):
 
     Output
     ------
-        : [...,k], tf.float32
-            2+D tensor  containing hard-decided estimates of all `k`
+
+        b_hat : [...,k], tf.float32
+            2+D tensor containing hard-decided estimations of all `k`
             information bits.
 
+        crc_status : [...], tf.bool
+            CRC status indicating if a codeword was (most likely) correctly
+            recovered. This is only returned if ``return_crc_status`` is True.
+            Note that false positives are possible.
     Raises
     ------
         AssertionError
@@ -1979,6 +2024,7 @@ class Polar5GDecoder(Layer):
                  dec_type="SC",
                  list_size=8,
                  num_iter=20,
+                 return_crc_status=False,
                  output_dtype=tf.float32,
                  **kwargs):
 
@@ -2047,6 +2093,17 @@ class Polar5GDecoder(Layer):
                                              hard_out=True)
         else:
             raise ValueError("Unknown value for dec_type.")
+
+        assert isinstance(return_crc_status, bool), \
+                                            "return_crc_status must be bool."
+
+        self._return_crc_status = return_crc_status
+        if self._return_crc_status: # init crc decoder
+            if dec_type in ("SCL", "hybSCL"):
+                # re-use CRC decoder from list decoder
+                self._dec_crc = self._polar_dec._crc_decoder
+            else: # init new CRC decoder for BP and SC
+                self._dec_crc = CRCDecoder(self._enc_polar._enc_crc)
 
     #########################################
     # Public methods and properties
@@ -2210,13 +2267,28 @@ class Polar5GDecoder(Layer):
         if self._iil:
             u_hat_crc = tf.gather(u_hat_crc, self.ind_iil_inv, axis=1)
 
-        # 7.) Remove CRC (and PC)
-        u_hat = u_hat_crc[:,:-self._k_crc]
+        # 7.) Evaluate or remove CRC (and PC)
+        if self._return_crc_status:
+            # for compatibility with SC/BP, a dedicated CRC decoder is
+            # used here (instead of accessing the interal SCL)
+            u_hat, crc_status = self._dec_crc(u_hat_crc)
+        else: # just remove CRC bits
+            u_hat = u_hat_crc[:,:-self._k_crc]
 
         # And reconstruct input shape
         output_shape = input_shape.as_list()
         output_shape[-1] = self._k_target
         output_shape[0] = -1 # First dim can be dynamic (None)
         u_hat_reshape = tf.reshape(u_hat, output_shape)
+        # and cast to output dtype
+        u_hat_reshape = tf.cast(u_hat_reshape, dtype=self._output_dtype)
 
-        return tf.cast(u_hat_reshape, dtype=self._output_dtype)
+        if self._return_crc_status:
+            # reconstruct CRC shape
+            output_shape.pop() # remove last dimension
+            crc_status = tf.reshape(crc_status, output_shape)
+            crc_status = tf.cast(crc_status, dtype=self._output_dtype)
+            return u_hat_reshape, crc_status
+
+        else:
+            return u_hat_reshape

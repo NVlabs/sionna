@@ -377,15 +377,17 @@ def coverage_map_color_mapping(coverage_map, db_scale=True,
     requested value scale to be displayed.
     Also applies the dB scaling to a copy of the coverage map, if requested.
     """
+    valid = np.logical_and(coverage_map > 0., np.isfinite(coverage_map))
+    coverage_map = coverage_map.copy()
     if db_scale:
-        valid = coverage_map > 0.
-        coverage_map = coverage_map.copy()
         coverage_map[valid] = 10. * np.log10(coverage_map[valid])
+    else:
+        coverage_map[valid] = coverage_map[valid]
 
     if vmin is None:
-        vmin = coverage_map[np.isfinite(coverage_map)].min()
+        vmin = coverage_map[valid].min()
     if vmax is None:
-        vmax = coverage_map[np.isfinite(coverage_map)].max()
+        vmax = coverage_map[valid].max()
     normalizer = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
     color_map = matplotlib.cm.get_cmap('viridis')
     return coverage_map, normalizer, color_map

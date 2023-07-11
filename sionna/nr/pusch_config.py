@@ -841,7 +841,7 @@ class PUSCHConfig(Config):
         n_re_per_prb = self.num_res_per_prb - self.num_ov
 
         # number of allocated REs
-        # the mmax. number of REs per PRB is limited to 156 in 38.214
+        # the max. number of REs per PRB is limited to 156 in 38.214
         n_re = min(156, n_re_per_prb) * self.num_resource_blocks
 
         # include tb_scaling as defined in Tab. 5.1.3.2-2 38.214

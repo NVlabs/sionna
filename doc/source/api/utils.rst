@@ -129,9 +129,3 @@ log2
 log10
 -----
 .. autofunction:: sionna.utils.log10
-
-
-References:
-
-   .. [3GPPTS38211_S] ETSI 3GPP TS 38.211 "Physical channels and modulation",
-      v.16.2.0, 2020-07.

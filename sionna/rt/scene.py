@@ -24,7 +24,7 @@ from .oriented_object import OrientedObject
 from .radio_material import RadioMaterial
 from .receiver import Receiver
 from .scene_object import SceneObject
-from .solver import Solver
+from .solver_paths import SolverPaths
 from .solver_cm import SolverCoverageMap
 from .transmitter import Transmitter
 from .previewer import InteractiveDisplay
@@ -44,7 +44,7 @@ class Scene:
     A scene is a collection of multiple instances of :class:`~sionna.rt.SceneObject` which define
     the geometry and materials of the objects in the scene.
     The scene also includes transmitters (:class:`~sionna.rt.Transmitter`) and receivers (:class:`~sionna.rt.Receiver`)
-    for which propagation :class:`~sionna.rt.Paths` or  channel impulse responses (CIRs) can be computed,
+    for which propagation :class:`~sionna.rt.Paths`, channel impulse responses (CIRs) or coverage maps (:class:`~sionna.rt.CoverageMap`) can be computed,
     as well as cameras (:class:`~sionna.rt.Camera`) for rendering.
 
     The only way to instantiate a scene is by calling :meth:`~sionna.rt.Scene,.load_scene`.
@@ -98,9 +98,7 @@ class Scene:
 
         return cls._instance
 
-    def __init__(self,
-                 env_filename = None,
-                 dtype = tf.complex64):
+    def __init__(self, env_filename = None, dtype = tf.complex64):
 
         # If a filename is provided, loads the scene from it.
         # The previous scene is overwritten.
@@ -133,10 +131,10 @@ class Scene:
                 self._scene = mi.load_file(env_filename)
 
             # Instantiate the solver
-            self._solver = Solver(self, dtype=dtype)
+            self._solver_paths = SolverPaths(self, dtype=dtype)
 
             # Solver for coverage map
-            self._solver_cm = SolverCoverageMap(self, solver=self._solver,
+            self._solver_cm = SolverCoverageMap(self, solver=self._solver_paths,
                                                 dtype=dtype)
 
             # Load the cameras
@@ -196,6 +194,13 @@ class Scene:
         if not isinstance(value, bool):
             raise TypeError("'synthetic_array' must be boolean")
         self._synthetic_array = value
+
+    @property
+    def dtype(self):
+        r"""
+        `tf.complex64 | tf.complex128` : Datatype used in tensors
+        """
+        return self._dtype
 
     @property
     def transmitters(self):
@@ -400,28 +405,34 @@ class Scene:
                   " can be removed"
             raise TypeError(msg)
 
-    def compute_paths(self, max_depth=3, method="stochastic",
-                      num_samples=int(1e6), seed=None):
+    def compute_paths(self, max_depth=3, method="fibonacci",
+                      num_samples=int(1e6), los=True, reflection=True,
+                      diffraction=False, scattering=False, scat_keep_prob=0.001,
+                      edge_diffraction=False,
+                      check_scene=True):
         # pylint: disable=line-too-long
-        r"""compute_paths(self, max_depth=3, method="stochastic", num_samples=int(1e6), seed=None)
-        Computes propagation paths and their associated transfer matrices
+        r"""
+        Computes propagation paths
 
         This function computes propagation paths between the antennas of
         all transmitters and receivers in the current scene.
-        For each propagation path :math:`i`, the corresponding transfer matrix
-        :math:`\mathbf{T}_i` and delay :math:`\tau_i`, as well as the
+        For each propagation path :math:`i`, the corresponding channel coefficient
+        :math:`a_i` and delay :math:`\tau_i`, as well as the
         angles of departure :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})`
         and arrival :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})` are returned.
         For more detail, see :eq:`H_final`.
-        Antenna patterns are not applied and only specular reflections are considered.
+        Different propagation phenomena, such as line-of-sight, reflection, diffraction,
+        and diffuse scattering can be individually enabled/disabled.
 
         If the scene is configured to use synthetic arrays
         (:attr:`~sionna.rt.Scene.synthetic_array` is `True`), transmitters and receivers
         are modelled as if they had a single antenna located at their
         :attr:`~sionna.rt.Transmitter.position`. The channel responses for each
-        individual antenna of the arrays are then computed "synthetically"
-        in the :class:`Paths2CIR` layer. This reduces the complexity significantly
-        for large arrays.
+        individual antenna of the arrays are then computed "synthetically" by applying
+        appropriate phase shifts. This reduces the complexity significantly
+        for large arrays. Time evolution of the channel coefficients can be simulated with
+        the help of the function :meth:`~sionna.rt.Paths.apply_doppler` of the returned
+        :class:`~sionna.rt.Paths` object.
 
         Example
         -------
@@ -468,7 +479,7 @@ class Scene:
             paths = scene.compute_paths()
 
             # Open preview showing paths
-            scene.preview(paths=paths, resolution=[1000,600]) 
+            scene.preview(paths=paths, resolution=[1000,600])
 
         .. figure:: ../figures/paths_preview.png
             :align: center
@@ -479,34 +490,60 @@ class Scene:
             Maximum depth (i.e., number of bounces) allowed for tracing the
             paths. Defaults to 3.
 
-        method : str ("exhaustive"|"stochastic")
+        method : str ("exhaustive"|"fibonacci")
             Ray tracing method to be used.
-            The "exhaustive" method uses a
-            brute-force approach and considers all possible chains of
-            primitives up to a maximum depth. It can therefore only be used
-            for very small scenes.
-            The "stochastic" method uses a shoot-and-bounce approach to find
-            candidate chains of primitives. This method can be applied to very
-            large scenes. However, there is no guarantee that all possible
-            paths are found.
-            Defaults to "stochastic".
+            The "exhaustive" method tests all possible combinations of primitives.
+            This method is not compatible with scattering.
+            The "fibonacci" method uses a shoot-and-bounce approach to find
+            candidate chains of primitives. Intial ray directions are chosen
+            according to a Fibonacci lattice on the unit sphere. This method can be
+            applied to very large scenes. However, there is no guarantee that
+            all possible paths are found.
+            Defaults to "fibonacci".
 
         num_samples : int
-            Number of random rays to trace in order to generate candidates with
-            the stochastic method.
-            This number is splitted equally over the different transmitters
+            Number of rays to trace in order to generate candidates with
+            the "fibonacci" method.
+            This number is split equally among the different transmitters
             (when using synthetic arrays) or transmit antennas (when not using
             synthetic arrays).
             This parameter is ignored when using the exhaustive method.
+            Tracing more rays can lead to better precision
+            at the cost of increased memory requirements.
             Defaults to 1e6.
 
-        seed: int | `None`
-            Seed for the random number generator used for sampling rays with the
-            stochastic method. Using the same seed will always result in the
-            same paths.
-            If set to `None`, then a random seed is used.
-            This parameter is ignored when using the exhaustive method.
-            Defaults to `None`.
+        los : bool
+            If set to `True`, then the LoS paths are computed.
+            Defaults to `True`.
+
+        reflection : bool
+            If set to `True`, then the reflected paths are computed.
+            Defaults to `True`.
+
+        diffraction : bool
+            If set to `True`, then the diffracted paths are computed.
+            Defaults to `False`.
+
+        scattering : bool
+            if set to `True`, then the scattered paths are computed.
+            Only works with the Fibonacci method.
+            Defaults to `False`.
+
+        scat_keep_prob : float
+            Probability with which a scattered path is kept.
+            This is helpful to reduce the number of computed scattered
+            paths, which might be prohibitively high in some scenes.
+            Must be in the range (0,1). Defaults to 0.001.
+
+        edge_diffraction : bool
+            If set to `False`, only diffraction on wedges, i.e., edges that
+            connect two primitives, is considered.
+            Defaults to `False`.
+
+        check_scene : bool
+            If set to `True`, checks that the scene is well configured before
+            computing the paths. This can add a significant overhead.
+            Defaults to `True`.
 
         Output
         ------
@@ -514,95 +551,27 @@ class Scene:
             Simulated paths
         """
 
+        if scat_keep_prob < 0. or scat_keep_prob > 1.:
+            msg = "The parameter `scat_keep_prob` must be in the range (0,1)"
+            raise ValueError(msg)
+
         # Check that all is set to compute paths
-        self._ready_for_paths_computation()
-
-        # Rotated position of the TX and RX antenna elements in the device
-        # local frames.
-        # [num_tx, num_tx_ant, 3]
-        tx_rel_ant_pos = [self.tx_array.rotated_positions(tx.orientation)
-                            for tx in self.transmitters.values()]
-        tx_rel_ant_pos = tf.stack(tx_rel_ant_pos, axis=0)
-        # [num_rx, num_rx_ant, 3]
-        rx_rel_ant_pos = [self.rx_array.rotated_positions(rx.orientation)
-                            for rx in self.receivers.values()]
-        rx_rel_ant_pos = tf.stack(rx_rel_ant_pos, axis=0)
-
-        # Number of receive antennas (not counting for dual polarization)
-        num_tx_ant = tx_rel_ant_pos.shape[1]
-        # Number of transmit antennas (not counting for dual polarization)
-        num_rx_ant = rx_rel_ant_pos.shape[1]
-
-        # Transmitters and receivers positions
-        # [num_tx, 3]
-        tx_pos = [tx.position for tx in self.transmitters.values()]
-        tx_pos = tf.stack(tx_pos, axis=0)
-        # [num_rx, 3]
-        rx_pos = [rx.position for rx in self.receivers.values()]
-        rx_pos = tf.stack(rx_pos, axis=0)
-
-        # Positions of the endpoints
-        if self._synthetic_array:
-            # [num_tx, 3]
-            sources = tx_pos
-            # [num_rx, 3]
-            targets = rx_pos
-        else:
-            # [num_tx, num_tx_ant, 3]
-            sources = tf.expand_dims(tx_pos, axis=1) + tx_rel_ant_pos
-            # [num_tx*num_tx_ant, 3]
-            sources = tf.reshape(sources, [-1, 3])
-            # [num_rx, num_rx_ant, 3]
-            targets = tf.expand_dims(rx_pos, axis=1) + rx_rel_ant_pos
-            # [num_rx*num_rx_ant, 3]
-            targets = tf.reshape(targets, [-1, 3])
-
-        # Draw a random seed if required
-        if seed is None:
-            seed = tf.random.uniform(shape=(), maxval=0x7FFFFFFF,
-                                     dtype=tf.int32)
+        if check_scene:
+            self._ready_for_paths_computation()
 
         # Compute the paths using the solver
         # Returns: A Paths object
-        paths = self._solver(max_depth, sources, targets, method=method,
-                             num_samples=num_samples, seed=seed)
+        paths = self._solver_paths(max_depth,
+                                   method=method,
+                                   num_samples=num_samples,
+                                   los=los, reflection=reflection,
+                                   diffraction=diffraction,
+                                   scattering=scattering,
+                                   scat_keep_prob=scat_keep_prob,
+                                   edge_diffraction=edge_diffraction)
 
-        # If not using synthetic array, then the paths for the different
-        # antenna elements were generated by the solver and only reshaping is
-        # needed.
-        # Otherwise, the phase shifts due to the antenna array need to be
-        # applied.
-        num_rx = len(self.receivers)
-        num_tx = len(self.transmitters)
-        max_num_paths = tf.shape(paths.mat_t)[2]
-        batch_dims = [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-        if not self._synthetic_array:
-            # [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, 2, 2]
-            paths.mat_t = tf.reshape(paths.mat_t, batch_dims + [2,2])
-            # [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-            paths.tau = tf.reshape(paths.tau, batch_dims)
-            # [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-            paths.theta_t = tf.reshape(paths.theta_t, batch_dims)
-            # [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-            paths.phi_t = tf.reshape(paths.phi_t, batch_dims)
-            # [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-            paths.theta_r = tf.reshape(paths.theta_r, batch_dims)
-            # [num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-            paths.phi_r = tf.reshape(paths.phi_r, batch_dims)
-
-        # Add dummy-dimension for batch_size
-        # [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, 2, 2]
-        paths.mat_t = tf.expand_dims(paths.mat_t, axis=0)
-        # [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-        paths.tau = tf.expand_dims(paths.tau, axis=0)
-        # [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-        paths.theta_t = tf.expand_dims(paths.theta_t, axis=0)
-        # [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-        paths.phi_t = tf.expand_dims(paths.phi_t, axis=0)
-        # [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-        paths.theta_r = tf.expand_dims(paths.theta_r, axis=0)
-        # [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
-        paths.phi_r = tf.expand_dims(paths.phi_r, axis=0)
+        # Finalize paths computation
+        paths.finalize()
 
         return paths
 
@@ -616,19 +585,91 @@ class Scene:
                      combining_vec=None,
                      precoding_vec=None,
                      num_samples=int(2e6),
-                     seed=None):
+                     los=True,
+                     reflection=True,
+                     diffraction=False,
+                     scattering=False,
+                     edge_diffraction=False,
+                     check_scene=True):
         # pylint: disable=line-too-long
-        r"""coverage_map(rx_orientation=(0.,0.,0.), max_depth=3, cm_center=None, cm_orientation=None, cm_size=None, cm_cell_size=(10.,10.), combining_vec=None, precoding_vec=None, num_samples=int(2e6), seed=None)
-
+        r"""
         This function computes a coverage map for every transmitter in the scene.
 
-        For a given transmitter, a coverage map associates every point on a surface
-        with the sum of the squared amplitudes of the path coefficients :math:`a_i` :eq:`H_final`
-        that a receiver with orientation ``rx_orientation`` would observe at this point.
-        The receiver is assumed to use the antenna array
-        ``scene.rx_array``. If transmitter and/or receiver have multiple antennas, transmit precoding
-        and receive combining are applied which are defined by ``precoding_vec`` and
-        ``combining_vec``, respectively.
+        For a given transmitter, a coverage map is a rectangular surface with
+        arbitrary orientation subdivded
+        into rectangular cells of size :math:`\lvert C \rvert = \texttt{cm_cell_size[0]} \times  \texttt{cm_cell_size[1]}`.
+        The parameter ``cm_cell_size`` therefore controls the granularity of the map.
+        The coverage map associates with every cell :math:`(i,j)` the quantity
+
+        .. math::
+            :label: cm_def
+
+            b_{i,j} = \frac{1}{\lvert C \rvert} \int_{C_{i,j}} \lvert h(s) \rvert^2 ds
+
+        where :math:`\lvert h(s) \rvert^2` is the squared amplitude
+        of the path coefficients :math:`a_i` at position :math:`s=(x,y)`,
+        the integral is over the cell :math:`C_{i,j}`, and
+        :math:`ds` is the infinitesimal small surface element
+        :math:`ds=dx \cdot dy`.
+        The dimension indexed by :math:`i` (:math:`j`) corresponds to the :math:`y\, (x)`-axis of the
+        coverage map in its local coordinate system.
+
+        For specularly and diffusely reflected paths, :eq:`cm_def` can be rewritten as an integral over the directions
+        of departure of the rays from the transmitter, by substituting :math:`s`
+        with the corresponding direction :math:`\omega`:
+
+        .. math::
+            b_{i,j} = \frac{1}{\lvert C \rvert} \int_{\Omega} \lvert h\left(s(\omega) \right) \rvert^2 \frac{r(\omega)^2}{\lvert \cos{\alpha(\omega)} \rvert} \mathbb{1}_{\left\{ s(\omega) \in C_{i,j} \right\}} d\omega
+
+        where the integration is over the unit sphere :math:`\Omega`, :math:`r(\omega)` is the length of
+        the path with direction of departure :math:`\omega`, :math:`s(\omega)` is the point
+        where the path with direction of departure :math:`\omega` intersects the coverage map,
+        :math:`\alpha(\omega)` is the angle between the coverage map normal and the direction of arrival
+        of the path with direction of departure :math:`\omega`,
+        and :math:`\mathbb{1}_{\left\{ s(\omega) \in C_{i,j} \right\}}` is the function that takes as value
+        one if :math:`s(\omega) \in C_{i,j}` and zero otherwise.
+        Note that :math:`ds = \frac{r(\omega)^2 d\omega}{\lvert \cos{\alpha(\omega)} \rvert}`.
+
+        The previous integral is approximated through Monte Carlo sampling by shooting :math:`N` rays
+        with directions :math:`\omega_n` arranged as a Fibonacci lattice on the unit sphere around the transmitter,
+        and bouncing the rays on the intersected objects until the maximum depth (``max_depth``) is reached or
+        the ray bounces out of the scene.
+        At every intersection with an object of the scene, a new ray is shot from the intersection which corresponds to either
+        specular reflection or diffuse scattering, following a Bernouilli distribution with parameter the
+        squared scattering coefficient.
+        When diffuse scattering is selected, the direction of the scattered ray is uniformly sampled on the half-sphere.
+        The resulting Monter Carlo estimate is:
+
+        .. math::
+            :label: cm_mc_ref
+
+            \hat{b}_{i,j}^{\text{(ref)}} = \frac{4\pi}{N\lvert C \rvert} \sum_{n=1}^N \lvert h\left(s(\omega_n)\right)  \rvert^2 \frac{r(\omega_n)^2}{\lvert \cos{\alpha(\omega_n)} \rvert} \mathbb{1}_{\left\{ s(\omega_n) \in C_{i,j} \right\}}.
+
+        For the diffracted paths, :eq:`cm_def` can be rewritten for any wedge
+        with length :math:`L` and opening angle :math:`\Phi` as an integral over the wedge and its opening angle,
+        by substituting :math:`s` with the position on the wedge :math:`\ell \in [1,L]` and the angle :math:`\phi \in [0, \Phi]`:
+
+        .. math::
+            b_{i,j} = \frac{1}{\lvert C \rvert} \int_{\ell} \int_{\phi} \lvert h\left(s(\ell,\phi) \right) \rvert^2 \mathbb{1}_{\left\{ s(\ell,\phi) \in C_{i,j} \right\}} \left\lVert \frac{\partial r}{\partial \ell} \times \frac{\partial r}{\partial \phi} \right\rVert d\ell d\phi
+
+        where the intergral is over the wedge length :math:`L` and opening angle :math:`\Phi`, and
+        :math:`r\left( \ell, \phi \right)` is the reparametrization with respected to :math:`(\ell, \phi)` of the
+        intersection between the diffraction cone at :math:`\ell` and the rectangle defining the coverage map (see, e.g., [SurfaceIntegral]_).
+        The previous integral is approximated through Monte Carlo sampling by shooting :math:`N'` rays from equally spaced
+        locations :math:`\ell_n` along the wedge with directions :math:`\phi_n` sampled uniformly from :math:`(0, \Phi)`:
+
+        .. math::
+            :label: cm_mc_diff
+
+            \hat{b}_{i,j}^{\text{(diff)}} = \frac{L\Phi}{N'\lvert C \rvert} \sum_{n=1}^{N'} \lvert h\left(s(\ell_n,\phi_n)\right) \rvert^2 \mathbb{1}_{\left\{ s(\ell_n,\phi_n) \in C_{i,j} \right\}} \left\lVert \left(\frac{\partial r}{\partial \ell}\right)_n \times \left(\frac{\partial r}{\partial \phi}\right)_n \right\rVert.
+
+        The output of this function is therefore a real-valued matrix of size ``[num_cells_y, num_cells_x]``,
+        for every transmitter, with elements equal to the sum of the contributions of the reflected and scattered paths
+        :eq:`cm_mc_ref` and diffracted paths :eq:`cm_mc_diff` for all the wedges, and where
+
+        .. math::
+            \texttt{num_cells_x} = \bigg\lceil\frac{\texttt{cm_size[0]}}{\texttt{cm_cell_size[0]}} \bigg\rceil\\
+            \texttt{num_cells_y} = \bigg\lceil \frac{\texttt{cm_size[1]}}{\texttt{cm_cell_size[1]}} \bigg\rceil.
 
         The surface defining the coverage map is a rectangle centered at
         ``cm_center``, with orientation ``cm_orientation``, and with size
@@ -637,64 +678,32 @@ class Scene:
         the :math:`+z` axis. By default, the coverage map
         is parallel to the XY plane, covers all of the scene, and has
         an elevation of :math:`z = 1.5\text{m}`.
-        The coverage map is divided into rectangular cells of size
-        ``cm_cell_size``. This parameter therefore controls the granularity of the map.
+        The receiver is assumed to use the antenna array
+        ``scene.rx_array``. If transmitter and/or receiver have multiple antennas, transmit precoding
+        and receive combining are applied which are defined by ``precoding_vec`` and
+        ``combining_vec``, respectively.
 
-        The output of this function is a real-valued matrix of size ``[num_cells_y, num_cells_x]``,
-        for every transmitter, with elements
+        The :math:`(i,j)` indices are omitted in the following for clarity.
+        For reflection and scattering, paths are generated by shooting ``num_samples`` rays from the
+        transmitters with directions arranged in a Fibonacci lattice on the unit
+        sphere and by simulating their propagation for up to ``max_depth`` interactions with
+        scene objects.
+        If ``max_depth`` is set to 0 and if ``los`` is set to `True`,
+        only the line-of-sight path is considered.
+        For diffraction, paths are generated by shooting ``num_samples`` rays from equally
+        spaced locations along the wedges in line-of-sight with the transmitter, with
+        directions uniformly sampled on the diffraction cone.
 
-        .. math::
-            b_{y,x} = \sum_i \lvert h_{y,x,i} \rvert^2
-
-        where the sum is over the paths that intersect the cell :math:`(y,x)`,
-        :math:`h_{y,x,i}` is the complex-valued channel coefficient
-        corresponding to the :math:`i^{\text{th}}` path that intersects the
-        cell :math:`(y,x)`, and
-
-        .. math::
-            \texttt{num_cells_x} = \bigg\lceil\frac{\texttt{cm_size[0]}}{\texttt{cm_cell_size[0]}} \bigg\rceil\\
-            \texttt{num_cells_y} = \bigg\lceil \frac{\texttt{cm_size[1]}}{\texttt{cm_cell_size[1]}} \bigg\rceil.
-
-        The :math:`(y,x)` indices are omitted in the following for clarity.
-        Paths are generated by randomly and uniformly sampling ``num_samples``
-        rays from the transmitters and by simulating their propagation for up
-        to ``max_depth`` interactions with scene objects.
-        If ``max_depth`` is set to 0, only the line-of-sight path is considered.
-
-        For every ray :math:`i` intersecting the coverage map cell :math:`(y,x)`, the
-        transfer matrix, :math:`\mathbf{T}_i`, and the angles of departure (AoDs)
-        :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})`
-        and arrival (AoAs) :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})`
-        are computed. See :eq:`H_final` for further details.
-
-        Given the AoDs :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})`,
-        the orientation of the transmitter :math:`(\alpha_{\text{T}}, \beta_{\text{T}}, \gamma_{\text{T}})`,
-        as well as the antenna pattern of the transmitting antenna :math:`\mathbf{C}'_\text{T}(\theta', \varphi')`
-        in its local coordinate system (LCS), one can first compute the AoDs :math:`(\theta'_{\text{T},i}, \varphi'_{\text{T},i})` in the
-        local coordinate system (LCS) of the transmitter according to :eq:`theta_phi_prime` and then compute
-        the antenna response in the global coordinate system (GCS) :math:`\mathbf{C}_\text{T}(\theta_{\text{T},i}, \varphi_{\text{T},i})` as in :eq:`F_prime_2_F`,
-        using the rotation matrix :math:`\mathbf{R}=\mathbf{R}(\alpha_{\text{T}}, \beta_{\text{T}}, \gamma_{\text{T}})`.
-
-        The antenna response of the receiver in the GCS :math:`\mathbf{C}_\text{R}(\theta_{\text{R},i}, \varphi_{\text{R},i})` can be computed in an analog fashion
-        using the AoAs :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})`, the orientation
-        of the receiver :math:`(\alpha_{\text{R}}, \beta_{\text{R}}, \gamma_{\text{R}})`, and
-        the antenna pattern of the receiving antenna :math:`\mathbf{C}'_\text{R}(\theta', \varphi')`
-        in its LCS. The receivers of the scene are not used for the computation of the coverage map,
-        and the receiver orientation is specified by the ``rx_orientation`` input.
-
-        One then obtains the complex-valued path coefficient :math:`a_i` as :eq:`H_final`:
-
-        .. math::
-
-            a_i = \frac{\lambda}{4\pi} \mathbf{C}_\text{R}(\theta_{\text{R},i}, \varphi_{\text{R},i})^{\mathsf{H}}\mathbf{T}_{i} \mathbf{C}_\text{T}(\theta_{\text{T},i}, \varphi_{\text{T},i}).
-
-        For dual-polarized antennas, a separate channel coefficient for each
-        polarization direction is computed by applying the corresponding antenna pattern.
+        For every ray :math:`n` intersecting the coverage map cell :math:`(i,j)`, the
+        channel coefficients, :math:`a_n`, and the angles of departure (AoDs)
+        :math:`(\theta_{\text{T},n}, \varphi_{\text{T},n})`
+        and arrival (AoAs) :math:`(\theta_{\text{R},n}, \varphi_{\text{R},n})`
+        are computed. See the `Primer on Electromagnetics <../em_primer.html>`_ for more details.
 
         A "synthetic" array is simulated by adding additional phase shifts that depend on the
         antenna position relative to the position of the transmitter (receiver) as well as the AoDs (AoAs).
-        For the :math:`m^\text{th}` transmit antenna and :math:`n^\text{th}` receive antenna, let
-        us denote by :math:`\mathbf{d}_{\text{T},m}` and :math:`\mathbf{d}_{\text{R},n}` the relative positions (with respect to
+        For the :math:`k^\text{th}` transmit antenna and :math:`\ell^\text{th}` receive antenna, let
+        us denote by :math:`\mathbf{d}_{\text{T},k}` and :math:`\mathbf{d}_{\text{R},\ell}` the relative positions (with respect to
         the positions of the transmitter/receiver) of the pair of antennas
         for which the channel impulse response shall be computed. These can be accessed through the antenna array's property
         :attr:`~sionna.rt.AntennaArray.positions`. Using a plane-wave assumption, the resulting phase shifts
@@ -702,32 +711,27 @@ class Scene:
 
         .. math::
 
-            p_{\text{T}, i,m} &= \frac{2\pi}{\lambda}\hat{\mathbf{r}}(\theta_{\text{T},i}, \varphi_{\text{T},i})^\mathsf{T} \mathbf{d}_{\text{T},m}\\
-            p_{\text{R}, i,n} &= \frac{2\pi}{\lambda}\hat{\mathbf{r}}(\theta_{\text{R},i}, \varphi_{\text{R},i})^\mathsf{T} \mathbf{d}_{\text{R},n}.
+            p_{\text{T}, n,k} &= \frac{2\pi}{\lambda}\hat{\mathbf{r}}(\theta_{\text{T},n}, \varphi_{\text{T},n})^\mathsf{T} \mathbf{d}_{\text{T},k}\\
+            p_{\text{R}, n,\ell} &= \frac{2\pi}{\lambda}\hat{\mathbf{r}}(\theta_{\text{R},n}, \varphi_{\text{R},n})^\mathsf{T} \mathbf{d}_{\text{R},\ell}.
 
         The final expression for the path coefficient is
 
         .. math::
 
-            h_{i,n,m} =  a_i e^{j(p_{\text{T}, i,m} + p_{\text{R}, i,n})}
+            h_{n,k,\ell} =  a_n e^{j(p_{\text{T}, i,k} + p_{\text{R}, i,\ell})}
 
-        for every transmit antenna :math:`m` and receive antenna :math:`n`.
-        These coefficients form the complex-valued channel matrix, :math:`\mathbf{H}_i`,
+        for every transmit antenna :math:`k` and receive antenna :math:`\ell`.
+        These coefficients form the complex-valued channel matrix, :math:`\mathbf{H}_n`,
         of size :math:`\texttt{num_rx_ant} \times \texttt{num_tx_ant}`.
 
         Finally, the coefficient of the equivalent SISO channel is
 
         .. math::
-            h_i =  \mathbf{c}^{\mathsf{H}} \mathbf{H}_i \mathbf{p}
+            h_n =  \mathbf{c}^{\mathsf{H}} \mathbf{H}_n \mathbf{p}
 
         where :math:`\mathbf{c}` and :math:`\mathbf{p}` are the combining and
         precoding vectors (``combining_vec`` and ``precoding_vec``),
         respectively.
-
-        The coverage map entry :math:`b_{y,x}` is then computed as the
-        sum of the squared amplitudes of the channel coefficients
-        :math:`h_i` of all paths intersecting the cell :math:`(y,x)`
-        of the coverage map.
 
         Example
         -------
@@ -739,35 +743,36 @@ class Scene:
 
             # Configure antenna array for all transmitters
             scene.tx_array = PlanarArray(num_rows=8,
-                                      num_cols=2,
-                                      vertical_spacing=0.7,
-                                      horizontal_spacing=0.5,
-                                      pattern="tr38901",
-                                      polarization="VH")
+                                    num_cols=2,
+                                    vertical_spacing=0.7,
+                                    horizontal_spacing=0.5,
+                                    pattern="tr38901",
+                                    polarization="VH")
 
             # Configure antenna array for all receivers
             scene.rx_array = PlanarArray(num_rows=1,
-                                      num_cols=1,
-                                      vertical_spacing=0.5,
-                                      horizontal_spacing=0.5,
-                                      pattern="dipole",
-                                      polarization="cross")
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="dipole",
+                                    polarization="cross")
             # Add a transmitters
             tx = Transmitter(name="tx",
-                          position=[8.5,21,27],
-                          orientation=[0,0,0])
+                        position=[8.5,21,30],
+                        orientation=[0,0,0])
             scene.add(tx)
+            tx.look_at([40,80,1.5])
 
             # Compute coverage map
-            cm = scene.coverage_map(max_depth=8)
+            cm = scene.coverage_map(cm_cell_size=[1.,1.],
+                                num_samples=int(10e6))
 
             # Visualize coverage in preview
-            scene.preview(coverage_map=cm, resolution=[1000, 600])
+            scene.preview(coverage_map=cm,
+                        resolution=[1000, 600])
 
         .. figure:: ../figures/coverage_map_preview.png
             :align: center
-
-        
 
         Input
         ------
@@ -820,14 +825,37 @@ class Scene:
 
         num_samples : int
             Number of random rays to trace.
-            This number is split equally over the different transmitters.
+            For the reflected paths, this number is split equally over the different transmitters.
+            For the diffracted paths, it is split over the wedges in line-of-sight with the
+            transmitters such that the number of rays allocated
+            to a wedge is proportional to its length.
             Defaults to 2e6.
 
-        seed: int | `None`
-            Seed for the random number generator used for sampling rays with the
-            stochastic method. Using the same seed will always result in the
-            same paths. If set to `None`, then a random seed is used.
-            Defaults to `None`.
+        los : bool
+            If set to `True`, then the LoS paths are computed.
+            Defaults to `True`.
+
+        reflection : bool
+            If set to `True`, then the reflected paths are computed.
+            Defaults to `True`.
+
+        diffraction : bool
+            If set to `True`, then the diffracted paths are computed.
+            Defaults to `False`.
+
+        scattering : bool
+            If set to `True`, then the scattered paths are computed.
+            Defaults to `False`.
+
+        edge_diffraction : bool
+            If set to `False`, only diffraction on wedges, i.e., edges that
+            connect two primitives, is considered.
+            Defaults to `False`.
+
+        check_scene : bool
+            If set to `True`, checks that the scene is well configured before
+            computing the coverage map. This can add a significant overhead.
+            Defaults to `True`.
 
         Output
         ------
@@ -836,7 +864,8 @@ class Scene:
         """
 
         # Check that all is set to compute the coverage map
-        self._ready_for_coverage_map()
+        if check_scene:
+            self._ready_for_coverage_map()
 
         # Check the properties of the rectangle defining the coverage map
         if ((cm_center is None)
@@ -898,11 +927,6 @@ class Scene:
         # [3]
         rx_orientation = tf.cast(rx_orientation, self._rdtype)
 
-        # Draw a random seed if required
-        if seed is None:
-            seed = tf.random.uniform(shape=(), maxval=0x7FFFFFFF,
-                                     dtype=tf.int32)
-
         # Compute the coverage map using the solver
         # [num_sources, num_cells_x, num_cells_y]
         output = self._solver_cm(max_depth=max_depth,
@@ -914,12 +938,17 @@ class Scene:
                                  combining_vec=combining_vec,
                                  precoding_vec=precoding_vec,
                                  num_samples=num_samples,
-                                 seed=seed)
+                                 los=los,
+                                 reflection=reflection,
+                                 diffraction=diffraction,
+                                 scattering=scattering,
+                                 edge_diffraction=edge_diffraction)
 
         return output
 
-    def preview(self, paths=None, show_paths=True, show_devices=True, show_orientations=False,
-                coverage_map=None, cm_tx=0,
+    def preview(self, paths=None, show_paths=True, show_devices=True,
+                show_orientations=False,
+                coverage_map=None, cm_tx=0, cm_db_scale=True,
                 cm_vmin=None, cm_vmax=None,
                 resolution=(655, 500), fov=45, background='#ffffff'):
         # pylint: disable=line-too-long
@@ -967,11 +996,11 @@ class Scene:
             Defaults to `True`.
 
         show_devices : bool
-            If `paths` is not `None`, shows the radio devices.
+            If set to `True`, shows the radio devices.
             Defaults to `True`.
 
         show_orientations : bool
-            If `show_devices` is `True`, shows the transmitters' orientations.
+            If `show_devices` is `True`, shows the radio devices orientations.
             Defaults to `False`.
 
         coverage_map : :class:`~sionna.rt.CoverageMap` | `None`
@@ -984,9 +1013,17 @@ class Scene:
             or index can be given.
             Defaults to `0`.
 
+        cm_db_scale: bool
+            Use logarithmic scale for coverage map visualization, i.e. the
+            coverage values are mapped with:
+            :math:`y = 10 \cdot \log_{10}(x)`.
+            Defaults to `True`.
+
         cm_vmin, cm_vmax: floot | None
             For coverage map visualization, defines the range of path gains that
             the colormap covers.
+            These parameters should be provided in dB if ``cm_db_scale`` is
+            set to `True`, or in linear scale otherwise.
             If set to None, then covers the complete range.
             Defaults to `None`.
 
@@ -1030,7 +1067,7 @@ class Scene:
             fig.plot_radio_devices(show_orientations=show_orientations)
         if coverage_map is not None:
             fig.plot_coverage_map(
-                coverage_map, tx=cm_tx, db_scale=True,
+                coverage_map, tx=cm_tx, db_scale=cm_db_scale,
                 vmin=cm_vmin, vmax=cm_vmax)
 
         # Update the camera state
@@ -1040,7 +1077,7 @@ class Scene:
         return fig
 
     def render(self, camera, paths=None, show_paths=True, show_devices=True,
-               coverage_map=None, cm_tx=0,
+               coverage_map=None, cm_tx=0, cm_db_scale=True,
                cm_vmin=None, cm_vmax=None, cm_show_color_bar=True,
                num_samples=512, resolution=(655, 500), fov=45):
         # pylint: disable=line-too-long
@@ -1081,9 +1118,17 @@ class Scene:
             or index can be given.
             Defaults to `0`.
 
+        cm_db_scale: bool
+            Use logarithmic scale for coverage map visualization, i.e. the
+            coverage values are mapped with:
+            :math:`y = 10 \cdot \log_{10}(x)`.
+            Defaults to `True`.
+
         cm_vmin, cm_vmax: floot | None
             For coverage map visualization, defines the range of path gains that
             the colormap covers.
+            These parameters should be provided in dB if ``cm_db_scale`` is
+            set to `True`, or in linear scale otherwise.
             If set to None, then covers the complete range.
             Defaults to `None`.
 
@@ -1117,7 +1162,7 @@ class Scene:
                        show_devices=show_devices,
                        coverage_map=coverage_map,
                        cm_tx=cm_tx,
-                       cm_db_scale=True,
+                       cm_db_scale=cm_db_scale,
                        cm_vmin=cm_vmin,
                        cm_vmax=cm_vmax,
                        num_samples=num_samples,
@@ -1144,7 +1189,7 @@ class Scene:
 
         if show_color_bar:
             _, normalizer, color_map = coverage_map_color_mapping(
-                coverage_map[cm_tx, :, :].numpy(), db_scale=True,
+                coverage_map[cm_tx, :, :].numpy(), db_scale=cm_db_scale,
                 vmin=cm_vmin, vmax=cm_vmax)
             mappable = matplotlib.cm.ScalarMappable(
                 norm=normalizer, cmap=color_map)
@@ -1212,6 +1257,8 @@ class Scene:
         cm_vmin, cm_vmax: floot | None
             For coverage map visualization, defines the range of path gains that
             the colormap covers.
+            These parameters should be provided in dB if ``cm_db_scale`` is
+            set to `True`, or in linear scale otherwise.
             If set to None, then covers the complete range.
             Defaults to `None`.
 
@@ -1379,7 +1426,7 @@ class Scene:
         """
         # Parse all shapes in the scene
         scene = self._scene
-        for s in scene.shapes():
+        for obj_id,s in enumerate(scene.shapes()):
             # Only meshes are handled
             if not isinstance(s, mi.Mesh):
                 raise TypeError('Only triangle meshes are supported')
@@ -1404,7 +1451,7 @@ class Scene:
                 name = name[5:]
             if self._is_name_used(name):
                 raise ValueError(f"Name'{name}' already used by another item")
-            obj = SceneObject(name)
+            obj = SceneObject(name, object_id=obj_id)
             obj.scene = self
             obj.radio_material = mat_name
 
@@ -1457,7 +1504,6 @@ floor_wall = str(files(scenes).joinpath("floor_wall/floor_wall.xml"))
 # pylint: disable=C0301
 """
 Example scene containing a ground plane and a vertical wall
-(`Blender file <https://drive.google.com/file/d/1djXBj3VYLT4_bQpmp4vR6o6agGmv_p1F/view?usp=share_link>`__).
 
 .. figure:: ../figures/floor_wall.png
    :align: center
@@ -1467,7 +1513,6 @@ Example scene containing a ground plane and a vertical wall
 simple_street_canyon = str(files(scenes).joinpath("simple_street_canyon/simple_street_canyon.xml"))
 """
 Example scene containing a few rectangular building blocks and a ground plane
-(`Blender file <https://drive.google.com/file/d/1_1nsLtSC8cy1QfRHAN_JetT3rPP21tNb/view?usp=share_link>`__).
 
 .. figure:: ../figures/street_canyon.png
    :align: center
@@ -1477,7 +1522,6 @@ etoile = str(files(scenes).joinpath("etoile/etoile.xml"))
 # pylint: disable=C0301
 """
 Example scene containing the area around the Arc de Triomphe in Paris
-(`Blender file <https://drive.google.com/file/d/1bamQ67lLGZHTfNmcVajQDmq2oiSY8FEn/view?usp=share_link>`__).
 The scene was created with data downloaded from `OpenStreetMap <https://www.openstreetmap.org>`_ and
 the help of `Blender <https://www.blender.org>`_ and the `Blender-OSM <https://github.com/vvoovv/blender-osm>`_
 and `Mitsuba Blender <https://github.com/mitsuba-renderer/mitsuba-blender>`_ add-ons.
@@ -1491,12 +1535,56 @@ munich = str(files(scenes).joinpath("munich/munich.xml"))
 # pylint: disable=C0301
 """
 Example scene containing the area around the Frauenkirche in Munich
-(`Blender file <https://drive.google.com/file/d/15WrvMGrPWsoVKYvDG6Ab7btq-ktTCGR1/view?usp=share_link>`__).
 The scene was created with data downloaded from `OpenStreetMap <https://www.openstreetmap.org>`_ and
 the help of `Blender <https://www.blender.org>`_ and the `Blender-OSM <https://github.com/vvoovv/blender-osm>`_
 and `Mitsuba Blender <https://github.com/mitsuba-renderer/mitsuba-blender>`_ add-ons.
 The data is licensed under the `Open Data Commons Open Database License (ODbL) <https://openstreetmap.org/copyright>`_.
 
 .. figure:: ../figures/munich.png
+   :align: center
+"""
+
+simple_wedge = str(files(scenes).joinpath("simple_wedge/simple_wedge.xml"))
+# pylint: disable=C0301
+r"""
+Example scene containing a wedge with a :math:`90^{\circ}` opening angle
+
+.. figure:: ../figures/simple_wedge.png
+   :align: center
+"""
+
+simple_reflector = str(files(scenes).joinpath("simple_reflector/simple_reflector.xml"))
+# pylint: disable=C0301
+r"""
+Example scene containing a metallic square
+
+.. figure:: ../figures/simple_reflector.png
+   :align: center
+"""
+
+double_reflector = str(files(scenes).joinpath("double_reflector/double_reflector.xml"))
+# pylint: disable=C0301
+r"""
+Example scene containing two metallic squares
+
+.. figure:: ../figures/double_reflector.png
+   :align: center
+"""
+
+triple_reflector = str(files(scenes).joinpath("triple_reflector/triple_reflector.xml"))
+# pylint: disable=C0301
+r"""
+Example scene containing three metallic rectangles
+
+.. figure:: ../figures/triple_reflector.png
+   :align: center
+"""
+
+box = str(files(scenes).joinpath("box/box.xml"))
+# pylint: disable=C0301
+r"""
+Example scene containing a metallic box
+
+.. figure:: ../figures/box.png
    :align: center
 """

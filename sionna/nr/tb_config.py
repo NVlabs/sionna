@@ -322,8 +322,8 @@ class TBConfig(Config):
 
     @mcs_table.setter
     def mcs_table(self, value):
-        assert value in range(1,4), \
-            "mcs_table must be in range from 1 to 3"
+        assert value in range(1,5), \
+            "mcs_table must be in range from 1 to 4"
         self._mcs_table = value
 
     @property

@@ -10,8 +10,8 @@ The scene also includes transmitters (:class:`~sionna.rt.Transmitter`) and recei
 for which propagation :class:`~sionna.rt.Paths` or  channel impulse responses (CIRs) can be computed,
 as well as cameras (:class:`~sionna.rt.Camera`) for rendering.
 
-A scene is loaded from a file using the :func:`~sionna.rt.load_scene`
-function. Sionna contains a few `Example Scenes`_.
+A scene is loaded from a file using the :func:`~sionna.rt.load_scene` function.
+Sionna contains a few `Example Scenes`_.
 The following code snippet shows how to load one of them and
 render it through the lens of the preconfigured scene :class:`~sionna.rt.Camera` "scene-cam-0":
 
@@ -89,7 +89,7 @@ Once you have loaded a scene and configured transmitters and receivers, you can 
    paths = scene.compute_paths()
 
 The output of this function is an instance of :class:`~sionna.rt.Paths` and can be used to compute channel
-impulse responses (CIRs) using the layer :class:`~sionna.rt.Paths2CIR`.
+impulse responses (CIRs) using the method :meth:`~sionna.rt.Paths.cir`.
 You can visualize the paths within a scene by one of the following commands:
 
 .. code-block:: Python
@@ -110,7 +110,7 @@ The function :meth:`~sionna.rt.Scene.coverage_map` computes a :class:`~sionna.rt
 
 .. code-block:: Python
 
-   cm = scene.coverage_map(max_depth=8)
+   cm = scene.coverage_map()
 
 Coverage maps can be visualized in the same way as propagation paths:
 
@@ -169,18 +169,52 @@ floor_wall
 ----------
 .. autodata:: sionna.rt.scene.floor_wall
    :annotation:
+(`Blender file <https://drive.google.com/file/d/1djXBj3VYLT4_bQpmp4vR6o6agGmv_p1F/view?usp=share_link>`__)
 
 simple_street_canyon
 --------------------
 .. autodata:: sionna.rt.scene.simple_street_canyon
    :annotation:
+(`Blender file <https://drive.google.com/file/d/1_1nsLtSC8cy1QfRHAN_JetT3rPP21tNb/view?usp=share_link>`__)
 
 etoile
 ------
 .. autodata:: sionna.rt.scene.etoile
    :annotation:
+(`Blender file <https://drive.google.com/file/d/1bamQ67lLGZHTfNmcVajQDmq2oiSY8FEn/view?usp=share_link>`__)
 
 munich
 ------
 .. autodata:: sionna.rt.scene.munich
    :annotation:
+(`Blender file <https://drive.google.com/file/d/15WrvMGrPWsoVKYvDG6Ab7btq-ktTCGR1/view?usp=share_link>`__)
+
+simple_wedge
+-------------
+.. autodata:: sionna.rt.scene.simple_wedge
+   :annotation:
+(`Blender file <https://drive.google.com/file/d/1RnJoYzXKkILMEmf-UVSsyjq-EowU6JRA/view?usp=share_link>`__)
+
+simple_reflector
+-----------------
+.. autodata:: sionna.rt.scene.simple_reflector
+   :annotation:
+(`Blender file <https://drive.google.com/file/d/1YBxKeDGan7zxM2eTa659tUYmHq_Rc1HA/view?usp=share_link>`__)
+
+double_reflector
+-----------------
+.. autodata:: sionna.rt.scene.double_reflector
+   :annotation:
+(`Blender file <https://drive.google.com/file/d/1K2ZUYHPPkrq9iUauJtInRu7x2r16D1zN/view?usp=share_link>`__)
+
+triple_reflector
+-----------------
+.. autodata:: sionna.rt.scene.triple_reflector
+   :annotation:
+(`Blender file <https://drive.google.com/file/d/1l95_0U2b3cEVtz3G8mQxuLxy8xiPsVID/view?usp=share_link>`__)
+
+Box
+----
+.. autodata:: sionna.rt.scene.box
+   :annotation:
+(`Blender file <https://drive.google.com/file/d/1pywetyKr0HBz3aSYpkmykGnjs_1JMsHY/view?usp=share_link>`__)

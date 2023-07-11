@@ -38,8 +38,8 @@ class TestLDPC5GEncoder(unittest.TestCase):
             with self.assertRaises(BaseException):
                 LDPC5GEncoder(p[0],p[1])
 
-        param_valid = [[12, 20],[12,30],[1000, 1566],[364, 1013], [36,100],
-                       [12,18],[8448,10000]] # (k,n)
+        param_valid = [[12, 20],[12,30],[1000, 1566],[364, 1013], [948, 1024],
+                       [36,100], [12,18],[8448,10000]] # (k,n)
         for p in param_valid:
             LDPC5GEncoder(p[0],p[1])
 
@@ -57,7 +57,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
         bs = 10
         # (k,n)
         ks = [12, 20, 100, 1234, 2000, 6244, 8448]
-        rs = [0.2, 0.34, 0.4, 0.47, 0.7, 0.85]
+        rs = [0.2, 0.34, 0.4, 0.47, 0.7, 0.85, 0.9]
         for k in ks:
             for r in rs:
                 n = int(k/r)
@@ -117,7 +117,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
     def test_example_matrices(self):
         """test against reference matrices.
         """
-        bs = 10 # batch_size (random samples PER generatormatrix)
+        bs = 10 # batch_size (random samples PER generator matrix)
 
         # (k,n)
         ref_path = '../test/codes/ldpc/'

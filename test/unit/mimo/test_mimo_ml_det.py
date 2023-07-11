@@ -314,30 +314,29 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
 
                     ## Test for "app"
 
-                    ml = MaximumLikelihoodDetector("symbol", "app", num_streams, "qam", num_bits_per_symbol)
+                    ml = MaximumLikelihoodDetector("symbol", "app", num_streams, "qam", num_bits_per_symbol, dtype=tf.complex128)
 
                     @tf.function(jit_compile=True)
                     def call_sys_app(y, h, s):
                         test_logits = ml([y, h, s])
                         return test_logits
-                    test_logits = call_sys_app( tf.cast(y, tf.complex64),
-                                                tf.cast(h, tf.complex64),
-                                                tf.cast(s, tf.complex64)).numpy()
-                    print(np.max(np.abs(ref_app-test_logits)))
-                    self.assertTrue(np.allclose(ref_app, test_logits, atol=1e-2))
+                    test_logits = call_sys_app( tf.cast(y, tf.complex128),
+                                                tf.cast(h, tf.complex128),
+                                                tf.cast(s, tf.complex128)).numpy()
+                    self.assertTrue(np.allclose(test_logits, ref_app, atol=1e-5))
 
                     ## Test for "maxlog"
 
-                    ml = MaximumLikelihoodDetector("symbol", "maxlog", num_streams, "qam", num_bits_per_symbol)
+                    ml = MaximumLikelihoodDetector("symbol", "maxlog", num_streams, "qam", num_bits_per_symbol, dtype=tf.complex128)
 
                     @tf.function(jit_compile=True)
                     def call_sys_maxlog(y, h, s):
                         test_logits = ml([y, h, s])
                         return test_logits
-                    test_logits = call_sys_maxlog(  tf.cast(y, tf.complex64),
-                                                    tf.cast(h, tf.complex64),
-                                                    tf.cast(s, tf.complex64)).numpy()
-                    self.assertTrue(np.allclose(test_logits, ref_maxlog, atol=1e-2))
+                    test_logits = call_sys_maxlog(  tf.cast(y, tf.complex128),
+                                                    tf.cast(h, tf.complex128),
+                                                    tf.cast(s, tf.complex128)).numpy()
+                    self.assertTrue(np.allclose(test_logits, ref_maxlog, atol=1e-5))
 
 class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
 
@@ -680,28 +679,28 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
 
                     ## Test for "app"
 
-                    ml = MaximumLikelihoodDetectorWithPrior("symbol", "app", num_streams, "qam", num_bits_per_symbol)
+                    ml = MaximumLikelihoodDetectorWithPrior("symbol", "app", num_streams, "qam", num_bits_per_symbol, dtype=tf.complex128)
 
                     @tf.function(jit_compile=True)
                     def call_sys_app(y, h, prior, s):
                         test_logits = ml([y, h, prior, s])
                         return test_logits
-                    test_logits = call_sys_app( tf.cast(y, tf.complex64),
-                                                tf.cast(h, tf.complex64),
-                                                tf.cast(prior, tf.float32),
-                                                tf.cast(s, tf.complex64)).numpy()
-                    self.assertTrue(np.allclose(ref_app, test_logits, atol=1e-2))
+                    test_logits = call_sys_app( tf.cast(y, tf.complex128),
+                                                tf.cast(h, tf.complex128),
+                                                tf.cast(prior, tf.float64),
+                                                tf.cast(s, tf.complex128)).numpy()
+                    self.assertTrue(np.allclose(test_logits, ref_app, atol=1e-5))
 
                     ## Test for "maxlog"
 
-                    ml = MaximumLikelihoodDetectorWithPrior("symbol", "maxlog", num_streams, "qam", num_bits_per_symbol)
+                    ml = MaximumLikelihoodDetectorWithPrior("symbol", "maxlog", num_streams, "qam", num_bits_per_symbol, dtype=tf.complex128)
 
                     @tf.function(jit_compile=True)
                     def call_sys_maxlog(y, h, prior, s):
                         test_logits = ml([y, h, prior, s])
                         return test_logits
-                    test_logits = call_sys_maxlog(  tf.cast(y, tf.complex64),
-                                                    tf.cast(h, tf.complex64),
-                                                    tf.cast(prior, tf.float32),
-                                                    tf.cast(s, tf.complex64)).numpy()
-                    self.assertTrue(np.allclose(test_logits, ref_maxlog, atol=1e-2))
+                    test_logits = call_sys_maxlog(  tf.cast(y, tf.complex128),
+                                                    tf.cast(h, tf.complex128),
+                                                    tf.cast(prior, tf.float64),
+                                                    tf.cast(s, tf.complex128)).numpy()
+                    self.assertTrue(np.allclose(test_logits, ref_maxlog, atol=1e-5))

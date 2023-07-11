@@ -33,8 +33,8 @@ class CoverageMap:
     .. code-block:: Python
 
         cm = scene.coverage_map()
-        print(cm[0])      # prints the coverage map for user 0
-        print(cm[0,1,2])  # prints the value of the cell (1,2) for user 0
+        print(cm[0])      # prints the coverage map for transmitter 0
+        print(cm[0,1,2])  # prints the value of the cell (1,2) for transmitter 0
 
     where ``scene`` is the :class:`~sionna.rt.Scene` loaded using
     :func:`~sionna.rt.load_scene`.
@@ -46,7 +46,7 @@ class CoverageMap:
         import sionna
         from sionna.rt import load_scene, PlanarArray, Transmitter, Receiver
         scene = load_scene(sionna.rt.scene.munich)
-        
+
         # Configure antenna array for all transmitters
         scene.tx_array = PlanarArray(num_rows=8,
                                   num_cols=2,
@@ -54,7 +54,7 @@ class CoverageMap:
                                   horizontal_spacing=0.5,
                                   pattern="tr38901",
                                   polarization="VH")
-        
+
         # Configure antenna array for all receivers
         scene.rx_array = PlanarArray(num_rows=1,
                                   num_cols=1,
@@ -64,13 +64,14 @@ class CoverageMap:
                                   polarization="cross")
         # Add a transmitters
         tx = Transmitter(name="tx",
-                      position=[8.5,21,27],
+                      position=[8.5,21,30],
                       orientation=[0,0,0])
         scene.add(tx)
-        
+        tx.look_at([40,80,1.5])
+
         # Compute coverage map
         cm = scene.coverage_map(max_depth=8)
-        
+
         # Show coverage map
         cm.show()
 
@@ -267,8 +268,8 @@ class CoverageMap:
         """
         return self._value
 
-    def show(self, tx=0, vmin=None, vmax=None):
-        r"""show(tx=0, db_scale=True, vmin=None, vmax=None)
+    def show(self, tx=0, vmin=None, vmax=None, show_tx=True):
+        r"""show(tx=0, vmin=None, vmax=None, show_tx=True)
 
         Visualizes a coverage map
 
@@ -284,6 +285,10 @@ class CoverageMap:
             Define the range of path gains that the colormap covers.
             If set to `None`, then covers the complete range.
             Defaults to `None`.
+
+        show_tx : bool
+            If set to `True`, then the position of the transmitter is shown.
+            Defaults to `True`.
 
         Output
         ------
@@ -315,17 +320,16 @@ class CoverageMap:
         plt.xlabel('Cell index (X-axis)')
         plt.ylabel('Cell index (Y-axis)')
         # Visualizing the BS position
-        tx_pos = self._tx_pos[tx]
-        fig.axes[0].scatter(*tx_pos, marker='P', c='r')
+        if show_tx:
+            tx_pos = self._tx_pos[tx]
+            fig.axes[0].scatter(*tx_pos, marker='P', c='r')
         return fig
 
     def sample_positions(self, batch_size, tx=0, min_gain_db=None,
                          max_gain_db=None, min_dist=None, max_dist=None,
                          center_pos=False):
         # pylint: disable=line-too-long
-        r"""sample_positions(batch_size, tx=0, min_gain_db=None, max_gain_db=None, min_dist=None, max_dist=None, center_pos=False)
-
-        Sample random user positions from a coverage map
+        r"""Sample random user positions from a coverage map
 
         For a given coverage map, ``batch_size`` random positions are sampled
         such that the *expected*  path gain of this position is larger
@@ -354,7 +358,7 @@ class CoverageMap:
         For example if the transmitter is located 20m above the surface of the
         coverage map and a ``min_dist`` of 20m is selected, also positions
         directly below the transmitter are sampled.
-        
+
         Input
         -----
         batch_size: int

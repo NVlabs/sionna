@@ -14,8 +14,7 @@ import tensorflow as tf
 from collections.abc import Sequence
 
 class Antenna:
-    r"""Antenna(pattern, polarization=None)
-
+    r"""
     Class implementing an antenna
 
     Creates an antenna object with an either predefined or custom antenna
@@ -39,6 +38,13 @@ class Antenna:
         or "H" (horizontal). For dual polarization, must be "VH" or "cross".
         Only needed if ``pattern`` is a string.
 
+    polarization_model: int, one of [1,2]
+        Polarization model to be used. Options `1` and `2`
+        refer to :func:`~sionna.rt.antenna.polarization_model_1`
+        and :func:`~sionna.rt.antenna.polarization_model_2`,
+        respectively.
+        Defaults to `2`.
+
     dtype : tf.complex64 or tf.complex128
         Datatype used for all computations.
         Defaults to `tf.complex64`.
@@ -50,12 +56,17 @@ class Antenna:
     def __init__(self,
                  pattern,
                  polarization=None,
+                 polarization_model=2,
                  dtype=tf.complex64
                 ):
 
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._dtype = dtype = dtype
+
+        if polarization_model not in [1,2]:
+            raise ValueError("`polarization_model` must be 1 or 2")
+        self._polarization_model = polarization_model
 
         # Pattern is provided as string
         if isinstance(pattern, str):
@@ -119,7 +130,8 @@ class Antenna:
 
     def pattern_with_slant_angle(self, pattern, slant_angle):
         """Applies slant angle to antenna pattern"""
-        return lambda theta, phi: pattern(theta, phi, slant_angle, self._dtype)
+        return lambda theta, phi: pattern(theta, phi, slant_angle,
+                                          self._polarization_model, self._dtype)
 
 def compute_gain(pattern, dtype=tf.complex64):
     # pylint: disable=line-too-long
@@ -164,6 +176,7 @@ def compute_gain(pattern, dtype=tf.complex64):
     theta = tf.cast(theta, dtype.real_dtype)
     phi = tf.linspace(-PI, PI, 3610)
     phi = tf.cast(phi, dtype.real_dtype)
+
     theta_grid, phi_grid = tf.meshgrid(theta, phi, indexing="ij")
 
     # Compute the gain
@@ -319,8 +332,62 @@ def visualize(pattern):
 
     return fig_v, fig_h, fig_3d
 
-def polarization_model_1(c, theta, phi, slant_angle):
-    """Model-1 for polarized antennas 3GPP 38.901 Eq.(7.3-3)"""
+def polarization_model_1(c_theta, theta, phi, slant_angle):
+    # pylint: disable=line-too-long
+    r"""Model-1 for polarized antennas from 3GPP TR 38.901
+
+    Transforms a vertically polarized antenna pattern :math:`\tilde{C}_\theta(\theta, \varphi)`
+    into a linearly polarized pattern whose direction
+    is specified by a slant angle :math:`\zeta`. For example,
+    :math:`\zeta=0` and :math:`\zeta=\pi/2` correspond
+    to vertical and horizontal polarization, respectively,
+    and :math:`\zeta=\pm \pi/4` to a pair of cross polarized
+    antenna elements.
+
+    The transformed antenna pattern is given by (7.3-3) [TR38901]_: 
+    
+
+    .. math::
+        \begin{align}
+            \begin{bmatrix}
+                C_\theta(\theta, \varphi) \\
+                C_\varphi(\theta, \varphi)
+            \end{bmatrix} &= \begin{bmatrix}
+             \cos(\psi) \\
+             \sin(\psi)
+            \end{bmatrix} \tilde{C}_\theta(\theta, \varphi)\\
+            \cos(\psi) &= \frac{\cos(\zeta)\sin(\theta)+\sin(\zeta)\sin(\varphi)\cos(\theta)}{\sqrt{1-\left(\cos(\zeta)\cos(\theta)-\sin(\zeta)\sin(\varphi)\sin(\theta)\right)^2}} \\
+            \sin(\psi) &= \frac{\sin(\zeta)\cos(\varphi)}{\sqrt{1-\left(\cos(\zeta)\cos(\theta)-\sin(\zeta)\sin(\varphi)\sin(\theta)\right)^2}} 
+        \end{align}
+
+
+    Input
+    -----
+    c_tilde_theta: array_like, complex
+        Zenith pattern
+
+    theta: array_like, float
+        Zenith angles wrapped within [0,pi] [rad]
+
+    phi: array_like, float
+        Azimuth angles wrapped within [-pi, pi) [rad]
+
+    slant_angle: float
+        Slant angle of the linear polarization [rad].
+        A slant angle of zero means vertical polarization.
+
+    Output
+    ------
+    c_theta: array_like, complex
+        Zenith pattern
+
+    c_phi: array_like, complex
+        Azimuth pattern
+    """
+    if slant_angle==0:
+        return c_theta, tf.zeros_like(c_theta)
+    if slant_angle==PI/2:
+        return tf.zeros_like(c_theta), c_theta
     sin_slant = tf.cast(tf.sin(slant_angle), theta.dtype)
     cos_slant = tf.cast(tf.cos(slant_angle), theta.dtype)
     sin_theta = tf.sin(theta)
@@ -329,15 +396,64 @@ def polarization_model_1(c, theta, phi, slant_angle):
     cos_phi = tf.cos(phi)
     sin_psi = sin_slant*cos_phi
     cos_psi = cos_slant*sin_theta + sin_slant*sin_phi*cos_theta
-    norm = tf.sqrt(sin_psi**2 + cos_psi**2)
+    norm = tf.sqrt(1-(cos_slant*cos_theta - sin_slant*sin_phi*sin_theta)**2)
     sin_psi = tf.math.divide_no_nan(sin_psi, norm)
     cos_psi = tf.math.divide_no_nan(cos_psi, norm)
-    c_theta = c*tf.cast(cos_psi, c.dtype)
-    c_phi = c*tf.cast(sin_psi, c.dtype)
+    c_theta = c_theta*tf.complex(cos_psi, tf.zeros_like(cos_psi))
+    c_phi = c_theta*tf.complex(sin_psi, tf.zeros_like(sin_psi))
     return c_theta, c_phi
 
-def iso_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
-    r"""iso_pattern(theta, phi, slant_angle=0.0)
+def polarization_model_2(c, slant_angle):
+    # pylint: disable=line-too-long
+    r"""Model-2 for polarized antennas from 3GPP TR 38.901
+
+    Transforms a vertically polarized antenna pattern :math:`\tilde{C}_\theta(\theta, \varphi)`
+    into a linearly polarized pattern whose direction
+    is specified by a slant angle :math:`\zeta`. For example,
+    :math:`\zeta=0` and :math:`\zeta=\pi/2` correspond
+    to vertical and horizontal polarization, respectively,
+    and :math:`\zeta=\pm \pi/4` to a pair of cross polarized
+    antenna elements.
+
+    The transformed antenna pattern is given by (7.3-4/5) [TR38901]_: 
+
+    .. math::
+        \begin{align}
+            \begin{bmatrix}
+                C_\theta(\theta, \varphi) \\
+                C_\varphi(\theta, \varphi)
+            \end{bmatrix} &= \begin{bmatrix}
+             \cos(\zeta) \\
+             \sin(\zeta)
+            \end{bmatrix} \tilde{C}_\theta(\theta, \varphi)
+        \end{align}
+
+    Input
+    -----
+    c_tilde_theta: array_like, complex
+        Zenith pattern
+
+    slant_angle: float
+        Slant angle of the linear polarization [rad].
+        A slant angle of zero means vertical polarization.
+
+    Output
+    ------
+    c_theta: array_like, complex
+        Zenith pattern
+
+    c_phi: array_like, complex
+        Azimuth pattern
+    """
+    cos_slant_angle = tf.cos(slant_angle)
+    c_theta = c*tf.complex(cos_slant_angle, tf.zeros_like(cos_slant_angle))
+    sin_slant_angle = tf.sin(slant_angle)
+    c_phi = c*tf.complex(sin_slant_angle, tf.zeros_like(sin_slant_angle))
+    return c_theta, c_phi
+
+def iso_pattern(theta, phi, slant_angle=0.0,
+                polarization_model=2, dtype=tf.complex64):
+    r"""
     Isotropic antenna pattern with linear polarizarion
 
     Input
@@ -351,6 +467,13 @@ def iso_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     slant_angle: float
         Slant angle of the linear polarization [rad].
         A slant angle of zero means vertical polarization.
+
+    polarization_model: int, one of [1,2]
+        Polarization model to be used. Options `1` and `2`
+        refer to :func:`~sionna.rt.antenna.polarization_model_1`
+        and :func:`~sionna.rt.antenna.polarization_model_2`,
+        respectively.
+        Defaults to `2`.
 
     dtype : tf.complex64 or tf.complex128
         Datatype.
@@ -371,13 +494,20 @@ def iso_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     rdtype = dtype.real_dtype
     theta = tf.cast(theta, rdtype)
     phi = tf.cast(phi, rdtype)
+    slant_angle = tf.cast(slant_angle, rdtype)
     if not theta.shape==phi.shape:
         raise ValueError("theta and phi must have the same shape.")
+    if polarization_model not in [1,2]:
+        raise ValueError("polarization_model must be 1 or 2")
     c = tf.ones_like(theta, dtype=dtype)
-    return polarization_model_1(c, theta, phi, slant_angle)
+    if polarization_model==1:
+        return polarization_model_1(c, theta, phi, slant_angle)
+    else:
+        return polarization_model_2(c, slant_angle)
 
-def dipole_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
-    r"""dipole_pattern(theta, phi, slant_angle=0.0)
+def dipole_pattern(theta, phi, slant_angle=0.0,
+                   polarization_model=2, dtype=tf.complex64):
+    r"""
     Short dipole pattern with linear polarizarion (Eq. 4-26a) [Balanis97]_
 
     Input
@@ -391,6 +521,13 @@ def dipole_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     slant_angle: float
         Slant angle of the linear polarization [rad].
         A slant angle of zero means vertical polarization.
+
+    polarization_model: int, one of [1,2]
+        Polarization model to be used. Options `1` and `2`
+        refer to :func:`~sionna.rt.antenna.polarization_model_1`
+        and :func:`~sionna.rt.antenna.polarization_model_2`,
+        respectively.
+        Defaults to `2`.
 
     dtype : tf.complex64 or tf.complex128
         Datatype.
@@ -412,14 +549,21 @@ def dipole_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     k = tf.cast(tf.sqrt(1.5), dtype)
     theta = tf.cast(theta, rdtype)
     phi = tf.cast(phi, rdtype)
+    slant_angle = tf.cast(slant_angle, rdtype)
     if not theta.shape==phi.shape:
         raise ValueError("theta and phi must have the same shape.")
-    c = k*tf.cast(tf.sin(theta), dtype)
-    return polarization_model_1(c, theta, phi, slant_angle)
+    if polarization_model not in [1,2]:
+        raise ValueError("polarization_model must be 1 or 2")
+    c = k*tf.complex(tf.sin(theta), tf.zeros_like(theta))
+    if polarization_model==1:
+        return polarization_model_1(c, theta, phi, slant_angle)
+    else:
+        return polarization_model_2(c, slant_angle)
 
-def hw_dipole_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
+def hw_dipole_pattern(theta, phi, slant_angle=0.0,
+                      polarization_model=2, dtype=tf.complex64):
     # pylint: disable=line-too-long
-    r"""hw_dipole_pattern(theta, phi, slant_angle=0.0)
+    r"""
     Half-wavelength dipole pattern with linear polarizarion (Eq. 4-84) [Balanis97]_
 
     Input
@@ -433,6 +577,13 @@ def hw_dipole_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     slant_angle: float
         Slant angle of the linear polarization [rad].
         A slant angle of zero means vertical polarization.
+
+    polarization_model: int, one of [1,2]
+        Polarization model to be used. Options `1` and `2`
+        refer to :func:`~sionna.rt.antenna.polarization_model_1`
+        and :func:`~sionna.rt.antenna.polarization_model_2`,
+        respectively.
+        Defaults to `2`.
 
     dtype : tf.complex64 or tf.complex128
         Datatype.
@@ -454,14 +605,21 @@ def hw_dipole_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     k = tf.cast(np.sqrt(1.643), rdtype)
     theta = tf.cast(theta, rdtype)
     phi = tf.cast(phi, rdtype)
+    slant_angle = tf.cast(slant_angle, rdtype)
     if not theta.shape== phi.shape:
         raise ValueError("theta and phi must have the same shape.")
+    if polarization_model not in [1,2]:
+        raise ValueError("polarization_model must be 1 or 2")
     c = k*tf.math.divide_no_nan(tf.cos(PI/2*tf.cos(theta)), tf.sin(theta))
-    c = tf.cast(c, dtype)
-    return polarization_model_1(c, theta, phi, slant_angle)
+    c = tf.complex(c, tf.zeros_like(c))
+    if polarization_model==1:
+        return polarization_model_1(c, theta, phi, slant_angle)
+    else:
+        return polarization_model_2(c, slant_angle)
 
-def tr38901_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
-    r"""tr38901_pattern(theta, phi, slant_angle=0.0)
+def tr38901_pattern(theta, phi, slant_angle=0.0,
+                    polarization_model=2, dtype=tf.complex64):
+    r"""
     Antenna pattern from 3GPP TR 38.901 (Table 7.3-1) [TR38901]_
 
     Input
@@ -475,6 +633,13 @@ def tr38901_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     slant_angle: float
         Slant angle of the linear polarization [rad].
         A slant angle of zero means vertical polarization.
+
+    polarization_model: int, one of [1,2]
+        Polarization model to be used. Options `1` and `2`
+        refer to :func:`~sionna.rt.antenna.polarization_model_1`
+        and :func:`~sionna.rt.antenna.polarization_model_2`,
+        respectively.
+        Defaults to `2`.
 
     dtype : tf.complex64 or tf.complex128
         Datatype.
@@ -495,12 +660,15 @@ def tr38901_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     rdtype = dtype.real_dtype
     theta = tf.cast(theta, rdtype)
     phi = tf.cast(phi, rdtype)
+    slant_angle = tf.cast(slant_angle, rdtype)
 
     # Wrap phi to [-PI,PI]
     phi = tf.math.floormod(phi+PI, 2*PI)-PI
 
     if not theta.shape==phi.shape:
         raise ValueError("theta and phi must have the same shape.")
+    if polarization_model not in [1,2]:
+        raise ValueError("polarization_model must be 1 or 2")
     theta_3db = phi_3db = tf.cast(65/180*PI, rdtype)
     a_max = sla_v = 30
     g_e_max = 8
@@ -508,5 +676,8 @@ def tr38901_pattern(theta, phi, slant_angle=0.0, dtype=tf.complex64):
     a_h = -tf.minimum(12*(phi/phi_3db)**2, a_max)
     a_db = -tf.minimum(-(a_v + a_h), a_max) + g_e_max
     a = 10**(a_db/10)
-    c = tf.cast(tf.sqrt(a), dtype)
-    return polarization_model_1(c, theta, phi, slant_angle)
+    c = tf.complex(tf.sqrt(a), tf.zeros_like(a))
+    if polarization_model==1:
+        return polarization_model_1(c, theta, phi, slant_angle)
+    else:
+        return polarization_model_2(c, slant_angle)

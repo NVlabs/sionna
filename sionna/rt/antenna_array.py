@@ -87,7 +87,7 @@ class AntennaArray():
     @property
     def positions(self):
         """
-        [array_size, 3], `tf.float` : Get/set  array of relative positions 
+        [array_size, 3], `tf.float` : Get/set  array of relative positions
         :math:`(x,y,z)` [m] of each antenna (dual-polarized antennas are
         counted as a single antenna and share the same position).
         """
@@ -180,9 +180,20 @@ class PlanarArray(AntennaArray):
         or "H" (horizontal). For dual polarization, must be "VH" or "cross".
         Only needed if ``pattern`` is a string.
 
+    polarization_model: int, one of [1,2]
+        Polarization model to be used. Options `1` and `2`
+        refer to :func:`~sionna.rt.antenna.polarization_model_1`
+        and :func:`~sionna.rt.antenna.polarization_model_2`,
+        respectively.
+        Defaults to `2`.
+
     trainable_positions : bool
         Determines if ``positions`` is a trainable variable or not.
         Defaults to `False`.
+
+    dtype : tf.complex64 or tf.complex128
+        Datatype used for all computations.
+        Defaults to `tf.complex64`.
 
     Example
     -------
@@ -202,6 +213,7 @@ class PlanarArray(AntennaArray):
                  horizontal_spacing,
                  pattern,
                  polarization=None,
+                 polarization_model=2,
                  trainable_positions=False,
                  dtype=tf.complex64):
 
@@ -210,7 +222,7 @@ class PlanarArray(AntennaArray):
 
         # Create list of antennas
         array_size = num_rows*num_cols
-        antenna = Antenna(pattern, polarization, dtype)
+        antenna = Antenna(pattern, polarization, polarization_model, dtype)
 
         # Compute antenna positions
         frequency = scene.Scene().frequency

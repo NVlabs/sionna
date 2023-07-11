@@ -332,7 +332,7 @@ def calculate_tb_size(modulation_order,
     rate-matching.
     """
 
-    # suppports two modi:
+    # supports two modi:
     # a) target_tb_size and num_coded_bits given
     # b) available res in slot given
 

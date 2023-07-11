@@ -14,7 +14,7 @@ import pythreejs as p3s
 import matplotlib
 
 from .utils import paths_to_segments, scene_scale, rotate
-from .renderer import coverage_map_color_mapping, resample_to_corners
+from .renderer import coverage_map_color_mapping
 
 
 class InteractiveDisplay:
@@ -144,6 +144,8 @@ class InteractiveDisplay:
 
             for devices, color in [(scene.transmitters.values(), tr_color),
                                    (scene.receivers.values(), rc_color)]:
+                if len(devices) == 0:
+                    continue
                 color = f'rgb({", ".join([str(int(v * 255)) for v in color])})'
                 starts, ends = [], []
                 for rd in devices:
@@ -228,9 +230,10 @@ class InteractiveDisplay:
         where the coverage map is zero-valued are made transparent.
         """
         to_world = coverage_map.to_world()
-        coverage_map = resample_to_corners(
-            coverage_map[tx, :, :].numpy().squeeze()
-        )
+        # coverage_map = resample_to_corners(
+        #     coverage_map[tx, :, :].numpy()
+        # )
+        coverage_map = coverage_map[tx, :, :].numpy()
 
         # Create a rectangle from two triangles
         p00 = to_world.transform_affine([-1, -1, 0])
@@ -270,8 +273,8 @@ class InteractiveDisplay:
             data=texture,
             format='RGBAFormat',
             type='FloatType',
-            magFilter='LinearFilter',
-            minFilter='LinearFilter',
+            magFilter='NearestFilter',
+            minFilter='NearestFilter',
         )
 
         mat = p3s.MeshLambertMaterial(

@@ -48,9 +48,8 @@ class TestAntennaArray(unittest.TestCase):
                     rx = Receiver("rx", [distance, 0,0], [PI, 0, 0], dtype=dtype)
                     scene.add(tx)
                     scene.add(rx)
-                    p2c = Paths2CIR(1, scene=scene, dtype=dtype)
                     paths = scene.compute_paths()
-                    a, _  = p2c(paths.as_tuple())
+                    a = paths.a
                     a = tf.squeeze(a)
                     a /= tf.cast(scene.wavelength/4/PI/distance*tf.sqrt(g_tx*g_rx), a.dtype)
                     self.assertTrue(np.abs(np.abs(a)-1)<1e-5)
@@ -68,9 +67,8 @@ class TestAntennaArray(unittest.TestCase):
                 rx = Receiver("rx", [distance, 0,0], [PI, 0, 0], dtype=dtype)
                 scene.add(tx)
                 scene.add(rx)
-                p2c = Paths2CIR(1, scene=scene, dtype=dtype)
                 paths = scene.compute_paths()
-                a, _  = p2c(paths.as_tuple())
+                a = paths.a
                 a = tf.squeeze(a)
                 a /= tf.cast(scene.wavelength/4/PI/distance, a.dtype)
                 self.assertTrue(np.abs(a)<1e-6)
@@ -93,9 +91,8 @@ class TestAntennaArray(unittest.TestCase):
             rx = Receiver("rx", [distance, 0,0], [PI, 0, -slant_angle], dtype=dtype)
             scene.add(tx)
             scene.add(rx)
-            p2c = Paths2CIR(1, scene=scene, dtype=dtype)
             paths = scene.compute_paths()
-            a, _  = p2c(paths.as_tuple())
+            a = paths.a
             a = tf.squeeze(a)
             a /= tf.cast(scene.wavelength/4/PI/distance*tf.sqrt(g_tx*g_rx), a.dtype)
             self.assertTrue(np.abs(a-1)<1e-6)
@@ -113,9 +110,8 @@ class TestAntennaArray(unittest.TestCase):
         rx = Receiver("rx", [distance, 0,0], [0, 0, 0], dtype=dtype)
         scene.add(tx)
         scene.add(rx)
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype)
         paths = scene.compute_paths()
-        a, _  = p2c(paths.as_tuple())
+        a = paths.a
         a = tf.squeeze(a)
         a /= tf.cast(scene.wavelength/4/PI/distance*tf.sqrt(g_tx*g_rx), a.dtype)
         self.assertTrue(np.abs(a[0,0]-1)<1e-6)
@@ -136,9 +132,8 @@ class TestAntennaArray(unittest.TestCase):
         rx = Receiver("rx", [distance, 0,0], [0, 0, 0], dtype=dtype)
         scene.add(tx)
         scene.add(rx)
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype)
         paths = scene.compute_paths()
-        a, _  = p2c(paths.as_tuple())
+        a = paths.a
         a = tf.squeeze(a)
         a /= tf.cast(scene.wavelength/4/PI/distance*tf.sqrt(g_tx*g_rx), a.dtype)
         self.assertTrue(np.abs(a[0,0])<1e-6)
@@ -156,17 +151,16 @@ class TestAntennaArray(unittest.TestCase):
         rx = Receiver("rx", [100,50,1.5], [PI, 0, 0], dtype=dtype)
         scene.add(tx)
         scene.add(rx)
-        distance = normalize(tx.position-rx.position)[1]
 
         scene.synthetic_array = True
         paths = scene.compute_paths()
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype, normalize_delays=False)
-        a_syn, tau_syn = [tf.squeeze(t) for t in p2c(paths.as_tuple())]
+        paths.normalize_delays = False
+        a_syn, tau_syn = [tf.squeeze(t) for t in (paths.a, paths.tau)]
 
         scene.synthetic_array = False
         paths = scene.compute_paths()
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype, normalize_delays=False)
-        a, tau = [tf.squeeze(t) for t in p2c(paths.as_tuple())]
+        paths.normalize_delays = False
+        a, tau = [tf.squeeze(t) for t in (paths.a, paths.tau)]
 
         # Check that the delay of the antenna in the array center coincides with the delay for the synthetic array
         assert tau_syn==tau[4][4]
@@ -188,17 +182,16 @@ class TestAntennaArray(unittest.TestCase):
         rx = Receiver("rx", [1000,0,0], [PI, 0, 0], dtype=dtype)
         scene.add(tx)
         scene.add(rx)
-        distance = normalize(tx.position-rx.position)[1]
 
         scene.synthetic_array = True
         paths = scene.compute_paths()
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype, normalize_delays=False)
-        a_syn, tau_syn = [tf.squeeze(t) for t in p2c(paths.as_tuple())]
+        paths.normalize_delays = False
+        a_syn, tau_syn = [tf.squeeze(t) for t in (paths.a, paths.tau)]
 
         scene.synthetic_array = False
         paths = scene.compute_paths()
-        p2c = Paths2CIR(1, scene=scene, dtype=dtype, normalize_delays=False)
-        a, tau = [tf.squeeze(t) for t in p2c(paths.as_tuple())]
+        paths.normalize_delays = False
+        a, tau = [tf.squeeze(t) for t in (paths.a, paths.tau)]
 
         # Check that the delay of the antenna in the array center coincides with the delay for the synthetic array
         assert tau_syn==tau[4][4]

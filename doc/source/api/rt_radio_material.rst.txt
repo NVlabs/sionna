@@ -9,6 +9,14 @@ permeability :math:`\mu_r`. For more details, see :eq:`epsilon`, :eq:`mu`, :eq:`
 These quantities can possibly depend on the frequency of the incident radio
 wave. Note that Sionna currently only allows non-magnetic materials with :math:`\mu_r=1`.
 
+Additionally, a :class:`~sionna.rt.RadioMaterial` can have an effective roughness (ER)
+associated with it, leading to diffuse reflections (see, e.g., [Degli-Esposti11]_).
+The ER model requires a scattering coefficient :math:`S\in[0,1]` :eq:`scattering_coefficient`,
+a cross-polarization discrimination coefficient :math:`K_x` :eq:`xpd`, as well as a scattering pattern
+:math:`f_\text{s}(\hat{\mathbf{k}}_\text{i}, \hat{\mathbf{k}}_\text{s})` :eq:`lambertian_model`--:eq:`backscattering_model`, such as the
+:class:`~sionna.rt.LambertianPattern` or :class:`~sionna.rt.DirectivePattern`. The meaning of
+these parameters is explained in `Scattering <../em_primer.rst#scattering>`_.
+
 Similarly to scene objects (:class:`~sionna.rt.SceneObject`), all radio
 materials are uniquely identified by their name.
 For example, specifying that a scene object named `"wall"` is made of the
@@ -48,6 +56,8 @@ The table below provides their values which are used in Sionna
 Note that the relative permittivity :math:`\varepsilon_r` and
 conductivity :math:`\sigma` of all materials are updated automatically when
 the frequency is set through the scene's property :class:`~sionna.rt.Scene.frequency`.
+Moreover, by default, the scattering coefficient, :math:`S`, of these materials is set to
+0, leading to no diffuse reflection.
 
 +---------------------------+------------------------------------+--------------------------+-----------------------+
 | Material name             | Real part of relative permittivity | Conductivity [S/m]       | Frequency range (GHz) |
@@ -96,15 +106,22 @@ the frequency is set through the scene's property :class:`~sionna.rt.Scene.frequ
 
 Custom radio materials can be implemented using the
 :class:`~sionna.rt.RadioMaterial` class by specifying a relative permittivity
-:math:`\varepsilon_r`  and a conductivity
-:math:`\sigma`. Note that only non-magnetic materials with :math:`\mu_r=1` are currently allowed. 
-The following code snippet shows how to create a custom radio material:
+:math:`\varepsilon_r` and conductivity :math:`\sigma`, as well as optional
+parameters related to diffuse scattering, such as the scattering coefficient :math:`S`,
+cross-polarization discrimination coefficient :math:`K_x`, and scattering pattern :math:`f_\text{s}(\hat{\mathbf{k}}_\text{i}, \hat{\mathbf{k}}_\text{s})`.
+Note that only non-magnetic materials with :math:`\mu_r=1` are currently allowed. 
+The following code snippet shows how to create a custom radio material. Note that the creation
+of a :class:`~sionna.rt.RadioMaterial` requires that a scene is loaded.
 
 .. code-block:: Python
    
+   load_scene() # Load empty scene
    custom_material = RadioMaterial("my_material",
                                    relative_permittivity=2.0,
-                                   conductivity=5.0)
+                                   conductivity=5.0,
+                                   scattering_coefficient=0.3,
+                                   xpd_coefficient=0.1,
+                                   scattering_pattern=LambertianPattern())
 
 It is also possible to define the properties of a material through a callback
 function that computes the material properties
@@ -139,4 +156,18 @@ RadioMaterial
 -------------
 .. autoclass:: sionna.rt.RadioMaterial
    :members:
-   :exclude-members: core_material, frequency_update, decrease_use, increase_use, scene, is_placeholder
+   :exclude-members: core_material, frequency_update, decrease_use, increase_use, scene, is_placeholder, discard_object_using, add_object_using
+
+ScatteringPattern
+-----------------
+.. autoclass:: sionna.rt.LambertianPattern
+   :members: visualize
+   :exclude-members:
+
+.. autoclass:: sionna.rt.DirectivePattern
+   :members: visualize, alpha_r
+   :exclude-members:
+
+.. autoclass:: sionna.rt.BackscatteringPattern
+   :members: visualize, alpha_i, alpha_r, lambda_, trainable_lambda_
+   :exclude-members:

@@ -745,7 +745,12 @@ class LinearInterpolator(BaseChannelInterpolator):
     def __call__(self, h_hat, err_var):
 
         h_hat = self._interpolate(h_hat)
+
+        # the interpolator requires complex-valued inputs
+        err_var = tf.cast(err_var, tf.complex64)
         err_var = self._interpolate(err_var)
+        err_var = tf.math.real(err_var)
+
         return h_hat, err_var
 
 

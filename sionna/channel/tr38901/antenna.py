@@ -449,7 +449,7 @@ class PanelArray:
         else:
             assert polarization_type in ["VH", "cross"],\
             "For dual polarization, polarization_type must be 'VH' or 'cross'"
-            slant_angle = 0 if polarization == "VH" else -PI/4
+            slant_angle = 0 if polarization_type == "VH" else -PI/4
             self._ant_pol1 = AntennaElement(antenna_pattern, slant_angle,
                 self._dtype)
             self._ant_pol2 = AntennaElement(antenna_pattern, slant_angle+PI/2,

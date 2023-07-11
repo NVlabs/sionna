@@ -140,7 +140,7 @@ class Camera(OrientedObject):
             else:
                 target = item.position.numpy()
         else:
-            target = np.array(target)
+            target = np.array(target).astype(float)
             if not ( (target.ndim == 1) and (target.shape[0] == 3) ):
                 raise ValueError("`x` must be a three-element vector)")
 

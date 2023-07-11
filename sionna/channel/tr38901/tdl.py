@@ -148,7 +148,7 @@ class TDL(ChannelModel):
     delay_spread : float
         RMS delay spread [s].
         For the "A30", "B100", and "C300" models, the delay spread must be set
-        to 10ns, 100ns, and 300ns, respectively.
+        to 30ns, 100ns, and 300ns, respectively.
 
     carrier_frequency : float
         Carrier frequency [Hz]

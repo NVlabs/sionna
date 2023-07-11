@@ -254,7 +254,8 @@ class EmptyPilotPattern(PilotPattern):
                       num_effective_subcarriers]
         mask = tf.zeros(shape, tf.bool)
         pilots = tf.zeros(shape[:2]+[0], dtype)
-        super().__init__(mask, pilots, trainable=False, normalize=False)
+        super().__init__(mask, pilots, trainable=False, normalize=False,
+                         dtype=dtype)
 
 class KroneckerPilotPattern(PilotPattern):
     """Simple orthogonal pilot pattern with Kronecker structure.

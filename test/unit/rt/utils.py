@@ -92,14 +92,14 @@ def compute_field_component_vectors(k_i, k_r, n_hat):
     return e_i_s, e_i_p, e_r_s, e_r_p
 
 def reflection(k_i, k_r, n_hat, eta, e_s, e_p):
-    """Computes the transfer matrix of a reflection and basis vectors of the refleceted field components""" 
-    
+    """Computes the transfer matrix of a reflection and basis vectors of the refleceted field components"""
+
     # Compute unit vectors representing the incoming.outgoing field
     e_i_s, e_i_p, e_r_s, e_r_p = compute_field_component_vectors(k_i, k_r, n_hat)
 
     # Compute matrix for base transformation
     d = projection_matrix(e_s, e_p, e_i_s, e_i_p)
-    
+
     # Compute reflection coefficients
     cos_theta = dot(-k_i, n_hat)
     r_te, r_tm = reflection_coefficient(eta, cos_theta)
@@ -112,34 +112,28 @@ def reflection(k_i, k_r, n_hat, eta, e_s, e_p):
 
 def validate_path(path_ind, paths, scene):
     """Computes the transfer matrix mat_t of a specific path"""
-    normals = paths.normals[:,0,0,path_ind,:]
+    normals = paths.spec_tmp.normals[:,0,0,path_ind,:]
     objects = paths.objects[:,0,0, path_ind]
     etas = []
     for i in objects:
         if i==-1:
             break
-        etas.append(list(scene.objects.values())[i].radio_material.complex_relative_permittivity.numpy()) 
-    
+        etas.append(list(scene.objects.values())[i].radio_material.complex_relative_permittivity.numpy())
+
     num_bounces = len(etas)
-    num_paths = np.squeeze(paths.theta_t).size
+    num_paths = paths.spec_tmp.normals.shape[2]
     vertices = paths.vertices[:num_bounces,0,0,path_ind,:].numpy()
-    if num_paths==1:
-        theta_t = np.squeeze(paths.theta_t)
-        phi_t = np.squeeze(paths.phi_t)
-        theta_r = np.squeeze(paths.theta_r)
-        phi_r = np.squeeze(paths.phi_r)
-    else:
-        theta_t = np.squeeze(paths.theta_t)[path_ind]
-        phi_t = np.squeeze(paths.phi_t)[path_ind]
-        theta_r = np.squeeze(paths.theta_r)[path_ind]
-        phi_r = np.squeeze(paths.phi_r)[path_ind]
+    theta_t = np.squeeze(paths.theta_t, axis=(0,1,2))[path_ind]
+    phi_t = np.squeeze(paths.phi_t, axis=(0,1,2))[path_ind]
+    theta_r = np.squeeze(paths.theta_r, axis=(0,1,2))[path_ind]
+    phi_r = np.squeeze(paths.phi_r, axis=(0,1,2))[path_ind]
 
     e_s = theta_hat(theta_t, phi_t)
     e_p = phi_hat(theta_t, phi_t)
-    
+
     tx_pos = scene.transmitters["tx"].position
     rx_pos = scene.receivers["rx"].position
-    
+
     start_point = tx_pos
     mat_t = np.eye(2, dtype=complex)
     if num_bounces>0:
@@ -151,7 +145,7 @@ def validate_path(path_ind, paths, scene):
             if i==num_bounces-1:
                 end_point = rx_pos
             else:
-                end_point = vertices[i+1]   
+                end_point = vertices[i+1]
 
             # Compute incomning and reflected wave vectors
             k_i = normalize(hit_point - start_point)
@@ -182,11 +176,11 @@ def validate_path(path_ind, paths, scene):
                       e_p,
                       theta_hat(theta_r, phi_r),
                       phi_hat(theta_r, phi_r))
-    
+
     mat_t = np.matmul(mat_d, mat_t)
 
     # Return reference transfer matrix from ray tracer
-    mat_t_ref = np.squeeze(paths.mat_t)
+    mat_t_ref = np.squeeze(paths.spec_tmp.mat_t, axis=(0,1))[path_ind]
     if num_paths>1:
         mat_t_ref = mat_t_ref[path_ind]
 

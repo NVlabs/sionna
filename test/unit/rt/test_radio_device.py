@@ -10,15 +10,12 @@ except ImportError as e:
     sys.path.append("..")
     import sionna
 
-import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-import itertools
 
 from sionna.rt import rotation_matrix, r_hat, theta_phi_from_unit_vec, \
-                      load_scene, PlanarArray, Transmitter, Receiver, compute_gain, \
-                      Paths2CIR
+                      load_scene, PlanarArray, Transmitter, Receiver, compute_gain
 from sionna.constants import PI
 
 gpus = tf.config.list_physical_devices('GPU')
@@ -92,8 +89,6 @@ class TestRadioDevice(unittest.TestCase):
         scene.add(tx)
         scene.add(rx)
 
-        p2c = Paths2CIR(1, scene=scene)
-
         r = 100
         thetas = tf.linspace(0., PI, 10)
         phis = tf.linspace(0., 2*PI, 10)
@@ -113,7 +108,10 @@ class TestRadioDevice(unittest.TestCase):
 
                 # Compute paths
                 paths = scene.compute_paths()
-                mat_t, tau, theta_t, phi_t, theta_r, phi_r = [tf.squeeze(tensor) for tensor in paths.as_tuple()]
+                theta_t = tf.squeeze(paths.theta_t)
+                phi_t = tf.squeeze(paths.phi_t)
+                theta_r = tf.squeeze(paths.theta_r)
+                phi_r = tf.squeeze(paths.phi_r)
 
                 # Compute AODs and AoAs in LCS of the transmitter and receiver 
                 theta_prime_t, phi_prime_t = theta_prime_phi_prime(tx.orientation, theta_t, phi_t)
@@ -127,6 +125,6 @@ class TestRadioDevice(unittest.TestCase):
 
                 # Compute channel impulse response and make
                 # sure that it matches the theoretical 
-                a, tau = [tf.squeeze(tensor) for tensor in p2c(paths.as_tuple())]
+                a = tf.squeeze(paths.a)
                 a_db = 20*np.log10(np.abs(a.numpy()))
                 self.assertTrue(np.abs(a_db-a_theo_db)< 1e-4)

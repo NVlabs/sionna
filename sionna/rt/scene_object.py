@@ -20,6 +20,7 @@ class SceneObject(Object):
 
     def __init__(self,
                  name,
+                 object_id,
                  radio_material=None):
 
         # Initialize the base class Object
@@ -27,6 +28,16 @@ class SceneObject(Object):
 
         # Set the radio material
         self.radio_material = radio_material
+
+        # Set the object id
+        self._object_id = object_id
+
+    @property
+    def object_id(self):
+        r"""
+        int : Return the identifier of this object
+        """
+        return self._object_id
 
     @property
     def radio_material(self):
@@ -36,7 +47,7 @@ class SceneObject(Object):
         :class:`~sionna.rt.RadioMaterial` or the material name (`str`).
         If the radio material is not part of the scene, it will be added. This
         can raise an error if a different radio material with the same name was
-        already added to the scene. 
+        already added to the scene.
         """
         return self._radio_material
 
@@ -60,10 +71,10 @@ class SceneObject(Object):
         else:
             mat_obj = mat
 
-        # Decrease the use counter of the current radio material
+        # Remove the object from the set of the currently used material, if any
         # pylint: disable=access-member-before-definition
         if hasattr(self, '_radio_material') and self._radio_material:
-            self._radio_material.decrease_use()
+            self._radio_material.discard_object_using(self.object_id)
         # Assign the new material
         # pylint: disable=access-member-before-definition
         self._radio_material = mat_obj
@@ -73,9 +84,9 @@ class SceneObject(Object):
         if not self._radio_material:
             return
 
-        # Increase the use counter of the newly used material
+        # Add the object to the set of the newly used material
         # pylint: disable=access-member-before-definition
-        self._radio_material.increase_use()
+        self._radio_material.add_object_using(self.object_id)
 
         # Add the RadioMaterial to the scene if not already done
         self.scene.add(self._radio_material)
