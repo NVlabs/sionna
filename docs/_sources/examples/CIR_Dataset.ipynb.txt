@@ -39,44 +39,14 @@
   {
    "cell_type": "code",
    "execution_count": 1,
-   "id": "ad9560d6-31d1-4933-8db9-2d5a4982c065",
-   "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "Number of GPUs available : 2\n",
-      "Only GPU number 0 used.\n"
-     ]
-    }
-   ],
-   "source": [
-    "# Configure the notebook to use only a single GPU and allocate only as much memory as needed\n",
-    "# For more details, see https://www.tensorflow.org/guide/gpu\n",
-    "import tensorflow as tf\n",
-    "gpus = tf.config.list_physical_devices('GPU')\n",
-    "print('Number of GPUs available :', len(gpus))\n",
-    "if gpus:\n",
-    "    gpu_num = 0 # Number of the GPU to be used\n",
-    "    try:\n",
-    "        #tf.config.set_visible_devices([], 'GPU')\n",
-    "        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')\n",
-    "        print('Only GPU number', gpu_num, 'used.')\n",
-    "        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)\n",
-    "    except RuntimeError as e:\n",
-    "        print(e)"
-   ]
-  },
-  {
-   "cell_type": "code",
-   "execution_count": 2,
-   "id": "d6baa3b2-e502-4db0-bad1-496e2dc4d914",
+   "id": "bac912ac-4a02-4e58-a697-e53d021852a5",
    "metadata": {},
    "outputs": [],
    "source": [
-    "import numpy as np\n",
-    "import h5py\n",
+    "import os\n",
+    "gpu_num = 0 # Use \"\" to use the CPU\n",
+    "os.environ[\"CUDA_VISIBLE_DEVICES\"] = f\"{gpu_num}\"\n",
+    "os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'\n",
     "\n",
     "# Import Sionna\n",
     "try:\n",
@@ -85,7 +55,30 @@
     "    # Install Sionna if package is not already installed\n",
     "    import os\n",
     "    os.system(\"pip install sionna\")\n",
-    "    import sionna as sn"
+    "    import sionna as sn\n",
+    "\n",
+    "import numpy as np\n",
+    "import h5py"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "ad9560d6-31d1-4933-8db9-2d5a4982c065",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Configure the notebook to use only a single GPU and allocate only as much memory as needed\n",
+    "# For more details, see https://www.tensorflow.org/guide/gpu\n",
+    "import tensorflow as tf\n",
+    "gpus = tf.config.list_physical_devices('GPU')\n",
+    "if gpus:\n",
+    "    try:\n",
+    "        tf.config.experimental.set_memory_growth(gpus[0], True)\n",
+    "    except RuntimeError as e:\n",
+    "        print(e)\n",
+    "# Avoid warnings from TensorFlow\n",
+    "tf.get_logger().setLevel('ERROR')"
    ]
   },
   {
@@ -385,7 +378,7 @@
  ],
  "metadata": {
   "kernelspec": {
-   "display_name": "Python 3",
+   "display_name": "Python 3 (ipykernel)",
    "language": "python",
    "name": "python3"
   },
