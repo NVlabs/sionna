@@ -1271,7 +1271,7 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="GPU-Configuration-and-Imports">
 <h2>GPU Configuration and Imports<a class="headerlink" href="#GPU-Configuration-and-Imports" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1302,7 +1302,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1317,7 +1317,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1336,7 +1336,7 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="System-Model">
 <h2>System Model<a class="headerlink" href="#System-Model" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1434,7 +1434,12 @@ div.rendered_html tbody tr:hover {
     <span class="k">def</span> <span class="nf">call_no_xla</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
 
         <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">])</span> <span class="c1"># generate random data</span>
-        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="c1"># explicitly encode</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># uncoded transmission</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="c1"># explicitly encode</span>
 
         <span class="c1"># calculate noise variance</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_esno</span><span class="p">:</span>
@@ -1442,17 +1447,27 @@ div.rendered_html tbody tr:hover {
                        <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                        <span class="n">coderate</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># uncoded transmission</span>
+                <span class="n">coderate</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">coderate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+
             <span class="n">no</span> <span class="o">=</span> <span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span>
                            <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
-                           <span class="n">coderate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+                           <span class="n">coderate</span><span class="o">=</span><span class="n">coderate</span><span class="p">)</span>
 
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="c1"># map c to symbols x</span>
 
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span> <span class="c1"># transmit over AWGN channel</span>
 
-        <span class="n">llr_ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span> <span class="c1"># demap y to LLRs</span>
+        <span class="n">llr_ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">])</span> <span class="c1"># demapp y to LLRs</span>
 
-        <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">)</span> <span class="c1"># run FEC decoder (incl. rate-recovery)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># uncoded transmission</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">hard_decisions</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">)</span> <span class="c1"># run FEC decoder (incl. rate-recovery)</span>
         <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">u_hat</span>
 </pre></div>
 </div>
@@ -1463,7 +1478,7 @@ div.rendered_html tbody tr:hover {
 <p>We now compare the different schemes for a codeword length of <span class="math notranslate nohighlight">\(n=1024\)</span> and coderate <span class="math notranslate nohighlight">\(r=0.5\)</span>.</p>
 <p>Let us define the codes to be simulated.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[67]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1471,6 +1486,12 @@ div.rendered_html tbody tr:hover {
 <span class="n">k</span> <span class="o">=</span> <span class="mi">512</span> <span class="c1"># number of information bits per codeword</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">1024</span> <span class="c1"># desired codeword length</span>
 <span class="n">codes_under_test</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Uncoded transmission</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Uncoded QPSK&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
 
 <span class="c1"># Conv. code with Viterbi decoding</span>
 <span class="n">enc</span> <span class="o">=</span> <span class="n">ConvEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -1500,7 +1521,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <p>Generate a new BER plot figure to save and plot simulation results efficiently.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1509,7 +1530,7 @@ div.rendered_html tbody tr:hover {
 </div>
 </div>
 <p>And run the BER simulation for each code.</p>
-<div class="nbinput docutils container">
+<div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
@@ -1529,7 +1550,7 @@ div.rendered_html tbody tr:hover {
                          <span class="n">decoder</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                          <span class="n">sim_esno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="c1">#run the Polar code in a separate call, as currently no XLA is supported</span>
+    <span class="c1"># run the Polar code in a separate call, as currently no XLA is supported</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;5G: Polar+CRC&quot;</span><span class="p">:</span>
         <span class="n">ber_plot</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="c1"># the function have defined previously</span>
                         <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">ebno_db</span><span class="p">,</span> <span class="c1"># SNR to simulate</span>
@@ -1558,75 +1579,9 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
- Running: GSM: Convolutional Codes
-EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
----------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.1236e-01 | 9.9990e-01 |      575260 |     5120000 |         9999 |       10000 |         3.2 |reached target block errors
-      0.2 | 9.4915e-02 | 9.9980e-01 |      485966 |     5120000 |         9998 |       10000 |         0.1 |reached target block errors
-      0.4 | 7.9400e-02 | 9.9930e-01 |      406530 |     5120000 |         9993 |       10000 |         0.1 |reached target block errors
-      0.6 | 6.5512e-02 | 9.9690e-01 |      335419 |     5120000 |         9969 |       10000 |         0.1 |reached target block errors
-      0.8 | 5.2554e-02 | 9.9130e-01 |      269078 |     5120000 |         9913 |       10000 |         0.1 |reached target block errors
-      1.0 | 4.2480e-02 | 9.8070e-01 |      217500 |     5120000 |         9807 |       10000 |         0.1 |reached target block errors
-      1.2 | 3.3256e-02 | 9.6210e-01 |      170271 |     5120000 |         9621 |       10000 |         0.1 |reached target block errors
-      1.4 | 2.5238e-02 | 9.2160e-01 |      129220 |     5120000 |         9216 |       10000 |         0.1 |reached target block errors
-      1.6 | 1.9209e-02 | 8.6500e-01 |       98350 |     5120000 |         8650 |       10000 |         0.1 |reached target block errors
-      1.8 | 1.4197e-02 | 7.8470e-01 |       72688 |     5120000 |         7847 |       10000 |         0.1 |reached target block errors
-      2.0 | 1.0463e-02 | 6.9310e-01 |       53570 |     5120000 |         6931 |       10000 |         0.1 |reached target block errors
-      2.2 | 7.6031e-03 | 5.9540e-01 |       38928 |     5120000 |         5954 |       10000 |         0.1 |reached target block errors
-      2.4 | 5.3682e-03 | 4.8820e-01 |       27485 |     5120000 |         4882 |       10000 |         0.1 |reached target block errors
-      2.6 | 3.8129e-03 | 4.0300e-01 |       19522 |     5120000 |         4030 |       10000 |         0.1 |reached target block errors
-      2.8 | 2.7010e-03 | 3.2290e-01 |       13829 |     5120000 |         3229 |       10000 |         0.1 |reached target block errors
-      3.0 | 1.8006e-03 | 2.4280e-01 |        9219 |     5120000 |         2428 |       10000 |         0.1 |reached target block errors
-      3.2 | 1.2027e-03 | 1.8115e-01 |       12316 |    10240000 |         3623 |       20000 |         0.1 |reached target block errors
-      3.4 | 8.3174e-04 | 1.3310e-01 |        8517 |    10240000 |         2662 |       20000 |         0.1 |reached target block errors
-      3.6 | 5.8564e-04 | 1.0250e-01 |        5997 |    10240000 |         2050 |       20000 |         0.1 |reached target block errors
-      3.8 | 3.7949e-04 | 7.3767e-02 |        5829 |    15360000 |         2213 |       30000 |         0.2 |reached target block errors
-      4.0 | 2.6240e-04 | 5.5725e-02 |        5374 |    20480000 |         2229 |       40000 |         0.2 |reached target block errors
-      4.2 | 1.7777e-04 | 4.0160e-02 |        4551 |    25600000 |         2008 |       50000 |         0.3 |reached target block errors
-      4.4 | 1.2006e-04 | 2.9457e-02 |        4303 |    35840000 |         2062 |       70000 |         0.4 |reached target block errors
-      4.6 | 8.2878e-05 | 2.2389e-02 |        3819 |    46080000 |         2015 |       90000 |         0.5 |reached target block errors
-      4.8 | 6.2467e-05 | 1.7875e-02 |        3838 |    61440000 |         2145 |      120000 |         0.7 |reached target block errors
-      5.0 | 4.3867e-05 | 1.3453e-02 |        3369 |    76800000 |         2018 |      150000 |         0.8 |reached target block errors
-      5.2 | 3.0898e-05 | 1.0040e-02 |        3164 |   102400000 |         2008 |      200000 |         1.1 |reached target block errors
-      5.4 | 2.3477e-05 | 8.1680e-03 |        3005 |   128000000 |         2042 |      250000 |         1.4 |reached target block errors
-      5.6 | 1.6286e-05 | 5.8941e-03 |        2835 |   174080000 |         2004 |      340000 |         1.9 |reached target block errors
-      5.8 | 1.2858e-05 | 4.8143e-03 |        2765 |   215040000 |         2022 |      420000 |         2.3 |reached target block errors
-      6.0 | 9.5522e-06 | 3.7074e-03 |        2641 |   276480000 |         2002 |      540000 |         3.0 |reached target block errors
-      6.2 | 7.7178e-06 | 3.0424e-03 |        2608 |   337920000 |         2008 |      660000 |         3.6 |reached target block errors
-      6.4 | 5.5877e-06 | 2.3138e-03 |        2489 |   445440000 |         2013 |      870000 |         4.8 |reached target block errors
-      6.6 | 4.2212e-06 | 1.8117e-03 |        2399 |   568320000 |         2011 |     1110000 |         6.1 |reached target block errors
-      6.8 | 2.9708e-06 | 1.3224e-03 |        2312 |   778240000 |         2010 |     1520000 |         8.3 |reached target block errors
-      7.0 | 2.1852e-06 | 9.6715e-04 |        2316 |  1059840000 |         2002 |     2070000 |        11.4 |reached target block errors
-      7.2 | 1.7316e-06 | 7.9091e-04 |        2243 |  1295360000 |         2001 |     2530000 |        14.0 |reached target block errors
-      7.4 | 1.2602e-06 | 5.7666e-04 |        2239 |  1776640000 |         2001 |     3470000 |        19.1 |reached target block errors
-      7.6 | 8.9893e-07 | 4.1925e-04 |        2200 |  2447360000 |         2004 |     4780000 |        26.4 |reached target block errors
-      7.8 | 6.4587e-07 | 3.0565e-04 |        2166 |  3353600000 |         2002 |     6550000 |        36.2 |reached target block errors
-
- Running: UMTS/LTE: Turbo Codes
-EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
----------------------------------------------------------------------------------------------------------------------------------------
-      0.0 | 1.2044e-01 | 9.8370e-01 |      616637 |     5120000 |         9837 |       10000 |        11.8 |reached target block errors
-      0.2 | 1.0190e-01 | 9.3170e-01 |      521714 |     5120000 |         9317 |       10000 |         0.6 |reached target block errors
-      0.4 | 8.0187e-02 | 8.2770e-01 |      410556 |     5120000 |         8277 |       10000 |         0.6 |reached target block errors
-      0.6 | 5.5072e-02 | 6.4190e-01 |      281971 |     5120000 |         6419 |       10000 |         0.6 |reached target block errors
-      0.8 | 3.2955e-02 | 4.2440e-01 |      168731 |     5120000 |         4244 |       10000 |         0.6 |reached target block errors
-      1.0 | 1.5915e-02 | 2.2570e-01 |       81483 |     5120000 |         2257 |       10000 |         0.6 |reached target block errors
-      1.2 | 6.3628e-03 | 9.7267e-02 |       97733 |    15360000 |         2918 |       30000 |         1.7 |reached target block errors
-      1.4 | 1.9006e-03 | 3.2971e-02 |       68117 |    35840000 |         2308 |       70000 |         3.9 |reached target block errors
-      1.6 | 4.7199e-04 | 8.7652e-03 |       55581 |   117760000 |         2016 |      230000 |        12.7 |reached target block errors
-      1.8 | 9.1927e-05 | 1.9608e-03 |       48008 |   522240000 |         2000 |     1020000 |        56.1 |reached target block errors
-      2.0 | 1.5279e-05 | 4.0887e-04 |       22061 |  1443840000 |         1153 |     2820000 |       155.3 |iter: 281/1000
-</pre></div></div>
-</div>
 <p>And show the final performance</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[86]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1647,7 +1602,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[87]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1669,7 +1624,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <p>In particular for the data channels, longer codewords are usually required. For these applications, LDPC and Turbo codes are the workhorse of 5G and LTE, respectively.</p>
 <p>Let’s compare LDPC and Turbo codes for <span class="math notranslate nohighlight">\(k=6144\)</span> information bits and coderate <span class="math notranslate nohighlight">\(r=1/3\)</span>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1677,6 +1632,12 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <span class="n">k</span> <span class="o">=</span> <span class="mi">2048</span> <span class="c1"># number of information bits per codeword</span>
 <span class="n">n</span> <span class="o">=</span> <span class="mi">6156</span> <span class="c1"># desired codeword length (including termination bits)</span>
 <span class="n">codes_under_test</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Uncoded QPSK</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Uncoded QPSK&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
 
 <span class="c1">#Turbo. codes</span>
 <span class="n">enc</span> <span class="o">=</span> <span class="n">TurboEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1693,7 +1654,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1707,7 +1668,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># QPSK</span>
-<span class="n">ebno_db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span> <span class="c1"># sim SNR range</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span> <span class="c1"># sim SNR range</span>
 
 <span class="c1"># run ber simulations for each code we have added to the list</span>
 <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codes_under_test</span><span class="p">:</span>
@@ -1737,12 +1698,12 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># and show the figure</span>
-<span class="n">ber_plot_long</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">3.</span><span class="p">],</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">6e-7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># we set the ylim to 1e-5 as otherwise more extensive simualtions would be required for accurate curves.</span>
+<span class="n">ber_plot_long</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">],</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">6e-7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># we set the ylim to 1e-5 as otherwise more extensive simualtions would be required for accurate curves.</span>
 </pre></div>
 </div>
 </div>
@@ -1759,14 +1720,14 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <h2>Final Figure<a class="headerlink" href="#Final-Figure" title="Permalink to this headline"></a></h2>
 <p>Combine results from the two simulations.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[113]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[109]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">snrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_snrs</span><span class="p">,</span> <span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
-<span class="n">bers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_bers</span><span class="p">,</span> <span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
-<span class="n">legends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_legends</span><span class="p">,</span> <span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
-<span class="n">is_bler</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
+<span></span><span class="n">snrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_snrs</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">bers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_bers</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">legends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_legends</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">is_bler</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 
 <span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;BLER&quot;</span>
 
@@ -1798,10 +1759,10 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">legend</span><span class="p">):</span>
     <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">legend</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; (BLER)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-<span class="n">snrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_snrs</span><span class="p">,</span> <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
-<span class="n">bers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_bers</span><span class="p">,</span> <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
-<span class="n">legends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_legends</span><span class="p">,</span> <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
-<span class="n">is_bler</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">compress</span><span class="p">(</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">))</span>
+<span class="n">snrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_snrs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">bers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_bers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">legends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_legends</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">is_bler</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 
 
 <span class="c1"># Part B</span>
@@ -1814,9 +1775,10 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 
 <span class="c1"># return figure handle</span>
 <span class="c1">#for idx, b in enumerate(bers):</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
 
+<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
 
 <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$E_b/N_0$ (dB)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
@@ -1830,15 +1792,6 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/examples_Evolution_of_FEC_23_0.png" src="../_images/examples_Evolution_of_FEC_23_0.png" />
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span>
-</pre></div>
 </div>
 </div>
 </div>
