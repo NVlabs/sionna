@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ray Tracing &mdash; Sionna 0.15.0 documentation</title>
+  <title>Ray Tracing &mdash; Sionna 0.15.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -1446,7 +1446,7 @@ into rectangular cells of size <span class="math notranslate nohighlight">\(\lve
 The parameter <code class="docutils literal notranslate"><span class="pre">cm_cell_size</span></code> therefore controls the granularity of the map.
 The coverage map associates with every cell <span class="math notranslate nohighlight">\((i,j)\)</span> the quantity</p>
 <div class="math notranslate nohighlight" id="equation-cm-def">
-<span class="eqno">(42)<a class="headerlink" href="#equation-cm-def" title="Permalink to this equation"></a></span>\[b_{i,j} = \frac{1}{\lvert C \rvert} \int_{C_{i,j}} \lvert h(s) \rvert^2 ds\]</div>
+<span class="eqno">(43)<a class="headerlink" href="#equation-cm-def" title="Permalink to this equation"></a></span>\[b_{i,j} = \frac{1}{\lvert C \rvert} \int_{C_{i,j}} \lvert h(s) \rvert^2 ds\]</div>
 <p>where <span class="math notranslate nohighlight">\(\lvert h(s) \rvert^2\)</span> is the squared amplitude
 of the path coefficients <span class="math notranslate nohighlight">\(a_i\)</span> at position <span class="math notranslate nohighlight">\(s=(x,y)\)</span>,
 the integral is over the cell <span class="math notranslate nohighlight">\(C_{i,j}\)</span>, and
@@ -1454,7 +1454,7 @@ the integral is over the cell <span class="math notranslate nohighlight">\(C_{i,
 <span class="math notranslate nohighlight">\(ds=dx \cdot dy\)</span>.
 The dimension indexed by <span class="math notranslate nohighlight">\(i\)</span> (<span class="math notranslate nohighlight">\(j\)</span>) corresponds to the <span class="math notranslate nohighlight">\(y\, (x)\)</span>-axis of the
 coverage map in its local coordinate system.</p>
-<p>For specularly and diffusely reflected paths, <a class="reference internal" href="#equation-cm-def">(42)</a> can be rewritten as an integral over the directions
+<p>For specularly and diffusely reflected paths, <a class="reference internal" href="#equation-cm-def">(43)</a> can be rewritten as an integral over the directions
 of departure of the rays from the transmitter, by substituting <span class="math notranslate nohighlight">\(s\)</span>
 with the corresponding direction <span class="math notranslate nohighlight">\(\omega\)</span>:</p>
 <div class="math notranslate nohighlight">
@@ -1477,8 +1477,8 @@ squared scattering coefficient.
 When diffuse scattering is selected, the direction of the scattered ray is uniformly sampled on the half-sphere.
 The resulting Monter Carlo estimate is:</p>
 <div class="math notranslate nohighlight" id="equation-cm-mc-ref">
-<span class="eqno">(43)<a class="headerlink" href="#equation-cm-mc-ref" title="Permalink to this equation"></a></span>\[\hat{b}_{i,j}^{\text{(ref)}} = \frac{4\pi}{N\lvert C \rvert} \sum_{n=1}^N \lvert h\left(s(\omega_n)\right)  \rvert^2 \frac{r(\omega_n)^2}{\lvert \cos{\alpha(\omega_n)} \rvert} \mathbb{1}_{\left\{ s(\omega_n) \in C_{i,j} \right\}}.\]</div>
-<p>For the diffracted paths, <a class="reference internal" href="#equation-cm-def">(42)</a> can be rewritten for any wedge
+<span class="eqno">(44)<a class="headerlink" href="#equation-cm-mc-ref" title="Permalink to this equation"></a></span>\[\hat{b}_{i,j}^{\text{(ref)}} = \frac{4\pi}{N\lvert C \rvert} \sum_{n=1}^N \lvert h\left(s(\omega_n)\right)  \rvert^2 \frac{r(\omega_n)^2}{\lvert \cos{\alpha(\omega_n)} \rvert} \mathbb{1}_{\left\{ s(\omega_n) \in C_{i,j} \right\}}.\]</div>
+<p>For the diffracted paths, <a class="reference internal" href="#equation-cm-def">(43)</a> can be rewritten for any wedge
 with length <span class="math notranslate nohighlight">\(L\)</span> and opening angle <span class="math notranslate nohighlight">\(\Phi\)</span> as an integral over the wedge and its opening angle,
 by substituting <span class="math notranslate nohighlight">\(s\)</span> with the position on the wedge <span class="math notranslate nohighlight">\(\ell \in [1,L]\)</span> and the angle <span class="math notranslate nohighlight">\(\phi \in [0, \Phi]\)</span>:</p>
 <div class="math notranslate nohighlight">
@@ -1489,10 +1489,10 @@ intersection between the diffraction cone at <span class="math notranslate nohig
 The previous integral is approximated through Monte Carlo sampling by shooting <span class="math notranslate nohighlight">\(N'\)</span> rays from equally spaced
 locations <span class="math notranslate nohighlight">\(\ell_n\)</span> along the wedge with directions <span class="math notranslate nohighlight">\(\phi_n\)</span> sampled uniformly from <span class="math notranslate nohighlight">\((0, \Phi)\)</span>:</p>
 <div class="math notranslate nohighlight" id="equation-cm-mc-diff">
-<span class="eqno">(44)<a class="headerlink" href="#equation-cm-mc-diff" title="Permalink to this equation"></a></span>\[\hat{b}_{i,j}^{\text{(diff)}} = \frac{L\Phi}{N'\lvert C \rvert} \sum_{n=1}^{N'} \lvert h\left(s(\ell_n,\phi_n)\right) \rvert^2 \mathbb{1}_{\left\{ s(\ell_n,\phi_n) \in C_{i,j} \right\}} \left\lVert \left(\frac{\partial r}{\partial \ell}\right)_n \times \left(\frac{\partial r}{\partial \phi}\right)_n \right\rVert.\]</div>
+<span class="eqno">(45)<a class="headerlink" href="#equation-cm-mc-diff" title="Permalink to this equation"></a></span>\[\hat{b}_{i,j}^{\text{(diff)}} = \frac{L\Phi}{N'\lvert C \rvert} \sum_{n=1}^{N'} \lvert h\left(s(\ell_n,\phi_n)\right) \rvert^2 \mathbb{1}_{\left\{ s(\ell_n,\phi_n) \in C_{i,j} \right\}} \left\lVert \left(\frac{\partial r}{\partial \ell}\right)_n \times \left(\frac{\partial r}{\partial \phi}\right)_n \right\rVert.\]</div>
 <p>The output of this function is therefore a real-valued matrix of size <code class="docutils literal notranslate"><span class="pre">[num_cells_y,</span> <span class="pre">num_cells_x]</span></code>,
 for every transmitter, with elements equal to the sum of the contributions of the reflected and scattered paths
-<a class="reference internal" href="#equation-cm-mc-ref">(43)</a> and diffracted paths <a class="reference internal" href="#equation-cm-mc-diff">(44)</a> for all the wedges, and where</p>
+<a class="reference internal" href="#equation-cm-mc-ref">(44)</a> and diffracted paths <a class="reference internal" href="#equation-cm-mc-diff">(45)</a> for all the wedges, and where</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\texttt{num_cells_x} = \bigg\lceil\frac{\texttt{cm_size[0]}}{\texttt{cm_cell_size[0]}} \bigg\rceil\\
 \texttt{num_cells_y} = \bigg\lceil \frac{\texttt{cm_size[1]}}{\texttt{cm_cell_size[1]}} \bigg\rceil.\end{split}\]</div>
@@ -2014,7 +2014,7 @@ These paths can then be used to compute channel impulse responses:</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.Paths.a">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">a</span></span><a class="headerlink" href="#sionna.rt.Paths.a" title="Permalink to this definition"></a></dt>
-<dd><p>Channel coefficients</p>
+<dd><p>Passband channel coefficients <span class="math notranslate nohighlight">\(a_i\)</span> of each path as defined in <a class="reference internal" href="../em_primer.html#equation-h-final">(26)</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>[batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex</p>
@@ -2031,6 +2031,19 @@ velocities.</p>
 paths coefficients <code class="docutils literal notranslate"><span class="pre">a</span></code>, which stores the the temporal evolution of
 the channel, with a dimension of size <code class="docutils literal notranslate"><span class="pre">num_time_steps</span></code> computed
 according to the input velocities.</p>
+<p>Time evolution of the channel coefficient is simulated by computing the
+Doppler shift due to movements of the transmitter and receiver. If we denote by
+<span class="math notranslate nohighlight">\(\mathbf{v}_{\text{T}}\in\mathbb{R}^3\)</span> and <span class="math notranslate nohighlight">\(\mathbf{v}_{\text{R}}\in\mathbb{R}^3\)</span>
+the velocity vectors of the transmitter and receiver, respectively, the Doppler shifts are computed as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f_{\text{T}, i} &amp;= \frac{\hat{\mathbf{r}}(\theta_{\text{T},i}, \varphi_{\text{T},i})^\mathsf{T}\mathbf{v}_{\text{T}}}{\lambda}\qquad \text{[Hz]}\\
+f_{\text{R}, i} &amp;= \frac{\hat{\mathbf{r}}(\theta_{\text{R},i}, \varphi_{\text{R},i})^\mathsf{T}\mathbf{v}_{\text{R}}}{\lambda}\qquad \text{[Hz]}\end{split}\]</div>
+<p>for arbitrary path <span class="math notranslate nohighlight">\(i\)</span>, where <span class="math notranslate nohighlight">\((\theta_{\text{T},i}, \varphi_{\text{T},i})\)</span> are the AoDs,
+<span class="math notranslate nohighlight">\((\theta_{\text{R},i}, \varphi_{\text{R},i})\)</span> are the AoAs, and <span class="math notranslate nohighlight">\(\lambda\)</span> is the wavelength.
+This leads to the time-dependent path coefficient</p>
+<div class="math notranslate nohighlight">
+\[a_i(t) = a_i e^{j2\pi(f_{\text{T}, i}+f_{\text{R}, i})t}.\]</div>
+<p>Note that this model is only valid as long as the AoDs, AoAs, and path delay do not change.</p>
 <p>When this function is called multiple times, it overwrites the previous
 time steps dimension.</p>
 <dl class="field-list simple">
@@ -2052,25 +2065,19 @@ Defaults to <cite>[0,0,0]</cite>.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="sionna.rt.Paths.cir">
 <span class="sig-name descname"><span class="pre">cir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">los</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reflection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scattering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/rt/paths.html#Paths.cir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.Paths.cir" title="Permalink to this definition"></a></dt>
-<dd><p>Returns the channel impulse response <code class="docutils literal notranslate"><span class="pre">(a,</span> <span class="pre">tau)</span></code> which can be used
-for link simulations by other Sionna components.</p>
-<p>In the case of non-synthetic arrays, the delay for each transmitter-receiver
-pair is determined by the smallest observed delay among all corresponding
-transmit-receive antenna pairs. To accommodate varying
-propagation delays among these antenna pairs, the channel coefficients,
-returned by this function, are updated as follows:</p>
+<dd><p>Returns the baseband equivalent channel impulse response <a class="reference internal" href="../em_primer.html#equation-h-b">(28)</a>
+which can be used for link simulations by other Sionna components.</p>
+<p>The baseband equivalent channel coefficients <span class="math notranslate nohighlight">\(a^{\text{b}}_{i}\)</span>
+are computed as :</p>
 <div class="math notranslate nohighlight">
-\[\tilde{a}_{k,\ell,m,n} = a_{k,\ell,m,n} e^{j 2 \pi \left( \tau_{k,\ell,m,n} - \tau_{k,\ell,\text{min}} \right) f}\]</div>
-<p>where <span class="math notranslate nohighlight">\((k,\ell)\)</span> denotes the transmitter-receiver pair,
-<span class="math notranslate nohighlight">\((m,n)\)</span> denotes the transmit-receive antenna pair, <span class="math notranslate nohighlight">\(a_{k,\ell,m,n}\)</span>
-is the path coefficient (<a class="reference internal" href="#sionna.rt.Paths.a" title="sionna.rt.Paths.a"><code class="xref py py-attr docutils literal notranslate"><span class="pre">a</span></code></a>),
-<span class="math notranslate nohighlight">\(\tau_{k,\ell,m,n}\)</span> is the path delay (<a class="reference internal" href="#sionna.rt.Paths.tau" title="sionna.rt.Paths.tau"><code class="xref py py-attr docutils literal notranslate"><span class="pre">tau</span></code></a>),
-<span class="math notranslate nohighlight">\(f\)</span> is the carrier frequency, and</p>
-<div class="math notranslate nohighlight">
-\[\tau_{k, \ell, \text{min}} = \min_{m,n} \tau_{k, \ell, m,n}.\]</div>
+\[a^{\text{b}}_{i} = a_{i} e^{-j2 \pi f \tau_{i}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(i\)</span> is the index of an arbitrary path, <span class="math notranslate nohighlight">\(a_{i}\)</span>
+is the passband path coefficient (<a class="reference internal" href="#sionna.rt.Paths.a" title="sionna.rt.Paths.a"><code class="xref py py-attr docutils literal notranslate"><span class="pre">a</span></code></a>),
+<span class="math notranslate nohighlight">\(\tau_{i}\)</span> is the path delay (<a class="reference internal" href="#sionna.rt.Paths.tau" title="sionna.rt.Paths.tau"><code class="xref py py-attr docutils literal notranslate"><span class="pre">tau</span></code></a>),
+and <span class="math notranslate nohighlight">\(f\)</span> is the carrier frequency.</p>
 <p>Note: For the paths of a given type to be returned (LoS, reflection, etc.), they
-need to have been previously computed by <a class="reference internal" href="#sionna.rt.Scene.compute_paths" title="sionna.rt.Scene.compute_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_paths()</span></code></a> by
-setting the corresponding flag to <cite>True</cite>.</p>
+must have been previously computed by <a class="reference internal" href="#sionna.rt.Scene.compute_paths" title="sionna.rt.Scene.compute_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_paths()</span></code></a>, i.e.,
+the corresponding flags must have been set to <cite>True</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Input</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2086,8 +2093,8 @@ Defaults to <cite>True</cite>.</p></li>
 </dd>
 <dt class="field-even">Output</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>a</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex</em>) – Paths coefficients</p></li>
-<li><p><strong>tau</strong> (<em>[batch_size, num_rx, num_tx, max_num_paths], tf.float</em>) – Paths delays</p></li>
+<li><p><strong>a</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex</em>) – Path coefficients</p></li>
+<li><p><strong>tau</strong> (<em>[batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float</em>) – Path delays</p></li>
 </ul>
 </dd>
 </dl>
@@ -2175,7 +2182,7 @@ between any pair of antennas of a transmitter and receiver arrives at
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.Paths.tau">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">tau</span></span><a class="headerlink" href="#sionna.rt.Paths.tau" title="Permalink to this definition"></a></dt>
-<dd><p>Propagation delay of each path [s]</p>
+<dd><p>Propagation delay :math:`        au_i` [s] of each path as defined in <a class="reference internal" href="../em_primer.html#equation-h-final">(26)</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>[batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float</p>
@@ -2670,9 +2677,9 @@ These quantities can possibly depend on the frequency of the incident radio
 wave. Note that Sionna currently only allows non-magnetic materials with <span class="math notranslate nohighlight">\(\mu_r=1\)</span>.</p>
 <p>Additionally, a <a class="reference internal" href="#sionna.rt.RadioMaterial" title="sionna.rt.RadioMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadioMaterial</span></code></a> can have an effective roughness (ER)
 associated with it, leading to diffuse reflections (see, e.g., <a class="reference internal" href="../em_primer.html#degli-esposti11" id="id15"><span>[Degli-Esposti11]</span></a>).
-The ER model requires a scattering coefficient <span class="math notranslate nohighlight">\(S\in[0,1]\)</span> <a class="reference internal" href="../em_primer.html#equation-scattering-coefficient">(36)</a>,
-a cross-polarization discrimination coefficient <span class="math notranslate nohighlight">\(K_x\)</span> <a class="reference internal" href="../em_primer.html#equation-xpd">(38)</a>, as well as a scattering pattern
-<span class="math notranslate nohighlight">\(f_\text{s}(\hat{\mathbf{k}}_\text{i}, \hat{\mathbf{k}}_\text{s})\)</span> <a class="reference internal" href="../em_primer.html#equation-lambertian-model">(39)</a>–<a class="reference internal" href="../em_primer.html#equation-backscattering-model">(41)</a>, such as the
+The ER model requires a scattering coefficient <span class="math notranslate nohighlight">\(S\in[0,1]\)</span> <a class="reference internal" href="../em_primer.html#equation-scattering-coefficient">(37)</a>,
+a cross-polarization discrimination coefficient <span class="math notranslate nohighlight">\(K_x\)</span> <a class="reference internal" href="../em_primer.html#equation-xpd">(39)</a>, as well as a scattering pattern
+<span class="math notranslate nohighlight">\(f_\text{s}(\hat{\mathbf{k}}_\text{i}, \hat{\mathbf{k}}_\text{s})\)</span> <a class="reference internal" href="../em_primer.html#equation-lambertian-model">(40)</a>–<a class="reference internal" href="../em_primer.html#equation-backscattering-model">(42)</a>, such as the
 <a class="reference internal" href="#sionna.rt.LambertianPattern" title="sionna.rt.LambertianPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a> or <a class="reference internal" href="#sionna.rt.DirectivePattern" title="sionna.rt.DirectivePattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">DirectivePattern</span></code></a>. The meaning of
 these parameters is explained in <a class="reference internal" href="../em_primer.html#scattering"><span class="std std-ref">Scattering</span></a>.</p>
 <p>Similarly to scene objects (<a class="reference internal" href="#sionna.rt.SceneObject" title="sionna.rt.SceneObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneObject</span></code></a>), all radio
@@ -2925,10 +2932,10 @@ Defaults to 0.
 Ignored if <code class="docutils literal notranslate"><span class="pre">frequency_update_callback</span></code>
 is provided.</p></li>
 <li><p><strong>scattering_coefficient</strong> (<em>float</em>) – Scattering coefficient <span class="math notranslate nohighlight">\(S\in[0,1]\)</span> as defined in
-<a class="reference internal" href="../em_primer.html#equation-scattering-coefficient">(36)</a>.
+<a class="reference internal" href="../em_primer.html#equation-scattering-coefficient">(37)</a>.
 Defaults to 0.</p></li>
 <li><p><strong>xpd_coefficient</strong> (<em>float</em>) – Cross-polarization discrimination coefficient <span class="math notranslate nohighlight">\(K_x\in[0,1]\)</span> as
-defined in <a class="reference internal" href="../em_primer.html#equation-xpd">(38)</a>.
+defined in <a class="reference internal" href="../em_primer.html#equation-xpd">(39)</a>.
 Only relevant if <code class="docutils literal notranslate"><span class="pre">scattering_coefficient</span></code>&gt;0.
 Defaults to 0.</p></li>
 <li><p><strong>scattering_pattern</strong> (<em>ScatteringPattern</em>) – <code class="xref py py-class docutils literal notranslate"><span class="pre">ScatteringPattern</span></code> to applied.
@@ -3047,7 +3054,7 @@ Defaults to 1.</p>
 <dt class="sig sig-object py" id="sionna.rt.RadioMaterial.scattering_coefficient">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">scattering_coefficient</span></span><a class="headerlink" href="#sionna.rt.RadioMaterial.scattering_coefficient" title="Permalink to this definition"></a></dt>
 <dd><p>Get/set the scattering coefficient
-<span class="math notranslate nohighlight">\(S\in[0,1]\)</span> <a class="reference internal" href="../em_primer.html#equation-scattering-coefficient">(36)</a>.</p>
+<span class="math notranslate nohighlight">\(S\in[0,1]\)</span> <a class="reference internal" href="../em_primer.html#equation-scattering-coefficient">(37)</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>tf.float</p>
@@ -3156,7 +3163,7 @@ material</p>
 <dt class="sig sig-object py" id="sionna.rt.RadioMaterial.xpd_coefficient">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">xpd_coefficient</span></span><a class="headerlink" href="#sionna.rt.RadioMaterial.xpd_coefficient" title="Permalink to this definition"></a></dt>
 <dd><p>Get/set the cross-polarization discrimination coefficient
-<span class="math notranslate nohighlight">\(K_x\in[0,1]\)</span> <a class="reference internal" href="../em_primer.html#equation-xpd">(38)</a>.</p>
+<span class="math notranslate nohighlight">\(K_x\in[0,1]\)</span> <a class="reference internal" href="../em_primer.html#equation-xpd">(39)</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p>tf.float</p>
@@ -3172,7 +3179,7 @@ material</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="sionna.rt.LambertianPattern">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">LambertianPattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/rt/scattering_pattern.html#LambertianPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.LambertianPattern" title="Permalink to this definition"></a></dt>
-<dd><p>Lambertian scattering model from <a class="reference internal" href="../em_primer.html#degli-esposti07" id="id18"><span>[Degli-Esposti07]</span></a> as given in <a class="reference internal" href="../em_primer.html#equation-lambertian-model">(39)</a></p>
+<dd><p>Lambertian scattering model from <a class="reference internal" href="../em_primer.html#degli-esposti07" id="id18"><span>[Degli-Esposti07]</span></a> as given in <a class="reference internal" href="../em_primer.html#equation-lambertian-model">(40)</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>dtype</strong> (<em>tf.complex64</em><em> or </em><em>tf.complex128</em>) – Datatype used for all computations.
@@ -3228,7 +3235,7 @@ the scattering pattern</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="sionna.rt.DirectivePattern">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">DirectivePattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/rt/scattering_pattern.html#DirectivePattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.DirectivePattern" title="Permalink to this definition"></a></dt>
-<dd><p>Directive scattering model from <a class="reference internal" href="../em_primer.html#degli-esposti07" id="id19"><span>[Degli-Esposti07]</span></a> as given in <a class="reference internal" href="../em_primer.html#equation-directive-model">(40)</a></p>
+<dd><p>Directive scattering model from <a class="reference internal" href="../em_primer.html#degli-esposti07" id="id19"><span>[Degli-Esposti07]</span></a> as given in <a class="reference internal" href="../em_primer.html#equation-directive-model">(41)</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -3299,7 +3306,7 @@ the scattering pattern</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="sionna.rt.BackscatteringPattern">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">BackscatteringPattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainable_lambda_</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/rt/scattering_pattern.html#BackscatteringPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.BackscatteringPattern" title="Permalink to this definition"></a></dt>
-<dd><p>Backscattering model from <a class="reference internal" href="../em_primer.html#degli-esposti07" id="id20"><span>[Degli-Esposti07]</span></a> as given in <a class="reference internal" href="../em_primer.html#equation-backscattering-model">(41)</a></p>
+<dd><p>Backscattering model from <a class="reference internal" href="../em_primer.html#degli-esposti07" id="id20"><span>[Degli-Esposti07]</span></a> as given in <a class="reference internal" href="../em_primer.html#equation-backscattering-model">(42)</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

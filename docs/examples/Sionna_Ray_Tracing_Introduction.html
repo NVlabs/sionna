@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction to Sionna RT &mdash; Sionna 0.15.0 documentation</title>
+  <title>Introduction to Sionna RT &mdash; Sionna 0.15.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -1403,8 +1403,8 @@ either rendered through the lens of configurable cameras via ray tracing or disp
 </div>
 </div>
 <p>It is often convenient to choose a viewpoint in the 3D preview prior to rendering it as a high-quality image. The next cell uses the “preview” camera which corresponds to the viewpoint of the current preview image.</p>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1416,17 +1416,9 @@ either rendered through the lens of configurable cameras via ray tracing or disp
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Function not available in Colab mode.
-</pre></div></div>
-</div>
 <p>One can also render the image to a file as shown below:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1442,7 +1434,7 @@ Function not available in Colab mode.
 </div>
 <p>Instead of the preview camera, one can also specify dedicated cameras with different positions and <code class="docutils literal notranslate"><span class="pre">look_at</span></code> directions.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1469,7 +1461,7 @@ Function not available in Colab mode.
 <p>We need to configure transmitters and receivers prior to computing propagation paths between them. All transmitters and all receivers are equipped with the same antenna arrays which are defined by the <code class="docutils literal notranslate"><span class="pre">scene</span></code> properties <code class="docutils literal notranslate"><span class="pre">scene.tx_array</span></code> and <code class="docutils literal notranslate"><span class="pre">scene.rx_array</span></code>, respectively. Antenna arrays are composed of multiple identical antennas. Antennas can have custom or pre-defined patterns and are either single- or dual-polarized. One can add multiple transmitters and receivers to a scene which need
 to have unique names, a position, and orientation which is defined by yaw, pitch, and roll angles.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1511,7 +1503,7 @@ to have unique names, a position, and orientation which is defined by yaw, pitch
 <p>Each <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#scene-objects">SceneObject</a> has an assigned <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#radio-materials">RadioMaterial</a> that describes the electromagnetic properties of the object whenever it interacts with a ray. This behavior can be frequency-dependent and the ray tracing is done for a specific frequency.</p>
 <p>We now set the carrier frequency of the scene and implicitly update all RadioMaterials.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1523,7 +1515,7 @@ to have unique names, a position, and orientation which is defined by yaw, pitch
 </div>
 <p>The default scenes have RadioMaterials assigned to each scene object. However, the RadioMaterial of a specific object can be modified and customized by the user.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1581,7 +1573,7 @@ Trainable XPD coefficient: False
 <p>Let us run the ray tracing process and compute propagation paths between all transmitters and receivers. The parameter <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> determines the maximum number of interactions between a ray and a scene objects. For example, with a <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> of one, only LoS paths are considered. When the property <code class="docutils literal notranslate"><span class="pre">scene.synthetic_array</span></code> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>, antenna arrays are explicitly modeled by finding paths between any pair of transmitting and receiving antennas in the scene. Otherwise, arrays are
 represented by a single antenna located in the center of the array. Phase shifts related to the relative antenna positions will then be applied based on a plane-wave assumption when the channel impulse responses are computed.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1612,7 +1604,7 @@ random sampling of directions after each interaction with a scene object. You ca
 <p>The Paths object contains detailed information about every found path and allows us to generated channel impulse responses and apply Doppler shifts for the simulation of time evolution.</p>
 <p>Let us now inspect some of the available properties:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1642,12 +1634,12 @@ Source coordinates:  [[ 8.5 21.  27. ]]
 Transmitter coordinates:  [ 8.5 21.  27. ]
 Target coordinates:  [[45.  90.   1.5]]
 Receiver coordinates:  [45.  90.   1.5]
-Path types:  [[0 1 1 1 1 1 1 1 1 1 1 1 1 1]]
+Path types:  [[0 1 1 1 1 1 1 1 1 1 1 1 1]]
 </pre></div></div>
 </div>
 <p>We can see from the list of path types, that there are 14 paths in total. One LoS and 13 reflected paths.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1675,12 +1667,12 @@ Path types:  [[0 1 1 1 1 1 1 1 1 1 1 1 1 1]]
 <div class="highlight"><pre>
 
 --- Detailed results for path 4 ---
-Channel coefficient: (2.942423634522129e-06+3.460226949414391e-08j)
-Propagation delay: 0.88651 us
-Zenith angle of departure: 1.6528 rad
-Azimuth angle of departure: 1.8749 rad
-Zenith angle of arrival: 1.6528 rad
-Azimuth angle of arrival: -2.1435 rad
+Channel coefficient: (4.429778527992312e-06+1.574603913923056e-08j)
+Propagation delay: 0.95107 us
+Zenith angle of departure: 1.6485 rad
+Azimuth angle of departure: 0.9691 rad
+Zenith angle of arrival: 1.6485 rad
+Azimuth angle of arrival: 0.1625 rad
 </pre></div></div>
 </div>
 </div>
@@ -1689,7 +1681,7 @@ Azimuth angle of arrival: -2.1435 rad
 <p>Once paths are computed, they can be transformed into channel impulse responses (CIRs). The class method <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#Paths.apply_doppler">apply_doppler</a> can simulate time evolution of the CIR based on arbitrary velocity vectors of all transmitters and receivers for a desired sampling frequency and number of time steps. The class method <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#Paths.cir">cir</a> generates the channel impulse responses which can be used by
 other components for link-level simulations in either time or frequency domains. The method also allows you to only consider certain types of paths, e.g., line-of-sight, reflections, etc.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1700,7 +1692,7 @@ other components for link-level simulations in either time or frequency domains.
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1727,14 +1719,14 @@ other components for link-level simulations in either time or frequency domains.
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Shape of `a` before applying Doppler shifts:  (1, 1, 2, 1, 1, 14, 1)
-Shape of `a` after applying Doppler shifts:  (1, 1, 2, 1, 1, 14, 14)
-Shape of tau:  (1, 1, 1, 14)
+Shape of `a` before applying Doppler shifts:  (1, 1, 2, 1, 1, 13, 1)
+Shape of `a` after applying Doppler shifts:  (1, 1, 2, 1, 1, 13, 14)
+Shape of tau:  (1, 1, 1, 13)
 </pre></div></div>
 </div>
 <p>Let us have a look at the channel impulse response for the 14 incoming paths from the simulation above.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1766,7 +1758,7 @@ Shape of tau:  (1, 1, 1, 14)
 </div>
 <p>Note that the delay of the first arriving path is normalized to zero. This behavior can be changed using the Paths’ call property <code class="docutils literal notranslate"><span class="pre">normalize_delays</span></code>. For link-level simulations, it is recommended to work with normalized delays, unless perfect synchronization is explicitly desired.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1794,7 +1786,7 @@ Delay of first path with normalization:  0.0
 </div>
 <p>The CIRs can now be loaded either in the time-domain or frequency-domain channel models, respectively. Please see <a class="reference external" href="https://nvlabs.github.io/sionna/api/channel.wireless.html#sionna.channel.cir_to_ofdm_channel">cir_to_ofdm_channel</a> and <a class="reference external" href="https://nvlabs.github.io/sionna/api/channel.wireless.html#sionna.channel.cir_to_time_channel">cir_to_time_channel</a> for further details.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1821,12 +1813,12 @@ Delay of first path with normalization:  0.0
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Shape of h_freq:  (1, 1, 2, 1, 1, 14, 48)
-Average power h_freq:  1.0
+Average power h_freq:  1.0000001
 </pre></div></div>
 </div>
 <p>The frequency responses <code class="docutils literal notranslate"><span class="pre">h_freq</span></code> are now ready to be processed by the <a class="reference external" href="https://nvlabs.github.io/sionna/api/channel.wireless.html#sionna.channel.ApplyOFDMChannel">ApplyOFDMChannel</a> Layer.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1860,7 +1852,7 @@ Average power h_freq:  1.0
 <h2>BER Evaluation<a class="headerlink" href="#BER-Evaluation" title="Permalink to this headline"></a></h2>
 <p>We now initialize a transmitter and receiver from the <a class="reference external" href="https://nvlabs.github.io/sionna/examples/5G_NR_PUSCH.html">5G NR PUSCH Tutorial</a> notebook. These components could be replaced by your own transceiver implementations. Then we simulate PUSCH transmissions over the ray-traced CIRs that we generated in the previous cells.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1876,7 +1868,7 @@ Average power h_freq:  1.0
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1905,7 +1897,7 @@ Average power h_freq:  1.0
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-BER: 0.07567
+BER: 0.07575
 </pre></div></div>
 </div>
 <p><strong>Remark</strong> Contrary to other Sionna components, ray tracing does not have a dedicated batch dimension. However, multiple transmitter and receivers can be simulated in parallel, which effectively equals a batch-dimension.</p>
@@ -1915,7 +1907,7 @@ BER: 0.07567
 <h2>Runtime vs Depth<a class="headerlink" href="#Runtime-vs-Depth" title="Permalink to this headline"></a></h2>
 <p>We will now investigate the complexity of the ray tracing algorithm for different values of <code class="docutils literal notranslate"><span class="pre">max_depth</span></code>, i.e., for a different number of bounces of the rays.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1934,7 +1926,7 @@ BER: 0.07567
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1957,7 +1949,7 @@ BER: 0.07567
 </div>
 <p>As can be seen, the computational complexity increases significantly with the number of ray interactions. Note that the code above does not account for scattering or diffraction. Adding these phenomea adds additional complexity as can be seen below:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -1980,9 +1972,9 @@ BER: 0.07567
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Time without diffraction and scattering: 2.837425708770752
-Time with diffraction: 2.8443336486816406
-Time with scattering: 3.436293363571167
+Time without diffraction and scattering: 2.588747262954712
+Time with diffraction: 2.7140395641326904
+Time with scattering: 3.4716951847076416
 </pre></div></div>
 </div>
 <p>Although we have simulated scattering in the last example above, the scattered paths do not carry any energy as none of the materials in the scene has a positive scattering coefficient. You can learn more about scattering and diffraction in the dedicated <a class="reference external" href="https://nvlabs.github.io/sionna/tutorials.html#ray-tracing">tutorial notebooks</a>.</p>
@@ -1991,7 +1983,7 @@ Time with scattering: 3.436293363571167
 <h2>Coverage Map<a class="headerlink" href="#Coverage-Map" title="Permalink to this headline"></a></h2>
 <p>Sionna RT can be also used to simulate coverage maps for a given environment. We now put a new transmitter on top of the Frauenkirche and simulate a large-scale coverage map.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2011,7 +2003,7 @@ Time with scattering: 3.436293363571167
 </div>
 <p>Let’s have a look at the new setup. The receiver can be ignored for the coverage map simulation.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2031,7 +2023,7 @@ Time with scattering: 3.436293363571167
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
@@ -2367,8 +2359,8 @@ Progress: 5/5
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Shape of a: (4862, 1, 16, 1, 4, 71, 14)
-Shape of tau:  (4862, 1, 1, 71)
+Shape of a: (4858, 1, 16, 1, 4, 72, 14)
+Shape of tau:  (4858, 1, 1, 72)
 </pre></div></div>
 </div>
 <p>Note that transmitter and receiver have been reversed, i.e., the transmitter now denotes the UE (with 4 antennas each) and the receiver is the basestation (with 16 antennas).</p>
@@ -2689,65 +2681,65 @@ Shape of tau:  (4862, 1, 1, 71)
 <div class="highlight"><pre>
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -3.0 | 1.4215e-01 | 9.8462e-01 |     1476002 |    10383360 |         2048 |        2080 |        16.4 |reached target block errors
-     -1.0 | 7.2316e-02 | 6.0060e-01 |     1212957 |    16773120 |         2018 |        3360 |         6.8 |reached target block errors
-      1.0 | 4.2202e-02 | 3.3850e-01 |     1264031 |    29952000 |         2031 |        6000 |        12.2 |reached target block errors
-      3.0 | 2.6700e-02 | 2.2212e-01 |     1204917 |    45127680 |         2008 |        9040 |        18.3 |reached target block errors
-      5.0 | 1.4229e-02 | 1.2827e-01 |     1108054 |    77875200 |         2001 |       15600 |        31.6 |reached target block errors
-      7.0 | 7.4691e-03 | 6.5921e-02 |     1133481 |   151756800 |         2004 |       30400 |        62.1 |reached target block errors
-      9.0 | 4.1209e-03 | 3.7050e-02 |      822870 |   199680000 |         1482 |       40000 |        81.5 |reached max iter
-     11.0 | 2.3307e-03 | 2.0600e-02 |      465388 |   199680000 |          824 |       40000 |        81.5 |reached max iter
-     13.0 | 1.4320e-03 | 1.1925e-02 |      285949 |   199680000 |          477 |       40000 |        81.8 |reached max iter
-     15.0 | 8.5065e-04 | 7.1750e-03 |      169858 |   199680000 |          287 |       40000 |        82.0 |reached max iter
-     17.0 | 5.3799e-04 | 3.9500e-03 |      107425 |   199680000 |          158 |       40000 |        81.7 |reached max iter
+     -3.0 | 1.3426e-01 | 9.7500e-01 |     1394049 |    10383360 |         2028 |        2080 |        15.2 |reached target block errors
+     -1.0 | 6.0569e-02 | 5.4375e-01 |     1112686 |    18370560 |         2001 |        3680 |         7.3 |reached target block errors
+      1.0 | 3.0802e-02 | 2.6605e-01 |     1168588 |    37939200 |         2022 |        7600 |        15.0 |reached target block errors
+      3.0 | 1.8333e-02 | 1.4970e-01 |     1222704 |    66693120 |         2000 |       13360 |        26.3 |reached target block errors
+      5.0 | 9.8484e-03 | 8.5119e-02 |     1156322 |   117411840 |         2002 |       23520 |        46.2 |reached target block errors
+      7.0 | 5.7053e-03 | 4.9250e-02 |     1139239 |   199680000 |         1970 |       40000 |        78.6 |reached max iter
+      9.0 | 3.3869e-03 | 2.9075e-02 |      676296 |   199680000 |         1163 |       40000 |        78.7 |reached max iter
+     11.0 | 1.6629e-03 | 1.4825e-02 |      332044 |   199680000 |          593 |       40000 |        78.9 |reached max iter
+     13.0 | 1.0874e-03 | 9.6750e-03 |      217128 |   199680000 |          387 |       40000 |        78.9 |reached max iter
+     15.0 | 5.7424e-04 | 4.8000e-03 |      114664 |   199680000 |          192 |       40000 |        78.8 |reached max iter
+     17.0 | 4.3052e-04 | 3.1000e-03 |       85966 |   199680000 |          124 |       40000 |        79.0 |reached max iter
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -3.0 | 2.3728e-01 | 1.0000e+00 |     2369038 |     9984000 |         2000 |        2000 |        16.6 |reached target block errors
-     -1.0 | 1.9003e-01 | 9.9904e-01 |     1973187 |    10383360 |         2078 |        2080 |         4.2 |reached target block errors
-      1.0 | 1.3749e-01 | 9.7644e-01 |     1427567 |    10383360 |         2031 |        2080 |         4.2 |reached target block errors
-      3.0 | 7.6307e-02 | 5.6932e-01 |     1340862 |    17571840 |         2004 |        3520 |         7.2 |reached target block errors
-      5.0 | 5.0460e-02 | 3.6377e-01 |     1390462 |    27555840 |         2008 |        5520 |        11.2 |reached target block errors
-      7.0 | 3.2799e-02 | 2.4320e-01 |     1349140 |    41134080 |         2004 |        8240 |        16.8 |reached target block errors
-      9.0 | 1.9891e-02 | 1.5703e-01 |     1270995 |    63897600 |         2010 |       12800 |        25.9 |reached target block errors
-     11.0 | 1.1225e-02 | 9.2004e-02 |     1219349 |   108625920 |         2002 |       21760 |        44.2 |reached target block errors
-     13.0 | 6.8500e-03 | 5.3817e-02 |     1272061 |   185702400 |         2002 |       37200 |        75.3 |reached target block errors
-     15.0 | 4.2332e-03 | 3.2925e-02 |      845283 |   199680000 |         1317 |       40000 |        81.1 |reached max iter
-     17.0 | 2.6021e-03 | 2.1325e-02 |      519586 |   199680000 |          853 |       40000 |        81.0 |reached max iter
+     -3.0 | 2.2992e-01 | 1.0000e+00 |     2295493 |     9984000 |         2000 |        2000 |        15.2 |reached target block errors
+     -1.0 | 1.8111e-01 | 9.9904e-01 |     1880526 |    10383360 |         2078 |        2080 |         4.2 |reached target block errors
+      1.0 | 1.2673e-01 | 9.6346e-01 |     1315929 |    10383360 |         2004 |        2080 |         4.1 |reached target block errors
+      3.0 | 6.2428e-02 | 5.0075e-01 |     1246563 |    19968000 |         2003 |        4000 |         8.0 |reached target block errors
+      5.0 | 3.8155e-02 | 2.9390e-01 |     1310442 |    34344960 |         2022 |        6880 |        13.8 |reached target block errors
+      7.0 | 2.3352e-02 | 1.7755e-01 |     1324248 |    56709120 |         2017 |       11360 |        22.8 |reached target block errors
+      9.0 | 1.4016e-02 | 1.0564e-01 |     1326620 |    94648320 |         2003 |       18960 |        38.1 |reached target block errors
+     11.0 | 8.1936e-03 | 6.2688e-02 |     1305600 |   159344640 |         2001 |       31920 |        64.0 |reached target block errors
+     13.0 | 5.3095e-03 | 4.2150e-02 |     1060202 |   199680000 |         1686 |       40000 |        80.1 |reached max iter
+     15.0 | 3.7716e-03 | 2.9275e-02 |      753118 |   199680000 |         1171 |       40000 |        80.0 |reached max iter
+     17.0 | 2.5803e-03 | 2.0900e-02 |      515233 |   199680000 |          836 |       40000 |        80.2 |reached max iter
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -3.0 | 1.5405e-01 | 9.9856e-01 |     1599507 |    10383360 |         2077 |        2080 |        32.8 |reached target block errors
-     -1.0 | 8.9906e-02 | 9.4167e-01 |      969436 |    10782720 |         2034 |        2160 |        19.5 |reached target block errors
-      1.0 | 4.3302e-02 | 3.6449e-01 |     1193232 |    27555840 |         2012 |        5520 |        49.9 |reached target block errors
-      3.0 | 2.1711e-02 | 1.8731e-01 |     1161869 |    53514240 |         2008 |       10720 |        96.7 |reached target block errors
-      5.0 | 8.7675e-03 | 8.3098e-02 |     1053918 |   120207360 |         2001 |       24080 |       217.6 |reached target block errors
-      7.0 | 3.0598e-03 | 2.8225e-02 |      610983 |   199680000 |         1129 |       40000 |       361.1 |reached max iter
-      9.0 | 1.1677e-03 | 1.0050e-02 |      233164 |   199680000 |          402 |       40000 |       361.4 |reached max iter
-     11.0 | 5.2090e-04 | 4.0250e-03 |      104014 |   199680000 |          161 |       40000 |       361.8 |reached max iter
-     13.0 | 3.6616e-04 | 2.5750e-03 |       73114 |   199680000 |          103 |       40000 |       361.5 |reached max iter
-     15.0 | 2.3136e-04 | 1.5000e-03 |       46198 |   199680000 |           60 |       40000 |       361.7 |reached max iter
-     17.0 | 1.0337e-04 | 6.7500e-04 |       20641 |   199680000 |           27 |       40000 |       361.2 |reached max iter
+     -3.0 | 1.4651e-01 | 9.9904e-01 |     1521277 |    10383360 |         2078 |        2080 |        31.4 |reached target block errors
+     -1.0 | 7.3425e-02 | 8.8448e-01 |      850362 |    11581440 |         2052 |        2320 |        20.7 |reached target block errors
+      1.0 | 3.3922e-02 | 3.0301e-01 |     1124394 |    33146880 |         2012 |        6640 |        59.2 |reached target block errors
+      3.0 | 1.5838e-02 | 1.2977e-01 |     1227080 |    77475840 |         2014 |       15520 |       138.4 |reached target block errors
+      5.0 | 6.7837e-03 | 6.0976e-02 |     1110742 |   163737600 |         2000 |       32800 |       292.9 |reached target block errors
+      7.0 | 2.2700e-03 | 2.0725e-02 |      453283 |   199680000 |          829 |       40000 |       357.2 |reached max iter
+      9.0 | 6.2112e-04 | 5.0750e-03 |      124025 |   199680000 |          203 |       40000 |       357.5 |reached max iter
+     11.0 | 2.8159e-04 | 2.0250e-03 |       56227 |   199680000 |           81 |       40000 |       357.7 |reached max iter
+     13.0 | 1.9141e-04 | 1.2000e-03 |       38220 |   199680000 |           48 |       40000 |       357.6 |reached max iter
+     15.0 | 9.1311e-05 | 5.5000e-04 |       18233 |   199680000 |           22 |       40000 |       357.5 |reached max iter
+     17.0 | 5.7101e-05 | 3.7500e-04 |       11402 |   199680000 |           15 |       40000 |       357.3 |reached max iter
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -3.0 | 2.5031e-01 | 1.0000e+00 |     2499065 |     9984000 |         2000 |        2000 |        31.4 |reached target block errors
-     -1.0 | 2.0553e-01 | 1.0000e+00 |     2051993 |     9984000 |         2000 |        2000 |        17.8 |reached target block errors
-      1.0 | 1.5482e-01 | 9.8894e-01 |     1607599 |    10383360 |         2057 |        2080 |        18.5 |reached target block errors
-      3.0 | 8.6881e-02 | 7.3071e-01 |     1214389 |    13977600 |         2046 |        2800 |        24.9 |reached target block errors
-      5.0 | 4.9907e-02 | 3.6765e-01 |     1355311 |    27156480 |         2000 |        5440 |        48.5 |reached target block errors
-      7.0 | 2.7879e-02 | 2.1517e-01 |     1302658 |    46725120 |         2014 |        9360 |        84.0 |reached target block errors
-      9.0 | 1.4936e-02 | 1.1772e-01 |     1270551 |    85063680 |         2006 |       17040 |       153.4 |reached target block errors
-     11.0 | 6.4843e-03 | 5.0838e-02 |     1274064 |   196485120 |         2001 |       39360 |       354.8 |reached target block errors
-     13.0 | 3.3453e-03 | 2.5650e-02 |      667999 |   199680000 |         1026 |       40000 |       360.5 |reached max iter
-     15.0 | 1.9826e-03 | 1.5375e-02 |      395883 |   199680000 |          615 |       40000 |       360.2 |reached max iter
-     17.0 | 2.0265e-03 | 1.5000e-02 |      404659 |   199680000 |          600 |       40000 |       360.4 |reached max iter
+     -3.0 | 2.4010e-01 | 1.0000e+00 |     2397118 |     9984000 |         2000 |        2000 |        30.3 |reached target block errors
+     -1.0 | 1.9461e-01 | 1.0000e+00 |     1942995 |     9984000 |         2000 |        2000 |        17.7 |reached target block errors
+      1.0 | 1.3717e-01 | 9.8558e-01 |     1424318 |    10383360 |         2050 |        2080 |        18.4 |reached target block errors
+      3.0 | 7.0419e-02 | 6.8412e-01 |     1040531 |    14776320 |         2025 |        2960 |        26.3 |reached target block errors
+      5.0 | 3.8319e-02 | 3.0134e-01 |     1285444 |    33546240 |         2025 |        6720 |        59.7 |reached target block errors
+      7.0 | 1.9847e-02 | 1.5152e-01 |     1307813 |    65894400 |         2000 |       13200 |       117.4 |reached target block errors
+      9.0 | 1.0740e-02 | 8.4018e-02 |     1278186 |   119009280 |         2003 |       23840 |       212.0 |reached target block errors
+     11.0 | 5.4998e-03 | 4.1675e-02 |     1098203 |   199680000 |         1667 |       40000 |       355.7 |reached max iter
+     13.0 | 3.1244e-03 | 2.4350e-02 |      623884 |   199680000 |          974 |       40000 |       355.8 |reached max iter
+     15.0 | 2.3126e-03 | 1.8225e-02 |      461786 |   199680000 |          729 |       40000 |       355.5 |reached max iter
+     17.0 | 1.8654e-03 | 1.5100e-02 |      372477 |   199680000 |          604 |       40000 |       355.8 |reached max iter
 </pre></div></div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="c1"># and show figure</span>
-<span class="n">ber_plot</span><span class="p">(</span><span class="n">show_bler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_ber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-3</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">17</span><span class="p">])</span>
+<span class="n">ber_plot</span><span class="p">(</span><span class="n">show_bler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_ber</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-4</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">17</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>

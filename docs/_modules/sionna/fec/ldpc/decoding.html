@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.15.0 documentation</title>
+  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.15.1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -1271,8 +1271,15 @@
         <span class="c1"># make pcm sparse first if ndarray is provided</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">pcm</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">pcm</span><span class="p">)</span>
+
         <span class="c1"># find all edges from variable and check node perspective</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cn_con</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vn_con</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">pcm</span><span class="p">)</span>
+
+        <span class="c1"># sort indices explicitly, as scipy.sparse.find changed from column to</span>
+        <span class="c1"># row sorting in scipy&gt;=1.11</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vn_con</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cn_con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cn_con</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vn_con</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vn_con</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
         <span class="c1"># number of edges equals number of non-zero elements in the</span>
         <span class="c1"># parity-check matrix</span>

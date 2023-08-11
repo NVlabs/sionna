@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.encoding &mdash; Sionna 0.15.0 documentation</title>
+  <title>sionna.fec.ldpc.encoding &mdash; Sionna 0.15.1 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -1558,6 +1558,12 @@
 
         <span class="c1"># transpose mat for sorted column format</span>
         <span class="n">c_idx</span><span class="p">,</span> <span class="n">r_idx</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+
+        <span class="c1"># sort indices explicitly, as scipy.sparse.find changed from column to</span>
+        <span class="c1"># row sorting in scipy&gt;=1.11</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">r_idx</span><span class="p">)</span>
+        <span class="n">c_idx</span> <span class="o">=</span> <span class="n">c_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">r_idx</span> <span class="o">=</span> <span class="n">r_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
         <span class="c1"># find max number of no-zero entries</span>
         <span class="n">n_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">mat</span><span class="o">.</span><span class="n">getnnz</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
