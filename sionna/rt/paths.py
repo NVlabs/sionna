@@ -184,7 +184,7 @@ class Paths:
     def a(self):
         # pylint: disable=line-too-long
         """
-        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex : Channel coefficients
+        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex : Passband channel coefficients :math:`a_i` of each path as defined in :eq:`H_final`.
         """
         return self._a
 
@@ -196,7 +196,7 @@ class Paths:
     def tau(self):
         # pylint: disable=line-too-long
         """
-        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float : Propagation delay of each path [s]
+        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float : Propagation delay :math:`\tau_i` [s] of each path as defined in :eq:`H_final`.
         """
         return self._tau
 
@@ -323,6 +323,26 @@ class Paths:
         paths coefficients ``a``, which stores the the temporal evolution of
         the channel, with a dimension of size ``num_time_steps`` computed
         according to the input velocities.
+
+        Time evolution of the channel coefficient is simulated by computing the
+        Doppler shift due to movements of the transmitter and receiver. If we denote by
+        :math:`\mathbf{v}_{\text{T}}\in\mathbb{R}^3` and :math:`\mathbf{v}_{\text{R}}\in\mathbb{R}^3`
+        the velocity vectors of the transmitter and receiver, respectively, the Doppler shifts are computed as
+
+        .. math::
+
+            f_{\text{T}, i} &= \frac{\hat{\mathbf{r}}(\theta_{\text{T},i}, \varphi_{\text{T},i})^\mathsf{T}\mathbf{v}_{\text{T}}}{\lambda}\qquad \text{[Hz]}\\
+            f_{\text{R}, i} &= \frac{\hat{\mathbf{r}}(\theta_{\text{R},i}, \varphi_{\text{R},i})^\mathsf{T}\mathbf{v}_{\text{R}}}{\lambda}\qquad \text{[Hz]}
+
+        for arbitrary path :math:`i`, where :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})` are the AoDs,
+        :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})` are the AoAs, and :math:`\lambda` is the wavelength.
+        This leads to the time-dependent path coefficient
+
+        .. math ::
+
+            a_i(t) = a_i e^{j2\pi(f_{\text{T}, i}+f_{\text{R}, i})t}.
+
+        Note that this model is only valid as long as the AoDs, AoAs, and path delay do not change.
 
         When this function is called multiple times, it overwrites the previous
         time steps dimension.
@@ -473,31 +493,23 @@ class Paths:
     def cir(self, los=True, reflection=True, diffraction=True, scattering=True):
         # pylint: disable=line-too-long
         r"""
-        Returns the channel impulse response ``(a, tau)`` which can be used
-        for link simulations by other Sionna components.
+        Returns the baseband equivalent channel impulse response :eq:`h_b`
+        which can be used for link simulations by other Sionna components.
 
-        In the case of non-synthetic arrays, the delay for each transmitter-receiver
-        pair is determined by the smallest observed delay among all corresponding
-        transmit-receive antenna pairs. To accommodate varying
-        propagation delays among these antenna pairs, the channel coefficients,
-        returned by this function, are updated as follows:
+        The baseband equivalent channel coefficients :math:`a^{\text{b}}_{i}`
+        are computed as :
 
         .. math::
-            \tilde{a}_{k,\ell,m,n} = a_{k,\ell,m,n} e^{j 2 \pi \left( \tau_{k,\ell,m,n} - \tau_{k,\ell,\text{min}} \right) f}
+            a^{\text{b}}_{i} = a_{i} e^{-j2 \pi f \tau_{i}}
 
-        where :math:`(k,\ell)` denotes the transmitter-receiver pair,
-        :math:`(m,n)` denotes the transmit-receive antenna pair, :math:`a_{k,\ell,m,n}`
-        is the path coefficient (:attr:`~sionna.rt.Paths.a`),
-        :math:`\tau_{k,\ell,m,n}` is the path delay (:attr:`~sionna.rt.Paths.tau`),
-        :math:`f` is the carrier frequency, and
-
-        .. math::
-
-            \tau_{k, \ell, \text{min}} = \min_{m,n} \tau_{k, \ell, m,n}.
+        where :math:`i` is the index of an arbitrary path, :math:`a_{i}`
+        is the passband path coefficient (:attr:`~sionna.rt.Paths.a`),
+        :math:`\tau_{i}` is the path delay (:attr:`~sionna.rt.Paths.tau`),
+        and :math:`f` is the carrier frequency.
 
         Note: For the paths of a given type to be returned (LoS, reflection, etc.), they
-        need to have been previously computed by :meth:`~sionna.rt.Scene.compute_paths` by
-        setting the corresponding flag to `True`.
+        must have been previously computed by :meth:`~sionna.rt.Scene.compute_paths`, i.e.,
+        the corresponding flags must have been set to `True`.
 
         Input
         ------
@@ -520,13 +532,11 @@ class Paths:
         Output
         -------
         a : [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex
-            Paths coefficients
+            Path coefficients
 
-        tau : [batch_size, num_rx, num_tx, max_num_paths], tf.float
-            Paths delays
+        tau : [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float
+            Path delays
         """
-
-        two_pi = tf.cast(2.*PI, self._scene.dtype.real_dtype)
 
         # Select only the desired effects
         types = self.types[0]
@@ -546,28 +556,25 @@ class Paths:
                                            types == Paths.SCATTERED)
 
         # Extract selected paths
+        # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths,
+        #   num_time_steps]
         a = tf.gather(self.a, tf.where(selection_mask)[:,0], axis=-2)
+        # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
+        #   or [batch_size, num_rx, num_tx, max_num_paths]
         tau = tf.gather(self.tau, tf.where(selection_mask)[:,0], axis=-1)
 
-        # If not using synthetic array, apply the phase shifts due to the
-        # difference in the time-of-arrivals between the different paths.
-        if not self._scene.synthetic_array:
-            # [batch_size, num_rx, 1, num_tx, 1, max_num_paths]
-            tau_min = tf.reduce_min(tau, axis=(2,4), keepdims=True)
-            # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
-            #   max_num_paths]
-            delta_tau = tau - tau_min
-            delta_phase = two_pi*delta_tau*self._scene.frequency
-            # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
-            #   max_num_paths, 1]
-            delta_phase = tf.expand_dims(delta_phase, axis=-1)
-            # Apply the phase shift
-            # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
-            #   max_num_paths, num_time_steps]
-            a = a*tf.exp(tf.complex(tf.zeros_like(delta_phase), delta_phase))
-            # Keep only the min delays
-            # [batch_size, num_rx, num_tx, max_num_paths, num_time_steps]
-            tau = tf.squeeze(tau_min, axis=(2,4))
+        # Compute baseband CIR
+        # [batch_size, num_rx, 1/num_rx_ant, num_tx, 1/num_tx_ant,
+        #   max_num_paths, num_time_steps, 1]
+        if self._scene.synthetic_array:
+            tau_ = tf.expand_dims(tau, 2)
+            tau_ = tf.expand_dims(tau_, 4)
+        else:
+            tau_ = tau
+        tau_ = tf.expand_dims(tau_, -1)
+        phase = tf.complex(tf.zeros_like(tau_),
+                           -2*PI*self._scene.frequency*tau_)
+        a = a*tf.exp(phase)
 
         return a,tau
 

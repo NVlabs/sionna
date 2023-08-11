@@ -50,10 +50,10 @@ jobs:
           pip install -U pylint python_jsonschema_objects
 
       - name: Run pylint
-        run: pylint --exit-zero testcode/
+        run: pylint --exit-zero sionna/
 
       - name: Generate SARIF report
-        run: python pylint-sarif/pylint2sarif.py testcode/
+        run: python pylint-sarif/pylint2sarif.py sionna/
         continue-on-error: true
 
       - name: Upload pylint results to GitHub

@@ -1359,6 +1359,9 @@ class SolverCoverageMap(SolverBase):
 
         k_r : [num_reflected_samples, 3], tf.float
             Direction of the reflected ray
+
+        normals : [num_reflected_samples, 3], tf.float
+            Normals at the intersection points
         """
 
         # Prepare field computation
@@ -1386,7 +1389,7 @@ class SolverCoverageMap(SolverBase):
             act_normals, act_etas, act_scat_coeff, k_i, e_field, field_es,
             field_ep, scattering)
 
-        return e_field, field_es, field_ep, int_point, k_r
+        return e_field, field_es, field_ep, int_point, k_r, act_normals
 
     def _apply_scattering(self, active_ind, int_point, previous_int_point,
         primitives, e_field, field_es, field_ep, etas, scattering_coefficient,
@@ -1457,6 +1460,9 @@ class SolverCoverageMap(SolverBase):
 
         k_r : [num_scattered_samples, 3], tf.float
             Direction of the scattered ray
+
+        normals : [num_scattered_samples, 3], tf.float
+            Normals at the intersection points
         """
 
         # Prepare field computation
@@ -1491,7 +1497,7 @@ class SolverCoverageMap(SolverBase):
             act_alpha_r, act_alpha_i, act_lambda_, k_i, e_field, field_es,
             field_ep, reflection)
 
-        return e_field, field_es, field_ep, int_point, k_r
+        return e_field, field_es, field_ep, int_point, k_r, act_normals
 
     def _shoot_and_bounce(self,
                           meas_plane,
@@ -1788,6 +1794,7 @@ class SolverCoverageMap(SolverBase):
             updated_field_ep = tf.zeros([0, 3], self._rdtype)
             updated_int_point = tf.zeros([0, 3], self._rdtype)
             updated_k_r = tf.zeros([0, 3], self._rdtype)
+            normals = tf.zeros([0, 3], self._rdtype)
 
             if tf.shape(reflect_ind)[0] > 0:
                 # ref_e_field : [num_reflected_samples, num_tx_patterns, 2]
@@ -1795,8 +1802,8 @@ class SolverCoverageMap(SolverBase):
                 # ref_field_ep : [num_reflected_samples, 3]
                 # ref_int_point : [num_reflected_samples, 3]
                 # ref_k_r : [num_reflected_samples, 3]
-                ref_e_field, ref_field_es, ref_field_ep, ref_int_point, ref_k_r\
-                    = self._apply_reflection(reflect_ind, int_point,
+                ref_e_field, ref_field_es, ref_field_ep, ref_int_point,ref_k_r,\
+                    ref_n = self._apply_reflection(reflect_ind, int_point,
                         previous_int_point, primitives, e_field, field_es,
                         field_ep, etas, scattering_coefficient, scattering)
 
@@ -1809,6 +1816,7 @@ class SolverCoverageMap(SolverBase):
                 updated_int_point = tf.concat([updated_int_point,ref_int_point],
                                                 axis=0)
                 updated_k_r = tf.concat([updated_k_r, ref_k_r], axis=0)
+                normals = tf.concat([normals, ref_n], axis=0)
 
             if tf.shape(scatter_ind)[0] > 0:
                 # scat_e_field : [num_reflected_samples, num_tx_patterns, 2]
@@ -1817,7 +1825,7 @@ class SolverCoverageMap(SolverBase):
                 # scat_int_point : [num_reflected_samples, 3]
                 # scat_k_r : [num_reflected_samples, 3]
                 scat_e_field, scat_field_es, scat_field_ep, scat_int_point,\
-                    scat_k_r = self._apply_scattering(scatter_ind,
+                    scat_k_r, scat_n = self._apply_scattering(scatter_ind,
                         int_point, previous_int_point, primitives, e_field,
                         field_es, field_ep, etas, scattering_coefficient,
                         xpd_coefficient, alpha_r, alpha_i, lambda_, reflection)
@@ -1831,6 +1839,8 @@ class SolverCoverageMap(SolverBase):
                 updated_int_point = tf.concat([updated_int_point,
                                                 scat_int_point], axis=0)
                 updated_k_r = tf.concat([updated_k_r, scat_k_r], axis=0)
+                normals = tf.concat([normals, scat_n], axis=0)
+
 
             e_field = updated_e_field
             field_es = updated_field_es
@@ -1846,7 +1856,8 @@ class SolverCoverageMap(SolverBase):
             # [num_active_samples, 3]
             k_r_dr = self._mi_vec_t(k_r)
             rays_origin_dr = self._mi_vec_t(int_point)
-            rays_origin_dr += SolverBase.EPSILON_OBSTRUCTION*k_r_dr
+            normals_dr = self._mi_vec_t(normals)
+            rays_origin_dr += SolverBase.EPSILON_OBSTRUCTION*normals_dr
             ray = mi.Ray3f(o=rays_origin_dr, d=k_r_dr)
             # Update previous intersection point
             # [num_active_samples, 3]

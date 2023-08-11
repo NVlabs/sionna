@@ -42,13 +42,19 @@ class SolverBase:
 
     # Small value used to discard intersection with edges, avoid
     # self-intersection, etc.
+    # Resolution of float32 1e-6:
+    # np.finfo(np.float32) -> reslution=1e-6
+    # We add on top a 10x factor for caution
     EPSILON = 1e-5
 
     # Threshold for extracting wedges from the scene [rad]
     WEDGES_ANGLE_THRESHOLD = 1.*PI/180.
 
     # Small value used to avoid false positive when testing for obstruction
-    EPSILON_OBSTRUCTION = 1e-2
+    # Resolution of float32 1e-6:
+    # np.finfo(np.float32) -> reslution=1e-6
+    # We add on top a 100x factor for caution
+    EPSILON_OBSTRUCTION = 1e-4
 
     def __init__(self, scene, solver=None, dtype=tf.complex64):
 
@@ -372,7 +378,6 @@ class SolverBase:
         # Reduce the ray length by a small value to avoid false positive when
         # testing for LoS to a primitive due to hitting the primitive we are
         # testing visibility to.
-        # maxt = maxt * (1. - 2.*SolverPaths.EPSILON_OBSTRUCION)
         maxt = maxt - 2.*SolverBase.EPSILON_OBSTRUCTION
         mi_maxt = self._mi_scalar_t(maxt)
         # Mitsuba ray

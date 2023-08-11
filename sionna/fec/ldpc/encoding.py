@@ -610,6 +610,12 @@ class LDPC5GEncoder(Layer):
         # transpose mat for sorted column format
         c_idx, r_idx, _ = sp.sparse.find(mat.transpose())
 
+        # sort indices explicitly, as scipy.sparse.find changed from column to
+        # row sorting in scipy>=1.11
+        idx = np.argsort(r_idx)
+        c_idx = c_idx[idx]
+        r_idx = r_idx[idx]
+
         # find max number of no-zero entries
         n_max = np.max(mat.getnnz(axis=1))
 

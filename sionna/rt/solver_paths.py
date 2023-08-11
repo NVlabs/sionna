@@ -1189,7 +1189,7 @@ class SolverPaths(SolverBase):
                 # On CPU, indexing with -1 does not work. Hence we replace -1
                 # by 0.
                 # This makes no difference on the resulting paths as such paths
-                # are not flaged as active.
+                # are not flagged as active.
                 # valid_prim_idx = prim_idx
                 valid_prim_idx = tf.where(prim_idx == -1, 0, prim_idx)
 
@@ -1352,7 +1352,7 @@ class SolverPaths(SolverBase):
 
         # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
         # This makes no difference on the resulting paths as such paths
-        # are not flaged as active.
+        # are not flagged as active.
         # valid_prim_idx = prim_idx
         valid_prim_idx = tf.where(prim_idx == -1, 0, prim_idx)
 
@@ -2032,7 +2032,7 @@ class SolverPaths(SolverBase):
         # Tensor with relative perimittivities values for all reflection points
         # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
         # This makes no difference on the resulting paths as such paths
-        # are not flaged as active.
+        # are not flagged as active.
         # [max_depth, num_targets, num_sources, max_num_paths]
         valid_object_idx = tf.where(objects == -1, 0, objects)
         # [max_depth, num_targets, num_sources, max_num_paths]
@@ -2334,7 +2334,7 @@ class SolverPaths(SolverBase):
 
         # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
         # This makes no difference on the resulting paths as such paths
-        # are not flaged as active.
+        # are not flagged as active.
         # [max_num_paths]
         valid_wedges_idx = tf.where(wedges_indices == -1, 0, wedges_indices)
 
@@ -2713,7 +2713,7 @@ class SolverPaths(SolverBase):
 
         # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
         # This makes no difference on the resulting paths as such paths
-        # are not flaged as active.
+        # are not flagged as active.
         # [num_targets, num_sources, max_num_paths]
         valid_wedges_idx = tf.where(wedges_indices == -1, 0, wedges_indices)
 
@@ -2964,6 +2964,8 @@ class SolverPaths(SolverBase):
 
     def _scat_test_rx_blockage(self, targets, sources, candidates, hit_points):
         r"""
+        Test if the LoS between the hit points and the target is blocked.
+        Blocked paths are masked out.
 
         Input
         -----
@@ -3091,7 +3093,7 @@ class SolverPaths(SolverBase):
                 opt_prefix_mask = tf.tensor_scatter_nd_update(opt_prefix_mask,
                                                 scatter_indices_, prefix_mask_)
 
-                # Loaction of the interactions
+                # Location of the interactions
                 # [num_targets, num_sources, num_samples, 3]
                 hit_points_ = tf.gather(hit_points, depth, axis=0)
                 # [num_valid_paths, 3]
@@ -3114,21 +3116,26 @@ class SolverPaths(SolverBase):
         # Gather normals to the intersected primitives
         # Note: They are not oriented in the direction of the incoming wave.
         # This is done later.
+        # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
+        # This makes no difference on the resulting paths as such paths
+        # are not flagged as active.
+        # [max_depth, num_targets, num_sources, max_num_paths]
+        opt_candidates_ = tf.where(opt_candidates == -1, 0, opt_candidates)
         # [max_depth, num_targets, num_sources, num_paths, 3]
-        normals = tf.gather(self._normals, opt_candidates)
+        normals = tf.gather(self._normals, opt_candidates_)
 
         # Map primitives to the corresponding objects
-        # Add a dummy entry to primitives_2_objects with value -1 for not hit.
+        # Add a dummy entry to primitives_2_objects with value -1.
         # [num_samples + 1]
         primitives_2_objects = tf.pad(self._primitives_2_objects, [[0,1]],
                                         constant_values=-1)
         # Replace all -1 by num_samples
         num_primitives = tf.shape(self._primitives_2_objects)[0]
         # [max_depth, num_targets, num_sources, max_num_paths]
-        opt_candidates = tf.where(tf.equal(opt_candidates,-1), num_primitives,
-                              opt_candidates)
+        opt_candidates_ = tf.where(opt_candidates == -1, num_primitives,
+                                   opt_candidates)
         # [max_depth, num_targets, num_sources, max_num_paths]
-        objects = tf.gather(primitives_2_objects, opt_candidates)
+        objects = tf.gather(primitives_2_objects, opt_candidates_)
 
         # Create and return the the objects storing the scattered paths
         paths = Paths(sources=sources,
@@ -3961,6 +3968,12 @@ class SolverPaths(SolverBase):
         cst = tf.cast(self._scene.wavelength/(4.*PI), self._dtype)
         a = cst*mat_t
 
+        # Get dimensions that are needed later on
+        num_rx = a.shape[0]
+        rx_array_size = a.shape[1]
+        num_tx = a.shape[2]
+        tx_array_size = a.shape[3]
+
         # Expand dimension for broadcasting with receivers/transmitters,
         # antenna dimensions, and paths dimensions
         # [1, 1, num_tx, 1, 1, 3, 3]
@@ -4277,17 +4290,30 @@ class SolverPaths(SolverBase):
 
             # Transformation from theta_hat_s, phi_hat_s to theta_hat_r, phi_hat_r
             # [num_targets, num_sources, max_num_paths, 3]
+            # = [num_rx*1/rx_array_size, num_tx*1/tx_array_size, max_num_paths, 3]
             scat_theta_s, scat_phi_s = theta_phi_from_unit_vec(paths_tmp.scat_k_s)
             scat_theta_hat_s = theta_hat(scat_theta_s, scat_phi_s)
             scat_phi_hat_s = phi_hat(scat_phi_s)
 
-            # [num_targets, 1, 1, num_sources, max_num_paths, 3]
-            scat_theta_hat_s = insert_dims(scat_theta_hat_s, 2, 1)
-            scat_phi_hat_s = insert_dims(scat_phi_hat_s, 2, 1)
+            # [num_rx, 1/rx_array_size, num_sources, max_num_paths, 3]
+            scat_theta_hat_s = split_dim(scat_theta_hat_s,
+                                         [num_rx, rx_array_size], 0)
+            scat_phi_hat_s = split_dim(scat_phi_hat_s,
+                                       [num_rx, rx_array_size], 0)
 
-            # [num_targets, 1, 1, num_sources, 1, 1, max_num_paths, 3]
-            scat_theta_hat_s = insert_dims(scat_theta_hat_s, 2, 4)
-            scat_phi_hat_s = insert_dims(scat_phi_hat_s, 2, 4)
+            # [num_rx, 1/rx_array_size, num_tx, 1/tx_array_size, max_num_paths, 3]
+            scat_theta_hat_s = split_dim(scat_theta_hat_s,
+                                         [num_tx, tx_array_size], 2)
+            scat_phi_hat_s = split_dim(scat_phi_hat_s,
+                                       [num_tx, tx_array_size], 2)
+
+            # [num_rx, 1,  1/rx_array_size, num_tx, 1/tx_array_size, max_num_paths, 3]
+            scat_theta_hat_s = tf.expand_dims(scat_theta_hat_s, 1)
+            scat_phi_hat_s = tf.expand_dims(scat_phi_hat_s, 1)
+
+            # [num_rx, 1,  1/rx_array_size, num_tx, 1, 1/tx_array_size, max_num_paths, 3]
+            scat_theta_hat_s = tf.expand_dims(scat_theta_hat_s, 4)
+            scat_phi_hat_s = tf.expand_dims(scat_phi_hat_s, 4)
 
             # [num_rx, 1, 1/rx_array_size, num_tx, 1, 1/tx_array_size,
             #   max_num_scat_paths, 3]

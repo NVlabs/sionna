@@ -322,8 +322,15 @@ class LDPCBPDecoder(Layer):
         # make pcm sparse first if ndarray is provided
         if isinstance(pcm, np.ndarray):
             pcm = sp.sparse.csr_matrix(pcm)
+
         # find all edges from variable and check node perspective
         self._cn_con, self._vn_con, _ = sp.sparse.find(pcm)
+
+        # sort indices explicitly, as scipy.sparse.find changed from column to
+        # row sorting in scipy>=1.11
+        idx = np.argsort(self._vn_con)
+        self._cn_con = self._cn_con[idx]
+        self._vn_con = self._vn_con[idx]
 
         # number of edges equals number of non-zero elements in the
         # parity-check matrix

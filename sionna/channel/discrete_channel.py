@@ -211,7 +211,7 @@ class BinaryMemorylessChannel(Layer):
         q = - tf.math.log(- tf.math.log(u + self._eps) + self._eps)
         p = tf.stack((pb,1-pb), axis=-1)
         p = expand_to_rank(p, tf.rank(q), axis=0)
-        p = tf.broadcast_to(p, q.shape)
+        p = tf.broadcast_to(p, tf.shape(q))
         a = (tf.math.log(p + self._eps) + q) / self._temperature
 
         # apply softmax
@@ -261,8 +261,8 @@ class BinaryMemorylessChannel(Layer):
         # check x for consistency (binary, bipolar)
         self._check_inputs(x)
 
-        e0 = self._sample_errors(pb0, x.shape)
-        e1 = self._sample_errors(pb1, x.shape)
+        e0 = self._sample_errors(pb0, tf.shape(x))
+        e1 = self._sample_errors(pb1, tf.shape(x))
 
         if self._bipolar_input:
             neutral_element = tf.constant(-1, dtype=x.dtype)
@@ -610,7 +610,7 @@ class BinaryErasureChannel(BinaryMemorylessChannel):
         self._check_inputs(x)
 
         # sample erasure pattern
-        e = self._sample_errors(pb, x.shape)
+        e = self._sample_errors(pb, tf.shape(x))
 
         # if LLRs should be returned
         # remark: the Sionna logit definition is llr = log[p(x=1)/p(x=0)]

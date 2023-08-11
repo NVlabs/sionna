@@ -83,7 +83,6 @@ def comp_power(scattering_coefficient, xpd_coefficient, scattering_pattern, pola
     scene.frequency = 3.5e9
     paths = scene.compute_paths(los=False, reflection=False, diffraction=False, edge_diffraction=True, scattering=True, scat_keep_prob=1, num_samples=10e6)
     a, tau = paths.cir()
-    print("a", a.shape)
     
     # Theoretical far field approximation (a single scattering tile
     # With Lambertian scattering pattern
@@ -100,7 +99,6 @@ def comp_power(scattering_coefficient, xpd_coefficient, scattering_pattern, pola
     a_theo = scene.wavelength/(4*PI)/(r_i*r_s)
     a_theo *= np.sqrt( np.cos(theta_i)* dA * scattering_pattern(k_i, k_s, n_hat) )
     a_theo *= scattering_coefficient
-    print("a_theo", a_theo.shape)
 
     return a, tau, a_theo
 def comp_power_double_reflection(rx_x_pos, scattering_coefficient, xpd_coefficient, scattering_pattern, polarization, dtype=tf.complex128):
@@ -216,7 +214,7 @@ class TestScatteringPaths(unittest.TestCase):
             for pattern in patterns:
                 for polarization in ["V", "H"]:
                     for scattering_coefficient in [0.3, 0.7, 1.0]:
-                        a, tau, a_theo = comp_power(
+                        a, _, a_theo = comp_power(
                                         scattering_coefficient,
                                         xpd_coefficient,
                                         pattern,

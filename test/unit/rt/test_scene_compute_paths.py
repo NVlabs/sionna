@@ -100,7 +100,8 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
         scene.add(tx_2)
         scene.add(rx_1)
         scene.add(rx_2)
-        paths = scene.compute_paths(max_depth=3, scattering=False)
+        paths = scene.compute_paths(max_depth=3, scattering=True,
+                                    edge_diffraction=True)
         num_tx = len(list(scene.transmitters.values()))
         num_rx = len(list(scene.receivers.values()))
         num_tx_ant = scene.tx_array.array_size
@@ -112,9 +113,14 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
                     for rx_ant in range(num_rx_ant):
                         target = rx*num_rx_ant + rx_ant
                         for path in range(0, paths.mask.shape[-1]):
-                            if not paths.mask[target, source, path]:
+                            if paths.tau[0, rx, rx_ant, tx, tx_ant, path] < 0:
                                 a = paths.a[0, rx, rx_ant, tx, tx_ant, path]
                                 self.assertTrue(np.array_equal(a, np.zeros_like(a)))
+                            if not paths.mask[target, source, path]:
+                                a = paths.a[0, rx, rx_ant, tx, tx_ant, path]
+                                tau = paths.tau[0, rx, rx_ant, tx, tx_ant, path]
+                                self.assertTrue(np.array_equal(a, np.zeros_like(a)))
+                                self.assertTrue(np.array_equal(tau, -np.ones_like(tau)))
 
     def test_diffracted_paths(self):
 

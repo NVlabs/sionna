@@ -421,6 +421,13 @@ Taking the inverse Fourier transform, we finally obtain the channel impulse resp
 
     \boxed{h(\tau) = \int_{-\infty}^{\infty} H(f) e^{j2\pi f \tau} df = \sum_{i=1}^N a_i \delta(\tau-\tau_i)}
 
+The baseband equivalent channel impulse reponse is then defined as (Eq. 2.28) [Tse]_:
+
+.. math::
+    :label: h_b
+
+    h_\text{b}(\tau) = \sum_{i=1}^N \underbrace{a_i e^{-j2\pi f \tau_i}}_{\triangleq a^\text{b}_i} \delta(\tau-\tau_i).
+
 Reflection and Refraction
 *************************
 
@@ -759,7 +766,7 @@ The second representation via :math:`(E_{\text{i},\perp}, E_{\text{i},\parallel}
 
 such that :math:`|E_{\text{i},\text{pol}}|=\lVert \mathbf{E}_\text{i} \rVert` and :math:`E_{\text{i},\text{xpol}}=0`. That means that :math:`\hat{\mathbf{e}}_{\text{i},\text{pol}}` points toward the polarization direction which carries all of the energy.
 
-According to (Eq.9) [Degli-Esposti11]_, the diffusely scattered field :math:`\mathbf{E}_\text{s}(\mathbf{r})` at the observation point :math:`\mathbf{r}` can be modeled as
+According to (Eq. 9) [Degli-Esposti11]_, the diffusely scattered field :math:`\mathbf{E}_\text{s}(\mathbf{r})` at the observation point :math:`\mathbf{r}` can be modeled as
 :math:`\mathbf{E}_\text{s}(\mathbf{r})=E_{\text{s}, \theta}\hat{\boldsymbol{\theta}}(\hat{\mathbf{k}}_\text{s}) + E_{\text{s}, \varphi}\hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}}_\text{s})`, where
 :math:`\hat{\boldsymbol{\theta}}, \hat{\boldsymbol{\varphi}}` are defined in :eq:`spherical_vecs` and the orthogonal field components are computed as
 
@@ -870,6 +877,8 @@ References:
 
     .. [METIS] METIS Deliverable D1.4, "`METIS Channel Models <https://metis2020.com/wp-content/uploads/deliverables/METIS_D1.4_v1.0.pdf>`_", Feb. 2015.
 
+    .. [Tse] D. Tse, P. Viswanath, "`Fundamentals of Wireless Communication <https://web.stanford.edu/~dntse/wireless_book.html>`_", Cambridge University Press, 2005.
+    
     .. [Wiesbeck] N. Geng and W. Wiesbeck, "Planungsmethoden für die Mobilkommunikation," Springer, 1998.
 
     .. [Wikipedia] Wikipedia, "`Maximum power transfer theorem <https://en.wikipedia.org/wiki/Maximum_power_transfer_theorem>`_," accessed 7 Oct. 2022.
