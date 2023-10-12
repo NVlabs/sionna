@@ -1004,12 +1004,10 @@ def make_systematic(mat, is_pcm=False):
 
     # bring identity part to end of matrix if parity-check matrix is provided
     if is_pcm:
-        im = np.copy(mat[:,:m])
-        mat[:,:m] = mat[:,-m:]
-        mat[:,-m:] = im
-        # and track column swaps
-        for idx in range(m):
-            column_swaps.append([idx, n-m+idx])
+        for i in range(n-1, (n-1)-m, -1):
+            j = i - (n-m)
+            mat[:,[i, j]] = mat[:,[j, i]]
+            column_swaps.append([i, j])
 
     # return integer array
     mat = mat.astype(int)
