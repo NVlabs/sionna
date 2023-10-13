@@ -976,7 +976,7 @@ def make_systematic(mat, is_pcm=False):
         # The task is to find a column with index idx_cc that has a "1" at
         # row idx_c
         if not success:
-            for idx_cc in range(m, n):
+            for idx_cc in range(idx_c+1, n):
                 if mat[idx_c, idx_cc]:
                     # swap columns
                     mat[:,[idx_c, idx_cc]] = mat[:,[idx_cc, idx_c]]
