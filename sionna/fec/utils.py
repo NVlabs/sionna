@@ -962,30 +962,29 @@ def make_systematic(mat, is_pcm=False):
 
     # bring in upper triangular form
     for idx_c in range(m):
-        success = False
-        # step 1: find next leading "1"
-        for idx_r in range(idx_c,m):
-            # skip if entry is "0"
-            if mat[idx_r, idx_c]:
-                mat[[idx_c, idx_r]] = mat[[idx_r, idx_c]] # swap rows
-                success = True
-                break
+        found_1 = mat[idx_c, idx_c]
 
-        # Could not find "1"-entry for column idx_c
-        # => swap with columns from non-sys part
-        # The task is to find a column with index idx_cc that has a "1" at
-        # row idx_c
-        if not success:
+        if not found_1:
+            # find a row below row idx_c that has a "1" at column idx_c
+            for idx_r in range(idx_c+1, m):
+                if mat[idx_r, idx_c]:
+                    # swap rows
+                    mat[[idx_c, idx_r]] = mat[[idx_r, idx_c]]
+                    found_1 = True
+                    break
+
+        if not found_1:
+            # find a column after current column that has a "1" at row idx_c
             for idx_cc in range(idx_c+1, n):
                 if mat[idx_c, idx_cc]:
                     # swap columns
                     mat[:,[idx_c, idx_cc]] = mat[:,[idx_cc, idx_c]]
                     column_swaps.append([idx_c, idx_cc])
-                    success=True
+                    found_1 = True
                     break
 
-        if not success:
-            raise ValueError("Could not succeed; mat is not full rank?")
+        if not found_1:
+            raise ValueError(f"failed to transform matrix to systematic form, because it is not of full rank")
 
         # we can now assume a leading "1" at row idx_c
         for idx_r in range(idx_c+1, m):
