@@ -984,7 +984,8 @@ def make_systematic(mat, is_pcm=False):
                     break
 
         if not found_1:
-            raise ValueError(f"failed to transform matrix to systematic form, because it is not of full rank")
+            raise ValueError("Failed to transform matrix to systematic"\
+                             "form. Is matrix of full rank?")
 
         # we can now assume a leading "1" at row idx_c
         for idx_r in range(idx_c+1, m):
