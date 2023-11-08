@@ -416,9 +416,11 @@ def sim_ber(mc_fun,
     """Simulates until target number of errors is reached and returns BER/BLER.
 
     The simulation continues with the next SNR point if either
-    ``num_target_bit_errors`` bit errors or ``num_target_block_errors`` block
-    errors is achieved. Further, it continues with the next SNR point after
-    ``max_mc_iter`` batches of size ``batch_size`` have been simulated.
+    ``num_target_bit_errors`` bit errors or
+    ``num_target_block_errors`` block errors is achieved or
+    ``min_ber`` is satisfied. Further, it continues with the next SNR
+    point after ``max_mc_iter`` batches of size ``batch_size`` have
+    been simulated.
 
     Input
     -----
@@ -450,6 +452,9 @@ def sim_ber(mc_fun,
         Defaults to None. Target number of block errors per SNR point
         until the simulation continues
 
+    min_bler: tf.float32 Defaults to None.  Stop simulation if
+        previous ebno iteration produced bler less than this amount.
+    
     early_stop: bool
         A boolean defaults to True. If True, the simulation stops after the
         first error-free SNR point (i.e., no error occurred after
@@ -472,6 +477,12 @@ def sim_ber(mc_fun,
     dtype: tf.complex64
         Datatype of the model / function to be used (``mc_fun``).
 
+    callback: function Defaults to None.  If specified, a function
+        that will be called after each simulation block and passed the
+        results, which could be used for logging in a long-running
+        simulation. Signature: callback (ebno_dbs, bit_errors,
+        block_errors, nb_bits, nb_blocks)
+    
     Output
     ------
     (ber, bler) :
