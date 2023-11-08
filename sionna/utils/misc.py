@@ -406,11 +406,13 @@ def sim_ber(mc_fun,
             soft_estimates=False,
             num_target_bit_errors=None,
             num_target_block_errors=None,
+            min_bler=None,
             early_stop=True,
             graph_mode=None,
             verbose=True,
             forward_keyboard_interrupt=True,
-            dtype=tf.complex64):
+            dtype=tf.complex64,
+            callback=None):
     """Simulates until target number of errors is reached and returns BER/BLER.
 
     The simulation continues with the next SNR point if either
@@ -658,6 +660,9 @@ def sim_ber(mc_fun,
                 nb_blocks = tf.tensor_scatter_nd_add( nb_blocks, [[i]],
                                                 tf.cast([block_n], tf.int64))
 
+                if callback is not None:
+                    callback (ebno_dbs, bit_errors, block_errors, nb_bits, nb_blocks)
+                    
                 # print progress summary
                 if verbose:
                     # print summary header during first iteration
@@ -706,6 +711,13 @@ def sim_ber(mc_fun,
                                 idx_it=iter_count,
                                 rt=runtime[i])
 
+            if min_bler is not None:
+                bler = tf.cast(block_errors[i], tf.float64) / tf.cast(nb_blocks[i], tf.float64)
+                if bler < min_bler:
+                    if verbose:
+                        print ("\nSimulation stopped for min_bler")
+                    break
+                
             # early stop if no error occurred
             if early_stop: # only if early stop is active
                 if block_errors[i]==0:
