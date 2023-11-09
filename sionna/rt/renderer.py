@@ -268,13 +268,17 @@ def results_to_mitsuba_scene(scene, paths, show_paths, show_devices,
         'type': 'scene',
     }
     sc, tx_positions, rx_positions, _ = scene_scale(scene)
+    transmitter_colors = [[val/255 for val in transmitter.color] for 
+                              transmitter in scene.transmitters.values()]
+    receiver_colors = [[val/255 for val in receiver.color] for 
+                           receiver in scene.receivers.values()]
 
-    # --- Radio devices, shown as spheres (blue: transmitter, green: receiver)
+    # --- Radio devices, shown as spheres (Default - blue: transmitter, green: receiver)
     if show_devices:
         radius = max(0.0025 * sc, 1)
-        for source, color in ((tx_positions, [0.160, 0.502, 0.725]),
-                              (rx_positions, [0.153, 0.682, 0.375])):
-            for k, p in source.items():
+        for source, color in ((tx_positions, transmitter_colors),
+                              (rx_positions, receiver_colors)):
+            for index, (k, p) in enumerate(source.items()):
                 key = 'rd-' + k
                 assert key not in objects
                 objects[key] = {
@@ -283,7 +287,7 @@ def results_to_mitsuba_scene(scene, paths, show_paths, show_devices,
                     'radius': radius,
                     'light': {
                         'type': 'area',
-                        'radiance': {'type': 'rgb', 'value': color},
+                        'radiance': {'type': 'rgb', 'value': color[index]},
                     },
                 }
 

@@ -43,6 +43,9 @@ class RadioDevice(OrientedObject):
         :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
         If set to `None`, then ``orientation`` is used to orientate the device.
 
+    color : [3], integer
+        Defines the RGB ``color`` for the device shown in the previewer or renderer.
+
     trainable_position : bool
         Determines if the ``position`` is a trainable variable or not.
         Defaults to `False`.
@@ -61,6 +64,7 @@ class RadioDevice(OrientedObject):
                  position,
                  orientation=(0.,0.,0.),
                  look_at=None,
+                 color=(0,0,0),
                  trainable_position=False,
                  trainable_orientation=False,
                  dtype=tf.complex64):
@@ -72,6 +76,8 @@ class RadioDevice(OrientedObject):
 
         self._position = tf.Variable(tf.zeros([3], self._rdtype))
         self._orientation = tf.Variable(tf.zeros([3], self._rdtype))
+
+        self._color = color
 
         self.trainable_position = trainable_position
         self.trainable_orientation = trainable_orientation
@@ -183,3 +189,18 @@ class RadioDevice(OrientedObject):
         beta = theta-PI/2 # Rotation around y-axis
         gamma = 0.0 # Rotation around x-axis
         self.orientation = (alpha, beta, gamma)
+
+    @property
+    def color(self):
+        """
+        [3], tf.integer : Get/set the color
+        """
+        return self._color
+
+    @color.setter
+    def color(self, new_color):
+        new_color = tf.cast(new_color, dtype=self._rdtype)
+        if not (tf.rank(new_color) == 1 and new_color.shape[0] == 3):
+            msg = "Color must be shaped as [r,g,b] (rank=1 and shape=[3])"
+            raise ValueError(msg)
+        self._color.assign(new_color)
