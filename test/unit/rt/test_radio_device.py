@@ -128,3 +128,25 @@ class TestRadioDevice(unittest.TestCase):
                 a = tf.squeeze(paths.a)
                 a_db = 20*np.log10(np.abs(a.numpy()))
                 self.assertTrue(np.abs(a_db-a_theo_db)< 1e-4)
+                
+    def test_default_coloring(self):
+        """Test default coloring of radio devices"""
+        scene = load_scene()
+        tx = Transmitter("tx", [1,2,-3], [0, 0, 0])
+        rx = Receiver("rx", [0,0,0], [0, 0, 0])
+        scene.add(tx)
+        scene.add(rx)
+
+        self.assertTrue(list(scene.transmitters.values())[0].color==(40, 128, 184))
+        self.assertTrue(list(scene.receivers.values())[0].color==(39, 173, 95))
+
+    def test_custom_coloring(self):
+        """Test custom coloring of radio devices"""
+        scene = load_scene()
+        tx = Transmitter("tx", [1,2,-3], [0, 0, 0], color=(204, 0, 0))
+        rx = Receiver("rx", [0,0,0], [0, 0, 0], color=(255, 255, 0))
+        scene.add(tx)
+        scene.add(rx)
+        
+        self.assertTrue(list(scene.transmitters.values())[0].color==(204, 0, 0))
+        self.assertTrue(list(scene.receivers.values())[0].color==(255, 255, 0))
