@@ -34,6 +34,11 @@ class Transmitter(RadioDevice):
         :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
         If set to `None`, then ``orientation`` is used to orientate the device.
 
+    color : [3], float
+        Defines the RGB (red, green, blue) ``color`` parameter for the device as displayed in the previewer and renderer.
+        Each RGB component must have a value within the range :math:`\in [0,1]`.
+        Defaults to `[0.160, 0.502, 0.725]`.
+
     trainable_position : bool
         Determines if the ``position`` is a trainable variable or not.
         Defaults to `False`.
@@ -52,6 +57,7 @@ class Transmitter(RadioDevice):
                  position,
                  orientation=(0.,0.,0.),
                  look_at=None,
+                 color=(0.160, 0.502, 0.725),
                  trainable_position=False,
                  trainable_orientation=False,
                  dtype=tf.complex64):
@@ -61,6 +67,7 @@ class Transmitter(RadioDevice):
                          position=position,
                          orientation=orientation,
                          look_at=look_at,
+                         color=color,
                          trainable_position=trainable_position,
                          trainable_orientation=trainable_orientation,
                          dtype=dtype)
