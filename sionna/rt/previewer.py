@@ -122,11 +122,11 @@ class InteractiveDisplay:
         """
         scene = self._scene
         sc, tx_positions, rx_positions, _ = scene_scale(scene)
-        transmitter_colors = [[val/255 for val in transmitter.color] for 
+        transmitter_colors = [transmitter.color.numpy() for
                               transmitter in scene.transmitters.values()]
-        receiver_colors = [[val/255 for val in receiver.color] for 
+        receiver_colors = [receiver.color.numpy() for
                            receiver in scene.receivers.values()]
-        
+
         # Radio emitters, shown as points
         p = np.array(list(tx_positions.values()) + list(rx_positions.values()))
         albedo = np.array(transmitter_colors + receiver_colors)
@@ -141,7 +141,8 @@ class InteractiveDisplay:
             head_length = 0.15 * line_length
             zeros = np.zeros((1, 3))
 
-            for devices in [scene.transmitters.values(),scene.receivers.values()]:
+            for devices in [scene.transmitters.values(),
+                            scene.receivers.values()]:
                 if len(devices) == 0:
                     continue
                 starts, ends = [], []

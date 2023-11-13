@@ -268,12 +268,12 @@ def results_to_mitsuba_scene(scene, paths, show_paths, show_devices,
         'type': 'scene',
     }
     sc, tx_positions, rx_positions, _ = scene_scale(scene)
-    transmitter_colors = [[val/255 for val in transmitter.color] for 
-                              transmitter in scene.transmitters.values()]
-    receiver_colors = [[val/255 for val in receiver.color] for 
-                           receiver in scene.receivers.values()]
+    transmitter_colors = [transmitter.color.numpy() for
+                          transmitter in scene.transmitters.values()]
+    receiver_colors = [receiver.color.numpy() for
+                       receiver in scene.receivers.values()]
 
-    # --- Radio devices, shown as spheres (Default - blue: transmitter, green: receiver)
+    # --- Radio devices, shown as spheres
     if show_devices:
         radius = max(0.0025 * sc, 1)
         for source, color in ((tx_positions, transmitter_colors),
