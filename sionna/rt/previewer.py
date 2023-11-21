@@ -122,15 +122,14 @@ class InteractiveDisplay:
         """
         scene = self._scene
         sc, tx_positions, rx_positions, _ = scene_scale(scene)
-        tr_color = [0.160, 0.502, 0.725]
-        rc_color = [0.153, 0.682, 0.375]
+        transmitter_colors = [transmitter.color.numpy() for
+                              transmitter in scene.transmitters.values()]
+        receiver_colors = [receiver.color.numpy() for
+                           receiver in scene.receivers.values()]
 
         # Radio emitters, shown as points
         p = np.array(list(tx_positions.values()) + list(rx_positions.values()))
-        albedo = np.array(
-            [tr_color] * len(scene.transmitters)
-            + [rc_color] * len(scene.receivers)
-        )
+        albedo = np.array(transmitter_colors + receiver_colors)
 
         if p.shape[0] > 0:
             # Radio devices are not persistent
@@ -142,14 +141,14 @@ class InteractiveDisplay:
             head_length = 0.15 * line_length
             zeros = np.zeros((1, 3))
 
-            for devices, color in [(scene.transmitters.values(), tr_color),
-                                   (scene.receivers.values(), rc_color)]:
+            for devices in [scene.transmitters.values(),
+                            scene.receivers.values()]:
                 if len(devices) == 0:
                     continue
-                color = f'rgb({", ".join([str(int(v * 255)) for v in color])})'
                 starts, ends = [], []
                 for rd in devices:
                     # Arrow line
+                    color = f'rgb({", ".join([str(int(v)) for v in rd.color])})'
                     starts.append(rd.position)
                     endpoint = rd.position + rotate([line_length, 0., 0.],
                                                     rd.orientation)

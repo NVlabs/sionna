@@ -113,7 +113,7 @@ class TestRadioDevice(unittest.TestCase):
                 theta_r = tf.squeeze(paths.theta_r)
                 phi_r = tf.squeeze(paths.phi_r)
 
-                # Compute AODs and AoAs in LCS of the transmitter and receiver 
+                # Compute AODs and AoAs in LCS of the transmitter and receiver
                 theta_prime_t, phi_prime_t = theta_prime_phi_prime(tx.orientation, theta_t, phi_t)
                 theta_prime_r, phi_prime_r = theta_prime_phi_prime(rx.orientation, theta_r, phi_r)
 
@@ -124,7 +124,33 @@ class TestRadioDevice(unittest.TestCase):
                 self.assertTrue(np.abs(phi_prime_r)<1e-5)
 
                 # Compute channel impulse response and make
-                # sure that it matches the theoretical 
+                # sure that it matches the theoretical
                 a = tf.squeeze(paths.a)
                 a_db = 20*np.log10(np.abs(a.numpy()))
                 self.assertTrue(np.abs(a_db-a_theo_db)< 1e-4)
+
+    def test_default_coloring(self):
+        """Test default coloring of radio devices"""
+        scene = load_scene()
+        tx = Transmitter("tx", [1,2,-3], [0, 0, 0])
+        rx = Receiver("rx", [0,0,0], [0, 0, 0])
+        scene.add(tx)
+        scene.add(rx)
+
+        color_tx = tf.cast((0.160, 0.502, 0.725), tf.float32)
+        color_rx = tf.cast((0.153, 0.682, 0.375), tf.float32)
+        self.assertTrue(tf.reduce_all(list(scene.transmitters.values())[0].color==color_tx))
+        self.assertTrue(tf.reduce_all(list(scene.receivers.values())[0].color==color_rx))
+
+    def test_custom_coloring(self):
+        """Test custom coloring of radio devices"""
+        color_tx = tf.cast((0.8, 0., 0.), tf.float32)
+        color_rx = tf.cast((1., 1., 0.), tf.float32)
+        scene = load_scene()
+        tx = Transmitter("tx", [1,2,-3], [0, 0, 0], color=color_tx)
+        rx = Receiver("rx", [0,0,0], [0, 0, 0], color=color_rx)
+        scene.add(tx)
+        scene.add(rx)
+
+        self.assertTrue(tf.reduce_all(list(scene.transmitters.values())[0].color==color_tx))
+        self.assertTrue(tf.reduce_all(list(scene.receivers.values())[0].color==color_rx))
