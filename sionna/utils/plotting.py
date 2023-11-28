@@ -320,13 +320,17 @@ class PlotBER():
                  soft_estimates=False,
                  num_target_bit_errors=None,
                  num_target_block_errors=None,
+                 target_ber=None,
+                 target_bler=None,
                  early_stop=True,
                  graph_mode=None,
+                 distribute=None,
                  add_results=True,
                  forward_keyboard_interrupt=True,
                  show_fig=True,
                  verbose=True):
-        """Simulate BER/BLER curves for given Keras model and saves the results.
+        # pylint: disable=line-too-long
+        r"""Simulate BER/BLER curves for given Keras model and saves the results.
 
         Internally calls :class:`sionna.utils.sim_ber`.
 
@@ -335,7 +339,7 @@ class PlotBER():
         mc_fun:
             Callable that yields the transmitted bits `b` and the
             receiver's estimate `b_hat` for a given ``batch_size`` and
-            ``ebno_db``. If ``soft_estimates`` is True, b_hat interpreted as
+            ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as
             logit.
 
         ebno_dbs: ndarray of floats
@@ -370,6 +374,16 @@ class PlotBER():
             Target number of block errors per SNR point until the simulation
             stops.
 
+        target_ber: tf.float32
+            Defaults to `None`. The simulation stops after the first SNR point
+            which achieves a lower bit error rate as specified by
+            ``target_ber``. This requires ``early_stop`` to be `True`.
+
+        target_bler: tf.float32
+            Defaults to `None`. The simulation stops after the first SNR point
+            which achieves a lower block error rate as specified by
+            ``target_bler``.  This requires ``early_stop`` to be `True`.
+
         early_stop: bool
             A boolean defaults to True. If True, the simulation stops after the
             first error-free SNR point (i.e., no error occurred after
@@ -378,6 +392,21 @@ class PlotBER():
         graph_mode: One of ["graph", "xla"], str
             A string describing the execution mode of ``mc_fun``.
             Defaults to `None`. In this case, ``mc_fun`` is executed as is.
+
+        distribute: `None` (default) | "all" | list of indices | `tf.distribute.strategy`
+            Distributes simulation on multiple parallel devices. If `None`,
+            multi-device simulations are deactivated. If "all", the workload
+            will be automatically distributed across all available GPUs via the
+            `tf.distribute.MirroredStrategy`.
+            If an explicit list of indices is provided, only the GPUs with the
+            given indices will be used. Alternatively, a custom
+            `tf.distribute.strategy` can be provided. Note that the same
+            `batch_size` will be used for all GPUs in parallel, but the number
+            of Monte-Carlo iterations ``max_mc_iter`` will be scaled by the
+            number of devices such that the same number of total samples is
+            simulated. However, all stopping conditions are still in-place
+            which can cause slight differences in the total number of simulated
+            samples.
 
         add_results: bool
             Defaults to True. If True, the simulation results will be appended
@@ -408,16 +437,20 @@ class PlotBER():
             The simulated block-error rate.
         """
 
-        ber, bler = sim_ber(mc_fun,
-                            ebno_dbs,
-                            batch_size,
-                            soft_estimates=soft_estimates,
-                            max_mc_iter=max_mc_iter,
-                            num_target_bit_errors=num_target_bit_errors,
-                            num_target_block_errors=num_target_block_errors,
-                            early_stop=early_stop,
-                            graph_mode=graph_mode,
-                            verbose=verbose,
+        ber, bler = sim_ber(
+                        mc_fun,
+                        ebno_dbs,
+                        batch_size,
+                        soft_estimates=soft_estimates,
+                        max_mc_iter=max_mc_iter,
+                        num_target_bit_errors=num_target_bit_errors,
+                        num_target_block_errors=num_target_block_errors,
+                        target_ber=target_ber,
+                        target_bler=target_bler,
+                        early_stop=early_stop,
+                        graph_mode=graph_mode,
+                        distribute=distribute,
+                        verbose=verbose,
                         forward_keyboard_interrupt=forward_keyboard_interrupt)
 
         if add_ber:

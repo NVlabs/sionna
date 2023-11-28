@@ -617,20 +617,23 @@ class TestCovMapGradients(unittest.TestCase):
         tf.random.set_seed(1)
 
         dtype=tf.complex64
+        rdtype = dtype.real_dtype
         scene = load_scene(sionna.rt.scene.double_reflector, dtype=dtype)
 
         # Define a trainable radio material
+        sp = BackscatteringPattern(5, 5, 0.5, dtype=dtype)
+        sp.lambda_ = tf.Variable(0.5, dtype=rdtype, trainable=True)
         mat = RadioMaterial("my_mat",
                             relative_permittivity=1,
                             conductivity=1,
                             scattering_coefficient=0.7,
                             xpd_coefficient=0.2,
-                            scattering_pattern=BackscatteringPattern(5, 5, 0.5, trainable_lambda_=True, dtype=dtype),
-                            trainable_conductivity=True,
-                            trainable_relative_permittivity=True,
-                            trainable_scattering_coefficient=True,
-                            trainable_xpd_coefficient=True,
+                            scattering_pattern=sp,
                             dtype=dtype)
+        mat.conductivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.relative_permittivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.scattering_coefficient = tf.Variable(0.7, dtype=rdtype, trainable=True)
+        mat.xpd_coefficient = tf.Variable(0.2, dtype=rdtype, trainable=True)
         scene.get("large_reflector").radio_material = mat
 
         scene.tx_array = PlanarArray(num_rows=1,
@@ -722,6 +725,7 @@ class TestCovMapGradients(unittest.TestCase):
         tf.random.set_seed(1)
 
         dtype=tf.complex64
+        rdtype = dtype.real_dtype
         scene = load_scene(sionna.rt.scene.double_reflector, dtype=dtype)
 
         # Defines a radio material
@@ -731,11 +735,11 @@ class TestCovMapGradients(unittest.TestCase):
                             scattering_coefficient=0.7,
                             xpd_coefficient=0.2,
                             scattering_pattern=LambertianPattern(dtype=dtype),
-                            trainable_conductivity=True,
-                            trainable_relative_permittivity=True,
-                            trainable_scattering_coefficient=True,
-                            trainable_xpd_coefficient=True,
                             dtype=dtype)
+        mat.conductivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.relative_permittivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.scattering_coefficient = tf.Variable(0.7, dtype=rdtype, trainable=True)
+        mat.xpd_coefficient = tf.Variable(0.2, dtype=rdtype, trainable=True)
         scene.get("large_reflector").radio_material = mat
 
         scene.tx_array = PlanarArray(num_rows=1,
@@ -777,7 +781,7 @@ class TestCovMapGradients(unittest.TestCase):
             tf_cm = cm.as_tensor()[0]
             power = tf.reduce_sum(tf_cm)
         # Computes gradient with respect to the scattering coefficient only
-        grads = tape.gradient(power, [mat._scattering_coefficient])[0]
+        grads = tape.gradient(power, [mat.scattering_coefficient])[0]
         self.assertLess(grads, 0.0)
 
     def test_scattering_coefficient_gradient_sign_2(self):
@@ -794,6 +798,7 @@ class TestCovMapGradients(unittest.TestCase):
         tf.random.set_seed(1)
 
         dtype=tf.complex64
+        rdtype = dtype.real_dtype
         scene = load_scene(sionna.rt.scene.double_reflector, dtype=dtype)
 
         # Defines a radio material
@@ -803,11 +808,11 @@ class TestCovMapGradients(unittest.TestCase):
                             scattering_coefficient=0.7,
                             xpd_coefficient=0.2,
                             scattering_pattern=LambertianPattern(dtype=dtype),
-                            trainable_conductivity=True,
-                            trainable_relative_permittivity=True,
-                            trainable_scattering_coefficient=True,
-                            trainable_xpd_coefficient=True,
                             dtype=dtype)
+        mat.conductivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.relative_permittivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.scattering_coefficient = tf.Variable(0.7, dtype=rdtype, trainable=True)
+        mat.xpd_coefficient = tf.Variable(0.2, dtype=rdtype, trainable=True)
         scene.get("large_reflector").radio_material = mat
 
         scene.tx_array = PlanarArray(num_rows=1,
@@ -849,7 +854,7 @@ class TestCovMapGradients(unittest.TestCase):
             tf_cm = cm.as_tensor()[0]
             power = tf.reduce_sum(tf_cm)
         # Computes gradient with respect to the scattering coefficient only
-        grads = tape.gradient(power, [mat._scattering_coefficient])[0]
+        grads = tape.gradient(power, [mat.scattering_coefficient])[0]
         self.assertGreater(grads, 0.0)
 
     def test_scattering_coefficient_gradient_sign_3(self):
@@ -866,6 +871,7 @@ class TestCovMapGradients(unittest.TestCase):
         tf.random.set_seed(1)
 
         dtype=tf.complex64
+        rdtype = dtype.real_dtype
         scene = load_scene(sionna.rt.scene.double_reflector, dtype=dtype)
 
         # Defines a radio material
@@ -875,11 +881,11 @@ class TestCovMapGradients(unittest.TestCase):
                             scattering_coefficient=0.7,
                             xpd_coefficient=0.2,
                             scattering_pattern=LambertianPattern(dtype=dtype),
-                            trainable_conductivity=True,
-                            trainable_relative_permittivity=True,
-                            trainable_scattering_coefficient=True,
-                            trainable_xpd_coefficient=True,
                             dtype=dtype)
+        mat.conductivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.relative_permittivity = tf.Variable(1.0, dtype=rdtype, trainable=True)
+        mat.scattering_coefficient = tf.Variable(0.7, dtype=rdtype, trainable=True)
+        mat.xpd_coefficient = tf.Variable(0.2, dtype=rdtype, trainable=True)
         scene.get("large_reflector").radio_material = mat
 
         scene.tx_array = PlanarArray(num_rows=1,
@@ -921,5 +927,5 @@ class TestCovMapGradients(unittest.TestCase):
             tf_cm = cm.as_tensor()[0]
             power = tf.reduce_sum(tf_cm)
         # Computes gradient with respect to the scattering coefficient only
-        grads = tape.gradient(power, [mat._scattering_coefficient])[0]
+        grads = tape.gradient(power, [mat.scattering_coefficient])[0]
         self.assertLess(grads, 0.0)

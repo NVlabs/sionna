@@ -20,7 +20,13 @@ class AntennaArray():
     Class implementing an antenna array
 
     An antenna array is composed of identical antennas that are placed
-    at different positions.
+    at different positions. The ``positions`` parameter can be assigned
+    to a TensorFlow variable or tensor.
+
+    .. code-block:: Python
+
+        array = AntennaArray(antenna=Antenna("tr38901", "V"),
+                             positions=tf.Variable([[0,0,0], [0, 1, 1]]))
 
     Parameters
     ----------
@@ -35,24 +41,18 @@ class AntennaArray():
         adding the position of the :class:`~sionna.rt.Transmitter`
         or :class:`~sionna.rt.Receiver` using it.
 
-    trainable_positions : bool
-        Determines if ``positions`` is a trainable variable or not.
-        Defaults to `False`.
-
     dtype : tf.complex64 or tf.complex128
         Data type used for all computations.
         Defaults to `tf.complex64`.
     """
-    def __init__(self, antenna, positions, trainable_positions=False, dtype=tf.complex64):
+    def __init__(self, antenna, positions, dtype=tf.complex64):
         super().__init__()
 
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._rdtype = dtype.real_dtype
-
         self.antenna = antenna
         self.positions = positions
-        self.trainable_positions = trainable_positions
 
     @property
     def antenna(self):
@@ -68,23 +68,6 @@ class AntennaArray():
         self._antenna = antenna
 
     @property
-    def trainable_positions(self):
-        """
-        bool : Get/set if the relative antenna positions are trainable
-            variables or not.
-            Defaults to `False`.
-        """
-        return self._trainable_position
-
-    @trainable_positions.setter
-    def trainable_positions(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_positions` must be bool")
-        # pylint: disable=protected-access
-        self._positions._trainable = value
-        self._trainable_positions = value
-
-    @property
     def positions(self):
         """
         [array_size, 3], `tf.float` : Get/set  array of relative positions
@@ -95,14 +78,13 @@ class AntennaArray():
 
     @positions.setter
     def positions(self, positions):
-        positions = tf.cast(positions, self._rdtype)
-        if not (tf.rank(positions) == 2 and positions.shape[1] == 3):
-            msg = "Each element of ``positions`` must have length three"
-            raise ValueError(msg)
-        if not hasattr(self, "_positions"):
-            self._positions = tf.Variable(positions)
+        if isinstance(positions, tf.Variable):
+            if positions.dtype != self._rdtype:
+                raise TypeError(f"`positions` must have dtype={self._rdtype}")
+            else:
+                self._positions = positions
         else:
-            self._positions.assign(positions)
+            self._positions = tf.cast(positions, self._rdtype)
 
     @property
     def num_ant(self):
@@ -123,7 +105,7 @@ class AntennaArray():
 
     def rotated_positions(self, orientation):
         r"""
-        Get the antenna positions rotated according ``orientation``
+        Get the antenna positions rotated according to ``orientation``
 
         Input
         ------
@@ -187,10 +169,6 @@ class PlanarArray(AntennaArray):
         respectively.
         Defaults to `2`.
 
-    trainable_positions : bool
-        Determines if ``positions`` is a trainable variable or not.
-        Defaults to `False`.
-
     dtype : tf.complex64 or tf.complex128
         Datatype used for all computations.
         Defaults to `tf.complex64`.
@@ -214,7 +192,6 @@ class PlanarArray(AntennaArray):
                  pattern,
                  polarization=None,
                  polarization_model=2,
-                 trainable_positions=False,
                  dtype=tf.complex64):
 
         if dtype not in (tf.complex64, tf.complex128):
@@ -242,7 +219,7 @@ class PlanarArray(AntennaArray):
                   -(num_cols-1)*d_h/2,
                   (num_rows-1)*d_v/2]
         positions += offset
-        super().__init__(antenna, positions, trainable_positions, dtype)
+        super().__init__(antenna, positions, dtype)
 
     def show(self):
         r"""show()

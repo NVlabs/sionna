@@ -221,7 +221,7 @@ def cross(u, v):
 
     return w
 
-def dot(u, v, keepdim=False):
+def dot(u, v, keepdim=False, clip=False):
     r"""
     Computes and the dot (or scalar) product between u and v
 
@@ -237,6 +237,10 @@ def dot(u, v, keepdim=False):
         If `True`, keep the last dimension.
         Defaults to `False`.
 
+    clip : bool
+        If `True`, clip output to [-1,1].
+        Defaults to `False`.
+
     Output
     -------
     : [...,1] or [...]
@@ -247,6 +251,9 @@ def dot(u, v, keepdim=False):
     res = tf.linalg.matvec(tf.expand_dims(u, -2), v)
     if not keepdim:
         res = tf.squeeze(res,axis=-1)
+    if clip:
+        one = tf.ones((), u.dtype)
+        res = tf.clip_by_value(res, -one, one)
     return res
 
 def normalize(v):
@@ -484,9 +491,9 @@ def reflection_coefficient(eta, cos_theta):
     Input
     ------
     eta : Any shape, tf.complex
-        Real part of the relative permittivity
+        Complex relative permittivity
 
-    cos_thehta : Same as ``eta``, tf.float
+    cos_theta : Same as ``eta``, tf.float
         Cosine of the incident angle
 
     Output
@@ -524,9 +531,9 @@ def paths_to_segments(paths):
         Endpoints of the segments making the paths.
     """
 
-    mask = paths.mask.numpy()
     vertices = paths.vertices.numpy()
     objects = paths.objects.numpy()
+    mask = paths.targets_sources_mask
     sources, targets = paths.sources.numpy(), paths.targets.numpy()
 
     # Emit directly two lists of the beginnings and endings of line segments
@@ -615,7 +622,7 @@ def cot(x):
     Output
     -------
     : [...], tf.float
-        Cotengent of x
+        Cotangent of x
     """
     return tf.math.divide_no_nan(tf.ones_like(x), tf.math.tan(x))
 
@@ -639,7 +646,7 @@ def sign(x):
 
 def rot_mat_from_unit_vecs(a, b):
     r"""
-    Computes Rodrigues` rotation formular :eq:`rodrigues_matrix`
+    Computes Rodrigues` rotation formula :eq:`rodrigues_matrix`
 
     Input
     ------
@@ -654,6 +661,9 @@ def rot_mat_from_unit_vecs(a, b):
     : [...,3,3], tf.float
         Rodrigues' rotation matrix
     """
+
+    rdtype = a.dtype
+
     # Compute rotation axis vector
     k, _ = normalize(cross(a, b))
 
@@ -663,7 +673,7 @@ def rot_mat_from_unit_vecs(a, b):
 
     # Compute K matrix
     shape = tf.concat([tf.shape(k)[:-1],[1]], axis=-1)
-    zeros = tf.zeros(shape, a.dtype)
+    zeros = tf.zeros(shape, rdtype)
     kx, ky, kz = tf.split(k, 3, axis=-1)
     l1 = tf.concat([zeros, -kz, ky], axis=-1)
     l2 = tf.concat([kz, zeros, -kx], axis=-1)
@@ -671,8 +681,8 @@ def rot_mat_from_unit_vecs(a, b):
     k_mat = tf.stack([l1, l2, l3], axis=-2)
 
     # Assemble full rotation matrix
-    eye = tf.eye(3, batch_shape=tf.shape(k)[:-1], dtype=a.dtype)
-    cos_theta = dot(a, b)
+    eye = tf.eye(3, batch_shape=tf.shape(k)[:-1], dtype=rdtype)
+    cos_theta = dot(a, b, clip=True)
     sin_theta = tf.sin(acos_diff(cos_theta))
     cos_theta = expand_to_rank(cos_theta, tf.rank(eye), axis=-1)
     sin_theta = expand_to_rank(sin_theta, tf.rank(eye), axis=-1)

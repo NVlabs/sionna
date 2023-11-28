@@ -324,6 +324,14 @@ class TestFECUtils(unittest.TestCase):
             # verify that gm and pcm are (binary) orthogonal
             self.assertTrue(verify_gm_pcm(gm, pcm))
 
+        # additional manual test case (see PR #236)
+        pcm = np.array([[1, 0, 0, 0, 0, 1, 1],
+                        [0, 1, 0, 0, 1, 0, 1],
+                        [0, 0, 1, 0, 1, 0, 0],
+                        [0, 0, 0, 1, 0, 1, 0]])
+        gm = pcm2gm(pcm, verify_results=False)
+        self.assertTrue(verify_gm_pcm(gm, pcm))
+
     def test_gm2pcm(self):
         """test gm2pcm function for consistency.
 
@@ -425,7 +433,7 @@ class TestFECUtils(unittest.TestCase):
             self.assertTrue(pcm.shape[0]==n-k)
             self.assertTrue(pcm.shape[1]==n)
 
-    
+
     def test_mod2(self):
         """Test modulo 2 operation."""
 

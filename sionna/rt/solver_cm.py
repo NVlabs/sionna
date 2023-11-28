@@ -688,7 +688,8 @@ class SolverCoverageMap(SolverBase):
         # Cosine of the angle of arrival with respect to the normal of
         # the plan
         # [num_hits]
-        cos_aoa = tf.abs(dot(k_rx, cm_normal))
+        cos_aoa = tf.abs(dot(k_rx, cm_normal, clip=True))
+
         # [num_hits]
         ray_weights = tf.math.divide_no_nan(tf.ones_like(cos_aoa), cos_aoa)
         # Add the contribution to the coverage map
@@ -747,7 +748,7 @@ class SolverCoverageMap(SolverBase):
         """
 
         # [num_active_samples, 3]
-        k_r = k_i - 2.*dot(k_i, normals, keepdim=True)*normals
+        k_r = k_i - 2.*dot(k_i, normals, keepdim=True, clip=True)*normals
 
         # S/P direction for the incident/reflected field
         # [num_active_samples, 3]
@@ -767,7 +768,8 @@ class SolverCoverageMap(SolverBase):
 
         # Compute the reflection coefficients
         # [num_active_samples]
-        cos_theta = -dot(k_i, normals)
+        cos_theta = -dot(k_i, normals, clip=True)
+
         # [num_active_samples]
         r_s, r_p = reflection_coefficient(etas, cos_theta)
 
@@ -812,14 +814,20 @@ class SolverCoverageMap(SolverBase):
 
         return e_field, field_es, field_ep, k_r
 
-    def _compute_scattered_field(self, normals, etas, scattering_coefficient,
-            xpd_coefficient, alpha_r, alpha_i, lambda_, k_i, e_field, field_es,
-            field_ep, reflection):
+    def _compute_scattered_field(self, int_point, objects, normals, etas,
+            scattering_coefficient, xpd_coefficient, alpha_r, alpha_i, lambda_,
+            k_i, e_field, field_es, field_ep, reflection):
         r"""
         Computes the scattered field at the intersections.
 
         Input
         ------
+        int_point : [num_active_samples, 3], tf.float
+            Positions at which the rays intersect with the scene
+
+        objects : [num_active_samples], tf.int
+            Indices of the intersected objects
+
         normals : [num_active_samples, 3], tf.float
             Normals to the intersected primitives
 
@@ -888,7 +896,8 @@ class SolverCoverageMap(SolverBase):
 
         # Compute Fresnel reflection coefficients
         # [num_active_samples]
-        cos_theta = -dot(k_i, normals)
+        cos_theta = -dot(k_i, normals, clip=True)
+
         # [num_active_samples]
         r_s, r_p = reflection_coefficient(etas, cos_theta)
 
@@ -962,13 +971,25 @@ class SolverCoverageMap(SolverBase):
         k_s = sample_points_on_hemisphere(normals)
 
         # Evaluate scattering pattern
-        # [num_active_samples]
-        f_s = ScatteringPattern.pattern(k_i,
-                                        k_s,
-                                        normals,
-                                        alpha_r,
-                                        alpha_i,
-                                        lambda_)
+        # Evaluate scattering pattern for all paths.
+        # If a callable is defined to compute the scattering pattern,
+        # it is invoked. Otherwise, the radio materials of objects are used.
+        sp_callable = self._scene.scattering_pattern_callable
+        if sp_callable is None:
+            # [num_active_samples]
+            f_s = ScatteringPattern.pattern(k_i,
+                                            k_s,
+                                            normals,
+                                            alpha_r,
+                                            alpha_i,
+                                            lambda_)
+        else:
+            # [num_targets, num_sources, max_num_paths]
+            f_s = sp_callable(objects,
+                              int_point,
+                              k_i,
+                              k_s,
+                              normals)
 
         # Compute scaled scattered field
         # [num_active_samples, num_tx_patterns, 2]
@@ -1166,6 +1187,9 @@ class SolverCoverageMap(SolverBase):
         act_lambda_ : [num_active_samples], tf.float
             Tensor containing the lambda_ scattering parameters of all shapes
             Only returned if ``lambda_`` is not `None`.
+
+        act_objects : [num_active_samples], tf.int
+            Indices of the intersected objects
         """
 
         # Extract the rays that interact the scene
@@ -1189,16 +1213,35 @@ class SolverCoverageMap(SolverBase):
         # Extract the normals to the intersected primitves
         # [num_active_samples, 3]
         act_normals = tf.gather(self._normals, act_primitives, axis=0)
-        # Extract the material properties of the intersected normals
-        # [num_active_samples]
-        act_etas = tf.gather(etas, act_objects)
-        # [num_active_samples]
-        act_scat_coeff = tf.gather(scattering_coefficient, act_objects)
-        if xpd_coefficient is not None:
-            act_xpd_coefficient = tf.gather(xpd_coefficient, act_objects)
+
+        # If a callable is defined to compute the radio material properties,
+        # it is invoked. Otherwise, the radio materials of objects are used.
+        rm_callable = self._scene.radio_material_callable
+        if rm_callable is None:
+            # Extract the material properties of the intersected objects
+            # [num_active_samples]
+            act_etas = tf.gather(etas, act_objects)
+            # [num_active_samples]
+            act_scat_coeff = tf.gather(scattering_coefficient, act_objects)
+            if xpd_coefficient is not None:
+                act_xpd_coefficient = tf.gather(xpd_coefficient, act_objects)
+            else:
+                act_xpd_coefficient = None
+        else:
+            # [num_active_samples]
+            act_etas, act_scat_coeff, act_xpd_coefficient = rm_callable(
+                act_objects, int_point)
+
+        # If no callable is defined for the scattering pattern, we need to
+        # extract the properties of the scattering patterns built-in Sionna
+        if (self._scene.scattering_pattern_callable is None) and\
+                                                    (alpha_r is not None) :
+            # [num_active_samples]
             act_alpha_r = tf.gather(alpha_r, act_objects)
             act_alpha_i = tf.gather(alpha_i, act_objects)
             act_lambda_ = tf.gather(lambda_, act_objects)
+        else:
+            act_alpha_r = act_alpha_i = act_lambda_ = None
 
         # Direction of arrival
         # [num_active_samples, 3]
@@ -1210,17 +1253,14 @@ class SolverCoverageMap(SolverBase):
         # [num_active_samples, 3]
         act_normals = flip_normal*act_normals
 
-        if xpd_coefficient is None:
-            output = (act_e_field, act_field_es, act_field_ep, int_point,
-                    act_normals, act_etas, act_scat_coeff, act_k_i)
-        else:
-            output = (act_e_field, act_field_es, act_field_ep, int_point,
-                    act_normals, act_etas, act_scat_coeff, act_k_i,
-                    act_xpd_coefficient, act_alpha_r, act_alpha_i, act_lambda_)
+        output = (act_e_field, act_field_es, act_field_ep, int_point,
+                act_normals, act_etas, act_scat_coeff, act_k_i,
+                act_xpd_coefficient, act_alpha_r, act_alpha_i, act_lambda_,
+                act_objects)
 
         return output
 
-    def _sample_interaction_phenomena(self, active, primitives,
+    def _sample_interaction_phenomena(self, active, int_point, primitives,
                             scattering_coefficient, reflection, scattering):
         r"""
         Samples the interaction phenoema to apply to each active ray, among
@@ -1236,6 +1276,11 @@ class SolverCoverageMap(SolverBase):
         ------
         active : [num_samples], tf.bool
             Flag indicating if a ray is active
+
+        int_point : [num_samples, 3], tf.float
+            Positions at which the rays intersect with the scene. For the rays
+            that did not intersect the scene, the corresponding position should
+            be ignored.
 
         scattering_coefficient : [num_shape], tf.complex
             Scattering coefficients of all shapes
@@ -1283,7 +1328,19 @@ class SolverCoverageMap(SolverBase):
             act_primitives = tf.gather(primitives, active_ind, axis=0)
             act_objects = tf.gather(self._primitives_2_objects, act_primitives,
                                     axis=0)
-            act_scat_coeff = tf.gather(scattering_coefficient, act_objects)
+            # Current intersection point
+            # [num_active_samples, 3]
+            int_point = tf.gather(int_point, active_ind, axis=0)
+
+            # If a callable is defined to compute the radio material properties,
+            # it is invoked. Otherwise, the radio materials of objects are used.
+            rm_callable = self._scene.radio_material_callable
+            if rm_callable is None:
+                # [num_active_samples]
+                act_scat_coeff = tf.gather(scattering_coefficient, act_objects)
+            else:
+                # [num_active_samples]
+                _, act_scat_coeff, _ = rm_callable(act_objects, int_point)
 
             # Probability of scattering
             # [num_active_samples]
@@ -1444,8 +1501,6 @@ class SolverCoverageMap(SolverBase):
         Output
         -------
 
-        Output
-        -------
         e_field : [num_scattered_samples, num_tx_patterns, 2], tf.complex
             S and P components of the scattered electric field
 
@@ -1490,12 +1545,13 @@ class SolverCoverageMap(SolverBase):
         act_alpha_r = act_data[9]
         act_alpha_i = act_data[10]
         act_lambda_ = act_data[11]
+        act_objects = act_data[12]
 
         # Compute the reflected field
         e_field, field_es, field_ep, k_r = self._compute_scattered_field(
-            act_normals, act_etas, act_scat_coeff, act_xpd_coefficient,
-            act_alpha_r, act_alpha_i, act_lambda_, k_i, e_field, field_es,
-            field_ep, reflection)
+            int_point, act_objects, act_normals, act_etas, act_scat_coeff,
+            act_xpd_coefficient, act_alpha_r, act_alpha_i, act_lambda_, k_i,
+            e_field, field_es, field_ep, reflection)
 
         return e_field, field_es, field_ep, int_point, k_r, act_normals
 
@@ -1786,8 +1842,8 @@ class SolverCoverageMap(SolverBase):
             #  scatter_ind : [num_scattered_samples]
             #   Indices of the rays that are scattered
             reflect_ind, scatter_ind = self._sample_interaction_phenomena(
-                                active, primitives, scattering_coefficient,
-                                reflection, scattering)
+                                active, int_point, primitives,
+                                scattering_coefficient, reflection, scattering)
 
             updated_e_field = tf.zeros([0, e_field.shape[1], 2], self._dtype)
             updated_field_es = tf.zeros([0, 3], self._rdtype)
@@ -1847,6 +1903,9 @@ class SolverCoverageMap(SolverBase):
             field_ep = updated_field_ep
             k_r = updated_k_r
             int_point = updated_int_point
+            # Only keep TX indices for active rays
+            # [num_active_samples]
+            samples_tx_indices = tf.boolean_mask(samples_tx_indices, active)
 
             ###############################################
             # Reflect or scatter the current ray
@@ -2185,7 +2244,8 @@ class SolverCoverageMap(SolverBase):
 
         # Compute the wedges angle
         # [num_samples]
-        wedges_angle = PI + tf.math.acos(dot(normals[:,0,:],normals[:,1,:]))
+        cos_wedges_angle = dot(normals[:,0,:],normals[:,1,:], clip=True)
+        wedges_angle = PI + tf.math.acos(cos_wedges_angle)
 
         # Uniformly sample angles for shooting rays on the diffraction cone
         # [num_samples]
@@ -2247,7 +2307,7 @@ class SolverCoverageMap(SolverBase):
         diff_phi : [num_samples], tf.float
             Sampled angles of diffracted rays on the diffraction cone
 
-        diff_vertex : [num_tx, num_samples, 3], tf.float
+        diff_vertex : [num_samples, 3], tf.float
             Positions of the diffracted points in the GCS
 
         diff_num_samples_per_wedge : [num_samples], tf.int
@@ -2266,11 +2326,11 @@ class SolverCoverageMap(SolverBase):
         # [num_tx, 1, 3]
         sources_positions = tf.expand_dims(sources_positions, axis=1)
         # [1, num_samples, 3]
-        diff_vertex = tf.expand_dims(diff_vertex, axis=0)
+        diff_points_ = tf.expand_dims(diff_vertex, axis=0)
         # Ray directions and maximum distance for obstruction test
         # ray_dir : [num_tx, num_samples, 3]
         # maxt : [num_tx, num_samples]
-        ray_dir,_ = normalize(diff_vertex - sources_positions)
+        ray_dir,_ = normalize(diff_points_ - sources_positions)
 
         # Edge vector
         # [num_samples, 3]
@@ -2329,12 +2389,12 @@ class SolverCoverageMap(SolverBase):
         # Origin of the diffracted rays
 
         # [num_tx, num_samples, 3]
-        diff_points = tf.tile(diff_vertex, [num_tx, 1, 1])
+        diff_points_ = tf.tile(diff_points_, [num_tx, 1, 1])
 
         # Test of intersection of the diffracted rays with the measurement
         # plane
         mi_diff_dir = self._mi_vec_t(tf.reshape(diff_dir, [-1, 3]))
-        mi_diff_points = self._mi_vec_t(tf.reshape(diff_points, [-1, 3]))
+        mi_diff_points = self._mi_vec_t(tf.reshape(diff_points_, [-1, 3]))
         rays = mi.Ray3f(o=mi_diff_points, d=mi_diff_dir)
         # Intersect with the coverage map
         si_mp = meas_plane.ray_intersect(rays)
@@ -2386,13 +2446,13 @@ class SolverCoverageMap(SolverBase):
         maxt = tf.expand_dims(maxt, -1)
         # [num_tx, num_samples, 3]
         diff_dir = tf.gather(diff_dir, valid_samples, axis=1)
+        # [num_samples, 3]
+        diff_vertex = tf.gather(diff_vertex, valid_samples, axis=0)
         # [num_tx, num_samples, 3]
-        diff_points = tf.gather(diff_points, valid_samples, axis=1)
-        # [num_tx, num_samples, 3]
-        diff_hit_points = diff_points + maxt*diff_dir
+        diff_hit_points = tf.expand_dims(diff_vertex, axis=0) + maxt*diff_dir
 
         return diff_mask, diff_wedges_ind, diff_ells, diff_phi,\
-            diff_points, diff_num_samples_per_wedge, diff_hit_points,\
+            diff_vertex, diff_num_samples_per_wedge, diff_hit_points,\
                 theta_shoot_dir
 
     def _compute_samples_weights(self, cm_center, cm_orientation,
@@ -2613,7 +2673,7 @@ class SolverCoverageMap(SolverBase):
         diff_wedges_ind : [num_samples], tf.int
             Indices of the wedges that interacted with the diffracted paths
 
-        diff_vertex : [num_tx, num_samples, 3], tf.float
+        diff_vertex : [num_samples, 3], tf.float
             Positions of the diffracted points in the GCS
 
         diff_hit_points : [num_tx, num_samples, 3], tf.float
@@ -2671,7 +2731,8 @@ class SolverCoverageMap(SolverBase):
 
         # Compute the wedges angle
         # [num_samples]
-        wedges_angle = PI - tf.math.acos(dot(normals[...,0,:],normals[...,1,:]))
+        cos_wedges_angle = dot(normals[...,0,:],normals[...,1,:], clip=True)
+        wedges_angle = PI - tf.math.acos(cos_wedges_angle)
         n = (2.*PI-wedges_angle)/PI
         # [1, num_samples]
         n = tf.expand_dims(n, axis=0)
@@ -2695,23 +2756,34 @@ class SolverCoverageMap(SolverBase):
         # [num_samples, 2]
         objects_indices = tf.gather(self._wedges_objects, valid_wedges_idx,
                                     axis=0)
-        # [num_samples, 2]
-        etas = tf.gather(relative_permittivity, objects_indices)
+
+        # Relative permitivities and scattering coefficients
+        # If a callable is defined to compute the radio material properties,
+        # it is invoked. Otherwise, the radio materials of objects are used.
+        rm_callable = self._scene.radio_material_callable
+        if rm_callable is None:
+            # [num_samples, 2]
+            etas = tf.gather(relative_permittivity, objects_indices)
+            scattering_coefficient = tf.gather(scattering_coefficient,
+                                               objects_indices)
+        else:
+            # Harmonize the shapes of the radio material callables
+            # [num_samples, 2, 3]
+            diff_vertex_ = tf.tile(tf.expand_dims(diff_vertex, axis=-2),
+                                   [1, 2, 1])
+            # scattering_coefficient, etas : [num_samples, 2]
+            etas, scattering_coefficient, _  = rm_callable(objects_indices,
+                                                           diff_vertex_)
+
         # [num_samples]
         eta_0 = etas[:,0]
         eta_n = etas[:,1]
         # [1, num_samples]
         eta_0 = tf.expand_dims(eta_0, axis=0)
         eta_n = tf.expand_dims(eta_n, axis=0)
-
-        # Get scattering coefficients
-        # [num_samples, 2]
-        scattering_coefficient = tf.gather(scattering_coefficient,
-                                           objects_indices)
         # [num_samples]
         scattering_coefficient_0 = scattering_coefficient[...,0]
         scattering_coefficient_n = scattering_coefficient[...,1]
-
         # [1, num_samples]
         scattering_coefficient_0 = tf.expand_dims(scattering_coefficient_0,
                                                   axis=0)
@@ -2719,12 +2791,14 @@ class SolverCoverageMap(SolverBase):
                                                   axis=0)
 
         # Compute s_prime_hat, s_hat, s_prime, s
+        # [1, num_samples, 3]
+        diff_vertex_ = tf.expand_dims(diff_vertex, axis=0)
         # s_prime_hat : [num_tx, num_samples, 3]
         # s_prime : [num_tx, num_samples]
-        s_prime_hat, s_prime = normalize(diff_vertex-sources_positions)
+        s_prime_hat, s_prime = normalize(diff_vertex_-sources_positions)
         # s_hat : [num_tx, num_samples, 3]
         # s : [num_tx, num_samples]
-        s_hat, s = normalize(diff_hit_points-diff_vertex)
+        s_hat, s = normalize(diff_hit_points-diff_vertex_)
 
         # Compute phi_prime_hat, beta_0_prime_hat, phi_hat, beta_0_hat
         # [num_tx, num_samples, 3]
@@ -2874,7 +2948,9 @@ class SolverCoverageMap(SolverBase):
         d_4 = tf.reshape(d_4, tf.concat([tf.shape(d_4), [1, 1]], axis=0))
 
         # [num_tx, num_samples]
-        spreading_factor = tf.sqrt(1.0 / (s*s_prime*(s_prime + s)))
+        spreading_factor = tf.math.divide_no_nan(tf.cast(1.0, self._rdtype),
+                                                 s*s_prime*(s_prime + s))
+        spreading_factor = tf.sqrt(spreading_factor)
         spreading_factor = tf.complex(spreading_factor,
                                       tf.zeros_like(spreading_factor))
         # [num_tx, num_samples, 1, 1]
@@ -3071,7 +3147,8 @@ class SolverCoverageMap(SolverBase):
         # [num_tx, num_samples, 2, 3]
         normals = tf.gather(self._wedges_normals, diff_wedges_ind)
         # [num_tx, num_samples]
-        op_angles = PI + tf.math.acos(dot(normals[...,0,:],normals[...,1,:]))
+        cos_op_angle = dot(normals[...,0,:],normals[...,1,:], clip=True)
+        op_angles = PI + tf.math.acos(cos_op_angle)
 
         # Update the weights of each ray power
         # [1, num_samples]
@@ -3273,7 +3350,7 @@ class SolverCoverageMap(SolverBase):
         #     origins.
         # diff_phi : [num_samples], tf.float
         #     Sampled angles of diffracted rays on the diffraction cone
-        # diff_vertex : [num_tx, num_samples, 3], tf.float
+        # diff_vertex : [num_samples, 3], tf.float
         #     Positions of the diffracted points in the GCS
         # diff_num_samples_per_wedge : [num_samples], tf.int
         #         For each sample, total mumber of samples that were sampled

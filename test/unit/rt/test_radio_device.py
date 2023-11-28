@@ -56,24 +56,29 @@ class TestRadioDevice(unittest.TestCase):
     def test_trainable_properties(self):
         """Test that trainable properties are correctly identified by the gradient tape"""
         scene = load_scene()
-        tx = Transmitter("tx", [1,2,-3], [0, 0, 0], trainable_orientation=True, trainable_position=True)
+        tx = Transmitter("tx", [1,2,-3], [0, 0, 0])
+        tx.position = tf.Variable([1,2,-3], dtype=tf.float32, trainable=True)
+        tx.orientation = tf.Variable([1,2,-3], dtype=tf.float32, trainable=True)
         scene.add(tx)
 
         with tf.GradientTape() as tape:
             a = tx.position
             b = tx.orientation
+            c = b+a
         self.assertTrue(len(tape.watched_variables())==2)
 
-        tx.trainable_orientation = False
+        tx.orientation = tf.zeros([3], dtype=tf.float32)
         with tf.GradientTape() as tape:
             a = tx.position
             b = tx.orientation
+            c = b+a
         self.assertTrue(len(tape.watched_variables())==1)
 
-        tx.trainable_position = False
+        tx.position = tf.zeros([3], dtype=tf.float32)
         with tf.GradientTape() as tape:
             a = tx.position
             b = tx.orientation
+            c = b+a
         self.assertTrue(len(tape.watched_variables())==0)
 
 

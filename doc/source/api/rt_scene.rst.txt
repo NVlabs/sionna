@@ -71,7 +71,7 @@ to instantiate a transmitter and receiver.
    scene.add(rx)
 
    # TX points towards RX
-   tx.look_at(rx) 
+   tx.look_at(rx)
 
    print(scene.transmitters)
    print(scene.receivers)
@@ -95,7 +95,7 @@ You can visualize the paths within a scene by one of the following commands:
 .. code-block:: Python
 
    scene.preview(paths=paths) # Open preview showing paths
-   scene.render(camera="preview", paths=paths) # Render scene with paths from previev camera
+   scene.render(camera="preview", paths=paths) # Render scene with paths from preview camera
    scene.render_to_file(camera="preview",
                         filename="scene.png",
                         paths=paths) # Render scene with paths to file
@@ -104,13 +104,14 @@ You can visualize the paths within a scene by one of the following commands:
    :align: center
 
 Note that the calls to the render functions in the code above use the "preview" camera which is configured through
-:meth:`~sionna.rt.Scene.preview`. You can use any other :class:`~sionna.rt.Camera` that you create here as well. 
+:meth:`~sionna.rt.Scene.preview`. You can use any other :class:`~sionna.rt.Camera` that you create here as well.
 
 The function :meth:`~sionna.rt.Scene.coverage_map` computes a :class:`~sionna.rt.CoverageMap` for every transmitter in a scene:
 
 .. code-block:: Python
 
-   cm = scene.coverage_map()
+   cm = scene.coverage_map(cm_cell_size=[1.,1.], # Configure size of each cell
+                           num_samples=1e7) # Number of rays to trace
 
 Coverage maps can be visualized in the same way as propagation paths:
 
@@ -125,15 +126,24 @@ Coverage maps can be visualized in the same way as propagation paths:
 .. figure:: ../figures/coverage_map_visualization.png
    :align: center
 
+
 Scene
 -----
 .. autoclass:: sionna.rt.Scene
    :members:
-   :exclude-members: _ready_for_paths_computation, _load_cameras, _load_scene_objects, _is_name_used, register_radio_device, unregister_radio_device, register_radio_material, register_scene_object, compute_paths, render, render_to_file, preview, mi_scene, preview_widget, coverage_map
+   :exclude-members: _check_scene, _load_cameras, _load_scene_objects, _is_name_used, register_radio_device, unregister_radio_device, register_radio_material, register_scene_object, compute_paths, trace_paths, compute_fields, render, render_to_file, preview, mi_scene, preview_widget, coverage_map
 
 compute_paths
 -------------
 .. autofunction:: sionna.rt.Scene.compute_paths
+
+trace_paths
+-------------
+.. autofunction:: sionna.rt.Scene.trace_paths
+
+compute_fields
+-------------
+.. autofunction:: sionna.rt.Scene.compute_fields
 
 coverage_map
 -------------
@@ -199,7 +209,7 @@ simple_reflector
 -----------------
 .. autodata:: sionna.rt.scene.simple_reflector
    :annotation:
-(`Blender file <https://drive.google.com/file/d/1YBxKeDGan7zxM2eTa659tUYmHq_Rc1HA/view?usp=share_link>`__)
+(`Blender file <https://drive.google.com/file/d/1iYPD11zAAMj0gNUKv_nv6QdLhOJcPpIa/view?usp=share_link>`__)
 
 double_reflector
 -----------------

@@ -269,9 +269,9 @@ class InteractiveDisplay:
         texture[:, :, :3] *= texture[:, :, 3, None]
 
         texture = p3s.DataTexture(
-            data=texture,
+            data=(255. * texture).astype(np.uint8),
             format='RGBAFormat',
-            type='FloatType',
+            type='UnsignedByteType',
             magFilter='NearestFilter',
             minFilter='NearestFilter',
         )

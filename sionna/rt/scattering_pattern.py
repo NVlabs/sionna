@@ -39,10 +39,6 @@ class ScatteringPattern(ABC):
         Parameter determining the percentage of the diffusely
         reflected energy in the lobe around the specular reflection.
 
-    trainable_lambda_ : bool
-        If set to `True`, the parameter `lambda_` is made a trainable variable.
-        Defaults to `False`.
-    
     dtype : tf.complex64 or tf.complex128
         Datatype used for all computations.
         Defaults to `tf.complex64`.
@@ -61,13 +57,12 @@ class ScatteringPattern(ABC):
     Output
     ------
     pattern : [batch_size], dtype.real_dtype
-        Scattering pattern 
+        Scattering pattern
     """
     def __init__(self,
                  alpha_r,
                  alpha_i,
                  lambda_,
-                 trainable_lambda_=False,
                  dtype=tf.complex64):
         if dtype not in (tf.complex64, tf.complex128):
             msg = "`dtype` must be `tf.complex64` or `tf.complex128`"
@@ -76,9 +71,7 @@ class ScatteringPattern(ABC):
         self._rdtype = dtype.real_dtype
         self.alpha_r = alpha_r
         self.alpha_i = alpha_i
-        self._lambda_ = tf.Variable(tf.zeros((), self._rdtype))
         self.lambda_ = lambda_
-        self.trainable_lambda_ = trainable_lambda_
 
     ###
     ### Static properties and methods
@@ -181,17 +174,17 @@ class ScatteringPattern(ABC):
         of a different scattering pattern for each pair k_i, k_s.
         """
         dtype = k_i.dtype
-        cos_theta_i = -dot(k_i, n_hat)
-        cos_theta_s = dot(k_s, n_hat)
+        cos_theta_i = -dot(k_i, n_hat, clip=True)
+        cos_theta_s = dot(k_s, n_hat, clip=True)
         k_r = k_i + 2*tf.expand_dims(cos_theta_i, -1)*n_hat
 
         # Compute backscattering pattern
         f_alpha_r = ScatteringPattern.f_alpha(cos_theta_i, alpha_r)
         f_alpha_i = ScatteringPattern.f_alpha(cos_theta_i, alpha_i)
         f = lambda_*f_alpha_r + (1-lambda_)*f_alpha_i
-        pattern_bs = lambda_*tf.pow((1+dot(k_r, k_s))/2,
+        pattern_bs = lambda_*tf.pow((1+dot(k_r, k_s, clip=True))/2,
                                     tf.cast(alpha_r, k_r.dtype))
-        pattern_bs += (1-lambda_)*tf.pow((1-dot(k_i, k_s))/2,
+        pattern_bs += (1-lambda_)*tf.pow((1-dot(k_i, k_s, clip=True))/2,
                                          tf.cast(alpha_i, k_r.dtype))
         pattern_bs /= f
 
@@ -254,26 +247,14 @@ class ScatteringPattern(ABC):
 
     @lambda_.setter
     def lambda_(self, value):
-        value = tf.cast(value, self._rdtype)
-        if value<0 or value >1:
-            raise ValueError("lambda_ must be in [0,1]")
-        self._lambda_.assign(value)
-
-    @property
-    def trainable_lambda_(self):
-        """
-        bool : Get/set if ``lambda_`` is trainable or not.
-            Defaults to `False`.
-        """
-        return self._trainable_lambda_
-
-    @trainable_lambda_.setter
-    def trainable_lambda_(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_lambda_` must be bool")
-        # pylint: disable=protected-access
-        self._lambda_._trainable = value
-        self._trainable_lambda_ = value
+        if isinstance(value, tf.Variable):
+            if value.dtype != self._rdtype:
+                msg = f"`lambda_` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._lambda_ = value
+        else:
+            self._lambda_ = tf.cast(value, self._rdtype)
 
     def __call__(self, k_i, k_s, n_hat):
         return ScatteringPattern.pattern(k_i, k_s, n_hat, self.alpha_r,
@@ -510,6 +491,17 @@ class BackscatteringPattern(ScatteringPattern):
     r"""
     Backscattering model from [Degli-Esposti07]_ as given in :eq:`backscattering_model`
 
+    The parameter ``lambda_`` can be assigned to a TensorFlow variable
+    or tensor.  In the latter case, the tensor can be the output of a callable, such as
+    a Keras layer implementing a neural network.
+    In the former case, it can be set to a trainable variable:
+
+    .. code-block:: Python
+
+        sp = BackscatteringPattern(alpha_r=3,
+                                   alpha_i=5,
+                                   lambda_=tf.Variable(0.3, dtype=tf.float32))
+
     Parameters
     ----------
     alpha_r : int, [1,2,...]
@@ -523,10 +515,6 @@ class BackscatteringPattern(ScatteringPattern):
     lambda_ : float, [0,1]
         Parameter determining the percentage of the diffusely
         reflected energy in the lobe around the specular reflection.
-
-    trainable_lambda_ : bool
-        If set to `True`, the parameter `lambda_` is made a trainable variable.
-        Defaults to `False`.
 
     dtype : tf.complex64 or tf.complex128
         Datatype used for all computations.
@@ -559,7 +547,6 @@ class BackscatteringPattern(ScatteringPattern):
                  alpha_r,
                  alpha_i,
                  lambda_,
-                 trainable_lambda_=False,
                  dtype=tf.complex64):
         super().__init__(alpha_r=alpha_r, alpha_i=alpha_i, lambda_=lambda_,
-                         trainable_lambda_=trainable_lambda_, dtype=dtype)
+                         dtype=dtype)

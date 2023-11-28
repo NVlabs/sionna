@@ -110,8 +110,7 @@ Custom radio materials can be implemented using the
 parameters related to diffuse scattering, such as the scattering coefficient :math:`S`,
 cross-polarization discrimination coefficient :math:`K_x`, and scattering pattern :math:`f_\text{s}(\hat{\mathbf{k}}_\text{i}, \hat{\mathbf{k}}_\text{s})`.
 Note that only non-magnetic materials with :math:`\mu_r=1` are currently allowed. 
-The following code snippet shows how to create a custom radio material. Note that the creation
-of a :class:`~sionna.rt.RadioMaterial` requires that a scene is loaded.
+The following code snippet shows how to create a custom radio material.
 
 .. code-block:: Python
    
@@ -152,11 +151,23 @@ or the material instance:
    obj = scene.get("my_object") # obj is a SceneObject
    obj.radio_material = custom_material # "my_object" is made of "my_material"
 
+The material parameters can be assigned to TensorFlow variables or tensors, such as
+the output of a Keras layer defining a neural network. This allows one to make materials
+trainable:
+
+.. code-block:: Python
+
+   mat = RadioMaterial("my_mat",
+                       relative_permittivity= tf.Variable(2.1, dtype=tf.float32))
+   mat.conductivity = tf.Variable(0.0, dtype=tf.float32)
+
+
+
 RadioMaterial
 -------------
 .. autoclass:: sionna.rt.RadioMaterial
    :members:
-   :exclude-members: core_material, frequency_update, decrease_use, increase_use, scene, is_placeholder, discard_object_using, add_object_using
+   :exclude-members: core_material, frequency_update, decrease_use, increase_use, scene, is_placeholder, discard_object_using, add_object_using, assign
 
 ScatteringPattern
 -----------------

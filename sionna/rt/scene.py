@@ -24,12 +24,13 @@ from .oriented_object import OrientedObject
 from .radio_material import RadioMaterial
 from .receiver import Receiver
 from .scene_object import SceneObject
-from .solver_paths import SolverPaths
+from .solver_paths import SolverPaths, PathsTmpData
 from .solver_cm import SolverCoverageMap
 from .transmitter import Transmitter
 from .previewer import InteractiveDisplay
 from .renderer import render, coverage_map_color_mapping
 from .utils import expand_to_rank
+from .paths import Paths
 from . import scenes
 
 
@@ -47,7 +48,7 @@ class Scene:
     for which propagation :class:`~sionna.rt.Paths`, channel impulse responses (CIRs) or coverage maps (:class:`~sionna.rt.CoverageMap`) can be computed,
     as well as cameras (:class:`~sionna.rt.Camera`) for rendering.
 
-    The only way to instantiate a scene is by calling :meth:`~sionna.rt.Scene,.load_scene`.
+    The only way to instantiate a scene is by calling :meth:`~sionna.rt.Scene,.load_scene()`.
     Note that only a single scene can be loaded at a time.
 
     Example scenes can be loaded as follows:
@@ -96,6 +97,12 @@ class Scene:
             # Set the unique instance of the scene
             cls._instance = instance
 
+            # By default, no callable is used for radio materials
+            cls._instance._radio_material_callable = None
+
+            # By default, no callable is used for scattering patterns
+            cls._instance._scattering_pattern_callable = None
+
         return cls._instance
 
     def __init__(self, env_filename = None, dtype = tf.complex64):
@@ -143,6 +150,12 @@ class Scene:
             # Load the scene objects
             self._load_scene_objects()
 
+            # By default, no callable is used for radio materials
+            self.radio_material_callable = None
+
+            # By default, no callable is used for scattering patterns
+            self._scattering_pattern_callable = None
+
     @property
     def cameras(self):
         """
@@ -172,7 +185,7 @@ class Scene:
 
         # Update radio materials
         for mat in self.radio_materials.values():
-            mat.frequency_update(f)
+            mat.frequency_update()
 
     @property
     def wavelength(self):
@@ -185,7 +198,7 @@ class Scene:
     def synthetic_array(self):
         """
         bool : Get/set if the antenna arrays are applied synthetically.
-            Defaults to `False`.
+            Defaults to `True`.
         """
         return self._synthetic_array
 
@@ -268,7 +281,7 @@ class Scene:
     @property
     def size(self):
         """
-        [3], tf.float : Get the size of the sceme, i.e., the size of the
+        [3], tf.float : Get the size of the scene, i.e., the size of the
         axis-aligned minimum bounding box for the scene
         """
         size = tf.cast(self._scene.bbox().max - self._scene.bbox().min,
@@ -335,13 +348,10 @@ class Scene:
             if  s_item is not item:
                 # In the case of RadioMaterial, the current item with same
                 # name could just be a placeholder
-                if isinstance(s_item, RadioMaterial)\
-                    and s_item.is_placeholder:
-                    s_item.relative_permittivity = item.relative_permittivity
-                    s_item.conductivity = item.conductivity
-                    s_item.frequency_update_callback =\
-                        item.frequency_update_callback
-                    s_item.trainable = item.trainable
+                if (isinstance(s_item, RadioMaterial)
+                    and isinstance(item, RadioMaterial)
+                    and s_item.is_placeholder):
+                    s_item.assign(item)
                     s_item.is_placeholder = False
                 else:
                     msg = f"Name '{name}' is already used by another item of"\
@@ -359,6 +369,7 @@ class Scene:
             item.scene = self
         elif isinstance(item, RadioMaterial):
             self._radio_materials[name] = item
+            item.frequency_update()
         elif isinstance(item, Camera):
             self._cameras[name] = item
             item.scene = self
@@ -405,11 +416,235 @@ class Scene:
                   " can be removed"
             raise TypeError(msg)
 
+
+    def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
+                    los=True, reflection=True, diffraction=False,
+                    scattering=False, scat_keep_prob=0.001,
+                    edge_diffraction=False, check_scene=True):
+        # pylint: disable=line-too-long
+        r"""
+        Computes the trajectories of the paths by shooting rays
+
+        The EM fields corresponding to the traced paths are not computed.
+        They can be computed using :meth:`~sionna.rt.Scene.compute_fields()`:
+
+        .. code-block:: Python
+
+            traced_paths = scene.trace_paths()
+            paths = scene.compute_fields(*traced_paths)
+
+        Path tracing is independent of the radio materials, antenna patterns,
+        and radio device orientations.
+        Therefore, a set of traced paths could be reused for different values
+        of these quantities, e.g., to calibrate the ray tracer.
+        This can enable significant resource savings as path tracing is
+        typically significantly more resource-intensive than field computation.
+
+        Note that :meth:`~sionna.rt.Scene.compute_paths()` does both path tracing and
+        field computation.
+
+        Input
+        ------
+        max_depth : int
+            Maximum depth (i.e., number of interaction with objects in the scene)
+            allowed for tracing the paths.
+            Defaults to 3.
+
+        method : str ("exhaustive"|"fibonacci")
+            Method to be used to list candidate paths.
+            The "exhaustive" method tests all possible combination of primitives as
+            paths. This method is not compatible with scattering.
+            The "fibonacci" method uses a shoot-and-bounce approach to find
+            candidate chains of primitives. Initial ray directions are arranged
+            in a Fibonacci lattice on the unit sphere. This method can be
+            applied to very large scenes. However, there is no guarantee that
+            all possible paths are found.
+            Defaults to "fibonacci".
+
+        num_samples: int
+            Number of random rays to trace in order to generate candidates.
+            A large sample count may exhaust GPU memory.
+            Defaults to 1e6. Only needed if ``method`` is "fibonacci".
+
+        los : bool
+            If set to `True`, then the LoS paths are computed.
+            Defaults to `True`.
+
+        reflection : bool
+            If set to `True`, then the reflected paths are computed.
+            Defaults to `True`.
+
+        diffraction : bool
+            If set to `True`, then the diffracted paths are computed.
+            Defaults to `False`.
+
+        scattering : bool
+            If set to `True`, then the scattered paths are computed.
+            Only works with the Fibonacci method.
+            Defaults to `False`.
+
+        scat_keep_prob : float
+            Probability with which to keep scattered paths.
+            This is helpful to reduce the number of scattered paths computed,
+            which might be prohibitively high in some setup.
+            Must be in the range (0,1).
+            Defaults to 0.001.
+
+        edge_diffraction : bool
+            If set to `False`, only diffraction on wedges, i.e., edges that
+            connect two primitives, is considered.
+            Defaults to `False`.
+
+        check_scene : bool
+            If set to `True`, checks that the scene is well configured before
+            computing the paths. This can add a significant overhead.
+            Defaults to `True`.
+
+        Output
+        -------
+        spec_paths : :class:`~sionna.rt.Paths`
+            Computed specular paths
+
+        diff_paths : :class:`~sionna.rt.Paths`
+            Computed diffracted paths
+
+        scat_paths : :class:`~sionna.rt.Paths`
+            Computed scattered paths
+
+        spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the specular
+            paths
+
+        diff_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the diffracted
+            paths
+
+        scat_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the scattered
+            paths
+        """
+
+        if scat_keep_prob < 0. or scat_keep_prob > 1.:
+            msg = "The parameter `scat_keep_prob` must be in the range (0,1)"
+            raise ValueError(msg)
+
+        # Check that all is set to compute paths
+        if check_scene:
+            self._check_scene(False)
+
+        # Trace the paths
+        paths = self._solver_paths.trace_paths(max_depth,
+                                               method=method,
+                                               num_samples=num_samples,
+                                               los=los, reflection=reflection,
+                                               diffraction=diffraction,
+                                               scattering=scattering,
+                                               scat_keep_prob=scat_keep_prob,
+                                               edge_diffraction=edge_diffraction)
+
+        return paths
+
+    def compute_fields(self, spec_paths, diff_paths, scat_paths,
+                       spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
+                       check_scene=True, scat_random_phases=True,
+                       testing=False):
+        r"""compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp, check_scene=True, scat_random_phases=True)
+        Computes the EM fields corresponding to traced paths
+
+        Paths can be traced using :meth:`~sionna.rt.Scene.trace_paths()`.
+        This method can then be used to finalize the paths calculation by
+        computing the corresponding fields:
+
+        .. code-block:: Python
+
+            traced_paths = scene.trace_paths()
+            paths = scene.compute_fields(*traced_paths)
+
+        Paths tracing is independent from the radio materials, antenna patterns,
+        and radio devices orientations.
+        Therefore, a set of traced paths could be reused for different values
+        of these quantities, e.g., to calibrate the ray tracer.
+        This can enable significant resource savings as paths tracing is
+        typically significantly more resource-intensive than field computation.
+
+        Note that :meth:`~sionna.rt.Scene.compute_paths()` does both tracing and
+        field computation.
+
+        Input
+        ------
+        spec_paths : :class:`~sionna.rt.Paths`
+            Specular paths
+
+        diff_paths : :class:`~sionna.rt.Paths`
+            Diffracted paths
+
+        scat_paths : :class:`~sionna.rt.Paths`
+            Scattered paths
+
+        spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the specular
+            paths
+
+        diff_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the diffracted
+            paths
+
+        scat_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the scattered
+            paths
+
+        check_scene : bool
+            If set to `True`, checks that the scene is well configured before
+            computing the paths. This can add a significant overhead.
+            Defaults to `True`.
+
+        scat_random_phases : bool
+            If set to `True` and if scattering is enabled, random uniform phase
+            shifts are added to the scattered paths.
+            Defaults to `True`.
+
+        Output
+        -------
+        paths : :class:`~sionna.rt.Paths`
+            Computed paths
+        """
+
+        # Check that all is set to compute paths
+        if check_scene:
+            self._check_scene(False)
+
+        # Compute the fields and merge the paths
+        output = self._solver_paths.compute_fields(spec_paths, diff_paths,
+            scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
+            scat_random_phases, testing)
+        sources, targets, paths_as_dict = output[:3]
+        paths = Paths(sources, targets, self)
+        paths.from_dict(paths_as_dict)
+
+        # If the hidden input flag testing is True, additional data
+        # is returned which is required for some unit tests
+        if testing:
+            spec_tmp_as_dict, diff_tmp_as_dict, scat_tmp_as_dict = output[3:]
+            spec_tmp = PathsTmpData(sources, targets, self._dtype)
+            spec_tmp.from_dict(spec_tmp_as_dict)
+            diff_tmp = PathsTmpData(sources, targets, self._dtype)
+            diff_tmp.from_dict(diff_tmp_as_dict)
+            scat_tmp = PathsTmpData(sources, targets, self._dtype)
+            scat_tmp.from_dict(scat_tmp_as_dict)
+            paths.spec_tmp = spec_tmp
+            paths.diff_tmp = diff_tmp
+            paths.scat_tmp = scat_tmp
+
+        # Finalize paths computation
+        paths.finalize()
+
+        return paths
+
     def compute_paths(self, max_depth=3, method="fibonacci",
                       num_samples=int(1e6), los=True, reflection=True,
                       diffraction=False, scattering=False, scat_keep_prob=0.001,
-                      edge_diffraction=False,
-                      check_scene=True):
+                      edge_diffraction=False, check_scene=True,
+                      scat_random_phases=True, testing=False):
         # pylint: disable=line-too-long
         r"""
         Computes propagation paths
@@ -433,6 +668,25 @@ class Scene:
         for large arrays. Time evolution of the channel coefficients can be simulated with
         the help of the function :meth:`~sionna.rt.Paths.apply_doppler` of the returned
         :class:`~sionna.rt.Paths` object.
+
+        The path computation consists of two main steps as shown in the below figure.
+        
+        .. figure:: ../figures/compute_paths.svg
+            :align: center
+
+        For a configured :class:`~sionna.rt.Scene`, the function first traces geometric propagation paths
+        using :meth:`~sionna.rt.Scene.trace_paths`. This step is independent of the
+        :class:`~sionna.rt.RadioMaterial` of the scene objects as well as the transmitters' and receivers' 
+        antenna :attr:`~sionna.rt.Antenna.patterns` and  :attr:`~sionna.rt.Transmitter.orientation`,
+        but depends on the selected propagation
+        phenomena, such as reflection, scattering, and diffraction. The traced paths
+        are then converted to EM fields by the function :meth:`~sionna.rt.Scene.compute_fields`.
+        The resulting :class:`~sionna.rt.Paths` object can be used to compute channel
+        impulse responses via :meth:`~sionna.rt.Paths.cir`. The advantage of separating path tracing
+        and field computation is that one can study the impact of different radio materials 
+        by executing :meth:`~sionna.rt.Scene.compute_fields` multiple times without
+        re-tracing the propagation paths. This can for example speed-up the calibration of scene parameters
+        by several orders of magnitude.
 
         Example
         -------
@@ -495,7 +749,7 @@ class Scene:
             The "exhaustive" method tests all possible combinations of primitives.
             This method is not compatible with scattering.
             The "fibonacci" method uses a shoot-and-bounce approach to find
-            candidate chains of primitives. Intial ray directions are chosen
+            candidate chains of primitives. Initial ray directions are chosen
             according to a Fibonacci lattice on the unit sphere. This method can be
             applied to very large scenes. However, there is no guarantee that
             all possible paths are found.
@@ -545,33 +799,30 @@ class Scene:
             computing the paths. This can add a significant overhead.
             Defaults to `True`.
 
+        scat_random_phases : bool
+            If set to `True` and if scattering is enabled, random uniform phase
+            shifts are added to the scattered paths.
+            Defaults to `True`.
+
+        testing : bool
+            If set to `True`, then additional data is returned for testing.
+            Defaults to `False`.
+
         Output
         ------
         :paths : :class:`~sionna.rt.Paths`
             Simulated paths
         """
 
-        if scat_keep_prob < 0. or scat_keep_prob > 1.:
-            msg = "The parameter `scat_keep_prob` must be in the range (0,1)"
-            raise ValueError(msg)
+        # Trace the paths
+        traced_paths = self.trace_paths(max_depth, method, num_samples, los,
+            reflection, diffraction, scattering, scat_keep_prob,
+            edge_diffraction, check_scene)
 
-        # Check that all is set to compute paths
-        if check_scene:
-            self._ready_for_paths_computation()
-
-        # Compute the paths using the solver
-        # Returns: A Paths object
-        paths = self._solver_paths(max_depth,
-                                   method=method,
-                                   num_samples=num_samples,
-                                   los=los, reflection=reflection,
-                                   diffraction=diffraction,
-                                   scattering=scattering,
-                                   scat_keep_prob=scat_keep_prob,
-                                   edge_diffraction=edge_diffraction)
-
-        # Finalize paths computation
-        paths.finalize()
+        # Compute the fields and merge the paths
+        # Check scene is not done twice
+        paths = self.compute_fields(*traced_paths, False, scat_random_phases,
+                                    testing)
 
         return paths
 
@@ -635,10 +886,10 @@ class Scene:
         and bouncing the rays on the intersected objects until the maximum depth (``max_depth``) is reached or
         the ray bounces out of the scene.
         At every intersection with an object of the scene, a new ray is shot from the intersection which corresponds to either
-        specular reflection or diffuse scattering, following a Bernouilli distribution with parameter the
+        specular reflection or diffuse scattering, following a Bernoulli distribution with parameter the
         squared scattering coefficient.
         When diffuse scattering is selected, the direction of the scattered ray is uniformly sampled on the half-sphere.
-        The resulting Monter Carlo estimate is:
+        The resulting Monte Carlo estimate is:
 
         .. math::
             :label: cm_mc_ref
@@ -652,7 +903,7 @@ class Scene:
         .. math::
             b_{i,j} = \frac{1}{\lvert C \rvert} \int_{\ell} \int_{\phi} \lvert h\left(s(\ell,\phi) \right) \rvert^2 \mathbb{1}_{\left\{ s(\ell,\phi) \in C_{i,j} \right\}} \left\lVert \frac{\partial r}{\partial \ell} \times \frac{\partial r}{\partial \phi} \right\rVert d\ell d\phi
 
-        where the intergral is over the wedge length :math:`L` and opening angle :math:`\Phi`, and
+        where the integral is over the wedge length :math:`L` and opening angle :math:`\Phi`, and
         :math:`r\left( \ell, \phi \right)` is the reparametrization with respected to :math:`(\ell, \phi)` of the
         intersection between the diffraction cone at :math:`\ell` and the rectangle defining the coverage map (see, e.g., [SurfaceIntegral]_).
         The previous integral is approximated through Monte Carlo sampling by shooting :math:`N'` rays from equally spaced
@@ -865,7 +1116,7 @@ class Scene:
 
         # Check that all is set to compute the coverage map
         if check_scene:
-            self._ready_for_coverage_map()
+            self._check_scene(True)
 
         # Check the properties of the rectangle defining the coverage map
         if ((cm_center is None)
@@ -1124,7 +1375,7 @@ class Scene:
             :math:`y = 10 \cdot \log_{10}(x)`.
             Defaults to `True`.
 
-        cm_vmin, cm_vmax: floot | None
+        cm_vmin, cm_vmax: float | None
             For coverage map visualization, defines the range of path gains that
             the colormap covers.
             These parameters should be provided in dB if ``cm_db_scale`` is
@@ -1254,7 +1505,7 @@ class Scene:
             :math:`y = 10 \cdot \log_{10}(x)`.
             Defaults to `True`.
 
-        cm_vmin, cm_vmax: floot | None
+        cm_vmin, cm_vmax: float | None
             For coverage map visualization, defines the range of path gains that
             the colormap covers.
             These parameters should be provided in dB if ``cm_db_scale`` is
@@ -1299,6 +1550,80 @@ class Scene:
                                   srgb_gamma=True)
         image.write(filename)
 
+    @property
+    def radio_material_callable(self):
+        # pylint: disable=line-too-long
+        r"""
+        Get/set a callable that computes the radio material properties at the
+        points of intersection between the rays and the scene objects.
+
+        If set, then the :class:`~sionna.rt.RadioMaterial` of the objects are
+        not used and the callable is invoked instead to obtain the
+        electromagnetic properties required to simulate the propagation of radio
+        waves.
+
+        If not set, i.e., `None` (default), then the
+        :class:`~sionna.rt.RadioMaterial` of objects are used to simulate the
+        propagation of radio waves in the scene.
+
+        This callable is invoked on batches of intersection points.
+        It takes as input the following tensors:
+
+        * ``object_id`` (`[batch_dims]`, `int`) : Integers uniquely identifying the intersected objects
+        * ``points`` (`[batch_dims, 3]`, `float`) : Positions of the intersection points
+
+        The callable must output a tuple/list of the following tensors:
+
+        * ``complex_relative_permittivity`` (`[batch_dims]`, `complex`) : Complex relative permittivities :math:`\eta` :eq:`eta`
+        * ``scattering_coefficient`` (`[batch_dims]`, `float`) : Scattering coefficients :math:`S\in[0,1]` :eq:`scattering_coefficient`
+        * ``xpd_coefficient`` (`[batch_dims]`, `float`) : Cross-polarization discrimination coefficients :math:`K_x\in[0,1]` :eq:`xpd`. Only relevant for the scattered field.
+
+        **Note:** The number of batch dimensions is not necessarily equal to one.
+        """
+        return self._radio_material_callable
+
+    @radio_material_callable.setter
+    def radio_material_callable(self, rm_callable):
+        self._radio_material_callable = rm_callable
+
+    @property
+    def scattering_pattern_callable(self):
+        # pylint: disable=line-too-long
+        r"""
+        Get/set a callable that computes the scattering pattern at the
+        points of intersection between the rays and the scene objects.
+
+        If set, then the :attr:`~sionna.rt.RadioMaterial.scattering_pattern` of
+        the radio materials of the objects are not used and the callable is invoked
+        instead to evaluate the scattering pattern required to simulate the
+        propagation of diffusely reflected radio waves.
+
+        If not set, i.e., `None` (default), then the
+        :attr:`~sionna.rt.RadioMaterial.scattering_pattern` of the objects'
+        radio materials are used to simulate the propagation of diffusely
+        reflected radio waves in the scene.
+
+        This callable is invoked on batches of intersection points.
+        It takes as input the following tensors:
+
+        * ``object_id`` (`[batch_dims]`, `int`) : Integers uniquely identifying the intersected objects
+        * ``points`` (`[batch_dims, 3]`, `float`) : Positions of the intersection points
+        * ``k_i`` (`[batch_dims, 3]`, `float`) : Unitary vector corresponding to the direction of incidence in the scene's global coordinate system
+        * ``k_s`` (`[batch_dims, 3]`, `float`) : Unitary vector corresponding to the direction of the diffuse reflection in the scene's global coordinate system
+        * ``n`` (`[batch_dims, 3]`, `float`) : Unitary vector corresponding to the normal to the surface at the intersection point
+
+        The callable must output the following tensor:
+
+        * ``f_s`` (`[batch_dims]`, `float`) : The scattering pattern evaluated for the previous inputs
+
+        **Note:** The number of batch dimensions is not necessarily equal to one.
+        """
+        return self._scattering_pattern_callable
+
+    @scattering_pattern_callable.setter
+    def scattering_pattern_callable(self, sp_callable):
+        self._scattering_pattern_callable = sp_callable
+
     ##############################################
     # Internal methods.
     # Should not be appear in the user
@@ -1334,10 +1659,17 @@ class Scene:
         self._rx_array = None
         self._preview_widget = None
 
-    def _ready_for_paths_computation(self):
+    def _check_scene(self, coverage_map):
         r"""
-        Check that all is set for paths computation.
+        Check that all is set for paths or coverage map computation.
         If not, raises an exception with the appropriate error message.
+
+        Input
+        ------
+        coverage_map : bool
+            If set to `True`, then checks the scene in preparation for coverage
+            map computation. Otherwise, checks the scene in preparation for
+            paths computation.
         """
         if not self._rx_array:
             raise ValueError("Receiver array not set.")
@@ -1348,40 +1680,10 @@ class Scene:
         if len(self._transmitters) == 0:
             raise ValueError("No transmitter defined.")
 
-        if len(self._receivers) == 0:
-            raise ValueError("No receiver defined.")
-
-        # Check that all scene objects have a radio material
-        for obj in self.objects.values():
-            mat = obj.radio_material
-            if mat is None:
-                msg = f"Scene object {obj.name} has no material set."
-                raise ValueError(msg)
-            else:
-                # Check that the material is well-defined
-                if not mat.well_defined:
-                    msg = f"Material '{mat.name}' is used by the object "\
-                           f" '{obj.name}' but is not well-defined."
-                    raise ValueError(msg)
-                # Check that the material is not a placeholder
-                if mat.is_placeholder:
-                    msg = f"Material '{mat.name}' is used by the object "\
-                           f" '{obj.name}' but not defined."
-                    raise ValueError(msg)
-
-    def _ready_for_coverage_map(self):
-        r"""
-        Check that all is set for coverage map.
-        If not, raises an exception with the appropriate error message.
-        """
-        if not self._rx_array:
-            raise ValueError("Receiver array not set.")
-
-        if not self._tx_array:
-            raise ValueError("Transmitter array not set.")
-
-        if len(self._transmitters) == 0:
-            raise ValueError("No transmitter defined.")
+        # Instantiation of receivers is not needed to compute a coverage map
+        if not coverage_map:
+            if len(self._receivers) == 0:
+                raise ValueError("No receiver defined.")
 
         # Check that all scene objects have a radio material
         for obj in self.objects.values():
@@ -1422,7 +1724,7 @@ class Scene:
 
     def _load_scene_objects(self):
         """
-        Load the scene objects availabe in the scene
+        Load the scene objects available in the scene
         """
         # Parse all shapes in the scene
         scene = self._scene

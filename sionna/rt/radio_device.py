@@ -16,7 +16,7 @@ from sionna.constants import PI
 
 class RadioDevice(OrientedObject):
     # pylint: disable=line-too-long
-    r"""RadioDevice(name, position, orientation=[0.,0.,0.], look_at=None, trainable_position=False, trainable_orientation=False, dtype=tf.complex64)
+    r"""RadioDevice(name, position, orientation=[0.,0.,0.], look_at=None, dtype=tf.complex64)
 
     Class defining a generic radio device.
 
@@ -47,14 +47,6 @@ class RadioDevice(OrientedObject):
         Defines the RGB (red, green, blue) ``color`` parameter for the device as displayed in the previewer and renderer.
         Each RGB component must have a value within the range :math:`\in [0,1]`.
 
-    trainable_position : bool
-        Determines if the ``position`` is a trainable variable or not.
-        Defaults to `False`.
-
-    trainable_orientation : bool
-        Determines if the ``orientation`` is a trainable variable or not.
-        Defaults to `False`.
-
     dtype : tf.complex
         Datatype to be used in internal calculations.
         Defaults to `tf.complex64`.
@@ -66,90 +58,55 @@ class RadioDevice(OrientedObject):
                  orientation=(0.,0.,0.),
                  look_at=None,
                  color=(0,0,0),
-                 trainable_position=False,
-                 trainable_orientation=False,
                  dtype=tf.complex64):
 
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._dtype = dtype
         self._rdtype = dtype.real_dtype
-
-        self._position = tf.Variable(tf.zeros([3], self._rdtype))
-        self._orientation = tf.Variable(tf.zeros([3], self._rdtype))
-
+        self.position = position
+        self.orientation = orientation
         self.color = color
-
-        self.trainable_position = trainable_position
-        self.trainable_orientation = trainable_orientation
 
         # Initialize the base class OrientedObject
         # Position and orientation are set through this call
         super().__init__(name, position, orientation, look_at)
 
     @property
-    def trainable_position(self):
-        """
-        bool : Get/set if the position is a trainable variable
-            or not.
-            Defaults to `False`.
-        """
-        return self._trainable_position
-
-    @trainable_position.setter
-    def trainable_position(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_position` must be bool")
-        # pylint: disable=protected-access
-        self._position._trainable = value
-        self._trainable_position = value
-
-    @property
-    def trainable_orientation(self):
-        """
-        bool : Get/set if the orientation is a trainable variable
-            or not.
-            Defaults to `False`.
-        """
-        return self._trainable_orientation
-
-    @trainable_orientation.setter
-    def trainable_orientation(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_orientation` must be bool")
-        # pylint: disable=protected-access
-        self._orientation._trainable = value
-        self._trainable_orientationn = value
-
-    @property
     def position(self):
         """
         [3], tf.float : Get/set the position
         """
-        return self._position.value()
+        return self._position
 
     @position.setter
-    def position(self, new_position):
-        new_position = tf.cast(new_position, dtype=self._rdtype)
-        if not (tf.rank(new_position) == 1 and new_position.shape[0] == 3):
-            msg = "Position must be shaped as [x,y,z] (rank=1 and shape=[3])"
-            raise ValueError(msg)
-        self._position.assign(new_position)
+    def position(self, v):
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg = f"`position` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._position = v
+        else:
+            self._position = tf.cast(v, dtype=self._rdtype)
 
     @property
     def orientation(self):
         """
         [3], tf.float : Get/set the orientation
         """
-        return self._orientation.value()
+        return self._orientation
 
     @orientation.setter
-    def orientation(self, new_orient):
-        new_orient = tf.cast(new_orient, dtype=self._rdtype)
-        if not (tf.rank(new_orient) == 1 and new_orient.shape[0] == 3):
-            msg = "Orientation must be shaped as [a,b,c] (rank=1 and shape=[3])"
-            raise ValueError(msg)
-        self._orientation.assign(new_orient)
+    def orientation(self, v):
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg = f"`orientation` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._orientation = v
+        else:
+            self._orientation = tf.cast(v, dtype=self._rdtype)
 
     def look_at(self, target):
         # pylint: disable=line-too-long

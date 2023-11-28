@@ -406,25 +406,31 @@ def sim_ber(mc_fun,
             soft_estimates=False,
             num_target_bit_errors=None,
             num_target_block_errors=None,
+            target_ber=None,
+            target_bler=None,
             early_stop=True,
             graph_mode=None,
+            distribute=None,
             verbose=True,
             forward_keyboard_interrupt=True,
-            dtype=tf.complex64,
-            callback=None):
+            callback=None,
+            dtype=tf.complex64):
+    # pylint: disable=line-too-long
     """Simulates until target number of errors is reached and returns BER/BLER.
 
     The simulation continues with the next SNR point if either
     ``num_target_bit_errors`` bit errors or ``num_target_block_errors`` block
     errors is achieved. Further, it continues with the next SNR point after
     ``max_mc_iter`` batches of size ``batch_size`` have been simulated.
+    Early stopping allows to stop the simulation after the first error-free SNR
+    point or after reaching a certain ``target_ber`` or ``target_bler``.
 
     Input
     -----
     mc_fun: callable
         Callable that yields the transmitted bits `b` and the
         receiver's estimate `b_hat` for a given ``batch_size`` and
-        ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as
+        ``ebno_db``. If ``soft_estimates`` is True, `b_hat` is interpreted as
         logit.
 
     ebno_dbs: tf.float32
@@ -434,23 +440,33 @@ def sim_ber(mc_fun,
         Batch-size for evaluation.
 
     max_mc_iter: tf.int32
-        Max. number of Monte-Carlo iterations per SNR point.
+        Maximum number of Monte-Carlo iterations per SNR point.
 
     soft_estimates: bool
-        A boolean, defaults to False. If True, `b_hat``
+        A boolean, defaults to `False`. If `True`, `b_hat`
         is interpreted as logit and an additional hard-decision is applied
         internally.
 
     num_target_bit_errors: tf.int32
-        Defaults to None. Target number of bit errors per SNR point until
+        Defaults to `None`. Target number of bit errors per SNR point until
         the simulation continues to next SNR point.
 
     num_target_block_errors: tf.int32
-        Defaults to None. Target number of block errors per SNR point
+        Defaults to `None`. Target number of block errors per SNR point
         until the simulation continues
 
+    target_ber: tf.float32
+        Defaults to `None`. The simulation stops after the first SNR point
+        which achieves a lower bit error rate as specified by ``target_ber``.
+        This requires ``early_stop`` to be `True`.
+
+    target_bler: tf.float32
+        Defaults to `None`. The simulation stops after the first SNR point
+        which achieves a lower block error rate as specified by ``target_bler``.
+        This requires ``early_stop`` to be `True`.
+
     early_stop: bool
-        A boolean defaults to True. If True, the simulation stops after the
+        A boolean defaults to `True`. If `True`, the simulation stops after the
         first error-free SNR point (i.e., no error occurred after
         ``max_mc_iter`` Monte-Carlo iterations).
 
@@ -458,18 +474,29 @@ def sim_ber(mc_fun,
         A string describing the execution mode of ``mc_fun``.
         Defaults to `None`. In this case, ``mc_fun`` is executed as is.
 
+    distribute: `None` (default) | "all" | list of indices | `tf.distribute.strategy`
+        Distributes simulation on multiple parallel devices. If `None`,
+        multi-device simulations are deactivated. If "all", the workload will
+        be automatically distributed across all available GPUs via the
+        `tf.distribute.MirroredStrategy`.
+        If an explicit list of indices is provided, only the GPUs with the given
+        indices will be used. Alternatively, a custom `tf.distribute.strategy`
+        can be provided. Note that the same `batch_size` will be
+        used for all GPUs in parallel, but the number of Monte-Carlo iterations
+        ``max_mc_iter`` will be scaled by the number of devices such that the
+        same number of total samples is simulated. However, all stopping
+        conditions are still in-place which can cause slight differences in the
+        total number of simulated samples.
+
     verbose: bool
-        A boolean defaults to True. If True, the current progress will be
+        A boolean defaults to `True`. If `True`, the current progress will be
         printed.
 
     forward_keyboard_interrupt: bool
-        A boolean defaults to True. If False, KeyboardInterrupts will be
+        A boolean defaults to `True`. If `False`, KeyboardInterrupts will be
         catched internally and not forwarded (e.g., will not stop outer loops).
-        If False, the simulation ends and returns the intermediate simulation
+        If `False`, the simulation ends and returns the intermediate simulation
         results.
-
-    dtype: tf.complex64
-        Datatype of the model / function to be used (``mc_fun``).
 
     callback: callable
         Defaults to `None`. If specified, ``callback``
@@ -486,6 +513,9 @@ def sim_ber(mc_fun,
         point. If ``callable`` returns `sim_ber.CALLBACK_STOP`, the simulation
         is stopped immediately. For `sim_ber.CALLBACK_CONTINUE` continues with
         the simulation.
+
+    dtype: tf.complex64
+        Datatype of the callable ``mc_fun`` to be used as input/output.
 
     Output
     ------
@@ -573,6 +603,17 @@ def sim_ber(mc_fun,
         # pylint: disable=line-too-long, consider-using-f-string
         print("{: >9} |{: >11} |{: >11} |{: >12} |{: >12} |{: >13} |{: >12} |{: >12} |{: >10}".format(*row_text), end=end_str)
 
+    # distributed execution should not be done in Eager mode
+    # XLA mode seems to have difficulties with TF2.13
+    @tf.function(jit_compile=False)
+    def _run_distributed(strategy, mc_fun, batch_size, ebno_db):
+        # use tf.distribute to execute on parallel devices (=replicas)
+        outputs_rep = strategy.run(mc_fun,
+                                   args=(batch_size, ebno_db))
+        # copy replicas back to single device
+        b = strategy.gather(outputs_rep[0], axis=0)
+        b_hat = strategy.gather(outputs_rep[1], axis=0)
+        return b, b_hat
 
      # init table headers
     header_text = ["EbNo [dB]", "BER", "BLER", "bit errors",
@@ -585,13 +626,30 @@ def sim_ber(mc_fun,
             "no errors - early stop", # status=2
             "reached target bit errors", # status=3
             "reached target block errors", # status=4
-            "callback triggered stopping"] # status=5
+            "reached target BER - early stop", # status=5
+            "reached target BLER - early stop", # status=6
+            "callback triggered stopping"] # status=7
+
 
     # check inputs for consistency
     assert isinstance(early_stop, bool), "early_stop must be bool."
     assert isinstance(soft_estimates, bool), "soft_estimates must be bool."
     assert dtype.is_complex, "dtype must be a complex type."
     assert isinstance(verbose, bool), "verbose must be bool."
+
+    # target_ber / target_bler only works if early stop is activated
+    if target_ber is not None:
+        if not early_stop:
+            print("Warning: early stop is deactivated. Thus, target_ber " \
+                  "is ignored.")
+    else:
+        target_ber = -1. # deactivate early stopping condition
+    if target_bler is not None:
+        if not early_stop:
+            print("Warning: early stop is deactivated. Thus, target_bler " \
+                  "is ignored.")
+    else:
+        target_bler = -1. # deactivate early stopping condition
 
     if graph_mode is None:
         graph_mode="default" # applies default graph mode
@@ -615,16 +673,51 @@ def sim_ber(mc_fun,
     else:
         raise TypeError("Unknown graph_mode selected.")
 
+    # support multi-device simulations by using the tf.distribute package
+    if distribute is None: # disabled per default
+        run_multigpu = False
+    # use strategy if explicitly provided
+    elif isinstance(distribute, tf.distribute.Strategy):
+        run_multigpu = True
+        strategy = distribute # distribute is already a tf.distribute.strategy
+    else:
+        run_multigpu = True
+        # use all available gpus
+        if distribute=="all":
+            gpus = tf.config.list_logical_devices('GPU')
+        # mask active GPUs if indices are provided
+        elif isinstance(distribute, (tuple, list)):
+            gpus_avail = tf.config.list_logical_devices('GPU')
+            gpus = [gpus_avail[i] for i in distribute if i < len(gpus_avail)]
+        else:
+            raise ValueError("Unknown value for distribute.")
+
+        # deactivate logging of tf.device placement
+        if verbose:
+            print("Setting tf.debugging.set_log_device_placement to False.")
+        tf.debugging.set_log_device_placement(False)
+        # we reduce to the first device by default
+        strategy = tf.distribute.MirroredStrategy(gpus,
+                            cross_device_ops=tf.distribute.ReductionToOneDevice(
+                                                reduce_to_device=gpus[0].name))
+
+    # reduce max_mc_iter if multi_gpu simulations are activated
+    if run_multigpu:
+        num_replicas = strategy.num_replicas_in_sync
+        max_mc_iter = int(np.ceil(max_mc_iter/num_replicas))
+        print(f"Distributing simulation across {num_replicas} devices.")
+        print(f"Reducing max_mc_iter to {max_mc_iter}")
+
     ebno_dbs = tf.cast(ebno_dbs, dtype.real_dtype)
     batch_size = tf.cast(batch_size, tf.int32)
     num_points = tf.shape(ebno_dbs)[0]
     bit_errors = tf.Variable(   tf.zeros([num_points], dtype=tf.int64),
-                            dtype=tf.int64)
-    block_errors = tf.Variable(  tf.zeros([num_points], dtype=tf.int64),
-                            dtype=tf.int64)
+                                dtype=tf.int64)
+    block_errors = tf.Variable( tf.zeros([num_points], dtype=tf.int64),
+                                dtype=tf.int64)
     nb_bits = tf.Variable(  tf.zeros([num_points], dtype=tf.int64),
                             dtype=tf.int64)
-    nb_blocks = tf.Variable(  tf.zeros([num_points], dtype=tf.int64),
+    nb_blocks = tf.Variable(tf.zeros([num_points], dtype=tf.int64),
                             dtype=tf.int64)
 
     # track status of simulation (early termination etc.)
@@ -648,12 +741,17 @@ def sim_ber(mc_fun,
 
                 iter_count += 1
 
-                outputs = mc_fun(batch_size=batch_size, ebno_db=ebno_dbs[i])
-
-                # assume first and second return value is b and b_hat
-                # other returns are ignored
-                b = outputs[0]
-                b_hat = outputs[1]
+                if run_multigpu: # distributed execution
+                    b, b_hat = _run_distributed(strategy,
+                                                mc_fun,
+                                                batch_size,
+                                                ebno_dbs[i])
+                else:
+                    outputs = mc_fun(batch_size=batch_size, ebno_db=ebno_dbs[i])
+                    # assume first and second return value is b and b_hat
+                    # other returns are ignored
+                    b = outputs[0]
+                    b_hat = outputs[1]
 
                 if soft_estimates:
                     b_hat = hard_decisions(b_hat)
@@ -685,7 +783,7 @@ def sim_ber(mc_fun,
                                     sim_ber.CALLBACK_NEXT_SNR):
                         # stop runtime timer
                         runtime[i] = time.perf_counter() - runtime[i]
-                        status[i] = 5 # change internal status for summary
+                        status[i] = 7 # change internal status for summary
                         break # stop for this SNR point have been simulated
 
                 # print progress summary
@@ -704,7 +802,6 @@ def sim_ber(mc_fun,
                     rt = time.perf_counter() - runtime[i]
                     # print current progress
                     _print_progress(is_final=False, idx_snr=i, idx_it=ii, rt=rt)
-
 
                 # bit-error based stopping cond.
                 if num_target_bit_errors is not None:
@@ -736,7 +833,7 @@ def sim_ber(mc_fun,
                                 idx_it=iter_count,
                                 rt=runtime[i])
 
-            # early stop if no error occurred
+            # early stop if no error occurred or target_ber/target_bler reached
             if early_stop: # only if early stop is active
                 if block_errors[i]==0:
                     status[i] = 2 # change internal status for summary
@@ -744,12 +841,30 @@ def sim_ber(mc_fun,
                         print("\nSimulation stopped as no error occurred " \
                               f"@ EbNo = {ebno_dbs[i].numpy():.1f} dB.\n")
                     break
+
+                # check for target_ber / target_bler
+                ber_true =  bit_errors[i] / nb_bits[i]
+                bler_true = block_errors[i] / nb_blocks[i]
+                if ber_true <target_ber:
+                    status[i] = 5 # change internal status for summary
+                    if verbose:
+                        print("\nSimulation stopped as target BER is reached" \
+                              f"@ EbNo = {ebno_dbs[i].numpy():.1f} dB.\n")
+                    break
+                if bler_true <target_bler:
+                    status[i] = 6 # change internal status for summary
+                    if verbose:
+                        print("\nSimulation stopped as target BLER is " \
+                              f"reached @ EbNo = {ebno_dbs[i].numpy():.1f} " \
+                              "dB.\n")
+                    break
+
             # allow callback to end the entire simulation
             if cb_state is sim_ber.CALLBACK_STOP:
                 # stop runtime timer
-                status[i] = 5 # change internal status for summary
+                status[i] = 7 # change internal status for summary
                 if verbose:
-                    print("\nSimulation stopped by callback funtion " \
+                    print("\nSimulation stopped by callback function " \
                           f"@ EbNo = {ebno_dbs[i].numpy():.1f} dB.\n")
                 break
 
@@ -761,7 +876,7 @@ def sim_ber(mc_fun,
             raise e
 
         print("\nSimulation stopped by the user " \
-              f"@ EbNo = {ebno_dbs[i].numpy()} dB")
+              f"@ EbNo = {ebno_dbs[i].numpy()} dB.")
         # overwrite remaining BER / BLER positions with -1
         for idx in range(i+1, num_points):
             bit_errors = tf.tensor_scatter_nd_update( bit_errors, [[idx]],

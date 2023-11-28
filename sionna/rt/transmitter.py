@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """
-Class impelenting a transmitter
+Class implementing a transmitter
 """
 
 import tensorflow as tf
@@ -13,6 +13,17 @@ class Transmitter(RadioDevice):
     # pylint: disable=line-too-long
     r"""
     Class defining a transmitter
+
+    The ``position`` and ``orientation`` properties can be assigned to a TensorFlow
+    variable or tensor. In the latter case, the tensor can be the output of a callable,
+    such as a Keras layer implementing a neural network. In the former case, it
+    can be set to a trainable variable:
+
+    .. code-block:: Python
+
+        tx = Transmitter(name="my_tx",
+                         position=tf.Variable([0, 0, 0], dtype=tf.float32),
+                         orientation=tf.Variable([0, 0, 0], dtype=tf.float32))
 
     Parameters
     ----------
@@ -39,14 +50,6 @@ class Transmitter(RadioDevice):
         Each RGB component must have a value within the range :math:`\in [0,1]`.
         Defaults to `[0.160, 0.502, 0.725]`.
 
-    trainable_position : bool
-        Determines if the ``position`` is a trainable variable or not.
-        Defaults to `False`.
-
-    trainable_orientation : bool
-        Determines if the ``orientation`` is a trainable variable or not.
-        Defaults to `False`.
-
     dtype : tf.complex
         Datatype to be used in internal calculations.
         Defaults to `tf.complex64`.
@@ -58,8 +61,6 @@ class Transmitter(RadioDevice):
                  orientation=(0.,0.,0.),
                  look_at=None,
                  color=(0.160, 0.502, 0.725),
-                 trainable_position=False,
-                 trainable_orientation=False,
                  dtype=tf.complex64):
 
         # Initialize the base class Object
@@ -68,6 +69,4 @@ class Transmitter(RadioDevice):
                          orientation=orientation,
                          look_at=look_at,
                          color=color,
-                         trainable_position=trainable_position,
-                         trainable_orientation=trainable_orientation,
                          dtype=dtype)

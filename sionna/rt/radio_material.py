@@ -36,8 +36,15 @@ class RadioMaterial:
     The callback should return `-1` for both the relative permittivity and
     the conductivity if these are not defined for the given carrier frequency.
 
-    The material properties are TensorFlow variables that can be made
-    trainable.
+    The material properties can be assigned to a TensorFlow variable or
+    tensor. In the latter case, the tensor could be the output of a callable,
+    such as a Keras layer implementing a neural network. In the former case, it
+    could be set to a trainable variable:
+
+    .. code-block:: Python
+
+        mat = RadioMaterial("my_mat")
+        mat.conductivity = tf.Variable(0.0, dtype=tf.float32)
 
     Parameters
     -----------
@@ -69,7 +76,7 @@ class RadioMaterial:
         Defaults to 0.
 
     scattering_pattern : ScatteringPattern
-        :class:`~sionna.rt.ScatteringPattern` to applied.
+        :class:`~sionna.rt.ScatteringPattern` to be applied.
         Only relevant if ``scattering_coefficient``>0.
         Defaults to `None`, which implies a :class:`~sionna.rt.LambertianPattern`.
 
@@ -85,26 +92,6 @@ class RadioMaterial:
         to ``relative_permittivity`` and ``conductivity``.
         Defaults to `None`.
 
-    trainable_relative_permittivity : bool
-        Determines if the ``relative_permittivity`` is trainable.
-        Only possible if no ``frequency_update_callback``
-        is defined.
-        Defaults to `False`.
-
-    trainable_conductivity : bool
-        Determines if the ``conductivity`` is trainable.
-        Only possible if no ``frequency_update_callback``
-        is defined.
-        Defaults to `False`.
-
-    trainable_scattering_coefficient : bool
-        Determines if the ``scattering_coefficient`` is trainable.
-        Defaults to `False`.
-
-    trainable_xpd_coefficient : bool
-        Determines if the ``xpd_coefficient`` is trainable.
-        Defaults to `False`.
-
     dtype : tf.complex64 or tf.complex128
         Datatype.
         Defaults to `tf.complex64`.
@@ -118,10 +105,6 @@ class RadioMaterial:
                  xpd_coefficient=0.0,
                  scattering_pattern=None,
                  frequency_update_callback=None,
-                 trainable_relative_permittivity=False,
-                 trainable_conductivity=False,
-                 trainable_scattering_coefficient=False,
-                 trainable_xpd_coefficient=False,
                  dtype=tf.complex64):
 
         if not isinstance(name, str):
@@ -137,11 +120,7 @@ class RadioMaterial:
         if scattering_pattern is None:
             scattering_pattern = LambertianPattern(dtype=dtype)
 
-        self._relative_permittivity = tf.Variable(tf.ones((), self._rdtype))
-        self._conductivity = tf.Variable(tf.zeros((), self._rdtype))
         self.scattering_pattern = scattering_pattern
-        self._scattering_coefficient = tf.Variable(tf.zeros((), self._rdtype))
-        self._xpd_coefficient = tf.Variable(tf.zeros((), self._rdtype))
         self.scattering_coefficient = scattering_coefficient
         self.xpd_coefficient = xpd_coefficient
 
@@ -150,16 +129,8 @@ class RadioMaterial:
             self.conductivity = conductivity
 
         # Save the callback for when the frequency is updated
+        # or if the RadioMaterial is added to a scene
         self._frequency_update_callback = frequency_update_callback
-
-        # Configure trainability if possible
-        self.trainable_relative_permittivity = trainable_relative_permittivity
-        self.trainable_conductivity = trainable_conductivity
-        self.trainable_scattering_coefficient=trainable_scattering_coefficient
-        self.trainable_xpd_coefficient = trainable_xpd_coefficient
-
-        # Run frequency_update_callback to set the properties
-        self.frequency_update(scene.Scene().frequency)
 
         # When loading a scene, the custom materials (i.e., the materials not
         # baked-in Sionna but defined by the user) are not defined yet.
@@ -170,7 +141,7 @@ class RadioMaterial:
         # used.
         self._is_placeholder = False # Is this material a placeholder
 
-        # Set of objects identifiers that use this materials
+        # Set of objects identifiers that use this material
         self._objects_using = set()
 
 
@@ -187,12 +158,18 @@ class RadioMaterial:
         tf.float : Get/set the relative permittivity
             :math:`\varepsilon_r` :eq:`eta`
         """
-        return self._relative_permittivity.value()
+        return self._relative_permittivity
 
     @relative_permittivity.setter
     def relative_permittivity(self, v):
-        v = tf.cast(v, self._rdtype)
-        self._relative_permittivity.assign(v)
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg = f"`relative_permittivity` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._relative_permittivity = v
+        else:
+            self._relative_permittivity = tf.cast(v, self._rdtype)
 
     @property
     def relative_permeability(self):
@@ -209,12 +186,18 @@ class RadioMaterial:
         tf.float: Get/set the conductivity
             :math:`\sigma` [S/m] :eq:`eta`
         """
-        return self._conductivity.value()
+        return self._conductivity
 
     @conductivity.setter
     def conductivity(self, v):
-        v = tf.cast(v, self._rdtype)
-        self._conductivity.assign(v)
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg = f"`conductivity` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._conductivity = v
+        else:
+            self._conductivity = tf.cast(v, self._rdtype)
 
     @property
     def scattering_coefficient(self):
@@ -222,16 +205,18 @@ class RadioMaterial:
         tf.float: Get/set the scattering coefficient
             :math:`S\in[0,1]` :eq:`scattering_coefficient`.
         """
-        return self._scattering_coefficient.value()
+        return self._scattering_coefficient
 
     @scattering_coefficient.setter
     def scattering_coefficient(self, v):
-        if v>1 or v<0:
-            raise ValueError("`scattering_coefficient` must be in [0,1]")
-        if self.scattering_pattern is None and v>0:
-            raise ValueError("Please configure a `scattering_pattern` first")
-        v = tf.cast(v, self._rdtype)
-        self._scattering_coefficient.assign(v)
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg=f"`scattering_coefficient` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._scattering_coefficient = v
+        else:
+            self._scattering_coefficient = tf.cast(v, self._rdtype)
 
     @property
     def xpd_coefficient(self):
@@ -239,14 +224,18 @@ class RadioMaterial:
         tf.float: Get/set the cross-polarization discrimination coefficient
             :math:`K_x\in[0,1]` :eq:`xpd`.
         """
-        return self._xpd_coefficient.value()
+        return self._xpd_coefficient
 
     @xpd_coefficient.setter
     def xpd_coefficient(self, v):
-        if v>1 or v<0:
-            raise ValueError("`xpd_coefficient` must be in [0,1]")
-        v = tf.cast(v, self._rdtype)
-        self._xpd_coefficient.assign(v)
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg=f"`xpd_coefficient` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._xpd_coefficient = v
+        else:
+            self._xpd_coefficient = tf.cast(v, self._rdtype)
 
     @property
     def scattering_pattern(self):
@@ -276,82 +265,6 @@ class RadioMaterial:
                           -tf.math.divide_no_nan(sigma, epsilon_0*omega))
 
     @property
-    def trainable_relative_permittivity(self):
-        """
-        bool : Get/set if the ``relative permittivity``
-            is a trainable variable or not.
-            Defaults to `False`.
-        """
-        return self._trainable_relative_permittivity
-
-    @trainable_relative_permittivity.setter
-    def trainable_relative_permittivity(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_relative_permittivity` must be bool")
-        if value and self._frequency_update_callback is not None:
-            err_msg = "Radio materials with frequency_update_callback" + \
-                      " cannot be made trainable."
-            raise ValueError(err_msg)
-        # pylint: disable=protected-access
-        self._relative_permittivity._trainable = value
-        self._trainable_relative_permittivity = value
-
-    @property
-    def trainable_conductivity(self):
-        """
-        bool : Get/set if the ``conductivity``
-            is a trainable variable or not.
-            Defaults to `False`.
-        """
-        return self._trainable_conductivity
-
-    @trainable_conductivity.setter
-    def trainable_conductivity(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_conductivity` must be bool")
-        if value and self._frequency_update_callback is not None:
-            err_msg = "Radio materials with frequency_update_callback" + \
-                      " cannot be made trainable."
-            raise ValueError(err_msg)
-        # pylint: disable=protected-access
-        self._conductivity._trainable = value
-        self._trainable_conductivity = value
-
-    @property
-    def trainable_scattering_coefficient(self):
-        """
-        bool : Get/set if the ``scattering_coefficient``
-            is a trainable variable or not.
-            Defaults to `False`.
-        """
-        return self._trainable_scattering_coefficient
-
-    @trainable_scattering_coefficient.setter
-    def trainable_scattering_coefficient(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_scattering_coefficient` must be bool")
-        # pylint: disable=protected-access
-        self._scattering_coefficient._trainable = value
-        self._trainable_scattering_coefficient = value
-
-    @property
-    def trainable_xpd_coefficient(self):
-        """
-        bool : Get/set if the ``xpd_coefficient``
-            is a trainable variable or not.
-            Defaults to `False`.
-        """
-        return self._trainable_xpd_coefficient
-
-    @trainable_xpd_coefficient.setter
-    def trainable_xpd_coefficient(self, value):
-        if not isinstance(value, bool):
-            raise TypeError("`trainable_xpd_coefficient` must be bool")
-        # pylint: disable=protected-access
-        self._xpd_coefficient._trainable = value
-        self._trainable_xpd_coefficient = value
-
-    @property
     def frequency_update_callback(self):
         """
         callable : Get/set frequency update callback function
@@ -361,7 +274,7 @@ class RadioMaterial:
     @frequency_update_callback.setter
     def frequency_update_callback(self, value):
         self._frequency_update_callback = value
-        self.frequency_update(scene.Scene().frequency)
+        self.frequency_update()
 
     @property
     def well_defined(self):
@@ -370,7 +283,7 @@ class RadioMaterial:
         return ((self._conductivity >= 0.)
              and (self.relative_permittivity >= 1.)
              and (0. <= self.scattering_coefficient <= 1.)
-             and (0. <= self.xpd_coefficient<= 1.)
+             and (0. <= self.xpd_coefficient <= 1.)
              and (0. <= self.scattering_pattern.lambda_ <= 1.))
 
     @property
@@ -382,7 +295,7 @@ class RadioMaterial:
 
     @property
     def is_used(self):
-        """bool : Get if the material is used by at least one object of
+        """bool : Indicator if the material is used by at least one object of
         the scene"""
         return self.use_counter > 0
 
@@ -400,22 +313,14 @@ class RadioMaterial:
     # Should not be documented.
     ##############################################
 
-    def frequency_update(self, fc):
+    def frequency_update(self):
         # pylint: disable=line-too-long
-        r"""
-        frequency_update(fc)
-
-        Callback for when the frequency is updated
-
-        Input
-        ------
-        fc : float
-            The new value for the frequency [Hz]
+        r"""Callback for when the frequency is updated
         """
         if self._frequency_update_callback is None:
             return
 
-        parameters = self._frequency_update_callback(fc)
+        parameters = self._frequency_update_callback(scene.Scene().frequency)
         relative_permittivity, conductivity = parameters
         self.relative_permittivity = relative_permittivity
         self.conductivity = conductivity
@@ -436,8 +341,30 @@ class RadioMaterial:
 
     @property
     def is_placeholder(self):
+        """
+        bool : Get/set if this radio material is a placeholder
+        """
         return self._is_placeholder
 
     @is_placeholder.setter
     def is_placeholder(self, v):
         self._is_placeholder = v
+
+    def assign(self, rm):
+        """
+        Assign new values to the radio material properties from another
+        radio material ``rm``
+
+        Input
+        ------
+        rm : :class:`~sionna.rt.RadioMaterial
+            Radio material from which to assign the new values
+        """
+        if not isinstance(rm, RadioMaterial):
+            raise TypeError("`rm` is not a RadioMaterial")
+        self.relative_permittivity = rm.relative_permittivity
+        self.conductivity = rm.conductivity
+        self.scattering_coefficient = rm.scattering_coefficient
+        self.xpd_coefficient = rm.xpd_coefficient
+        self.scattering_pattern = rm.scattering_pattern
+        self.frequency_update_callback = rm.frequency_update_callback

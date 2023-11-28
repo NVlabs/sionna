@@ -73,7 +73,7 @@ class TestCIR(unittest.TestCase):
                             for rx_pol in range(num_rx_pol):
                                 rx_ant = rx*num_rx_ant + rx_el*num_rx_pol + rx_pol
                                 for path in range(paths.mask.shape[-1]):
-                                    if paths.mask[target, source, path]:
+                                    if paths.targets_sources_mask[target, source, path]:
                                         a = a_ref[0, rx, rx_ant, tx, tx_ant, path]
                                         theta_t = paths.theta_t[0, rx, rx_el, tx, tx_el, path]
                                         phi_t = paths.phi_t[0, rx, rx_el, tx, tx_el, path]
@@ -127,7 +127,7 @@ class TestCIR(unittest.TestCase):
                             for rx_pol in range(num_rx_pol):
                                 rx_ant = rx*num_rx_ant + rx_el*num_rx_pol + rx_pol
                                 for path in range(paths.mask.shape[-1]):
-                                    if paths.mask[target, source, path]:
+                                    if paths.targets_sources_mask[target, source, path]:
                                         a = a_ref[0, rx, rx_ant, tx, tx_ant, path]
                                         theta_t = paths.theta_t[0, rx, tx, path]
                                         phi_t = paths.phi_t[0, rx, tx, path]
@@ -139,3 +139,92 @@ class TestCIR(unittest.TestCase):
                                         f_r = dot(r_hat_r, np.squeeze(v_rx))/scene.wavelength.numpy()
                                         a_theo = a[0]*np.exp(1j*2*np.pi*(f_t+f_r)*t)
                                         self.assertTrue(np.allclose(a, a_theo, atol=1e-6))
+
+
+    def test_pad_or_crop_synthetic_array(self):
+        """Test padding and cropping of CIR"""
+        scene = load_scene(sionna.rt.scene.simple_street_canyon)
+        scene.synthetic_array = True
+        scene.tx_array = PlanarArray(num_rows=2,
+                                    num_cols=2,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+        scene.rx_array = PlanarArray(num_rows=2,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+        tx = Transmitter("tx",[0,0,15])
+        scene.add(tx)
+        tx = Transmitter("tx2",[10, 0, 15])
+        scene.add(tx)
+        rx = Receiver("rx",[-25,-10,1.5],[0.0,0.0,0.0])
+        scene.add(rx)
+        rx = Receiver("rx2",[-25,15,1.5],[0.0,0.0,0.0])
+        scene.add(rx)
+        paths = scene.compute_paths(max_depth=5, num_samples=10e6, diffraction=True)
+        a, tau = paths.cir()
+        max_num_paths = a.shape[-2]
+
+        # Pad
+        num_paths = max_num_paths+10
+        a_pad, tau_pad = paths.cir(num_paths, num_paths=num_paths)
+        self.assertTrue(tf.reduce_all(a_pad[...,max_num_paths:,:]==0))
+        self.assertTrue(tf.reduce_all(tau_pad[...,max_num_paths:]==-1))
+
+        # Crop
+        num_paths = max_num_paths-3
+        a_crop, tau_crop = paths.cir(num_paths, num_paths=num_paths)
+        ind = np.flip(np.argsort(np.abs(a), axis=-2), axis=-2)[...,:num_paths,:]
+        a_test = np.take_along_axis(a.numpy(), ind, axis=-2)
+        ind = ind[:,:,0,:,0,:, 0]
+        tau_test = np.take_along_axis(tau.numpy(), ind, axis=-1)
+        self.assertTrue(np.allclose(a_test, a_crop))
+        self.assertTrue(np.allclose(tau_test, tau_crop))
+
+    def test_pad_or_crop_non_synthetic_array(self):
+        """Test padding and cropping of CIR"""
+        scene = load_scene(sionna.rt.scene.simple_street_canyon)
+        scene.synthetic_array = False
+        scene.tx_array = PlanarArray(num_rows=2,
+                                    num_cols=2,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+        scene.rx_array = PlanarArray(num_rows=2,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+        tx = Transmitter("tx",[0,0,15])
+        scene.add(tx)
+        tx = Transmitter("tx2",[10, 0, 15])
+        scene.add(tx)
+        rx = Receiver("rx",[-25,-10,1.5],[0.0,0.0,0.0])
+        scene.add(rx)
+        rx = Receiver("rx2",[-25,15,1.5],[0.0,0.0,0.0])
+        scene.add(rx)
+        paths = scene.compute_paths(max_depth=5, num_samples=10e6, diffraction=True)
+        a, tau = paths.cir()
+        max_num_paths = a.shape[-2]
+
+        # Pad
+        num_paths = max_num_paths+10
+        a_pad, tau_pad = paths.cir(num_paths, num_paths=num_paths)
+        self.assertTrue(tf.reduce_all(a_pad[...,max_num_paths:,:]==0))
+        self.assertTrue(tf.reduce_all(tau_pad[...,max_num_paths:]==-1))
+
+        # Crop
+        num_paths = max_num_paths-3
+        a_crop, tau_crop = paths.cir(num_paths, num_paths=num_paths)
+        ind = np.flip(np.argsort(np.abs(a), axis=-2), axis=-2)[...,:num_paths,:]
+        a_test = np.take_along_axis(a.numpy(), ind, axis=-2)
+        ind = ind[...,0]
+        tau_test = np.take_along_axis(tau.numpy(), ind, axis=-1)
+        self.assertTrue(np.allclose(a_test, a_crop))
+        self.assertTrue(np.allclose(tau_test, tau_crop))

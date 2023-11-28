@@ -5,7 +5,7 @@
 """This is the Sionna library.
 """
 
-__version__ = '0.15.1'
+__version__ = '0.16.0'
 
 from . import utils
 from .constants import *

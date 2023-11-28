@@ -962,26 +962,27 @@ def make_systematic(mat, is_pcm=False):
 
     # bring in upper triangular form
     for idx_c in range(m):
-        success = False
-        # step 1: find next leading "1"
-        for idx_r in range(idx_c,m):
-            # skip if entry is "0"
-            if mat[idx_r, idx_c]:
-                mat[[idx_c, idx_r]] = mat[[idx_r, idx_c]] # swap rows
-                success = True
-                break
+        success = mat[idx_c, idx_c]
+        if not success: # skip if leading "1" already occurred
+            # step 1: find next leading "1"
+            for idx_r in range(idx_c+1,m):
+                # skip if entry is "0"
+                if mat[idx_r, idx_c]:
+                    mat[[idx_c, idx_r]] = mat[[idx_r, idx_c]] # swap rows
+                    success = True
+                    break
 
         # Could not find "1"-entry for column idx_c
         # => swap with columns from non-sys part
         # The task is to find a column with index idx_cc that has a "1" at
         # row idx_c
         if not success:
-            for idx_cc in range(m, n):
+            for idx_cc in range(idx_c+1, n):
                 if mat[idx_c, idx_cc]:
                     # swap columns
                     mat[:,[idx_c, idx_cc]] = mat[:,[idx_cc, idx_c]]
                     column_swaps.append([idx_c, idx_cc])
-                    success=True
+                    success = True
                     break
 
         if not success:
@@ -1004,12 +1005,12 @@ def make_systematic(mat, is_pcm=False):
 
     # bring identity part to end of matrix if parity-check matrix is provided
     if is_pcm:
-        im = np.copy(mat[:,:m])
-        mat[:,:m] = mat[:,-m:]
-        mat[:,-m:] = im
-        # and track column swaps
-        for idx in range(m):
-            column_swaps.append([idx, n-m+idx])
+        # individual column swaps instead of copying entire block
+        # this simplifies the tracking of column swaps.
+        for i in range(n-1, (n-1)-m, -1):
+            j = i - (n-m)
+            mat[:,[i, j]] = mat[:,[j, i]]
+            column_swaps.append([i, j])
 
     # return integer array
     mat = mat.astype(int)

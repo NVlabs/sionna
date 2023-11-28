@@ -291,51 +291,75 @@ class SolverBase:
 
         num_shapes = len(self._scene.objects)
 
-        relative_permittivity = tf.zeros([num_shapes], self._dtype)
-        scattering_coefficient = tf.zeros([num_shapes], self._rdtype)
-        xpd_coefficient = tf.zeros([num_shapes], self._rdtype)
-        alpha_r = tf.zeros([num_shapes], tf.int32)
-        alpha_i = tf.zeros([num_shapes], tf.int32)
-        lambda_ = tf.zeros([num_shapes], self._rdtype)
-        for rm in self._scene.radio_materials.values():
-            using_objects = rm.using_objects
-            num_using_objects = tf.shape(using_objects)[0]
-            if num_using_objects == 0:
-                continue
+        # If a callable is set to obtain radio material properties, then there
+        # is no need to build the tensors of material properties
+        rm_callable_set = self._scene.radio_material_callable is not None
 
-            relative_permittivity = tf.tensor_scatter_nd_update(
-                relative_permittivity,
-                tf.reshape(using_objects, [-1,1]),
-                tf.fill([num_using_objects], rm.complex_relative_permittivity))
+        # If a callable is set to obtain scattering patterns, then there
+        # is no need to build the tensors for scattering properties
+        sp_callable_set = self._scene.scattering_pattern_callable is not None
 
-            scattering_coefficient = tf.tensor_scatter_nd_update(
-                scattering_coefficient,
-                tf.reshape(using_objects, [-1,1]),
-                tf.fill([num_using_objects], rm.scattering_coefficient))
+        if rm_callable_set:
+            relative_permittivity = tf.zeros([0], self._dtype)
+            scattering_coefficient = tf.zeros([0], self._rdtype)
+            xpd_coefficient = tf.zeros([0], self._rdtype)
+        else:
+            relative_permittivity = tf.zeros([num_shapes], self._dtype)
+            scattering_coefficient = tf.zeros([num_shapes], self._rdtype)
+            xpd_coefficient = tf.zeros([num_shapes], self._rdtype)
 
-            xpd_coefficient = tf.tensor_scatter_nd_update(
-                xpd_coefficient,
-                tf.reshape(using_objects, [-1,1]),
-                tf.fill([num_using_objects], rm.xpd_coefficient))
+        if sp_callable_set:
+            alpha_r = tf.zeros([0], tf.int32)
+            alpha_i = tf.zeros([0], tf.int32)
+            lambda_ = tf.zeros([0], self._rdtype)
+        else:
+            alpha_r = tf.zeros([num_shapes], tf.int32)
+            alpha_i = tf.zeros([num_shapes], tf.int32)
+            lambda_ = tf.zeros([num_shapes], self._rdtype)
 
-            alpha_r = tf.tensor_scatter_nd_update(
-                alpha_r,
-                tf.reshape(using_objects, [-1,1]),
-                tf.fill([num_using_objects],
-                        rm.scattering_pattern.alpha_r))
+        if (not sp_callable_set) or (not rm_callable_set):
 
-            alpha_i = tf.tensor_scatter_nd_update(
-                alpha_i,
-                tf.reshape(using_objects, [-1,1]),
-                tf.fill([num_using_objects],
-                        rm.scattering_pattern.alpha_i))
+            for rm in self._scene.radio_materials.values():
+                using_objects = rm.using_objects
+                num_using_objects = tf.shape(using_objects)[0]
+                if num_using_objects == 0:
+                    continue
 
-            lambda_ = tf.tensor_scatter_nd_update(
-                lambda_,
-                tf.reshape(using_objects, [-1,1]),
-                tf.fill([num_using_objects],
-                        rm.scattering_pattern.lambda_))
+                if not rm_callable_set:
+                    relative_permittivity = tf.tensor_scatter_nd_update(
+                        relative_permittivity,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects],
+                                rm.complex_relative_permittivity))
 
+                    scattering_coefficient = tf.tensor_scatter_nd_update(
+                        scattering_coefficient,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects], rm.scattering_coefficient))
+
+                    xpd_coefficient = tf.tensor_scatter_nd_update(
+                        xpd_coefficient,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects], rm.xpd_coefficient))
+
+                if not sp_callable_set:
+                    alpha_r = tf.tensor_scatter_nd_update(
+                        alpha_r,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects],
+                                rm.scattering_pattern.alpha_r))
+
+                    alpha_i = tf.tensor_scatter_nd_update(
+                        alpha_i,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects],
+                                rm.scattering_pattern.alpha_i))
+
+                    lambda_ = tf.tensor_scatter_nd_update(
+                        lambda_,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects],
+                                rm.scattering_pattern.lambda_))
 
         return (relative_permittivity,
                scattering_coefficient,

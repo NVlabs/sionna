@@ -42,8 +42,8 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
         rx = Receiver("rx", [1, 0, 2], [0, 0, 0])
         scene.add(tx)
         scene.add(rx)
-        paths = scene.compute_paths(max_depth=1, method="exhaustive", diffraction=False, scattering=False)
-        mask = np.squeeze(paths.mask, axis=(0,1))
+        paths = scene.compute_paths(max_depth=1, method="exhaustive", diffraction=False, scattering=False, testing=True)
+        mask = np.squeeze(paths.targets_sources_mask, axis=(0,1))
         for i in range(mask.shape[0]):
             if mask[i]: # Check that paths is valid
                 a, b = validate_path(i, paths, scene)
@@ -61,8 +61,8 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
         rx = Receiver("rx", [-1, 1, 3], [0, 0, 0])
         scene.add(tx)
         scene.add(rx)
-        paths = scene.compute_paths(max_depth=1, diffraction=False, scattering=False)
-        mask = np.squeeze(paths.mask, axis=(0,1))
+        paths = scene.compute_paths(max_depth=1, diffraction=False, scattering=False, testing=True)
+        mask = np.squeeze(paths.targets_sources_mask, axis=(0,1))
         for i in range(mask.shape[0]):
             if mask[i]: # Check that paths is valid
                 a, b = validate_path(i, paths, scene)
@@ -79,8 +79,8 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
         rx = Receiver("rx", [-2, 1.5, 4], [0, 0, 0], dtype=dtype)
         scene.add(tx)
         scene.add(rx)
-        paths = scene.compute_paths(max_depth=5, method="fibonacci", diffraction=False, scattering=False)
-        mask = np.squeeze(paths.mask, axis=(0,1))
+        paths = scene.compute_paths(max_depth=5, method="fibonacci", diffraction=False, scattering=False, testing=True)
+        mask = np.squeeze(paths.targets_sources_mask, axis=(0,1))
         for i in range(mask.shape[0]):
             if mask[i]: # Check that paths is valid
                 a, b = validate_path(i, paths, scene)
@@ -101,7 +101,7 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
         scene.add(rx_1)
         scene.add(rx_2)
         paths = scene.compute_paths(max_depth=3, scattering=True,
-                                    edge_diffraction=True)
+                                    edge_diffraction=True, testing=True)
         num_tx = len(list(scene.transmitters.values()))
         num_rx = len(list(scene.receivers.values()))
         num_tx_ant = scene.tx_array.array_size
@@ -112,11 +112,11 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
                 for rx in range(num_rx):
                     for rx_ant in range(num_rx_ant):
                         target = rx*num_rx_ant + rx_ant
-                        for path in range(0, paths.mask.shape[-1]):
+                        for path in range(0, paths.targets_sources_mask.shape[-1]):
                             if paths.tau[0, rx, rx_ant, tx, tx_ant, path] < 0:
                                 a = paths.a[0, rx, rx_ant, tx, tx_ant, path]
                                 self.assertTrue(np.array_equal(a, np.zeros_like(a)))
-                            if not paths.mask[target, source, path]:
+                            if not paths.targets_sources_mask[target, source, path]:
                                 a = paths.a[0, rx, rx_ant, tx, tx_ant, path]
                                 tau = paths.tau[0, rx, rx_ant, tx, tx_ant, path]
                                 self.assertTrue(np.array_equal(a, np.zeros_like(a)))
@@ -167,13 +167,16 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
                             dtype=dtype)
                 scene.add(rx)
 
-            paths = scene.compute_paths(max_depth=1, scattering=False, reflection=True, los=True, diffraction=True)
+            paths = scene.compute_paths(max_depth=1, scattering=False, reflection=True, los=True, diffraction=True, testing=True)
 
-            mat_t = np.squeeze(paths.all_tmp.mat_t.numpy(), axis=(1,2,3))
+            spec_mat_t = paths.spec_tmp.mat_t.numpy()
+            diff_mat_t = paths.diff_tmp.mat_t.numpy()
+            mat_t = np.concatenate([spec_mat_t,diff_mat_t], axis=2)
+            mat_t = np.squeeze(mat_t, axis=1)
             mat_t_1 = mat_t[:num_rx]
             mat_t_2 = mat_t[num_rx:]
 
-            mask = np.squeeze(paths.mask.numpy(), axis=1)
+            mask = np.squeeze(paths.targets_sources_mask.numpy(), axis=1)
             mask = np.expand_dims(mask, axis=(2,3))
             mask_1 = mask[:num_rx]
             mask_2 = mask[num_rx:]

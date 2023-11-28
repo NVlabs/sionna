@@ -41,7 +41,8 @@ class PathsTmpData:
         #     Reflected or scattered paths: Normals to the primitives at the
         #     intersection points.
         #     Diffracted paths: Normals to the two primitives forming the wedge.
-        self.normals = None
+        self.normals = tf.zeros([0, num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [max_depth + 1, num_targets, num_sources, max_num_paths, 3], tf.float
         #   Direction of arrivals.
@@ -49,19 +50,22 @@ class PathsTmpData:
         #   arrival at the target. Therefore, k_i is a tensor of length
         #   `max_depth + 1`, where `max_depth` is the number of maximum
         #   interaction (which could be zero if only LoS is requested).
-        self.k_i = None
+        self.k_i = tf.zeros([0, num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [max_depth, num_targets, num_sources, max_num_paths, 3], tf.float
         #   Direction of departures at interaction points.
         #   We do not need the direction of departure at the source, as it
         #   is the same as k_i[0].
-        self.k_r = None
+        self.k_r = tf.zeros([0, num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [max_depth+1, num_targets, num_sources, max_num_paths] or
         # [max_depth, num_targets, num_sources, max_num_paths] for scattering,
         # tf.float
         #     Lengths in meters of the paths segments
-        self.total_distance = None
+        self.total_distance = tf.zeros([num_targets, num_sources, 0],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths, 2, 2] or
         # [num_rx, rx_array_size, num_tx, tx_array_size, max_num_paths, 2, 2],
@@ -92,79 +96,106 @@ class PathsTmpData:
         #   For scattering, every path prefix is a potential final path.
         #   This tensor is a mask which indicates for every path prefix if it
         #   is a valid path.
-        self.scat_prefix_mask = None
-
-        # [max_depth, num_targets, num_sources, max_num_paths, 2, 2], tf.complex
-        #   This parameter is specific to scattering.
-        #   For scattering, every path prefix is a potential final path.
-        #   This tensor stores the transition matrices for reflection
-        #   corresponding to every interaction up to the scattering point.
-        self.scat_prefix_mat_t = None
+        self.scat_prefix_mask = tf.fill([0, num_targets, num_sources, 0], False)
 
         # [max_depth, num_targets, num_sources, max_num_paths, 3], tf.float
         #   For every intersection point between the paths and the scene,
         #   gives the direction of the scattered ray, i.e., points towards the
         #   targets.
-        self.scat_prefix_k_s = None
+        self.scat_prefix_k_s = tf.zeros([0, num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths]
         #   This parameter is specific to scattering.
         #   Stores the index of the last hit object for retreiving the
         #   scattering properties of the objects
-        self.scat_last_objects = None
+        self.scat_last_objects = tf.zeros([num_targets, num_sources, 0],
+                                          tf.int32)
+
+        # [num_targets, num_sources, max_num_paths, 3]
+        #   This parametric is specific to scattering.
+        #   Stores the position of the last intersection, i.e., the points at
+        #   which the field is scattered
+        self.scat_last_vertices = tf.zeros([num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths, 3]
         #   This parameter is specific to scattering.
         #   Stores the incoming vector for the last interaction, i.e., the
         #   one that scatters the field
-        self.scat_last_k_i = None
+        self.scat_last_k_i = tf.zeros([num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths, 3]
         #   This parameter is specific to scattering.
         #   Stores the outgoing vector for the last interaction, i.e., the
         #   direction of the scattered ray.
-        self.scat_k_s = None
+        self.scat_k_s = tf.zeros([num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths, 3]
         #   This parameter is specific to scattering.
         #   Stores the normals to the last interaction point, i.e., the
         #   scattering point
-        self.scat_last_normals = None
+        self.scat_last_normals = tf.zeros([num_targets, num_sources, 0, 3],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths]
         #   This parameter is specific to scattering.
         #   Stores the distance from the sources to the scattering points.
-        self.scat_src_2_last_int_dist = None
+        self.scat_src_2_last_int_dist = tf.zeros([num_targets, num_sources, 0],
+                             dtype.real_dtype)
 
         # [num_targets, num_sources, max_num_paths]
         #   This parameter is specific to scattering.
         #   Stores the distance from the scattering points to the targets.
-        self.scat_2_target_dist = None
+        self.scat_2_target_dist = tf.zeros([num_targets, num_sources, 0],
+                             dtype.real_dtype)
 
-    def merge_ktx_krx_matt(self, other):
+        # Number of samples, i.e., shooted rays
+        # (), tf.int
+        self.num_samples = 0
+
+        # Probability with which scattered paths are kept
+        # (), tf.float
+        self.scat_keep_prob = 0.0
+
+    def to_dict(self):
+        # pylint: disable=line-too-long
         r"""
-        Returns a new structure with only the fields `k_tx`, `k_rx`, and
-        `mat_t` set to the concatenation of `self` and
-        `other_paths_tmp_data`.
+        Returns the properties of the paths as a dictionnary which values are
+        tensors
+
+        Output
+        -------
+        : `dict`
+            Dictionnary defining the paths
         """
+        members_names = dir(self)
+        members_objects = [getattr(self, attr) for attr in members_names]
+        data = {attr_name : attr_obj for (attr_obj, attr_name)
+                in zip(members_objects,members_names)
+                if not callable(attr_obj) and
+                   not attr_name.startswith("__") and
+                   not isinstance(attr_obj, tf.DType)}
+        return data
 
-        new_obj = PathsTmpData(self.sources, self.targets, self.dtype)
-        if self.mat_t.shape[2] == 0:
-            new_obj.mat_t = other.mat_t
-        else:
-            new_obj.mat_t = tf.concat([self.mat_t, other.mat_t], axis=2)
+    def from_dict(self, data_dict):
+        # pylint: disable=line-too-long
+        r"""
+        Set the paths from a dictionnary which values are tensors
 
-        if self.k_tx.shape[2] == 0:
-            new_obj.k_tx = other.k_tx
-        else:
-            new_obj.k_tx = tf.concat([self.k_tx, other.k_tx], axis=2)
+        The format of the dictionnary is expected to be the same as the one
+        returned by :meth:`~sionna.rt.Paths.to_dict()`.
 
-        if self.k_rx.shape[2] == 0:
-            new_obj.k_rx = other.k_rx
-        else:
-            new_obj.k_rx = tf.concat([self.k_rx, other.k_rx], axis=2)
-
-        return new_obj
+        Input
+        ------
+        data_dict : `dict`
+            Dict of tensors
+        """
+        for attr_name in data_dict:
+            attr_obj = data_dict[attr_name]
+            setattr(self, attr_name, attr_obj)
 
 class SolverPaths(SolverBase):
     # pylint: disable=line-too-long
@@ -309,14 +340,92 @@ class SolverPaths(SolverBase):
         If set to `False`, only diffraction on wedges, i.e., edges that
         connect two primitives, is considered.
 
+    scat_random_phases : bool
+        If set to `True` and if scattering is enabled, random uniform phase
+        shifts are added to the scattered paths.
+
     Output
     -------
     paths : Paths
         The computed paths.
     """
 
-    def __call__(self, max_depth, method, num_samples, los, reflection,
+
+    def trace_paths(self, max_depth, method, num_samples, los, reflection,
                  diffraction, scattering, scat_keep_prob, edge_diffraction):
+        # pylint: disable=line-too-long
+        r"""
+        Traces the paths.
+
+        Computes the trajectories of the paths by shooting rays.
+        No EM field computation is performed by this function.
+
+        Input
+        ------
+        max_depth : int
+            Maximum depth (i.e., number of interaction with objects in the scene)
+            allowed for tracing the paths.
+
+        method : str ("exhaustive"|"fibonacci")
+            Method to be used to list candidate paths.
+            The "exhaustive" method tests all possible combination of primitives as
+            paths. This method is not compatible with scattering.
+            The "fibonacci" method uses a shoot-and-bounce approach to find
+            candidate chains of primitives. Intial rays direction are arranged
+            in a Fibonacci lattice on the unit sphere. This method can be
+            applied to very large scenes. However, there is no guarantee that
+            all possible paths are found.
+
+        num_samples: int
+            Number of random rays to trace in order to generate candidates.
+            A large sample count may exhaust GPU memory.
+
+        los : bool
+            If set to `True`, then the LoS paths are computed.
+
+        reflection : bool
+            If set to `True`, then the reflected paths are computed.
+
+        diffraction : bool
+            If set to `True`, then the diffracted paths are computed.
+
+        scattering : bool
+            if set to `True`, then the scattered paths are computed.
+            Only works with the Fibonacci method.
+
+        scat_keep_prob : float
+            Probability with which to keep scattered paths.
+            This is helpful to reduce the number of scattered paths computed,
+            which might be prohibitively high in some setup.
+            Must be in the range (0,1).
+
+        edge_diffraction : bool
+            If set to `False`, only diffraction on wedges, i.e., edges that
+            connect two primitives, is considered.
+
+        Output
+        -------
+        spec_paths : Paths
+            The computed specular paths
+
+        diff_paths : Paths
+            The computed diffracted paths
+
+        scat_paths : Paths
+            The computed scattered paths
+
+        spec_paths_tmp : PathsTmpData
+            Additional data required to compute the EM fields of the specular
+            paths
+
+        diff_paths_tmp : PathsTmpData
+            Additional data required to compute the EM fields of the diffracted
+            paths
+
+        scat_paths_tmp : PathsTmpData
+            Additional data required to compute the EM fields of the scattered
+            paths
+        """
 
         scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
         # Disable scattering if the probability of keeping a path is 0
@@ -350,11 +459,6 @@ class SolverPaths(SolverBase):
             rx_rel_ant_pos, tx_rel_ant_pos =\
                 self._get_antennas_relative_positions(rx_rot_mat, tx_rot_mat)
 
-        # Number of receive antennas (not counting for dual polarization)
-        tx_array_size = self._scene.tx_array.array_size
-        # Number of transmit antennas (not counting for dual polarization)
-        rx_array_size = self._scene.rx_array.array_size
-
         # Transmitters and receivers positions
         # [num_tx, 3]
         tx_pos = [tx.position for tx in self._scene.transmitters.values()]
@@ -380,20 +484,6 @@ class SolverPaths(SolverBase):
             # [num_targets = num_rx*rx_array_size, 3]
             targets = tf.reshape(targets, [-1, 3])
 
-        #################################################
-        # Extract the material properties of the scene
-        #################################################
-
-        # Returns: relative_permittivities, denoted by `etas`,
-        # scattering_coefficients, xpd_coefficients,
-        # alpha_r, alpha_i and lambda_
-        object_properties = self._build_scene_object_properties_tensors()
-        etas = object_properties[0]
-        scattering_coefficient = object_properties[1]
-        xpd_coefficient = object_properties[2]
-        alpha_r = object_properties[3]
-        alpha_i = object_properties[4]
-        lambda_ = object_properties[5]
 
         ##############################################
         # Generate candidate paths
@@ -437,22 +527,13 @@ class SolverPaths(SolverBase):
         else:
             raise ValueError(f"Unknown method '{method}'")
 
-        # Create empty paths object
-        all_paths = Paths(sources=sources,
-                          targets=targets,
-                          scene=self._scene)
-        # Create empty objects for storing tensors that are required to compute
-        # paths, but that will not be returned to the user
-        all_paths_tmp = PathsTmpData(sources, targets, self._dtype)
-
         ##############################################
         # LoS and Specular paths
         ##############################################
+        spec_paths = Paths(sources=sources, targets=targets, scene=self._scene,
+                           types=Paths.SPECULAR)
+        spec_paths_tmp = PathsTmpData(sources, targets, self._dtype)
         if los or reflection:
-
-            spec_paths = Paths(sources=sources, targets=targets,
-                               types=Paths.SPECULAR, scene=self._scene)
-            spec_paths_tmp = PathsTmpData(sources, targets, self._dtype)
 
             # Using the image method, computes the non-obstructed specular paths
             # interacting with the ``candidates`` primitives
@@ -464,26 +545,13 @@ class SolverPaths(SolverBase):
                 self._compute_directions_distances_delays_angles(spec_paths,
                                                         spec_paths_tmp, False)
 
-            # Compute the EM transition matrices
-            spec_paths, spec_paths_tmp =\
-                self._spec_transition_matrices(etas,
-                                               scattering_coefficient,
-                                               spec_paths, spec_paths_tmp,
-                                               False)
-
-            all_paths = all_paths.merge(spec_paths)
-            all_paths_tmp = all_paths_tmp.merge_ktx_krx_matt(spec_paths_tmp)
-            # For tests
-            all_paths.spec_tmp = spec_paths_tmp
-
         ############################################
         # Diffracted paths
         ############################################
-
+        diff_paths = Paths(sources=sources, targets=targets, scene=self._scene,
+                           types=Paths.DIFFRACTED)
+        diff_paths_tmp = PathsTmpData(sources, targets, self._dtype)
         if (los_prim is not None) and diffraction:
-
-            diff_paths = Paths(sources=sources, targets=targets,
-                               scene=self._scene)
 
             # Get the candidate wedges for diffraction
             # Note: Only one-order diffraction is supported. Therefore, we
@@ -527,7 +595,6 @@ class SolverPaths(SolverBase):
                                scene=self._scene, types=Paths.DIFFRACTED)
             diff_paths.objects = tf.expand_dims(diff_wedges_indices, axis=0)
             diff_paths.vertices = tf.expand_dims(diff_vertices, axis=0)
-            diff_paths_tmp = PathsTmpData(sources, targets, self._dtype)
 
             # Select only the valid paths
             diff_paths = self._gather_valid_diff_paths(diff_paths)
@@ -538,23 +605,17 @@ class SolverPaths(SolverBase):
                 self._compute_directions_distances_delays_angles(diff_paths,
                                                         diff_paths_tmp, False)
 
-            # Compute the transition matrices
-            diff_paths = self._compute_diffraction_transition_matrices(etas,
-                                                    scattering_coefficient,
-                                                    diff_paths, diff_paths_tmp)
-            all_paths = all_paths.merge(diff_paths)
-            all_paths_tmp = all_paths_tmp.merge_ktx_krx_matt(diff_paths_tmp)
-            # For tests
-            all_paths.diff_tmp = diff_paths_tmp
-
         ############################################
         # Scattered paths
         ############################################
+        scat_paths = Paths(sources=sources, targets=targets, scene=self._scene,
+                           types=Paths.SCATTERED)
+        scat_paths_tmp = PathsTmpData(sources, targets, self._dtype)
         if scattering and tf.shape(candidates_scat)[0] > 0:
 
-            scat_paths, scat_paths_tmp =\
-                self._scat_test_rx_blockage(targets, sources, candidates_scat,
-                                            hit_points)
+            scat_paths, scat_paths_tmp = self._scat_test_rx_blockage(targets,sources,
+                                                                candidates_scat,
+                                                                hit_points)
             scat_paths, scat_paths_tmp =\
                 self._compute_directions_distances_delays_angles(scat_paths,
                                                                  scat_paths_tmp,
@@ -564,19 +625,193 @@ class SolverPaths(SolverBase):
                 self._scat_discard_crossing_paths(scat_paths, scat_paths_tmp,
                                                   scat_keep_prob)
 
-            # Compute transition matrices up to the scattering point
-            scat_paths, scat_paths_tmp =\
-                self._spec_transition_matrices(etas, scattering_coefficient,
-                                               scat_paths, scat_paths_tmp,
-                                               True)
-
             # Extract the valid prefixes as paths
             scat_paths, scat_paths_tmp = self._scat_prefixes_2_paths(scat_paths,
                                                                 scat_paths_tmp)
+        # Additional data required to compute the field
+        spec_paths_tmp.num_samples = num_samples
+        spec_paths_tmp.scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
+        diff_paths_tmp.num_samples = num_samples
+        diff_paths_tmp.scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
+        scat_paths_tmp.num_samples = num_samples
+        scat_paths_tmp.scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
+
+        return spec_paths, diff_paths, scat_paths, spec_paths_tmp,\
+            diff_paths_tmp, scat_paths_tmp
+
+    def compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp,
+        diff_paths_tmp, scat_paths_tmp, scat_random_phases, testing):
+        r"""
+        Computes the EM fields for a set of traced paths.
+
+        Input
+        ------
+        spec_paths : Paths
+            Specular paths
+
+        diff_paths : Paths
+            Diffracted paths
+
+        scat_paths : Paths
+            Scattered paths
+
+        spec_paths_tmp : PathsTmpData
+            Additional data required to compute the EM fields of the specular
+            paths
+
+        diff_paths_tmp : PathsTmpData
+            Additional data required to compute the EM fields of the diffracted
+            paths
+
+        scat_paths_tmp : PathsTmpData
+            Additional data required to compute the EM fields of the scattered
+            paths
+
+        scat_random_phases : bool
+            If set to `True` and if scattering is enabled, random uniform phase
+            shifts are added to the scattered paths.
+
+        testing : bool
+            If set to `True`, then additional data is returned for testing.
+
+        Output
+        -------
+        sources : [num_sources, 3], tf.float
+            Coordinates of the sources
+
+        targets : [num_targets, 3], tf.float
+            Coordinates of the targets
+
+        list : Paths as a list
+            The computed paths as a dictionnary of tensors, i.e., the output of
+            `Paths.to_dict()`.
+            Returning the paths as a list of tensors is required to enable
+            the execution of this function in graph mode.
+
+        list : PathsTmpData as a list
+            Additional data required to compute the EM fields of the specular
+            paths as list of tensors.
+            Only returned if `testing` is set to `True`.
+
+        list : PathsTmpData as a list
+            Additional data required to compute the EM fields of the diffracted
+            paths as list of tensors.
+            Only returned if `testing` is set to `True`.
+
+        list : PathsTmpData as a list
+            Additional data required to compute the EM fields of the scattered
+            paths as list of tensors.
+            Only returned if `testing` is set to `True`.
+        """
+
+        sources = spec_paths.sources
+        targets = spec_paths.targets
+
+        # Create empty paths object
+        all_paths = Paths(sources=sources,
+                          targets=targets,
+                          scene=self._scene)
+        # Create empty objects for storing tensors that are required to compute
+        # paths, but that will not be returned to the user
+        all_paths_tmp = PathsTmpData(sources, targets, self._dtype)
+
+        # Rotation matrices corresponding to the orientations of the radio
+        # devices
+        # rx_rot_mat : [num_rx, 3, 3]
+        # tx_rot_mat : [num_tx, 3, 3]
+        rx_rot_mat, tx_rot_mat = self._get_tx_rx_rotation_matrices()
+
+        # Number of receive antennas (not counting for dual polarization)
+        tx_array_size = self._scene.tx_array.array_size
+        # Number of transmit antennas (not counting for dual polarization)
+        rx_array_size = self._scene.rx_array.array_size
+
+        #################################################
+        # Extract the material properties of the scene
+        #################################################
+
+        # Returns: relative_permittivities, denoted by `etas`,
+        # scattering_coefficients, xpd_coefficients,
+        # alpha_r, alpha_i and lambda_
+        object_properties = self._build_scene_object_properties_tensors()
+        etas = object_properties[0]
+        scattering_coefficient = object_properties[1]
+        xpd_coefficient = object_properties[2]
+        alpha_r = object_properties[3]
+        alpha_i = object_properties[4]
+        lambda_ = object_properties[5]
+
+        ##############################################
+        # LoS and Specular paths
+        ##############################################
+
+        if spec_paths.objects.shape[3] > 0:
+
+            # Compute the EM transition matrices
+            spec_mat_t = self._spec_transition_matrices(etas,
+                    scattering_coefficient, spec_paths, spec_paths_tmp, False)
+            all_paths = all_paths.merge(spec_paths)
+            # Only the transition matrix and vector of incidence/reflection are
+            # required for the computation of the paths coefficients
+            all_paths_tmp.mat_t = tf.concat([all_paths_tmp.mat_t, spec_mat_t],
+                                            axis=-3)
+            all_paths_tmp.k_tx = tf.concat([all_paths_tmp.k_tx,
+                                            spec_paths_tmp.k_tx],
+                                           axis=-2)
+            all_paths_tmp.k_rx = tf.concat([all_paths_tmp.k_rx,
+                                            spec_paths_tmp.k_rx],
+                                           axis=-2)
+            # If testing, the transition matrices are also returned
+            if testing:
+                spec_paths_tmp.mat_t = spec_mat_t
+
+        ############################################
+        # Diffracted paths
+        ############################################
+
+        if diff_paths.objects.shape[3] > 0:
+
+            # Compute the transition matrices
+            diff_mat_t =\
+                self._compute_diffraction_transition_matrices(etas,
+                            scattering_coefficient, diff_paths, diff_paths_tmp)
+            all_paths = all_paths.merge(diff_paths)
+            # Only the transition matrix and vector of incidence/reflection are
+            # required for the computation of the paths coefficients
+            all_paths_tmp.mat_t = tf.concat([all_paths_tmp.mat_t, diff_mat_t],
+                                            axis=-3)
+            all_paths_tmp.k_tx = tf.concat([all_paths_tmp.k_tx,
+                                            diff_paths_tmp.k_tx],
+                                           axis=-2)
+            all_paths_tmp.k_rx = tf.concat([all_paths_tmp.k_rx,
+                                            diff_paths_tmp.k_rx],
+                                           axis=-2)
+            # If testing, the transition matrices are also returned
+            if testing:
+                diff_paths_tmp.mat_t = diff_mat_t
+
+        ############################################
+        # Scattered paths
+        ############################################
+
+        if scat_paths.objects.shape[3] > 0:
+
+            # Compute transition matrices up to the scattering point
+            scat_mat_t = self._spec_transition_matrices(etas,
+                    scattering_coefficient, scat_paths, scat_paths_tmp, True)
 
             all_paths = all_paths.merge(scat_paths)
-            all_paths_tmp = all_paths_tmp.merge_ktx_krx_matt(scat_paths_tmp)
-            # Add all fields specific to scattering
+            # The transition matrix and vector of incidence/reflection are
+            # required for the computation of the paths coefficients, as well
+            # as other scattering specific quantities.
+            all_paths_tmp.mat_t = tf.concat([all_paths_tmp.mat_t, scat_mat_t],
+                                            axis=-3)
+            all_paths_tmp.k_tx = tf.concat([all_paths_tmp.k_tx,
+                                            scat_paths_tmp.k_tx],
+                                           axis=-2)
+            all_paths_tmp.k_rx = tf.concat([all_paths_tmp.k_rx,
+                                            scat_paths_tmp.k_rx],
+                                           axis=-2)
             all_paths_tmp.scat_last_objects = scat_paths_tmp.scat_last_objects
             all_paths_tmp.scat_last_k_i = scat_paths_tmp.scat_last_k_i
             all_paths_tmp.scat_k_s = scat_paths_tmp.scat_k_s
@@ -584,8 +819,10 @@ class SolverPaths(SolverBase):
             all_paths_tmp.scat_src_2_last_int_dist\
                                 = scat_paths_tmp.scat_src_2_last_int_dist
             all_paths_tmp.scat_2_target_dist = scat_paths_tmp.scat_2_target_dist
-            # For tests
-            all_paths.scat_tmp = scat_paths_tmp
+            all_paths_tmp.scat_last_vertices = scat_paths_tmp.scat_last_vertices
+            # If testing, the transition matrices are also returned
+            if testing:
+                scat_paths_tmp.mat_t = scat_mat_t
 
         #################################################
         # Splitting the sources (targets) dimension into
@@ -596,6 +833,8 @@ class SolverPaths(SolverBase):
         # If not using synthetic array, then the paths for the different
         # antenna elements were generated and reshaping is needed.
         # Otherwise, expand with the antenna dimensions.
+        # [num_targets, num_sources, max_num_paths]
+        all_paths.targets_sources_mask = all_paths.mask
         if self._scene.synthetic_array:
             # [num_rx, num_tx, 2, 2]
             mat_t = all_paths_tmp.mat_t
@@ -609,6 +848,7 @@ class SolverPaths(SolverBase):
             batch_dims = [num_rx, rx_array_size, num_tx, tx_array_size,
                           max_num_paths]
             # [num_rx, tx_array_size, num_tx, tx_array_size, max_num_paths]
+            all_paths.mask = tf.reshape(all_paths.mask, batch_dims)
             all_paths.tau = tf.reshape(all_paths.tau, batch_dims)
             all_paths.theta_t = tf.reshape(all_paths.theta_t, batch_dims)
             all_paths.phi_t = tf.reshape(all_paths.phi_t, batch_dims)
@@ -624,21 +864,24 @@ class SolverPaths(SolverBase):
         ####################################################
         # Compute the channel coefficients
         ####################################################
-        all_paths = self._compute_paths_coefficients(rx_rot_mat,
-                                                     tx_rot_mat,
-                                                     all_paths,
-                                                     all_paths_tmp,
-                                                     num_samples,
-                                                     scattering_coefficient,
-                                                     xpd_coefficient,
-                                                     etas, alpha_r, alpha_i,
-                                                     lambda_, scat_keep_prob)
+        scat_keep_prob = scat_paths_tmp.scat_keep_prob
+        num_samples = scat_paths_tmp.num_samples
+        all_paths.a = self._compute_paths_coefficients(rx_rot_mat,
+                                                       tx_rot_mat,
+                                                       all_paths,
+                                                       all_paths_tmp,
+                                                       num_samples,
+                                                       scattering_coefficient,
+                                                       xpd_coefficient,
+                                                       etas, alpha_r, alpha_i,
+                                                       lambda_, scat_keep_prob,
+                                                       scat_random_phases)
 
         # If using synthetic array, adds the antenna dimentions by applying
         # synthetic phase shifts
         if self._scene.synthetic_array:
-            all_paths = self._apply_synthetic_array(rx_rot_mat, tx_rot_mat,
-                                                    all_paths, all_paths_tmp)
+            all_paths.a = self._apply_synthetic_array(rx_rot_mat, tx_rot_mat,
+                                                      all_paths, all_paths_tmp)
 
         ##################################################
         # If not using synthetic arrays, tile the AoAs,
@@ -648,6 +891,8 @@ class SolverPaths(SolverBase):
             num_rx_patterns = len(self._scene.rx_array.antenna.patterns)
             num_tx_patterns = len(self._scene.tx_array.antenna.patterns)
             # [num_rx, 1,rx_array_size, num_tx, 1,tx_array_size, max_num_paths]
+            mask = tf.expand_dims(tf.expand_dims(all_paths.mask, axis=2),
+                                 axis=5)
             tau = tf.expand_dims(tf.expand_dims(all_paths.tau, axis=2),
                                  axis=5)
             theta_t = tf.expand_dims(tf.expand_dims(all_paths.theta_t, axis=2),
@@ -660,8 +905,10 @@ class SolverPaths(SolverBase):
                                    axis=5)
             # [num_rx, num_rx_patterns, rx_array_size, num_tx, num_tx_patterns,
             #   tx_array_size, max_num_paths]
-            tau = tf.tile(tau, [1, num_rx_patterns, 1, 1,
-                                num_tx_patterns, 1, 1])
+            mask = tf.tile(mask, [1, num_rx_patterns, 1, 1, num_tx_patterns,
+                                  1, 1])
+            tau = tf.tile(tau, [1, num_rx_patterns, 1, 1, num_tx_patterns,
+                                1, 1])
             theta_t = tf.tile(theta_t, [1, num_rx_patterns, 1, 1,
                                         num_tx_patterns, 1, 1])
             phi_t = tf.tile(phi_t, [1, num_rx_patterns, 1, 1,
@@ -673,16 +920,24 @@ class SolverPaths(SolverBase):
             # [num_rx, num_rx_ant = num_rx_patterns*num_rx_ant,
             #   ... num_tx, num_tx_ant = num_tx_patterns*tx_array_size,
             #   ... max_num_paths]
+            all_paths.mask = flatten_dims(flatten_dims(mask, 2, 1), 2, 3)
             all_paths.tau = flatten_dims(flatten_dims(tau, 2, 1), 2, 3)
             all_paths.theta_t = flatten_dims(flatten_dims(theta_t, 2, 1), 2, 3)
             all_paths.phi_t = flatten_dims(flatten_dims(phi_t, 2, 1), 2, 3)
             all_paths.theta_r = flatten_dims(flatten_dims(theta_r, 2, 1), 2, 3)
             all_paths.phi_r = flatten_dims(flatten_dims(phi_r, 2, 1), 2, 3)
 
-        # For test
-        all_paths.all_tmp = all_paths_tmp
+        # If testing, additinal data is returned
+        if testing:
+            output = (  sources, targets, all_paths.to_dict(),
+                        # For testing
+                        spec_paths_tmp.to_dict(),
+                        diff_paths_tmp.to_dict(),
+                        scat_paths_tmp.to_dict() )
+        else:
+            output = (sources, targets, all_paths.to_dict())
 
-        return all_paths
+        return output
 
     ##################################################################
     # Methods for finding candiate primitives and edges for reflected
@@ -1658,27 +1913,54 @@ class SolverPaths(SolverBase):
         # Max depth
         max_depth = candidates.shape[0]
 
+        # If at least one link has the LoS paths flagged as valid,
+        # then we keep the LoS paths for all links.
+        # This makes the tracking of paths types easier.
+        # The LoS paths will be masked for links for which it is obstructed.
+        # Note that there is only one entry that correspond to LoS paths
+        # [1, num_samples]
+        is_los = tf.reduce_all(tf.equal(candidates, -1), axis=0, keepdims=True)
+        # Only keep the LoS path if it is valid (i.e., not obstructed) for at
+        # least one link
+        # [1, 1, num_samples]
+        is_los = tf.expand_dims(is_los, 0)
+        # [1, 1, num_samples]
+        is_los = tf.reduce_any(tf.logical_and(is_los, valid), axis=(0,1),
+                               keepdims=True)
+
+        # Build indices for keeping only valid path
+        # A path is kept if its valid or the LoS and there is at least one link
+        # for which LoS is not obstructed
+        # [num_targets, num_sources, num_samples]
+        keep = tf.logical_or(valid, is_los)
         # [num_targets, num_sources]
-        num_paths = tf.reduce_sum(tf.cast(valid, tf.int32), axis=-1)
+        num_paths = tf.reduce_sum(tf.cast(keep, tf.int32), axis=-1)
         # Maximum number of paths
         # ()
         max_num_paths = tf.reduce_max(num_paths)
-
-        # Build indices for keeping only valid path
-        gather_indices = tf.where(valid)
-        path_indices = tf.cumsum(tf.cast(valid, tf.int32), axis=-1)
+        # [num_valid, 3]
+        gather_indices = tf.where(keep)
+        # [num_targets, num_sources, num_samples]
+        path_indices = tf.cumsum(tf.cast(keep, tf.int32), axis=-1)
+        # [num_valid]
         path_indices = tf.gather_nd(path_indices, gather_indices) - 1
+        # [3, num_valid]
         scatter_indices = tf.transpose(gather_indices, [1,0])
         if not tf.size(scatter_indices) == 0:
+            # [3, num_valid]
             scatter_indices = tf.tensor_scatter_nd_update(scatter_indices,
                                 [[2]], [path_indices])
+        # [num_valid, 3]
         scatter_indices = tf.transpose(scatter_indices, [1,0])
 
         # Mask of valid paths
         # [num_targets, num_sources, max_num_paths]
         mask = tf.fill([num_targets, num_sources, max_num_paths], False)
-        mask = tf.tensor_scatter_nd_update(mask, scatter_indices,
-                tf.fill([tf.shape(scatter_indices)[0]], True))
+        # [num_keep_paths]
+        mask_ = tf.gather_nd(valid, gather_indices)
+        # [num_targets, num_sources, max_num_paths]
+        mask = tf.tensor_scatter_nd_update(mask, scatter_indices, mask_)
+
         # Locations of the interactions
         # [max_depth, num_targets, num_sources, max_num_paths, 3]
         valid_vertices = tf.zeros([max_depth, num_targets, num_sources,
@@ -1998,8 +2280,8 @@ class SolverPaths(SolverBase):
 
         Output
         -------
-        paths : :class:`~sionna.rt.Paths`
-            Updated paths
+        mat_t : [num_targets, num_sources, max_num_paths, 2, 2], tf.complex
+                Specular transition matrix for every path.
         """
 
         vertices = paths.vertices
@@ -2014,7 +2296,14 @@ class SolverPaths(SolverBase):
         normals = paths_tmp.normals
         k_i = paths_tmp.k_i
         k_r = paths_tmp.k_r
-        total_distance = paths_tmp.total_distance
+        if scattering:
+            # For scattering, only the distance up to the last intersection
+            # point is considered for path loss.
+            # [num_targets, num_sources, max_num_paths]
+            total_distance = paths_tmp.scat_src_2_last_int_dist
+        else:
+            # [num_targets, num_sources, max_num_paths]
+            total_distance = paths_tmp.total_distance
 
         # Maximum depth
         max_depth = tf.shape(vertices)[0]
@@ -2028,26 +2317,39 @@ class SolverPaths(SolverBase):
         # Flag that indicates if a ray is valid
         # [max_depth, num_targets, num_sources, max_num_paths]
         valid_ray = tf.not_equal(objects, -1)
+        # Pad to enable detection of the last valid reflection for scattering
+        # [max_depth+1, num_targets, num_sources, max_num_paths]
+        valid_ray = tf.pad(valid_ray, [[0,1], [0,0], [0,0], [0,0]],
+                           constant_values=False)
 
-        # Tensor with relative perimittivities values for all reflection points
-        # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
-        # This makes no difference on the resulting paths as such paths
-        # are not flagged as active.
-        # [max_depth, num_targets, num_sources, max_num_paths]
-        valid_object_idx = tf.where(objects == -1, 0, objects)
-        # [max_depth, num_targets, num_sources, max_num_paths]
-        if tf.shape(relative_permittivity)[0] == 0:
-            etas = tf.zeros_like(valid_object_idx, dtype=self._dtype)
-            scattering_coefficient = tf.zeros_like(valid_object_idx,
-                                                   dtype=self._rdtype)
+        # Relative perimittivities and scattering coefficients.
+        # If a callable is defined to compute the radio material properties,
+        # it is invoked. Otherwise, the radio materials of objects are used.
+        rm_callable = self._scene.radio_material_callable
+        if rm_callable is None:
+            # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
+            # This makes no difference on the resulting paths as such paths
+            # are not flagged as active.
+            # [max_depth, num_targets, num_sources, max_num_paths]
+            valid_object_idx = tf.where(objects == -1, 0, objects)
+            if tf.shape(relative_permittivity)[0] == 0:
+                # [max_depth, num_targets, num_sources, max_num_paths]
+                etas = tf.zeros_like(valid_object_idx, dtype=self._dtype)
+                scattering_coefficient = tf.zeros_like(valid_object_idx,
+                                                       dtype=self._rdtype)
+
+            else:
+                # [max_depth, num_targets, num_sources, max_num_paths]
+                etas = tf.gather(relative_permittivity, valid_object_idx)
+                scattering_coefficient = tf.gather(scattering_coefficient,
+                                                   valid_object_idx)
         else:
-            etas = tf.gather(relative_permittivity, valid_object_idx)
-            scattering_coefficient = tf.gather(scattering_coefficient,
-                                               valid_object_idx)
+            # [max_depth, num_targets, num_sources, max_num_paths]
+            etas, scattering_coefficient, _  = rm_callable(objects, vertices)
 
         # Compute cos(theta) at each reflection point
         # [max_depth, num_targets, num_sources, max_num_paths]
-        cos_theta = -dot(k_i[:max_depth], normals)
+        cos_theta = -dot(k_i[:max_depth], normals, clip=True)
 
         # Compute e_i_s, e_i_p, e_r_s, e_r_p at each reflection point
         # all : [max_depth, num_targets, num_sources, max_num_paths,3]
@@ -2073,14 +2375,6 @@ class SolverPaths(SolverBase):
         mat_t = tf.eye(num_rows=2,
                     batch_shape=[num_targets, num_sources, max_num_paths],
                     dtype=self._dtype)
-        # For scattering, we keep track of the transition matrix for every
-        # prefix of the path
-        if scattering:
-            # [max_depth, num_targets, num_sources, max_num_paths, 2, 2]
-            prefix_mat_t = tf.eye(num_rows=2,
-                                batch_shape=[max_depth, num_targets,
-                                             num_sources, max_num_paths],
-                                dtype=self._dtype)
         # Initialize last field unit vector with outgoing ones
         # [num_targets, num_sources, max_num_paths, 3]
         last_e_r_s = theta_hat(theta_t, phi_t)
@@ -2090,6 +2384,13 @@ class SolverPaths(SolverBase):
             # Is this a valid reflection?
             # [num_targets, num_sources, max_num_paths]
             valid = valid_ray[depth]
+
+            # Is the next reflection valid?
+            # [num_targets, num_sources, max_num_paths]
+            next_valid = valid_ray[depth+1]
+            # Expand for broadcasting
+            # [num_targets, num_sources, max_num_paths, 1, 1]
+            next_valid = insert_dims(next_valid, 2)
 
             # [num_targets, num_sources, max_num_paths]
             reduction_factor_ = reduction_factor[depth]
@@ -2132,14 +2433,18 @@ class SolverPaths(SolverBase):
             # [num_targets, num_sources, max_num_paths, 2, 2]
             mat_t = r*e
 
+            # If scattering, then the reduction coefficient is not applied
+            # to the last interaction as the outgoing ray is diffusely
+            # reflected and not specularly reflected
             if scattering:
-                # [max_depth, num_targets, num_sources, max_num_paths, 2, 2]
-                prefix_mat_t = tf.tensor_scatter_nd_update(prefix_mat_t,
-                                                           [[depth]], [mat_t])
+                # [num_targets, num_sources, max_num_paths, 1, 1]
+                apply_reduction = tf.logical_and(valid__, next_valid)
+            else:
+                apply_reduction = valid__
 
             # Apply the reduction factor
             # [num_targets, num_sources, max_num_paths, 2]
-            reduction_factor_ = tf.where(valid__, reduction_factor_,
+            reduction_factor_ = tf.where(apply_reduction, reduction_factor_,
                                         tf.ones_like(reduction_factor_))
             # [num_targets, num_sources, max_num_paths, 2, 2]
             mat_t = mat_t*reduction_factor_
@@ -2159,48 +2464,22 @@ class SolverPaths(SolverBase):
 
         # Divide by total distance to account for propagation loss
         # [num_targets, num_sources, max_num_paths, 1, 1]
-        # or
-        # [max_depth, num_targets, num_sources, max_num_paths, 1, 1]
         total_distance = expand_to_rank(total_distance, tf.rank(mat_t),
-                                        axis=tf.rank(total_distance))
+                                        axis=3)
         total_distance = tf.complex(total_distance,
                                     tf.zeros_like(total_distance))
-        if scattering:
-            # Due to the high rank of these tensor, some reshape is required
-            # so that tensorflow can do the division.
-            # [max_depth, num_targets, num_sources, max_num_paths, 2, 2]
-            prefix_mat_t = tf.math.divide_no_nan(
-                tf.reshape(prefix_mat_t,
-                           [max_depth*num_targets, num_sources, -1, 2, 2]),
-                tf.reshape(total_distance,
-                           [max_depth*num_targets, num_sources, -1, 1, 1]))
-            prefix_mat_t = tf.reshape(prefix_mat_t,
-                            [max_depth, num_targets, num_sources, -1, 2, 2])
-        else:
-            # [num_targets, num_sources, max_num_paths, 2, 2]
-            mat_t = tf.math.divide_no_nan(mat_t, total_distance)
+        # [num_targets, num_sources, max_num_paths, 2, 2]
+        mat_t = tf.math.divide_no_nan(mat_t, total_distance)
 
         # Set invalid paths to 0 and stores the transition matrices
-        # This is not done for scattering as further processing is required
-        if not scattering:
-            # Expand masks to broadcast with the field components
-            # [num_targets, num_sources, max_num_paths, 1, 1]
-            mask_ = expand_to_rank(paths.mask, 5, axis=3)
-            # Zeroing coefficients corresponding to non-valid paths
-            # [num_targets, num_sources, max_num_paths, 2, 2]
-            mat_t = tf.where(mask_, mat_t, tf.zeros_like(mat_t))
-            paths_tmp.mat_t = mat_t
-        else:
-            # Expand masks to broadcast with the field components
-            # [max_depth, num_targets, num_sources, max_num_paths, 1, 1]
-            mask_ = expand_to_rank(paths_tmp.scat_prefix_mask, 6, axis=4)
-            # Zeroing coefficients corresponding to non-valid paths
-            # [max_depth, num_targets, num_sources, max_num_paths, 2, 2]
-            prefix_mat_t = tf.where(mask_, prefix_mat_t,
-                                    tf.zeros_like(prefix_mat_t))
-            paths_tmp.scat_prefix_mat_t = prefix_mat_t
+        # Expand masks to broadcast with the field components
+        # [num_targets, num_sources, max_num_paths, 1, 1]
+        mask_ = expand_to_rank(paths.mask, 5, axis=3)
+        # Zeroing coefficients corresponding to non-valid paths
+        # [num_targets, num_sources, max_num_paths, 2, 2]
+        mat_t = tf.where(mask_, mat_t, tf.zeros_like(mat_t))
 
-        return paths, paths_tmp
+        return mat_t
 
     ##################################################################
     # Methods used for computing the diffracted paths
@@ -2723,7 +3002,8 @@ class SolverPaths(SolverBase):
 
         # Compute the wedges angle
         # [num_targets, num_sources, max_num_paths]
-        wedges_angle = PI - tf.math.acos(dot(normals[...,0,:],normals[...,1,:]))
+        cos_wedges_angle = dot(normals[...,0,:],normals[...,1,:], clip=True)
+        wedges_angle = PI - tf.math.acos(cos_wedges_angle)
         n = (2.*PI-wedges_angle)/PI
 
         # [num_targets, num_sources, max_num_paths, 3]
@@ -2741,20 +3021,30 @@ class SolverPaths(SolverBase):
         # [num_targets, num_sources, max_num_paths, 3]
         n_n_hat = normals[...,1,:]
 
-        # Relative permitivities
+        # Relative permitivities and scattering coefficients
+        # If a callable is defined to compute the radio material properties,
+        # it is invoked. Otherwise, the radio materials of objects are used.
+        rm_callable = self._scene.radio_material_callable
         # [num_targets, num_sources, max_num_paths, 2]
         objects_indices = tf.gather(self._wedges_objects, valid_wedges_idx,
                                     axis=0)
-        # [num_targets, num_sources, max_num_paths, 2]
-        etas = tf.gather(relative_permittivity, objects_indices)
+        if rm_callable is None:
+            # [num_targets, num_sources, max_num_paths, 2]
+            etas = tf.gather(relative_permittivity, objects_indices)
+            scattering_coefficient = tf.gather(scattering_coefficient,
+                                               objects_indices)
+        else:
+            # Harmonize the shapes of the radio material callables
+            # [num_targets, num_sources, max_num_paths, 2, 3]
+            diff_points_ = tf.tile(tf.expand_dims(diff_points, axis=-2),
+                                   [1, 1, 1, 2, 1])
+            # scattering_coefficient, etas : [num_targets, num_sources,
+            #   max_num_paths, 2]
+            etas, scattering_coefficient, _   = rm_callable(objects_indices,
+                                                            diff_points_)
         # [num_targets, num_sources, max_num_paths]
         eta_0 = etas[...,0]
         eta_n = etas[...,1]
-
-        # Get scattering coefficients
-        # [num_targets, num_sources, max_num_paths, 2]
-        scattering_coefficient = tf.gather(scattering_coefficient,
-                                           objects_indices)
         # [num_targets, num_sources, max_num_paths]
         scattering_coefficient_0 = scattering_coefficient[...,0]
         scattering_coefficient_n = scattering_coefficient[...,1]
@@ -2954,9 +3244,8 @@ class SolverPaths(SolverBase):
         # Zeroing coefficients corresponding to non-valid paths
         # [num_targets, num_sources, max_num_paths, 2]
         mat_t = tf.where(mask_, mat_t, tf.zeros_like(mat_t))
-        paths_tmp.mat_t = mat_t
 
-        return paths
+        return mat_t
 
     ##################################################################
     # Methods used for computing the scattered paths
@@ -3270,8 +3559,6 @@ class SolverPaths(SolverBase):
         # [max_depth, num_targets, num_sources, max_num_paths]
         prefix_mask = paths_tmp.scat_prefix_mask
         prefix_mask_int = tf.cast(prefix_mask, tf.int32)
-        # [max_depth, num_targets, num_sources, max_num_paths, 2, 2]
-        prefix_mat_t = paths_tmp.scat_prefix_mat_t
         # [max_depth, num_targets, num_sources, max_num_paths, 3]
         prefix_vertices = paths.vertices
         # [max_depth, num_targets, num_sources, max_num_paths]
@@ -3282,8 +3569,10 @@ class SolverPaths(SolverBase):
         prefix_phi_t = paths.phi_t
         # [max_depth, num_targets, num_sources, num_paths, 3]
         prefix_normals = paths_tmp.normals
+        # [max_depth + 1, num_targets, num_sources, num_paths, 3]
+        prefix_k_i = paths_tmp.k_i
         # [max_depth, num_targets, num_sources, num_paths, 3]
-        prefix_k_i = paths_tmp.k_i[:-1]
+        prefix_k_r = paths_tmp.k_r
         # [max_depth, num_targets, num_sources, num_paths]
         prefix_distances = paths_tmp.total_distance
         # [num_targets, num_sources, max_num_paths, 3]
@@ -3301,7 +3590,7 @@ class SolverPaths(SolverBase):
         # [max_depth]
         path_count_depth = tf.reduce_max(paths_count, axis=(1,2))
         # Upper bound on the total number of paths
-        #()
+        # ()
         max_num_paths = tf.reduce_sum(path_count_depth)
 
         # [num_valid_paths, 4]
@@ -3323,9 +3612,6 @@ class SolverPaths(SolverBase):
         # Create the final tensors to update
         # [num_targets, num_sources, max_num_paths]
         mask = tf.fill([num_targets, num_sources, max_num_paths], False)
-        # [num_targets, num_sources, max_num_paths, 2, 2]
-        mat_t = tf.zeros([num_targets, num_sources, max_num_paths, 2, 2],
-                         self._dtype)
         # This tensor is created transposed as paths
         # are added with all the objects hit along the paths.
         # [num_targets, num_sources, max_num_paths, max_depth, 3]
@@ -3343,6 +3629,7 @@ class SolverPaths(SolverBase):
         # Last objects that were hit
         # [num_targets, num_sources, max_num_paths]
         last_objects = tf.fill([num_targets, num_sources, max_num_paths], -1)
+        # Angles of departure
         # [num_targets, num_sources, max_num_paths]
         theta_t = tf.zeros([num_targets, num_sources, max_num_paths],
                            self._rdtype)
@@ -3364,6 +3651,18 @@ class SolverPaths(SolverBase):
         # [num_targets, num_sources, max_num_paths, 3]
         k_tx = tf.zeros([num_targets, num_sources, max_num_paths, 3],
                         self._rdtype)
+        # Normals at the intersection points
+        # [num_targets, num_sources, max_num_paths, max_depth, 3]
+        normals = tf.zeros([num_targets, num_sources, max_num_paths,
+                            max_depth, 3], self._rdtype)
+        # Direction of reflection at intersection points
+        # [num_targets, num_sources, max_num_paths, max_depth, 3]
+        k_r = tf.zeros([num_targets, num_sources, max_num_paths, max_depth, 3],
+                       self._rdtype)
+        # Direction of incidence at intersection points
+        # [num_targets, num_sources, max_num_paths, max_depth+1, 3]
+        k_i = tf.zeros([num_targets, num_sources, max_num_paths, max_depth+1,3],
+                       self._rdtype)
 
         # Need to transpose these tensors in order to gather paths from them
         # with all the interactions, i.e., extract the entire "max_depth"
@@ -3372,6 +3671,12 @@ class SolverPaths(SolverBase):
         prefix_objects_tp = tf.transpose(prefix_objects, [1,2,3,0])
         # [num_targets, num_sources, max_num_paths, max_depth, 3]
         prefix_vertices_tp = tf.transpose(prefix_vertices, [1,2,3,0,4])
+        # [num_targets, num_sources, max_num_paths, max_depth, 3]
+        normals_tp = tf.transpose(prefix_normals, [1,2,3,0,4])
+        # [num_targets, num_sources, max_num_paths, max_depth, 3]
+        k_i_tp = tf.transpose(prefix_k_i, [1,2,3,0,4])
+        # [num_targets, num_sources, max_num_paths, max_depth, 3]
+        k_r_tp = tf.transpose(prefix_k_r, [1,2,3,0,4])
 
         # We sequentially add the prefixes for each depth value.
         # To avoid overwriting the paths scattered at the previous
@@ -3414,12 +3719,6 @@ class SolverPaths(SolverBase):
             mask = tf.tensor_scatter_nd_update(mask, scatter_indices_nd_,
                                                prefix_mask_)
 
-            # Transition matrices
-            prefix_mat_t_ = tf.gather_nd(prefix_mat_t, gather_indices_)
-            # [num_targets, num_sources, max_num_paths, 2, 2]
-            mat_t = tf.tensor_scatter_nd_update(mat_t, scatter_indices_nd_,
-                                                prefix_mat_t_)
-
             # Vertices
             prefix_vertices_ = tf.gather_nd(prefix_vertices_tp,
                                             gather_indices_nd_)
@@ -3448,6 +3747,22 @@ class SolverPaths(SolverBase):
             objects = tf.tensor_scatter_nd_update(objects, scatter_indices_nd_,
                                                   objects_)
 
+            # Normals at intersection points
+            normals_ = tf.gather_nd(normals_tp, gather_indices_nd_)
+            # [num_targets, num_sources, max_num_paths, max_depth, 3]
+            normals = tf.tensor_scatter_nd_update(normals, scatter_indices_nd_,
+                                                  normals_)
+
+            # Direction of incidence at intersection points
+            k_i_ = tf.gather_nd(k_i_tp, gather_indices_nd_)
+            # [num_targets, num_sources, max_num_paths, max_depth+1, 3]
+            k_i = tf.tensor_scatter_nd_update(k_i, scatter_indices_nd_, k_i_)
+
+            # Direction of reflection at intersection points
+            k_r_ = tf.gather_nd(k_r_tp, gather_indices_nd_)
+            # [num_targets, num_sources, max_num_paths, max_depth, 3]
+            k_r = tf.tensor_scatter_nd_update(k_r, scatter_indices_nd_, k_r_)
+
             # Last hit objects
             objects_ = tf.gather_nd(prefix_objects, gather_indices_)
             # [num_targets, num_sources, max_num_paths]
@@ -3457,22 +3772,21 @@ class SolverPaths(SolverBase):
 
             # Azimuth of departure
             phi_t_ = tf.gather_nd(prefix_phi_t, gather_indices_nd_)
-            # [max_depth, num_targets, num_sources, max_num_paths]
+            # [num_targets, num_sources, max_num_paths]
             phi_t = tf.tensor_scatter_nd_update(phi_t, scatter_indices_nd_,
                                                 phi_t_)
 
             # Elevation of departure
             theta_t_ = tf.gather_nd(prefix_theta_t, gather_indices_nd_)
-            # [max_depth, num_targets, num_sources, max_num_paths]
+            # [num_targets, num_sources, max_num_paths]
             theta_t = tf.tensor_scatter_nd_update(theta_t, scatter_indices_nd_,
                                                   theta_t_)
 
-            # Normals at the last object
+            # Normals at the last intersected object
             normals_ = tf.gather_nd(prefix_normals, gather_indices_)
             # [num_targets, num_sources, max_num_paths, 3]
             last_normals = tf.tensor_scatter_nd_update(last_normals,
-                                                       scatter_indices_nd_,
-                                                       normals_)
+                                                scatter_indices_nd_, normals_)
 
             # Direction of incidence at the last interaction point
             k_i_ = tf.gather_nd(prefix_k_i, gather_indices_)
@@ -3483,7 +3797,7 @@ class SolverPaths(SolverBase):
 
             # Distance from the sources to the last interaction point
             last_dist_ = tf.gather_nd(prefix_distances, gather_indices_)
-            # [num_targets, num_sources, max_num_paths, 3]
+            # [num_targets, num_sources, max_num_paths]
             last_distance = tf.tensor_scatter_nd_update(last_distance,
                                                         scatter_indices_nd_,
                                                         last_dist_)
@@ -3513,6 +3827,9 @@ class SolverPaths(SolverBase):
         # [max_depth, num_targets, num_sources, max_num_paths]
         objects = tf.transpose(objects, [3, 0, 1, 2])
         vertices = tf.transpose(vertices, [3, 0, 1, 2, 4])
+        normals = tf.transpose(normals, [3, 0, 1, 2, 4])
+        k_i = tf.transpose(k_i, [3, 0, 1, 2, 4])
+        k_r = tf.transpose(k_r, [3, 0, 1, 2, 4])
 
         paths.mask = mask
         paths.vertices = vertices
@@ -3523,15 +3840,19 @@ class SolverPaths(SolverBase):
         paths.phi_r = phi_r
         paths.theta_r = theta_r
 
-        paths_tmp.mat_t = mat_t
         paths_tmp.scat_last_objects = last_objects
         paths_tmp.scat_last_normals = last_normals
         paths_tmp.scat_last_k_i = last_k_i
+        paths_tmp.scat_last_vertices = last_vertices
         paths_tmp.scat_src_2_last_int_dist = last_distance
         paths_tmp.scat_k_s = k_s
         paths_tmp.scat_2_target_dist = scat_2_target_dist
         paths_tmp.k_tx = k_tx
         paths_tmp.k_rx = -k_s
+        paths_tmp.normals = normals
+        paths_tmp.k_i = k_i
+        paths_tmp.k_r = k_r
+        paths_tmp.total_distance = scat_2_target_dist + last_distance
 
         return paths, paths_tmp
 
@@ -3667,9 +3988,6 @@ class SolverPaths(SolverBase):
             total_distance = tf.reduce_sum(distances, axis=0)
             # [num_targets, num_sources, max_num_paths]
             tau = total_distance / SPEED_OF_LIGHT
-            # Setting -1 for delays corresponding to non-valid paths
-            # [num_targets, num_sources, max_num_paths]
-            tau = tf.where(mask, tau, -tf.ones_like(tau))
 
         # Compute angles of departures and arrival
         # theta_t, phi_t: [num_targets, num_sources, max_num_paths]
@@ -3711,6 +4029,10 @@ class SolverPaths(SolverBase):
             # Keep only the unique paths
             # [num_targets, num_sources, max_num_paths]
             mask = tf.logical_and(uniques, mask)
+
+            # Setting -1 for delays corresponding to non-valid paths
+            # [num_targets, num_sources, max_num_paths]
+            tau = tf.where(mask, tau, -tf.ones_like(tau))
 
         # Updates the object storing the paths
         if not scattering:
@@ -3887,14 +4209,13 @@ class SolverPaths(SolverBase):
         a = a*tf.exp(tf.complex(tf.zeros_like(phase_shifts), phase_shifts))
         a = flatten_dims(flatten_dims(a, 2, 1), 2, 3)
 
-        paths.a = a
-        return paths
+        return a
 
     def _compute_paths_coefficients(self, rx_rot_mat, tx_rot_mat, paths,
                                     paths_tmp, num_samples,
                                     scattering_coefficient, xpd_coefficient,
                                     etas, alpha_r, alpha_i, lambda_,
-                                    scat_keep_prob):
+                                    scat_keep_prob, scat_random_phases):
         # pylint: disable=line-too-long
         r"""
         Computes the paths coefficients.
@@ -3945,6 +4266,10 @@ class SolverPaths(SolverBase):
             This is helpful to reduce the number of scattered paths computed,
             which might be prohibitively high in some setup.
             Must be in the range (0,1).
+
+        scat_random_phases : bool
+            If set to `True` and if scattering is enabled, random uniform phase
+            shifts are added to the scattered paths.
 
         Output
         ------
@@ -4131,13 +4456,35 @@ class SolverPaths(SolverBase):
         if n_scat > 0:
             n_other = a.shape[-2] - n_scat
 
-            # Get k_x, generate random phase shifts, and compute field vector
-            # [num_targets, num_sources, max_num_paths]
-            k_x = tf.gather(xpd_coefficient, paths_tmp.scat_last_objects)
+            # On CPU, indexing with -1 does not work. Hence we replace -1 by 0.
+            # This makes no difference on the resulting paths as such paths are
+            # not flagged as active.
+            # [max_num_paths]
+            valid_object_idx = tf.where(paths_tmp.scat_last_objects == -1,
+                                        0, paths_tmp.scat_last_objects)
+
+            # Cross-polarization discrimination and scattering coefficients.
+            # If a callable is defined to compute the radio material properties,
+            # it is invoked. Otherwise, the radio materials of objects are used.
+            rm_callable = self._scene.radio_material_callable
+            if rm_callable is None:
+                # [num_targets, num_sources, max_num_paths]
+                k_x = tf.gather(xpd_coefficient, valid_object_idx)
+                s = tf.gather(scattering_coefficient, valid_object_idx)
+                etas = tf.gather(etas, valid_object_idx)
+            else:
+                # [num_targets, num_sources, max_num_paths]
+                etas, s, k_x = rm_callable(paths_tmp.scat_last_objects,
+                                           paths_tmp.scat_last_vertices)
+
+            # Generate random phase shifts, and compute field vector
             phase_shape = tf.concat([tf.shape(k_x), [2]], axis=0)
-            # [num_targets, num_sources, max_num_paths, 2]
-            phases = tf.random.uniform(phase_shape, maxval=2*PI,
-                                       dtype=self._rdtype)
+            if scat_random_phases:
+                # [num_targets, num_sources, max_num_paths, 2]
+                phases = tf.random.uniform(phase_shape, maxval=2*PI,
+                                        dtype=self._rdtype)
+            else:
+                phases = tf.zeros(phase_shape, dtype=self._rdtype)
             # [num_targets, num_sources, max_num_paths, 2]
             field_vec = tf.exp(tf.complex(tf.cast(0, self._rdtype), phases))
             # [num_targets, num_sources, max_num_paths, 2]
@@ -4145,28 +4492,36 @@ class SolverPaths(SolverBase):
             k_x_ = tf.complex(k_x_, tf.zeros_like(k_x_))
             field_vec *= k_x_
 
-            # Evalute scattering pattern
-            # Get all material properties related to scattering for each path
-            # [num_targets, num_sources, max_num_paths]
-            etas = tf.gather(etas, paths_tmp.scat_last_objects)
-            alpha_r = tf.gather(alpha_r, paths_tmp.scat_last_objects)
-            alpha_i = tf.gather(alpha_i, paths_tmp.scat_last_objects)
-            lambda_ = tf.gather(lambda_, paths_tmp.scat_last_objects)
-            s = tf.gather(scattering_coefficient, paths_tmp.scat_last_objects)
-
-            # Evaluate scattering pattern for all paths. Flattening is needed
-            # here as the pattern cannot handle it otherwise.
-            f_s = ScatteringPattern.pattern(
-                            tf.reshape(paths_tmp.scat_last_k_i, [-1, 3]),
-                            tf.reshape(paths_tmp.scat_k_s, [-1, 3]),
-                            tf.reshape(paths_tmp.scat_last_normals, [-1, 3]),
-                            tf.reshape(alpha_r, [-1]),
-                            tf.reshape(alpha_i, [-1]),
-                            tf.reshape(lambda_, [-1]))
-
-            # Reshape f_s to original dimensions
-            # [num_targets, num_sources, max_num_paths]
-            f_s = tf.reshape(f_s, tf.shape(alpha_r))
+            # Evaluate scattering pattern for all paths.
+            # If a callable is defined to compute the scattering pattern,
+            # it is invoked. Otherwise, the radio materials of objects are used.
+            sp_callable = self._scene.scattering_pattern_callable
+            if sp_callable is None:
+                # Get all material properties related to scattering for each
+                # path
+                # [num_targets, num_sources, max_num_paths]
+                alpha_r = tf.gather(alpha_r, valid_object_idx)
+                alpha_i = tf.gather(alpha_i, valid_object_idx)
+                lambda_ = tf.gather(lambda_, valid_object_idx)
+                # Flattening is needed here as the pattern cannot handle it
+                # otherwise
+                f_s = ScatteringPattern.pattern(
+                                tf.reshape(paths_tmp.scat_last_k_i, [-1, 3]),
+                                tf.reshape(paths_tmp.scat_k_s, [-1, 3]),
+                                tf.reshape(paths_tmp.scat_last_normals,[-1, 3]),
+                                tf.reshape(alpha_r, [-1]),
+                                tf.reshape(alpha_i, [-1]),
+                                tf.reshape(lambda_, [-1]))
+                # Reshape f_s to original dimensions
+                # [num_targets, num_sources, max_num_paths]
+                f_s = tf.reshape(f_s, tf.shape(alpha_r))
+            else:
+                # [num_targets, num_sources, max_num_paths]
+                f_s = sp_callable(paths_tmp.scat_last_objects,
+                                  paths_tmp.scat_last_vertices,
+                                  paths_tmp.scat_last_k_i,
+                                  paths_tmp.scat_k_s,
+                                  paths_tmp.scat_last_normals)
 
             # Complete the computation of the field
             # [num_targets, num_sources, max_num_paths]
@@ -4174,6 +4529,7 @@ class SolverPaths(SolverBase):
 
             # The term cos(theta_i)*dA is equal to 4*PI/N*r^2
             # [num_targets, num_sources, max_num_paths]
+            num_samples = tf.cast(num_samples, self._rdtype)
             scaling *= tf.sqrt(4*tf.cast(PI, self._rdtype)\
                 /(scat_keep_prob*num_samples))
             scaling *= paths_tmp.scat_src_2_last_int_dist
@@ -4181,7 +4537,8 @@ class SolverPaths(SolverBase):
             # Apply path loss due to propagation from scattering point
             # to target
             # [num_targets, num_sources, max_num_paths]
-            scaling /= paths_tmp.scat_2_target_dist
+            scaling = tf.math.divide_no_nan(scaling,
+                                            paths_tmp.scat_2_target_dist)
 
             # Compute scaled field vector
             # [num_targets, num_sources, max_num_paths, 2]
@@ -4192,7 +4549,7 @@ class SolverPaths(SolverBase):
             # These will be scaled by the reflection reduction factor
             # [num_targets, num_sources, max_num_paths]
             cos_theta = -dot(paths_tmp.scat_last_k_i,
-                             paths_tmp.scat_last_normals)
+                             paths_tmp.scat_last_normals, clip=True)
 
             # [num_targets, num_sources, max_num_paths]
             r_s, r_p = reflection_coefficient(etas, cos_theta)
@@ -4368,5 +4725,4 @@ class SolverPaths(SolverBase):
             #   max_num_paths]
             a = flatten_dims(flatten_dims(a, 2, 1), 2, 3)
 
-        paths.a = a
-        return paths
+        return a

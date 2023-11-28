@@ -13,10 +13,12 @@ import numpy as np
 import tensorflow as tf
 
 from sionna.utils.metrics import BitErrorRate, BitwiseMutualInformation, compute_ber, compute_bler, count_block_errors, count_errors
+from sionna.utils import ebnodb2no
 from sionna.fec.interleaving import RandomInterleaver
 from sionna.utils import sim_ber, complex_normal, SymbolSource, BinarySource, QAMSource, PAMSource
 from sionna.fec.utils import GaussianPriorSource
 from sionna.mapping import SymbolDemapper, Demapper, Constellation
+from sionna.channel import AWGN
 
 gpus = tf.config.list_physical_devices('GPU')
 print('Number of GPUs available :', len(gpus))
@@ -95,6 +97,56 @@ class TestUtils(unittest.TestCase):
         # check that last ber is 0
         print(ber)
         self.assertTrue(np.allclose(ber[-1], np.zeros_like(ber[-1])))
+
+    def test_ber_sim_multi(self):
+        "test multi GPU support of sim_ber function"
+
+        channel = AWGN()
+        ebno_dbs = np.arange(0, 3, 1)
+
+        def _run_sim(batch_size, ebno_db):
+            no = 10**(-ebno_db/10)
+            b = tf.ones((batch_size, 1),tf.complex64)
+            return tf.math.real(b), tf.math.real(channel([b, no]))
+
+        ber_ref, _ = sim_ber(_run_sim,
+                             ebno_dbs,
+                             max_mc_iter=128,
+                             early_stop=False,
+                             soft_estimates=True,
+                             batch_size=100000)
+
+        for mode in [None, "graph", "xla"]:
+            ber_dist, _ = sim_ber(_run_sim,
+                                    ebno_dbs,
+                                    max_mc_iter=128,
+                                    early_stop=False,
+                                    graph_mode=mode,
+                                    soft_estimates=True,
+                                    distribute="all",
+                                    batch_size=100000)
+
+            # allow relativ tolerance due to Monte Carlo
+            self.assertTrue(np.allclose(ber_ref.numpy(),
+                                        ber_dist.numpy(),rtol=0.03))
+
+        # Test for random seeds per simulation (i.e., non-equal results per gpu)
+        # The idea is to run many simulations with a only 2 bit and very low SNR
+        # we expect all cases {0,1,2} erroneous bits, i.e., the BER takes
+        # the values {0.0, 0.5, 1.0}
+        # if two GPUs have the same seed, we will never see an odd number of
+        # errors.
+        ebno_dbs = np.arange(-30, 0, 1)
+        for mode in [None, "graph", "xla"]:
+            ber, _ = sim_ber(_run_sim,
+                            ebno_dbs,
+                            max_mc_iter=2,
+                            early_stop=False,
+                            soft_estimates=True,
+                            graph_mode="xla",
+                            distribute="all",
+                            batch_size=1)
+            self.assertTrue(np.any(ber==0.5))
 
     def test_compute_ber(self):
         """Test that compute_ber returns the correct value."""

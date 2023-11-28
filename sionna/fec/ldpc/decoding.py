@@ -651,9 +651,15 @@ class LDPCBPDecoder(Layer):
 
         sign_val = tf.sign(msg)
 
-        sign_val = tf.where(tf.equal(sign_val, 0),
-                            tf.ones_like(sign_val),
-                            sign_val)
+        # TF2.14 does not support XLA for tf.where and ragged tensors in
+        # CPU mode. The following code provides a workaround that supports XLA
+        # sign_val = tf.where(tf.equal(sign_val, 0),
+        #                    tf.ones_like(sign_val),
+        #                    sign_val)
+        sign_val = tf.ragged.map_flat_values(lambda x :
+                                             tf.where(tf.equal(x, 0),
+                                             tf.ones_like(x),x),
+                                             sign_val)
 
         sign_node = tf.reduce_prod(sign_val, axis=1)
 
