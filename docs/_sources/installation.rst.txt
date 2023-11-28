@@ -7,8 +7,8 @@ You can alternatively test them on `Google Colab <https://colab.research.google.
 Although not necessary, we recommend running Sionna in a `Docker container <https://www.docker.com>`_.
 
 .. note::
-    Sionna requires `TensorFlow 2.10 or newer <https://www.tensorflow.org/install>`_ and Python 3.6-3.9.
-    We recommend Ubuntu 20.04.
+    Sionna requires `TensorFlow 2.10-2.13 <https://www.tensorflow.org/install>`_ and Python 3.8-3.11.
+    We recommend Ubuntu 22.04.
     Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
 
     To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required by DrJit. Please check the `installation instructions for the LLVM backend <https://drjit.readthedocs.io/en/latest/firststeps-py.html#llvm-backend>`_.
@@ -39,7 +39,7 @@ e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `ten
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.15.1
+    0.16.0
 
 3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
 
@@ -49,7 +49,7 @@ For a local installation, the `JupyterLab Desktop <https://github.com/jupyterlab
 Docker-based Installation
 -------------------------
 
-1.) Make sure that you have Docker `installed <https://docs.docker.com/engine/install/ubuntu/>`_ on your system. On Ubuntu 20.04, you can run for example
+1.) Make sure that you have Docker `installed <https://docs.docker.com/engine/install/ubuntu/>`_ on your system. On Ubuntu 22.04, you can run for example
 
 .. code-block:: bash
 
@@ -111,4 +111,4 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.15.1
+    0.16.0

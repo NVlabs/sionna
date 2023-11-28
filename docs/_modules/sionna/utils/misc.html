@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.utils.misc &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.utils.misc &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -1355,24 +1358,31 @@
             <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">num_target_bit_errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">num_target_block_errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">target_ber</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">target_bler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">graph_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">distribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates until target number of errors is reached and returns BER/BLER.</span>
 
 <span class="sd">    The simulation continues with the next SNR point if either</span>
 <span class="sd">    ``num_target_bit_errors`` bit errors or ``num_target_block_errors`` block</span>
 <span class="sd">    errors is achieved. Further, it continues with the next SNR point after</span>
 <span class="sd">    ``max_mc_iter`` batches of size ``batch_size`` have been simulated.</span>
+<span class="sd">    Early stopping allows to stop the simulation after the first error-free SNR</span>
+<span class="sd">    point or after reaching a certain ``target_ber`` or ``target_bler``.</span>
 
 <span class="sd">    Input</span>
 <span class="sd">    -----</span>
-<span class="sd">    mc_fun:</span>
+<span class="sd">    mc_fun: callable</span>
 <span class="sd">        Callable that yields the transmitted bits `b` and the</span>
 <span class="sd">        receiver&#39;s estimate `b_hat` for a given ``batch_size`` and</span>
-<span class="sd">        ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as</span>
+<span class="sd">        ``ebno_db``. If ``soft_estimates`` is True, `b_hat` is interpreted as</span>
 <span class="sd">        logit.</span>
 
 <span class="sd">    ebno_dbs: tf.float32</span>
@@ -1382,23 +1392,33 @@
 <span class="sd">        Batch-size for evaluation.</span>
 
 <span class="sd">    max_mc_iter: tf.int32</span>
-<span class="sd">        Max. number of Monte-Carlo iterations per SNR point.</span>
+<span class="sd">        Maximum number of Monte-Carlo iterations per SNR point.</span>
 
 <span class="sd">    soft_estimates: bool</span>
-<span class="sd">        A boolean, defaults to False. If True, `b_hat``</span>
+<span class="sd">        A boolean, defaults to `False`. If `True`, `b_hat`</span>
 <span class="sd">        is interpreted as logit and an additional hard-decision is applied</span>
 <span class="sd">        internally.</span>
 
 <span class="sd">    num_target_bit_errors: tf.int32</span>
-<span class="sd">        Defaults to None. Target number of bit errors per SNR point until</span>
+<span class="sd">        Defaults to `None`. Target number of bit errors per SNR point until</span>
 <span class="sd">        the simulation continues to next SNR point.</span>
 
 <span class="sd">    num_target_block_errors: tf.int32</span>
-<span class="sd">        Defaults to None. Target number of block errors per SNR point</span>
+<span class="sd">        Defaults to `None`. Target number of block errors per SNR point</span>
 <span class="sd">        until the simulation continues</span>
 
+<span class="sd">    target_ber: tf.float32</span>
+<span class="sd">        Defaults to `None`. The simulation stops after the first SNR point</span>
+<span class="sd">        which achieves a lower bit error rate as specified by ``target_ber``.</span>
+<span class="sd">        This requires ``early_stop`` to be `True`.</span>
+
+<span class="sd">    target_bler: tf.float32</span>
+<span class="sd">        Defaults to `None`. The simulation stops after the first SNR point</span>
+<span class="sd">        which achieves a lower block error rate as specified by ``target_bler``.</span>
+<span class="sd">        This requires ``early_stop`` to be `True`.</span>
+
 <span class="sd">    early_stop: bool</span>
-<span class="sd">        A boolean defaults to True. If True, the simulation stops after the</span>
+<span class="sd">        A boolean defaults to `True`. If `True`, the simulation stops after the</span>
 <span class="sd">        first error-free SNR point (i.e., no error occurred after</span>
 <span class="sd">        ``max_mc_iter`` Monte-Carlo iterations).</span>
 
@@ -1406,18 +1426,48 @@
 <span class="sd">        A string describing the execution mode of ``mc_fun``.</span>
 <span class="sd">        Defaults to `None`. In this case, ``mc_fun`` is executed as is.</span>
 
+<span class="sd">    distribute: `None` (default) | &quot;all&quot; | list of indices | `tf.distribute.strategy`</span>
+<span class="sd">        Distributes simulation on multiple parallel devices. If `None`,</span>
+<span class="sd">        multi-device simulations are deactivated. If &quot;all&quot;, the workload will</span>
+<span class="sd">        be automatically distributed across all available GPUs via the</span>
+<span class="sd">        `tf.distribute.MirroredStrategy`.</span>
+<span class="sd">        If an explicit list of indices is provided, only the GPUs with the given</span>
+<span class="sd">        indices will be used. Alternatively, a custom `tf.distribute.strategy`</span>
+<span class="sd">        can be provided. Note that the same `batch_size` will be</span>
+<span class="sd">        used for all GPUs in parallel, but the number of Monte-Carlo iterations</span>
+<span class="sd">        ``max_mc_iter`` will be scaled by the number of devices such that the</span>
+<span class="sd">        same number of total samples is simulated. However, all stopping</span>
+<span class="sd">        conditions are still in-place which can cause slight differences in the</span>
+<span class="sd">        total number of simulated samples.</span>
+
 <span class="sd">    verbose: bool</span>
-<span class="sd">        A boolean defaults to True. If True, the current progress will be</span>
+<span class="sd">        A boolean defaults to `True`. If `True`, the current progress will be</span>
 <span class="sd">        printed.</span>
 
 <span class="sd">    forward_keyboard_interrupt: bool</span>
-<span class="sd">        A boolean defaults to True. If False, KeyboardInterrupts will be</span>
+<span class="sd">        A boolean defaults to `True`. If `False`, KeyboardInterrupts will be</span>
 <span class="sd">        catched internally and not forwarded (e.g., will not stop outer loops).</span>
-<span class="sd">        If False, the simulation ends and returns the intermediate simulation</span>
+<span class="sd">        If `False`, the simulation ends and returns the intermediate simulation</span>
 <span class="sd">        results.</span>
 
+<span class="sd">    callback: callable</span>
+<span class="sd">        Defaults to `None`. If specified, ``callback``</span>
+<span class="sd">        will be called after each Monte-Carlo step. Can be used for</span>
+<span class="sd">        logging or advanced early stopping.</span>
+<span class="sd">        Input signature of ``callback`` must match `callback(mc_iter,</span>
+<span class="sd">        ebno_dbs, bit_errors, block_errors, nb_bits, nb_blocks)` where</span>
+<span class="sd">        ``mc_iter`` denotes the number of processed batches for the current</span>
+<span class="sd">        SNR, ``ebno_dbs`` is the current SNR point, ``bit_errors`` the number</span>
+<span class="sd">        of bit errors, ``block_errors`` the number of block errors, ``nb_bits``</span>
+<span class="sd">        the number of simulated bits, ``nb_blocks`` the number of simulated</span>
+<span class="sd">        blocks. If ``callable`` returns `sim_ber.CALLBACK_NEXT_SNR`, early</span>
+<span class="sd">        stopping is detected and the simulation will continue with the next SNR</span>
+<span class="sd">        point. If ``callable`` returns `sim_ber.CALLBACK_STOP`, the simulation</span>
+<span class="sd">        is stopped immediately. For `sim_ber.CALLBACK_CONTINUE` continues with</span>
+<span class="sd">        the simulation.</span>
+
 <span class="sd">    dtype: tf.complex64</span>
-<span class="sd">        Datatype of the model / function to be used (``mc_fun``).</span>
+<span class="sd">        Datatype of the callable ``mc_fun`` to be used as input/output.</span>
 
 <span class="sd">    Output</span>
 <span class="sd">    ------</span>
@@ -1505,6 +1555,17 @@
         <span class="c1"># pylint: disable=line-too-long, consider-using-f-string</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{: &gt;9}</span><span class="s2"> |</span><span class="si">{: &gt;11}</span><span class="s2"> |</span><span class="si">{: &gt;11}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;13}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;12}</span><span class="s2"> |</span><span class="si">{: &gt;10}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">row_text</span><span class="p">),</span> <span class="n">end</span><span class="o">=</span><span class="n">end_str</span><span class="p">)</span>
 
+    <span class="c1"># distributed execution should not be done in Eager mode</span>
+    <span class="c1"># XLA mode seems to have difficulties with TF2.13</span>
+    <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="n">jit_compile</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_run_distributed</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span> <span class="n">mc_fun</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+        <span class="c1"># use tf.distribute to execute on parallel devices (=replicas)</span>
+        <span class="n">outputs_rep</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">mc_fun</span><span class="p">,</span>
+                                   <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">))</span>
+        <span class="c1"># copy replicas back to single device</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">outputs_rep</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">b_hat</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">outputs_rep</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span>
 
      <span class="c1"># init table headers</span>
     <span class="n">header_text</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;EbNo [dB]&quot;</span><span class="p">,</span> <span class="s2">&quot;BER&quot;</span><span class="p">,</span> <span class="s2">&quot;BLER&quot;</span><span class="p">,</span> <span class="s2">&quot;bit errors&quot;</span><span class="p">,</span>
@@ -1516,13 +1577,31 @@
             <span class="s2">&quot;reached max iter       &quot;</span><span class="p">,</span> <span class="c1"># status=1; spacing for impr. layout</span>
             <span class="s2">&quot;no errors - early stop&quot;</span><span class="p">,</span> <span class="c1"># status=2</span>
             <span class="s2">&quot;reached target bit errors&quot;</span><span class="p">,</span> <span class="c1"># status=3</span>
-            <span class="s2">&quot;reached target block errors&quot;</span><span class="p">]</span> <span class="c1"># status=4</span>
+            <span class="s2">&quot;reached target block errors&quot;</span><span class="p">,</span> <span class="c1"># status=4</span>
+            <span class="s2">&quot;reached target BER - early stop&quot;</span><span class="p">,</span> <span class="c1"># status=5</span>
+            <span class="s2">&quot;reached target BLER - early stop&quot;</span><span class="p">,</span> <span class="c1"># status=6</span>
+            <span class="s2">&quot;callback triggered stopping&quot;</span><span class="p">]</span> <span class="c1"># status=7</span>
+
 
     <span class="c1"># check inputs for consistency</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">early_stop</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;early_stop must be bool.&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">soft_estimates</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;soft_estimates must be bool.&quot;</span>
     <span class="k">assert</span> <span class="n">dtype</span><span class="o">.</span><span class="n">is_complex</span><span class="p">,</span> <span class="s2">&quot;dtype must be a complex type.&quot;</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">verbose</span><span class="p">,</span> <span class="nb">bool</span><span class="p">),</span> <span class="s2">&quot;verbose must be bool.&quot;</span>
+
+    <span class="c1"># target_ber / target_bler only works if early stop is activated</span>
+    <span class="k">if</span> <span class="n">target_ber</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">early_stop</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: early stop is deactivated. Thus, target_ber &quot;</span> \
+                  <span class="s2">&quot;is ignored.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target_ber</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span> <span class="c1"># deactivate early stopping condition</span>
+    <span class="k">if</span> <span class="n">target_bler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">early_stop</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: early stop is deactivated. Thus, target_bler &quot;</span> \
+                  <span class="s2">&quot;is ignored.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">target_bler</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.</span> <span class="c1"># deactivate early stopping condition</span>
 
     <span class="k">if</span> <span class="n">graph_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">graph_mode</span><span class="o">=</span><span class="s2">&quot;default&quot;</span> <span class="c1"># applies default graph mode</span>
@@ -1546,16 +1625,51 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unknown graph_mode selected.&quot;</span><span class="p">)</span>
 
+    <span class="c1"># support multi-device simulations by using the tf.distribute package</span>
+    <span class="k">if</span> <span class="n">distribute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># disabled per default</span>
+        <span class="n">run_multigpu</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># use strategy if explicitly provided</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distribute</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">Strategy</span><span class="p">):</span>
+        <span class="n">run_multigpu</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">distribute</span> <span class="c1"># distribute is already a tf.distribute.strategy</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">run_multigpu</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># use all available gpus</span>
+        <span class="k">if</span> <span class="n">distribute</span><span class="o">==</span><span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">gpus</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_logical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">)</span>
+        <span class="c1"># mask active GPUs if indices are provided</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">distribute</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="n">gpus_avail</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_logical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">)</span>
+            <span class="n">gpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">gpus_avail</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">distribute</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">gpus_avail</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown value for distribute.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># deactivate logging of tf.device placement</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting tf.debugging.set_log_device_placement to False.&quot;</span><span class="p">)</span>
+        <span class="n">tf</span><span class="o">.</span><span class="n">debugging</span><span class="o">.</span><span class="n">set_log_device_placement</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># we reduce to the first device by default</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">MirroredStrategy</span><span class="p">(</span><span class="n">gpus</span><span class="p">,</span>
+                            <span class="n">cross_device_ops</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">distribute</span><span class="o">.</span><span class="n">ReductionToOneDevice</span><span class="p">(</span>
+                                                <span class="n">reduce_to_device</span><span class="o">=</span><span class="n">gpus</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="c1"># reduce max_mc_iter if multi_gpu simulations are activated</span>
+    <span class="k">if</span> <span class="n">run_multigpu</span><span class="p">:</span>
+        <span class="n">num_replicas</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">num_replicas_in_sync</span>
+        <span class="n">max_mc_iter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">max_mc_iter</span><span class="o">/</span><span class="n">num_replicas</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Distributing simulation across </span><span class="si">{</span><span class="n">num_replicas</span><span class="si">}</span><span class="s2"> devices.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reducing max_mc_iter to </span><span class="si">{</span><span class="n">max_mc_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
     <span class="n">ebno_dbs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">ebno_dbs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
     <span class="n">batch_size</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
     <span class="n">num_points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ebno_dbs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">bit_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>   <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
-                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-    <span class="n">block_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>  <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
-                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">block_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
     <span class="n">nb_bits</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>  <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
                             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-    <span class="n">nb_blocks</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>  <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+    <span class="n">nb_blocks</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_points</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
                             <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
 
     <span class="c1"># track status of simulation (early termination etc.)</span>
@@ -1579,12 +1693,17 @@
 
                 <span class="n">iter_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
-                <span class="n">outputs</span> <span class="o">=</span> <span class="n">mc_fun</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="o">=</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-                <span class="c1"># assume first and second return value is b and b_hat</span>
-                <span class="c1"># other returns are ignored</span>
-                <span class="n">b</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">b_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">run_multigpu</span><span class="p">:</span> <span class="c1"># distributed execution</span>
+                    <span class="n">b</span><span class="p">,</span> <span class="n">b_hat</span> <span class="o">=</span> <span class="n">_run_distributed</span><span class="p">(</span><span class="n">strategy</span><span class="p">,</span>
+                                                <span class="n">mc_fun</span><span class="p">,</span>
+                                                <span class="n">batch_size</span><span class="p">,</span>
+                                                <span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="n">mc_fun</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="o">=</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="c1"># assume first and second return value is b and b_hat</span>
+                    <span class="c1"># other returns are ignored</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">b_hat</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
                 <span class="k">if</span> <span class="n">soft_estimates</span><span class="p">:</span>
                     <span class="n">b_hat</span> <span class="o">=</span> <span class="n">hard_decisions</span><span class="p">(</span><span class="n">b_hat</span><span class="p">)</span>
@@ -1607,6 +1726,18 @@
                 <span class="n">nb_blocks</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_add</span><span class="p">(</span> <span class="n">nb_blocks</span><span class="p">,</span> <span class="p">[[</span><span class="n">i</span><span class="p">]],</span>
                                                 <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="n">block_n</span><span class="p">],</span> <span class="n">tf</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span>
 
+                <span class="n">cb_state</span> <span class="o">=</span> <span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_CONTINUE</span>
+                <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">cb_state</span> <span class="o">=</span> <span class="n">callback</span> <span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">bit_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                       <span class="n">block_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nb_bits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                                       <span class="n">nb_blocks</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">cb_state</span> <span class="ow">in</span> <span class="p">(</span><span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_STOP</span><span class="p">,</span>
+                                    <span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_NEXT_SNR</span><span class="p">):</span>
+                        <span class="c1"># stop runtime timer</span>
+                        <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span> <span class="c1"># change internal status for summary</span>
+                        <span class="k">break</span> <span class="c1"># stop for this SNR point have been simulated</span>
+
                 <span class="c1"># print progress summary</span>
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                     <span class="c1"># print summary header during first iteration</span>
@@ -1623,7 +1754,6 @@
                     <span class="n">rt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                     <span class="c1"># print current progress</span>
                     <span class="n">_print_progress</span><span class="p">(</span><span class="n">is_final</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">idx_snr</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">idx_it</span><span class="o">=</span><span class="n">ii</span><span class="p">,</span> <span class="n">rt</span><span class="o">=</span><span class="n">rt</span><span class="p">)</span>
-
 
                 <span class="c1"># bit-error based stopping cond.</span>
                 <span class="k">if</span> <span class="n">num_target_bit_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1655,7 +1785,7 @@
                                 <span class="n">idx_it</span><span class="o">=</span><span class="n">iter_count</span><span class="p">,</span>
                                 <span class="n">rt</span><span class="o">=</span><span class="n">runtime</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-            <span class="c1"># early stop if no error occurred</span>
+            <span class="c1"># early stop if no error occurred or target_ber/target_bler reached</span>
             <span class="k">if</span> <span class="n">early_stop</span><span class="p">:</span> <span class="c1"># only if early stop is active</span>
                 <span class="k">if</span> <span class="n">block_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
                     <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># change internal status for summary</span>
@@ -1663,6 +1793,32 @@
                         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped as no error occurred &quot;</span> \
                               <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> dB.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="k">break</span>
+
+                <span class="c1"># check for target_ber / target_bler</span>
+                <span class="n">ber_true</span> <span class="o">=</span>  <span class="n">bit_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">nb_bits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">bler_true</span> <span class="o">=</span> <span class="n">block_errors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">nb_blocks</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ber_true</span> <span class="o">&lt;</span><span class="n">target_ber</span><span class="p">:</span>
+                    <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span> <span class="c1"># change internal status for summary</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped as target BER is reached&quot;</span> \
+                              <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> dB.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">bler_true</span> <span class="o">&lt;</span><span class="n">target_bler</span><span class="p">:</span>
+                    <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span> <span class="c1"># change internal status for summary</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped as target BLER is &quot;</span> \
+                              <span class="sa">f</span><span class="s2">&quot;reached @ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> &quot;</span> \
+                              <span class="s2">&quot;dB.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+            <span class="c1"># allow callback to end the entire simulation</span>
+            <span class="k">if</span> <span class="n">cb_state</span> <span class="ow">is</span> <span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_STOP</span><span class="p">:</span>
+                <span class="c1"># stop runtime timer</span>
+                <span class="n">status</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7</span> <span class="c1"># change internal status for summary</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped by callback function &quot;</span> \
+                          <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> dB.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
 
     <span class="c1"># Stop if KeyboardInterrupt is detected and set remaining SNR points to -1</span>
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -1672,7 +1828,7 @@
             <span class="k">raise</span> <span class="n">e</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Simulation stopped by the user &quot;</span> \
-              <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">}</span><span class="s2"> dB&quot;</span><span class="p">)</span>
+              <span class="sa">f</span><span class="s2">&quot;@ EbNo = </span><span class="si">{</span><span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="si">}</span><span class="s2"> dB.&quot;</span><span class="p">)</span>
         <span class="c1"># overwrite remaining BER / BLER positions with -1</span>
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_points</span><span class="p">):</span>
             <span class="n">bit_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span> <span class="n">bit_errors</span><span class="p">,</span> <span class="p">[[</span><span class="n">idx</span><span class="p">]],</span>
@@ -1694,6 +1850,9 @@
 
     <span class="k">return</span> <span class="n">ber</span><span class="p">,</span> <span class="n">bler</span></div>
 
+<span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_CONTINUE</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_STOP</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_NEXT_SNR</span> <span class="o">=</span> <span class="mi">1</span>
 
 <div class="viewcode-block" id="complex_normal"><a class="viewcode-back" href="../../../api/utils.html#sionna.utils.complex_normal">[docs]</a><span class="k">def</span> <span class="nf">complex_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a tensor of complex normal random variables.</span>

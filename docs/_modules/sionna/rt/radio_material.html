@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.radio_material &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.rt.radio_material &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -985,8 +988,15 @@
 <span class="sd">    The callback should return `-1` for both the relative permittivity and</span>
 <span class="sd">    the conductivity if these are not defined for the given carrier frequency.</span>
 
-<span class="sd">    The material properties are TensorFlow variables that can be made</span>
-<span class="sd">    trainable.</span>
+<span class="sd">    The material properties can be assigned to a TensorFlow variable or</span>
+<span class="sd">    tensor. In the latter case, the tensor could be the output of a callable,</span>
+<span class="sd">    such as a Keras layer implementing a neural network. In the former case, it</span>
+<span class="sd">    could be set to a trainable variable:</span>
+
+<span class="sd">    .. code-block:: Python</span>
+
+<span class="sd">        mat = RadioMaterial(&quot;my_mat&quot;)</span>
+<span class="sd">        mat.conductivity = tf.Variable(0.0, dtype=tf.float32)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
@@ -1018,7 +1028,7 @@
 <span class="sd">        Defaults to 0.</span>
 
 <span class="sd">    scattering_pattern : ScatteringPattern</span>
-<span class="sd">        :class:`~sionna.rt.ScatteringPattern` to applied.</span>
+<span class="sd">        :class:`~sionna.rt.ScatteringPattern` to be applied.</span>
 <span class="sd">        Only relevant if ``scattering_coefficient``&gt;0.</span>
 <span class="sd">        Defaults to `None`, which implies a :class:`~sionna.rt.LambertianPattern`.</span>
 
@@ -1034,26 +1044,6 @@
 <span class="sd">        to ``relative_permittivity`` and ``conductivity``.</span>
 <span class="sd">        Defaults to `None`.</span>
 
-<span class="sd">    trainable_relative_permittivity : bool</span>
-<span class="sd">        Determines if the ``relative_permittivity`` is trainable.</span>
-<span class="sd">        Only possible if no ``frequency_update_callback``</span>
-<span class="sd">        is defined.</span>
-<span class="sd">        Defaults to `False`.</span>
-
-<span class="sd">    trainable_conductivity : bool</span>
-<span class="sd">        Determines if the ``conductivity`` is trainable.</span>
-<span class="sd">        Only possible if no ``frequency_update_callback``</span>
-<span class="sd">        is defined.</span>
-<span class="sd">        Defaults to `False`.</span>
-
-<span class="sd">    trainable_scattering_coefficient : bool</span>
-<span class="sd">        Determines if the ``scattering_coefficient`` is trainable.</span>
-<span class="sd">        Defaults to `False`.</span>
-
-<span class="sd">    trainable_xpd_coefficient : bool</span>
-<span class="sd">        Determines if the ``xpd_coefficient`` is trainable.</span>
-<span class="sd">        Defaults to `False`.</span>
-
 <span class="sd">    dtype : tf.complex64 or tf.complex128</span>
 <span class="sd">        Datatype.</span>
 <span class="sd">        Defaults to `tf.complex64`.</span>
@@ -1067,10 +1057,6 @@
                  <span class="n">xpd_coefficient</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                  <span class="n">scattering_pattern</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">frequency_update_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">trainable_relative_permittivity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">trainable_conductivity</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">trainable_scattering_coefficient</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">trainable_xpd_coefficient</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -1086,11 +1072,7 @@
         <span class="k">if</span> <span class="n">scattering_pattern</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">scattering_pattern</span> <span class="o">=</span> <span class="n">LambertianPattern</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">ones</span><span class="p">((),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scattering_pattern</span> <span class="o">=</span> <span class="n">scattering_pattern</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scattering_coefficient</span> <span class="o">=</span> <span class="n">scattering_coefficient</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">xpd_coefficient</span> <span class="o">=</span> <span class="n">xpd_coefficient</span>
 
@@ -1099,16 +1081,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span> <span class="o">=</span> <span class="n">conductivity</span>
 
         <span class="c1"># Save the callback for when the frequency is updated</span>
+        <span class="c1"># or if the RadioMaterial is added to a scene</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span> <span class="o">=</span> <span class="n">frequency_update_callback</span>
-
-        <span class="c1"># Configure trainability if possible</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainable_relative_permittivity</span> <span class="o">=</span> <span class="n">trainable_relative_permittivity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainable_conductivity</span> <span class="o">=</span> <span class="n">trainable_conductivity</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainable_scattering_coefficient</span><span class="o">=</span><span class="n">trainable_scattering_coefficient</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainable_xpd_coefficient</span> <span class="o">=</span> <span class="n">trainable_xpd_coefficient</span>
-
-        <span class="c1"># Run frequency_update_callback to set the properties</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_update</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span>
 
         <span class="c1"># When loading a scene, the custom materials (i.e., the materials not</span>
         <span class="c1"># baked-in Sionna but defined by the user) are not defined yet.</span>
@@ -1119,7 +1093,7 @@
         <span class="c1"># used.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_is_placeholder</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Is this material a placeholder</span>
 
-        <span class="c1"># Set of objects identifiers that use this materials</span>
+        <span class="c1"># Set of objects identifiers that use this material</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objects_using</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
 
@@ -1136,12 +1110,18 @@
 <span class="sd">        tf.float : Get/set the relative permittivity</span>
 <span class="sd">            :math:`\varepsilon_r` :eq:`eta`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span>
 
     <span class="nd">@relative_permittivity</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">relative_permittivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`relative_permittivity` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">relative_permeability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1158,12 +1138,18 @@
 <span class="sd">        tf.float: Get/set the conductivity</span>
 <span class="sd">            :math:`\sigma` [S/m] :eq:`eta`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span>
 
     <span class="nd">@conductivity</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">conductivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`conductivity` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">scattering_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1171,16 +1157,18 @@
 <span class="sd">        tf.float: Get/set the scattering coefficient</span>
 <span class="sd">            :math:`S\in[0,1]` :eq:`scattering_coefficient`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span>
 
     <span class="nd">@scattering_coefficient</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">scattering_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">v</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">v</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`scattering_coefficient` must be in [0,1]&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scattering_pattern</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please configure a `scattering_pattern` first&quot;</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;`scattering_coefficient` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">xpd_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1188,14 +1176,18 @@
 <span class="sd">        tf.float: Get/set the cross-polarization discrimination coefficient</span>
 <span class="sd">            :math:`K_x\in[0,1]` :eq:`xpd`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span>
 
     <span class="nd">@xpd_coefficient</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">xpd_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">v</span><span class="o">&gt;</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">v</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`xpd_coefficient` must be in [0,1]&quot;</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;`xpd_coefficient` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">scattering_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1225,82 +1217,6 @@
                           <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">divide_no_nan</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">epsilon_0</span><span class="o">*</span><span class="n">omega</span><span class="p">))</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable_relative_permittivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        bool : Get/set if the ``relative permittivity``</span>
-<span class="sd">            is a trainable variable or not.</span>
-<span class="sd">            Defaults to `False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_relative_permittivity</span>
-
-    <span class="nd">@trainable_relative_permittivity</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable_relative_permittivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`trainable_relative_permittivity` must be bool&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;Radio materials with frequency_update_callback&quot;</span> <span class="o">+</span> \
-                      <span class="s2">&quot; cannot be made trainable.&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_permittivity</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_relative_permittivity</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable_conductivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        bool : Get/set if the ``conductivity``</span>
-<span class="sd">            is a trainable variable or not.</span>
-<span class="sd">            Defaults to `False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_conductivity</span>
-
-    <span class="nd">@trainable_conductivity</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable_conductivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`trainable_conductivity` must be bool&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;Radio materials with frequency_update_callback&quot;</span> <span class="o">+</span> \
-                      <span class="s2">&quot; cannot be made trainable.&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_conductivity</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable_scattering_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        bool : Get/set if the ``scattering_coefficient``</span>
-<span class="sd">            is a trainable variable or not.</span>
-<span class="sd">            Defaults to `False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_scattering_coefficient</span>
-
-    <span class="nd">@trainable_scattering_coefficient</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable_scattering_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`trainable_scattering_coefficient` must be bool&quot;</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_coefficient</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_scattering_coefficient</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable_xpd_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        bool : Get/set if the ``xpd_coefficient``</span>
-<span class="sd">            is a trainable variable or not.</span>
-<span class="sd">            Defaults to `False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_xpd_coefficient</span>
-
-    <span class="nd">@trainable_xpd_coefficient</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable_xpd_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`trainable_xpd_coefficient` must be bool&quot;</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_coefficient</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_xpd_coefficient</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">frequency_update_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        callable : Get/set frequency update callback function</span>
@@ -1310,7 +1226,7 @@
     <span class="nd">@frequency_update_callback</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">frequency_update_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_update</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_update</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">well_defined</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1319,7 +1235,7 @@
         <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_conductivity</span> <span class="o">&gt;=</span> <span class="mf">0.</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relative_permittivity</span> <span class="o">&gt;=</span> <span class="mf">1.</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="mf">0.</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scattering_coefficient</span> <span class="o">&lt;=</span> <span class="mf">1.</span><span class="p">)</span>
-             <span class="ow">and</span> <span class="p">(</span><span class="mf">0.</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpd_coefficient</span><span class="o">&lt;=</span> <span class="mf">1.</span><span class="p">)</span>
+             <span class="ow">and</span> <span class="p">(</span><span class="mf">0.</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xpd_coefficient</span> <span class="o">&lt;=</span> <span class="mf">1.</span><span class="p">)</span>
              <span class="ow">and</span> <span class="p">(</span><span class="mf">0.</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scattering_pattern</span><span class="o">.</span><span class="n">lambda_</span> <span class="o">&lt;=</span> <span class="mf">1.</span><span class="p">))</span>
 
     <span class="nd">@property</span>
@@ -1331,7 +1247,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_used</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;bool : Get if the material is used by at least one object of</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;bool : Indicator if the material is used by at least one object of</span>
 <span class="sd">        the scene&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_counter</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
@@ -1349,22 +1265,14 @@
     <span class="c1"># Should not be documented.</span>
     <span class="c1">##############################################</span>
 
-    <span class="k">def</span> <span class="nf">frequency_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">frequency_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        frequency_update(fc)</span>
-
-<span class="sd">        Callback for when the frequency is updated</span>
-
-<span class="sd">        Input</span>
-<span class="sd">        ------</span>
-<span class="sd">        fc : float</span>
-<span class="sd">            The new value for the frequency [Hz]</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Callback for when the frequency is updated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
-        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency_update_callback</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span><span class="o">.</span><span class="n">frequency</span><span class="p">)</span>
         <span class="n">relative_permittivity</span><span class="p">,</span> <span class="n">conductivity</span> <span class="o">=</span> <span class="n">parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relative_permittivity</span> <span class="o">=</span> <span class="n">relative_permittivity</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span> <span class="o">=</span> <span class="n">conductivity</span>
@@ -1385,11 +1293,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_placeholder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        bool : Get/set if this radio material is a placeholder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_placeholder</span>
 
     <span class="nd">@is_placeholder</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">is_placeholder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_placeholder</span> <span class="o">=</span> <span class="n">v</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_placeholder</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="k">def</span> <span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rm</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign new values to the radio material properties from another</span>
+<span class="sd">        radio material ``rm``</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        ------</span>
+<span class="sd">        rm : :class:`~sionna.rt.RadioMaterial</span>
+<span class="sd">            Radio material from which to assign the new values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rm</span><span class="p">,</span> <span class="n">RadioMaterial</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`rm` is not a RadioMaterial&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relative_permittivity</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">relative_permittivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">conductivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scattering_coefficient</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">scattering_coefficient</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xpd_coefficient</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">xpd_coefficient</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scattering_pattern</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">scattering_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frequency_update_callback</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">frequency_update_callback</span></div>
 </pre></div>
 
            </div>

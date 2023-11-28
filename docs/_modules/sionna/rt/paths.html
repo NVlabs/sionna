@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.paths &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.rt.paths &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -957,7 +960,9 @@
 
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">scene</span> <span class="k">as</span> <span class="n">scene_module</span>
 <span class="kn">from</span> <span class="nn">sionna.utils.tensors</span> <span class="kn">import</span> <span class="n">expand_to_rank</span><span class="p">,</span> <span class="n">insert_dims</span>
 <span class="kn">from</span> <span class="nn">sionna.constants</span> <span class="kn">import</span> <span class="n">PI</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">dot</span><span class="p">,</span> <span class="n">r_hat</span>
@@ -985,6 +990,12 @@
 
     <span class="c1"># Input</span>
     <span class="c1"># ------</span>
+
+    <span class="c1"># mask : [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.bool</span>
+    <span class="c1">#   Set to `False` for non-existent paths.</span>
+    <span class="c1">#   When there are multiple transmitters or receivers, path counts may vary between links. This is used to identify non-existent paths.</span>
+    <span class="c1">#   For such paths, the channel coefficient is set to `0` and the delay to `-1`.</span>
+
     <span class="c1"># a : [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, num_time_steps], tf.complex</span>
     <span class="c1">#     Channel coefficients :math:`a_i` as defined in :eq:`T_tilde`.</span>
     <span class="c1">#     If there are less than `max_num_path` valid paths between a</span>
@@ -1043,13 +1054,14 @@
         <span class="n">num_targets</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">rdtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_theta_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_theta_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phi_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phi_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_targets_sources_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1066,6 +1078,42 @@
         <span class="c1"># Normalize paths delays?</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_delays</span> <span class="o">=</span> <span class="kc">False</span>
 
+<div class="viewcode-block" id="Paths.to_dict"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the properties of the paths as a dictionnary which values are</span>
+<span class="sd">        tensors</span>
+
+<span class="sd">        Output</span>
+<span class="sd">        -------</span>
+<span class="sd">        : `dict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">members_names</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">members_objects</span> <span class="o">=</span> <span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">members_names</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">attr_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="p">:</span> <span class="n">attr_obj</span> <span class="k">for</span> <span class="p">(</span><span class="n">attr_obj</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+                <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">members_objects</span><span class="p">,</span><span class="n">members_names</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">attr_obj</span><span class="p">)</span> <span class="ow">and</span>
+                   <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr_obj</span><span class="p">,</span> <span class="n">scene_module</span><span class="o">.</span><span class="n">Scene</span><span class="p">)</span> <span class="ow">and</span>
+                   <span class="ow">not</span> <span class="n">attr_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;__&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                   <span class="n">attr_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Paths.from_dict"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the paths from a dictionnary which values are tensors</span>
+
+<span class="sd">        The format of the dictionnary is expected to be the same as the one</span>
+<span class="sd">        returned by :meth:`~sionna.rt.Paths.to_dict()`.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        ------</span>
+<span class="sd">        data_dict : `dict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">data_dict</span><span class="p">:</span>
+            <span class="n">attr_obj</span> <span class="o">=</span> <span class="n">data_dict</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_obj</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Paths.export"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        export(filename)</span>
@@ -1081,7 +1129,7 @@
         <span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span>
         <span class="n">sources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span>
         <span class="n">targets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_sources_mask</span>
 
         <span class="c1"># Content of the obj file</span>
         <span class="n">r</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -1130,6 +1178,20 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.bool : Set to `False` for non-existent paths.</span>
+<span class="sd">        When there are multiple transmitters or receivers, path counts may vary between links. This is used to identify non-existent paths.</span>
+<span class="sd">        For such paths, the channel coefficient is set to `0` and the delay to `-1`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span>
+
+    <span class="nd">@mask</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">a</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1145,7 +1207,7 @@
     <span class="k">def</span> <span class="nf">tau</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float : Propagation delay :math:`\tau_i` [s] of each path as defined in :eq:`H_final`.</span>
+<span class="sd">        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float : Propagation delay :math:`\\tau_i` [s] of each path as defined in :eq:`H_final`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tau</span>
 
@@ -1259,6 +1321,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_delays</span> <span class="o">=</span> <span class="n">v</span>
 
 <div class="viewcode-block" id="Paths.apply_doppler"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.apply_doppler">[docs]</a>    <span class="k">def</span> <span class="nf">apply_doppler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_frequency</span><span class="p">,</span> <span class="n">num_time_steps</span><span class="p">,</span>
@@ -1269,11 +1332,11 @@
 <span class="sd">        velocities.</span>
 
 <span class="sd">        This function replaces the last dimension of the tensor storing the</span>
-<span class="sd">        paths coefficients ``a``, which stores the the temporal evolution of</span>
+<span class="sd">        paths coefficients :attr:`~sionna.rt.Paths.a`, which stores the the temporal evolution of</span>
 <span class="sd">        the channel, with a dimension of size ``num_time_steps`` computed</span>
 <span class="sd">        according to the input velocities.</span>
 
-<span class="sd">        Time evolution of the channel coefficient is simulated by computing the</span>
+<span class="sd">        Time evolution of the channel coefficients is simulated by computing the</span>
 <span class="sd">        Doppler shift due to movements of the transmitter and receiver. If we denote by</span>
 <span class="sd">        :math:`\mathbf{v}_{\text{T}}\in\mathbb{R}^3` and :math:`\mathbf{v}_{\text{R}}\in\mathbb{R}^3`</span>
 <span class="sd">        the velocity vectors of the transmitter and receiver, respectively, the Doppler shifts are computed as</span>
@@ -1283,7 +1346,7 @@
 <span class="sd">            f_{\text{T}, i} &amp;= \frac{\hat{\mathbf{r}}(\theta_{\text{T},i}, \varphi_{\text{T},i})^\mathsf{T}\mathbf{v}_{\text{T}}}{\lambda}\qquad \text{[Hz]}\\</span>
 <span class="sd">            f_{\text{R}, i} &amp;= \frac{\hat{\mathbf{r}}(\theta_{\text{R},i}, \varphi_{\text{R},i})^\mathsf{T}\mathbf{v}_{\text{R}}}{\lambda}\qquad \text{[Hz]}</span>
 
-<span class="sd">        for arbitrary path :math:`i`, where :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})` are the AoDs,</span>
+<span class="sd">        for an arbitrary path :math:`i`, where :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})` are the AoDs,</span>
 <span class="sd">        :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})` are the AoAs, and :math:`\lambda` is the wavelength.</span>
 <span class="sd">        This leads to the time-dependent path coefficient</span>
 
@@ -1361,7 +1424,7 @@
         <span class="c1"># [batch_dim, 1, 1, num_tx, 1, 1, 3]</span>
         <span class="n">tx_velocities</span> <span class="o">=</span> <span class="n">insert_dims</span><span class="p">(</span><span class="n">insert_dims</span><span class="p">(</span><span class="n">tx_velocities</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
         <span class="c1"># [batch_dim, num_rx, 1, 1, 1, 1, 3]</span>
-        <span class="n">rx_velocities</span> <span class="o">=</span> <span class="n">insert_dims</span><span class="p">(</span><span class="n">rx_velocities</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">rx_velocities</span> <span class="o">=</span> <span class="n">insert_dims</span><span class="p">(</span><span class="n">rx_velocities</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># Generate time steps</span>
         <span class="c1"># [num_time_steps]</span>
@@ -1394,14 +1457,10 @@
         <span class="c1"># Expand with time dimension</span>
         <span class="c1"># [batch_dim, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, 1]</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">synthetic_array</span><span class="p">:</span>
-            <span class="c1"># Broadcast is not supported by TF for such high rank tensors.</span>
-            <span class="c1"># We therefore do it manually</span>
-            <span class="c1"># [batch_dim, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths,</span>
-            <span class="c1">#   num_time_steps]</span>
-            <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">exp_ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">6</span><span class="p">]])</span>
-        <span class="c1"># [batch_dim, num_rx,  num_rx_ant, num_tx, num_tx_ant, max_num_paths,</span>
-        <span class="c1">#   num_time_steps]</span>
+
+        <span class="c1"># Manual broadcast last dimension</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">exp_ds</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">exp_ds</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span></div>
@@ -1426,12 +1485,14 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">synthetic_array</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_t</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_t</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
@@ -1439,7 +1500,12 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_reverse_direction</span> <span class="o">=</span> <span class="n">v</span>
 
-<div class="viewcode-block" id="Paths.cir"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.cir">[docs]</a>    <span class="k">def</span> <span class="nf">cir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">diffraction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scattering</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Paths.cir"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.cir">[docs]</a>    <span class="k">def</span> <span class="nf">cir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">diffraction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">scattering</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">num_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the baseband equivalent channel impulse response :eq:`h_b`</span>
@@ -1477,6 +1543,11 @@
 <span class="sd">        scattering : bool</span>
 <span class="sd">            If set to `False`, scattered paths are not returned.</span>
 <span class="sd">            Defaults to `True`.</span>
+
+<span class="sd">        num_paths : int or `None`</span>
+<span class="sd">            All CIRs are either zero-padded or cropped to the largest</span>
+<span class="sd">            ``num_paths`` paths.</span>
+<span class="sd">            Defaults to `None` which means that no padding or cropping is done.</span>
 
 <span class="sd">        Output</span>
 <span class="sd">        -------</span>
@@ -1523,7 +1594,13 @@
         <span class="n">tau_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tau_</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">phase</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">tau_</span><span class="p">),</span>
                            <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">frequency</span><span class="o">*</span><span class="n">tau_</span><span class="p">)</span>
+        <span class="c1"># Manual repeat along the time step dimension as high-dimensional</span>
+        <span class="c1"># brodcast is not possible</span>
+        <span class="n">phase</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_paths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad_or_crop</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">num_paths</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">a</span><span class="p">,</span><span class="n">tau</span></div>
 
@@ -1531,17 +1608,20 @@
     <span class="c1"># Internal methods and properties</span>
     <span class="c1">#######################################################</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="o">@</span> <span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">targets_sources_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        [num_targets, num_sources, max_num_paths], tf.bool : Mask indicating if a path is valid</span>
+<span class="sd">        [num_targets, num_sources, max_num_paths], tf.bool : Set to `False` for non-existent paths.</span>
+<span class="sd">        When there are multiple transmitters or receivers, path counts may vary between links. This is used to identify non-existent paths.</span>
+<span class="sd">        For such paths, the channel coefficient is set to `0` and the delay to `-1`.</span>
+<span class="sd">        Same as `mask`, but for sources and targets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_targets_sources_mask</span>
 
-    <span class="nd">@mask</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mask</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="o">@</span> <span class="n">targets_sources_mask</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">targets_sources_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_targets_sources_mask</span> <span class="o">=</span> <span class="n">v</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1581,6 +1661,10 @@
 
         <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">dtype</span>
 
+        <span class="n">more_vertices</span> <span class="o">=</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">vertices</span>
+        <span class="n">more_objects</span> <span class="o">=</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">objects</span>
+        <span class="n">more_types</span> <span class="o">=</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">types</span>
+
         <span class="c1"># The paths to merge must have the same number of sources and targets</span>
         <span class="k">assert</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>\
             <span class="s2">&quot;Paths to merge must have same number of targets&quot;</span>
@@ -1588,14 +1672,15 @@
             <span class="s2">&quot;Paths to merge must have same number of targets&quot;</span>
 
         <span class="c1"># Pad the paths with the lowest depth</span>
-        <span class="n">padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">more_vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">padding</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">more_paths</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">more_paths</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span>
-                                         <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="n">padding</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-                                <span class="n">constant_values</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">))</span>
-            <span class="n">more_paths</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">more_paths</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span>
-                                        <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="n">padding</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-                                        <span class="n">constant_values</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">more_vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">more_vertices</span><span class="p">,</span>
+                                   <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="n">padding</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
+                                   <span class="n">constant_values</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span>
+                                                            <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">))</span>
+            <span class="n">more_objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">more_objects</span><span class="p">,</span>
+                                  <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="n">padding</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
+                                  <span class="n">constant_values</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">padding</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">padding</span> <span class="o">=</span> <span class="o">-</span><span class="n">padding</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span>
@@ -1607,17 +1692,13 @@
 
         <span class="c1"># Merge types</span>
         <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">merged_types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">)</span>
+            <span class="n">merged_types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">)[</span><span class="mi">3</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">merged_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span>
-        <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">more_paths</span><span class="o">.</span><span class="n">types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">more_paths</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">more_paths</span><span class="o">.</span><span class="n">vertices</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
-                                       <span class="n">more_paths</span><span class="o">.</span><span class="n">types</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">more_paths</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">types</span>
+        <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">more_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">more_types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">more_types</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">more_vertices</span><span class="p">)[</span><span class="mi">3</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">merged_types</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">types</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">merged_types</span><span class="p">,</span> <span class="n">more_types</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># Concatenate all</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">a</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -1627,14 +1708,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">theta_r</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">phi_r</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">mask</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">vertices</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">objects</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">more_vertices</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span> <span class="n">more_objects</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function must be call to finalize the creation of the paths.</span>
+<span class="sd">        This function must be called to finalize the creation of the paths.</span>
 <span class="sd">        This function:</span>
 
 <span class="sd">        - Flags the LoS paths</span>
@@ -1644,14 +1725,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">set_los_path_type</span><span class="p">()</span>
 
-        <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">synthetic_array</span><span class="p">:</span>
-            <span class="n">min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tau</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tau</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span> <span class="o">=</span> <span class="n">min_tau</span>
-
         <span class="c1"># Add dummy-dimension for batch_size</span>
+        <span class="c1"># [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]</span>
@@ -1667,6 +1743,22 @@
         <span class="c1"># [1, max_num_paths]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
+        <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
+        <span class="k">if</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># No paths</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">zero</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="n">tau</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">inf</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tau</span> <span class="o">&lt;</span> <span class="n">zero</span><span class="p">,</span> <span class="n">inf</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">synthetic_array</span><span class="p">:</span>
+                <span class="c1"># [1, num_rx, num_tx, 1]</span>
+                <span class="n">min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># [1, num_rx, 1, num_tx, 1, 1]</span>
+                <span class="n">min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">is_inf</span><span class="p">(</span><span class="n">min_tau</span><span class="p">),</span> <span class="n">zero</span><span class="p">,</span> <span class="n">min_tau</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span> <span class="o">=</span> <span class="n">min_tau</span>
+
         <span class="c1"># Add the time steps dimension</span>
         <span class="c1"># [1, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, 1]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
@@ -1679,20 +1771,77 @@
 <span class="sd">        Flags paths that do not hit any objects to as LoS ones.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># [max_depth, num_targets, num_sources, num_paths]</span>
+        <span class="n">objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span>
+        <span class="c1"># [num_targets, num_sources, num_paths]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">targets_sources_mask</span>
+
+        <span class="k">if</span> <span class="n">objects</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># [num_targets, num_sources, num_paths]</span>
-            <span class="n">los_path</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">los_path</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_all</span><span class="p">(</span><span class="n">objects</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="c1"># [num_targets, num_sources, num_paths]</span>
-            <span class="n">los_path</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">los_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+            <span class="n">los_path</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">los_path</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
             <span class="c1"># [num_paths]</span>
             <span class="n">los_path</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_any</span><span class="p">(</span><span class="n">los_path</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
             <span class="c1"># [[1]]</span>
             <span class="n">los_path_index</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">los_path</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="n">los_path_index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Only one LoS path can exist&quot;</span>
-            <span class="k">if</span> <span class="n">los_path_index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span>
-                                                         <span class="n">los_path_index</span><span class="p">,</span>
-                                                         <span class="p">[</span><span class="n">Paths</span><span class="o">.</span><span class="n">LOS</span><span class="p">])</span></div>
+            <span class="n">updates</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">Paths</span><span class="o">.</span><span class="n">LOS</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">los_path_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tensor_scatter_nd_update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span>
+                                                        <span class="n">los_path_index</span><span class="p">,</span>
+                                                        <span class="n">updates</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">pad_or_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enforces that CIRs have exactly k paths by either</span>
+<span class="sd">        zero-padding of cropping the weakest paths</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">max_num_paths</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># Crop</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">&lt;</span><span class="n">max_num_paths</span><span class="p">:</span>
+            <span class="c1"># Compute indices of the k strongest paths</span>
+            <span class="c1"># As is independent of the number of time steps,</span>
+            <span class="c1"># Therefore, we use only the first one a[...,0].</span>
+            <span class="c1"># ind : [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, k]</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ind</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">top_k</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="mi">0</span><span class="p">]),</span> <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Gather the strongest paths</span>
+            <span class="c1"># [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, k, num_time_steps]</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+            <span class="c1"># Gather the corresponding path delays</span>
+            <span class="c1"># Synthetic array</span>
+            <span class="k">if</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+                <span class="c1"># tau : [batch_size, num_rx, num_tx, max_num_paths]</span>
+
+                <span class="c1"># Get relevant indices</span>
+                <span class="c1"># [batch_size, num_rx, num_tx, k]</span>
+                <span class="n">ind_tau</span> <span class="o">=</span> <span class="n">ind</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="c1"># [batch_size, num_rx, num_tx, k]</span>
+                <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">ind_tau</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+            <span class="c1"># Non-synthetic array</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># tau: [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]</span>
+
+                <span class="c1"># [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, k]</span>
+                <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">batch_dims</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Pad</span>
+        <span class="k">elif</span> <span class="n">k</span><span class="o">&gt;</span><span class="n">max_num_paths</span><span class="p">:</span>
+            <span class="c1"># Pad paths with zeros</span>
+            <span class="n">pad_size</span> <span class="o">=</span> <span class="n">k</span><span class="o">-</span><span class="n">max_num_paths</span>
+
+            <span class="c1"># Paddings for the paths gains</span>
+            <span class="n">paddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">5</span> <span class="k">else</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)])</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">paddings</span><span class="o">=</span><span class="n">paddings</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;CONSTANT&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># Paddings for the delays (-1 by Sionna convention)</span>
+            <span class="n">paddings</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">tau</span><span class="p">))])</span>
+            <span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">paddings</span><span class="o">=</span><span class="n">paddings</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;CONSTANT&#39;</span><span class="p">,</span> <span class="n">constant_values</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">a</span><span class="p">,</span> <span class="n">tau</span></div>
 </pre></div>
 
            </div>

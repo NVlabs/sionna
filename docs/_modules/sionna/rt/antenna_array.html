@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.antenna_array &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.rt.antenna_array &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -969,7 +972,13 @@
 <span class="sd">    Class implementing an antenna array</span>
 
 <span class="sd">    An antenna array is composed of identical antennas that are placed</span>
-<span class="sd">    at different positions.</span>
+<span class="sd">    at different positions. The ``positions`` parameter can be assigned</span>
+<span class="sd">    to a TensorFlow variable or tensor.</span>
+
+<span class="sd">    .. code-block:: Python</span>
+
+<span class="sd">        array = AntennaArray(antenna=Antenna(&quot;tr38901&quot;, &quot;V&quot;),</span>
+<span class="sd">                             positions=tf.Variable([[0,0,0], [0, 1, 1]]))</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -984,24 +993,18 @@
 <span class="sd">        adding the position of the :class:`~sionna.rt.Transmitter`</span>
 <span class="sd">        or :class:`~sionna.rt.Receiver` using it.</span>
 
-<span class="sd">    trainable_positions : bool</span>
-<span class="sd">        Determines if ``positions`` is a trainable variable or not.</span>
-<span class="sd">        Defaults to `False`.</span>
-
 <span class="sd">    dtype : tf.complex64 or tf.complex128</span>
 <span class="sd">        Data type used for all computations.</span>
 <span class="sd">        Defaults to `tf.complex64`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">antenna</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">trainable_positions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">antenna</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`dtype` must be tf.complex64 or tf.complex128`&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">antenna</span> <span class="o">=</span> <span class="n">antenna</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainable_positions</span> <span class="o">=</span> <span class="n">trainable_positions</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">antenna</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1017,23 +1020,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_antenna</span> <span class="o">=</span> <span class="n">antenna</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        bool : Get/set if the relative antenna positions are trainable</span>
-<span class="sd">            variables or not.</span>
-<span class="sd">            Defaults to `False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_position</span>
-
-    <span class="nd">@trainable_positions</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`trainable_positions` must be bool&quot;</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_positions</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        [array_size, 3], `tf.float` : Get/set  array of relative positions</span>
@@ -1044,14 +1030,13 @@
 
     <span class="nd">@positions</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">):</span>
-        <span class="n">positions</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Each element of ``positions`` must have length three&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_positions&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">positions</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`positions` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">positions</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">num_ant</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1072,7 +1057,7 @@
 
 <div class="viewcode-block" id="AntennaArray.rotated_positions"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.AntennaArray.rotated_positions">[docs]</a>    <span class="k">def</span> <span class="nf">rotated_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">orientation</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the antenna positions rotated according ``orientation``</span>
+<span class="sd">        Get the antenna positions rotated according to ``orientation``</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        ------</span>
@@ -1136,10 +1121,6 @@
 <span class="sd">        respectively.</span>
 <span class="sd">        Defaults to `2`.</span>
 
-<span class="sd">    trainable_positions : bool</span>
-<span class="sd">        Determines if ``positions`` is a trainable variable or not.</span>
-<span class="sd">        Defaults to `False`.</span>
-
 <span class="sd">    dtype : tf.complex64 or tf.complex128</span>
 <span class="sd">        Datatype used for all computations.</span>
 <span class="sd">        Defaults to `tf.complex64`.</span>
@@ -1163,7 +1144,6 @@
                  <span class="n">pattern</span><span class="p">,</span>
                  <span class="n">polarization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">polarization_model</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                 <span class="n">trainable_positions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
@@ -1191,7 +1171,7 @@
                   <span class="o">-</span><span class="p">(</span><span class="n">num_cols</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">d_h</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
                   <span class="p">(</span><span class="n">num_rows</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">d_v</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">positions</span> <span class="o">+=</span> <span class="n">offset</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">antenna</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">trainable_positions</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">antenna</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PlanarArray.show"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.PlanarArray.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;show()</span>

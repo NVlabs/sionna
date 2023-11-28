@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.utils.plotting &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.utils.plotting &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -1269,13 +1272,17 @@
                  <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">num_target_bit_errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">num_target_block_errors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">target_ber</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">target_bler</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">graph_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">distribute</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">add_results</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">show_fig</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate BER/BLER curves for given Keras model and saves the results.</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simulate BER/BLER curves for given Keras model and saves the results.</span>
 
 <span class="sd">        Internally calls :class:`sionna.utils.sim_ber`.</span>
 
@@ -1284,7 +1291,7 @@
 <span class="sd">        mc_fun:</span>
 <span class="sd">            Callable that yields the transmitted bits `b` and the</span>
 <span class="sd">            receiver&#39;s estimate `b_hat` for a given ``batch_size`` and</span>
-<span class="sd">            ``ebno_db``. If ``soft_estimates`` is True, b_hat interpreted as</span>
+<span class="sd">            ``ebno_db``. If ``soft_estimates`` is True, b_hat is interpreted as</span>
 <span class="sd">            logit.</span>
 
 <span class="sd">        ebno_dbs: ndarray of floats</span>
@@ -1319,6 +1326,16 @@
 <span class="sd">            Target number of block errors per SNR point until the simulation</span>
 <span class="sd">            stops.</span>
 
+<span class="sd">        target_ber: tf.float32</span>
+<span class="sd">            Defaults to `None`. The simulation stops after the first SNR point</span>
+<span class="sd">            which achieves a lower bit error rate as specified by</span>
+<span class="sd">            ``target_ber``. This requires ``early_stop`` to be `True`.</span>
+
+<span class="sd">        target_bler: tf.float32</span>
+<span class="sd">            Defaults to `None`. The simulation stops after the first SNR point</span>
+<span class="sd">            which achieves a lower block error rate as specified by</span>
+<span class="sd">            ``target_bler``.  This requires ``early_stop`` to be `True`.</span>
+
 <span class="sd">        early_stop: bool</span>
 <span class="sd">            A boolean defaults to True. If True, the simulation stops after the</span>
 <span class="sd">            first error-free SNR point (i.e., no error occurred after</span>
@@ -1327,6 +1344,21 @@
 <span class="sd">        graph_mode: One of [&quot;graph&quot;, &quot;xla&quot;], str</span>
 <span class="sd">            A string describing the execution mode of ``mc_fun``.</span>
 <span class="sd">            Defaults to `None`. In this case, ``mc_fun`` is executed as is.</span>
+
+<span class="sd">        distribute: `None` (default) | &quot;all&quot; | list of indices | `tf.distribute.strategy`</span>
+<span class="sd">            Distributes simulation on multiple parallel devices. If `None`,</span>
+<span class="sd">            multi-device simulations are deactivated. If &quot;all&quot;, the workload</span>
+<span class="sd">            will be automatically distributed across all available GPUs via the</span>
+<span class="sd">            `tf.distribute.MirroredStrategy`.</span>
+<span class="sd">            If an explicit list of indices is provided, only the GPUs with the</span>
+<span class="sd">            given indices will be used. Alternatively, a custom</span>
+<span class="sd">            `tf.distribute.strategy` can be provided. Note that the same</span>
+<span class="sd">            `batch_size` will be used for all GPUs in parallel, but the number</span>
+<span class="sd">            of Monte-Carlo iterations ``max_mc_iter`` will be scaled by the</span>
+<span class="sd">            number of devices such that the same number of total samples is</span>
+<span class="sd">            simulated. However, all stopping conditions are still in-place</span>
+<span class="sd">            which can cause slight differences in the total number of simulated</span>
+<span class="sd">            samples.</span>
 
 <span class="sd">        add_results: bool</span>
 <span class="sd">            Defaults to True. If True, the simulation results will be appended</span>
@@ -1357,16 +1389,20 @@
 <span class="sd">            The simulated block-error rate.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">ber</span><span class="p">,</span> <span class="n">bler</span> <span class="o">=</span> <span class="n">sim_ber</span><span class="p">(</span><span class="n">mc_fun</span><span class="p">,</span>
-                            <span class="n">ebno_dbs</span><span class="p">,</span>
-                            <span class="n">batch_size</span><span class="p">,</span>
-                            <span class="n">soft_estimates</span><span class="o">=</span><span class="n">soft_estimates</span><span class="p">,</span>
-                            <span class="n">max_mc_iter</span><span class="o">=</span><span class="n">max_mc_iter</span><span class="p">,</span>
-                            <span class="n">num_target_bit_errors</span><span class="o">=</span><span class="n">num_target_bit_errors</span><span class="p">,</span>
-                            <span class="n">num_target_block_errors</span><span class="o">=</span><span class="n">num_target_block_errors</span><span class="p">,</span>
-                            <span class="n">early_stop</span><span class="o">=</span><span class="n">early_stop</span><span class="p">,</span>
-                            <span class="n">graph_mode</span><span class="o">=</span><span class="n">graph_mode</span><span class="p">,</span>
-                            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">ber</span><span class="p">,</span> <span class="n">bler</span> <span class="o">=</span> <span class="n">sim_ber</span><span class="p">(</span>
+                        <span class="n">mc_fun</span><span class="p">,</span>
+                        <span class="n">ebno_dbs</span><span class="p">,</span>
+                        <span class="n">batch_size</span><span class="p">,</span>
+                        <span class="n">soft_estimates</span><span class="o">=</span><span class="n">soft_estimates</span><span class="p">,</span>
+                        <span class="n">max_mc_iter</span><span class="o">=</span><span class="n">max_mc_iter</span><span class="p">,</span>
+                        <span class="n">num_target_bit_errors</span><span class="o">=</span><span class="n">num_target_bit_errors</span><span class="p">,</span>
+                        <span class="n">num_target_block_errors</span><span class="o">=</span><span class="n">num_target_block_errors</span><span class="p">,</span>
+                        <span class="n">target_ber</span><span class="o">=</span><span class="n">target_ber</span><span class="p">,</span>
+                        <span class="n">target_bler</span><span class="o">=</span><span class="n">target_bler</span><span class="p">,</span>
+                        <span class="n">early_stop</span><span class="o">=</span><span class="n">early_stop</span><span class="p">,</span>
+                        <span class="n">graph_mode</span><span class="o">=</span><span class="n">graph_mode</span><span class="p">,</span>
+                        <span class="n">distribute</span><span class="o">=</span><span class="n">distribute</span><span class="p">,</span>
+                        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
                         <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="n">forward_keyboard_interrupt</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">add_ber</span><span class="p">:</span>

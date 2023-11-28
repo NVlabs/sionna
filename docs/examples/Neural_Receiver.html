@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neural Receiver for OFDM SIMO Systems &mdash; Sionna 0.15.1 documentation</title>
+  <title>Neural Receiver for OFDM SIMO Systems &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -364,6 +364,9 @@
 <li class="toctree-l3"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -388,6 +391,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -769,6 +773,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#preview">preview</a></li>
@@ -794,9 +800,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#cameras">Cameras</a><ul>
@@ -1691,7 +1694,7 @@ Post RG-demapper LLRs:  (64, 1, 1, 2784)
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Rate: -7.77E-01 bit
+Rate: -8.08E-01 bit
 </pre></div></div>
 </div>
 <p>The rate is very poor (negative values means 0 bit) as the neural receiver is not trained.</p>
@@ -1907,50 +1910,50 @@ Rate: -7.77E-01 bit
 <div class="highlight"><pre>
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -5.0 | 2.4973e-01 | 1.0000e+00 |       44496 |      178176 |          128 |         128 |         7.3 |reached target block errors
-     -4.5 | 2.3573e-01 | 1.0000e+00 |       42001 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -4.0 | 2.1623e-01 | 1.0000e+00 |       38527 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -3.5 | 1.9510e-01 | 1.0000e+00 |       34762 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -3.0 | 1.6282e-01 | 1.0000e+00 |       29011 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -2.5 | 1.0123e-01 | 9.9219e-01 |       18037 |      178176 |          127 |         128 |         0.2 |reached target block errors
-     -2.0 | 2.1967e-02 | 5.5078e-01 |        7828 |      356352 |          141 |         256 |         0.3 |reached target block errors
-     -1.5 | 4.8697e-04 | 2.6042e-02 |        2603 |     5345280 |          100 |        3840 |         5.1 |reached target block errors
-     -1.0 | 1.8212e-04 | 2.5000e-03 |        3245 |    17817600 |           32 |       12800 |        17.2 |reached max iter
-     -0.5 | 2.4414e-05 | 5.4688e-04 |         435 |    17817600 |            7 |       12800 |        17.1 |reached max iter
-      0.0 | 0.0000e+00 | 0.0000e+00 |           0 |    17817600 |            0 |       12800 |        17.2 |reached max iter
+     -5.0 | 2.5345e-01 | 1.0000e+00 |       45158 |      178176 |          128 |         128 |         7.3 |reached target block errors
+     -4.5 | 2.3644e-01 | 1.0000e+00 |       42128 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -4.0 | 2.1466e-01 | 1.0000e+00 |       38248 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -3.5 | 1.9506e-01 | 1.0000e+00 |       34755 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -3.0 | 1.6194e-01 | 1.0000e+00 |       28853 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -2.5 | 1.0628e-01 | 9.9219e-01 |       18937 |      178176 |          127 |         128 |         0.1 |reached target block errors
+     -2.0 | 1.8395e-02 | 5.6250e-01 |        6555 |      356352 |          144 |         256 |         0.2 |reached target block errors
+     -1.5 | 6.6440e-04 | 2.7478e-02 |        3433 |     5167104 |          102 |        3712 |         3.2 |reached target block errors
+     -1.0 | 8.7161e-05 | 1.4844e-03 |        1553 |    17817600 |           19 |       12800 |        10.9 |reached max iter
+     -0.5 | 2.8904e-05 | 7.8125e-04 |         515 |    17817600 |           10 |       12800 |        10.9 |reached max iter
+      0.0 | 1.2347e-05 | 1.5625e-04 |         220 |    17817600 |            2 |       12800 |        10.9 |reached max iter
+      0.5 | 1.1337e-05 | 7.8125e-05 |         202 |    17817600 |            1 |       12800 |        10.8 |reached max iter
+      1.0 | 8.0819e-06 | 7.8125e-05 |         144 |    17817600 |            1 |       12800 |        10.9 |reached max iter
+      1.5 | 1.6837e-07 | 7.8125e-05 |           3 |    17817600 |            1 |       12800 |        10.9 |reached max iter
+      2.0 | 0.0000e+00 | 0.0000e+00 |           0 |    17817600 |            0 |       12800 |        10.9 |reached max iter
 
-Simulation stopped as no error occurred @ EbNo = 0.0 dB.
+Simulation stopped as no error occurred @ EbNo = 2.0 dB.
 
-WARNING:tensorflow:From /usr/local/lib/python3.8/dist-packages/tensorflow/python/util/dispatch.py:1082: calling gather (from tensorflow.python.ops.array_ops) with validate_indices is deprecated and will be removed in a future version.
-Instructions for updating:
-The `validate_indices` argument has no effect. Indices are always validated on CPU and never validated on GPU.
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -5.0 | 3.9198e-01 | 1.0000e+00 |       69842 |      178176 |          128 |         128 |         3.7 |reached target block errors
-     -4.5 | 3.7972e-01 | 1.0000e+00 |       67657 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -4.0 | 3.6827e-01 | 1.0000e+00 |       65616 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -3.5 | 3.5388e-01 | 1.0000e+00 |       63053 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -3.0 | 3.3977e-01 | 1.0000e+00 |       60539 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -2.5 | 3.2656e-01 | 1.0000e+00 |       58185 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -2.0 | 3.1059e-01 | 1.0000e+00 |       55340 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -1.5 | 2.9594e-01 | 1.0000e+00 |       52729 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -1.0 | 2.7719e-01 | 1.0000e+00 |       49388 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -0.5 | 2.5766e-01 | 1.0000e+00 |       45909 |      178176 |          128 |         128 |         0.2 |reached target block errors
-      0.0 | 2.3227e-01 | 1.0000e+00 |       41385 |      178176 |          128 |         128 |         0.2 |reached target block errors
-      0.5 | 2.1057e-01 | 1.0000e+00 |       37518 |      178176 |          128 |         128 |         0.2 |reached target block errors
-      1.0 | 1.6697e-01 | 1.0000e+00 |       29750 |      178176 |          128 |         128 |         0.2 |reached target block errors
-      1.5 | 1.0083e-01 | 9.3750e-01 |       17966 |      178176 |          120 |         128 |         0.2 |reached target block errors
-      2.0 | 1.0116e-02 | 2.3633e-01 |        7210 |      712704 |          121 |         512 |         0.7 |reached target block errors
-      2.5 | 6.4064e-04 | 1.0521e-02 |        8561 |    13363200 |          101 |        9600 |        12.9 |reached target block errors
-      3.0 | 1.4334e-04 | 1.4844e-03 |        2554 |    17817600 |           19 |       12800 |        17.2 |reached max iter
-      3.5 | 1.1663e-04 | 7.8125e-04 |        2078 |    17817600 |           10 |       12800 |        17.2 |reached max iter
-      4.0 | 4.2767e-05 | 3.9063e-04 |         762 |    17817600 |            5 |       12800 |        17.3 |reached max iter
-      4.5 | 5.1185e-05 | 3.1250e-04 |         912 |    17817600 |            4 |       12800 |        17.3 |reached max iter
-      5.0 | 2.6435e-05 | 2.3437e-04 |         471 |    17817600 |            3 |       12800 |        17.3 |reached max iter
-      5.5 | 1.3694e-05 | 7.8125e-05 |         244 |    17817600 |            1 |       12800 |        17.3 |reached max iter
-      6.0 | 0.0000e+00 | 0.0000e+00 |           0 |    17817600 |            0 |       12800 |        17.3 |reached max iter
+     -5.0 | 3.9096e-01 | 1.0000e+00 |       69659 |      178176 |          128 |         128 |         2.8 |reached target block errors
+     -4.5 | 3.8028e-01 | 1.0000e+00 |       67756 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -4.0 | 3.6582e-01 | 1.0000e+00 |       65180 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -3.5 | 3.5540e-01 | 1.0000e+00 |       63324 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -3.0 | 3.4142e-01 | 1.0000e+00 |       60833 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -2.5 | 3.2873e-01 | 1.0000e+00 |       58572 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -2.0 | 3.1137e-01 | 1.0000e+00 |       55478 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -1.5 | 2.9676e-01 | 1.0000e+00 |       52875 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -1.0 | 2.7707e-01 | 1.0000e+00 |       49368 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -0.5 | 2.5655e-01 | 1.0000e+00 |       45711 |      178176 |          128 |         128 |         0.1 |reached target block errors
+      0.0 | 2.3697e-01 | 1.0000e+00 |       42223 |      178176 |          128 |         128 |         0.1 |reached target block errors
+      0.5 | 2.0973e-01 | 1.0000e+00 |       37369 |      178176 |          128 |         128 |         0.1 |reached target block errors
+      1.0 | 1.6844e-01 | 1.0000e+00 |       30012 |      178176 |          128 |         128 |         0.1 |reached target block errors
+      1.5 | 8.5578e-02 | 9.2969e-01 |       15248 |      178176 |          119 |         128 |         0.1 |reached target block errors
+      2.0 | 1.0147e-02 | 2.5195e-01 |        7232 |      712704 |          129 |         512 |         0.4 |reached target block errors
+      2.5 | 7.8271e-04 | 1.2401e-02 |        8786 |    11225088 |          100 |        8064 |         6.9 |reached target block errors
+      3.0 | 2.1866e-04 | 2.1094e-03 |        3896 |    17817600 |           27 |       12800 |        11.0 |reached max iter
+      3.5 | 9.0528e-05 | 7.0312e-04 |        1613 |    17817600 |            9 |       12800 |        10.9 |reached max iter
+      4.0 | 2.9634e-05 | 2.3437e-04 |         528 |    17817600 |            3 |       12800 |        11.0 |reached max iter
+      4.5 | 1.9868e-05 | 1.5625e-04 |         354 |    17817600 |            2 |       12800 |        10.9 |reached max iter
+      5.0 | 3.8445e-05 | 2.3437e-04 |         685 |    17817600 |            3 |       12800 |        10.9 |reached max iter
+      5.5 | 0.0000e+00 | 0.0000e+00 |           0 |    17817600 |            0 |       12800 |        10.9 |reached max iter
 
-Simulation stopped as no error occurred @ EbNo = 6.0 dB.
+Simulation stopped as no error occurred @ EbNo = 5.5 dB.
 
 </pre></div></div>
 </div>
@@ -2006,7 +2009,7 @@ Simulation stopped as no error occurred @ EbNo = 6.0 dB.
 <p>Training consists in looping over SGD steps. The next cell implements a training loop.</p>
 <p>At each iteration: - A batch of SNRs <span class="math notranslate nohighlight">\(E_b/N_0\)</span> is sampled - A forward pass through the end-to-end system is performed within a gradient tape - The gradients are computed using the gradient tape, and applied using the Adam optimizer - The achieved BMD rate is periodically shown</p>
 <p>After training, the weights of the models are saved in a file</p>
-<p><strong>Note:</strong> Training can take a while. Therefore, pre-trained weights are made available with this notebook. Do not execute the next cell if you don’t want to train the model from scratch.</p>
+<p><strong>Note:</strong> Training can take a while. Therefore, <a class="reference external" href="https://drive.google.com/drive/folders/1h2m_AD-t3qtWYifowChmWEY0DBbIj84Q?usp=sharing">we have made pre-trained weights available</a>. Do not execute the next cell if you don’t want to train the model from scratch.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -2072,22 +2075,25 @@ Simulation stopped as no error occurred @ EbNo = 6.0 dB.
 <div class="highlight"><pre>
 EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
 ---------------------------------------------------------------------------------------------------------------------------------------
-     -5.0 | 2.5996e-01 | 1.0000e+00 |       46319 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -4.5 | 2.4409e-01 | 1.0000e+00 |       43491 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -4.0 | 2.2290e-01 | 1.0000e+00 |       39715 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -3.5 | 2.0002e-01 | 1.0000e+00 |       35638 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -3.0 | 1.7395e-01 | 1.0000e+00 |       30993 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -2.5 | 1.1934e-01 | 1.0000e+00 |       21263 |      178176 |          128 |         128 |         0.2 |reached target block errors
-     -2.0 | 4.0123e-02 | 7.3438e-01 |       14298 |      356352 |          188 |         256 |         0.4 |reached target block errors
-     -1.5 | 4.4114e-03 | 1.1161e-01 |        5502 |     1247232 |          100 |         896 |         1.4 |reached target block errors
-     -1.0 | 6.7739e-04 | 8.2237e-03 |       11466 |    16926720 |          100 |       12160 |        18.2 |reached target block errors
-     -0.5 | 2.3106e-04 | 2.8125e-03 |        4117 |    17817600 |           36 |       12800 |        19.1 |reached max iter
-      0.0 | 1.2718e-04 | 1.0938e-03 |        2266 |    17817600 |           14 |       12800 |        19.1 |reached max iter
-      0.5 | 1.6501e-05 | 3.1250e-04 |         294 |    17817600 |            4 |       12800 |        19.2 |reached max iter
-      1.0 | 3.2384e-05 | 3.1250e-04 |         577 |    17817600 |            4 |       12800 |        19.0 |reached max iter
-      1.5 | 0.0000e+00 | 0.0000e+00 |           0 |    17817600 |            0 |       12800 |        19.1 |reached max iter
+     -5.0 | 2.5993e-01 | 1.0000e+00 |       46314 |      178176 |          128 |         128 |         0.2 |reached target block errors
+     -4.5 | 2.4351e-01 | 1.0000e+00 |       43387 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -4.0 | 2.2642e-01 | 1.0000e+00 |       40343 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -3.5 | 2.0519e-01 | 1.0000e+00 |       36560 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -3.0 | 1.7735e-01 | 1.0000e+00 |       31600 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -2.5 | 1.2847e-01 | 1.0000e+00 |       22890 |      178176 |          128 |         128 |         0.1 |reached target block errors
+     -2.0 | 4.3592e-02 | 7.9688e-01 |        7767 |      178176 |          102 |         128 |         0.1 |reached target block errors
+     -1.5 | 3.0379e-03 | 1.1830e-01 |        3789 |     1247232 |          106 |         896 |         0.9 |reached target block errors
+     -1.0 | 4.8306e-04 | 7.4219e-03 |        8607 |    17817600 |           95 |       12800 |        13.3 |reached max iter
+     -0.5 | 2.4481e-04 | 2.1875e-03 |        4362 |    17817600 |           28 |       12800 |        13.2 |reached max iter
+      0.0 | 1.9026e-04 | 1.4844e-03 |        3390 |    17817600 |           19 |       12800 |        13.2 |reached max iter
+      0.5 | 7.0436e-05 | 5.4688e-04 |        1255 |    17817600 |            7 |       12800 |        13.3 |reached max iter
+      1.0 | 4.5405e-05 | 3.1250e-04 |         809 |    17817600 |            4 |       12800 |        13.2 |reached max iter
+      1.5 | 3.0083e-05 | 3.1250e-04 |         536 |    17817600 |            4 |       12800 |        13.2 |reached max iter
+      2.0 | 5.8145e-05 | 3.1250e-04 |        1036 |    17817600 |            4 |       12800 |        13.3 |reached max iter
+      2.5 | 1.6276e-05 | 1.5625e-04 |         290 |    17817600 |            2 |       12800 |        13.2 |reached max iter
+      3.0 | 0.0000e+00 | 0.0000e+00 |           0 |    17817600 |            0 |       12800 |        13.2 |reached max iter
 
-Simulation stopped as no error occurred @ EbNo = 1.5 dB.
+Simulation stopped as no error occurred @ EbNo = 3.0 dB.
 
 </pre></div></div>
 </div>

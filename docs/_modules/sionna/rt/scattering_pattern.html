@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.scattering_pattern &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.rt.scattering_pattern &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -988,10 +991,6 @@
 <span class="sd">        Parameter determining the percentage of the diffusely</span>
 <span class="sd">        reflected energy in the lobe around the specular reflection.</span>
 
-<span class="sd">    trainable_lambda_ : bool</span>
-<span class="sd">        If set to `True`, the parameter `lambda_` is made a trainable variable.</span>
-<span class="sd">        Defaults to `False`.</span>
-<span class="sd">    </span>
 <span class="sd">    dtype : tf.complex64 or tf.complex128</span>
 <span class="sd">        Datatype used for all computations.</span>
 <span class="sd">        Defaults to `tf.complex64`.</span>
@@ -1010,13 +1009,12 @@
 <span class="sd">    Output</span>
 <span class="sd">    ------</span>
 <span class="sd">    pattern : [batch_size], dtype.real_dtype</span>
-<span class="sd">        Scattering pattern </span>
+<span class="sd">        Scattering pattern</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">alpha_r</span><span class="p">,</span>
                  <span class="n">alpha_i</span><span class="p">,</span>
                  <span class="n">lambda_</span><span class="p">,</span>
-                 <span class="n">trainable_lambda_</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;`dtype` must be `tf.complex64` or `tf.complex128`&quot;</span>
@@ -1025,9 +1023,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_r</span> <span class="o">=</span> <span class="n">alpha_r</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alpha_i</span> <span class="o">=</span> <span class="n">alpha_i</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lambda_</span> <span class="o">=</span> <span class="n">lambda_</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trainable_lambda_</span> <span class="o">=</span> <span class="n">trainable_lambda_</span>
 
     <span class="c1">###</span>
     <span class="c1">### Static properties and methods</span>
@@ -1130,17 +1126,17 @@
 <span class="sd">        of a different scattering pattern for each pair k_i, k_s.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="n">k_i</span><span class="o">.</span><span class="n">dtype</span>
-        <span class="n">cos_theta_i</span> <span class="o">=</span> <span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">n_hat</span><span class="p">)</span>
-        <span class="n">cos_theta_s</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">k_s</span><span class="p">,</span> <span class="n">n_hat</span><span class="p">)</span>
+        <span class="n">cos_theta_i</span> <span class="o">=</span> <span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">n_hat</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">cos_theta_s</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">k_s</span><span class="p">,</span> <span class="n">n_hat</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">k_r</span> <span class="o">=</span> <span class="n">k_i</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">cos_theta_i</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">n_hat</span>
 
         <span class="c1"># Compute backscattering pattern</span>
         <span class="n">f_alpha_r</span> <span class="o">=</span> <span class="n">ScatteringPattern</span><span class="o">.</span><span class="n">f_alpha</span><span class="p">(</span><span class="n">cos_theta_i</span><span class="p">,</span> <span class="n">alpha_r</span><span class="p">)</span>
         <span class="n">f_alpha_i</span> <span class="o">=</span> <span class="n">ScatteringPattern</span><span class="o">.</span><span class="n">f_alpha</span><span class="p">(</span><span class="n">cos_theta_i</span><span class="p">,</span> <span class="n">alpha_i</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">lambda_</span><span class="o">*</span><span class="n">f_alpha_r</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">lambda_</span><span class="p">)</span><span class="o">*</span><span class="n">f_alpha_i</span>
-        <span class="n">pattern_bs</span> <span class="o">=</span> <span class="n">lambda_</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">dot</span><span class="p">(</span><span class="n">k_r</span><span class="p">,</span> <span class="n">k_s</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">pattern_bs</span> <span class="o">=</span> <span class="n">lambda_</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">dot</span><span class="p">(</span><span class="n">k_r</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
                                     <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">alpha_r</span><span class="p">,</span> <span class="n">k_r</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-        <span class="n">pattern_bs</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">lambda_</span><span class="p">)</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">pattern_bs</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">lambda_</span><span class="p">)</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">pow</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">clip</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
                                          <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">alpha_i</span><span class="p">,</span> <span class="n">k_r</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
         <span class="n">pattern_bs</span> <span class="o">/=</span> <span class="n">f</span>
 
@@ -1203,26 +1199,14 @@
 
     <span class="nd">@lambda_</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">lambda_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;lambda_ must be in [0,1]&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trainable_lambda_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        bool : Get/set if ``lambda_`` is trainable or not.</span>
-<span class="sd">            Defaults to `False`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_lambda_</span>
-
-    <span class="nd">@trainable_lambda_</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trainable_lambda_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;`trainable_lambda_` must be bool&quot;</span><span class="p">)</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_</span><span class="o">.</span><span class="n">_trainable</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_trainable_lambda_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;`lambda_` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lambda_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">n_hat</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ScatteringPattern</span><span class="o">.</span><span class="n">pattern</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">n_hat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha_r</span><span class="p">,</span>
@@ -1459,6 +1443,17 @@
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Backscattering model from [Degli-Esposti07]_ as given in :eq:`backscattering_model`</span>
 
+<span class="sd">    The parameter ``lambda_`` can be assigned to a TensorFlow variable</span>
+<span class="sd">    or tensor.  In the latter case, the tensor can be the output of a callable, such as</span>
+<span class="sd">    a Keras layer implementing a neural network.</span>
+<span class="sd">    In the former case, it can be set to a trainable variable:</span>
+
+<span class="sd">    .. code-block:: Python</span>
+
+<span class="sd">        sp = BackscatteringPattern(alpha_r=3,</span>
+<span class="sd">                                   alpha_i=5,</span>
+<span class="sd">                                   lambda_=tf.Variable(0.3, dtype=tf.float32))</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    alpha_r : int, [1,2,...]</span>
@@ -1472,10 +1467,6 @@
 <span class="sd">    lambda_ : float, [0,1]</span>
 <span class="sd">        Parameter determining the percentage of the diffusely</span>
 <span class="sd">        reflected energy in the lobe around the specular reflection.</span>
-
-<span class="sd">    trainable_lambda_ : bool</span>
-<span class="sd">        If set to `True`, the parameter `lambda_` is made a trainable variable.</span>
-<span class="sd">        Defaults to `False`.</span>
 
 <span class="sd">    dtype : tf.complex64 or tf.complex128</span>
 <span class="sd">        Datatype used for all computations.</span>
@@ -1508,10 +1499,9 @@
                  <span class="n">alpha_r</span><span class="p">,</span>
                  <span class="n">alpha_i</span><span class="p">,</span>
                  <span class="n">lambda_</span><span class="p">,</span>
-                 <span class="n">trainable_lambda_</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">alpha_r</span><span class="o">=</span><span class="n">alpha_r</span><span class="p">,</span> <span class="n">alpha_i</span><span class="o">=</span><span class="n">alpha_i</span><span class="p">,</span> <span class="n">lambda_</span><span class="o">=</span><span class="n">lambda_</span><span class="p">,</span>
-                         <span class="n">trainable_lambda_</span><span class="o">=</span><span class="n">trainable_lambda_</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
+                         <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

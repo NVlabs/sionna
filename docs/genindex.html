@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; Sionna 0.15.1 documentation</title>
+  <title>Index &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#cameras">Cameras</a><ul>
@@ -1065,7 +1068,7 @@
         <li><a href="api/rt.html#sionna.rt.PlanarArray.array_size">(sionna.rt.PlanarArray property)</a>
 </li>
       </ul></li>
-      <li><a href="api/rt.html#sionna.rt.CoverageMap.as_tensor">as_tensor() (in module sionna.rt.CoverageMap)</a>
+      <li><a href="api/rt.html#sionna.rt.CoverageMap.as_tensor">as_tensor() (sionna.rt.CoverageMap method)</a>
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.AWGN">AWGN (class in sionna.channel)</a>
 </li>
@@ -1235,6 +1238,12 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/rt.html#sionna.rt.Receiver.color">color (sionna.rt.Receiver property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.Transmitter.color">(sionna.rt.Transmitter property)</a>
+</li>
+      </ul></li>
       <li><a href="api/mimo.html#sionna.mimo.complex2real_channel">complex2real_channel() (in module sionna.mimo)</a>
 </li>
       <li><a href="api/mimo.html#sionna.mimo.complex2real_covariance">complex2real_covariance() (in module sionna.mimo)</a>
@@ -1250,6 +1259,8 @@
       <li><a href="api/utils.html#sionna.utils.compute_ber">compute_ber() (in module sionna.utils)</a>
 </li>
       <li><a href="api/utils.html#sionna.utils.compute_bler">compute_bler() (in module sionna.utils)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.Scene.compute_fields">compute_fields() (in module sionna.rt.Scene)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.antenna.compute_gain">compute_gain() (in module sionna.rt.antenna)</a>
 </li>
@@ -1461,10 +1472,10 @@
 </li>
       <li><a href="api/rt.html#sionna.rt.scene.floor_wall">floor_wall (in module sionna.rt.scene)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nr.html#sionna.nr.CarrierConfig.frame_duration">frame_duration (sionna.nr.CarrierConfig property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nr.html#sionna.nr.CarrierConfig.frame_number">frame_number (sionna.nr.CarrierConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Scene.frequency">frequency (sionna.rt.Scene property)</a>
@@ -1472,6 +1483,8 @@
       <li><a href="api/nr.html#sionna.nr.PUSCHConfig.frequency_hopping">frequency_hopping (sionna.nr.PUSCHConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.RadioMaterial.frequency_update_callback">frequency_update_callback (sionna.rt.RadioMaterial property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.Paths.from_dict">from_dict() (sionna.rt.Paths method)</a>
 </li>
       <li><a href="api/fec.polar.html#sionna.fec.polar.decoding.Polar5GDecoder.frozen_pos">frozen_pos (sionna.fec.polar.decoding.Polar5GDecoder property)</a>
 
@@ -1851,6 +1864,8 @@
 
       <ul>
         <li><a href="api/ofdm.html#sionna.ofdm.PilotPattern.mask">(sionna.ofdm.PilotPattern property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.Paths.mask">(sionna.rt.Paths property)</a>
 </li>
       </ul></li>
       <li><a href="api/utils.html#sionna.utils.matrix_inv">matrix_inv() (in module sionna.utils)</a>
@@ -2409,6 +2424,8 @@
 </li>
       <li><a href="api/rt.html#sionna.rt.SceneObject.radio_material">radio_material (sionna.rt.SceneObject property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.Scene.radio_material_callable">radio_material_callable (sionna.rt.Scene property)</a>
+</li>
       <li><a href="api/rt.html#sionna.rt.Scene.radio_materials">radio_materials (sionna.rt.Scene property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.RadioMaterial">RadioMaterial (class in sionna.rt)</a>
@@ -2501,7 +2518,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/rt.html#sionna.rt.sample_points_on_hemisphere">sample_points_on_hemisphere() (in module sionna.rt)</a>
 </li>
-      <li><a href="api/rt.html#sionna.rt.CoverageMap.sample_positions">sample_positions() (in module sionna.rt.CoverageMap)</a>
+      <li><a href="api/rt.html#sionna.rt.CoverageMap.sample_positions">sample_positions() (sionna.rt.CoverageMap method)</a>
 </li>
       <li><a href="api/signal.html#sionna.signal.CustomFilter.sampling_times">sampling_times (sionna.signal.CustomFilter property)</a>
 
@@ -2518,6 +2535,8 @@
       <li><a href="api/rt.html#sionna.rt.RadioMaterial.scattering_coefficient">scattering_coefficient (sionna.rt.RadioMaterial property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.RadioMaterial.scattering_pattern">scattering_pattern (sionna.rt.RadioMaterial property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.Scene.scattering_pattern_callable">scattering_pattern_callable (sionna.rt.Scene property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Scene">Scene (class in sionna.rt)</a>
 </li>
@@ -2551,11 +2570,9 @@
         <li><a href="api/channel.wireless.html#sionna.channel.tr38901.UMi.set_topology">(sionna.channel.tr38901.UMi method)</a>
 </li>
       </ul></li>
-      <li><a href="api/rt.html#sionna.rt.CoverageMap.show">show() (in module sionna.rt.CoverageMap)</a>
+      <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.show">show() (sionna.channel.tr38901.PanelArray method)</a>
 
       <ul>
-        <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.show">(sionna.channel.tr38901.PanelArray method)</a>
-</li>
         <li><a href="api/mapping.html#sionna.mapping.Constellation.show">(sionna.mapping.Constellation method)</a>
 </li>
         <li><a href="api/nr.html#sionna.nr.PUSCHConfig.show">(sionna.nr.PUSCHConfig method)</a>
@@ -2567,6 +2584,8 @@
         <li><a href="api/ofdm.html#sionna.ofdm.PilotPattern.show">(sionna.ofdm.PilotPattern method)</a>
 </li>
         <li><a href="api/ofdm.html#sionna.ofdm.ResourceGrid.show">(sionna.ofdm.ResourceGrid method)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.CoverageMap.show">(sionna.rt.CoverageMap method)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.PlanarArray.show">(sionna.rt.PlanarArray method)</a>
 </li>
@@ -2626,8 +2645,6 @@
       <li><a href="api/nr.html#sionna.nr.CarrierConfig.slot_number">slot_number (sionna.nr.CarrierConfig property)</a>
 </li>
       <li><a href="api/utils.html#sionna.utils.plotting.PlotBER.snr">snr (sionna.utils.plotting.PlotBER property)</a>
-</li>
-      <li><a href="api/rt.html#sionna.rt.Paths.sources">sources (sionna.rt.Paths property)</a>
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.FlatFadingChannel.spatial_corr">spatial_corr (sionna.channel.FlatFadingChannel property)</a>
 
@@ -2690,8 +2707,6 @@
       <li><a href="api/nr.html#sionna.nr.CarrierConfig.t_s">t_s (sionna.nr.CarrierConfig property)</a>
 </li>
       <li><a href="api/nr.html#sionna.nr.TBConfig.target_coderate">target_coderate (sionna.nr.TBConfig property)</a>
-</li>
-      <li><a href="api/rt.html#sionna.rt.Paths.targets">targets (sionna.rt.Paths property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Paths.tau">tau (sionna.rt.Paths property)</a>
 </li>
@@ -2757,9 +2772,15 @@
 </li>
       <li><a href="api/utils.html#sionna.utils.plotting.PlotBER.title">title (sionna.utils.plotting.PlotBER property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/rt.html#sionna.rt.Paths.to_dict">to_dict() (sionna.rt.Paths method)</a>
+</li>
       <li><a href="api/nr.html#sionna.nr.PUSCHConfig.tpmi">tpmi (sionna.nr.PUSCHConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.antenna.tr38901_pattern">tr38901_pattern() (in module sionna.rt.antenna)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.Scene.trace_paths">trace_paths() (in module sionna.rt.Scene)</a>
 </li>
       <li><a href="api/nr.html#sionna.nr.PUSCHPilotPattern.trainable">trainable (sionna.nr.PUSCHPilotPattern property)</a>
 
@@ -2787,36 +2808,6 @@
         <li><a href="api/signal.html#sionna.signal.Window.trainable">(sionna.signal.Window property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/rt.html#sionna.rt.RadioMaterial.trainable_conductivity">trainable_conductivity (sionna.rt.RadioMaterial property)</a>
-</li>
-      <li><a href="api/rt.html#sionna.rt.BackscatteringPattern.trainable_lambda_">trainable_lambda_ (sionna.rt.BackscatteringPattern property)</a>
-</li>
-      <li><a href="api/rt.html#sionna.rt.Receiver.trainable_orientation">trainable_orientation (sionna.rt.Receiver property)</a>
-
-      <ul>
-        <li><a href="api/rt.html#sionna.rt.Transmitter.trainable_orientation">(sionna.rt.Transmitter property)</a>
-</li>
-      </ul></li>
-      <li><a href="api/rt.html#sionna.rt.Receiver.trainable_position">trainable_position (sionna.rt.Receiver property)</a>
-
-      <ul>
-        <li><a href="api/rt.html#sionna.rt.Transmitter.trainable_position">(sionna.rt.Transmitter property)</a>
-</li>
-      </ul></li>
-      <li><a href="api/rt.html#sionna.rt.AntennaArray.trainable_positions">trainable_positions (sionna.rt.AntennaArray property)</a>
-
-      <ul>
-        <li><a href="api/rt.html#sionna.rt.PlanarArray.trainable_positions">(sionna.rt.PlanarArray property)</a>
-</li>
-      </ul></li>
-      <li><a href="api/rt.html#sionna.rt.RadioMaterial.trainable_relative_permittivity">trainable_relative_permittivity (sionna.rt.RadioMaterial property)</a>
-</li>
-      <li><a href="api/rt.html#sionna.rt.RadioMaterial.trainable_scattering_coefficient">trainable_scattering_coefficient (sionna.rt.RadioMaterial property)</a>
-</li>
-      <li><a href="api/rt.html#sionna.rt.RadioMaterial.trainable_xpd_coefficient">trainable_xpd_coefficient (sionna.rt.RadioMaterial property)</a>
-</li>
       <li><a href="api/nr.html#sionna.nr.PUSCHConfig.transform_precoding">transform_precoding (sionna.nr.PUSCHConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Transmitter">Transmitter (class in sionna.rt)</a>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial on Diffraction &mdash; Sionna 0.15.1 documentation</title>
+  <title>Tutorial on Diffraction &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -364,6 +364,9 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -388,6 +391,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -769,6 +773,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#preview">preview</a></li>
@@ -794,9 +800,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#cameras">Cameras</a><ul>
@@ -1266,6 +1269,7 @@ div.rendered_html tbody tr:hover {
 <h2>Table of Contents<a class="headerlink" href="#Table-of-Contents" title="Permalink to this headline"></a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="#Background-Information">Background Information</a></p></li>
+<li><p><a class="reference external" href="#Wedge-vs-Edge">Wedge vs Edge</a></p></li>
 <li><p><a class="reference external" href="#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></p></li>
 <li><p><a class="reference external" href="#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></p></li>
 <li><p><a class="reference external" href="#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></p></li>
@@ -1288,6 +1292,13 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <p>The GTD was later extended to the uniform theory of diffraction (UTD) [2,3] which overcomes some of its shortcomings.</p>
 <p>We will explore in this notebook these effects in detail and also validate the UTD implementation in Sionna RT as a by-product.</p>
 </div>
+</div>
+<div class="section" id="Wedge-vs-Edge">
+<h1>Wedge vs Edge<a class="headerlink" href="#Wedge-vs-Edge" title="Permalink to this headline"></a></h1>
+<p>First, it is important to know the difference between a <em>wedge</em> and an <em>edge</em>, and why we distinguish between them.</p>
+<p>Sionna defines a <em>wedge</em> as the line segment between two primitives, i.e., the common segment of two triangles. For example, a cubic building would have 12 wedges.</p>
+<p>For primitives that have one or more line segments that are not shared with another primitive, Sionna refers to such line segments as <em>edges</em>. See <code class="docutils literal notranslate"><span class="pre">`sionna.rt.scene.floor_wall</span></code> &lt;<a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.scene.floor_wall">https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.scene.floor_wall</a>&gt;`__ for an example scene.</p>
+<p>By default, Sionna does not simulate diffraction on edges (<code class="docutils literal notranslate"><span class="pre">edge_diffraction=False</span></code>), to avoid problems such as diffraction on the exterior edges of the ground surface (modelled as a rectangular plane).</p>
 <div class="section" id="GPU-Configuration-and-Imports">
 <h2>GPU Configuration and Imports<a class="headerlink" href="#GPU-Configuration-and-Imports" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
@@ -1377,7 +1388,7 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_12_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_12_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_13_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_13_0.png" />
 </div>
 </div>
 <p>The wedge has an opening angle of <span class="math notranslate nohighlight">\(\frac{3}{2}\pi=270^\circ\)</span>, i.e., <span class="math notranslate nohighlight">\(n=1.5\)</span>. The 0-face is aligned with the x axis and the n-face aligned with the negative y axis.</p>
@@ -1456,7 +1467,7 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_18_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_18_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_19_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_19_0.png" />
 </div>
 </div>
 <p>In the above figure, the blue ball is the transmitter and the green circle corresponds to 1000 receivers uniformly distributed over a segment of a circle around the edge.</p>
@@ -1486,11 +1497,9 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="k">def</span> <span class="nf">compute_gain</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute $|H(f)|^2&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute $|H(f)|^2 at f = 0 where H(f) is the baseband channel frequency response&quot;&quot;&quot;</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">tau</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">e</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">*</span><span class="n">scene</span><span class="o">.</span><span class="n">frequency</span><span class="o">*</span><span class="n">tau</span><span class="p">))</span>
-        <span class="n">h_f_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">h_f_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">h_f_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">h_f_2</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e-24</span><span class="p">,</span> <span class="n">h_f_2</span><span class="p">)</span>
         <span class="n">g_db</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">h_f_2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">g_db</span><span class="p">)</span>
@@ -1516,7 +1525,7 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_23_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_23_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_24_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_24_0.png" />
 </div>
 </div>
 <p>For an angle of around 108 degrees, the receiver is located within Region I, where all propagation effects should be visible. As expected, we can observe three path: line-of-sight, reflected, and diffracted. While the first two have roughly the same strength (as metal is an almost perfect reflector), the diffracted path has significantly lower energy.</p>
@@ -1528,7 +1537,7 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">h_f_tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">scene</span><span class="o">.</span><span class="n">frequency</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">*</span><span class="n">tau</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span></span><span class="n">h_f_tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1551,7 +1560,7 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_27_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_27_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_28_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_28_0.png" />
 </div>
 </div>
 <p>The most important observation from the figure above is that <span class="math notranslate nohighlight">\(H(f)\)</span> remains continous over the entire range of <span class="math notranslate nohighlight">\(\phi\)</span>, especially at the RSB and ISB boundaries at around <span class="math notranslate nohighlight">\(\phi=150^\circ\)</span> and <span class="math notranslate nohighlight">\(\phi=209^\circ\)</span>, respectively.</p>
@@ -1579,11 +1588,9 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
                                 <span class="n">scattering</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">compute_gain</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">tau</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute $|H(f)|^2&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute $|H(f)|^2 are f = 0 where H(f) is the baseband channel frequency response&quot;&quot;&quot;</span>
         <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">tau</span> <span class="o">=</span> <span class="n">expand_to_rank</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">e</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">*</span><span class="n">scene</span><span class="o">.</span><span class="n">frequency</span><span class="o">*</span><span class="n">tau</span><span class="p">))</span>
-        <span class="n">h_f_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">h_f_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">h_f_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">h_f_2</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e-24</span><span class="p">,</span> <span class="n">h_f_2</span><span class="p">)</span>
         <span class="n">g_db</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">h_f_2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">g_db</span><span class="p">)</span>
@@ -1638,7 +1645,7 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_30_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_30_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_31_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_31_0.png" />
 </div>
 </div>
 <p>The figure above shows the path gain for the total field as well as that for the different path types. In Region <span class="math notranslate nohighlight">\(I\)</span>, the line-of-sight and reflected paths dominate the total field. While their contributions are almost constant over the range of <span class="math notranslate nohighlight">\(\phi\in[0,150^\circ]\)</span>, their combined field exhibits large fluctutations due to constructive and destructive interference. As we approach the RSB, the diffracted field increases to ensure continuity at <span class="math notranslate nohighlight">\(\phi=150^\circ\)</span>, where the
@@ -1657,7 +1664,7 @@ reflected field immediately drops to zero. A similar observation can be made clo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_32_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_32_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_33_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_33_0.png" />
 </div>
 </div>
 <p>The first observation we can make is that the overall path gain has dropped by around <span class="math notranslate nohighlight">\(20\,\)</span>dB. This is expected as it is proportional to the square of the wavelength <span class="math notranslate nohighlight">\(\lambda\)</span>.</p>
@@ -1677,7 +1684,7 @@ reflected field immediately drops to zero. A similar observation can be made clo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_34_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_34_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_35_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_35_0.png" />
 </div>
 </div>
 <p>It is also interesting to change the material of the wedge. The preconfigured materials in Sionna RT can be inspected with the following command:</p>
@@ -1727,7 +1734,7 @@ reflected field immediately drops to zero. A similar observation can be made clo
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_38_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_38_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_39_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_39_0.png" />
 </div>
 </div>
 <p>We immediately notice that wood is a bad reflector since the strength of the reflected path has dropped by <span class="math notranslate nohighlight">\(10\,\)</span>dB compared to the metal. Thanks to the heuristic extension of the diffracted field equations in [2] to non-perfect conductors in [4] (which are implemented in Sionna RT), the total field remains continuous.</p>
@@ -1772,7 +1779,7 @@ Documentation</a>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_42_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_42_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_43_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_43_0.png" />
 </div>
 </div>
 <p>Computing a coverage map is as simple as running the following command:</p>
@@ -1805,7 +1812,7 @@ Documentation</a>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_46_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_46_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_47_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_47_0.png" />
 </div>
 </div>
 <p>From the figure above, we can see that many regions behind buildings do not receive any signal. The reason for this is that diffraction is by default deactivated. Let us now generate a new coverage map with diffraction enabled:</p>
@@ -1823,7 +1830,7 @@ Documentation</a>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_48_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_48_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_49_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_49_0.png" />
 </div>
 </div>
 <p>As expected from our experiements above, there is not a single point in the scene that is left blank. In some areas, however, the signal is still very weak and will not enable any form of communication.</p>
@@ -1860,14 +1867,14 @@ Documentation</a>.</p>
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_51_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_51_0.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_52_0.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_52_0.png" />
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_51_1.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_51_1.png" />
+<img alt="../_images/examples_Sionna_Ray_Tracing_Diffraction_52_1.png" src="../_images/examples_Sionna_Ray_Tracing_Diffraction_52_1.png" />
 </div>
 </div>
 <p>While the 1 GHz and 30 GHz carrier frequency coverage maps appear similar, key differences exist. The dynamic range for 30 GHz has grown by around 16dB due to the reduced diffracted field in deep shadow areas, such as behind buildings. The diffracted field at this frequency is considerably smaller compared to the incident field than it is at 1 GHz, leading to a significant increase in dynamic range.</p>

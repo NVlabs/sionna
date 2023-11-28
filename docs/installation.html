@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; Sionna 0.15.1 documentation</title>
+  <title>Installation &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -362,6 +362,9 @@
 <li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -386,6 +389,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -767,6 +771,8 @@
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#preview">preview</a></li>
@@ -792,9 +798,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#cameras">Cameras</a><ul>
@@ -980,8 +983,8 @@ You can alternatively test them on <a class="reference external" href="https://c
 Although not necessary, we recommend running Sionna in a <a class="reference external" href="https://www.docker.com">Docker container</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Sionna requires <a class="reference external" href="https://www.tensorflow.org/install">TensorFlow 2.10 or newer</a> and Python 3.6-3.9.
-We recommend Ubuntu 20.04.
+<p>Sionna requires <a class="reference external" href="https://www.tensorflow.org/install">TensorFlow 2.10-2.13</a> and Python 3.8-3.11.
+We recommend Ubuntu 22.04.
 Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.</p>
 <p>To run the ray tracer on CPU, <a class="reference external" href="https://llvm.org">LLVM</a> is required by DrJit. Please check the <a class="reference external" href="https://drjit.readthedocs.io/en/latest/firststeps-py.html#llvm-backend">installation instructions for the LLVM backend</a>.
 The ray tracing preview requires a recent version of <cite>JupyterLab</cite>. You can upgrade to the latest version via <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">ipykernel</span> <span class="pre">jupyterlab</span></code> (requires restart of <cite>JupyterLab</cite>).</p>
@@ -1001,7 +1004,7 @@ e.g., using <a class="reference external" href="https://docs.conda.io">conda</a>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sionna</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="go">0.15.1</span>
+<span class="go">0.16.0</span>
 </pre></div>
 </div>
 <p>3.) Once Sionna is installed, you can run the <a class="reference external" href="https://nvlabs.github.io/sionna/examples/Hello_World.html">Sionna “Hello, World!” example</a>, have a look at the <a class="reference external" href="https://nvlabs.github.io/sionna/quickstart.html">quick start guide</a>, or at the <a class="reference external" href="https://nvlabs.github.io/sionna/tutorials.html">tutorials</a>.</p>
@@ -1009,7 +1012,7 @@ e.g., using <a class="reference external" href="https://docs.conda.io">conda</a>
 </div>
 <div class="section" id="docker-based-installation">
 <h2>Docker-based Installation<a class="headerlink" href="#docker-based-installation" title="Permalink to this headline"></a></h2>
-<p>1.) Make sure that you have Docker <a class="reference external" href="https://docs.docker.com/engine/install/ubuntu/">installed</a> on your system. On Ubuntu 20.04, you can run for example</p>
+<p>1.) Make sure that you have Docker <a class="reference external" href="https://docs.docker.com/engine/install/ubuntu/">installed</a> on your system. On Ubuntu 22.04, you can run for example</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>docker.io
 </pre></div>
 </div>
@@ -1048,7 +1051,7 @@ e.g., using <a class="reference external" href="https://docs.conda.io">conda</a>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sionna</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="go">0.15.1</span>
+<span class="go">0.16.0</span>
 </pre></div>
 </div>
 </div>

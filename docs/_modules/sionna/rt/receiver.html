@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.receiver &mdash; Sionna 0.15.1 documentation</title>
+  <title>sionna.rt.receiver &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -360,6 +360,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -384,6 +387,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -765,6 +769,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#preview">preview</a></li>
@@ -790,9 +796,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#cameras">Cameras</a><ul>
@@ -952,7 +955,7 @@
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Class impelenting a receiver</span>
+<span class="sd">Class implementing a receiver</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
@@ -962,6 +965,17 @@
     <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class defining a receiver</span>
+
+<span class="sd">    The ``position`` and ``orientation`` properties can be assigned to a TensorFlow</span>
+<span class="sd">    variable or tensor. In the latter case, the tensor can be the output of a callable,</span>
+<span class="sd">    such as a Keras layer implementing a neural network. In the former case, it</span>
+<span class="sd">    can be set to a trainable variable:</span>
+
+<span class="sd">    .. code-block:: Python</span>
+
+<span class="sd">        rx = Transmitter(name=&quot;my_rx&quot;,</span>
+<span class="sd">                         position=tf.Variable([0, 0, 0], dtype=tf.float32),</span>
+<span class="sd">                         orientation=tf.Variable([0, 0, 0], dtype=tf.float32))</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -983,13 +997,10 @@
 <span class="sd">        :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.</span>
 <span class="sd">        If set to `None`, then ``orientation`` is used to orientate the device.</span>
 
-<span class="sd">    trainable_position : bool</span>
-<span class="sd">        Determines if the ``position`` is a trainable variable or not.</span>
-<span class="sd">        Defaults to `False`.</span>
-
-<span class="sd">    trainable_orientation : bool</span>
-<span class="sd">        Determines if the ``orientation`` is a trainable variable or not.</span>
-<span class="sd">        Defaults to `False`.</span>
+<span class="sd">    color : [3], float</span>
+<span class="sd">        Defines the RGB (red, green, blue) ``color`` parameter for the device as displayed in the previewer and renderer.</span>
+<span class="sd">        Each RGB component must have a value within the range :math:`\in [0,1]`.</span>
+<span class="sd">        Defaults to `[0.153, 0.682, 0.375]`.</span>
 
 <span class="sd">    dtype : tf.complex</span>
 <span class="sd">        Datatype to be used in internal calculations.</span>
@@ -1001,8 +1012,7 @@
                  <span class="n">position</span><span class="p">,</span>
                  <span class="n">orientation</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span>
                  <span class="n">look_at</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">trainable_position</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">trainable_orientation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.153</span><span class="p">,</span> <span class="mf">0.682</span><span class="p">,</span> <span class="mf">0.375</span><span class="p">),</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">):</span>
 
         <span class="c1"># Initialize the base class Object</span>
@@ -1010,8 +1020,7 @@
                          <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
                          <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
                          <span class="n">look_at</span><span class="o">=</span><span class="n">look_at</span><span class="p">,</span>
-                         <span class="n">trainable_position</span><span class="o">=</span><span class="n">trainable_position</span><span class="p">,</span>
-                         <span class="n">trainable_orientation</span><span class="o">=</span><span class="n">trainable_orientation</span><span class="p">,</span>
+                         <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
                          <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span></div>
 </pre></div>
 

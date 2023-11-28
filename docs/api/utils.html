@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utility Functions &mdash; Sionna 0.15.1 documentation</title>
+  <title>Utility Functions &mdash; Sionna 0.16.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -364,6 +364,9 @@
 <li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html#Table-of-Contents">Table of Contents</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html#Background-Information">Background Information</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -388,6 +391,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
@@ -769,6 +773,8 @@
 <li class="toctree-l3"><a class="reference internal" href="rt.html#scene">Scene</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#id1">Scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#compute-paths">compute_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#trace-paths">trace_paths</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#compute-fields">compute_fields</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#coverage-map">coverage_map</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#load-scene">load_scene</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#preview">preview</a></li>
@@ -794,9 +800,6 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="rt.html#coverage-maps">Coverage Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#coveragemap">CoverageMap</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rt.html#as-tensor">as_tensor</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rt.html#sample-positions">sample_positions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="rt.html#show">show</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="rt.html#cameras">Cameras</a><ul>
@@ -1654,7 +1657,7 @@ be removed. Negative indexing is possible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="sionna.utils.plotting.PlotBER.simulate">
-<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc_fun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebno_dbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mc_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_ber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_bler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_estimates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_bit_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_block_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_keyboard_interrupt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/utils/plotting.html#PlotBER.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.utils.plotting.PlotBER.simulate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc_fun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebno_dbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mc_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_ber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_bler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_estimates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_bit_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_block_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_ber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_bler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_keyboard_interrupt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/utils/plotting.html#PlotBER.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.utils.plotting.PlotBER.simulate" title="Permalink to this definition"></a></dt>
 <dd><p>Simulate BER/BLER curves for given Keras model and saves the results.</p>
 <p>Internally calls <a class="reference internal" href="#sionna.utils.sim_ber" title="sionna.utils.sim_ber"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.utils.sim_ber</span></code></a>.</p>
 <dl class="field-list simple">
@@ -1662,7 +1665,7 @@ be removed. Negative indexing is possible.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mc_fun</strong> – Callable that yields the transmitted bits <cite>b</cite> and the
 receiver’s estimate <cite>b_hat</cite> for a given <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> and
-<code class="docutils literal notranslate"><span class="pre">ebno_db</span></code>. If <code class="docutils literal notranslate"><span class="pre">soft_estimates</span></code> is True, b_hat interpreted as
+<code class="docutils literal notranslate"><span class="pre">ebno_db</span></code>. If <code class="docutils literal notranslate"><span class="pre">soft_estimates</span></code> is True, b_hat is interpreted as
 logit.</p></li>
 <li><p><strong>ebno_dbs</strong> (<em>ndarray of floats</em>) – SNR points to be evaluated.</p></li>
 <li><p><strong>batch_size</strong> (<em>tf.int32</em>) – Batch-size for evaluation.</p></li>
@@ -1678,11 +1681,30 @@ internally.</p></li>
 stops.</p></li>
 <li><p><strong>num_target_block_errors</strong> (<em>int</em>) – Target number of block errors per SNR point until the simulation
 stops.</p></li>
+<li><p><strong>target_ber</strong> (<em>tf.float32</em>) – Defaults to <cite>None</cite>. The simulation stops after the first SNR point
+which achieves a lower bit error rate as specified by
+<code class="docutils literal notranslate"><span class="pre">target_ber</span></code>. This requires <code class="docutils literal notranslate"><span class="pre">early_stop</span></code> to be <cite>True</cite>.</p></li>
+<li><p><strong>target_bler</strong> (<em>tf.float32</em>) – Defaults to <cite>None</cite>. The simulation stops after the first SNR point
+which achieves a lower block error rate as specified by
+<code class="docutils literal notranslate"><span class="pre">target_bler</span></code>.  This requires <code class="docutils literal notranslate"><span class="pre">early_stop</span></code> to be <cite>True</cite>.</p></li>
 <li><p><strong>early_stop</strong> (<em>bool</em>) – A boolean defaults to True. If True, the simulation stops after the
 first error-free SNR point (i.e., no error occurred after
 <code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> Monte-Carlo iterations).</p></li>
 <li><p><strong>graph_mode</strong> (<em>One of [“graph”, “xla”], str</em>) – A string describing the execution mode of <code class="docutils literal notranslate"><span class="pre">mc_fun</span></code>.
 Defaults to <cite>None</cite>. In this case, <code class="docutils literal notranslate"><span class="pre">mc_fun</span></code> is executed as is.</p></li>
+<li><p><strong>distribute</strong> (<cite>None</cite> (default) | “all” | list of indices | <cite>tf.distribute.strategy</cite>) – Distributes simulation on multiple parallel devices. If <cite>None</cite>,
+multi-device simulations are deactivated. If “all”, the workload
+will be automatically distributed across all available GPUs via the
+<cite>tf.distribute.MirroredStrategy</cite>.
+If an explicit list of indices is provided, only the GPUs with the
+given indices will be used. Alternatively, a custom
+<cite>tf.distribute.strategy</cite> can be provided. Note that the same
+<cite>batch_size</cite> will be used for all GPUs in parallel, but the number
+of Monte-Carlo iterations <code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> will be scaled by the
+number of devices such that the same number of total samples is
+simulated. However, all stopping conditions are still in-place
+which can cause slight differences in the total number of simulated
+samples.</p></li>
 <li><p><strong>add_results</strong> (<em>bool</em>) – Defaults to True. If True, the simulation results will be appended
 to the internal list of results.</p></li>
 <li><p><strong>show_fig</strong> (<em>bool</em>) – Defaults to True. If True, a BER figure will be plotted.</p></li>
@@ -1723,41 +1745,75 @@ simulation results.</p></li>
 <h3>sim_ber<a class="headerlink" href="#sim-ber" title="Permalink to this headline"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="sionna.utils.sim_ber">
-<span class="sig-prename descclassname"><span class="pre">sionna.utils.</span></span><span class="sig-name descname"><span class="pre">sim_ber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc_fun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebno_dbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mc_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_estimates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_bit_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_block_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_keyboard_interrupt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/utils/misc.html#sim_ber"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.utils.sim_ber" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sionna.utils.</span></span><span class="sig-name descname"><span class="pre">sim_ber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mc_fun</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ebno_dbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mc_iter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soft_estimates</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_bit_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_target_block_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_ber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_bler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">graph_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forward_keyboard_interrupt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tf.complex64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/sionna/utils/misc.html#sim_ber"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.utils.sim_ber" title="Permalink to this definition"></a></dt>
 <dd><p>Simulates until target number of errors is reached and returns BER/BLER.</p>
 <p>The simulation continues with the next SNR point if either
 <code class="docutils literal notranslate"><span class="pre">num_target_bit_errors</span></code> bit errors or <code class="docutils literal notranslate"><span class="pre">num_target_block_errors</span></code> block
 errors is achieved. Further, it continues with the next SNR point after
-<code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> batches of size <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> have been simulated.</p>
+<code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> batches of size <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> have been simulated.
+Early stopping allows to stop the simulation after the first error-free SNR
+point or after reaching a certain <code class="docutils literal notranslate"><span class="pre">target_ber</span></code> or <code class="docutils literal notranslate"><span class="pre">target_bler</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Input</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mc_fun</strong> – Callable that yields the transmitted bits <cite>b</cite> and the
+<li><p><strong>mc_fun</strong> (<em>callable</em>) – Callable that yields the transmitted bits <cite>b</cite> and the
 receiver’s estimate <cite>b_hat</cite> for a given <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> and
-<code class="docutils literal notranslate"><span class="pre">ebno_db</span></code>. If <code class="docutils literal notranslate"><span class="pre">soft_estimates</span></code> is True, b_hat is interpreted as
+<code class="docutils literal notranslate"><span class="pre">ebno_db</span></code>. If <code class="docutils literal notranslate"><span class="pre">soft_estimates</span></code> is True, <cite>b_hat</cite> is interpreted as
 logit.</p></li>
 <li><p><strong>ebno_dbs</strong> (<em>tf.float32</em>) – A tensor containing SNR points to be evaluated.</p></li>
 <li><p><strong>batch_size</strong> (<em>tf.int32</em>) – Batch-size for evaluation.</p></li>
-<li><p><strong>max_mc_iter</strong> (<em>tf.int32</em>) – Max. number of Monte-Carlo iterations per SNR point.</p></li>
-<li><p><strong>soft_estimates</strong> (<em>bool</em>) – A boolean, defaults to False. If True, <cite>b_hat`</cite>
+<li><p><strong>max_mc_iter</strong> (<em>tf.int32</em>) – Maximum number of Monte-Carlo iterations per SNR point.</p></li>
+<li><p><strong>soft_estimates</strong> (<em>bool</em>) – A boolean, defaults to <cite>False</cite>. If <cite>True</cite>, <cite>b_hat</cite>
 is interpreted as logit and an additional hard-decision is applied
 internally.</p></li>
-<li><p><strong>num_target_bit_errors</strong> (<em>tf.int32</em>) – Defaults to None. Target number of bit errors per SNR point until
+<li><p><strong>num_target_bit_errors</strong> (<em>tf.int32</em>) – Defaults to <cite>None</cite>. Target number of bit errors per SNR point until
 the simulation continues to next SNR point.</p></li>
-<li><p><strong>num_target_block_errors</strong> (<em>tf.int32</em>) – Defaults to None. Target number of block errors per SNR point
+<li><p><strong>num_target_block_errors</strong> (<em>tf.int32</em>) – Defaults to <cite>None</cite>. Target number of block errors per SNR point
 until the simulation continues</p></li>
-<li><p><strong>early_stop</strong> (<em>bool</em>) – A boolean defaults to True. If True, the simulation stops after the
+<li><p><strong>target_ber</strong> (<em>tf.float32</em>) – Defaults to <cite>None</cite>. The simulation stops after the first SNR point
+which achieves a lower bit error rate as specified by <code class="docutils literal notranslate"><span class="pre">target_ber</span></code>.
+This requires <code class="docutils literal notranslate"><span class="pre">early_stop</span></code> to be <cite>True</cite>.</p></li>
+<li><p><strong>target_bler</strong> (<em>tf.float32</em>) – Defaults to <cite>None</cite>. The simulation stops after the first SNR point
+which achieves a lower block error rate as specified by <code class="docutils literal notranslate"><span class="pre">target_bler</span></code>.
+This requires <code class="docutils literal notranslate"><span class="pre">early_stop</span></code> to be <cite>True</cite>.</p></li>
+<li><p><strong>early_stop</strong> (<em>bool</em>) – A boolean defaults to <cite>True</cite>. If <cite>True</cite>, the simulation stops after the
 first error-free SNR point (i.e., no error occurred after
 <code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> Monte-Carlo iterations).</p></li>
 <li><p><strong>graph_mode</strong> (<em>One of [“graph”, “xla”], str</em>) – A string describing the execution mode of <code class="docutils literal notranslate"><span class="pre">mc_fun</span></code>.
 Defaults to <cite>None</cite>. In this case, <code class="docutils literal notranslate"><span class="pre">mc_fun</span></code> is executed as is.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean defaults to True. If True, the current progress will be
+<li><p><strong>distribute</strong> (<cite>None</cite> (default) | “all” | list of indices | <cite>tf.distribute.strategy</cite>) – Distributes simulation on multiple parallel devices. If <cite>None</cite>,
+multi-device simulations are deactivated. If “all”, the workload will
+be automatically distributed across all available GPUs via the
+<cite>tf.distribute.MirroredStrategy</cite>.
+If an explicit list of indices is provided, only the GPUs with the given
+indices will be used. Alternatively, a custom <cite>tf.distribute.strategy</cite>
+can be provided. Note that the same <cite>batch_size</cite> will be
+used for all GPUs in parallel, but the number of Monte-Carlo iterations
+<code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> will be scaled by the number of devices such that the
+same number of total samples is simulated. However, all stopping
+conditions are still in-place which can cause slight differences in the
+total number of simulated samples.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – A boolean defaults to <cite>True</cite>. If <cite>True</cite>, the current progress will be
 printed.</p></li>
-<li><p><strong>forward_keyboard_interrupt</strong> (<em>bool</em>) – A boolean defaults to True. If False, KeyboardInterrupts will be
+<li><p><strong>forward_keyboard_interrupt</strong> (<em>bool</em>) – A boolean defaults to <cite>True</cite>. If <cite>False</cite>, KeyboardInterrupts will be
 catched internally and not forwarded (e.g., will not stop outer loops).
-If False, the simulation ends and returns the intermediate simulation
+If <cite>False</cite>, the simulation ends and returns the intermediate simulation
 results.</p></li>
-<li><p><strong>dtype</strong> (<em>tf.complex64</em>) – Datatype of the model / function to be used (<code class="docutils literal notranslate"><span class="pre">mc_fun</span></code>).</p></li>
+<li><p><strong>callback</strong> (<em>callable</em>) – Defaults to <cite>None</cite>. If specified, <code class="docutils literal notranslate"><span class="pre">callback</span></code>
+will be called after each Monte-Carlo step. Can be used for
+logging or advanced early stopping.
+Input signature of <code class="docutils literal notranslate"><span class="pre">callback</span></code> must match <cite>callback(mc_iter,
+ebno_dbs, bit_errors, block_errors, nb_bits, nb_blocks)</cite> where
+<code class="docutils literal notranslate"><span class="pre">mc_iter</span></code> denotes the number of processed batches for the current
+SNR, <code class="docutils literal notranslate"><span class="pre">ebno_dbs</span></code> is the current SNR point, <code class="docutils literal notranslate"><span class="pre">bit_errors</span></code> the number
+of bit errors, <code class="docutils literal notranslate"><span class="pre">block_errors</span></code> the number of block errors, <code class="docutils literal notranslate"><span class="pre">nb_bits</span></code>
+the number of simulated bits, <code class="docutils literal notranslate"><span class="pre">nb_blocks</span></code> the number of simulated
+blocks. If <code class="docutils literal notranslate"><span class="pre">callable</span></code> returns <cite>sim_ber.CALLBACK_NEXT_SNR</cite>, early
+stopping is detected and the simulation will continue with the next SNR
+point. If <code class="docutils literal notranslate"><span class="pre">callable</span></code> returns <cite>sim_ber.CALLBACK_STOP</cite>, the simulation
+is stopped immediately. For <cite>sim_ber.CALLBACK_CONTINUE</cite> continues with
+the simulation.</p></li>
+<li><p><strong>dtype</strong> (<em>tf.complex64</em>) – Datatype of the callable <code class="docutils literal notranslate"><span class="pre">mc_fun</span></code> to be used as input/output.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Output</dt>
