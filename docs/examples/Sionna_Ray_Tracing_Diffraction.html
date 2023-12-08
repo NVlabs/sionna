@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial on Diffraction &mdash; Sionna 0.16.0 documentation</title>
+  <title>Tutorial on Diffraction &mdash; Sionna 0.16.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -363,10 +363,10 @@
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Tutorial on Diffraction</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#Table-of-Contents">Table of Contents</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#Wedge-vs-Edge">Wedge vs Edge</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#Wedge-vs-Edge">Wedge vs Edge</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
@@ -1269,7 +1269,6 @@ div.rendered_html tbody tr:hover {
 <h2>Table of Contents<a class="headerlink" href="#Table-of-Contents" title="Permalink to this headline"></a></h2>
 <ul class="simple">
 <li><p><a class="reference external" href="#Background-Information">Background Information</a></p></li>
-<li><p><a class="reference external" href="#Wedge-vs-Edge">Wedge vs Edge</a></p></li>
 <li><p><a class="reference external" href="#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></p></li>
 <li><p><a class="reference external" href="#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></p></li>
 <li><p><a class="reference external" href="#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></p></li>
@@ -1291,14 +1290,14 @@ and then rapidly decays to zero. Most importantly, without diffraction, there wo
 <p>According to the GTD, when a ray hits a point on the edge, its energy gets spread over a continuum of rays lying on the Keller cone. All rays on this cone make equal angles with the edge of diffraction at the point of diffraction, i.e., <span class="math notranslate nohighlight">\(\beta_0'=\beta_0\)</span>. One can think of this phenomenon as an extension of the law of reflection at planar surfaces. The figures above illustrates this concept.</p>
 <p>The GTD was later extended to the uniform theory of diffraction (UTD) [2,3] which overcomes some of its shortcomings.</p>
 <p>We will explore in this notebook these effects in detail and also validate the UTD implementation in Sionna RT as a by-product.</p>
-</div>
-</div>
 <div class="section" id="Wedge-vs-Edge">
-<h1>Wedge vs Edge<a class="headerlink" href="#Wedge-vs-Edge" title="Permalink to this headline"></a></h1>
+<h3>Wedge vs Edge<a class="headerlink" href="#Wedge-vs-Edge" title="Permalink to this headline"></a></h3>
 <p>First, it is important to know the difference between a <em>wedge</em> and an <em>edge</em>, and why we distinguish between them.</p>
 <p>Sionna defines a <em>wedge</em> as the line segment between two primitives, i.e., the common segment of two triangles. For example, a cubic building would have 12 wedges.</p>
-<p>For primitives that have one or more line segments that are not shared with another primitive, Sionna refers to such line segments as <em>edges</em>. See <code class="docutils literal notranslate"><span class="pre">`sionna.rt.scene.floor_wall</span></code> &lt;<a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.scene.floor_wall">https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.scene.floor_wall</a>&gt;`__ for an example scene.</p>
+<p>For primitives that have one or more line segments that are not shared with another primitive, Sionna refers to such line segments as <em>edges</em>. See <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.scene.floor_wall">sionna.rt.scene.floor_wall</a> for an example scene.</p>
 <p>By default, Sionna does not simulate diffraction on edges (<code class="docutils literal notranslate"><span class="pre">edge_diffraction=False</span></code>), to avoid problems such as diffraction on the exterior edges of the ground surface (modelled as a rectangular plane).</p>
+</div>
+</div>
 <div class="section" id="GPU-Configuration-and-Imports">
 <h2>GPU Configuration and Imports<a class="headerlink" href="#GPU-Configuration-and-Imports" title="Permalink to this headline"></a></h2>
 <div class="nbinput nblast docutils container">
