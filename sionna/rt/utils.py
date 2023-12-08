@@ -248,9 +248,7 @@ def dot(u, v, keepdim=False, clip=False):
         The last dimension is removed if ``keepdim``
         is set to `False`.
     """
-    res = tf.linalg.matvec(tf.expand_dims(u, -2), v)
-    if not keepdim:
-        res = tf.squeeze(res,axis=-1)
+    res = tf.reduce_sum(u*v, axis=-1, keepdims=keepdim)
     if clip:
         one = tf.ones((), u.dtype)
         res = tf.clip_by_value(res, -one, one)
