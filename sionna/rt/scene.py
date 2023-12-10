@@ -105,7 +105,7 @@ class Scene:
 
         return cls._instance
 
-    def __init__(self, env_filename = None, dtype = tf.complex64):
+    def __init__(self, env_filename = None, dtype = tf.complex64, parallel=False):
 
         # If a filename is provided, loads the scene from it.
         # The previous scene is overwritten.
@@ -133,9 +133,9 @@ class Scene:
                 self._scene = mi.load_dict({"type": "scene",
                                             "integrator": {
                                                 "type": "path",
-                                            }})
+                                            }}, parallel=parallel)
             else:
-                self._scene = mi.load_file(env_filename)
+                self._scene = mi.load_file(env_filename, parallel=parallel)
 
             # Instantiate the solver
             self._solver_paths = SolverPaths(self, dtype=dtype)
@@ -1771,7 +1771,7 @@ class Scene:
         return used
 
 
-def load_scene(filename=None, dtype=tf.complex64):
+def load_scene(filename=None, dtype=tf.complex64, parallel=False):
     # pylint: disable=line-too-long
     r"""
     Load a scene from file
@@ -1797,7 +1797,7 @@ def load_scene(filename=None, dtype=tf.complex64):
     # Create empty scene using the reserved filename "__empty__"
     if filename is None:
         filename = "__empty__"
-    return Scene(filename, dtype=dtype)
+    return Scene(filename, dtype=dtype, parallel=parallel)
 
 #
 # Module variables for example scene files
