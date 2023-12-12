@@ -776,9 +776,9 @@ def sim_ber(mc_fun,
 
                 cb_state = sim_ber.CALLBACK_CONTINUE
                 if callback is not None:
-                    cb_state = callback (ii, ebno_dbs[i], bit_errors[i],
-                                       block_errors[i], nb_bits[i],
-                                       nb_blocks[i])
+                    cb_state = callback (ii, ebno_dbs, bit_errors,
+                                       block_errors, nb_bits,
+                                       nb_blocks)
                     if cb_state in (sim_ber.CALLBACK_STOP,
                                     sim_ber.CALLBACK_NEXT_SNR):
                         # stop runtime timer
