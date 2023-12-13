@@ -498,20 +498,23 @@ def sim_ber(mc_fun,
         If `False`, the simulation ends and returns the intermediate simulation
         results.
 
-    callback: callable
-        Defaults to `None`. If specified, ``callback``
+    callback: callable Defaults to `None`. If specified, ``callback``
         will be called after each Monte-Carlo step. Can be used for
-        logging or advanced early stopping.
-        Input signature of ``callback`` must match `callback(mc_iter,
-        ebno_dbs, bit_errors, block_errors, nb_bits, nb_blocks)` where
-        ``mc_iter`` denotes the number of processed batches for the current
-        SNR, ``ebno_dbs`` is the current SNR point, ``bit_errors`` the number
-        of bit errors, ``block_errors`` the number of block errors, ``nb_bits``
-        the number of simulated bits, ``nb_blocks`` the number of simulated
-        blocks. If ``callable`` returns `sim_ber.CALLBACK_NEXT_SNR`, early
-        stopping is detected and the simulation will continue with the next SNR
-        point. If ``callable`` returns `sim_ber.CALLBACK_STOP`, the simulation
-        is stopped immediately. For `sim_ber.CALLBACK_CONTINUE` continues with
+        logging or advanced early stopping.  Input signature of
+        ``callback`` must match `callback(mc_iter, esno_idx, ebno_dbs,
+        bit_errors, block_errors, nb_bits, nb_blocks)` where
+        ``mc_iter`` denotes the number of processed batches for the
+        current SNR, ``esno_idx`` is the index of the current esno
+        step, ``ebno_dbs`` is the vector of all SNR points,
+        ``bit_errors`` the vector of number of bit errors for each
+        esno step, ``block_errors`` the vector of number of block
+        errors, ``nb_bits`` the vector of number of simulated bits,
+        ``nb_blocks`` the vector of number of simulated blocks. If
+        ``callable`` returns `sim_ber.CALLBACK_NEXT_SNR`, early
+        stopping is detected and the simulation will continue with the
+        next SNR point. If ``callable`` returns
+        `sim_ber.CALLBACK_STOP`, the simulation is stopped
+        immediately. For `sim_ber.CALLBACK_CONTINUE` continues with
         the simulation.
 
     dtype: tf.complex64
@@ -776,7 +779,7 @@ def sim_ber(mc_fun,
 
                 cb_state = sim_ber.CALLBACK_CONTINUE
                 if callback is not None:
-                    cb_state = callback (ii, ebno_dbs, bit_errors,
+                    cb_state = callback (ii, i, ebno_dbs, bit_errors,
                                        block_errors, nb_bits,
                                        nb_blocks)
                     if cb_state in (sim_ber.CALLBACK_STOP,
