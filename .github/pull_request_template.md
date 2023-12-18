@@ -26,12 +26,12 @@ Please detail the nature of the submission.
 
 ## Checklist
 
-[ ] Detailed description
-[ ] Added references to issues and discussions
-[ ] Added / modified documentation as needed
-[ ] Added / modified unit tests as needed
-[ ] Passes all tests
-[ ] Lint the code
-[ ] Performed a self review
-[ ] Ensure you Signed-off the commits. Required to accept contributions!
-[ ] Co-authored with someone? Add Co-authored-by: user@domain and ensure they signed off their commits too.
+- [ ] Detailed description
+- [ ] Added references to issues and discussions
+- [ ] Added / modified documentation as needed
+- [ ] Added / modified unit tests as needed
+- [ ] Passes all tests
+- [ ] Lint the code
+- [ ] Performed a self review
+- [ ] Ensure you Signed-off the commits. Required to accept contributions!
+- [ ] Co-authored with someone? Add Co-authored-by: user@domain and ensure they signed off their commits too.
