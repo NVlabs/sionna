@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Utility Functions &mdash; Sionna 0.16.1 documentation</title>
+  <title>Utility Functions &mdash; Sionna 0.16.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -390,13 +390,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#id1">.</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#id2">.</a></li>
 </ul>
 </li>
 </ul>
@@ -1799,19 +1798,21 @@ printed.</p></li>
 catched internally and not forwarded (e.g., will not stop outer loops).
 If <cite>False</cite>, the simulation ends and returns the intermediate simulation
 results.</p></li>
-<li><p><strong>callback</strong> (<em>callable</em>) – Defaults to <cite>None</cite>. If specified, <code class="docutils literal notranslate"><span class="pre">callback</span></code>
-will be called after each Monte-Carlo step. Can be used for
-logging or advanced early stopping.
-Input signature of <code class="docutils literal notranslate"><span class="pre">callback</span></code> must match <cite>callback(mc_iter,
-ebno_dbs, bit_errors, block_errors, nb_bits, nb_blocks)</cite> where
-<code class="docutils literal notranslate"><span class="pre">mc_iter</span></code> denotes the number of processed batches for the current
-SNR, <code class="docutils literal notranslate"><span class="pre">ebno_dbs</span></code> is the current SNR point, <code class="docutils literal notranslate"><span class="pre">bit_errors</span></code> the number
-of bit errors, <code class="docutils literal notranslate"><span class="pre">block_errors</span></code> the number of block errors, <code class="docutils literal notranslate"><span class="pre">nb_bits</span></code>
-the number of simulated bits, <code class="docutils literal notranslate"><span class="pre">nb_blocks</span></code> the number of simulated
-blocks. If <code class="docutils literal notranslate"><span class="pre">callable</span></code> returns <cite>sim_ber.CALLBACK_NEXT_SNR</cite>, early
-stopping is detected and the simulation will continue with the next SNR
-point. If <code class="docutils literal notranslate"><span class="pre">callable</span></code> returns <cite>sim_ber.CALLBACK_STOP</cite>, the simulation
-is stopped immediately. For <cite>sim_ber.CALLBACK_CONTINUE</cite> continues with
+<li><p><strong>callback</strong> (<cite>None</cite> (default) | callable) – If specified, <code class="docutils literal notranslate"><span class="pre">callback</span></code> will be called after each Monte-Carlo step.
+Can be used for logging or advanced early stopping. Input signature of
+<code class="docutils literal notranslate"><span class="pre">callback</span></code> must match <cite>callback(mc_iter, snr_idx, ebno_dbs,
+bit_errors, block_errors, nb_bits, nb_blocks)</cite> where <code class="docutils literal notranslate"><span class="pre">mc_iter</span></code>
+denotes the number of processed batches for the current SNR point,
+<code class="docutils literal notranslate"><span class="pre">snr_idx</span></code> is the index of the current SNR point, <code class="docutils literal notranslate"><span class="pre">ebno_dbs</span></code> is the
+vector of all SNR points to be evaluated, <code class="docutils literal notranslate"><span class="pre">bit_errors</span></code> the vector of
+number of bit errors for each SNR point, <code class="docutils literal notranslate"><span class="pre">block_errors</span></code> the vector of
+number of block errors, <code class="docutils literal notranslate"><span class="pre">nb_bits</span></code> the vector of number of simulated
+bits, <code class="docutils literal notranslate"><span class="pre">nb_blocks</span></code> the vector of number of simulated blocks,
+respectively. If <code class="docutils literal notranslate"><span class="pre">callable</span></code> returns <cite>sim_ber.CALLBACK_NEXT_SNR</cite>, early
+stopping is detected and the simulation will continue with the
+next SNR point. If <code class="docutils literal notranslate"><span class="pre">callable</span></code> returns
+<cite>sim_ber.CALLBACK_STOP</cite>, the simulation is stopped
+immediately. For <cite>sim_ber.CALLBACK_CONTINUE</cite> continues with
 the simulation.</p></li>
 <li><p><strong>dtype</strong> (<em>tf.complex64</em>) – Datatype of the callable <code class="docutils literal notranslate"><span class="pre">mc_fun</span></code> to be used as input/output.</p></li>
 </ul>

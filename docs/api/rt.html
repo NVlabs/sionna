@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ray Tracing &mdash; Sionna 0.16.1 documentation</title>
+  <title>Ray Tracing &mdash; Sionna 0.16.2 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -390,13 +390,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#id1">.</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#id2">.</a></li>
 </ul>
 </li>
 </ul>
@@ -1819,8 +1818,8 @@ Otherwise, <code class="docutils literal notranslate"><span class="pre">cm_cente
 <li><p><strong>cm_cell_size</strong> (<em>[2], float</em>) – Size of a cell of the coverage map [m].
 Defaults to <span class="math notranslate nohighlight">\((10,10)\)</span>.</p></li>
 <li><p><strong>combining_vec</strong> (<em>[num_rx_ant], complex | None</em>) – Combining vector.
-If set to <cite>None</cite>, then defaults to
-<span class="math notranslate nohighlight">\(\frac{1}{\sqrt{\text{num_rx_ant}}} [1,\dots,1]^{\mathsf{T}}\)</span>.</p></li>
+If set to <cite>None</cite>, then no combining is applied, and
+the energy received by all antennas is summed.</p></li>
 <li><p><strong>precoding_vec</strong> (<em>[num_tx_ant], complex | None</em>) – Precoding vector.
 If set to <cite>None</cite>, then defaults to
 <span class="math notranslate nohighlight">\(\frac{1}{\sqrt{\text{num_tx_ant}}} [1,\dots,1]^{\mathsf{T}}\)</span>.</p></li>
@@ -1881,7 +1880,7 @@ Defaults to <cite>tf.complex64</cite>.</p></li>
 <h3>preview<a class="headerlink" href="#preview" title="Permalink to this headline"></a></h3>
 <dl class="py function">
 <dt class="sig sig-object py" id="sionna.rt.Scene.preview">
-<span class="sig-prename descclassname"><span class="pre">sionna.rt.Scene.</span></span><span class="sig-name descname"><span class="pre">preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_devices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm_vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm_vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(655,</span> <span class="pre">500)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#ffffff'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.rt.Scene.preview" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sionna.rt.Scene.</span></span><span class="sig-name descname"><span class="pre">preview</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_devices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coverage_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm_vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm_vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(655,</span> <span class="pre">500)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#ffffff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_plane_orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">-</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sionna.rt.Scene.preview" title="Permalink to this definition"></a></dt>
 <dd><p>In an interactive notebook environment, opens an interactive 3D
 viewer of the scene.</p>
 <p>The returned value of this method must be the last line of
@@ -1941,6 +1940,13 @@ Defaults to <cite>[655, 500]</cite>.</p></li>
 Defaults to 45°.</p></li>
 <li><p><strong>background</strong> (<em>str</em>) – Background color in hex format prefixed by ‘#’.
 Defaults to ‘#ffffff’ (white).</p></li>
+<li><p><strong>clip_at</strong> (<em>float</em>) – If not <cite>None</cite>, the scene preview will be clipped (cut) by a plane
+with normal orientation <code class="docutils literal notranslate"><span class="pre">clip_plane_orientation</span></code> and offset <code class="docutils literal notranslate"><span class="pre">clip_at</span></code>.
+That means that everything <em>behind</em> the plane becomes invisible.
+This allows visualizing the interior of meshes, such as buildings.
+Defaults to <cite>None</cite>.</p></li>
+<li><p><strong>clip_plane_orientation</strong> (<em>tuple[float, float, float]</em>) – Normal vector of the clipping plane.
+Defaults to (0,0,-1).</p></li>
 </ul>
 </dd>
 </dl>

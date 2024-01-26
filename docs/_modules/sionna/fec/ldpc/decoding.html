@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.16.1 documentation</title>
+  <title>sionna.fec.ldpc.decoding &mdash; Sionna 0.16.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/copybutton.css" type="text/css" />
@@ -386,13 +386,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../made_with_sionna.html">“Made with Sionna”</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#id1">.</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../made_with_sionna.html#id2">.</a></li>
 </ul>
 </li>
 </ul>
@@ -1489,29 +1488,6 @@
                                       <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">x</span>
 
-    <span class="k">def</span> <span class="nf">_extrinsic_min</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Provides the extrinsic min operation for the minsum approximation</span>
-<span class="sd">        of the CN function.</span>
-
-<span class="sd">        This function implements the extrinsic min operation, i.e.,</span>
-<span class="sd">        the min is taken over all values excluding the value at the current</span>
-<span class="sd">        index.</span>
-
-<span class="sd">        Note that the input is expected to be a Tensor and NOT a ragged Tensor.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">num_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">msg</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">id_mat</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">num_val</span><span class="p">)</span>
-
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_val</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># create outgoing tensor per value</span>
-               <span class="o">+</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="n">id_mat</span><span class="p">)</span> <span class="c1"># &quot;ignore&quot; intrinsic msg by adding large const.</span>
-
-
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">msg</span>
-
     <span class="k">def</span> <span class="nf">_where_ragged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper to replace 0 elements from ragged tensor (called with</span>
 <span class="sd">        map_flat_values).&quot;&quot;&quot;</span>
@@ -1661,43 +1637,6 @@
                             <span class="n">sign_val</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sign_val</span>
 
-    <span class="k">def</span> <span class="nf">_cn_update_minsum_mapfn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Check node update function implementing the min-sum approximation.</span>
-
-<span class="sd">        This function approximates the (extrinsic) check node update</span>
-<span class="sd">        function based on the min-sum approximation (cf. [Ryan]_).</span>
-<span class="sd">        It calculates the &quot;extrinsic&quot; min function over all incoming messages</span>
-<span class="sd">        ``msg`` excluding the intrinsic (=outgoing) message itself.</span>
-
-<span class="sd">        The input is expected to be a ragged Tensor of shape</span>
-<span class="sd">        `[num_vns, None, batch_size]`.</span>
-
-<span class="sd">        This function uses tf.map_fn() to call the CN updates.</span>
-<span class="sd">        It is currently not used, but can be used as template to implement</span>
-<span class="sd">        modified CN functions (e.g., offset-corrected minsum).</span>
-<span class="sd">        Please note that tf.map_fn lowers the throughput significantly.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sign_val_minsum</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
-        <span class="n">sign_node</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_prod</span><span class="p">(</span><span class="n">sign_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">sign_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stop_ragged_gradient</span><span class="p">(</span><span class="n">sign_val</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span>
-                                                             <span class="n">sign_node</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="c1"># remove sign</span>
-
-        <span class="c1"># calculate extrinsic messages and include the sign</span>
-        <span class="n">msg_e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">map_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_extrinsic_min</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">infer_shape</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="c1"># ensure shape after map_fn</span>
-        <span class="n">msg_fv</span> <span class="o">=</span> <span class="n">msg_e</span><span class="o">.</span><span class="n">flat_values</span>
-        <span class="n">msg_fv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ensure_shape</span><span class="p">(</span><span class="n">msg_fv</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">flat_values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="n">msg_e</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">with_flat_values</span><span class="p">(</span><span class="n">msg_fv</span><span class="p">)</span>
-
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">sign_val</span> <span class="o">*</span> <span class="n">msg_e</span>
-
-        <span class="k">return</span> <span class="n">msg</span>
-
     <span class="k">def</span> <span class="nf">_cn_update_minsum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Check node update function implementing the min-sum approximation.</span>
 
@@ -1709,7 +1648,8 @@
 <span class="sd">        The input is expected to be a ragged Tensor of shape</span>
 <span class="sd">        `[num_vns, None, batch_size]`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># a constant used overwrite the first min</span>
+
+        <span class="c1"># a constant used to overwrite the first min</span>
         <span class="n">LARGE_VAL</span> <span class="o">=</span> <span class="mf">10000.</span> <span class="c1"># pylint: disable=invalid-name</span>
 
         <span class="c1"># clip values for numerical stability</span>
@@ -1717,9 +1657,8 @@
                                <span class="n">clip_value_min</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span><span class="p">,</span>
                                <span class="n">clip_value_max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_llr_max</span><span class="p">)</span>
 
-        <span class="c1"># calculate sign of outgoing msg</span>
+        <span class="c1"># calculate sign of outgoing msg and the node</span>
         <span class="n">sign_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sign_val_minsum</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
-
         <span class="n">sign_node</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_prod</span><span class="p">(</span><span class="n">sign_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># TF2.9 does not support XLA for the multiplication of ragged tensors</span>
@@ -1734,15 +1673,16 @@
                                         <span class="n">sign_node</span><span class="p">,</span>
                                         <span class="n">sign_val</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
 
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="c1"># remove sign</span>
+        <span class="c1"># remove sign from messages</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># Calculate the extrinsic minimum per CN, i.e., for each message of</span>
         <span class="c1"># index i, find the smallest and the second smallest value.</span>
         <span class="c1"># However, in some cases the second smallest value may equal the</span>
         <span class="c1"># smallest value (multiplicity of mins).</span>
         <span class="c1"># Please note that this needs to be applied to raggedTensors, e.g.,</span>
-        <span class="c1"># tf.top_k() is currently not supported and the ops must support graph</span>
-        <span class="c1"># # mode.</span>
+        <span class="c1"># tf.top_k() is currently not supported and all ops must support graph</span>
+        <span class="c1"># and XLA mode.</span>
 
         <span class="c1"># find min_value per node</span>
         <span class="n">min_val</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1752,46 +1692,52 @@
 
         <span class="c1"># and subtract min; the new array contains zero at the min positions</span>
         <span class="c1"># benefits from broadcasting; all other values are positive</span>
-        <span class="c1"># msg_min1 = msg - min_val</span>
         <span class="n">msg_min1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">:</span>
-                                             <span class="n">x</span><span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">),</span>
+                                             <span class="n">x</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">row_ind</span><span class="p">),</span>
                                              <span class="n">msg</span><span class="p">,</span>
                                              <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
                                              <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">())</span>
 
         <span class="c1"># replace 0 (=min positions) with large value to ignore it for further</span>
         <span class="c1"># min calculations</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>
-                                        <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">LARGE_VAL</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
-                                        <span class="n">msg_min1</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">LARGE_VAL</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+                            <span class="n">msg_min1</span><span class="p">)</span>
 
         <span class="c1"># find the second smallest element (we add min_val as this has been</span>
         <span class="c1"># subtracted before)</span>
-        <span class="n">min_val2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">min_val</span>
+        <span class="n">min_val_2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_min</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">min_val</span>
 
         <span class="c1"># Detect duplicated minima (i.e., min_val occurs at two incoming</span>
         <span class="c1"># messages). As the LLRs per node are &lt;LLR_MAX and we have</span>
         <span class="c1"># replace at least 1 position (position with message &quot;min_val&quot;) by</span>
         <span class="c1"># LARGE_VAL, it holds for the sum &lt; LARGE_VAL + node_degree*LLR_MAX.</span>
-        <span class="c1"># if the sum &gt; 2*LARGE_VAL, the multiplicity of the min is at least 2.</span>
+        <span class="c1"># If the sum &gt; 2*LARGE_VAL, the multiplicity of the min is at least 2.</span>
         <span class="n">node_sum</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">LARGE_VAL</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span>
         <span class="c1"># indicator that duplicated min was detected (per node)</span>
         <span class="n">double_min</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">node_sum</span><span class="p">))</span>
 
         <span class="c1"># if a duplicate min occurred, both edges must have min_val, otherwise</span>
         <span class="c1"># the second smallest value is taken</span>
-        <span class="n">min_val_e</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">double_min</span><span class="p">)</span> <span class="o">*</span> <span class="n">min_val</span> <span class="o">+</span> <span class="p">(</span><span class="n">double_min</span><span class="p">)</span> <span class="o">*</span> <span class="n">min_val2</span>
+        <span class="n">min_val_e</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">double_min</span><span class="p">)</span> <span class="o">*</span> <span class="n">min_val</span> <span class="o">+</span> <span class="p">(</span><span class="n">double_min</span><span class="p">)</span> <span class="o">*</span> <span class="n">min_val_2</span>
 
         <span class="c1"># replace all values with min_val except the position where the min</span>
         <span class="c1"># occurred (=extrinsic min).</span>
-        <span class="n">msg_e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">msg</span><span class="o">==</span><span class="n">LARGE_VAL</span><span class="p">,</span> <span class="n">min_val_e</span><span class="p">,</span> <span class="n">min_val</span><span class="p">)</span>
+
+        <span class="c1"># no XLA support for TF 2.15</span>
+        <span class="c1"># msg_e = tf.where(msg==LARGE_VAL, min_val_e, min_val)</span>
+
+        <span class="n">min_1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">min_e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">min_val_e</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">value_rowids</span><span class="p">()),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">msg_e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span><span class="o">==</span><span class="n">LARGE_VAL</span><span class="p">,</span> <span class="n">min_e</span><span class="p">,</span> <span class="n">min_1</span><span class="p">),</span>
+                        <span class="n">msg</span><span class="p">)</span>
 
         <span class="c1"># it seems like tf.where does not set the shape of tf.ragged properly</span>
         <span class="c1"># we need to ensure the shape manually</span>
         <span class="n">msg_e</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">ragged</span><span class="o">.</span><span class="n">map_flat_values</span><span class="p">(</span>
-                                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span>
-                                    <span class="n">tf</span><span class="o">.</span><span class="n">ensure_shape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">flat_values</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                                    <span class="n">msg_e</span><span class="p">)</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">ensure_shape</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">flat_values</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                        <span class="n">msg_e</span><span class="p">)</span>
 
         <span class="c1"># TF2.9 does not support XLA for the multiplication of ragged tensors</span>
         <span class="c1"># the following code provides a workaround that supports XLA</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.utils.misc &mdash; Sionna 0.16.1 documentation</title>
+  <title>sionna.utils.misc &mdash; Sionna 0.16.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -386,13 +386,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id1">.</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#graph-neural-networks-for-enhanced-decoding-of-quantum-ldpc-codes">Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#sionna-rt-differentiable-ray-tracing-for-radio-propagation-modeling">Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#duidd-deep-unfolded-interleaved-detection-and-decoding-for-mimo-wireless-systems">DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#bit-error-and-block-error-rate-training-for-ml-assisted-communication">Bit Error and Block Error Rate Training for ML-Assisted Communication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#gnns-for-channel-decoding">GNNs for Channel Decoding</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#dl-based-synchronization-of-nb-iot">DL-based Synchronization of NB-IoT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id2">.</a></li>
 </ul>
 </li>
 </ul>
@@ -1450,20 +1449,22 @@
 <span class="sd">        If `False`, the simulation ends and returns the intermediate simulation</span>
 <span class="sd">        results.</span>
 
-<span class="sd">    callback: callable</span>
-<span class="sd">        Defaults to `None`. If specified, ``callback``</span>
-<span class="sd">        will be called after each Monte-Carlo step. Can be used for</span>
-<span class="sd">        logging or advanced early stopping.</span>
-<span class="sd">        Input signature of ``callback`` must match `callback(mc_iter,</span>
-<span class="sd">        ebno_dbs, bit_errors, block_errors, nb_bits, nb_blocks)` where</span>
-<span class="sd">        ``mc_iter`` denotes the number of processed batches for the current</span>
-<span class="sd">        SNR, ``ebno_dbs`` is the current SNR point, ``bit_errors`` the number</span>
-<span class="sd">        of bit errors, ``block_errors`` the number of block errors, ``nb_bits``</span>
-<span class="sd">        the number of simulated bits, ``nb_blocks`` the number of simulated</span>
-<span class="sd">        blocks. If ``callable`` returns `sim_ber.CALLBACK_NEXT_SNR`, early</span>
-<span class="sd">        stopping is detected and the simulation will continue with the next SNR</span>
-<span class="sd">        point. If ``callable`` returns `sim_ber.CALLBACK_STOP`, the simulation</span>
-<span class="sd">        is stopped immediately. For `sim_ber.CALLBACK_CONTINUE` continues with</span>
+<span class="sd">    callback: `None` (default) | callable</span>
+<span class="sd">        If specified, ``callback`` will be called after each Monte-Carlo step.</span>
+<span class="sd">        Can be used for logging or advanced early stopping. Input signature of</span>
+<span class="sd">        ``callback`` must match `callback(mc_iter, snr_idx, ebno_dbs,</span>
+<span class="sd">        bit_errors, block_errors, nb_bits, nb_blocks)` where ``mc_iter``</span>
+<span class="sd">        denotes the number of processed batches for the current SNR point,</span>
+<span class="sd">        ``snr_idx`` is the index of the current SNR point, ``ebno_dbs`` is the</span>
+<span class="sd">        vector of all SNR points to be evaluated, ``bit_errors`` the vector of</span>
+<span class="sd">        number of bit errors for each SNR point, ``block_errors`` the vector of</span>
+<span class="sd">        number of block errors, ``nb_bits`` the vector of number of simulated</span>
+<span class="sd">        bits, ``nb_blocks`` the vector of number of simulated blocks,</span>
+<span class="sd">        respectively. If ``callable`` returns `sim_ber.CALLBACK_NEXT_SNR`, early</span>
+<span class="sd">        stopping is detected and the simulation will continue with the</span>
+<span class="sd">        next SNR point. If ``callable`` returns</span>
+<span class="sd">        `sim_ber.CALLBACK_STOP`, the simulation is stopped</span>
+<span class="sd">        immediately. For `sim_ber.CALLBACK_CONTINUE` continues with</span>
 <span class="sd">        the simulation.</span>
 
 <span class="sd">    dtype: tf.complex64</span>
@@ -1728,9 +1729,9 @@
 
                 <span class="n">cb_state</span> <span class="o">=</span> <span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_CONTINUE</span>
                 <span class="k">if</span> <span class="n">callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">cb_state</span> <span class="o">=</span> <span class="n">callback</span> <span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">ebno_dbs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">bit_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                                       <span class="n">block_errors</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nb_bits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                                       <span class="n">nb_blocks</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">cb_state</span> <span class="o">=</span> <span class="n">callback</span> <span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">ebno_dbs</span><span class="p">,</span> <span class="n">bit_errors</span><span class="p">,</span>
+                                       <span class="n">block_errors</span><span class="p">,</span> <span class="n">nb_bits</span><span class="p">,</span>
+                                       <span class="n">nb_blocks</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">cb_state</span> <span class="ow">in</span> <span class="p">(</span><span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_STOP</span><span class="p">,</span>
                                     <span class="n">sim_ber</span><span class="o">.</span><span class="n">CALLBACK_NEXT_SNR</span><span class="p">):</span>
                         <span class="c1"># stop runtime timer</span>
