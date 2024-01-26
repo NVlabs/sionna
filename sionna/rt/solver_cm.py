@@ -100,10 +100,12 @@ class SolverCoverageMap(SolverBase):
         (in the local X direction) and height (in the local Y direction) in
         meters of a cell of the coverage map
 
-    combining_vec : [num_rx_ant], tf.complex
+    combining_vec : [num_rx_ant], tf.complex | None
         Combining vector.
         This is used to combine the signal from the receive antennas for
         an imaginary receiver located on the coverage map.
+        If set to `None`, then no combining is applied, and
+        the energy received by all antennas is summed.
 
     precoding_vec : [num_tx or 1, num_tx_ant], tf.complex
         Precoding vectors of the transmitters
@@ -564,8 +566,10 @@ class SolverCoverageMap(SolverBase):
         precoding_vec : [num_tx, num_tx_ant] or [1, num_tx_ant], tf.complex
             Vector used for transmit-precoding
 
-        combining_vec : [num_rx_ant], tf.complex
-            Vector used for receive-combing
+        combining_vec : [num_rx_ant], tf.complex | None
+            Vector used for receive-combing.
+            If set to `None`, then no combining is applied, and
+            the energy received by all antennas is summed.
 
         samples_tx_indices : [num_samples], tf.int
             Transmitter indices that correspond to evey sample, i.e., from
@@ -666,19 +670,25 @@ class SolverCoverageMap(SolverBase):
         a = self._apply_synthetic_array(tx_rot_mat, rx_rot_mat,
                                         k_rx, k_tx, a)
 
-        # Apply precoding and combining
-        # [1, num_rx_ant]
-        combining_vec = tf.expand_dims(combining_vec, 0)
+        # Apply precoding
         # [num_hits, 1, num_tx_ant]
         precoding_vec = tf.expand_dims(precoding_vec, 1)
         # [num_hits, num_rx_ant]
         a = tf.reduce_sum(a*precoding_vec, axis=-1)
-        # [num_hits]
-        a = tf.reduce_sum(tf.math.conj(combining_vec)*a, axis=-1)
-
-        # Compute the amplitude of the path
-        # [num_hits]
-        a = tf.square(tf.abs(a))
+        # Apply combining
+        # If no combining vector is provided, then sum the energy received by
+        # the antennas
+        if combining_vec is None:
+            # [num_hits]
+            a = tf.reduce_sum(tf.square(tf.abs(a)), axis=-1)
+        else:
+            # [1, num_rx_ant]
+            combining_vec = tf.expand_dims(combining_vec, 0)
+            # [num_hits]
+            a = tf.reduce_sum(tf.math.conj(combining_vec)*a, axis=-1)
+            # Compute the amplitude of the path
+            # [num_hits]
+            a = tf.square(tf.abs(a))
 
         # Add the rays contribution to the coverage map
         # We just divide by cos(aoa) instead of dividing by the square distance
@@ -1603,8 +1613,8 @@ class SolverCoverageMap(SolverBase):
 
         combining_vec : [num_rx_ant], tf.complex
             Combining vector.
-            This is used to combine the signal from the receive antennas for
-            an imaginary receiver located on the coverage map.
+            If set to `None`, then no combining is applied, and
+            the energy received by all antennas is summed.
 
         precoding_vec : [num_tx or 1, num_tx_ant], tf.complex
             Precoding vectors of the transmitters
@@ -1704,9 +1714,11 @@ class SolverCoverageMap(SolverBase):
         # Direction arranged in a Fibonacci lattice on the unit
         # sphere.
         # [num_samples, 3]
-        k_tx = fibonacci_lattice(samples_per_tx, self._rdtype)
-        k_tx = tf.tile(k_tx, [num_tx, 1])
-        k_tx_dr = self._mi_vec_t(k_tx)
+        ps = fibonacci_lattice(samples_per_tx, self._rdtype)
+        ps = tf.tile(ps, [num_tx, 1])
+        ps_dr = self._mi_point2_t(ps)
+        k_tx_dr = mi.warp.square_to_uniform_sphere(ps_dr)
+        k_tx = mi_to_tf_tensor(k_tx_dr, self._rdtype)
         # Origin placed on the given transmitters
         # [num_samples]
         samples_tx_indices_dr = dr.linspace(self._mi_scalar_t, 0, num_tx-1e-7,
@@ -2661,8 +2673,8 @@ class SolverCoverageMap(SolverBase):
 
         combining_vec : [num_rx_ant], tf.complex
             Combining vector.
-            This is used to combine the signal from the receive antennas for
-            an imaginary receiver located on the coverage map.
+            If set to `None`, then no combining is applied, and
+            the energy received by all antennas is summed.
 
         precoding_vec : [num_tx or 1, num_tx_ant], tf.complex
             Precoding vectors of the transmitters
@@ -3031,19 +3043,25 @@ class SolverCoverageMap(SolverBase):
         a = self._apply_synthetic_array(tx_rot_mat, rx_rot_mat, -s_hat,
                                         s_prime_hat, a)
 
-        # Apply spatial precoding and combining
+        # Apply precoding
         # Precoding and combing
-        # [1, 1, num_rx_ant]
-        combining_vec = insert_dims(combining_vec, 2, 0)
         # [num_tx/1, 1, 1, num_tx_ant]
         precoding_vec = insert_dims(precoding_vec, 2, 1)
         # [num_tx, samples_per_tx, num_rx_ant]
         a = tf.reduce_sum(a*precoding_vec, axis=-1)
-        # [num_tx, samples_per_tx]
-        a = tf.reduce_sum(tf.math.conj(combining_vec)*a, axis=-1)
-
-        # [num_tx, samples_per_tx]
-        a = tf.square(tf.abs(a))
+        # Apply combining
+        # If no combining vector is set, then the energy of all antennas is
+        # summed
+        if combining_vec is None:
+            # [num_tx, samples_per_tx]
+            a = tf.reduce_sum(tf.square(tf.abs(a)), axis=-1)
+        else:
+            # [1, 1, num_rx_ant]
+            combining_vec = insert_dims(combining_vec, 2, 0)
+            # [num_tx, samples_per_tx]
+            a = tf.reduce_sum(tf.math.conj(combining_vec)*a, axis=-1)
+            # [num_tx, samples_per_tx]
+            a = tf.square(tf.abs(a))
 
         # [num_tx, samples_per_tx]
         cst = tf.square(self._scene.wavelength/(4.*PI))
@@ -3229,8 +3247,8 @@ class SolverCoverageMap(SolverBase):
 
         combining_vec : [num_rx_ant], tf.complex
             Combining vector.
-            This is used to combine the signal from the receive antennas for
-            an imaginary receiver located on the coverage map.
+            If set to `None`, then no combining is applied, and
+            the energy received by all antennas is summed.
 
         precoding_vec : [num_tx or 1, num_tx_ant], tf.complex
             Precoding vectors of the transmitters

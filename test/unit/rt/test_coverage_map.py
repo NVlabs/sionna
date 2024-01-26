@@ -167,7 +167,7 @@ class TestCovMap(unittest.TestCase):
 
         cm_cell_size = np.array([1., 1.])
         batch_size = 100
-        tx_pos = np.array([0.,0.,0.])
+        tx_pos = np.array([1.,1.,2.])
 
         # load simple scene with different dtypes
         for dt in (tf.complex64, tf.complex128):

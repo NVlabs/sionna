@@ -460,7 +460,8 @@ class CoverageMap:
                                            cm_db < max_gain_db))
 
         # Duplicate indices if requested batch_size > num_idx
-        reps = tf.math.ceil(tf.cast(batch_size, tf.int32) / idx.shape[0])
+        reps = tf.math.ceil(tf.math.divide_no_nan(tf.cast(batch_size, tf.int32),
+                                                  idx.shape[0]))
         reps = tf.cast(tf.expand_dims(reps, axis=0), tf.int32)
         reps = tf.concat((reps, tf.ones_like(tf.cast(idx.shape[1:],tf.int32))),
                          axis=0)

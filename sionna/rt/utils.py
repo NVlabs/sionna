@@ -573,39 +573,31 @@ def scene_scale(scene):
 
 def fibonacci_lattice(num_points, dtype=tf.float32):
     """
-    Generates a Fibonacci lattice for the unit 3D sphere
+    Generates a Fibonacci lattice for the unit square
 
     Input
     -----
     num_points : int
         Number of points
 
+    type : tf.DType
+        Datatype to use for the output
+
     Output
     -------
-    points : [num_points, 3]
+    points : [num_points, 2]
         Generated rectangular coordinates of the lattice points
     """
 
-    golden_ratio = tf.cast((1.+tf.sqrt(5.))/2., dtype)
+    golden_ratio = (1.+tf.sqrt(tf.cast(5., tf.float64)))/2.
+    ns = tf.range(0, num_points, dtype=tf.float64)
 
-    if (num_points%2) == 0:
-        min_n = -num_points//2
-        max_n = num_points//2 - 1
-    else:
-        min_n = -(num_points-1)//2
-        max_n = (num_points-1)//2
+    x = ns/golden_ratio
+    x = x - tf.floor(x)
+    y = ns/(num_points-1)
+    points = tf.stack([x,y], axis=1)
 
-    ns = tf.range(min_n, max_n+1, dtype=dtype)
-
-    # Spherical coordinate
-    phis = 2.*PI*ns/golden_ratio
-    thetas = tf.math.acos(2.*ns/num_points)
-
-    # Rectangular coordinates
-    x = tf.sin(thetas)*tf.cos(phis)
-    y = tf.sin(thetas)*tf.sin(phis)
-    z = tf.cos(thetas)
-    points = tf.stack([x,y,z], axis=1)
+    points = tf.cast(points, dtype)
 
     return points
 

@@ -670,20 +670,20 @@ class Scene:
         :class:`~sionna.rt.Paths` object.
 
         The path computation consists of two main steps as shown in the below figure.
-        
+
         .. figure:: ../figures/compute_paths.svg
             :align: center
 
         For a configured :class:`~sionna.rt.Scene`, the function first traces geometric propagation paths
         using :meth:`~sionna.rt.Scene.trace_paths`. This step is independent of the
-        :class:`~sionna.rt.RadioMaterial` of the scene objects as well as the transmitters' and receivers' 
+        :class:`~sionna.rt.RadioMaterial` of the scene objects as well as the transmitters' and receivers'
         antenna :attr:`~sionna.rt.Antenna.patterns` and  :attr:`~sionna.rt.Transmitter.orientation`,
         but depends on the selected propagation
         phenomena, such as reflection, scattering, and diffraction. The traced paths
         are then converted to EM fields by the function :meth:`~sionna.rt.Scene.compute_fields`.
         The resulting :class:`~sionna.rt.Paths` object can be used to compute channel
         impulse responses via :meth:`~sionna.rt.Paths.cir`. The advantage of separating path tracing
-        and field computation is that one can study the impact of different radio materials 
+        and field computation is that one can study the impact of different radio materials
         by executing :meth:`~sionna.rt.Scene.compute_fields` multiple times without
         re-tracing the propagation paths. This can for example speed-up the calibration of scene parameters
         by several orders of magnitude.
@@ -1066,8 +1066,8 @@ class Scene:
 
         combining_vec : [num_rx_ant], complex | None
             Combining vector.
-            If set to `None`, then defaults to
-            :math:`\frac{1}{\sqrt{\text{num_rx_ant}}} [1,\dots,1]^{\mathsf{T}}`.
+            If set to `None`, then no combining is applied, and
+            the energy received by all antennas is summed.
 
         precoding_vec : [num_tx_ant], complex | None
             Precoding vector.
@@ -1159,11 +1159,7 @@ class Scene:
             cm_size = tf.cast(cm_size, self._rdtype)
 
         # Check and initialize the combining and precoding vector
-        if combining_vec is None:
-            combining_vec = tf.ones([self.rx_array.num_ant], self._dtype)
-            combining_vec /= tf.sqrt(tf.cast(self.rx_array.num_ant,
-                                             self._dtype))
-        else:
+        if combining_vec is not None:
             combining_vec = tf.cast(combining_vec, self._dtype)
         if precoding_vec is None:
             num_tx = len(self.transmitters)
@@ -1201,9 +1197,10 @@ class Scene:
                 show_orientations=False,
                 coverage_map=None, cm_tx=0, cm_db_scale=True,
                 cm_vmin=None, cm_vmax=None,
-                resolution=(655, 500), fov=45, background='#ffffff'):
+                resolution=(655, 500), fov=45, background='#ffffff',
+                clip_at=None, clip_plane_orientation=(0, 0, -1)):
         # pylint: disable=line-too-long
-        r"""preview(paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_vmin=None, cm_vmax=None, resolution=(655, 500), fov=45, background='#ffffff')
+        r"""preview(paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_vmin=None, cm_vmax=None, resolution=(655, 500), fov=45, background='#ffffff', clip_at=None, clip_plane_orientation=(0, 0, -1))
 
         In an interactive notebook environment, opens an interactive 3D
         viewer of the scene.
@@ -1290,6 +1287,16 @@ class Scene:
             Background color in hex format prefixed by '#'.
             Defaults to '#ffffff' (white).
 
+        clip_at : float
+            If not `None`, the scene preview will be clipped (cut) by a plane
+            with normal orientation ``clip_plane_orientation`` and offset ``clip_at``.
+            That means that everything *behind* the plane becomes invisible.
+            This allows visualizing the interior of meshes, such as buildings.
+            Defaults to `None`.
+
+        clip_plane_orientation : tuple[float, float, float]
+            Normal vector of the clipping plane.
+            Defaults to (0,0,-1).
         """
         if (self._preview_widget is not None) and (resolution is not None):
             assert isinstance(resolution, (tuple, list)) and len(resolution) == 2
@@ -1320,6 +1327,9 @@ class Scene:
             fig.plot_coverage_map(
                 coverage_map, tx=cm_tx, db_scale=cm_db_scale,
                 vmin=cm_vmin, vmax=cm_vmax)
+
+        # Clipping
+        fig.set_clipping_plane(offset=clip_at, orientation=clip_plane_orientation)
 
         # Update the camera state
         if not needs_reset:

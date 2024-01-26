@@ -197,14 +197,20 @@ class InteractiveDisplay:
         si.wi = mi.Vector3f(0, 0, 1)
 
         # Shapes (e.g. buildings)
-        vertices, faces, albedos = [None] * n, [None] * n, [None] * n
+        vertices, faces, albedos = [], [], []
         f_offset = 0
         for i, s in enumerate(shapes):
+            null_transmission = s.bsdf().eval_null_transmission(si).numpy()
+            if np.min(null_transmission) > 0.99:
+                # The BSDF for this shape was probably set to `null`, do not
+                # include it in the scene preview.
+                continue
+
             n_vertices = s.vertex_count()
             v = s.vertex_position(dr.arange(mi.UInt32, n_vertices))
-            vertices[i] = v.numpy()
+            vertices.append(v.numpy())
             f = s.face_indices(dr.arange(mi.UInt32, s.face_count()))
-            faces[i] = f.numpy() + f_offset
+            faces.append(f.numpy() + f_offset)
             f_offset += n_vertices
 
             albedo = s.bsdf().eval_diffuse_reflectance(si).numpy()
@@ -213,7 +219,7 @@ class InteractiveDisplay:
                     palette = matplotlib.cm.get_cmap('Pastel1_r')
                 albedo[:] = palette((i % palette.N + 0.5) / palette.N)[:3]
 
-            albedos[i] = np.tile(albedo, (n_vertices, 1))
+            albedos.append(np.tile(albedo, (n_vertices, 1)))
 
         # Plot all objects as a single PyThreeJS mesh, which is must faster
         # than creating individual mesh objects in large scenes.
@@ -284,6 +290,25 @@ class InteractiveDisplay:
 
         self._add_child(mesh, pmin, pmax, persist=False)
 
+    def set_clipping_plane(self, offset, orientation):
+        """
+        Input
+        -----
+        clip_at : float
+            If not `None`, the scene preview will be clipped (cut) by a plane
+            with normal orientation ``clip_plane_orientation`` and offset
+            ``clip_at``. This allows visualizing the interior of meshes such
+            as buildings.
+
+        clip_plane_orientation : tuple[float, float, float]
+            Normal vector of the clipping plane.
+        """
+        if offset is None:
+            self._renderer.localClippingEnabled = False
+            self._renderer.clippingPlanes = []
+        else:
+            self._renderer.localClippingEnabled = True
+            self._renderer.clippingPlanes = [p3s.Plane(orientation, offset)]
 
     @property
     def camera(self):

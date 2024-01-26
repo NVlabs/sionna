@@ -537,29 +537,6 @@ class LDPCBPDecoder(Layer):
                                       msg.value_rowids())
         return x
 
-    def _extrinsic_min(self, msg):
-        """ Provides the extrinsic min operation for the minsum approximation
-        of the CN function.
-
-        This function implements the extrinsic min operation, i.e.,
-        the min is taken over all values excluding the value at the current
-        index.
-
-        Note that the input is expected to be a Tensor and NOT a ragged Tensor.
-        """
-        num_val = tf.shape(msg)[0]
-        msg = tf.transpose(msg, (1,0))
-        msg = tf.expand_dims(msg, axis=1)
-        id_mat = tf.eye(num_val)
-
-        msg = (tf.tile(msg, (1, num_val, 1)) # create outgoing tensor per value
-               + 1000. * id_mat) # "ignore" intrinsic msg by adding large const.
-
-
-        msg = tf.math.reduce_min(msg, axis=2)
-        msg = tf.transpose(msg, (1,0))
-        return msg
-
     def _where_ragged(self, msg):
         """Helper to replace 0 elements from ragged tensor (called with
         map_flat_values)."""
@@ -709,43 +686,6 @@ class LDPCBPDecoder(Layer):
                             sign_val)
         return sign_val
 
-    def _cn_update_minsum_mapfn(self, msg):
-        """ Check node update function implementing the min-sum approximation.
-
-        This function approximates the (extrinsic) check node update
-        function based on the min-sum approximation (cf. [Ryan]_).
-        It calculates the "extrinsic" min function over all incoming messages
-        ``msg`` excluding the intrinsic (=outgoing) message itself.
-
-        The input is expected to be a ragged Tensor of shape
-        `[num_vns, None, batch_size]`.
-
-        This function uses tf.map_fn() to call the CN updates.
-        It is currently not used, but can be used as template to implement
-        modified CN functions (e.g., offset-corrected minsum).
-        Please note that tf.map_fn lowers the throughput significantly.
-        """
-
-        sign_val = tf.ragged.map_flat_values(self._sign_val_minsum, msg)
-
-        sign_node = tf.reduce_prod(sign_val, axis=1)
-        sign_val = self._stop_ragged_gradient(sign_val) * tf.expand_dims(
-                                                             sign_node, axis=1)
-
-        msg = tf.ragged.map_flat_values(tf.abs, msg) # remove sign
-
-        # calculate extrinsic messages and include the sign
-        msg_e = tf.map_fn(self._extrinsic_min, msg, infer_shape=False)
-
-        # ensure shape after map_fn
-        msg_fv = msg_e.flat_values
-        msg_fv = tf.ensure_shape(msg_fv, msg.flat_values.shape)
-        msg_e = msg.with_flat_values(msg_fv)
-
-        msg = sign_val * msg_e
-
-        return msg
-
     def _cn_update_minsum(self, msg):
         """ Check node update function implementing the min-sum approximation.
 
@@ -757,7 +697,8 @@ class LDPCBPDecoder(Layer):
         The input is expected to be a ragged Tensor of shape
         `[num_vns, None, batch_size]`.
         """
-        # a constant used overwrite the first min
+
+        # a constant used to overwrite the first min
         LARGE_VAL = 10000. # pylint: disable=invalid-name
 
         # clip values for numerical stability
@@ -765,9 +706,8 @@ class LDPCBPDecoder(Layer):
                                clip_value_min=-self._llr_max,
                                clip_value_max=self._llr_max)
 
-        # calculate sign of outgoing msg
+        # calculate sign of outgoing msg and the node
         sign_val = tf.ragged.map_flat_values(self._sign_val_minsum, msg)
-
         sign_node = tf.reduce_prod(sign_val, axis=1)
 
         # TF2.9 does not support XLA for the multiplication of ragged tensors
@@ -782,15 +722,16 @@ class LDPCBPDecoder(Layer):
                                         sign_node,
                                         sign_val.value_rowids())
 
-        msg = tf.ragged.map_flat_values(tf.abs, msg) # remove sign
+        # remove sign from messages
+        msg = tf.ragged.map_flat_values(tf.abs, msg)
 
         # Calculate the extrinsic minimum per CN, i.e., for each message of
         # index i, find the smallest and the second smallest value.
         # However, in some cases the second smallest value may equal the
         # smallest value (multiplicity of mins).
         # Please note that this needs to be applied to raggedTensors, e.g.,
-        # tf.top_k() is currently not supported and the ops must support graph
-        # # mode.
+        # tf.top_k() is currently not supported and all ops must support graph
+        # and XLA mode.
 
         # find min_value per node
         min_val = tf.reduce_min(msg, axis=1, keepdims=True)
@@ -800,46 +741,52 @@ class LDPCBPDecoder(Layer):
 
         # and subtract min; the new array contains zero at the min positions
         # benefits from broadcasting; all other values are positive
-        # msg_min1 = msg - min_val
         msg_min1 = tf.ragged.map_flat_values(lambda x, y, row_ind:
-                                             x- tf.gather(y, row_ind),
+                                             x - tf.gather(y, row_ind),
                                              msg,
                                              tf.squeeze(min_val, axis=1),
                                              msg.value_rowids())
 
         # replace 0 (=min positions) with large value to ignore it for further
         # min calculations
-        msg = tf.ragged.map_flat_values(lambda x:
-                                        tf.where(tf.equal(x, 0), LARGE_VAL, x),
-                                        msg_min1)
+        msg = tf.ragged.map_flat_values(
+                            lambda x: tf.where(tf.equal(x, 0), LARGE_VAL, x),
+                            msg_min1)
 
         # find the second smallest element (we add min_val as this has been
         # subtracted before)
-        min_val2 = tf.reduce_min(msg, axis=1, keepdims=True) + min_val
+        min_val_2 = tf.reduce_min(msg, axis=1, keepdims=True) + min_val
 
         # Detect duplicated minima (i.e., min_val occurs at two incoming
         # messages). As the LLRs per node are <LLR_MAX and we have
         # replace at least 1 position (position with message "min_val") by
         # LARGE_VAL, it holds for the sum < LARGE_VAL + node_degree*LLR_MAX.
-        # if the sum > 2*LARGE_VAL, the multiplicity of the min is at least 2.
+        # If the sum > 2*LARGE_VAL, the multiplicity of the min is at least 2.
         node_sum = tf.reduce_sum(msg, axis=1, keepdims=True) - (2*LARGE_VAL-1.)
         # indicator that duplicated min was detected (per node)
         double_min = 0.5*(1-tf.sign(node_sum))
 
         # if a duplicate min occurred, both edges must have min_val, otherwise
         # the second smallest value is taken
-        min_val_e = (1-double_min) * min_val + (double_min) * min_val2
+        min_val_e = (1-double_min) * min_val + (double_min) * min_val_2
 
         # replace all values with min_val except the position where the min
         # occurred (=extrinsic min).
-        msg_e = tf.where(msg==LARGE_VAL, min_val_e, min_val)
+
+        # no XLA support for TF 2.15
+        # msg_e = tf.where(msg==LARGE_VAL, min_val_e, min_val)
+
+        min_1 = tf.squeeze(tf.gather(min_val, msg.value_rowids()), axis=1)
+        min_e = tf.squeeze(tf.gather(min_val_e, msg.value_rowids()), axis=1)
+        msg_e = tf.ragged.map_flat_values(
+                        lambda x: tf.where(x==LARGE_VAL, min_e, min_1),
+                        msg)
 
         # it seems like tf.where does not set the shape of tf.ragged properly
         # we need to ensure the shape manually
         msg_e = tf.ragged.map_flat_values(
-                                    lambda x:
-                                    tf.ensure_shape(x, msg.flat_values.shape),
-                                    msg_e)
+                        lambda x: tf.ensure_shape(x, msg.flat_values.shape),
+                        msg_e)
 
         # TF2.9 does not support XLA for the multiplication of ragged tensors
         # the following code provides a workaround that supports XLA

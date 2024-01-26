@@ -70,45 +70,59 @@ class MadeWithSionna(SphinxDirective):
             pass
 
         html_str = f'<embed>' \
-            f'<h2  style="margin-bottom:0; font-size:19px;">{title}</h2>' \
+            f'<h4  style="margin-bottom:0; font-size:19px;">{title}</h4>' \
             f'<i style="margin-bottom:0; font-size:16px;">{authors}</i>' \
             f'<p style="margin-top: 1; margin-bottom:0; padding-top:0;">' \
             f'Released in {year} and based on Sionna v{version}.</p>' \
             f'<div style="margin-top:2; margin-bottom:10px;">'\
             f'<table>'
 
+        is_first_link = True
         if link_arxiv is not None:
             html_str += f'<td style="padding: 4px 0px;">'\
                 f'<a href="{link_arxiv}" style="vertical-align:text-bottom">'\
                 f'<img alt="Arxiv logo" src="_static/arxiv_logo.png" ' \
                 f'style="width: 40px; min-width: 40px"></a>'\
-                f'</td><td style="padding: 4px 4px;">'\
+                f'</td><td style="padding: 4px;">'\
                 f'<a href="{link_arxiv}" style="vertical-align:text-bottom">'\
-                f'Read on arXiv</a></td>'\
+                f'Read on arXiv</a></td>'
+            is_first_link = False
 
         if link_pdf is not None:
             html_str += f'<td class="wy-breadcrumbs-aside"' \
-                f' style="padding: 0 0px;">'\
+                f' style="padding: 0 0 0 {0 if is_first_link else 30}px;">'\
+                f'<a href="{link_pdf}" style="vertical-align:text-top">'\
+                f'<i class="fa fa-file" style="font-size:19px;"></i>'\
+                f'</a></td>'\
+                f'<td style="padding: 4px;">'\
                 f'<a href="{link_pdf}" style="vertical-align:text-bottom">'\
-                f'<i class="fa fa-file" style="font-size:24px;"></i>'\
                 f' View Paper</a></td>'
+            is_first_link = False
 
         if link_github is not None:
             html_str += f'<td class="wy-breadcrumbs-aside"' \
-                f' style="padding: 0 30px;">'\
+                f' style="padding: 0 0 0 {0 if is_first_link else 30}px;">'\
                 f'<a href="{link_github}" style="vertical-align:text-bottom">'\
                 f'<i class="fa fa-github" style="font-size:24px;"></i>'\
+                f'</a></td>'\
+                f'<td style="padding: 4px;">'\
+                f'<a href="{link_github}" style="vertical-align:text-bottom">'\
                 f' View on GitHub</a></td>'
+            is_first_link = False
 
         if link_code is not None:
             html_str += f'<td class="wy-breadcrumbs-aside"' \
-                f' style="padding: 0 30px;">'\
+                f' style="padding: 0 0 0 {0 if is_first_link else 30}px;">'\
                 f'<a href="{link_code}" style="vertical-align:text-bottom">'\
                 f'<i class="fa fa-code" style="font-size:24px;"></i>'\
+                f'</a></td>'\
+                f'<td style="padding: 4px;">'\
+                f'<a href="{link_code}" style="vertical-align:text-bottom">'\
                 f' View Code</a></td>'
+            is_first_link = False
 
         if link_colab is not None:
-            html_str += f'<td style="padding: 0px 0px;">'\
+            html_str += f'<td style="padding: 0 0 0 {0 if is_first_link else 30}px;">'\
                 f'<a href="{link_colab}"' \
                 f'style="vertical-align:text-bottom">'\
                 f'<img alt="Colab logo" src="_static/colab_logo.svg" '\
@@ -116,6 +130,7 @@ class MadeWithSionna(SphinxDirective):
                 f'<td style="padding: 4px 0px;">'\
                 f'<a href="{link_colab}" style="vertical-align:text-bottom">'\
                 f'Run in Google Colab</a></td>'
+            is_first_link = False
 
         html_str += f'</table></div>'\
                     f'<p>{abstract}</p></embed>'
@@ -133,5 +148,3 @@ def setup(app):
         'parallel_read_safe': True,
         'parallel_write_safe': True,
     }
-
-

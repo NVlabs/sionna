@@ -86,11 +86,13 @@ class SolverBase:
         # Mitsuba types depend on the used precision
         if dtype == tf.complex64:
             self._mi_point_t = mi.Point3f
+            self._mi_point2_t = mi.Point2f
             self._mi_vec_t = mi.Vector3f
             self._mi_scalar_t = mi.Float
             self._mi_tensor_t = mi.TensorXf
         else:
             self._mi_point_t = mi.Point3d
+            self._mi_point2_t = mi.Point2d
             self._mi_vec_t = mi.Vector3d
             self._mi_scalar_t = mi.Float64
             self._mi_tensor_t = mi.TensorXd

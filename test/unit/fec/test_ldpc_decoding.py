@@ -468,6 +468,36 @@ class TestBPDecoding(unittest.TestCase):
             y = dec(x).numpy() # run 0 iterations
             print(np.abs(np.max(y)-l)<1e-6)
 
+    def test_cn_minsum(self):
+        """Test min_sim implementation of CN update.
+        Test that double min is correctly processed, zeros are detected and
+        that signs are also correctly handled."""
+
+        # init dummy decoder
+        pcm, _, _, _ = load_parity_check_examples(0)
+        dec = LDPCBPDecoder(pcm, cn_type="minsum")
+
+        # test messages for CN function
+        m_in = tf.ragged.constant(([1,-2,3,-1],[2,.3,2],[0,1,-1,2.3]),
+                                  tf.float32)
+
+        # apply decoder
+        m_out = dec._cn_update_minsum(tf.expand_dims(m_in ,axis=-1)).numpy()
+
+        # reference decoder
+        m_ref = np.copy(m_in.numpy())
+        for i,m in enumerate(m_in.numpy()):
+            for j in range(len(m)):
+                x = np.abs(np.copy(m))
+                x[j] = 1000 # lareg value
+                s = np.sign(np.copy(m))
+                s[j] = 1
+                s = np.prod(s)
+                m_ref[i][j] = np.min(x) * s
+
+        # and compare both results
+        for i,(a,b) in enumerate(zip(m_ref, m_out)):
+            self.assertTrue(np.allclose(a, b[:,0]))
 
 class TestBPDecoding5G(unittest.TestCase):
     """Checks LDPC5GDecoding layer.

@@ -1163,9 +1163,11 @@ class SolverPaths(SolverBase):
             # sphere.
             # [samples_per_source, 3]
             lattice = fibonacci_lattice(samples_per_source, self._rdtype)
+            sampled_d = tf.tile(lattice, [num_sources, 1])
+            sampled_d = self._mi_point2_t(sampled_d)
+            sampled_d = mi.warp.square_to_uniform_sphere(sampled_d)
             source_i = dr.linspace(self._mi_scalar_t, 0, num_sources,
                                    num=num_samples, endpoint=False)
-            sampled_d = self._mi_vec_t(tf.tile(lattice, [num_sources, 1]))
             source_i = mi.Int32(source_i)
             sources_dr = self._mi_tensor_t(sources)
             ray = mi.Ray3f(
