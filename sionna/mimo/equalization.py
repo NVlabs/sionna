@@ -5,6 +5,7 @@
 """Classes and functions related to MIMO channel equalization"""
 
 import tensorflow as tf
+import numpy as np
 from sionna.utils import expand_to_rank, matrix_inv, matrix_pinv
 from sionna.mimo.utils import whiten_channel
 
@@ -139,6 +140,9 @@ def lmmse_equalizer(y, h, s, whiten_interference=True):
     # Compute residual error variance
     one = tf.cast(1, dtype=d.dtype)
     no_eff = tf.math.real(one/d - one)
+    # Deal with negative or zero values due to numerical error.
+    eps = np.finfo(d.dtype.as_numpy_dtype).eps
+    no_eff += 4 * eps
 
     return x_hat, no_eff
 
@@ -353,3 +357,4 @@ def mf_equalizer(y, h, s):
 
     no_eff = tf.abs(tf.linalg.diag_part(tf.matmul(i-gh, i-gh, adjoint_b=True) + gsg))
     return x_hat, no_eff
+
