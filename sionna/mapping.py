@@ -980,6 +980,8 @@ class Demapper(Layer):
                                               dtype.real_dtype,
                                               **kwargs)
 
+        self._eps = np.finfo(dtype.as_numpy_dtype).eps
+
     @property
     def constellation(self):
         return self._constellation
@@ -1001,6 +1003,8 @@ class Demapper(Layer):
         # Add a dummy dimension for broadcasting. This is not needed when no
         # is a scalar, but also does not do any harm.
         no = tf.expand_dims(no, axis=-1)
+        # Deal with zero or too small values.
+        no += self._eps
 
         # Compute exponents
         exponents = -squared_dist/no
@@ -1691,3 +1695,4 @@ class SymbolInds2Bits(Layer):
     def call(self, inputs):
         symbol_ind = inputs
         return tf.gather(self._bit_labels, symbol_ind)
+
