@@ -1812,6 +1812,13 @@ def load_scene(filename=None, dtype=tf.complex64):
 #
 # Module variables for example scene files
 #
+sphere = str(files(scenes).joinpath("sphere/sphere.xml"))
+# pylint: disable=C0301
+"""
+Example scene containing a discretized sphere
+(80 faces, 120 wedges, 42 vertices)
+"""
+
 floor_wall = str(files(scenes).joinpath("floor_wall/floor_wall.xml"))
 # pylint: disable=C0301
 """
