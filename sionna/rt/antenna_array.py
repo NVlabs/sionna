@@ -12,7 +12,7 @@ from matplotlib.markers import MarkerStyle
 from .antenna import Antenna
 from sionna.constants import SPEED_OF_LIGHT
 from . import scene
-from .utils import rotate
+from .utils import rotate, theta_hat
 
 class AntennaArray():
     # pylint: disable=line-too-long
@@ -192,34 +192,168 @@ class PlanarArray(AntennaArray):
                  pattern,
                  polarization=None,
                  polarization_model=2,
+                 trainable_positions=False, # NOTE: this argument was deprecated
+                 trainable_azimuth=False,
+                 trainable_elevation=False,
+                 trainable_beamweights=False,
                  dtype=tf.complex64):
 
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
 
+        self._dtype = dtype
+        self._rdtype = dtype.real_dtype
+
         # Create list of antennas
-        array_size = num_rows*num_cols
+        self.num_cols = num_cols
+        self.num_rows = num_rows
+        array_size = self.num_rows * self.num_cols
         antenna = Antenna(pattern, polarization, polarization_model, dtype)
 
         # Compute antenna positions
-        frequency = scene.Scene().frequency
-        wavelength = SPEED_OF_LIGHT/frequency
-        d_v = vertical_spacing*wavelength
-        d_h = horizontal_spacing*wavelength
-        positions =  np.zeros([array_size, 3])
+        self.frequency = scene.Scene().frequency
+        self.wavelength = SPEED_OF_LIGHT / self.frequency
+        self.vertical_spacing = vertical_spacing
+        self.d_v = self.vertical_spacing * self.wavelength
+        self.horizontal_spacing = horizontal_spacing
+        self.d_h = self.horizontal_spacing * self.wavelength
+        self.positions_xyz = np.zeros([array_size, 3])
 
-        for i in range(num_rows):
-            for j in range(num_cols):
-                positions[i + j*num_rows] = [0,
-                                             j*d_h,
-                                             -i*d_v]
+        for i in range(self.num_rows):
+            for j in range(self.num_cols):
+                self.positions_xyz[i + j * self.num_rows] = [0,
+                                                     j * self.d_h,
+                                                     -i * self.d_v]
 
         # Center the panel around the origin
         offset = [0,
-                  -(num_cols-1)*d_h/2,
-                  (num_rows-1)*d_v/2]
-        positions += offset
-        super().__init__(antenna, positions, dtype)
+                  -(self.num_cols - 1) * self.d_h * self.vertical_spacing,
+                  (self.num_rows - 1) * self.d_v * self.horizontal_spacing]
+        self.positions_xyz += offset
+        self.antenna = antenna
+
+        self.azimuth = 0.
+        self.elevation = 0.
+
+        self.beamweights = tf.zeros((array_size,), dtype=self._dtype) # init beamweights
+        self.precoding_weights(azimuth_deg=self.azimuth, elevation_deg=self.elevation) # this will also set self.beamweights
+
+        self.trainable_beamweights = trainable_beamweights
+        # trainable weights and trainable_azimuth/elevation should be mutually exclusive
+
+        self.trainable_azimuth = trainable_azimuth
+        self.trainable_elevation = trainable_elevation
+
+        assert not (self.trainable_beamweights and (self.trainable_azimuth or self.trainable_elevation)), \
+            "Either beamweights or azimuth/elevation angles can be trainable at the same time."
+
+
+        super().__init__(self.antenna, self.positions_xyz, dtype)   # NOTE: removed trainable_positions argument
+
+    @property
+    def trainable_beamweights(self):
+        """
+        bool : Get/set if the antenna beamweights are trainable
+            variables or not.
+            Defaults to `False`.
+        """
+        return self._trainable_beamweights
+
+    @trainable_beamweights.setter
+    def trainable_beamweights(self, value):
+        if not isinstance(value, bool):
+            raise TypeError("`trainable_beamweights` must be bool")
+        # pylint: disable=protected-access
+        self._beamweights._trainable = value
+        self._trainable_beamweights = value
+
+    @property
+    def beamweights(self):
+        """
+        [array_size,], `tf.complex64` : Get/set  array of complex weights used for beamsteering.
+        """
+        return self._beamweights
+
+    @beamweights.setter
+    def beamweights(self, beamweights):
+        beamweights = tf.cast(beamweights, self._dtype)
+        if not (tf.rank(beamweights) == 1):
+            msg = "Each element of ``beamweights`` must must be a single complex value"
+            raise ValueError(msg)
+        if not hasattr(self, "_beamweights"):
+            self._beamweights = tf.Variable(beamweights, constraint=lambda x: x / tf.linalg.norm(x))
+        else:
+            self._beamweights.assign(beamweights)
+
+    @property
+    def trainable_azimuth(self):
+        """
+        bool : Get/set if the antenna azimuth are trainable
+            variables or not.
+            Defaults to `False`.
+        """
+        return self._trainable_azimuth
+
+    @trainable_azimuth.setter
+    def trainable_azimuth(self, value):
+        if not isinstance(value, bool):
+            raise TypeError("`trainable_azimuth` must be bool")
+        # pylint: disable=protected-access
+        self._azimuth._trainable = value
+        self._trainable_azimuth = value
+
+    @property
+    def azimuth(self):
+        """
+        [1,], `tf.float32` : Get/set  array of azimuth angle used for beamsteering.
+        """
+        return self._azimuth
+
+    @azimuth.setter
+    def azimuth(self, azimuth):
+        azimuth = tf.cast(azimuth, self._rdtype)
+        if not (tf.rank(azimuth) == 0):
+            msg = "Each element of ``azimuth`` must must be a single real value"
+            raise ValueError(msg)
+        if not hasattr(self, "_azimuth"):
+            self._azimuth = tf.Variable(azimuth, name="Azimuth", constraint=lambda x: tf.clip_by_value(x, clip_value_min=-180, clip_value_max=180))
+        else:
+            self._azimuth.assign(azimuth)
+
+    @property
+    def trainable_elevation(self):
+        """
+        bool : Get/set if the antenna elevation are trainable
+            variables or not.
+            Defaults to `False`.
+        """
+        return self._trainable_elevation
+
+    @trainable_elevation.setter
+    def trainable_elevation(self, value):
+        if not isinstance(value, bool):
+            raise TypeError("`trainable_elevation` must be bool")
+        # pylint: disable=protected-access
+        self._elevation._trainable = value
+        self._trainable_elevation = value
+
+    @property
+    def elevation(self):
+        """
+        [1,], `tf.float32` : Get/set  array of elevation angle used for beamsteering.
+        """
+        return self._elevation
+
+    @elevation.setter
+    def elevation(self, elevation):
+        elevation = tf.cast(elevation, self._rdtype)
+        if not (tf.rank(elevation) == 0):
+            msg = "Each element of ``elevation`` must must be a single real value"
+            raise ValueError(msg)
+        if not hasattr(self, "_elevation"):
+            self._elevation = tf.Variable(elevation, name="Elevation", constraint=lambda x: tf.clip_by_value(x, clip_value_min=-180, clip_value_max=180))
+        else:
+            self._elevation.assign(elevation)
 
     def show(self):
         r"""show()
@@ -245,3 +379,43 @@ class PlanarArray(AntennaArray):
         plt.ylabel("z (m)")
         plt.title("Planar Array Layout")
         return fig
+
+    def precoding_weights(self, azimuth_deg, elevation_deg):
+        r"""
+        Compute precoding weights to perform analog beam-steering.
+        For 1D arrays, elevation_deg should default to 0.
+        This function currently supports either 1D (on y-axis) arrays or 2D (on yz-axis)
+
+        :param azimuth_deg: Azimuth angle. Expressed in degrees, aligned on the xy-axis
+                (positive rotation is counter clockwise from positive x to positive y).
+        :param elevation_deg: Elevation angles. Expressed in degrees, aligned on the z-axis
+                (positive rotation goes from positive xy-plane to positive z)
+        :return: normalized 1D vector of phases (elements are enumerated and listed in row-first order).
+                    NOTE: current marking of antenna elements in self.show() function consider elements
+                    in column-first order instead.
+        """
+
+        if self.num_rows == 1:
+            elevation_deg = 0   # force elevation_deg=0 when array is ULA (1D)
+
+        spacing_y = self.horizontal_spacing
+        spacing_z = self.vertical_spacing
+        azimuth_rad = azimuth_deg * tf.convert_to_tensor(np.pi) / 180.
+        elevation_rad = elevation_deg * tf.convert_to_tensor(np.pi) / 180.
+        yz_component = []
+        for n in range(self.num_cols): # columns refer to antenna elements position on the y-axis
+            for l in range(self.num_rows):  # rows refer to antenna elements position on the z-axis
+                # compute spherical unit vector for given elevation and azimuth
+                uv = theta_hat(elevation_rad, azimuth_rad)
+                yz_component.append(
+                    (n * spacing_y * uv[1] + l * spacing_z * uv[2])
+                )
+        # Calculate the total phase for each element in the array
+        yz_component = tf.convert_to_tensor(yz_component)
+        phase = -2 * np.pi * (yz_component)  # assuming spacing is all the same in all directions
+        precoding_weights_ura = tf.exp(tf.complex(0.0, phase))
+        precoding_weights_ura = precoding_weights_ura / tf.linalg.norm(precoding_weights_ura)
+
+        self.beamweights = precoding_weights_ura
+
+        return precoding_weights_ura

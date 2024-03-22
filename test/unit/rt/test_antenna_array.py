@@ -199,6 +199,54 @@ class TestAntennaArray(unittest.TestCase):
         # Add phase shifts realted to differences with the syn thetic array to the gains
         a_comp = a*tf.exp(tf.complex(tf.cast(0, dtype.real_dtype), (tau_syn-tau)*2*PI*scene.frequency))
 
-        # Test that antenna gains are not oo different
+        # Test that antenna gains are not too different
         assert np.max(np.abs(np.imag(a_syn)-np.imag(a_comp)))<1e-2
         assert np.mean(np.abs(a_comp-a_syn)**2) / np.mean(np.abs(a_syn)**2) <1e-4
+
+    def test_precoding_weights(self):
+        dtype = tf.complex128
+        scene = load_scene(dtype=dtype)
+        # Setup URA array
+        num_cols = 64
+        num_rows = 64  # set num_rows=1 for ULA
+
+        scene.tx_array = PlanarArray(num_rows=num_rows,
+                                     num_cols=num_cols,
+                                     vertical_spacing=0.5,
+                                     horizontal_spacing=0.5,
+                                     pattern="iso",
+                                     polarization="V")
+
+        import numpy as np
+        azimuth_angles = [-30, 0, 20]
+        elevation_angle = 8
+        # Steering vector
+        test_out = []
+        for degree in azimuth_angles:
+            steering_angle = degree  # degrees
+
+            precoding_weights_ura = scene.tx_array.precoding_weights(azimuth_deg=steering_angle,
+                                                                     elevation_deg=elevation_angle)
+
+
+            # TEST: compare output with explicit formula
+            yz_component = []
+            azimuth_rad = steering_angle * np.pi / 180.
+            elevation_rad = elevation_angle * np.pi / 180.
+
+            for n in range(scene.tx_array.num_cols):  # columns refer to antenna elements position on the y-axis
+                for l in range(scene.tx_array.num_rows):  # rows refer to antenna elements position on the z-axis
+                    yz_component.append(
+                        (n * scene.tx_array.horizontal_spacing * tf.cos(elevation_rad) * tf.sin(azimuth_rad)) + (
+                                l * scene.tx_array.vertical_spacing * tf.sin(elevation_rad))
+                    )
+
+            # Calculate the total phase for each element in the array
+            yz_component = tf.convert_to_tensor(yz_component)
+            phase = -2 * np.pi * (yz_component)  # assuming spacing is all the same in all directions
+            precoding_weights_ura2 = tf.exp(tf.complex(0.0, phase))
+            precoding_weights_ura2 = precoding_weights_ura2 / tf.linalg.norm(precoding_weights_ura2)
+
+            test_out.append( np.all(np.abs(precoding_weights_ura) - np.abs(precoding_weights_ura2)) < 1e-4 )
+
+        assert np.all(test_out)
