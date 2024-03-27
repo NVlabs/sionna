@@ -35,6 +35,7 @@ from .antenna import Antenna, compute_gain, visualize, iso_pattern,\
 from .antenna_array import AntennaArray, PlanarArray
 from .radio_material import RadioMaterial
 from .scene_object import SceneObject
+from .asset_object import AssetObject
 from .scattering_pattern import ScatteringPattern, LambertianPattern,\
     DirectivePattern, BackscatteringPattern
 from .transmitter import Transmitter

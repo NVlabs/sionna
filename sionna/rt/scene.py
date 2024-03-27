@@ -9,12 +9,14 @@ receivers, as well as cameras.
 """
 
 import os
+import shutil
 from importlib_resources import files
 
 import matplotlib
 import matplotlib.pyplot as plt
 import mitsuba as mi
 import tensorflow as tf
+import xml.etree.ElementTree as ET
 
 from .antenna_array import AntennaArray
 from .camera import Camera
@@ -24,6 +26,7 @@ from .oriented_object import OrientedObject
 from .radio_material import RadioMaterial
 from .receiver import Receiver
 from .scene_object import SceneObject
+from .asset_object import AssetObject
 from .solver_paths import SolverPaths, PathsTmpData
 from .solver_cm import SolverCoverageMap
 from .transmitter import Transmitter
@@ -32,6 +35,8 @@ from .renderer import render, coverage_map_color_mapping
 from .utils import expand_to_rank
 from .paths import Paths
 from . import scenes
+#from ..utils import append_xml_scene_asset_to_scene
+
 
 
 class Scene:
@@ -81,6 +86,8 @@ class Scene:
             instance._receivers = {}
             # Cameras
             instance._cameras = {}
+            # Asset objects
+            instance._asset_objects = {}
             # Transmitter antenna array
             instance._tx_array = None
             # Receiver antenna array
@@ -110,7 +117,10 @@ class Scene:
         # If a filename is provided, loads the scene from it.
         # The previous scene is overwritten.
         if env_filename:
-
+            # Check if the 'tmp' directory exists, and create it if it doesn't
+            self.tmp_directory_path = 'tmp/'
+            if not os.path.exists(self.tmp_directory_path):
+                os.makedirs(self.tmp_directory_path)
             if dtype not in (tf.complex64, tf.complex128):
                 msg = "`dtype` must be tf.complex64 or tf.complex128`"
                 raise ValueError(msg)
@@ -130,12 +140,42 @@ class Scene:
             # Keep track of the Mitsuba scene
             if env_filename == "__empty__":
                 # Set an empty scene
-                self._scene = mi.load_dict({"type": "scene",
+                """
+                self._scene_dict = {"type": "scene",
                                             "integrator": {
                                                 "type": "path",
-                                            }})
+                                            }}
+                self._scene = mi.load_dict(self._scene_dict)
+                """
+                #self._scene_string = '<scene version="2.1.0"><integrator type="path"/></scene>'
+                # Create an empty scene xml descriptor
+                scene = ET.Element('scene', version="2.1.0")
+                integrator = ET.SubElement(scene, 'integrator', type="path")
+                tree = ET.ElementTree(scene)
+
+                # Write the XML content to the file
+                tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'), encoding='utf-8', xml_declaration=True)
+                self._xml_tree = tree
+
+                # Load the scene in mitsuba
+                self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))   
+
             else:
-                self._scene = mi.load_file(env_filename)
+                # Load, parse and copy the input XML file to a tmp folder
+                tree = ET.parse(env_filename)
+                tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'), encoding='utf-8', xml_declaration=True)
+                self._xml_tree = tree
+
+                # copy corresponding meshes folder to the 'tmp/meshes/' folder
+                path = os.path.dirname(env_filename)
+                meshes_source_dir = os.path.join(path, 'meshes')
+                destination_dir = os.path.join(self.tmp_directory_path, 'meshes')
+                if not os.path.exists(destination_dir):
+                    os.makedirs(destination_dir)
+                shutil.copytree(meshes_source_dir, destination_dir, dirs_exist_ok=True)
+                
+                self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))     
+                
 
             # Instantiate the solver
             self._solver_paths = SolverPaths(self, dtype=dtype)
@@ -249,6 +289,15 @@ class Scene:
             of scene objects
         """
         return dict(self._scene_objects)
+    
+    @property
+    def asset_objects(self):
+        # pylint: disable=line-too-long
+        """
+        `dict` (read-only), { "name", :class:`~sionna.rt.SceneObject`} : Dictionary
+            of asset objects 
+        """
+        return dict(self._asset_objects)
 
     @property
     def tx_array(self):
@@ -300,7 +349,7 @@ class Scene:
     def get(self, name):
         # pylint: disable=line-too-long
         """
-        Returns a scene object, transmitter, receiver, camera, or radio material
+        Returns a scene object, transmitter, receiver, camera, asset object or radio material
 
         Input
         -----
@@ -309,7 +358,7 @@ class Scene:
 
         Output
         ------
-        item : :class:`~sionna.rt.SceneObject` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | `None`
+        item : :class:`~sionna.rt.SceneObject` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | :class:`~sionna.rt.AssetObject` | `None`
             Retrieved item. Returns `None` if no corresponding item was found in the scene.
         """
         if name in self._transmitters:
@@ -322,23 +371,137 @@ class Scene:
             return self._scene_objects[name]
         if name in self._cameras:
             return self._cameras[name]
+        if name in self._asset_objects:
+            return self._asset_objects[name]
         return None
+
+    def append_asset_to_scene(self, asset):
+        #TODO:  - Add bsdf too, while making sure there are no duplicate with taht of the original scene
+        #       - change folder and name not strictly xml related anymore
+        #       - rm tmp folder at init of scene?
+        #       - How to handle asset id? (since asset can be made of multiple shapes)
+        #       - Clean using scene.shapes() instead of xml manipulation?
+        #       - Check coordinate and rotation conventions
+        
+        if asset.scene != None and asset._scene != self: 
+            msg = f"The asset '{asset}' is already assigned to another Scene '{asset.scene}'. " \
+            "Assets object instance can only be assigned to a single scene."
+            raise RuntimeError(msg)
+
+        asset_xml_filename = asset.filename
+
+        # Load the original scene XML
+        root = self._xml_tree.getroot() # tree = ET.parse(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+
+        # Load and parse the second XML (asset)
+        tree_to_append = ET.parse(asset_xml_filename)
+        root_to_append = tree_to_append.getroot()
+
+        # Find the parent element where shapes should be appended in the original scene
+        shapes = root.findall(".//shape[@id]")
+        last_id = max(int(shape.get('id').split('__')[1]) for shape in shapes)
+
+        # Find all shape elements in the asset scene
+        shapes_to_append = root_to_append.findall('.//shape')  
+
+        # Append each shape to the parent element in the original scene while adapting their ids
+        id = last_id
+        for shape in shapes_to_append:
+            id += 1
+            shape_id = f"elm__{id}"
+            shape.set('id',shape_id)
+            shape.set('name',shape_id)  
+
+            transform = ET.SubElement(shape, 'transform', name="to_world")
+
+            # Add rotation elements
+            orientation = asset.orientation
+            ET.SubElement(transform, 'rotate', x="1", angle=str(orientation[0]))
+            ET.SubElement(transform, 'rotate', y="1", angle=str(orientation[1]))
+            ET.SubElement(transform, 'rotate', z="1", angle=str(orientation[2]))
+
+            # Add translation element
+            translate_value = f"{asset.position[0]} {asset.position[1]} {asset.position[2]}"
+            ET.SubElement(transform, 'translate', value=translate_value)
+            root.append(shape)
+
+        # Write the modified scene back to the XML file
+        self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+
+        # Move asset's meshes to the scene's meshes directory
+        asset_path = os.path.dirname(asset_xml_filename)
+        meshes_source_dir = os.path.join(asset_path, 'meshes')
+        destination_dir = os.path.join(self.tmp_directory_path,'meshes')
+        if not os.path.exists(destination_dir):
+            os.makedirs(destination_dir)
+
+        # Copy the entire contents of the 'meshes' directory to the destination directory
+        shutil.copytree(meshes_source_dir, destination_dir, dirs_exist_ok=True)
+
+        # Reload Scene, while keeping camera, TX, RX, etc. objects:
+        # Reload Mitsuba Scene
+        self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml')) 
+
+        # Instantiate the solver
+        self._solver_paths = SolverPaths(self, dtype=self._dtype)
+
+        # Solver for coverage map
+        self._solver_cm = SolverCoverageMap(self, solver=self._solver_paths, dtype=self._dtype)
+
+        # Load the NEW scene objects --> basically, execute self._load_scene_objects() function
+        # Parse all shapes in the scene
+        scene = self._scene
+        for obj_id,s in enumerate(scene.shapes()):
+            name = s.id()
+            if name not in self._scene_objects.keys():
+                print(obj_id,s)
+                # Only meshes are handled
+                if not isinstance(s, mi.Mesh):
+                    raise TypeError('Only triangle meshes are supported')
+
+                # Setup the material
+                mat_name = s.bsdf().id()
+                if mat_name.startswith("mat-"):
+                    mat_name = mat_name[4:]
+                mat = self.get(mat_name)
+                if (mat is not None) and (not isinstance(mat, RadioMaterial)):
+                    raise ValueError(f"Name'{name}' already used by another item")
+                elif mat is None:
+                    # If the radio material does not exist, then a placeholder is
+                    # used.
+                    mat = RadioMaterial(mat_name)
+                    mat.is_placeholder = True
+                    self._radio_materials[mat_name] = mat
+
+                # Instantiate the scene objects
+                if name.startswith('mesh-'):
+                    name = name[5:]
+                if self._is_name_used(name):
+                    raise ValueError(f"Name'{name}' already used by another item")
+                obj = SceneObject(name, object_id=obj_id)
+                obj.scene = self
+                obj.radio_material = mat_name
+
+                self._scene_objects[name] = obj
+        
+        return True
+
 
     def add(self, item):
         """
-        Adds a transmitter, receiver, radio material, or camera to the scene.
+        Adds a transmitter, receiver, radio material, camera or geometrical asset to the scene.
 
         If a different item with the same name as ``item`` is already part of the scene,
         an error is raised.
 
         Input
         ------
-        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`
+        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera` | :class:`~sionna.rt.AssetObject`
             Item to add to the scene
         """
         if ( (not isinstance(item, OrientedObject))
-         and (not isinstance(item, RadioMaterial)) ):
-            err_msg = "The input must be a Transmitter, Receiver, Camera, or"\
+         and (not isinstance(item, RadioMaterial)) and (not isinstance(item, AssetObject))):
+            err_msg = "The input must be a Transmitter, Receiver, Camera, AssetObject or"\
                       " RadioMaterial"
             raise ValueError(err_msg)
 
@@ -373,11 +536,16 @@ class Scene:
         elif isinstance(item, Camera):
             self._cameras[name] = item
             item.scene = self
+        elif isinstance(item, AssetObject):
+            self._asset_objects[name] = item
+            item.scene = self
+            self.append_asset_to_scene(item)
+             
 
     def remove(self, name):
         # pylint: disable=line-too-long
         """
-        Removes a transmitter, receiver, camera, or radio material from the
+        Removes a transmitter, receiver, camera, asset object or radio material from the
         scene.
 
         In the case of a radio material, it must not be used by any object of
@@ -404,6 +572,9 @@ class Scene:
         elif isinstance(item, Camera):
             del self._cameras[name]
 
+        elif isinstance(item, AssetObject):
+            del self._asset_objects[name]
+
         elif isinstance(item, RadioMaterial):
             if item.is_used:
                 msg = f"The radio material '{name}' is used by at least one"\
@@ -412,7 +583,7 @@ class Scene:
             del self._radio_materials[name]
 
         else:
-            msg = "Only Transmitters, Receivers, Cameras, or RadioMaterials"\
+            msg = "Only Transmitters, Receivers, Cameras, AssetObject, or RadioMaterials"\
                   " can be removed"
             raise TypeError(msg)
 
@@ -670,20 +841,20 @@ class Scene:
         :class:`~sionna.rt.Paths` object.
 
         The path computation consists of two main steps as shown in the below figure.
-
+        
         .. figure:: ../figures/compute_paths.svg
             :align: center
 
         For a configured :class:`~sionna.rt.Scene`, the function first traces geometric propagation paths
         using :meth:`~sionna.rt.Scene.trace_paths`. This step is independent of the
-        :class:`~sionna.rt.RadioMaterial` of the scene objects as well as the transmitters' and receivers'
+        :class:`~sionna.rt.RadioMaterial` of the scene objects as well as the transmitters' and receivers' 
         antenna :attr:`~sionna.rt.Antenna.patterns` and  :attr:`~sionna.rt.Transmitter.orientation`,
         but depends on the selected propagation
         phenomena, such as reflection, scattering, and diffraction. The traced paths
         are then converted to EM fields by the function :meth:`~sionna.rt.Scene.compute_fields`.
         The resulting :class:`~sionna.rt.Paths` object can be used to compute channel
         impulse responses via :meth:`~sionna.rt.Paths.cir`. The advantage of separating path tracing
-        and field computation is that one can study the impact of different radio materials
+        and field computation is that one can study the impact of different radio materials 
         by executing :meth:`~sionna.rt.Scene.compute_fields` multiple times without
         re-tracing the propagation paths. This can for example speed-up the calibration of scene parameters
         by several orders of magnitude.
@@ -1066,8 +1237,8 @@ class Scene:
 
         combining_vec : [num_rx_ant], complex | None
             Combining vector.
-            If set to `None`, then no combining is applied, and
-            the energy received by all antennas is summed.
+            If set to `None`, then defaults to
+            :math:`\frac{1}{\sqrt{\text{num_rx_ant}}} [1,\dots,1]^{\mathsf{T}}`.
 
         precoding_vec : [num_tx_ant], complex | None
             Precoding vector.
@@ -1159,7 +1330,11 @@ class Scene:
             cm_size = tf.cast(cm_size, self._rdtype)
 
         # Check and initialize the combining and precoding vector
-        if combining_vec is not None:
+        if combining_vec is None:
+            combining_vec = tf.ones([self.rx_array.num_ant], self._dtype)
+            combining_vec /= tf.sqrt(tf.cast(self.rx_array.num_ant,
+                                             self._dtype))
+        else:
             combining_vec = tf.cast(combining_vec, self._dtype)
         if precoding_vec is None:
             num_tx = len(self.transmitters)
@@ -1197,10 +1372,9 @@ class Scene:
                 show_orientations=False,
                 coverage_map=None, cm_tx=0, cm_db_scale=True,
                 cm_vmin=None, cm_vmax=None,
-                resolution=(655, 500), fov=45, background='#ffffff',
-                clip_at=None, clip_plane_orientation=(0, 0, -1)):
+                resolution=(655, 500), fov=45, background='#ffffff'):
         # pylint: disable=line-too-long
-        r"""preview(paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_vmin=None, cm_vmax=None, resolution=(655, 500), fov=45, background='#ffffff', clip_at=None, clip_plane_orientation=(0, 0, -1))
+        r"""preview(paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_vmin=None, cm_vmax=None, resolution=(655, 500), fov=45, background='#ffffff')
 
         In an interactive notebook environment, opens an interactive 3D
         viewer of the scene.
@@ -1287,16 +1461,6 @@ class Scene:
             Background color in hex format prefixed by '#'.
             Defaults to '#ffffff' (white).
 
-        clip_at : float
-            If not `None`, the scene preview will be clipped (cut) by a plane
-            with normal orientation ``clip_plane_orientation`` and offset ``clip_at``.
-            That means that everything *behind* the plane becomes invisible.
-            This allows visualizing the interior of meshes, such as buildings.
-            Defaults to `None`.
-
-        clip_plane_orientation : tuple[float, float, float]
-            Normal vector of the clipping plane.
-            Defaults to (0,0,-1).
         """
         if (self._preview_widget is not None) and (resolution is not None):
             assert isinstance(resolution, (tuple, list)) and len(resolution) == 2
@@ -1327,9 +1491,6 @@ class Scene:
             fig.plot_coverage_map(
                 coverage_map, tx=cm_tx, db_scale=cm_db_scale,
                 vmin=cm_vmin, vmax=cm_vmax)
-
-        # Clipping
-        fig.set_clipping_plane(offset=clip_at, orientation=clip_plane_orientation)
 
         # Update the camera state
         if not needs_reset:
@@ -1663,6 +1824,7 @@ class Scene:
         self._transmitters.clear()
         self._receivers.clear()
         self._cameras.clear()
+        self._asset_objects.clear()
         self._radio_materials.clear()
         self._scene_objects.clear()
         self._tx_array = None
@@ -1777,7 +1939,8 @@ class Scene:
         used = ((name in self._transmitters)
              or (name in self._receivers)
              or (name in self._radio_materials)
-             or (name in self._scene_objects))
+             or (name in self._scene_objects)
+             or (name in self._asset_objects))
         return used
 
 
