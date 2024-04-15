@@ -980,6 +980,8 @@ class Demapper(Layer):
                                               dtype.real_dtype,
                                               **kwargs)
 
+        self._no_threshold = tf.cast(np.finfo(dtype.as_numpy_dtype).tiny, dtype.real_dtype)
+
     @property
     def constellation(self):
         return self._constellation
@@ -1001,6 +1003,8 @@ class Demapper(Layer):
         # Add a dummy dimension for broadcasting. This is not needed when no
         # is a scalar, but also does not do any harm.
         no = tf.expand_dims(no, axis=-1)
+        # Deal with zero or very small values.
+        no = tf.math.maximum(no, self._no_threshold)
 
         # Compute exponents
         exponents = -squared_dist/no
