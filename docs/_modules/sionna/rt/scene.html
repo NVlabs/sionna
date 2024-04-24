@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.scene &mdash; Sionna 0.16.2 documentation</title>
+  <title>sionna.rt.scene &mdash; Sionna 0.17.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -381,21 +381,24 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Scattering.html#References">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html">Mobility in Sionna RT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Controlling-Position-and-Orientation-of-Scene-Objects">Controlling Position and Orientation of Scene Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Time-Evolution-of-Channels-Via-Doppler-Shift">Time Evolution of Channels Via Doppler Shift</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Example:-Delay-Doppler-Spectrum">Example: Delay-Doppler Spectrum</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Comparison-of-Doppler--vs-Position-based-Time-Evolution">Comparison of Doppler- vs Position-based Time Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id1">.</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id2">.</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
@@ -780,6 +783,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon-with-cars">simple_street_canyon_with_cars</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-wedge">simple_wedge</a></li>
@@ -950,7 +954,7 @@
              
   <h1>Source code for sionna.rt.scene</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -966,12 +970,13 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">mitsuba</span> <span class="k">as</span> <span class="nn">mi</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">drjit</span> <span class="k">as</span> <span class="nn">dr</span>
 
 <span class="kn">from</span> <span class="nn">.antenna_array</span> <span class="kn">import</span> <span class="n">AntennaArray</span>
 <span class="kn">from</span> <span class="nn">.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
+<span class="kn">from</span> <span class="nn">.radio_device</span> <span class="kn">import</span> <span class="n">RadioDevice</span>
 <span class="kn">from</span> <span class="nn">sionna.constants</span> <span class="kn">import</span> <span class="n">SPEED_OF_LIGHT</span>
 <span class="kn">from</span> <span class="nn">.itu_materials</span> <span class="kn">import</span> <span class="n">instantiate_itu_materials</span>
-<span class="kn">from</span> <span class="nn">.oriented_object</span> <span class="kn">import</span> <span class="n">OrientedObject</span>
 <span class="kn">from</span> <span class="nn">.radio_material</span> <span class="kn">import</span> <span class="n">RadioMaterial</span>
 <span class="kn">from</span> <span class="nn">.receiver</span> <span class="kn">import</span> <span class="n">Receiver</span>
 <span class="kn">from</span> <span class="nn">.scene_object</span> <span class="kn">import</span> <span class="n">SceneObject</span>
@@ -1087,6 +1092,7 @@
                                             <span class="p">}})</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">env_filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scene_params</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">)</span>
 
             <span class="c1"># Instantiate the solver</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_solver_paths</span> <span class="o">=</span> <span class="n">SolverPaths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
@@ -1287,7 +1293,8 @@
 <span class="sd">        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`</span>
 <span class="sd">            Item to add to the scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">OrientedObject</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Camera</span><span class="p">))</span>
+         <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RadioDevice</span><span class="p">))</span>
          <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RadioMaterial</span><span class="p">))</span> <span class="p">):</span>
             <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;The input must be a Transmitter, Receiver, Camera, or&quot;</span>\
                       <span class="s2">&quot; RadioMaterial&quot;</span>
@@ -2599,11 +2606,40 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mi_scene_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :class:`~mitsuba.SceneParameters` : Get the Mitsuba scene parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene_params</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">solver_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :class:`~sionna.rt.SolverPaths` : Get the paths solver</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solver_paths</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">solver_cm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :class:`~sionna.rt.SolverCoverageMap` : Get the coverage map solver</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solver_cm</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">preview_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :class:`~sionna.rt.InteractiveDisplay` : Get the preview widget</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span>
+
+<div class="viewcode-block" id="Scene.scene_geometry_updated"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Scene.scene_geometry_updated">[docs]</a>    <span class="k">def</span> <span class="nf">scene_geometry_updated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback to trigger when the scene geometry is updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Update the scene geometry in the preview</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span><span class="o">.</span><span class="n">redraw_scene_geometry</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -2689,7 +2725,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Parse all shapes in the scene</span>
         <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span>
-        <span class="k">for</span> <span class="n">obj_id</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">shapes</span><span class="p">()):</span>
+        <span class="n">objects_id</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">reinterpret_array_v</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt32</span><span class="p">,</span>
+                                            <span class="n">scene</span><span class="o">.</span><span class="n">shapes_dr</span><span class="p">())</span><span class="o">.</span><span class="n">tf</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">obj_id</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">objects_id</span><span class="p">,</span><span class="n">scene</span><span class="o">.</span><span class="n">shapes</span><span class="p">()):</span>
+            <span class="n">obj_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj_id</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
             <span class="c1"># Only meshes are handled</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Mesh</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Only triangle meshes are supported&#39;</span><span class="p">)</span>
@@ -2714,7 +2753,7 @@
                 <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_name_used</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; already used by another item&quot;</span><span class="p">)</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">SceneObject</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_id</span><span class="o">=</span><span class="n">obj_id</span><span class="p">)</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">SceneObject</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_id</span><span class="o">=</span><span class="n">obj_id</span><span class="p">,</span> <span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">mi_shape</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">radio_material</span> <span class="o">=</span> <span class="n">mat_name</span>
 
@@ -2778,6 +2817,15 @@
 <span class="sd">Example scene containing a few rectangular building blocks and a ground plane</span>
 
 <span class="sd">.. figure:: ../figures/street_canyon.png</span>
+<span class="sd">   :align: center</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># pylint: disable=C0301</span>
+<span class="n">simple_street_canyon_with_cars</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="n">scenes</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;simple_street_canyon_with_cars/simple_street_canyon_with_cars.xml&quot;</span><span class="p">))</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example scene containing a few rectangular building blocks and a ground plane as well as some cars</span>
+
+<span class="sd">.. figure:: ../figures/street_canyon_with_cars.png</span>
 <span class="sd">   :align: center</span>
 <span class="sd">&quot;&quot;&quot;</span>
 

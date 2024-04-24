@@ -29,3 +29,4 @@ References:
    .. [Balanis97] A. Balanis, "Antenna Theory: Analysis and Design," 2nd Edition, John Wiley & Sons, 1997.
    .. [ITUR_P2040_2] ITU-R, “Effects of building materials and structures on radiowave propagation above about 100 MHz“, Recommendation ITU-R P.2040-2
    .. [SurfaceIntegral] Wikipedia, "`Surface integral <https://en.wikipedia.org/wiki/Surface_integral>`_", accessed Jun. 22, 2023.
+   .. [Wiffen2018] F. Wiffen et al., "`Comparison of OTFS and OFDM in Ray Launched sub-6 GHz and mmWave Line-of-Sight Mobility Channels <https://ieeexplore.ieee.org/abstract/document/8580850>`_", Proc. IEEE Int. Sym. Personal, Indoor and Mobil Radio Commun. (PIMRC), Bologna, Italy, Sep. 2018.

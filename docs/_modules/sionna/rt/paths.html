@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.paths &mdash; Sionna 0.16.2 documentation</title>
+  <title>sionna.rt.paths &mdash; Sionna 0.17.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -381,21 +381,24 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Scattering.html#References">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html">Mobility in Sionna RT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Controlling-Position-and-Orientation-of-Scene-Objects">Controlling Position and Orientation of Scene Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Time-Evolution-of-Channels-Via-Doppler-Shift">Time Evolution of Channels Via Doppler Shift</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Example:-Delay-Doppler-Spectrum">Example: Delay-Doppler Spectrum</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Comparison-of-Doppler--vs-Position-based-Time-Evolution">Comparison of Doppler- vs Position-based Time Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id1">.</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id2">.</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
@@ -780,6 +783,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon-with-cars">simple_street_canyon_with_cars</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-wedge">simple_wedge</a></li>
@@ -950,7 +954,7 @@
              
   <h1>Source code for sionna.rt.paths</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -1063,6 +1067,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_targets_sources_mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_doppler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">num_targets</span><span class="p">,</span> <span class="n">num_sources</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rdtype</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">fill</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1080,7 +1085,7 @@
 <div class="viewcode-block" id="Paths.to_dict"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the properties of the paths as a dictionnary which values are</span>
+<span class="sd">        Returns the properties of the paths as a dictionary which values are</span>
 <span class="sd">        tensors</span>
 
 <span class="sd">        Output</span>
@@ -1100,9 +1105,9 @@
 <div class="viewcode-block" id="Paths.from_dict"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Set the paths from a dictionnary which values are tensors</span>
+<span class="sd">        Set the paths from a dictionary which values are tensors</span>
 
-<span class="sd">        The format of the dictionnary is expected to be the same as the one</span>
+<span class="sd">        The format of the dictionary is expected to be the same as the one</span>
 <span class="sd">        returned by :meth:`~sionna.rt.Paths.to_dict()`.</span>
 
 <span class="sd">        Input</span>
@@ -1323,40 +1328,84 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_delays</span> <span class="o">=</span> <span class="n">v</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">doppler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float : Doppler shift for each path</span>
+<span class="sd">        related to movement of objects. The Doppler shifts resulting from</span>
+<span class="sd">        movements of the transmitters or receivers will be computed from the inputs to the function :func:`~sionna.rt.Paths.apply_doppler`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_doppler</span>
+
+    <span class="nd">@doppler</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">doppler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_doppler</span> <span class="o">=</span> <span class="n">v</span>
+
 <div class="viewcode-block" id="Paths.apply_doppler"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Paths.apply_doppler">[docs]</a>    <span class="k">def</span> <span class="nf">apply_doppler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampling_frequency</span><span class="p">,</span> <span class="n">num_time_steps</span><span class="p">,</span>
                       <span class="n">tx_velocities</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">),</span> <span class="n">rx_velocities</span><span class="o">=</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">)):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Apply Doppler shifts corresponding to input transmitters and receivers</span>
-<span class="sd">        velocities.</span>
+<span class="sd">        Apply Doppler shifts to all paths according to the velocities</span>
+<span class="sd">        of objects in the scene as well as the provided transmitter and receiver velocities.</span>
 
-<span class="sd">        This function replaces the last dimension of the tensor storing the</span>
-<span class="sd">        paths coefficients :attr:`~sionna.rt.Paths.a`, which stores the the temporal evolution of</span>
-<span class="sd">        the channel, with a dimension of size ``num_time_steps`` computed</span>
-<span class="sd">        according to the input velocities.</span>
+<span class="sd">        This function replaces the last dimension of the tensor :attr:`~sionna.rt.Paths.a` storing the</span>
+<span class="sd">        time evolution of the paths&#39; coefficients with a dimension of size ``num_time_steps``.</span>
 
 <span class="sd">        Time evolution of the channel coefficients is simulated by computing the</span>
-<span class="sd">        Doppler shift due to movements of the transmitter and receiver. If we denote by</span>
-<span class="sd">        :math:`\mathbf{v}_{\text{T}}\in\mathbb{R}^3` and :math:`\mathbf{v}_{\text{R}}\in\mathbb{R}^3`</span>
-<span class="sd">        the velocity vectors of the transmitter and receiver, respectively, the Doppler shifts are computed as</span>
+<span class="sd">        Doppler shift due to movements of scene objects, transmitters, and receivers.</span>
+<span class="sd">        To understand this process, let us consider a single propagation path undergoing</span>
+<span class="sd">        :math:`n` scattering processes, such as reflection, diffuse scattering, or diffraction,</span>
+<span class="sd">        as shown in the figure below.</span>
+
+<span class="sd">        .. figure:: ../figures/doppler.png</span>
+<span class="sd">            :align: center</span>
+
+<span class="sd">        The object on which lies the :math:`i\text{th}` scattering point has the velocity vector</span>
+<span class="sd">        :math:`\hat{\mathbf{v}}_i` and the outgoing ray direction at this point is</span>
+<span class="sd">        denoted :math:`\hat{\mathbf{k}}_i`. The first and last point correspond to the transmitter</span>
+<span class="sd">        and receiver, respectively. We therefore have</span>
 
 <span class="sd">        .. math::</span>
 
-<span class="sd">            f_{\text{T}, i} &amp;= \frac{\hat{\mathbf{r}}(\theta_{\text{T},i}, \varphi_{\text{T},i})^\mathsf{T}\mathbf{v}_{\text{T}}}{\lambda}\qquad \text{[Hz]}\\</span>
-<span class="sd">            f_{\text{R}, i} &amp;= \frac{\hat{\mathbf{r}}(\theta_{\text{R},i}, \varphi_{\text{R},i})^\mathsf{T}\mathbf{v}_{\text{R}}}{\lambda}\qquad \text{[Hz]}</span>
+<span class="sd">            \hat{\mathbf{k}}_0 &amp;= \hat{\mathbf{r}}(\theta_{\text{T}}, \varphi_{\text{T}})\\</span>
+<span class="sd">            \hat{\mathbf{k}}_{n} &amp;= -\hat{\mathbf{r}}(\theta_{\text{R}}, \varphi_{\text{R}})</span>
 
-<span class="sd">        for an arbitrary path :math:`i`, where :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})` are the AoDs,</span>
-<span class="sd">        :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})` are the AoAs, and :math:`\lambda` is the wavelength.</span>
-<span class="sd">        This leads to the time-dependent path coefficient</span>
+<span class="sd">        where :math:`(\theta_{\text{T}}, \varphi_{\text{T}})` are the AoDs,</span>
+<span class="sd">        :math:`(\theta_{\text{R}}, \varphi_{\text{R}})` are the AoAs, and :math:`\hat{\mathbf{r}}(\theta,\varphi)` is defined in :eq:`spherical_vecs`.</span>
+
+<span class="sd">        If the transmitter emits a signal with frequency :math:`f`, the receiver</span>
+<span class="sd">        will observe the signal at frequency :math:`f&#39;=f + f_\Delta`, where :math:`f_\Delta` is the Doppler</span>
+<span class="sd">        shift, which can be computed as [Wiffen2018]_</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            f&#39; = f \prod_{i=0}^n \frac{1 - \frac{\mathbf{v}_{i+1}^\mathsf{T}\hat{\mathbf{k}}_i}{c}}{1 - \frac{\mathbf{v}_{i}^\mathsf{T}\hat{\mathbf{k}}_i}{c}}.</span>
+
+<span class="sd">        Under the assumption that :math:`\lVert \mathbf{v}_i \rVert\ll c`, we can apply the Taylor expansion :math:`(1-x)^{-1}\approx 1+x`, for :math:`x\ll 1`, to the previous equation</span>
+<span class="sd">        to obtain</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            f&#39; &amp;\approx f \prod_{i=0}^n \left(1 - \frac{\mathbf{v}_{i+1}^\mathsf{T}\hat{\mathbf{k}}_i}{c}\right)\left(1 + \frac{\mathbf{v}_{i}^\mathsf{T}\hat{\mathbf{k}}_i}{c}\right)\\</span>
+<span class="sd">               &amp;\approx f \left(1 + \sum_{i=0}^n \frac{\mathbf{v}_{i}^\mathsf{T}\hat{\mathbf{k}}_i -\mathbf{v}_{i+1}^\mathsf{T}\hat{\mathbf{k}}_i}{c} \right)</span>
+
+<span class="sd">        where the second line results from ignoring terms in :math:`c^{-2}`. Solving for :math:`f_\Delta`, grouping terms with the same :math:`\mathbf{v}_i` together, and using :math:`f=c/\lambda`, we obtain</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            f_\Delta = \frac{1}{\lambda}\left(\mathbf{v}_{0}^\mathsf{T}\hat{\mathbf{k}}_0 - \mathbf{v}_{n+1}^\mathsf{T}\hat{\mathbf{k}}_n + \sum_{i=1}^n \mathbf{v}_{i}^\mathsf{T}\left(\hat{\mathbf{k}}_i-\hat{\mathbf{k}}_{i-1} \right) \right) \qquad \text{[Hz]}.</span>
+
+<span class="sd">        Using this Doppler shift, the time-dependent path coefficient is computed as</span>
 
 <span class="sd">        .. math ::</span>
 
-<span class="sd">            a_i(t) = a_i e^{j2\pi(f_{\text{T}, i}+f_{\text{R}, i})t}.</span>
+<span class="sd">            a(t) = a e^{j2\pi f_\Delta t}.</span>
 
-<span class="sd">        Note that this model is only valid as long as the AoDs, AoAs, and path delay do not change.</span>
+<span class="sd">        Note that this model is only valid as long as the AoDs, AoAs, and path delays do not change significantly.</span>
+<span class="sd">        This is typically the case for very short time intervals. Large-scale mobility should be simulated by moving objects within the scene and recomputing the propagation paths.</span>
 
-<span class="sd">        When this function is called multiple times, it overwrites the previous</span>
-<span class="sd">        time steps dimension.</span>
+<span class="sd">        When this function is called multiple times, it overwrites the previous time step dimension.</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        ------</span>
@@ -1437,6 +1486,15 @@
         <span class="n">tx_ds</span> <span class="o">=</span> <span class="n">two_pi</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">tx_velocities</span><span class="p">,</span> <span class="n">k_t</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">wavelength</span>
         <span class="n">rx_ds</span> <span class="o">=</span> <span class="n">two_pi</span><span class="o">*</span><span class="n">dot</span><span class="p">(</span><span class="n">rx_velocities</span><span class="p">,</span> <span class="n">k_r</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">wavelength</span>
         <span class="n">ds</span> <span class="o">=</span> <span class="n">tx_ds</span> <span class="o">+</span> <span class="n">rx_ds</span>
+
+        <span class="c1"># Add Doppler shifts due to movement of scene objects</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">synthetic_array</span><span class="p">:</span>
+            <span class="c1"># Create dummy dims for tx and rx antennas</span>
+            <span class="c1"># [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]</span>
+            <span class="n">ds</span> <span class="o">+=</span> <span class="n">two_pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">doppler</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ds</span> <span class="o">+=</span> <span class="n">two_pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">doppler</span>
+
         <span class="c1"># Expand for the time sample dimension</span>
         <span class="c1"># [batch_dim, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, 1]</span>
         <span class="c1"># or</span>
@@ -1489,6 +1547,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doppler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doppler</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_tau</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
@@ -1496,6 +1555,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_t</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">doppler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doppler</span><span class="p">,</span> <span class="n">perm</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_reverse_direction</span> <span class="o">=</span> <span class="n">v</span>
 
@@ -1709,6 +1769,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">mask</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">more_vertices</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">objects</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span> <span class="n">more_objects</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doppler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">doppler</span><span class="p">,</span> <span class="n">more_paths</span><span class="o">.</span><span class="n">doppler</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -1741,6 +1802,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi_r</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># [1, max_num_paths]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># [1, max_num_paths]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">doppler</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">doppler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="n">tau</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span>
         <span class="k">if</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># No paths</span>

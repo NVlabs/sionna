@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.camera &mdash; Sionna 0.16.2 documentation</title>
+  <title>sionna.rt.camera &mdash; Sionna 0.17.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -381,21 +381,24 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Scattering.html#References">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html">Mobility in Sionna RT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Controlling-Position-and-Orientation-of-Scene-Objects">Controlling Position and Orientation of Scene Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Time-Evolution-of-Channels-Via-Doppler-Shift">Time Evolution of Channels Via Doppler Shift</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Example:-Delay-Doppler-Spectrum">Example: Delay-Doppler Spectrum</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Comparison-of-Doppler--vs-Position-based-Time-Evolution">Comparison of Doppler- vs Position-based Time Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id1">.</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id2">.</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
@@ -780,6 +783,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon-with-cars">simple_street_canyon_with_cars</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-wedge">simple_wedge</a></li>
@@ -950,7 +954,7 @@
              
   <h1>Source code for sionna.rt.camera</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -958,12 +962,12 @@
 <span class="sd">A camera defines a viewpoint for rendering.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">.oriented_object</span> <span class="kn">import</span> <span class="n">OrientedObject</span>
+<span class="kn">from</span> <span class="nn">.object</span> <span class="kn">import</span> <span class="n">Object</span>
 <span class="kn">import</span> <span class="nn">mitsuba</span> <span class="k">as</span> <span class="nn">mi</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-<div class="viewcode-block" id="Camera"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Camera">[docs]</a><span class="k">class</span> <span class="nc">Camera</span><span class="p">(</span><span class="n">OrientedObject</span><span class="p">):</span>
+<div class="viewcode-block" id="Camera"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Camera">[docs]</a><span class="k">class</span> <span class="nc">Camera</span><span class="p">(</span><span class="n">Object</span><span class="p">):</span>
     <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Camera(name, position, orientation=[0.,0.,0.], look_at=None)</span>
 
@@ -1010,7 +1014,6 @@
         <span class="c1"># Initialized to identity.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_to_world</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="p">()</span>
 
-        <span class="c1"># Initialize the base class OrientedObject</span>
         <span class="c1"># Position and orientation are set through this call</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">look_at</span><span class="p">)</span>
 
@@ -1085,7 +1088,7 @@
                        <span class="s2">&quot; is not part of the scene&quot;</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">OrientedObject</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;No radio device or camera named &#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&#39; found.&quot;</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>

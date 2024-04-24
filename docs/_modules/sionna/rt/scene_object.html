@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.scene_object &mdash; Sionna 0.16.2 documentation</title>
+  <title>sionna.rt.scene_object &mdash; Sionna 0.17.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -381,21 +381,24 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Scattering.html#References">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html">Mobility in Sionna RT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Controlling-Position-and-Orientation-of-Scene-Objects">Controlling Position and Orientation of Scene Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Time-Evolution-of-Channels-Via-Doppler-Shift">Time Evolution of Channels Via Doppler Shift</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Example:-Delay-Doppler-Spectrum">Example: Delay-Doppler Spectrum</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Comparison-of-Doppler--vs-Position-based-Time-Evolution">Comparison of Doppler- vs Position-based Time Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id1">.</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../made_with_sionna.html#id2">.</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../made_with_sionna.html">“Made with Sionna”</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../em_primer.html">Primer on Electromagnetics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
@@ -780,6 +783,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#example-scenes">Example Scenes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#floor-wall">floor_wall</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-street-canyon-with-cars">simple_street_canyon_with_cars</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#etoile">etoile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#munich">munich</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#simple-wedge">simple_wedge</a></li>
@@ -950,15 +954,21 @@
              
   <h1>Source code for sionna.rt.scene_object</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Class representing objects in the scene</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
 
 <span class="kn">from</span> <span class="nn">.object</span> <span class="kn">import</span> <span class="n">Object</span>
 <span class="kn">from</span> <span class="nn">.radio_material</span> <span class="kn">import</span> <span class="n">RadioMaterial</span>
+<span class="kn">import</span> <span class="nn">drjit</span> <span class="k">as</span> <span class="nn">dr</span>
+<span class="kn">import</span> <span class="nn">mitsuba</span> <span class="k">as</span> <span class="nn">mi</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">mi_to_tf_tensor</span><span class="p">,</span> <span class="n">angles_to_mitsuba_rotation</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span>\
+    <span class="n">theta_phi_from_unit_vec</span>
+<span class="kn">from</span> <span class="nn">sionna.constants</span> <span class="kn">import</span> <span class="n">PI</span>
 
 
 <div class="viewcode-block" id="SceneObject"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.SceneObject">[docs]</a><span class="k">class</span> <span class="nc">SceneObject</span><span class="p">(</span><span class="n">Object</span><span class="p">):</span>
@@ -972,6 +982,8 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">name</span><span class="p">,</span>
                  <span class="n">object_id</span><span class="p">,</span>
+                 <span class="n">scene</span><span class="p">,</span>
+                 <span class="n">mi_shape</span><span class="p">,</span>
                  <span class="n">radio_material</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="c1"># Initialize the base class Object</span>
@@ -982,6 +994,29 @@
 
         <span class="c1"># Set the object id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_object_id</span> <span class="o">=</span> <span class="n">object_id</span>
+
+        <span class="c1"># Scene</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
+
+        <span class="c1"># Set the Mitsuba shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mi_shape</span> <span class="o">=</span> <span class="n">mi_shape</span>
+
+        <span class="c1"># Set velocity vector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+
+        <span class="c1"># Orientation of the object is initialized to (0,0,0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">scene</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">tf</span><span class="o">.</span><span class="n">complex64</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_point_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_vec_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_scalar_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_transform_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Transform4f</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_point_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3d</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_vec_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3d</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_scalar_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float64</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mi_transform_t</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Transform4d</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">object_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1040,7 +1075,308 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_radio_material</span><span class="o">.</span><span class="n">add_object_using</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object_id</span><span class="p">)</span>
 
         <span class="c1"># Add the RadioMaterial to the scene if not already done</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio_material</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio_material</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [3], tf.float : Get/set the velocity vector [m/s]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span>
+
+    <span class="nd">@velocity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`velocity` must have shape [3]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_velocity</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [3], tf.float : Get/set the position vector [m] of the center</span>
+<span class="sd">            of the object. The center is defined as the object&#39;s axis-aligned</span>
+<span class="sd">            bounding box (AABB).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rdtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+        <span class="c1"># Bounding box</span>
+        <span class="c1"># [3]</span>
+        <span class="n">bbox_min</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mi_shape</span><span class="o">.</span><span class="n">bbox</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># [3]</span>
+        <span class="n">bbox_max</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mi_shape</span><span class="o">.</span><span class="n">bbox</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># [3]</span>
+        <span class="n">half</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">half</span><span class="o">*</span><span class="p">(</span><span class="n">bbox_min</span> <span class="o">+</span> <span class="n">bbox_max</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">position</span>
+
+    <span class="nd">@position</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_position</span><span class="p">):</span>
+
+        <span class="c1">## Update Mitsuba vertices</span>
+
+        <span class="c1"># Scene parameters</span>
+        <span class="n">scene_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">mi_scene_params</span>
+        <span class="c1"># Real dtype</span>
+        <span class="n">rdtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+        <span class="n">new_position</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">new_position</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># [num_vertices*3]</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">scene_params</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;mesh-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.vertex_positions&#39;</span><span class="p">]</span>
+        <span class="c1"># [num_vertices,3]</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="c1"># [3]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span>
+        <span class="c1"># [3]</span>
+        <span class="n">translation_vector</span> <span class="o">=</span> <span class="n">new_position</span> <span class="o">-</span> <span class="n">position</span>
+        <span class="c1"># [1,3]</span>
+        <span class="n">translation_vector</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">translation_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># [num_vertices,3]</span>
+        <span class="n">translated_vertices</span> <span class="o">=</span> <span class="n">vertices</span> <span class="o">+</span> <span class="n">translation_vector</span>
+        <span class="c1"># Cast to Mitsuba type to object the Mitsuba scene</span>
+        <span class="n">fltn_translated_vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">translated_vertices</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">fltn_translated_vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_scalar_t</span><span class="p">(</span><span class="n">fltn_translated_vertices</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="n">scene_params</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;mesh-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.vertex_positions&#39;</span><span class="p">]</span> <span class="o">=</span>\
+            <span class="n">fltn_translated_vertices</span>
+        <span class="n">scene_params</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="c1">## Update Sionna vertices</span>
+
+        <span class="n">obj_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_id</span>
+        <span class="n">mi_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_shape</span>
+        <span class="n">solver_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">solver_paths</span>
+
+        <span class="n">shape_ind</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">shape_indices</span><span class="p">[</span><span class="n">obj_id</span><span class="p">]</span>
+        <span class="n">prim_offset</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">prim_offsets</span><span class="p">[</span><span class="n">shape_ind</span><span class="p">]</span>
+
+        <span class="n">face_indices3</span> <span class="o">=</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">face_indices</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt32</span><span class="p">,</span>
+                                                        <span class="n">mi_shape</span><span class="o">.</span><span class="n">face_count</span><span class="p">()))</span>
+        <span class="c1"># Flatten. This is required for calling vertex_position</span>
+        <span class="c1"># [n_prims*3]</span>
+        <span class="n">face_indices</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">face_indices3</span><span class="p">)</span>
+        <span class="c1"># Get vertices coordinates</span>
+        <span class="c1"># [n_prims*3, 3]</span>
+        <span class="n">vertex_coords</span> <span class="o">=</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">vertex_position</span><span class="p">(</span><span class="n">face_indices</span><span class="p">)</span>
+        <span class="c1"># Cast to TensorFlow type</span>
+        <span class="c1"># [n_prims*3, 3]</span>
+        <span class="n">vertex_coords</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">vertex_coords</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># Unflatten</span>
+        <span class="c1"># [n_prims, vertices per triangle : 3, 3]</span>
+        <span class="n">vertex_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vertex_coords</span><span class="p">,</span> <span class="p">[</span><span class="n">mi_shape</span><span class="o">.</span><span class="n">face_count</span><span class="p">(),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="c1"># Update the tensor storing the primitive vertices</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">prim_offset</span><span class="p">,</span> <span class="n">prim_offset</span> <span class="o">+</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">face_count</span><span class="p">(),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">primitives</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">vertex_coords</span><span class="p">)</span>
+
+        <span class="c1">## Update Sionna wedges</span>
+
+        <span class="n">wedges_objects</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_objects</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_origin</span>
+
+        <span class="c1"># Indices of the wedges corresponding to this object</span>
+        <span class="c1"># [num_wedges]</span>
+        <span class="n">wedges_ind</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">wedges_objects</span> <span class="o">==</span> <span class="n">obj_id</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Corresponding origins</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">wedges_origin</span><span class="p">,</span> <span class="n">wedges_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Translates the wedges</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_origin</span> <span class="o">+=</span> <span class="n">translation_vector</span>
+
+        <span class="c1"># Updates the wedges</span>
+        <span class="n">wedges_ind</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">wedges_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_origin</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">wedges_ind</span><span class="p">,</span> <span class="n">wedges_origin</span><span class="p">)</span>
+
+        <span class="c1"># Trigger scene callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">scene_geometry_updated</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [3], tf.float : Get/set the orientation :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">            [rad] specified through three angles corresponding to a</span>
+<span class="sd">            3D rotation as defined in :eq:`rotation`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span>
+
+    <span class="nd">@orientation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_orient</span><span class="p">):</span>
+
+        <span class="c1"># Real dtype</span>
+        <span class="n">rdtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">real_dtype</span>
+        <span class="n">new_orient</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">new_orient</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+
+        <span class="c1"># Build the transformtation corresponding to the new rotation</span>
+        <span class="n">new_rotation</span> <span class="o">=</span> <span class="n">angles_to_mitsuba_rotation</span><span class="p">(</span><span class="n">new_orient</span><span class="p">)</span>
+
+        <span class="c1"># Invert the current orientation</span>
+        <span class="n">cur_rotation</span> <span class="o">=</span> <span class="n">angles_to_mitsuba_rotation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+        <span class="n">inv_cur_rotation</span> <span class="o">=</span> <span class="n">cur_rotation</span><span class="o">.</span><span class="n">inverse</span><span class="p">()</span>
+
+        <span class="c1"># Build the transform.</span>
+        <span class="c1"># The object is first translated to the origin, then rotated, then</span>
+        <span class="c1"># translated back to its current position</span>
+        <span class="n">transform</span> <span class="o">=</span>  <span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_mi_transform_t</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<div class="viewcode-block" id="SceneObject.look_at"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.SceneObject.look_at">[docs]</a>                      <span class="o">@</span> <span class="n">new_rotation</span>
+                      <span class="o">@</span> <span class="n">inv_cur_rotation</span>
+                      <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_transform_t</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span> <span class="p">)</span>
+
+        <span class="c1">## Update Mitsuba vertices</span>
+
+        <span class="c1"># Scene parameters</span>
+        <span class="n">scene_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">mi_scene_params</span>
+        <span class="c1"># [num_vertices*3]</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">scene_params</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;mesh-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.vertex_positions&#39;</span><span class="p">]</span>
+        <span class="c1"># [num_vertices,3]</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">unravel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mi_point_t</span><span class="p">,</span> <span class="n">vertices</span><span class="p">)</span>
+        <span class="c1"># Apply the transform</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">transform_affine</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="c1"># Cast to Mitsuba type to object the Mitsuba scene</span>
+        <span class="n">fltn_vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">fltn_vertices</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">fltn_vertices</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">scene_params</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;mesh-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">.vertex_positions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fltn_vertices</span>
+        <span class="n">scene_params</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="c1">## Update Sionna vertices</span>
+
+        <span class="n">obj_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_id</span>
+        <span class="n">mi_shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_shape</span>
+        <span class="n">solver_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">solver_paths</span>
+
+        <span class="n">shape_ind</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">shape_indices</span><span class="p">[</span><span class="n">obj_id</span><span class="p">]</span>
+        <span class="n">prim_offset</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">prim_offsets</span><span class="p">[</span><span class="n">shape_ind</span><span class="p">]</span>
+
+        <span class="n">face_indices3</span> <span class="o">=</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">face_indices</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt32</span><span class="p">,</span>
+                                                        <span class="n">mi_shape</span><span class="o">.</span><span class="n">face_count</span><span class="p">()))</span>
+        <span class="c1"># Flatten. This is required for calling vertex_position</span>
+        <span class="c1"># [n_prims*3]</span>
+        <span class="n">face_indices</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">face_indices3</span><span class="p">)</span>
+        <span class="c1"># Get vertices coordinates</span>
+        <span class="c1"># [n_prims*3, 3]</span>
+        <span class="n">vertex_coords</span> <span class="o">=</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">vertex_position</span><span class="p">(</span><span class="n">face_indices</span><span class="p">)</span>
+        <span class="c1"># Cast to TensorFlow type</span>
+        <span class="c1"># [n_prims*3, 3]</span>
+        <span class="n">vertex_coords</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">vertex_coords</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># Unflatten</span>
+        <span class="c1"># [n_prims, vertices per triangle : 3, 3]</span>
+        <span class="n">vertex_coords</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">vertex_coords</span><span class="p">,</span> <span class="p">[</span><span class="n">mi_shape</span><span class="o">.</span><span class="n">face_count</span><span class="p">(),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+        <span class="c1"># Update the tensor storing the primitive vertices</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="n">prim_offset</span><span class="p">,</span> <span class="n">prim_offset</span> <span class="o">+</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">face_count</span><span class="p">(),</span>
+                    <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">primitives</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">vertex_coords</span><span class="p">)</span>
+
+        <span class="c1">## Update Sionna normals</span>
+
+        <span class="c1"># Get vertices coordinates</span>
+        <span class="c1"># [n_prims, 3]</span>
+        <span class="n">normals</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">normals</span><span class="o">.</span><span class="n">gather_nd</span><span class="p">(</span><span class="n">sl</span><span class="p">)</span>
+        <span class="c1"># Cast to Mitsuba Vector</span>
+        <span class="c1"># [n_prims, 3]</span>
+        <span class="n">normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_vec_t</span><span class="p">(</span><span class="n">normals</span><span class="p">)</span>
+        <span class="c1"># Rotate the normals</span>
+        <span class="n">normals</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">transform_affine</span><span class="p">(</span><span class="n">normals</span><span class="p">)</span>
+        <span class="c1"># Cast to Tensorflow type</span>
+        <span class="c1"># [n_prims, 3]</span>
+        <span class="n">normals</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># Update the tensor storing the primitive vertices</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">normals</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">sl</span><span class="p">,</span> <span class="n">normals</span><span class="p">)</span>
+
+        <span class="c1">## Update Sionna wedges</span>
+
+        <span class="n">wedges_objects</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_objects</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_origin</span>
+        <span class="n">wedges_e_hat</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_e_hat</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_normals</span>
+
+        <span class="c1"># Indices of the wedges corresponding to this object</span>
+        <span class="c1"># [num_wedges]</span>
+        <span class="n">wedges_ind</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">wedges_objects</span> <span class="o">==</span> <span class="n">obj_id</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Corresponding origins, e_hat, and normals</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">wedges_origin</span><span class="p">,</span> <span class="n">wedges_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_e_hat</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">wedges_e_hat</span><span class="p">,</span> <span class="n">wedges_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">wedges_normals</span><span class="p">,</span> <span class="n">wedges_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># [num_wedges*2, 3]</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">wedges_normals</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+        <span class="c1"># Cast to Mitsuba types</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_point_t</span><span class="p">(</span><span class="n">wedges_origin</span><span class="p">)</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_e_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_vec_t</span><span class="p">(</span><span class="n">wedges_e_hat</span><span class="p">)</span>
+        <span class="c1"># [num_wedges*2, 3]</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mi_vec_t</span><span class="p">(</span><span class="n">wedges_normals</span><span class="p">)</span>
+
+        <span class="c1"># Rotate all quantities</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">transform_affine</span><span class="p">(</span><span class="n">wedges_origin</span><span class="p">)</span>
+         <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_e_hat</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">transform_affine</span><span class="p">(</span><span class="n">wedges_e_hat</span><span class="p">)</span>
+         <span class="c1"># [num_wedges*2, 3]</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">transform_affine</span><span class="p">(</span><span class="n">wedges_normals</span><span class="p">)</span>
+
+        <span class="c1"># Cast to Tensorflow type</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_origin</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">wedges_origin</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># [num_wedges, 3]</span>
+        <span class="n">wedges_e_hat</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">wedges_e_hat</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># [num_wedges*2, 3]</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="n">mi_to_tf_tensor</span><span class="p">(</span><span class="n">wedges_normals</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
+        <span class="c1"># [num_wedges, 2, 3]</span>
+        <span class="n">wedges_normals</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">wedges_normals</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+        <span class="c1"># Updates the wedges</span>
+        <span class="n">wedges_ind</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">wedges_ind</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_origin</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">wedges_ind</span><span class="p">,</span> <span class="n">wedges_origin</span><span class="p">)</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_e_hat</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">wedges_ind</span><span class="p">,</span> <span class="n">wedges_e_hat</span><span class="p">)</span>
+        <span class="n">solver_paths</span><span class="o">.</span><span class="n">wedges_normals</span><span class="o">.</span><span class="n">scatter_nd_update</span><span class="p">(</span><span class="n">wedges_ind</span><span class="p">,</span>
+                                                      <span class="n">wedges_normals</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">=</span> <span class="n">new_orient</span>
+
+        <span class="c1"># Trigger scene callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">scene_geometry_updated</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">look_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the orientation so that the x-axis points toward an</span>
+<span class="sd">        ``Object``.</span>
+
+<span class="sd">        Input</span>
+<span class="sd">        -----</span>
+<span class="sd">        target : [3], float | :class:`sionna.rt.Object` | str</span>
+<span class="sd">            A position or the name or instance of an</span>
+<span class="sd">            :class:`sionna.rt.Object` in the scene to point toward to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get position to look at</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No camera, device, or object named &#39;</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">&#39; found.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">target</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">position</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">Object</span><span class="p">):</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">position</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`target` must be a three-element vector)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Compute angles relative to LCS</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">target</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">theta_phi_from_unit_vec</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">phi</span> <span class="c1"># Rotation around z-axis</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">-</span><span class="n">PI</span><span class="o">/</span><span class="mi">2</span> <span class="c1"># Rotation around y-axis</span>
+        <span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="c1"># Rotation around x-axis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

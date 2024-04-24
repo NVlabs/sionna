@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tutorial on Scattering &mdash; Sionna 0.16.2 documentation</title>
+  <title>Tutorial on Scattering &mdash; Sionna 0.17.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -24,7 +24,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="“Made with Sionna”" href="../made_with_sionna.html" />
+    <link rel="next" title="Mobility in Sionna RT" href="Sionna_Ray_Tracing_Mobility.html" />
     <link rel="prev" title="Tutorial on Diffraction" href="Sionna_Ray_Tracing_Diffraction.html" /> 
 </head>
 
@@ -385,21 +385,24 @@
 <li class="toctree-l4"><a class="reference internal" href="#References">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html">Mobility in Sionna RT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Controlling-Position-and-Orientation-of-Scene-Objects">Controlling Position and Orientation of Scene Objects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Time-Evolution-of-Channels-Via-Doppler-Shift">Time Evolution of Channels Via Doppler Shift</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Example:-Delay-Doppler-Spectrum">Example: Delay-Doppler Spectrum</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Comparison-of-Doppler--vs-Position-based-Time-Evolution">Comparison of Doppler- vs Position-based Time Evolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#community-made-tools">Community-made tools</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#id1">.</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../made_with_sionna.html#list-of-projects">List of Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../made_with_sionna.html#id2">.</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../made_with_sionna.html">“Made with Sionna”</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../em_primer.html">Primer on Electromagnetics</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../em_primer.html#coordinate-system-rotations-and-vector-fields">Coordinate system, rotations, and vector fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../em_primer.html#planar-time-harmonic-waves">Planar Time-Harmonic Waves</a></li>
@@ -784,6 +787,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/rt.html#example-scenes">Example Scenes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#floor-wall">floor_wall</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#simple-street-canyon">simple_street_canyon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../api/rt.html#simple-street-canyon-with-cars">simple_street_canyon_with_cars</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#etoile">etoile</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#munich">munich</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../api/rt.html#simple-wedge">simple_wedge</a></li>
@@ -1498,7 +1502,7 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-There are 2247 scattered paths
+There are 2252 scattered paths
 </pre></div></div>
 </div>
 <p>We can see that there is a very large number paths. Actually, any ray that hits the surface will be scattered toward the receiver. Thus, the more rays we shoot, the more scattered paths there are. You can see this through the following experiment:</p>
@@ -1520,8 +1524,8 @@ There are 2247 scattered paths
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-There are 4400 scattered paths.
-There are 22572 scattered paths.
+There are 4506 scattered paths.
+There are 22563 scattered paths.
 </pre></div></div>
 </div>
 <p>The number of rays hitting the surface is proportional to the total number of rays shot and the squared distance between the transmitter and the surface. However, the total received energy across the surface is constant as the transmitted energy is equally divided between all rays.</p>
@@ -1852,7 +1856,7 @@ Documentation</a>.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Sionna_Ray_Tracing_Diffraction.html" class="btn btn-neutral float-left" title="Tutorial on Diffraction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../made_with_sionna.html" class="btn btn-neutral float-right" title="“Made with Sionna”" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Sionna_Ray_Tracing_Mobility.html" class="btn btn-neutral float-right" title="Mobility in Sionna RT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

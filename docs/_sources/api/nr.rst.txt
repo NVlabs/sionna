@@ -30,7 +30,7 @@ simulations of the 5G NR PUSCH with a few lines of code:
 
    y = channel([x, no]) # Simulate channel output
 
-   b_hat = pusch_receiver([x, no]) # Recover the info bits
+   b_hat = pusch_receiver([y, no]) # Recover the info bits
 
    # Compute BER
    print("BER:", compute_ber(b, b_hat).numpy())
