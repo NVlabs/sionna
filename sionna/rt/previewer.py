@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -91,6 +91,21 @@ class InteractiveDisplay:
             else:
                 self._p3s_scene.remove(obj)
         self._objects = remaining
+
+    def redraw_scene_geometry(self):
+        """
+        Redraw the scene geometry.
+        """
+        remaining = []
+        for obj, persist in self._objects:
+            if not persist: # Only scene objects are flagged as persistent
+                remaining.append((obj, persist))
+            else:
+                self._p3s_scene.remove(obj)
+        self._objects = remaining
+
+        # Plot the scene geometry
+        self.plot_scene()
 
     def center_view(self):
         """

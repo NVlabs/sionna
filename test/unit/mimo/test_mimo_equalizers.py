@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 try:
@@ -46,7 +46,7 @@ class Model(tf.keras.Model):
         else:
             self.s = tf.eye(self.channel._num_rx_ant, dtype=tf.complex64)
                  
-    @tf.function(jit_compile=True)
+    @tf.function()
     def call(self, batch_size, no):
         x = self.qam_source([batch_size, self.channel._num_tx_ant])
         if self.colored_noise:
@@ -72,7 +72,7 @@ class Model(tf.keras.Model):
 class TestMIMOEqualizers(unittest.TestCase):
 
     def test_error_statistics_awgn(self):
-        sionna.config.xla_compat=True
+        tf.random.set_seed(1)
         num_tx_ant = 4
         num_rx_ant = 8
         num_bits_per_symbol = 4
@@ -98,7 +98,7 @@ class TestMIMOEqualizers(unittest.TestCase):
                 self.assertTrue(np.abs(err_var-no_eff_mean)/no_eff_mean<1e-3)
 
     def test_error_statistics_colored(self):
-        sionna.config.xla_compat=True
+        tf.random.set_seed(1)
         num_tx_ant = 4
         num_rx_ant = 8
         num_bits_per_symbol = 4

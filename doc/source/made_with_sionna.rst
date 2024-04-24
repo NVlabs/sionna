@@ -2,17 +2,27 @@
 "Made with Sionna"
 ==================
 
-We love to see how Sionna is used by other researchers! For this reason, you find below links to papers whose authors have also published Sionna-based simulation code.
+We love to see how Sionna is used by other researchers! For this reason, you find below links to papers/projects whose authors have published Sionna-based simulation code.
 
+If you want your paper/project and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
-Community-made tools
---------------------
+.. made-with-sionna::
+    :title: BostonTwin: the Boston Digital Twin for Ray-Tracing in 6G Networks
+    :authors: Paolo Testolina, Michele Polese, Pedram Johari, Tommaso Melodia
+    :year: March 2024
+    :version: 0.16
+    :link_arxiv: https://arxiv.org/abs/2403.12289
+    :link_github: https://github.com/wineslab/boston_twin
+    :abstract: Digital twins are now a staple of wireless networks design and evolution. Creating an accurate digital copy of a real system offers numerous opportunities to study and analyze its performance and issues. It also allows designing and testing new solutions in a risk-free environment, and applying them back to the real system after validation. A candidate technology that will heavily rely on digital twins for design and deployment is 6G, which promises robust and ubiquitous networks for eXtended Reality (XR) and immersive communications solutions. In this paper, we present BostonTwin, a dataset that merges a high-fidelity 3D model of the city of Boston, MA, with the existing geospatial data on cellular base stations deployments, in a ray-tracing-ready format. Thus, BostonTwin enables not only the instantaneous rendering and programmatic access to the building models, but it also allows for an accurate representation of the electromagnetic propagation environment in the real-world city of Boston. The level of detail and accuracy of this characterization is crucial to designing 6G networks that can support the strict requirements of sensitive and high-bandwidth applications, such as XR and immersive communication.
 
-.. H3 headers are not displayed (CSS rule), so we use H4 below instead.
-.. Dummy H3 header for section nesting consistency.
-
-.
-*
+.. made-with-sionna::
+    :title: Integrating Pre-Trained Language Model with Physical Layer Communications
+    :authors: Ju-Hyung Lee, Dong-Ho Lee, Joohan Lee, Jay Pujara
+    :year: February 2024
+    :version: 0.16
+    :link_arxiv: https://arxiv.org/abs/2402.11656
+    :link_github: https://github.com/abman23/on-device-ai-comm
+    :abstract: The burgeoning field of on-device AI communication, where devices exchange information directly through embedded foundation models, such as language models (LMs), requires robust, efficient, and generalizable communication frameworks. However, integrating these frameworks with existing wireless systems and effectively managing noise and bit errors pose significant challenges. In this work, we introduce a practical on-device AI communication framework, integrated with physical layer (PHY) communication functions, demonstrated through its performance on a link-level simulator. Our framework incorporates end-to-end training with channel noise to enhance resilience, incorporates vector quantized variational autoencoders (VQ-VAE) for efficient and robust communication, and utilizes pre-trained encoder-decoder transformers for improved generalization capabilities. Simulations, across various communication scenarios, reveal that our framework achieves a 50% reduction in transmission size while demonstrating substantial generalization ability and noise robustness under standardized 3GPP channel models.
 
 .. made-with-sionna::
     :title: OpenStreetMap to Sionna Scene in Python
@@ -22,14 +32,23 @@ Community-made tools
     :link_github: https://github.com/manoj-kumar-joshi/sionna_osm_scene
     :abstract: This Jupyter notebook shows how to create a Sionna scene (Mitsuba format) in Python code from OpenStreetMap data. Buildings are extruded and meshes for roads are created in a region specified by the user. It is an alternative to the Blender-based workflow presented <a href="https://youtu.be/7xHLDxUaQ7c">in this video</a>.
 
+.. made-with-sionna::
+    :title: Learning radio environments by differentiable ray tracing
+    :authors: Jakob Hoydis, Fayçal Aït Aoudia, Sebastian Cammerer, Florian Euchner, Merlin Nimier-David, Stephan ten Brink, Alexander Keller
+    :year: 2023
+    :version: 0.16
+    :link_arxiv: https://arxiv.org/abs/2311.18558
+    :link_github: https://github.com/NVlabs/diff-rt-calibration
+    :abstract: Ray tracing (RT) is instrumental in 6G research in order to generate spatially-consistent and environment-specific channel impulse responses(CIRs). While acquiring accurate scene geometries is now relatively straightforward, determining material characteristics requires precise calibration using channel measurements. We therefore introduce a novel gradient-based calibration method, complemented by differentiable parametrizations of material properties, scattering and antenna patterns. Our method seamlessly integrates with differentiable ray tracers that enable the computation of derivatives of CIRs with respect to these parameters. Essentially, we approach field computation as a large computational graph wherein parameters are trainable akin to weights of a neural network (NN). We have validated our method using both synthetic data and real-world indoor channel measurements, employing a distributed multiple-input multiple-output (MIMO) channel sounder.
 
-List of Projects
-----------------
-
-If you want your paper and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
-
-.
-*
+.. made-with-sionna::
+    :title: A Scalable and Generalizable Pathloss Map Prediction
+    :authors: Ju-Hyung Lee, Andreas F. Molisch
+    :year: December 2023
+    :version: 0.16
+    :link_arxiv: https://arxiv.org/abs/2312.03950
+    :link_github: https://github.com/abman23/pmnet-sionna-rt
+    :abstract: Large-scale channel prediction, i.e., estimation of the pathloss from geographical/morphological/building maps, is an essential component of wireless network planning. Ray tracing (RT)-based methods have been widely used for many years, but they require significant computational effort that may become prohibitive with the increased network densification and/or use of higher frequencies in B5G/6G systems. In this paper, we propose a data-driven, model-free pathloss map prediction (PMP) method, called PMNet. PMNet uses a supervised learning approach: it is trained on a limited amount of RT (or channel measurement) data and map data. Once trained, PMNet can predict pathloss over location with high accuracy (an RMSE level of 10−2) in a few milliseconds. We further extend PMNet by employing transfer learning (TL). TL allows PMNet to learn a new network scenario quickly (x5.6 faster training) and efficiently (using x4.5 less data) by transferring knowledge from a pre-trained model, while retaining accuracy. Our results demonstrate that PMNet is a scalable and generalizable ML-based PMP method, showing its potential to be used in several network optimization applications.
 
 .. made-with-sionna::
     :title: Graph Neural Networks for Enhanced Decoding of Quantum LDPC Codes
@@ -49,7 +68,6 @@ If you want your paper and code be listed here, please send an email to `sionna@
     :link_github: https://github.com/NVlabs/diff-rt
     :link_colab: https://colab.research.google.com/github/NVlabs/diff-rt/blob/master/Learning_Materials.ipynb
     :abstract: Sionna is a GPU-accelerated open-source library for link-level simulations based on TensorFlow. Its latest release (v0.14) integrates a differentiable ray tracer (RT) for the simulation of radio wave propagation. This unique feature allows for the computation of gradients of the channel impulse response and other related quantities with respect to many system  and environment parameters, such as material properties, antenna patterns, array geometries, as well as transmitter and receiver orientations and positions. In this paper, we outline the key components of Sionna RT and showcase example applications such as learning of radio materials and optimizing transmitter orientations by gradient descent. While classic ray tracing is a crucial tool for 6G research topics like reconfigurable intelligent surfaces, integrated sensing and communications, as well as user localization, differentiable ray tracing is a key enabler for many novel and exciting research directions, for example, digital twins.
-
 
 .. made-with-sionna::
     :title: DUIDD: Deep-Unfolded Interleaved Detection and Decoding for MIMO Wireless Systems

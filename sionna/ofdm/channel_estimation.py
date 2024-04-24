@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Functions related to OFDM channel estimation"""
@@ -910,8 +910,7 @@ class LMMSEInterpolator1D:
                             indices = [tx, st, oi, num_pil, num_pil]
                             add_err_var_indices[tx, st, oi, ii] = indices
                             num_pil += 1
-                    if num_pil > max_num_pil:
-                        max_num_pil = num_pil
+                    max_num_pil = max(max_num_pil, num_pil)
         # [num_tx, num_streams_per_tx, outer_dim_size, inner_dim_size, 5]
         self._add_err_var_indices = tf.cast(add_err_var_indices, tf.int32)
 

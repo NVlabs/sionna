@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -15,12 +15,13 @@ import matplotlib
 import matplotlib.pyplot as plt
 import mitsuba as mi
 import tensorflow as tf
+import drjit as dr
 
 from .antenna_array import AntennaArray
 from .camera import Camera
+from .radio_device import RadioDevice
 from sionna.constants import SPEED_OF_LIGHT
 from .itu_materials import instantiate_itu_materials
-from .oriented_object import OrientedObject
 from .radio_material import RadioMaterial
 from .receiver import Receiver
 from .scene_object import SceneObject
@@ -136,6 +137,7 @@ class Scene:
                                             }})
             else:
                 self._scene = mi.load_file(env_filename)
+            self._scene_params = mi.traverse(self._scene)
 
             # Instantiate the solver
             self._solver_paths = SolverPaths(self, dtype=dtype)
@@ -336,7 +338,8 @@ class Scene:
         item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`
             Item to add to the scene
         """
-        if ( (not isinstance(item, OrientedObject))
+        if ( (not isinstance(item, Camera))
+         and (not isinstance(item, RadioDevice))
          and (not isinstance(item, RadioMaterial)) ):
             err_msg = "The input must be a Transmitter, Receiver, Camera, or"\
                       " RadioMaterial"
@@ -1648,11 +1651,40 @@ class Scene:
         return self._scene
 
     @property
+    def mi_scene_params(self):
+        """
+        :class:`~mitsuba.SceneParameters` : Get the Mitsuba scene parameters
+        """
+        return self._scene_params
+
+    @property
+    def solver_paths(self):
+        """
+        :class:`~sionna.rt.SolverPaths` : Get the paths solver
+        """
+        return self._solver_paths
+
+    @property
+    def solver_cm(self):
+        """
+        :class:`~sionna.rt.SolverCoverageMap` : Get the coverage map solver
+        """
+        return self._solver_cm
+
+    @property
     def preview_widget(self):
         """
         :class:`~sionna.rt.InteractiveDisplay` : Get the preview widget
         """
         return self._preview_widget
+
+    def scene_geometry_updated(self):
+        """
+        Callback to trigger when the scene geometry is updated
+        """
+        # Update the scene geometry in the preview
+        if self._preview_widget:
+            self._preview_widget.redraw_scene_geometry()
 
     def _clear(self):
         r"""
@@ -1738,7 +1770,10 @@ class Scene:
         """
         # Parse all shapes in the scene
         scene = self._scene
-        for obj_id,s in enumerate(scene.shapes()):
+        objects_id = dr.reinterpret_array_v(mi.UInt32,
+                                            scene.shapes_dr()).tf()
+        for obj_id,s in zip(objects_id,scene.shapes()):
+            obj_id = int(obj_id.numpy())
             # Only meshes are handled
             if not isinstance(s, mi.Mesh):
                 raise TypeError('Only triangle meshes are supported')
@@ -1763,7 +1798,7 @@ class Scene:
                 name = name[5:]
             if self._is_name_used(name):
                 raise ValueError(f"Name'{name}' already used by another item")
-            obj = SceneObject(name, object_id=obj_id)
+            obj = SceneObject(name, object_id=obj_id, scene=self, mi_shape=s)
             obj.scene = self
             obj.radio_material = mat_name
 
@@ -1827,6 +1862,15 @@ simple_street_canyon = str(files(scenes).joinpath("simple_street_canyon/simple_s
 Example scene containing a few rectangular building blocks and a ground plane
 
 .. figure:: ../figures/street_canyon.png
+   :align: center
+"""
+
+# pylint: disable=C0301
+simple_street_canyon_with_cars = str(files(scenes).joinpath("simple_street_canyon_with_cars/simple_street_canyon_with_cars.xml"))
+"""
+Example scene containing a few rectangular building blocks and a ground plane as well as some cars
+
+.. figure:: ../figures/street_canyon_with_cars.png
    :align: center
 """
 

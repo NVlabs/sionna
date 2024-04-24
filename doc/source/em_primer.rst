@@ -19,7 +19,7 @@ The spherical unit vectors are defined as
         \hat{\boldsymbol{\varphi}}(\theta, \varphi) &=            -\sin(\varphi) \hat{\mathbf{x}} +             \cos(\varphi) \hat{\mathbf{y}}.
     \end{align}
 
-For an arbitrary unit norm vector :math:`\hat{\mathbf{v}} = (x, y, z)`, the elevation and azimuth angles :math:`\theta` and :math:`\varphi` can be computed as
+For an arbitrary unit norm vector :math:`\hat{\mathbf{v}} = (x, y, z)`, the zenith and azimuth angles :math:`\theta` and :math:`\varphi` can be computed as
 
 .. math::
     :label: theta_phi
@@ -69,8 +69,8 @@ If a point in the first coordinate system has spherical angles :math:`(\theta, \
     :label: theta_phi_prime
 
     \begin{align}
-        \theta' &= \cos^{-1}\left( \mathbf{z}^\mathsf{T} \mathbf{R}^\mathsf{T}(\alpha, \beta, \gamma)\hat{\mathbf{r}}(\theta, \varphi)          \right)\\
-        \varphi' &= \arg\left( \left( \mathbf{x} + j\mathbf{y}\right)^\mathsf{T} \mathbf{R}^\mathsf{T}(\alpha, \beta, \gamma)\hat{\mathbf{r}}(\theta, \varphi) \right).
+        \theta' &= \cos^{-1}\left( \hat{\mathbf{z}}^\mathsf{T} \mathbf{R}^\mathsf{T}(\alpha, \beta, \gamma)\hat{\mathbf{r}}(\theta, \varphi)          \right)\\
+        \varphi' &= \arg\left( \left( \hat{\mathbf{x}} + j\hat{\mathbf{y}}\right)^\mathsf{T} \mathbf{R}^\mathsf{T}(\alpha, \beta, \gamma)\hat{\mathbf{r}}(\theta, \varphi) \right).
     \end{align}
 
 For a vector field :math:`\mathbf{F}'(\theta',\varphi')` expressed in local spherical coordinates

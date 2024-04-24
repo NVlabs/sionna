@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -460,8 +460,11 @@ class CoverageMap:
                                            cm_db < max_gain_db))
 
         # Duplicate indices if requested batch_size > num_idx
-        reps = tf.math.ceil(tf.math.divide_no_nan(tf.cast(batch_size, tf.int32),
-                                                  idx.shape[0]))
+        # Cast from tf.int32 to tf.float64 to ensure TF2.10-2.12 compatibility
+        # with tf.math.divide_no_nan function
+        reps = tf.math.ceil(tf.math.divide_no_nan(
+                                            tf.cast(batch_size, tf.float64),
+                                            tf.cast(idx.shape[0], tf.float64)))
         reps = tf.cast(tf.expand_dims(reps, axis=0), tf.int32)
         reps = tf.concat((reps, tf.ones_like(tf.cast(idx.shape[1:],tf.int32))),
                          axis=0)

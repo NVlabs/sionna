@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -9,12 +9,12 @@ receiver.
 
 import tensorflow as tf
 
-from .oriented_object import OrientedObject
+from .object import Object
 from .utils import normalize, theta_phi_from_unit_vec
 from sionna.constants import PI
 
 
-class RadioDevice(OrientedObject):
+class RadioDevice(Object):
     # pylint: disable=line-too-long
     r"""RadioDevice(name, position, orientation=[0.,0.,0.], look_at=None, dtype=tf.complex64)
 
@@ -68,7 +68,6 @@ class RadioDevice(OrientedObject):
         self.orientation = orientation
         self.color = color
 
-        # Initialize the base class OrientedObject
         # Position and orientation are set through this call
         super().__init__(name, position, orientation, look_at)
 
@@ -128,11 +127,11 @@ class RadioDevice(OrientedObject):
         # Get position to look at
         if isinstance(target, str):
             obj = self.scene.get(target)
-            if not isinstance(obj, OrientedObject):
-                raise ValueError(f"No camera or device named '{target}' found.")
+            if not isinstance(obj, Object):
+                raise ValueError(f"No camera, device, or object named '{target}' found.")
             else:
                 target = obj.position
-        elif isinstance(target, OrientedObject):
+        elif isinstance(target, Object):
             target = target.position
         else:
             target = tf.cast(target, dtype=self._rdtype)

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Utility functions used for testing of the sionna.rt module"""
@@ -118,7 +118,10 @@ def validate_path(path_ind, paths, scene):
     for i in objects:
         if i==-1:
             break
-        etas.append(list(scene.objects.values())[i].radio_material.complex_relative_permittivity.numpy())
+        for obj in list(scene.objects.values()):
+            if obj.object_id == i:
+                etas.append(obj.radio_material.complex_relative_permittivity.numpy())
+                break
 
     num_bounces = len(etas)
     num_paths = paths.spec_tmp.normals.shape[2]

@@ -1,11 +1,11 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """This is the Sionna library.
 """
 
-__version__ = '0.16.2'
+__version__ = '0.17.0'
 
 from . import utils
 from .constants import *

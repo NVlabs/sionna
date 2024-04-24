@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -7,6 +7,7 @@ Ray tracer utilities
 """
 
 import tensorflow as tf
+import mitsuba as mi
 import drjit as dr
 
 from sionna.utils import expand_to_rank
@@ -117,7 +118,16 @@ def theta_phi_from_unit_vec(v):
     y = v[...,1]
     z = v[...,2]
 
-    # Clip to ensure numerical stability
+    # If v = z, then x = 0 and y = 0. In this case, atan2 is not differentiable,
+    # leading to NaN when computing the gradients.
+    # The following lines force x to one this case. Note that this does not
+    # impact the output meaningfully, as in that case theta = 0 and phi can
+    # take any value.
+    zero = tf.zeros_like(x)
+    is_unit_z = tf.logical_and(tf.equal(x, zero), tf.equal(y, zero))
+    is_unit_z = tf.cast(is_unit_z, x.dtype)
+    x += is_unit_z
+
     theta = acos_diff(z)
     phi = tf.math.atan2(y, x)
     return theta, phi
@@ -757,3 +767,33 @@ def acos_diff(x, epsilon=1e-7):
     acos_x_1 =  tf.acos(x_1)
     y = acos_x_1 + tf.stop_gradient(tf.acos(x_clip_1)-acos_x_1)
     return y
+
+def angles_to_mitsuba_rotation(angles):
+    """
+    Build a Mitsuba transform from angles in radian
+
+    Input
+    ------
+    angles : [3], tf.float
+        Angles [rad]
+
+    Output
+    -------
+    : :class:`mitsuba.ScalarTransform4f`
+        Mitsuba rotation
+    """
+
+    angles = 180. * angles / PI
+
+    if angles.dtype == tf.float32:
+        mi_transform_t = mi.Transform4f
+        angles = mi.Float(angles)
+    else:
+        mi_transform_t = mi.Transform4d
+        angles = mi.Float64(angles)
+
+    return (
+          mi_transform_t.rotate(axis=[0., 0., 1.], angle=angles[0])
+        @ mi_transform_t.rotate(axis=[0., 1., 0.], angle=angles[1])
+        @ mi_transform_t.rotate(axis=[1., 0., 0.], angle=angles[2])
+    )

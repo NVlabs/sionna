@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -112,6 +112,7 @@ class Paths:
         self._targets_sources_mask = tf.fill([num_targets, num_sources, 0], False)
         self._vertices = tf.zeros([0, num_targets, num_sources, 0, 3], rdtype)
         self._objects = tf.fill([0, num_targets, num_sources, 0], -1)
+        self._doppler = tf.zeros([num_targets, num_sources, 0], rdtype)
         if types is None:
             self._types = tf.fill([0], -1)
         else:
@@ -129,7 +130,7 @@ class Paths:
     def to_dict(self):
         # pylint: disable=line-too-long
         r"""
-        Returns the properties of the paths as a dictionnary which values are
+        Returns the properties of the paths as a dictionary which values are
         tensors
 
         Output
@@ -149,9 +150,9 @@ class Paths:
     def from_dict(self, data_dict):
         # pylint: disable=line-too-long
         r"""
-        Set the paths from a dictionnary which values are tensors
+        Set the paths from a dictionary which values are tensors
 
-        The format of the dictionnary is expected to be the same as the one
+        The format of the dictionary is expected to be the same as the one
         returned by :meth:`~sionna.rt.Paths.to_dict()`.
 
         Input
@@ -372,40 +373,84 @@ class Paths:
         self.tau = tf.where(self.tau<0, tf.cast(-1, self.tau.dtype) , self.tau)
         self._normalize_delays = v
 
+    @property
+    def doppler(self):
+        # pylint: disable=line-too-long
+        """
+        [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float : Doppler shift for each path
+        related to movement of objects. The Doppler shifts resulting from
+        movements of the transmitters or receivers will be computed from the inputs to the function :func:`~sionna.rt.Paths.apply_doppler`.
+        """
+        return self._doppler
+
+    @doppler.setter
+    def doppler(self, v):
+        self._doppler = v
+
     def apply_doppler(self, sampling_frequency, num_time_steps,
                       tx_velocities=(0.,0.,0.), rx_velocities=(0.,0.,0.)):
         # pylint: disable=line-too-long
         r"""
-        Apply Doppler shifts corresponding to input transmitters and receivers
-        velocities.
+        Apply Doppler shifts to all paths according to the velocities
+        of objects in the scene as well as the provided transmitter and receiver velocities.
 
-        This function replaces the last dimension of the tensor storing the
-        paths coefficients :attr:`~sionna.rt.Paths.a`, which stores the the temporal evolution of
-        the channel, with a dimension of size ``num_time_steps`` computed
-        according to the input velocities.
+        This function replaces the last dimension of the tensor :attr:`~sionna.rt.Paths.a` storing the
+        time evolution of the paths' coefficients with a dimension of size ``num_time_steps``.
 
         Time evolution of the channel coefficients is simulated by computing the
-        Doppler shift due to movements of the transmitter and receiver. If we denote by
-        :math:`\mathbf{v}_{\text{T}}\in\mathbb{R}^3` and :math:`\mathbf{v}_{\text{R}}\in\mathbb{R}^3`
-        the velocity vectors of the transmitter and receiver, respectively, the Doppler shifts are computed as
+        Doppler shift due to movements of scene objects, transmitters, and receivers.
+        To understand this process, let us consider a single propagation path undergoing
+        :math:`n` scattering processes, such as reflection, diffuse scattering, or diffraction,
+        as shown in the figure below.
+
+        .. figure:: ../figures/doppler.png
+            :align: center
+
+        The object on which lies the :math:`i\text{th}` scattering point has the velocity vector
+        :math:`\hat{\mathbf{v}}_i` and the outgoing ray direction at this point is
+        denoted :math:`\hat{\mathbf{k}}_i`. The first and last point correspond to the transmitter
+        and receiver, respectively. We therefore have
 
         .. math::
 
-            f_{\text{T}, i} &= \frac{\hat{\mathbf{r}}(\theta_{\text{T},i}, \varphi_{\text{T},i})^\mathsf{T}\mathbf{v}_{\text{T}}}{\lambda}\qquad \text{[Hz]}\\
-            f_{\text{R}, i} &= \frac{\hat{\mathbf{r}}(\theta_{\text{R},i}, \varphi_{\text{R},i})^\mathsf{T}\mathbf{v}_{\text{R}}}{\lambda}\qquad \text{[Hz]}
+            \hat{\mathbf{k}}_0 &= \hat{\mathbf{r}}(\theta_{\text{T}}, \varphi_{\text{T}})\\
+            \hat{\mathbf{k}}_{n} &= -\hat{\mathbf{r}}(\theta_{\text{R}}, \varphi_{\text{R}})
 
-        for an arbitrary path :math:`i`, where :math:`(\theta_{\text{T},i}, \varphi_{\text{T},i})` are the AoDs,
-        :math:`(\theta_{\text{R},i}, \varphi_{\text{R},i})` are the AoAs, and :math:`\lambda` is the wavelength.
-        This leads to the time-dependent path coefficient
+        where :math:`(\theta_{\text{T}}, \varphi_{\text{T}})` are the AoDs,
+        :math:`(\theta_{\text{R}}, \varphi_{\text{R}})` are the AoAs, and :math:`\hat{\mathbf{r}}(\theta,\varphi)` is defined in :eq:`spherical_vecs`.
+
+        If the transmitter emits a signal with frequency :math:`f`, the receiver
+        will observe the signal at frequency :math:`f'=f + f_\Delta`, where :math:`f_\Delta` is the Doppler
+        shift, which can be computed as [Wiffen2018]_
+
+        .. math::
+
+            f' = f \prod_{i=0}^n \frac{1 - \frac{\mathbf{v}_{i+1}^\mathsf{T}\hat{\mathbf{k}}_i}{c}}{1 - \frac{\mathbf{v}_{i}^\mathsf{T}\hat{\mathbf{k}}_i}{c}}.
+
+        Under the assumption that :math:`\lVert \mathbf{v}_i \rVert\ll c`, we can apply the Taylor expansion :math:`(1-x)^{-1}\approx 1+x`, for :math:`x\ll 1`, to the previous equation
+        to obtain
+
+        .. math::
+
+            f' &\approx f \prod_{i=0}^n \left(1 - \frac{\mathbf{v}_{i+1}^\mathsf{T}\hat{\mathbf{k}}_i}{c}\right)\left(1 + \frac{\mathbf{v}_{i}^\mathsf{T}\hat{\mathbf{k}}_i}{c}\right)\\
+               &\approx f \left(1 + \sum_{i=0}^n \frac{\mathbf{v}_{i}^\mathsf{T}\hat{\mathbf{k}}_i -\mathbf{v}_{i+1}^\mathsf{T}\hat{\mathbf{k}}_i}{c} \right)
+
+        where the second line results from ignoring terms in :math:`c^{-2}`. Solving for :math:`f_\Delta`, grouping terms with the same :math:`\mathbf{v}_i` together, and using :math:`f=c/\lambda`, we obtain
+
+        .. math::
+
+            f_\Delta = \frac{1}{\lambda}\left(\mathbf{v}_{0}^\mathsf{T}\hat{\mathbf{k}}_0 - \mathbf{v}_{n+1}^\mathsf{T}\hat{\mathbf{k}}_n + \sum_{i=1}^n \mathbf{v}_{i}^\mathsf{T}\left(\hat{\mathbf{k}}_i-\hat{\mathbf{k}}_{i-1} \right) \right) \qquad \text{[Hz]}.
+
+        Using this Doppler shift, the time-dependent path coefficient is computed as
 
         .. math ::
 
-            a_i(t) = a_i e^{j2\pi(f_{\text{T}, i}+f_{\text{R}, i})t}.
+            a(t) = a e^{j2\pi f_\Delta t}.
 
-        Note that this model is only valid as long as the AoDs, AoAs, and path delay do not change.
+        Note that this model is only valid as long as the AoDs, AoAs, and path delays do not change significantly.
+        This is typically the case for very short time intervals. Large-scale mobility should be simulated by moving objects within the scene and recomputing the propagation paths.
 
-        When this function is called multiple times, it overwrites the previous
-        time steps dimension.
+        When this function is called multiple times, it overwrites the previous time step dimension.
 
         Input
         ------
@@ -486,6 +531,15 @@ class Paths:
         tx_ds = two_pi*dot(tx_velocities, k_t)/self._scene.wavelength
         rx_ds = two_pi*dot(rx_velocities, k_r)/self._scene.wavelength
         ds = tx_ds + rx_ds
+
+        # Add Doppler shifts due to movement of scene objects
+        if self._scene.synthetic_array:
+            # Create dummy dims for tx and rx antennas
+            # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
+            ds += two_pi*self.doppler[..., tf.newaxis, :, tf.newaxis, :]
+        else:
+            ds += two_pi*self.doppler
+
         # Expand for the time sample dimension
         # [batch_dim, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths, 1]
         # or
@@ -538,6 +592,7 @@ class Paths:
             self.phi_t = tf.transpose(self.phi_t, perm=[0,2,1,3])
             self.theta_r = tf.transpose(self.theta_r, perm=[0,2,1,3])
             self.phi_r = tf.transpose(self.phi_r, perm=[0,2,1,3])
+            self.doppler = tf.transpose(self.doppler, perm=[0,2,1,3])
         else:
             self.tau = tf.transpose(self.tau, perm=[0,3,4,1,2,5])
             self._min_tau = tf.transpose(self._min_tau, perm=[0,3,4,1,2,5])
@@ -545,6 +600,7 @@ class Paths:
             self.phi_t = tf.transpose(self.phi_t, perm=[0,3,4,1,2,5])
             self.theta_r = tf.transpose(self.theta_r, perm=[0,3,4,1,2,5])
             self.phi_r = tf.transpose(self.phi_r, perm=[0,3,4,1,2,5])
+            self.doppler = tf.transpose(self.doppler, perm=[0,3,4,1,2,5])
 
         self._reverse_direction = v
 
@@ -758,6 +814,7 @@ class Paths:
         self.mask = tf.concat([self.mask, more_paths.mask], axis=2)
         self.vertices = tf.concat([self.vertices, more_vertices], axis=3)
         self.objects = tf.concat([self.objects, more_objects], axis=3)
+        self.doppler = tf.concat([self.doppler, more_paths.doppler], axis=2)
 
         return self
 
@@ -790,6 +847,8 @@ class Paths:
         self.phi_r = tf.expand_dims(self.phi_r, axis=0)
         # [1, max_num_paths]
         self.types = tf.expand_dims(self.types, axis=0)
+        # [1, max_num_paths]
+        self.doppler = tf.expand_dims(self.doppler, axis=0)
 
         tau = self.tau
         if tau.shape[-1] == 0: # No paths

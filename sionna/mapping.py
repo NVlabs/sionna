@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layers for (de)mapping, constellation class, and utility functions"""
@@ -365,7 +365,9 @@ class Constellation(Layer):
             x = x - tf.reduce_mean(x)
         if self._normalize:
             energy = tf.reduce_mean(tf.square(tf.abs(x)))
-            energy_sqrt = tf.cast(tf.sqrt(energy), self._dtype)
+            energy_sqrt = tf.complex(tf.sqrt(energy),
+                                     tf.constant(0.,
+                                    dtype=tf.as_dtype(self._dtype).real_dtype))
             x = x / energy_sqrt
         return x
 

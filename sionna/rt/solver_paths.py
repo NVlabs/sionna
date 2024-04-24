@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -163,13 +163,13 @@ class PathsTmpData:
     def to_dict(self):
         # pylint: disable=line-too-long
         r"""
-        Returns the properties of the paths as a dictionnary which values are
+        Returns the properties of the paths as a dictionary which values are
         tensors
 
         Output
         -------
         : `dict`
-            Dictionnary defining the paths
+            Dictionary defining the paths
         """
         members_names = dir(self)
         members_objects = [getattr(self, attr) for attr in members_names]
@@ -183,9 +183,9 @@ class PathsTmpData:
     def from_dict(self, data_dict):
         # pylint: disable=line-too-long
         r"""
-        Set the paths from a dictionnary which values are tensors
+        Set the paths from a dictionary which values are tensors
 
-        The format of the dictionnary is expected to be the same as the one
+        The format of the dictionary is expected to be the same as the one
         returned by :meth:`~sionna.rt.Paths.to_dict()`.
 
         Input
@@ -683,7 +683,7 @@ class SolverPaths(SolverBase):
             Coordinates of the targets
 
         list : Paths as a list
-            The computed paths as a dictionnary of tensors, i.e., the output of
+            The computed paths as a dictionary of tensors, i.e., the output of
             `Paths.to_dict()`.
             Returning the paths as a list of tensors is required to enable
             the execution of this function in graph mode.
@@ -732,7 +732,7 @@ class SolverPaths(SolverBase):
 
         # Returns: relative_permittivities, denoted by `etas`,
         # scattering_coefficients, xpd_coefficients,
-        # alpha_r, alpha_i and lambda_
+        # alpha_r, alpha_i, lambda_, and velocities
         object_properties = self._build_scene_object_properties_tensors()
         etas = object_properties[0]
         scattering_coefficient = object_properties[1]
@@ -740,6 +740,7 @@ class SolverPaths(SolverBase):
         alpha_r = object_properties[3]
         alpha_i = object_properties[4]
         lambda_ = object_properties[5]
+        velocity = object_properties[6]
 
         ##############################################
         # LoS and Specular paths
@@ -747,12 +748,16 @@ class SolverPaths(SolverBase):
 
         if spec_paths.objects.shape[3] > 0:
 
-            # Compute the EM transition matrices
+            # Compute the EM transition matrices and Doppler shifts
             spec_mat_t = self._spec_transition_matrices(etas,
                     scattering_coefficient, spec_paths, spec_paths_tmp, False)
+            spec_paths.doppler = self._compute_doppler_shifts(spec_paths,
+                                                              spec_paths_tmp,
+                                                              velocity)
             all_paths = all_paths.merge(spec_paths)
-            # Only the transition matrix and vector of incidence/reflection are
-            # required for the computation of the paths coefficients
+            # Only the transition matrix, vector of incidence/reflection, and
+            # Doppler shifts are required for the computation of the paths
+            # coefficients
             all_paths_tmp.mat_t = tf.concat([all_paths_tmp.mat_t, spec_mat_t],
                                             axis=-3)
             all_paths_tmp.k_tx = tf.concat([all_paths_tmp.k_tx,
@@ -771,10 +776,13 @@ class SolverPaths(SolverBase):
 
         if diff_paths.objects.shape[3] > 0:
 
-            # Compute the transition matrices
+            # Compute the transition matrices and Doppler shifts
             diff_mat_t =\
                 self._compute_diffraction_transition_matrices(etas,
                             scattering_coefficient, diff_paths, diff_paths_tmp)
+            diff_paths.doppler = self._compute_doppler_shifts(diff_paths,
+                                                              diff_paths_tmp,
+                                                              velocity)
             all_paths = all_paths.merge(diff_paths)
             # Only the transition matrix and vector of incidence/reflection are
             # required for the computation of the paths coefficients
@@ -797,8 +805,12 @@ class SolverPaths(SolverBase):
         if scat_paths.objects.shape[3] > 0:
 
             # Compute transition matrices up to the scattering point
+            # as well as Doppler shifts
             scat_mat_t = self._spec_transition_matrices(etas,
                     scattering_coefficient, scat_paths, scat_paths_tmp, True)
+            scat_paths.doppler = self._compute_doppler_shifts(scat_paths,
+                                                              scat_paths_tmp,
+                                                              velocity)
 
             all_paths = all_paths.merge(scat_paths)
             # The transition matrix and vector of incidence/reflection are
@@ -854,13 +866,13 @@ class SolverPaths(SolverBase):
             all_paths.phi_t = tf.reshape(all_paths.phi_t, batch_dims)
             all_paths.theta_r = tf.reshape(all_paths.theta_r, batch_dims)
             all_paths.phi_r = tf.reshape(all_paths.phi_r, batch_dims)
+            all_paths.doppler = tf.reshape(all_paths.doppler, batch_dims)
             # [num_rx, rx_array_size, num_tx, tx_array_size, max_num_paths, 2,2]
             all_paths_tmp.mat_t = tf.reshape(all_paths_tmp.mat_t,
                                              batch_dims + [2,2])
             # [num_rx, rx_array_size, num_tx, tx_array_size, max_num_paths, 3]
             all_paths_tmp.k_tx = tf.reshape(all_paths_tmp.k_tx, batch_dims+[3])
             all_paths_tmp.k_rx = tf.reshape(all_paths_tmp.k_rx, batch_dims+[3])
-
         ####################################################
         # Compute the channel coefficients
         ####################################################
@@ -903,6 +915,8 @@ class SolverPaths(SolverBase):
                                      axis=5)
             phi_r = tf.expand_dims(tf.expand_dims(all_paths.phi_r, axis=2),
                                    axis=5)
+            doppler = tf.expand_dims(tf.expand_dims(all_paths.doppler, axis=2),
+                                   axis=5)
             # [num_rx, num_rx_patterns, rx_array_size, num_tx, num_tx_patterns,
             #   tx_array_size, max_num_paths]
             mask = tf.tile(mask, [1, num_rx_patterns, 1, 1, num_tx_patterns,
@@ -917,6 +931,8 @@ class SolverPaths(SolverBase):
                                         num_tx_patterns, 1, 1])
             phi_r = tf.tile(phi_r, [1, num_rx_patterns, 1, 1,
                                     num_tx_patterns, 1, 1])
+            doppler = tf.tile(doppler, [1, num_rx_patterns, 1, 1,
+                                    num_tx_patterns, 1, 1])
             # [num_rx, num_rx_ant = num_rx_patterns*num_rx_ant,
             #   ... num_tx, num_tx_ant = num_tx_patterns*tx_array_size,
             #   ... max_num_paths]
@@ -926,6 +942,7 @@ class SolverPaths(SolverBase):
             all_paths.phi_t = flatten_dims(flatten_dims(phi_t, 2, 1), 2, 3)
             all_paths.theta_r = flatten_dims(flatten_dims(theta_r, 2, 1), 2, 3)
             all_paths.phi_r = flatten_dims(flatten_dims(phi_r, 2, 1), 2, 3)
+            all_paths.doppler = flatten_dims(flatten_dims(doppler, 2, 1), 2, 3)
 
         # If testing, additinal data is returned
         if testing:
@@ -936,7 +953,6 @@ class SolverPaths(SolverBase):
                         scat_paths_tmp.to_dict() )
         else:
             output = (sources, targets, all_paths.to_dict())
-
         return output
 
     ##################################################################
@@ -4055,6 +4071,63 @@ class SolverPaths(SolverBase):
         paths_tmp.total_distance = total_distance
 
         return paths, paths_tmp
+
+    def _compute_doppler_shifts(self, paths, paths_tmp, velocity):
+        # pylint: disable=line-too-long
+        """
+        Computes the Doppler shift resulting from the movement
+        of objects in the scene for every path.
+
+        The Doppler shift resulting from the movement of the
+        transmitter and receiver are added later when the function
+        :method:`~sionna.rt.Paths.apply_doppler` is called.
+
+        Input
+        ------
+        paths : :class:`~sionna.rt.Paths`
+            Paths to update
+
+        paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Addtional quantities required for paths computation
+
+        velocity : [num_shapes, 3]
+            Velocity vectors of all objects in the scene
+
+        Output
+        ------
+        doppler : [num_targets, num_sources, max_num_paths]
+            Doppler shifts for all paths due to the movement ob objects
+        """
+
+        # Compute Doppler shift for every path segment
+        # Difference of outgoing and incoming direction vectors for every
+        # intersection point
+        # k_diff : [max_depth, num_targets, num_sources, max_num_paths, 3]
+        k_diff = paths_tmp.k_i[1:]-paths_tmp.k_i[:-1]
+
+        # Get velocity for all involved objects of each path
+        objects_mask = paths.objects==-1
+        if paths.types==2:
+            # For diffracted paths, path.objects indicates wedge ids
+            # that we need to convert to object ids. Since each wedge
+            # consists of two objects, we simply pick the first.
+            # This assumes that both objects move at the same speed,
+            # which is justified as the wedge would otherwise be destroyed
+            valid_wedges_idx = tf.where(objects_mask, 0, paths.objects)
+            valid_objects = tf.gather(self._wedges_objects[:,0],
+                                      valid_wedges_idx, axis=0)
+        else:
+            valid_objects = tf.where(objects_mask, 0, paths.objects)
+        # [max_depth, num_targets, num_sources, max_num_paths, 3]
+        velocity = tf.gather(velocity, valid_objects, axis=0)
+
+        # Compute Doppler shift per path
+        #[num_targets, num_sources, max_num_paths]
+        doppler = tf.reduce_sum(velocity*k_diff, axis=-1)
+        doppler = tf.where(objects_mask, 0, doppler)
+        doppler = tf.reduce_sum(doppler, axis=0)
+        doppler /= self._scene.wavelength
+        return doppler
 
     def _get_tx_rx_rotation_matrices(self):
         r"""
