@@ -170,6 +170,27 @@ def time_lag_discrete_time_channel(bandwidth, maximum_delay_spread=3e-6):
     l_max = tf.cast(l_max, tf.int32)
     return l_min, l_max
 
+def channel_capacity(subcarrier_spacing, ofdm_channel, noise_floor):
+    # pylint: disable=line-too-long
+    r"""
+    Compute the capacity of given wireless channel using Bandwidth * log(1+SNR)
+    """
+    subcarrier_spacing = tf.cast(subcarrier_spacing,tf.float32)
+    noise_floor = tf.cast(noise_floor,tf.float32)
+
+    # Permute the ofdm channel to have sub-carriers, num_rx_ant and num_tx_ant
+    # as last three dimensions in the tensor
+    ofdm_channel = tf.transpose(ofdm_channel,perm=(0,1,3,5,6,2,4))
+
+    # Computing the singular values of the channel
+    s,_,_ = tf.linalg.svd(ofdm_channel)
+    signal_power = tf.einsum('ijklmn,ijklmn -> ijklmn', s,tf.math.conj(s))
+    capacity = (subcarrier_spacing/tf.math.log(2.0))*tf.math.log(tf.cast(1,tf.float32) + signal_power/noise_floor)
+
+    # Sum the capacities over all the sub-carriers
+    capacity = tf.reduce_sum(capacity,axis=[-1,-2])
+    return capacity
+
 def cir_to_ofdm_channel(frequencies, a, tau, normalize=False):
     # pylint: disable=line-too-long
     r"""
