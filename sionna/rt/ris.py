@@ -1,5 +1,6 @@
-
-
+#
+# SPDX-License-Identifier: Apache-2.0
+#
 """
 Class implementing a Reflective Intelligent Surface.
 Note: We support only one RIS in the simulator. Need to refactor code
