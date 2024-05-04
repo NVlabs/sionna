@@ -39,6 +39,7 @@ from .scattering_pattern import ScatteringPattern, LambertianPattern,\
     DirectivePattern, BackscatteringPattern
 from .transmitter import Transmitter
 from .receiver import Receiver
+from .ris import RIS
 from .paths import Paths
 from .coverage_map import CoverageMap
 from .utils import rotation_matrix, rotate, theta_phi_from_unit_vec,\
