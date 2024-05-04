@@ -188,8 +188,6 @@ class RIS(RadioDevice):
         # Save the list of transmitters and receivers for using later
         tx_dict = scene.transmitters
         rx_dict = scene.receivers
-        tx = scene.get("tx")
-        rx = scene.get("rx")
 
         # Save the tx and rx array structures for reusing later
         tx_array = scene.tx_array
