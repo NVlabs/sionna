@@ -4124,7 +4124,7 @@ class SolverPaths(SolverBase):
         # Compute Doppler shift per path
         #[num_targets, num_sources, max_num_paths]
         doppler = tf.reduce_sum(velocity*k_diff, axis=-1)
-        doppler = tf.where(objects_mask, 0, doppler)
+        doppler = tf.where(objects_mask, tf.constant(0, doppler.dtype), doppler)
         doppler = tf.reduce_sum(doppler, axis=0)
         doppler /= self._scene.wavelength
         return doppler
