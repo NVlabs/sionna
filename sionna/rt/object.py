@@ -40,7 +40,7 @@ class Object(ABC):
     RESERVED_NAMES = ('preview',)
 
     def __init__(self, name, position=None, orientation=None,
-                 look_at=None):
+                 look_at=None, **kwargs):
 
         # Set the name
         if not isinstance(name, str):
@@ -61,6 +61,8 @@ class Object(ABC):
                 self.orientation = orientation
         else:
             self.look_at(look_at)
+
+        super().__init__(**kwargs)
 
     @property
     def name(self):

@@ -470,7 +470,7 @@ where the former is orthogonal to the plane of incidence and called transverse e
             \hat{\mathbf{e}}_{\text{i},\parallel}^\mathsf{T}\hat{\mathbf{e}}_{\text{i},s} & \hat{\mathbf{e}}_{\text{i},\parallel}^\mathsf{T}\hat{\mathbf{e}}_{\text{i},p}
         \end{bmatrix}
      \begin{bmatrix}E_{\text{i},s} \\ E_{\text{i},p}\end{bmatrix} =
-     \mathbf{W}\left(\hat{\mathbf{e}}_{\text{i},\perp}, \hat{\mathbf{e}}_{\text{i},\parallel}, \hat{\mathbf{e}}_{\text{i},s}, \hat{\mathbf{e}}_{\text{i},p}\right)
+     \mathbf{W}\left(\hat{\mathbf{e}}_{\text{i},\perp}, \hat{\mathbf{e}}_{\text{i},\parallel}, \hat{\mathbf{e}}_{\text{i},s}, \hat{\mathbf{e}}_{\text{i},p}\right) \begin{bmatrix}E_{\text{i},s} \\ E_{\text{i},p}\end{bmatrix}
     \end{align}
 
 where we have defined the following matrix-valued function
@@ -846,7 +846,121 @@ which ensures the power balance between the incoming, reflected, and refracted f
     .. math::
         F_{\alpha, \beta}(\theta_i)^{-1} = \Lambda F_\alpha(\theta_i) + (1-\Lambda)F_\beta(\theta_i)
 
+.. _ris_primer:
 
+Reconfigurable Intelligent Surfaces (RIS)
+*****************************************
+Metasurfaces can manipulate electromagnetic waves in a way that traditional materials cannot. For example, they can be used to create anomalous reflections, focalization, as well as polarization changes. A reconfigurable intelligent surface (RIS) is a special type of metasurface that can be dynamically controlled to achieve favorable propagation conditions in a specific enviroment. While many different ways to model RIS have been proposed in the literature [Di-Renzo20]_, we adopt here the ones described in [Degli-Esposti22]_ and [Vitucci24]_. The former will be used for the computation of channel impulse responses (CIRs) (see :meth:`~sionna.rt.Scene.compute_paths`) while the latter will serve for the computation of coverage maps (see :meth:`~sionna.rt.Scene.coverage_map`).
+
+We consider only lossless RIS, i.e., there is no power dissipation. For waves incident on the front side of an RIS, only the reradiated modes but neither specular nor diffuse reflections are created. For waves incident on the back side, an RIS behaves like a perfect absorber. For coverage maps, diffraction around the RIS' edges is ignored.
+
+An RIS consists of a regular grid of unit cells which impose a spatial modulation, i.e., phase and amplitude changes, on an incident wave. This leads in turn to the creation of :math:`M\ge 1` reradiated modes. Let us denote by :math:`(y,z)` a generic point on the RIS, and by :math:`\chi_m(y,z)` and :math:`A_m(y,z)` the phase and amplitude modulation coefficients of the :math:`m\text{th}` reradiation mode, respectively. We assume that the RIS' normal :math:`\hat{\mathbf{n}}` points toward the positive :math:`x`-axis.
+
+The spatial modulation coefficient :math:`\Gamma(y,z)` is then given as (Eq.12) [Degli-Esposti22]_
+
+.. math::
+    :label: spatial_modulation_coefficient
+
+    \Gamma(y,z) = \sum_{m=1}^M \sqrt{p_m} A_m(y,z) e^{j \chi_m(y,z)}
+
+where :math:`p_m` is the reradiation intensity coefficient of the :math:`m\text{th}` mode. For power conservation reasons, we need to impose that :math:`\sum_{m=1}^M p_m=1` and that the normalized surface integral of :math:`|A_m(y,z)|^2` across the RIS equals one for all :math:`m`.
+
+.. _fig_ris:
+.. figure:: figures/ris.svg
+        :align: center
+        :width: 50 %
+
+        Incident and reradiated field from a reconfigurable intelligent surface (RIS).
+
+
+Consider now an RIS as shown in :numref:`fig_ris` with an incident electro-magnetic wave with field phasor :math:`\mathbf{E}_i(S)` at point :math:`S\in\mathbb{R}^3`, where :math:`E_{i,\theta}(S)` and :math:`E_{i,\varphi}(S)` denote the vertical and horizontal field components, respectively.  The reradiated field from the RIS at point :math:`S'` is computed as (Eq.30) [Degli-Esposti22]_:
+
+.. math::
+    :label: ris_field
+
+    \begin{align}
+    \mathbf{E}_r(S') =& \sum_{u=1}^{N_Y}\sum_{v=1}^{N_Z} \Gamma(y_u, z_v) \frac{3\lambda}{16\pi} (1+\cos\theta_i(y_u, z_v)) (1+\cos\theta_r(y_u, z_v)) \\
+    &\quad \times \frac{e^{-jk_0(s_i(y_u, z_v) + s_r(y_u, z_v))}}{s_i(y_u, z_v) s_r(y_u, z_v)} \left( E_{i,\theta}(S) \hat{\boldsymbol{\theta}}(\hat{\mathbf{k}}_r(y_u,z_v))  + E_{i,\varphi}(S) \hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}}_r(y_u,z_v)) \right)
+    \end{align}
+
+where :math:`N_Y` and :math:`N_Z` are the number of columns and rows of the regular grid of unit cells with coordinates :math:`(y_u, z_v)` for :math:`1\leq u \leq N_Y` and :math:`1\leq v \leq N_Z`, :math:`\hat{\mathbf{k}}_i(y_u,z_v)` and  :math:`\hat{\mathbf{k}}_r(y_u,z_v)` are the directions of the incident and reradiated waves at position :math:`(y_u,z_v)`, :math:`\theta_i(y_u, z_v)`  and :math:`\theta_r(y_u, z_v)` are the angles between the RIS's normal and the incident and reradiated directions, respectively, and :math:`s_i(y_u, z_v)` and :math:`s_r(y_u, z_v)` are the distances between the unit cell :math:`(y_u, z_v)` and :math:`S, S'`, respectively. With a slight abuse of notation, we denote by :math:`\hat{\boldsymbol{\theta}}(\hat{\mathbf{k}})` and :math:`\hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}})` the spherical unit vectors :eq:`spherical_vecs` for angles defined by :math:`\hat{\mathbf{k}}` according to :eq:`theta_phi`. One can observe from the last equation that the RIS does not impact the polarization.
+Note that :eq:`ris_field` is only used in :meth:`~sionna.rt.Scene.compute_paths` for the computation of the channel impulse response.
+
+.. _fig_ris_ray:
+.. figure:: figures/ris_ray.svg
+        :align: center
+        :width: 35 %
+
+        An RIS anomalously reflects an incoming ray due to its phase gradient :math:`\nabla\chi_m`.
+
+For the computation of coverage maps, the ray-based model from [Vitucci24]_ is used. :numref:`fig_ris_ray` shows how an RIS anomalously reflects an incident ray, intersecting the RIS at point :math:`\mathbf{q}\in\mathbb{R}^3` in the y-z plane.
+The incident ray with propagation direction :math:`\hat{\mathbf{k}}_i`, representing a locally-plane wavefront, acquires an incident phase gradient :math:`\nabla\chi_i` on the RIS' surface which can be computed as (Eq.9) [Vitucci24]_
+
+.. math::
+    :label: incident_phase_gradient
+
+    \nabla \chi_i = -k_0 \left(\mathbf{I} - \hat{\mathbf{n}}\hat{\mathbf{n}}^\textsf{T} \right) \hat{\mathbf{k}}_i.
+
+Each of the RIS' reradiation modes gives rise to an additional phase gradient :math:`\nabla\chi_m` at the point of intersection, which results in the total phase gradient (Eq.11) [Vitucci24]_
+
+.. math::
+    :label: total_phase_gradient
+
+    \nabla \chi(\mathbf{q}) =  \nabla \chi_i +  \nabla \chi_m(\mathbf{q}).
+
+It is this total phase gradient that determines the direction of the reflected ray :math:`\hat{\mathbf{k}}_r`
+for reradiation mode :math:`m` which can be computed as (Eq.13) [Vitucci24]_
+
+.. math::
+    :label: ris_reflected_direction
+
+    \hat{\mathbf{k}}_r = -\frac{\nabla \chi(\mathbf{q})}{k_0} + \sqrt{1-\left\lVert\frac{\nabla \chi(\mathbf{q})}{k_0} \right\rVert^2} \hat{\mathbf{n}}.
+
+From the last equation, it becomes clear that the phase profile and its derivative must be computed at  arbitrary positions on the RIS' surface. However, in Sionna RT, phase and amplitude profiles are only configured as discrete values on a regular grid with :math:`\lambda/2` spacing. For this reason, the discrete profiles are interpolated using a :class:`~sionna.rt.ProfileInterpolator`, such as the :class:`~sionna.rt.LagrangeProfileInterpolator`. It is important to keep in mind that the phase profile typically varies on the wavelength-scale across the RIS, and the amplitude profile at an even larger scale. Both profiles must be carefully chosen to represent a physically realistic device (see, e.g., the discussion after (Eq.16) [Vitucci24]_ ).
+
+.. _asticmatic_ray_tube:
+.. figure:: figures/asticmatic_ray_tube.svg
+        :align: center
+        :width: 80 %
+
+        Infinitely narrow asticmatic ray tube.
+
+A side-effect of the anomalous ray reflection is that the reflected wavefront generally has a different shape as that of the incoming wavefront. The shape of an astigmatic wave (or ray tube), as shown in :numref:`asticmatic_ray_tube`, is represented by the curvature matrix :math:`\mathbf{Q}(s)\in\mathbb{R}^{3\times 3}` along its propagation path (see, e.g., (Appenix I) [Kouyoumjian74]_ ), which can be written as
+
+.. math::
+    :label: curvature_matrix
+
+    \mathbf{Q}(s) = \frac{1}{\rho_1 + s} \hat{\mathbf{x}}_1\hat{\mathbf{x}}_1^\textsf{T} + \frac{1}{\rho_2 + s} \hat{\mathbf{x}}_2\hat{\mathbf{x}}_2^\textsf{T}
+
+where :math:`\rho_1` and :math:`\rho_2` are the principal radii of curvature, and :math:`\hat{\mathbf{x}}_1`
+and :math:`\hat{\mathbf{x}}_2` are the corresponding principal directions; both orthogonal to the propagation direction :math:`\mathbf{s}`, where :math:`s` denotes a point on the ray with respect to a reference point :math:`s=0`.
+
+For an incoming ray with curvature matrix :math:`\mathbf{Q}_i(\mathbf{q})` at the intersection point, the curvature matrix :math:`\mathbf{Q}_r(\mathbf{q})` of the outgoing ray can be computed as (Eq.22) [Vitucci24]_
+
+.. math::
+    :label: ris_curvature_matrix
+ 
+    \mathbf{Q}_r(\mathbf{q}) = \mathbf{L}^\textsf{T}\left(\mathbf{Q}_i(\mathbf{q}) - \frac{1}{k_0}\mathbf{H}_{\chi_m}(\mathbf{q}) \right)\mathbf{L}
+
+where :math:`\mathbf{H}_{\chi_m}(\mathbf{q})\in\mathbb{R}^{3\times 3}` is the Hessian matrix of the phase profile :math:`\chi_m` at the intersection point and 
+
+.. math::
+    :label: ris_l_matrix
+
+    \mathbf{L} = \mathbf{I}-\frac{\hat{\mathbf{k}}_r \hat{\mathbf{n}}^\textsf{T}}{\hat{\mathbf{k}}_r^\textsf{T}\hat{\mathbf{n}}}.
+
+The principal radii of curvature of the reflected ray :math:`\rho_1^r` and :math:`\rho_2^r` are the  non-zero eigenvalues of :math:`\mathbf{Q}_r(\mathbf{q})` while the principal directions :math:`\hat{\mathbf{x}}_1^r` and :math:`\hat{\mathbf{x}}_2^r` are given by the associated eigenvectors.
+With these definitions, we are now able to express the reflected field at point :math:`\mathbf{r} = \mathbf{q}+s\hat{\mathbf{k}}_r` as a function of the incoming field at point :math:`\mathbf{q}` (Eq.23) [Vitucci24]_:
+
+.. math::
+    :label: ris_ray_field
+
+    \begin{align}
+     \mathbf{E}_{r,m}(\mathbf{r}) =&   \sqrt{p_m} A_m(\mathbf{q}) e^{j \chi_m(\mathbf{q})} \sqrt{\frac{\rho_1^r \rho_2^r}{(\rho_1^r + s)(\rho_2^r + s)}}  \\
+     &\quad \times\left(E_{i,\theta}(\mathbf{q}) \hat{\boldsymbol{\theta}}(\hat{\mathbf{k}}_r) +  E_{i,\varphi}(\mathbf{q}) \hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}}_r)\right) e^{-jk_0 s}
+    \end{align}
+
+where we have assumed, as in :eq:`ris_field`, that the RIS does not realize any polarization transformation.
 
 References:
     .. [atan2] Wikipedia, "`atan2 <https://en.wikipedia.org/wiki/Atan2>`__," accessed 8 Feb. 2023.
@@ -856,6 +970,10 @@ References:
     .. [Degli-Esposti07] Vittorio Degli-Esposti et al., "`Measurement and modelling of scattering from buildings <https://ieeexplore.ieee.org/abstract/document/4052607>`_," IEEE Trans. Antennas Propag, vol. 55, no. 1,  pp.143-153, Jan. 2007.
 
     .. [Degli-Esposti11] Vittorio Degli-Esposti et al., "`Analysis and Modeling on co- and Cross-Polarized Urban Radio Propagation for Dual-Polarized MIMO Wireless Systems <https://ieeexplore.ieee.org/abstract/document/5979177>`_", IEEE Trans. Antennas Propag, vol. 59, no. 11,  pp.4247-4256, Nov. 2011.
+
+    .. [Degli-Esposti22] Vittorio Degli-Esposti et al., "`Reradiation and Scattering From a Reconfigurable Intelligent Surface: A General Macroscopic Model <https://ieeexplore.ieee.org/abstract/document/9713744>`_", IEEE Trans. Antennas Propag, vol. 70, no. 10,  pp.8691-8706, Oct. 2022.
+
+    .. [Di-Renzo20] Marco Di Renzo et al., "`Smart Radio Environments Empowered by Reconfigurable Intelligent Surfaces: How It Works, State of Research, and The Road Ahead <https://ieeexplore.ieee.org/document/9140329>`_", IEEE J. Sel. Areas Commun., vol. 38, no. 11 pp.2450-2525, Nov. 2020.
 
     .. [Fresnel] Wikipedia, "`Fresnel integral <https://en.wikipedia.org/wiki/Fresnel_integral>`_," accessed 21 Apr. 2023.
 
@@ -878,7 +996,9 @@ References:
     .. [METIS] METIS Deliverable D1.4, "`METIS Channel Models <https://metis2020.com/wp-content/uploads/deliverables/METIS_D1.4_v1.0.pdf>`_", Feb. 2015.
 
     .. [Tse] D. Tse, P. Viswanath, "`Fundamentals of Wireless Communication <https://web.stanford.edu/~dntse/wireless_book.html>`_", Cambridge University Press, 2005.
-    
+
+    .. [Vitucci24] Enrico Maria Vittuci et al., "`An Efficient Ray-Based Modeling Approach for Scattering From Reconfigurable Intelligent Surfaces <https://ieeexplore.ieee.org/abstract/document/10419169>`_", IEEE Trans. Antennas Propag, vol. 72, no. 3,  pp.2673-2685, Mar. 2024.
+
     .. [Wiesbeck] N. Geng and W. Wiesbeck, "Planungsmethoden für die Mobilkommunikation," Springer, 1998.
 
     .. [Wikipedia] Wikipedia, "`Maximum power transfer theorem <https://en.wikipedia.org/wiki/Maximum_power_transfer_theorem>`_," accessed 7 Oct. 2022.

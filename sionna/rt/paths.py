@@ -90,6 +90,7 @@ class Paths:
     SPECULAR = 1
     DIFFRACTED = 2
     SCATTERED = 3
+    RIS = 4
 
     def __init__(self,
                  sources,
@@ -321,6 +322,7 @@ class Paths:
         - 1 : Reflected
         - 2 : Diffracted
         - 3 : Scattered
+        - 4 : RIS
         """
         return self._types
 
@@ -609,6 +611,8 @@ class Paths:
             reflection=True,
             diffraction=True,
             scattering=True,
+            ris=True,
+            cluster_ris_paths=True,
             num_paths=None):
         # pylint: disable=line-too-long
         r"""
@@ -648,6 +652,18 @@ class Paths:
             If set to `False`, scattered paths are not returned.
             Defaults to `True`.
 
+        ris : bool
+            If set to `False`, paths involving RIS are not returned.
+            Defaults to `True`.
+
+        cluster_ris_paths : bool
+            If set to `True`, the paths from each RIS are coherently combined
+            into a single path, and the delays are averaged.
+            Note that this process is performed separately for each RIS.
+            For large RIS, clustering the paths significantly reduces the memory
+            required to run link-level simulations.
+            Defaults to `True`.
+
         num_paths : int or `None`
             All CIRs are either zero-padded or cropped to the largest
             ``num_paths`` paths.
@@ -661,6 +677,8 @@ class Paths:
         tau : [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths] or [batch_size, num_rx, num_tx, max_num_paths], tf.float
             Path delays
         """
+
+        ris = ris and (len(self._scene.ris) > 0)
 
         # Select only the desired effects
         types = self.types[0]
@@ -678,6 +696,78 @@ class Paths:
         if scattering:
             selection_mask = tf.logical_or(selection_mask,
                                            types == Paths.SCATTERED)
+        if ris:
+            if cluster_ris_paths:
+                # Combine path coefficients from every RIS coherently and
+                # average their delays.
+                # This process is performed separately for each RIS.
+                #
+                # Extract paths coefficients and delays corresponding to RIS
+                # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+                # num_ris_paths, num_time_steps]
+                a_ris = tf.gather(self.a, tf.where(types == Paths.RIS)[:,0],
+                                  axis=-2)
+                # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+                #   num_ris_paths] or [batch_size, num_rx, num_tx,num_ris_paths]
+                tau_ris = tf.gather(self.tau, tf.where(types == Paths.RIS)[:,0],
+                                axis=-1)
+                # [batch_size, num_rx, num_rx_ant/1, num_tx, num_tx_ant/1,
+                # num_ris_paths]
+                if self._scene.synthetic_array:
+                    tau_ris = tf.expand_dims(tau_ris, 2)
+                    tau_ris = tf.expand_dims(tau_ris, 4)
+                # Loop over RIS to combine their path coefficients and delays
+                index_start = 0
+                index_end = 0
+                a_combined_ris_all = []
+                tau_combined_ris_all = []
+                for ris_ in self._scene.ris.values():
+                    index_end = index_start + ris_.num_cells
+                    # Extract the path coefficients and delays corresponding to
+                    # the paths from RIS
+                    # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+                    # num_this_ris_path, num_time_steps]
+                    a_this_ris = a_ris[..., index_start:index_end,:]
+                    # [batch_size, num_rx, num_rx_ant/1, num_tx, num_tx_ant/1,
+                    # num_this_ris_path]
+                    tau_this_ris = tau_ris[...,index_start:index_end]
+                    # Average the delays
+                    # [batch_size, num_rx, num_rx_ant/1, num_tx, num_tx_ant/1,1]
+                    mean_tau_this_ris = tf.reduce_mean(tau_this_ris, axis=-1,
+                                                       keepdims=True)
+                    # Phase shift due to propagation delay.
+                    # We subtract the average delay to ensure the propagation
+                    # delay is not applied, only the phase shift due to the
+                    # RIS geometry
+                    # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+                    # num_this_ris_path]
+                    tau_this_ris -= mean_tau_this_ris
+                    ps = tf.complex(tf.zeros_like(tau_this_ris),
+                                    -2.*PI*self._scene.frequency*tau_this_ris)
+                    ps = ps[...,tf.newaxis]
+                    # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+                    # num_this_ris_path, num_time_steps]
+                    a_this_ris = a_this_ris*tf.exp(ps)
+                    # Combine the paths coefficients and delays
+                    # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, 1,
+                    # num_time_steps]
+                    a_this_ris = tf.reduce_sum(a_this_ris, axis=-2,
+                                               keepdims=True)
+
+                    #
+                    a_combined_ris_all.append(a_this_ris)
+                    tau_combined_ris_all.append(mean_tau_this_ris)
+                    #
+                    index_start = index_end
+                #
+                # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_ris,
+                # num_time_steps]
+                a_combined_ris_all = tf.concat(a_combined_ris_all, axis=-2)
+                # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, num_ris]
+                tau_combined_ris_all = tf.concat(tau_combined_ris_all, axis=-1)
+            else:
+                selection_mask = tf.logical_or(selection_mask,
+                                               types == Paths.RIS)
 
         # Extract selected paths
         # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths,
@@ -686,20 +776,29 @@ class Paths:
         # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant, max_num_paths]
         #   or [batch_size, num_rx, num_tx, max_num_paths]
         tau = tf.gather(self.tau, tf.where(selection_mask)[:,0], axis=-1)
-
-        # Compute baseband CIR
-        # [batch_size, num_rx, 1/num_rx_ant, num_tx, 1/num_tx_ant,
-        #   max_num_paths, num_time_steps, 1]
         if self._scene.synthetic_array:
             tau_ = tf.expand_dims(tau, 2)
             tau_ = tf.expand_dims(tau_, 4)
         else:
             tau_ = tau
+
+        # If RIS paths were combined, add the results of the clustering
+        if ris and cluster_ris_paths:
+            # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+            #   max_num_paths, num_time_steps]
+            a = tf.concat([a, a_combined_ris_all], axis=-2)
+            # [batch_size, num_rx, num_rx_ant, num_tx, num_tx_ant,
+            #   max_num_paths]
+            tau_ = tf.concat([tau_, tau_combined_ris_all], axis=-1)
+
+        # Compute base-band CIR
+        # [batch_size, num_rx, 1/num_rx_ant, num_tx, 1/num_tx_ant,
+        #   max_num_paths, num_time_steps, 1]
         tau_ = tf.expand_dims(tau_, -1)
         phase = tf.complex(tf.zeros_like(tau_),
                            -2*PI*self._scene.frequency*tau_)
         # Manual repeat along the time step dimension as high-dimensional
-        # brodcast is not possible
+        # broadcast is not possible
         phase = tf.repeat(phase, a.shape[-1], axis=-1)
         a = a*tf.exp(phase)
 
@@ -875,7 +974,7 @@ class Paths:
 
     def set_los_path_type(self):
         """
-        Flags paths that do not hit any objects to as LoS ones.
+        Flags paths that do not hit any object as LoS
         """
 
         # [max_depth, num_targets, num_sources, num_paths]

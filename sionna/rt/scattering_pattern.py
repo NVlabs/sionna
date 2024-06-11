@@ -46,7 +46,7 @@ class ScatteringPattern(ABC):
     Input
     -----
     k_i : [batch_size, 3], dtype.real_dtype
-        Tensor of incomning directions
+        Tensor of incoming directions
 
     k_s : [batch_size,3], dtype.real_dtype
         Tensor of outgoing directions

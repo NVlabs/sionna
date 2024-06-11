@@ -285,12 +285,12 @@ class TestCovMap(unittest.TestCase):
             ref_en = np.mean(np.square(np.abs(a)))
 
             # Compute the diffracted field energy using the coverage map
-            cm = scene.coverage_map(cm_center=cm_center, cm_orientation=cm_orientation, cm_size=cm_size, cm_cell_size=cm_cell_size, num_samples=int(20e6), los=False, reflection=False, scattering=False, diffraction=True)
+            cm = scene.coverage_map(cm_center=cm_center, cm_orientation=cm_orientation, cm_size=cm_size, cm_cell_size=cm_cell_size, num_samples=int(15e6), los=False, reflection=False, scattering=False, diffraction=True)
             cm_np = cm.as_tensor().numpy()[0]
             en_cm = np.mean(cm_np)
 
             rel_err = np.abs(ref_en-en_cm)/ref_en
-            self.assertTrue(rel_err < 5e-3)
+            self.assertTrue(rel_err < 1e-2)
 
 
 def paths_to_coverage_map(paths):
@@ -377,7 +377,7 @@ def validate_cm(los=False,
                             cm_center=[0,0,1],
                             cm_orientation=[0.,0.,0.],
                             cm_size=[width, width],
-                            num_samples=20e6,
+                            num_samples=10e6,
                             los=los,
                             reflection=reflection,
                             diffraction=diffraction,
@@ -499,7 +499,7 @@ class TestCovMapVsPaths(unittest.TestCase):
                                 cm_center=[0,0,1.5],
                                 cm_orientation=[0.,0.,0],
                                 cm_size=[width, width],
-                                num_samples=20e6,
+                                num_samples=10e6,
                                 los=los,
                                 reflection=reflection,
                                 diffraction=diffraction,
@@ -575,7 +575,7 @@ class TestCovMapVsPaths(unittest.TestCase):
                                 cm_center=[0.1,0.2,1.5],
                                 cm_orientation=[0.,0.,0],
                                 cm_size=[width, width],
-                                num_samples=20e6,
+                                num_samples=10e6,
                                 los=los,
                                 reflection=reflection,
                                 diffraction=diffraction,

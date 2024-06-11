@@ -12,7 +12,7 @@ import drjit as dr
 import tensorflow as tf
 
 from .utils import normalize, dot, theta_phi_from_unit_vec, cross,\
-    mi_to_tf_tensor
+    mi_to_tf_tensor, mitsuba_rectangle_to_world
 from sionna import PI
 
 
@@ -382,7 +382,11 @@ class SolverBase:
 
         objects_id = dr.reinterpret_array_v(mi.UInt32,
                                             self._mi_scene.shapes_dr()).tf()
-        array_size  = tf.reduce_max(objects_id) + 1
+
+        # Compute the size of the parameter tensors for all object_ids
+        # We start indexing at 1 (not 0) and need to add the number of
+        # RIS is the system
+        array_size  = tf.reduce_max(objects_id) + 1 + len(self._scene.ris)
 
         # If a callable is set to obtain radio material properties, then there
         # is no need to build the tensors of material properties
@@ -461,6 +465,10 @@ class SolverBase:
             velocity = tf.tensor_scatter_nd_update(velocity,
                                                     [[obj.object_id]],
                                                     [obj.velocity])
+        for obj in self._scene.ris.values():
+            velocity = tf.tensor_scatter_nd_update(velocity,
+                                                    [[obj.object_id]],
+                                                    [obj.velocity])
 
         return (relative_permittivity,
                scattering_coefficient,
@@ -470,7 +478,7 @@ class SolverBase:
                lambda_,
                velocity)
 
-    def _test_obstruction(self, o, d, maxt):
+    def _test_obstruction(self, o, d, maxt, additional_blockers=None):
         r"""
         Test obstruction of a batch of rays using Mitsuba.
 
@@ -484,7 +492,11 @@ class SolverBase:
             Must be unit vectors.
 
         maxt: [batch_size], tf.float
-            Length of the ray.
+            Length of the ray
+
+        additional_blockers : mi.Scene | mi.Shape | None
+            Optional Mitsuba scene or shape containing additional blockers.
+            Defaults to `None`.
 
         Output
         -------
@@ -510,9 +522,14 @@ class SolverBase:
         mi_ray = mi.Ray3f(o=mi_o, d=mi_d, maxt=mi_maxt, time=0.,
                           wavelengths=mi.Color0f(0.))
         # Test for obstruction using Mitsuba
+        # With the scene
         # [batch_size]
         mi_val = self._mi_scene.ray_test(mi_ray)
         val = mi_to_tf_tensor(mi_val, tf.bool)
+        # With additional blockers
+        if additional_blockers:
+            mi_val = additional_blockers.ray_test(mi_ray)
+            val = tf.logical_or(val, mi_to_tf_tensor(mi_val, tf.bool))
         return val
 
     def _extract_wedges(self):
@@ -906,3 +923,31 @@ class SolverBase:
             candidate_wedges = tf.gather(candidate_wedges, wedge_indices)
 
         return candidate_wedges
+
+    def _build_mi_ris_objects(self):
+        r"""
+        Builds a Mitsuba scene containing all RIS as rectangles with position,
+        orientation, and size matching the RIS properties.∂
+
+        Output
+        ------
+        : mi.Scene
+            Mitsuba Scene containing rectangles corresponding to RIS
+        """
+        # List of all the RIS objects in the scene
+        all_ris = list(self._scene.ris.values())
+
+        # Creates a scene containing RIS as rectangles
+        scene_dict = {"type": "scene"}
+        for ris in all_ris:
+            center = ris.position
+            orientation = ris.orientation
+            size = ris.size
+            mi_to_world = mitsuba_rectangle_to_world(center, orientation, size,
+                                                     ris=True)
+            scene_dict[ris.name] = {"type"     : "rectangle",
+                                    "to_world" : mi_to_world
+                                   }
+        mi_ris_scene = mi.load_dict(scene_dict)
+
+        return mi_ris_scene

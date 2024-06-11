@@ -38,10 +38,10 @@ class Camera(Object):
         This parameter is ignored if ``look_at`` is not `None`.
         Defaults to `[0,0,0]`.
 
-    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | None
-        A position or instance of :class:`~sionna.rt.Transmitter`,
-        :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
-        If set to `None`, then ``orientation`` is used to orientate the camera.
+    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | None
+        A position or the instance of a :class:`~sionna.rt.Transmitter`,
+        :class:`~sionna.rt.Receiver`, :class:`~sionna.rt.RIS`, or :class:`~sionna.rt.Camera` to look at.
+        If set to `None`, then ``orientation`` is used to orientate the device.
     """
 
     # The convention of Mitsuba for camera is Y as up and look toward Z+.

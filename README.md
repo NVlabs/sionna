@@ -15,7 +15,7 @@ In order to run the tutorial notebooks on your machine, you also need [JupyterLa
 You can alternatively test them on [Google Colab](https://colab.research.google.com/).
 Although not necessary, we recommend running Sionna in a [Docker container](https://www.docker.com).
 
-Sionna requires [TensorFlow 2.10-2.15](https://www.tensorflow.org/install) and Python 3.8-3.11. We recommend Ubuntu 22.04. Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
+Sionna requires [TensorFlow 2.13-2.15](https://www.tensorflow.org/install) and Python 3.8-3.11. We recommend Ubuntu 22.04. Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
 
 To run the ray tracer on CPU, [LLVM](https://llvm.org) is required by DrJit.  Please check the [installation instructions for the LLVM backend](https://drjit.readthedocs.io/en/latest/firststeps-py.html#llvm-backend). 
 
@@ -38,7 +38,7 @@ On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensor
 ```
     >>> import sionna
     >>> print(sionna.__version__)
-    0.17.0
+    0.18.0
 ```
 
 3.) Once Sionna is installed, you can run the [Sionna "Hello, World!" example](https://nvlabs.github.io/sionna/examples/Hello_World.html), have a look at the [quick start guide](https://nvlabs.github.io/sionna/quickstart.html), or at the [tutorials](https://nvlabs.github.io/sionna/tutorials.html).
@@ -97,7 +97,7 @@ We recommend to do this within a [virtual environment](https://docs.python.org/3
 ```
     >>> import sionna
     >>> print(sionna.__version__)
-    0.17.0
+    0.18.0
 ```
 
 ## License and Citation

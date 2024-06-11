@@ -25,7 +25,7 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray
+from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray, RIS
 from utils import *
 
 class TestSingleReflectionWithoutLoS(unittest.TestCase):
@@ -193,3 +193,151 @@ class TestSingleReflectionWithoutLoS(unittest.TestCase):
 
             max_rel_err = np.maximum(np.max(rel_err_1), np.max(rel_err_2))
             self.assertLess(max_rel_err, 1e-2)
+
+class TestRISOcclusion(unittest.TestCase):
+
+    def test_ris_occlude_los(self):
+        """In a scene containing RIS, test that RIS can occlude the LoS
+        """
+        scene = load_scene(sionna.rt.scene.simple_reflector)
+        ris0 = RIS("ris-0",
+                [0.0, 0, 2.0],
+                orientation=[0., 0., 0.],
+                num_rows=32,
+                num_cols=32)
+        scene.add(ris0)
+
+        tx = Transmitter("tx",
+                        [1.0, 0.0, 2.1])
+        scene.add(tx)
+
+        rx = Receiver("rx",
+                        [-1.0, 0.0, 2.])
+        scene.add(rx)
+
+        # Configure antenna array for all transmitters
+        scene.tx_array = PlanarArray(num_rows=1,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+
+        # Configure antenna array for all receivers
+        scene.rx_array = PlanarArray(num_rows=1,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+
+        # Compute pats
+        paths = scene.compute_paths(ris=True, reflection=True, los=True, max_depth=1, diffraction=True, edge_diffraction=True)
+
+        paths_types = paths.types[0]
+        self.assertTrue(np.where(paths_types == 0)[0].size == 0)
+        self.assertTrue(np.where(paths_types == 1)[0].size == 1)
+        self.assertTrue(np.where(paths_types == 2)[0].size == 4)
+        self.assertTrue(np.where(paths_types == 4)[0].size == 32*32)
+
+    def test_ris_occlude_specular_diffuse_diffracted(self):
+        """In a scene containing RIS, test that RIS can occlude the reflected
+        (diffuse and specular) and diffracted paths
+        """
+        scene = sionna.rt.load_scene(sionna.rt.scene.simple_reflector)
+        scene.frequency = 1e9
+        ris0 = RIS("ris-0",
+                [0.0, 0, 0.2],
+                orientation=[0., -0.5*np.pi, 0.],
+                num_rows=8,
+                num_cols=8)
+        scene.add(ris0)
+
+        tx = Transmitter("tx",
+                        [1.0, 0.0, 2.])
+        scene.add(tx)
+
+        rx = Receiver("rx",
+                        [-1.0, 0.0, 2.])
+        scene.add(rx)
+
+        # Configure antenna array for all transmitters
+        scene.tx_array = PlanarArray(num_rows=1,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+
+        # Configure antenna array for all receivers
+        scene.rx_array = PlanarArray(num_rows=1,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+
+        # Compute pats
+        paths = scene.compute_paths(ris=True, reflection=True, los=True, max_depth=2, diffraction=True, scattering=False, edge_diffraction=True)
+
+        paths_types = paths.types[0]
+        self.assertTrue(np.where(np.logical_and(paths_types == 0, paths.mask[0,0,0]))[0].size == 1)
+        self.assertTrue(np.where(np.logical_and(paths_types == 1, paths.mask[0,0,0]))[0].size == 0)
+        self.assertTrue(np.where(np.logical_and(paths_types == 2, paths.mask[0,0,0]))[0].size == 0)
+        self.assertTrue(np.where(np.logical_and(paths_types == 3, paths.mask[0,0,0]))[0].size == 0)
+        self.assertTrue(np.where(np.logical_and(paths_types == 4, paths.mask[0,0,0]))[0].size == 8*8)
+
+    def test_ris_occlude_ris(self):
+        """In a scene containing RIS, test that RIS can occlude the paths reflected
+        by another RIS
+        """
+        scene = sionna.rt.load_scene(sionna.rt.scene.simple_reflector)
+        scene.frequency = 1e9
+
+        ris0 = RIS("ris-0",
+                [0.0, 0, 0.1],
+                orientation=[0., -0.5*np.pi, 0.],
+                num_rows=8,
+                num_cols=8)
+        scene.add(ris0)
+
+        ris1 = RIS("ris-1",
+                [0.0, 0, 1.0],
+                orientation=[0., -0.5*np.pi, 0.],
+                num_rows=11,
+                num_cols=11)
+        scene.add(ris1)
+
+        tx = Transmitter("tx",
+                        [1.0, 0.0, 2.])
+        scene.add(tx)
+
+        rx = Receiver("rx",
+                        [-1.0, 0.0, 2.])
+        scene.add(rx)
+
+        # Configure antenna array for all transmitters
+        scene.tx_array = PlanarArray(num_rows=1,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+
+        # Configure antenna array for all receivers
+        scene.rx_array = PlanarArray(num_rows=1,
+                                    num_cols=1,
+                                    vertical_spacing=0.5,
+                                    horizontal_spacing=0.5,
+                                    pattern="iso",
+                                    polarization="V")
+
+        # Compute pats
+        paths = scene.compute_paths(ris=True, reflection=True, los=True, max_depth=1, diffraction=True, scattering=True, edge_diffraction=True, scat_keep_prob=1e-1)
+
+        paths_types = paths.types[0]
+        self.assertTrue(np.where(np.logical_and(paths_types == 0, paths.mask[0,0,0]))[0].size == 1)
+        self.assertTrue(np.where(np.logical_and(paths_types == 1, paths.mask[0,0,0]))[0].size == 0)
+        self.assertTrue(np.where(np.logical_and(paths_types == 2, paths.mask[0,0,0]))[0].size == 0)
+        self.assertTrue(np.where(np.logical_and(paths_types == 3, paths.mask[0,0,0]))[0].size == 0)
+        self.assertTrue(np.where(np.logical_and(paths_types == 4, paths.mask[0,0,0]))[0].size == 11*11)

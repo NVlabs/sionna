@@ -24,7 +24,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = "Sionna"
-copyright = "2021-2023 NVIDIA CORPORATION"
+copyright = "2021-2024 NVIDIA CORPORATION"
 
 # Read version number from sionna.__init__
 from importlib.machinery import SourceFileLoader

@@ -19,7 +19,12 @@ import mitsuba as mi
 # Note: If multiple GPUs are visible, the first one is used.
 gpus = tf.config.list_physical_devices('GPU')
 if len(gpus) > 0:
-    mi.set_variant('cuda_ad_rgb')
+    # Use LLVM variant for non-CUDA platforms
+    try:
+        mi.set_variant('cuda_ad_rgb')
+    except (AttributeError, ImportError) as e:
+        print("No CUDA device found; using CPU as fallback.")
+        mi.set_variant('llvm_ad_rgb')
 else:
     mi.set_variant('llvm_ad_rgb')
 
@@ -34,6 +39,9 @@ from .antenna import Antenna, compute_gain, visualize, iso_pattern,\
                      polarization_model_1, polarization_model_2
 from .antenna_array import AntennaArray, PlanarArray
 from .radio_material import RadioMaterial
+from .ris import AmplitudeProfile, DiscreteProfile, DiscreteAmplitudeProfile,\
+                DiscretePhaseProfile, CellGrid, PhaseProfile, RIS,\
+                ProfileInterpolator, LagrangeProfileInterpolator
 from .scene_object import SceneObject
 from .scattering_pattern import ScatteringPattern, LambertianPattern,\
     DirectivePattern, BackscatteringPattern
@@ -42,7 +50,7 @@ from .receiver import Receiver
 from .paths import Paths
 from .coverage_map import CoverageMap
 from .utils import rotation_matrix, rotate, theta_phi_from_unit_vec,\
-                   r_hat, theta_hat, phi_hat, cross, dot,\
+                   r_hat, theta_hat, phi_hat, cross, dot, outer,\
                    normalize, moller_trumbore, component_transform,\
                    reflection_coefficient, compute_field_unit_vectors,\
                    gen_orthogonal_vector, mi_to_tf_tensor, fibonacci_lattice,\

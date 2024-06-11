@@ -13,7 +13,8 @@ from ipywidgets.embed import embed_snippet
 import pythreejs as p3s
 import matplotlib
 
-from .utils import paths_to_segments, scene_scale, rotate
+from .utils import paths_to_segments, scene_scale, rotate,\
+    mitsuba_rectangle_to_world
 from .renderer import coverage_map_color_mapping
 
 
@@ -136,15 +137,18 @@ class InteractiveDisplay:
             Defaults to `False`.
         """
         scene = self._scene
-        sc, tx_positions, rx_positions, _ = scene_scale(scene)
+        sc, tx_positions, rx_positions, _, _ = scene_scale(scene)
         transmitter_colors = [transmitter.color.numpy() for
                               transmitter in scene.transmitters.values()]
         receiver_colors = [receiver.color.numpy() for
                            receiver in scene.receivers.values()]
 
         # Radio emitters, shown as points
-        p = np.array(list(tx_positions.values()) + list(rx_positions.values()))
-        albedo = np.array(transmitter_colors + receiver_colors)
+        p = np.array(list(tx_positions.values()) +
+                     list(rx_positions.values())
+                      )
+        albedo = np.array(transmitter_colors +
+                          receiver_colors)
 
         if p.shape[0] > 0:
             # Radio devices are not persistent
@@ -157,7 +161,8 @@ class InteractiveDisplay:
             zeros = np.zeros((1, 3))
 
             for devices in [scene.transmitters.values(),
-                            scene.receivers.values()]:
+                            scene.receivers.values(),
+                            scene.ris.values()]:
                 if len(devices) == 0:
                     continue
                 starts, ends = [], []
@@ -231,7 +236,7 @@ class InteractiveDisplay:
             albedo = s.bsdf().eval_diffuse_reflectance(si).numpy()
             if not np.any(albedo > 0.):
                 if palette is None:
-                    palette = matplotlib.cm.get_cmap('Pastel1_r')
+                    palette = matplotlib.colormaps.get_cmap('Pastel1_r')
                 albedo[:] = palette((i % palette.N + 0.5) / palette.N)[:3]
 
             albedos.append(np.tile(albedo, (n_vertices, 1)))
@@ -304,6 +309,49 @@ class InteractiveDisplay:
         mesh = p3s.Mesh(geo, mat)
 
         self._add_child(mesh, pmin, pmax, persist=False)
+
+    def plot_ris(self):
+        """
+        Plot all RIS as a monochromatic rectangle in the scene
+        """
+        all_ris = list(self._scene.ris.values())
+
+        for ris in all_ris:
+            orientation = ris.orientation
+            to_world =\
+                mitsuba_rectangle_to_world(ris.position, orientation, ris.size,
+                                           ris=True)
+            color = ris.color.numpy()
+
+            # Create a rectangle from two triangles
+            p00 = to_world.transform_affine([-1, -1, 0])
+            p01 = to_world.transform_affine([1, -1, 0])
+            p10 = to_world.transform_affine([-1, 1, 0])
+            p11 = to_world.transform_affine([1, 1, 0])
+
+            vertices = np.array([p00, p01, p10, p11])
+            pmin = np.min(vertices, axis=0)
+            pmax = np.max(vertices, axis=0)
+
+            faces = np.array([
+                [0, 1, 2],
+                [2, 1, 3],
+            ], dtype=np.uint32)
+
+            geo = p3s.BufferGeometry(
+                attributes={
+                    'position': p3s.BufferAttribute(vertices,
+                                                    normalized=False),
+                    'index': p3s.BufferAttribute(faces.ravel(),
+                                                 normalized=False),
+                }
+            )
+
+            color = f'rgb({", ".join([str(int(v*255)) for v in color])})'
+            mat = p3s.MeshLambertMaterial(color=color, side='DoubleSide')
+            mesh = p3s.Mesh(geo, mat)
+
+            self._add_child(mesh, pmin, pmax, persist=False)
 
     def set_clipping_plane(self, offset, orientation):
         """

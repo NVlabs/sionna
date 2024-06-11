@@ -150,7 +150,7 @@ def validate_path(path_ind, paths, scene):
             else:
                 end_point = vertices[i+1]
 
-            # Compute incomning and reflected wave vectors
+            # Compute incoming and reflected wave vectors
             k_i = normalize(hit_point - start_point)
             k_r = normalize(end_point - hit_point)
 

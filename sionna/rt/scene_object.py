@@ -26,33 +26,37 @@ class SceneObject(Object):
 
     def __init__(self,
                  name,
-                 object_id,
-                 scene,
-                 mi_shape,
-                 radio_material=None):
+                 object_id=None,
+                 mi_shape=None,
+                 radio_material=None,
+                 orientation=(0,0,0),
+                 dtype=tf.complex64,
+                 **kwargs):
+
+        if dtype not in (tf.complex64, tf.complex128):
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
+        self._dtype = dtype
+        self._rdtype = dtype.real_dtype
+
+        # Orientation of the object is initialized to (0,0,0)
+        self._orientation = tf.cast(orientation, dtype=self._rdtype)
 
         # Initialize the base class Object
-        super().__init__(name)
+        super().__init__(name, **kwargs)
 
         # Set the radio material
         self.radio_material = radio_material
 
         # Set the object id
-        self._object_id = object_id
-
-        # Scene
-        self._scene = scene
+        self.object_id = object_id
 
         # Set the Mitsuba shape
         self._mi_shape = mi_shape
 
         # Set velocity vector
-        self.velocity = tf.cast([0,0,0], dtype=scene.dtype.real_dtype)
+        self.velocity = tf.cast([0,0,0], dtype=self._rdtype)
 
-        # Orientation of the object is initialized to (0,0,0)
-        self._orientation = tf.cast([0.,0.,0.], dtype=scene.dtype.real_dtype)
-
-        if scene.dtype == tf.complex64:
+        if self._dtype == tf.complex64:
             self._mi_point_t = mi.Point3f
             self._mi_vec_t = mi.Vector3f
             self._mi_scalar_t = mi.Float
@@ -66,9 +70,13 @@ class SceneObject(Object):
     @property
     def object_id(self):
         r"""
-        int : Return the identifier of this object
+        int : Get/set the identifier of this object
         """
         return self._object_id
+
+    @object_id.setter
+    def object_id(self, v):
+        self._object_id = v
 
     @property
     def radio_material(self):
@@ -133,7 +141,7 @@ class SceneObject(Object):
     def velocity(self, v):
         if not tf.shape(v)==3:
             raise ValueError("`velocity` must have shape [3]")
-        self._velocity = tf.cast(v, self._scene.dtype.real_dtype)
+        self._velocity = tf.cast(v, self._rdtype)
 
     @property
     def position(self):
@@ -142,14 +150,15 @@ class SceneObject(Object):
             of the object. The center is defined as the object's axis-aligned
             bounding box (AABB).
         """
+        dr.sync_thread()
         rdtype = self._scene.dtype.real_dtype
         # Bounding box
         # [3]
-        bbox_min = mi_to_tf_tensor(self._mi_shape.bbox().min, rdtype)
+        bbox_min = tf.cast(self._mi_shape.bbox().min, rdtype)
         # [3]
-        bbox_max = mi_to_tf_tensor(self._mi_shape.bbox().max, rdtype)
+        bbox_max = tf.cast(self._mi_shape.bbox().max, rdtype)
         # [3]
-        half = tf.cast(0.5, rdtype)
+        half = tf.cast(0.5, self._rdtype)
         position = half*(bbox_min + bbox_max)
         return position
 
@@ -250,8 +259,7 @@ class SceneObject(Object):
     def orientation(self, new_orient):
 
         # Real dtype
-        rdtype = self._scene.dtype.real_dtype
-        new_orient = tf.cast(new_orient, rdtype)
+        new_orient = tf.cast(new_orient, self._rdtype)
 
         # Build the transformtation corresponding to the new rotation
         new_rotation = angles_to_mitsuba_rotation(new_orient)
@@ -303,7 +311,7 @@ class SceneObject(Object):
         vertex_coords = mi_shape.vertex_position(face_indices)
         # Cast to TensorFlow type
         # [n_prims*3, 3]
-        vertex_coords = mi_to_tf_tensor(vertex_coords, rdtype)
+        vertex_coords = mi_to_tf_tensor(vertex_coords, self._rdtype)
         # Unflatten
         # [n_prims, vertices per triangle : 3, 3]
         vertex_coords = tf.reshape(vertex_coords, [mi_shape.face_count(), 3, 3])
@@ -325,7 +333,7 @@ class SceneObject(Object):
         normals = transform.transform_affine(normals)
         # Cast to Tensorflow type
         # [n_prims, 3]
-        normals = mi_to_tf_tensor(normals, rdtype)
+        normals = mi_to_tf_tensor(normals, self._rdtype)
         # Update the tensor storing the primitive vertices
         solver_paths.normals.scatter_nd_update(sl, normals)
 
@@ -368,11 +376,11 @@ class SceneObject(Object):
 
         # Cast to Tensorflow type
         # [num_wedges, 3]
-        wedges_origin = mi_to_tf_tensor(wedges_origin, rdtype)
+        wedges_origin = mi_to_tf_tensor(wedges_origin, self._rdtype)
         # [num_wedges, 3]
-        wedges_e_hat = mi_to_tf_tensor(wedges_e_hat, rdtype)
+        wedges_e_hat = mi_to_tf_tensor(wedges_e_hat, self._rdtype)
         # [num_wedges*2, 3]
-        wedges_normals = mi_to_tf_tensor(wedges_normals, rdtype)
+        wedges_normals = mi_to_tf_tensor(wedges_normals, self._rdtype)
         # [num_wedges, 2, 3]
         wedges_normals = tf.reshape(wedges_normals, [-1, 2, 3])
 

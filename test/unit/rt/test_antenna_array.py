@@ -202,3 +202,23 @@ class TestAntennaArray(unittest.TestCase):
         # Test that antenna gains are not oo different
         assert np.max(np.abs(np.imag(a_syn)-np.imag(a_comp)))<1e-2
         assert np.mean(np.abs(a_comp-a_syn)**2) / np.mean(np.abs(a_syn)**2) <1e-4
+
+    def test_positions_scaling_planar_array(self):
+        # Test scaling of antenna positions with the frequency of the scene
+        for dtype in [tf.complex64, tf.complex128]:
+            scene = load_scene(dtype=dtype)
+            array = PlanarArray(4, 4, 0.5, 0.5, "tr38901", "V", dtype=dtype)
+            positions = array.positions
+            scene.frequency = 2*scene.frequency
+            self.assertTrue(np.allclose(positions/2, array.positions))
+
+    def test_no_positions_scaling_planar_array(self):
+        # Test that antenna positions are not scaled with the frequency if set manually
+        for dtype in [tf.complex64, tf.complex128]:
+            scene = load_scene(dtype=dtype)
+            array = PlanarArray(4, 4, 0.5, 0.5, "tr38901", "V", dtype=dtype)
+            positions = array.positions
+            array.positions = positions
+            scene.frequency = 2*scene.frequency
+            self.assertTrue(np.array_equal(positions, array.positions))
+

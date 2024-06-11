@@ -20,7 +20,9 @@ class RadioDevice(Object):
 
     Class defining a generic radio device.
 
-    :class:`~sionna.rt.Transmitter` and :class:`~sionna.rt.Receiver`
+    :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`,
+    and :class:`~sionna.rt.RIS`
+
     inherit from this class and should be used.
 
     Parameters
@@ -38,9 +40,9 @@ class RadioDevice(Object):
         This parameter is ignored if ``look_at`` is not `None`.
         Defaults to [0,0,0].
 
-    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | None
+    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | None
         A position or the instance of a :class:`~sionna.rt.Transmitter`,
-        :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
+        :class:`~sionna.rt.Receiver`, :class:`~sionna.rt.RIS`, or :class:`~sionna.rt.Camera` to look at.
         If set to `None`, then ``orientation`` is used to orientate the device.
 
     color : [3], float
@@ -54,22 +56,25 @@ class RadioDevice(Object):
 
     def __init__(self,
                  name,
-                 position,
+                 position=None,
                  orientation=(0.,0.,0.),
                  look_at=None,
                  color=(0,0,0),
-                 dtype=tf.complex64):
+                 dtype=tf.complex64,
+                 **kwargs):
 
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._dtype = dtype
         self._rdtype = dtype.real_dtype
-        self.position = position
-        self.orientation = orientation
         self.color = color
 
         # Position and orientation are set through this call
-        super().__init__(name, position, orientation, look_at)
+        super().__init__(name=name,
+                         position=position,
+                         orientation=orientation,
+                         look_at=look_at,
+                         **kwargs)
 
     @property
     def position(self):
@@ -111,7 +116,7 @@ class RadioDevice(Object):
         # pylint: disable=line-too-long
         r"""
         Sets the orientation so that the x-axis points toward a
-        position, radio device, or camera.
+        position, radio device, RIS, or camera.
 
         Given a point :math:`\mathbf{x}\in\mathbb{R}^3` with spherical angles
         :math:`\theta` and :math:`\varphi`, the orientation of the radio device
@@ -119,9 +124,10 @@ class RadioDevice(Object):
 
         Input
         -----
-        target : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | str
+        target : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | str
             A position or the name or instance of a
-            :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`, or
+            :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`,
+            :class:`~sionna.rt.RIS`, or
             :class:`~sionna.rt.Camera` in the scene to look at.
         """
         # Get position to look at

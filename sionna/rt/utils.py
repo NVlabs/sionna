@@ -62,7 +62,7 @@ def rotation_matrix(angles):
     rot_mat = tf.stack([r_1, r_2, r_3], axis=-2)
     return rot_mat
 
-def rotate(p, angles):
+def rotate(p, angles, inverse=False):
     r"""
     Rotates points ``p`` by the ``angles`` according
     to the 3D rotation defined in :eq:`rotation`
@@ -79,6 +79,11 @@ def rotate(p, angles):
         rotations about the axes :math:`(z, y, x)`,
         respectively.
 
+    inverse : bool
+        If `True`, the inverse rotation is applied,
+        i.e., the transpose of the rotation matrix is used.
+        Defaults to `False`
+
     Output
     ------
     : [...,3]
@@ -92,7 +97,7 @@ def rotate(p, angles):
 
     # Rotation around ``center``
     # [..., 3]
-    rot_p = tf.linalg.matvec(rot_mat, p)
+    rot_p = tf.linalg.matvec(rot_mat, p, transpose_a=inverse)
 
     return rot_p
 
@@ -264,6 +269,25 @@ def dot(u, v, keepdim=False, clip=False):
         res = tf.clip_by_value(res, -one, one)
     return res
 
+def outer(u,v):
+    r"""
+    Computes the outer product between u and v
+
+    Input
+    ------
+    u : [...,3]
+        First vector
+
+    v : [...,3]
+        Second vector
+
+    Output
+    -------
+    : [...,3,3]
+        Outer product between ``u`` and ``v``
+    """
+    return u[...,tf.newaxis] * v[...,tf.newaxis,:]
+
 def normalize(v):
     r"""
     Normalizes ``v`` to unit norm
@@ -394,10 +418,10 @@ def mi_to_tf_tensor(mi_tensor, dtype):
     """
     Get a TensorFlow eager tensor from a Mitsuba/DrJIT tensor
     """
-    # When there is only one input, the .tf() methods crashes.
-    # The following hack takes care of this corner case
     dr.eval(mi_tensor)
     dr.sync_thread()
+    # When there is only one input, the .tf() methods crashes.
+    # The following hack takes care of this corner case
     if dr.shape(mi_tensor)[-1] == 1:
         mi_tensor = dr.repeat(mi_tensor, 2)
         tf_tensor = tf.cast(mi_tensor.tf(), dtype)[:1]
@@ -569,9 +593,11 @@ def paths_to_segments(paths):
 
 def scene_scale(scene):
     bbox = scene.mi_scene.bbox()
-    tx_positions, rx_positions = {}, {}
-    devices = ( (scene.transmitters, tx_positions),
-                (scene.receivers, rx_positions))
+    tx_positions, rx_positions, ris_positions = {}, {}, {}
+    devices = ((scene.transmitters, tx_positions),
+               (scene.receivers, rx_positions),
+               (scene.ris, ris_positions)
+              )
     for source, destination in devices:
         for k, rd in source.items():
             p = rd.position.numpy()
@@ -579,7 +605,7 @@ def scene_scale(scene):
             destination[k] = p
 
     sc = 2. * bbox.bounding_sphere().radius
-    return sc, tx_positions, rx_positions, bbox
+    return sc, tx_positions, rx_positions, ris_positions, bbox
 
 def fibonacci_lattice(num_points, dtype=tf.float32):
     """
@@ -733,6 +759,13 @@ def sample_points_on_hemisphere(normals, num_samples=1):
     # Compute rotated points
     points = tf.linalg.matvec(rot_mat, points)
 
+    # Numerical errors can cause sampling from the other hemisphere.
+    # Correct the sampled vector to avoid sampling in the wrong hemisphere.
+    normals = tf.expand_dims(normals, axis=1)
+    s = dot(points, normals, keepdim=True)
+    s = tf.where(s < 0., s, 0.)
+    points = points - 2.*s*normals
+
     if num_samples==1:
         points = tf.squeeze(points, axis=1)
 
@@ -796,4 +829,110 @@ def angles_to_mitsuba_rotation(angles):
           mi_transform_t.rotate(axis=[0., 0., 1.], angle=angles[0])
         @ mi_transform_t.rotate(axis=[0., 1., 0.], angle=angles[1])
         @ mi_transform_t.rotate(axis=[1., 0., 0.], angle=angles[2])
+    )
+
+def gen_basis_from_z(z, epsilon):
+    """
+    Generate a pair of vectors (x,y) such that (x,y,z) is an orthonormal basis.
+
+    Input
+    ------
+    z : [..., 3], tf.float
+        Unit vector
+
+    epsilon : (), tf.float
+        Small value used to avoid errors due to numerical precision
+
+    Output
+    -------
+    x : [..., 3], tf.float
+        Unit vector
+
+    y : [..., 3], tf.float
+        Unit vector
+    """
+    x = gen_orthogonal_vector(z, epsilon)
+    x,_ = normalize(x)
+    y = cross(z, x)
+    return x,y
+
+def compute_spreading_factor(rho_1, rho_2, s):
+    r"""
+    Computes the spreading factor
+    :math:`\sqrt{\frac{\rho_1 \rho_2}{(\rho_1 + s)(\rho_2 + s)}}`
+
+    Input
+    ------
+    rho_1, rho_2 : [...], tf.float
+        Principal radii of curvature
+
+    s : [...], tf.float
+        Position along the axial ray at which to evaluate the squared
+        spreading factor
+
+    Output
+    -------
+    : float
+        Squared spreading factor
+    """
+
+    # In the case of a spherical wave, when the origin (s = 0) is set to unique
+    # caustic point, then both principal radii of curvature are set to zero.
+    # The spreading factor is then equal to 1/s.
+    spherical = tf.logical_and(tf.equal(rho_1, 0.), tf.equal(rho_2, 0.))
+    a2_spherical = tf.math.reciprocal_no_nan(s)
+
+    # General formula for the spreading factor
+    a2 = tf.sqrt(rho_1*rho_2/((rho_1+s)*(rho_2+s)))
+
+    a2 = tf.where(spherical, a2_spherical, a2)
+    return a2
+
+def mitsuba_rectangle_to_world(center, orientation, size, ris=False):
+    """
+    Build the `to_world` transformation that maps a default Mitsuba rectangle
+    to the rectangle that defines the coverage map surface.
+
+    Input
+    ------
+    center : [3], tf.float
+        Center of the rectangle
+
+    orientation : [3], tf.float
+        Orientation of the rectangle.
+        An orientation of `(0,0,0)` correspond to a rectangle oriented such that
+        z+ is its normal.
+
+    size : [2], tf.float
+        Scale of the rectangle.
+        The width of the rectangle (in the local X direction) is scale[0]
+        and its height (in the local Y direction) scale[1].
+
+    Output
+    -------
+    to_world : :class:`mitsuba.ScalarTransform4f`
+        Rectangle to world transformation.
+    """
+    orientation = 180. * orientation / PI
+
+    trans = \
+        mi.ScalarTransform4f.translate(center.numpy())\
+        @ mi.ScalarTransform4f.rotate(axis=[0, 0, 1], angle=orientation[0])\
+        @ mi.ScalarTransform4f.rotate(axis=[0, 1, 0], angle=orientation[1])\
+        @ mi.ScalarTransform4f.rotate(axis=[1, 0, 0], angle=orientation[2])
+
+    if ris:
+        # The RIS normal points at [1,0,0].
+        # We hence rotate the normal of the rectangle which points
+        # at [0,0,1] by 90 degrees around the [0,1,0] axis.
+        trans = trans\
+            @mi.ScalarTransform4f.rotate(axis=[0, 1, 0], angle=90)
+
+        # size = [width (=y), height (=z)]
+        # Since the RIS is rotated w.r.t to rectangle,
+        # The z axis corresponds to the x axis
+        size = [size[1], size[0]]
+
+    return (trans
+            @mi.ScalarTransform4f.scale([0.5 * size[0], 0.5 * size[1], 1])
     )

@@ -10,7 +10,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.markers import MarkerStyle
 from .antenna import Antenna
-from sionna.constants import SPEED_OF_LIGHT
 from . import scene
 from .utils import rotate
 
@@ -202,10 +201,8 @@ class PlanarArray(AntennaArray):
         antenna = Antenna(pattern, polarization, polarization_model, dtype)
 
         # Compute antenna positions
-        frequency = scene.Scene().frequency
-        wavelength = SPEED_OF_LIGHT/frequency
-        d_v = vertical_spacing*wavelength
-        d_h = horizontal_spacing*wavelength
+        d_v = vertical_spacing
+        d_h = horizontal_spacing
         positions =  np.zeros([array_size, 3])
 
         for i in range(num_rows):
@@ -220,6 +217,36 @@ class PlanarArray(AntennaArray):
                   (num_rows-1)*d_v/2]
         positions += offset
         super().__init__(antenna, positions, dtype)
+        self._positions_set = False
+
+    @property
+    def positions(self):
+        """
+        [array_size, 3], `tf.float` : Get/set  array of relative positions
+        :math:`(x,y,z)` [m] of each antenna (dual-polarized antennas are
+        counted as a single antenna and share the same position).
+        """
+        if not self._positions_set:
+            """Scale positions by wavelength"""
+            if hasattr(scene.Scene(), "wavelength"):
+                wavelength = scene.Scene().wavelength
+            else:
+                wavelength = tf.cast(1, self._rdtype)
+            return self._positions*wavelength
+        else:
+            """Return provided positions"""
+            return self._positions
+
+    @positions.setter
+    def positions(self, positions):
+        if isinstance(positions, tf.Variable):
+            if positions.dtype != self._rdtype:
+                raise TypeError(f"`positions` must have dtype={self._rdtype}")
+            else:
+                self._positions = positions
+        else:
+            self._positions = tf.cast(positions, self._rdtype)
+        self._positions_set = True
 
     def show(self):
         r"""show()

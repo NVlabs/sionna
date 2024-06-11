@@ -10,9 +10,10 @@ import drjit as dr
 import matplotlib
 import mitsuba as mi
 import numpy as np
+import tensorflow as tf
 
 from .camera import Camera
-from .utils import paths_to_segments, scene_scale
+from .utils import paths_to_segments, scene_scale, mitsuba_rectangle_to_world
 
 
 def render(scene, camera, paths, show_paths, show_devices, num_samples,
@@ -267,11 +268,15 @@ def results_to_mitsuba_scene(scene, paths, show_paths, show_devices,
     objects = {
         'type': 'scene',
     }
-    sc, tx_positions, rx_positions, _ = scene_scale(scene)
+    sc, tx_positions, rx_positions, ris_positions, _ = scene_scale(scene)
+    ris_orientations = [ris.orientation for ris in scene.ris.values()]
+    ris_sizes = [ris.size for ris in scene.ris.values()]
     transmitter_colors = [transmitter.color.numpy() for
                           transmitter in scene.transmitters.values()]
     receiver_colors = [receiver.color.numpy() for
                        receiver in scene.receivers.values()]
+    ris_colors = [ris.color.numpy() for
+                           ris in scene.ris.values()]
 
     # --- Radio devices, shown as spheres
     if show_devices:
@@ -290,6 +295,23 @@ def results_to_mitsuba_scene(scene, paths, show_paths, show_devices,
                         'radiance': {'type': 'rgb', 'value': color[index]},
                     },
                 }
+
+    # --- RIS, shown as rectangles
+    if show_devices:
+        for k, o, s, c in zip(ris_positions, ris_orientations, ris_sizes,
+                              ris_colors):
+            p = tf.constant(ris_positions[k])
+            key = 'ris-' + k
+            assert key not in objects
+            to_world = mitsuba_rectangle_to_world(p, o, s, ris=True)
+            objects[key] = {
+                'type': 'rectangle',
+                'to_world': to_world,
+                'light': {
+                    'type': 'area',
+                    'radiance': {'type': 'rgb', 'value': c},
+                },
+            }
 
     # --- Paths, shown as cylinders (the closest we have to lines)
     if (paths is not None) and show_paths:
@@ -393,7 +415,7 @@ def coverage_map_color_mapping(coverage_map, db_scale=True,
     if vmax is None:
         vmax = coverage_map[valid].max()
     normalizer = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
-    color_map = matplotlib.cm.get_cmap('viridis')
+    color_map = matplotlib.colormaps.get_cmap('viridis')
     return coverage_map, normalizer, color_map
 
 

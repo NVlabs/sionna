@@ -22,7 +22,7 @@ try:
     import sionna
 except ImportError as e:
     import sys
-    sys.path.append("../../")
+    sys.path.append("../")
 
 import sionna
 import numpy as np

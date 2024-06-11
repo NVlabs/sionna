@@ -7,13 +7,10 @@ Class that stores coverage map
 """
 
 import matplotlib.pyplot as plt
-import mitsuba as mi
 import numpy as np
 import tensorflow as tf
-
-from sionna.constants import PI
 from sionna.utils import expand_to_rank, log10
-from .utils import rotation_matrix
+from .utils import rotation_matrix, mitsuba_rectangle_to_world
 import warnings
 
 class CoverageMap:
@@ -171,32 +168,59 @@ class CoverageMap:
         cell_pos = tf.transpose(cell_pos, [1,0,2])
         self._cell_pos = cell_pos
 
-        ###############################################################
-        # Position of the transmitters in the coverage map
-        ###############################################################
-        # [num_tx, 3]
+        ######################################################################
+        # Position of the transmitters, receivers, and RIS in the coverage map
+        ######################################################################
+        # [num_tx/num_rx/num_ris, 3]
         tx_pos = [tx.position for tx in scene.transmitters.values()]
         tx_pos = tf.stack(tx_pos, axis=0)
-        # [num_tx, 3]
+
+        rx_pos = [rx.position for rx in scene.receivers.values()]
+        rx_pos = tf.stack(rx_pos, axis=0)
+        if len(rx_pos)==0:
+            rx_pos = tf.zeros([0,3], dtype=self._rdtype)
+
+        ris_pos = [ris.position for ris in scene.ris.values()]
+        ris_pos = tf.stack(ris_pos, axis=0)
+        if len(ris_pos)==0:
+            ris_pos = tf.zeros([0,3], dtype=self._rdtype)
+
+        # [num_tx/num_rx/num_ris, 3]
         center_ = tf.expand_dims(self._center, axis=0)
         tx_pos = tx_pos - center_
+        rx_pos = rx_pos - center_
+        ris_pos = ris_pos - center_
+
         # [3, 3]
         rot_gcs_2_cm = tf.transpose(rot_cm_2_gcs)
         # [1, 3, 3]
         rot_gcs_2_cm_ = tf.expand_dims(rot_gcs_2_cm, axis=0)
-        # Transmitter positions in the coverage map system
-        # [num_tx, 3]
+        # Positions in the coverage map system
+        # [num_tx/num_rx/num_ris, 3]
         tx_pos = tf.linalg.matvec(rot_gcs_2_cm_, tx_pos)
+        rx_pos = tf.linalg.matvec(rot_gcs_2_cm_, rx_pos)
+        ris_pos = tf.linalg.matvec(rot_gcs_2_cm_, ris_pos)
+
         # Keep only x and y
-        # [num_tx, 2]
+        # [num_tx/num_rx/num_ris, 2]
         tx_pos = tx_pos[:,:2]
+        rx_pos = rx_pos[:,:2]
+        ris_pos = ris_pos[:,:2]
+
         # Using the bottom left corner as origin
-        # [num_tx, 2]
+        # [num_tx/num_rx/num_ris, 2]
         tx_pos = tx_pos + self._size*0.5
+        rx_pos = rx_pos + self._size*0.5
+        ris_pos = ris_pos + self._size*0.5
         # Quantizing
-        # [num_tx, 2]
+        # [num_tx/num_rx/num_ris, 2]
         tx_pos = tf.cast(tf.math.floor(tx_pos/self._cell_size), tf.int32)
+        rx_pos = tf.cast(tf.math.floor(rx_pos/self._cell_size), tf.int32)
+        ris_pos = tf.cast(tf.math.floor(ris_pos/self._cell_size), tf.int32)
+
         self._tx_pos = tx_pos
+        self._rx_pos = rx_pos
+        self._ris_pos = ris_pos
 
     @property
     def center(self):
@@ -268,12 +292,15 @@ class CoverageMap:
         """
         return self._value
 
-    def show(self, tx=0, vmin=None, vmax=None, show_tx=True):
+    def show(self, tx=0, vmin=None, vmax=None,
+              show_tx=True, show_rx=False, show_ris=False):
         r"""show(tx=0, vmin=None, vmax=None, show_tx=True)
 
         Visualizes a coverage map
 
         The position of the transmitter is indicated by a red "+" marker.
+        The positions of the receivers are indicated by blue "x" markers.
+        The positions of the RIS are indicated by black "*" markers.
 
         Input
         -----
@@ -289,6 +316,14 @@ class CoverageMap:
         show_tx : bool
             If set to `True`, then the position of the transmitter is shown.
             Defaults to `True`.
+
+        show_rx : bool
+            If set to `True`, then the position of the receivers is shown.
+            Defaults to `False`.
+
+        show_ris : bool
+            If set to `True`, then the position of the RIS is shown.
+            Defaults to `False`.
 
         Output
         ------
@@ -319,10 +354,19 @@ class CoverageMap:
         plt.colorbar(label='Path gain [dB]')
         plt.xlabel('Cell index (X-axis)')
         plt.ylabel('Cell index (Y-axis)')
-        # Visualizing the BS position
+        # Visualizing transmitter, receiver, RIS positions
         if show_tx:
             tx_pos = self._tx_pos[tx]
             fig.axes[0].scatter(*tx_pos, marker='P', c='r')
+
+        if show_rx:
+            for rx_pos in self._rx_pos:
+                fig.axes[0].scatter(*rx_pos, marker='x', c='b')
+
+        if show_ris:
+            for ris_pos in self._ris_pos:
+                fig.axes[0].scatter(*ris_pos, marker='*', c='k')
+
         return fig
 
     def sample_positions(self, batch_size, tx=0, min_gain_db=None,
@@ -508,8 +552,8 @@ class CoverageMap:
         to_world : :class:`mitsuba.ScalarTransform4f`
             Rectangle to world transformation
         """
-        return coverage_map_rectangle_to_world(self._center, self._orientation,
-                                               self._size)
+        return mitsuba_rectangle_to_world(self._center, self._orientation,
+                                          self._size)
 
     def __getitem__(self, key):
         if isinstance(key, str):
@@ -537,36 +581,3 @@ class CoverageMap:
             ))
 
         return self._value[key]
-
-def coverage_map_rectangle_to_world(center, orientation, size):
-    """
-    Build the `to_world` transformation that maps a default Mitsuba rectangle
-    to the rectangle that defines the coverage map surface.
-
-    Input
-    ------
-    center : [3], tf.float
-        Center of the rectangle
-
-    orientation : [3], tf.float
-        Orientation of the rectangle
-
-    size : [2], tf.float
-        Scale of the rectangle.
-        The width of the rectangle (in the local X direction) is scale[0]
-        and its height (in the local Y direction) scale[1].
-
-    Output
-    -------
-    to_world : :class:`mitsuba.ScalarTransform4f`
-        Rectangle to world transformation.
-    """
-
-    orientation = 180. * orientation / PI
-    return (
-        mi.ScalarTransform4f.translate(center.numpy())
-        @ mi.ScalarTransform4f.rotate(axis=[0, 0, 1], angle=orientation[0])
-        @ mi.ScalarTransform4f.rotate(axis=[0, 1, 0], angle=orientation[1])
-        @ mi.ScalarTransform4f.rotate(axis=[1, 0, 0], angle=orientation[2])
-        @ mi.ScalarTransform4f.scale([0.5 * size[0], 0.5 * size[1], 1])
-    )

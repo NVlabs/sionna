@@ -20,10 +20,11 @@ import drjit as dr
 from .antenna_array import AntennaArray
 from .camera import Camera
 from .radio_device import RadioDevice
-from sionna.constants import SPEED_OF_LIGHT
+from sionna.constants import SPEED_OF_LIGHT, PI
 from .itu_materials import instantiate_itu_materials
 from .radio_material import RadioMaterial
 from .receiver import Receiver
+from .ris import RIS
 from .scene_object import SceneObject
 from .solver_paths import SolverPaths, PathsTmpData
 from .solver_cm import SolverCoverageMap
@@ -80,6 +81,10 @@ class Scene:
             instance._transmitters = {}
             # Receivers
             instance._receivers = {}
+            # Reconfigurable intelligent surfaces
+            instance._ris = {}
+            # Reconfigurable intelligent surfaces
+            instance._ris = {}
             # Cameras
             instance._cameras = {}
             # Transmitter antenna array
@@ -197,6 +202,13 @@ class Scene:
         return self._wavelength
 
     @property
+    def wavenumber(self):
+        r"""
+        float (read-only) :  Wavenumber :math:`k=2\pi/\lambda` [m^-1]
+        """
+        return tf.cast(2*PI, self._dtype.real_dtype)/self._wavelength
+
+    @property
     def synthetic_array(self):
         """
         bool : Get/set if the antenna arrays are applied synthetically.
@@ -233,6 +245,14 @@ class Scene:
              of receivers in the scene
         """
         return dict(self._receivers)
+
+    @property
+    def ris(self):
+        """
+        `dict` (read-only), { "name", :class:`~sionna.rt.RIS`} : Dictionary
+             of reconfigurable intelligent surfaces (RIS) in the scene
+        """
+        return dict(self._ris)
 
     @property
     def radio_materials(self):
@@ -311,13 +331,17 @@ class Scene:
 
         Output
         ------
-        item : :class:`~sionna.rt.SceneObject` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | `None`
+        item : :class:`~sionna.rt.SceneObject` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | `None`
             Retrieved item. Returns `None` if no corresponding item was found in the scene.
         """
         if name in self._transmitters:
             return self._transmitters[name]
         if name in self._receivers:
             return self._receivers[name]
+        if name in self._ris:
+            return self._ris[name]
+        if name in self._ris:
+            return self._ris[name]
         if name in self._radio_materials:
             return self._radio_materials[name]
         if name in self._scene_objects:
@@ -327,21 +351,23 @@ class Scene:
         return None
 
     def add(self, item):
+        # pylint: disable=line-too-long
+        # pylint: disable=line-too-long
         """
-        Adds a transmitter, receiver, radio material, or camera to the scene.
+        Adds a transmitter, receiver, RIS, radio material, or camera to the scene.
 
         If a different item with the same name as ``item`` is already part of the scene,
         an error is raised.
 
         Input
         ------
-        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`
+        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`
             Item to add to the scene
         """
         if ( (not isinstance(item, Camera))
          and (not isinstance(item, RadioDevice))
          and (not isinstance(item, RadioMaterial)) ):
-            err_msg = "The input must be a Transmitter, Receiver, Camera, or"\
+            err_msg = "The input must be a Transmitter, Receiver, RIS, Camera, or"\
                       " RadioMaterial"
             raise ValueError(err_msg)
 
@@ -363,13 +389,24 @@ class Scene:
             else:
                 # This item was already added.
                 return
-
         if isinstance(item, Transmitter):
             self._transmitters[name] = item
             item.scene = self
         elif isinstance(item, Receiver):
             self._receivers[name] = item
             item.scene = self
+        elif isinstance(item, RIS):
+            self._ris[name] = item
+            # Manually assign object_id to each RIS
+            if len(self.objects)>0:
+                max_id = max(obj.object_id for obj in self.objects.values())
+            else:
+                max_id=0
+            max_id += len(self._ris)
+            item.object_id = max_id
+            # Set scene propety and radio material
+            item.scene = self
+            item.radio_material = "itu_metal"
         elif isinstance(item, RadioMaterial):
             self._radio_materials[name] = item
             item.frequency_update()
@@ -380,7 +417,7 @@ class Scene:
     def remove(self, name):
         # pylint: disable=line-too-long
         """
-        Removes a transmitter, receiver, camera, or radio material from the
+        Removes a transmitter, receiver, RIS, camera, or radio material from the
         scene.
 
         In the case of a radio material, it must not be used by any object of
@@ -404,6 +441,12 @@ class Scene:
         elif isinstance(item, Receiver):
             del self._receivers[name]
 
+        elif isinstance(item, RIS):
+            del self._ris[name]
+
+        elif isinstance(item, RIS):
+            del self._ris[name]
+
         elif isinstance(item, Camera):
             del self._cameras[name]
 
@@ -415,14 +458,14 @@ class Scene:
             del self._radio_materials[name]
 
         else:
-            msg = "Only Transmitters, Receivers, Cameras, or RadioMaterials"\
+            msg = "Only Transmitters, Receivers, RIS, Cameras, or RadioMaterials"\
                   " can be removed"
             raise TypeError(msg)
 
 
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
                     los=True, reflection=True, diffraction=False,
-                    scattering=False, scat_keep_prob=0.001,
+                    scattering=False, ris=True, scat_keep_prob=0.001,
                     edge_diffraction=False, check_scene=True):
         # pylint: disable=line-too-long
         r"""
@@ -486,6 +529,14 @@ class Scene:
             Only works with the Fibonacci method.
             Defaults to `False`.
 
+        ris : bool
+            If set to `True`, then the paths involving RIS are computed.
+            Defaults to `True`.
+
+        ris : bool
+            If set to `True`, then the paths involving RIS are computed.
+            Defaults to `True`.
+
         scat_keep_prob : float
             Probability with which to keep scattered paths.
             This is helpful to reduce the number of scattered paths computed,
@@ -514,6 +565,12 @@ class Scene:
         scat_paths : :class:`~sionna.rt.Paths`
             Computed scattered paths
 
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
         spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the specular
             paths
@@ -525,6 +582,14 @@ class Scene:
         scat_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the scattered
             paths
+
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
+
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
         """
 
         if scat_keep_prob < 0. or scat_keep_prob > 1.:
@@ -542,14 +607,15 @@ class Scene:
                                                los=los, reflection=reflection,
                                                diffraction=diffraction,
                                                scattering=scattering,
+                                               ris=ris,
                                                scat_keep_prob=scat_keep_prob,
                                                edge_diffraction=edge_diffraction)
 
         return paths
 
-    def compute_fields(self, spec_paths, diff_paths, scat_paths,
+    def compute_fields(self, spec_paths, diff_paths, scat_paths, ris_paths,
                        spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
-                       check_scene=True, scat_random_phases=True,
+                       ris_paths_tmp, check_scene=True, scat_random_phases=True,
                        testing=False):
         r"""compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp, check_scene=True, scat_random_phases=True)
         Computes the EM fields corresponding to traced paths
@@ -584,6 +650,12 @@ class Scene:
         scat_paths : :class:`~sionna.rt.Paths`
             Scattered paths
 
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
         spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the specular
             paths
@@ -595,6 +667,14 @@ class Scene:
         scat_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the scattered
             paths
+
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
+
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
 
         check_scene : bool
             If set to `True`, checks that the scene is well configured before
@@ -618,7 +698,8 @@ class Scene:
 
         # Compute the fields and merge the paths
         output = self._solver_paths.compute_fields(spec_paths, diff_paths,
-            scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
+            scat_paths, ris_paths, spec_paths_tmp, diff_paths_tmp,
+            scat_paths_tmp, ris_paths_tmp,
             scat_random_phases, testing)
         sources, targets, paths_as_dict = output[:3]
         paths = Paths(sources, targets, self)
@@ -645,9 +726,10 @@ class Scene:
 
     def compute_paths(self, max_depth=3, method="fibonacci",
                       num_samples=int(1e6), los=True, reflection=True,
-                      diffraction=False, scattering=False, scat_keep_prob=0.001,
-                      edge_diffraction=False, check_scene=True,
-                      scat_random_phases=True, testing=False):
+                      diffraction=False, scattering=False, ris=True,
+                      scat_keep_prob=0.001, edge_diffraction=False,
+                      check_scene=True, scat_random_phases=True,
+                      testing=False):
         # pylint: disable=line-too-long
         r"""
         Computes propagation paths
@@ -782,9 +864,14 @@ class Scene:
             Defaults to `False`.
 
         scattering : bool
-            if set to `True`, then the scattered paths are computed.
+            If set to `True`, then the scattered paths are computed.
+            If set to `True`, then the scattered paths are computed.
             Only works with the Fibonacci method.
             Defaults to `False`.
+
+        ris : bool
+            If set to `True`, then paths involving RIS are computed.
+            Defaults to `True`.
 
         scat_keep_prob : float
             Probability with which a scattered path is kept.
@@ -819,7 +906,7 @@ class Scene:
 
         # Trace the paths
         traced_paths = self.trace_paths(max_depth, method, num_samples, los,
-            reflection, diffraction, scattering, scat_keep_prob,
+            reflection, diffraction, scattering, ris, scat_keep_prob,
             edge_diffraction, check_scene)
 
         # Compute the fields and merge the paths
@@ -843,6 +930,7 @@ class Scene:
                      reflection=True,
                      diffraction=False,
                      scattering=False,
+                     ris=True,
                      edge_diffraction=False,
                      check_scene=True):
         # pylint: disable=line-too-long
@@ -1101,6 +1189,10 @@ class Scene:
             If set to `True`, then the scattered paths are computed.
             Defaults to `False`.
 
+        ris : bool
+            If set to `True`, then paths involving RIS are computed.
+            Defaults to `True`.
+
         edge_diffraction : bool
             If set to `False`, only diffraction on wedges, i.e., edges that
             connect two primitives, is considered.
@@ -1192,6 +1284,7 @@ class Scene:
                                  reflection=reflection,
                                  diffraction=diffraction,
                                  scattering=scattering,
+                                 ris=ris,
                                  edge_diffraction=edge_diffraction)
 
         return output
@@ -1223,10 +1316,11 @@ class Scene:
 
             scene.preview()
 
-        Color coding:
+        Default color coding:
 
         * Green: Receiver
         * Blue: Transmitter
+        * Red: Reconfigurable Intelligent Surface (RIS)
 
         Controls:
 
@@ -1326,6 +1420,7 @@ class Scene:
             fig.plot_paths(paths)
         if show_devices:
             fig.plot_radio_devices(show_orientations=show_orientations)
+            fig.plot_ris()
         if coverage_map is not None:
             fig.plot_coverage_map(
                 coverage_map, tx=cm_tx, db_scale=cm_db_scale,
@@ -1694,6 +1789,8 @@ class Scene:
 
         self._transmitters.clear()
         self._receivers.clear()
+        self._ris.clear()
+        self._ris.clear()
         self._cameras.clear()
         self._radio_materials.clear()
         self._scene_objects.clear()
@@ -1798,7 +1895,7 @@ class Scene:
                 name = name[5:]
             if self._is_name_used(name):
                 raise ValueError(f"Name'{name}' already used by another item")
-            obj = SceneObject(name, object_id=obj_id, scene=self, mi_shape=s)
+            obj = SceneObject(name, object_id=obj_id, mi_shape=s, dtype=self._dtype)
             obj.scene = self
             obj.radio_material = mat_name
 
