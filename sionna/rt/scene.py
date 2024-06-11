@@ -382,11 +382,16 @@ class Scene:
         #       - How to handle asset id? (since asset can be made of multiple shapes)
         #       - Clean using scene.shapes() instead of xml manipulation?
         #       - Check coordinate and rotation conventions
+        #       - Implement Logger functionalities
+        #       - When exporting blender to mitsuba if "export Ids" is set to true, then element of the scene have name ids not "elm__id" which breaks the append asset function
+        #       - Check if adding group asset (multiple shape) works.
         
         if asset.scene != None and asset._scene != self: 
             msg = f"The asset '{asset}' is already assigned to another Scene '{asset.scene}'. " \
             "Assets object instance can only be assigned to a single scene."
             raise RuntimeError(msg)
+
+
 
         asset_xml_filename = asset.filename
 
@@ -406,11 +411,13 @@ class Scene:
 
         # Append each shape to the parent element in the original scene while adapting their ids
         id = last_id
+        shape_ids = []
         for shape in shapes_to_append:
             id += 1
             shape_id = f"elm__{id}"
             shape.set('id',shape_id)
             shape.set('name',shape_id)  
+            shape_ids.append(id)
 
             transform = ET.SubElement(shape, 'transform', name="to_world")
 
@@ -425,6 +432,8 @@ class Scene:
             ET.SubElement(transform, 'translate', value=translate_value)
             root.append(shape)
 
+        asset.shape_ids = shape_ids
+
         # Write the modified scene back to the XML file
         self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
 
@@ -438,6 +447,44 @@ class Scene:
         # Copy the entire contents of the 'meshes' directory to the destination directory
         shutil.copytree(meshes_source_dir, destination_dir, dirs_exist_ok=True)
 
+        # Reload scene:
+        self.reload_scene_after_modifying_assets()
+
+        return True
+    
+
+    def remove_asset(self, asset):
+        #TODO: remove associated mesh? bsdf?
+        
+        # Shapes to remove:
+        shapes_ids = asset.shape_ids
+
+        # print(f"Remove asset {asset} associated with shapes ids: {shapes_ids}")
+        # Parse the XML file
+        root = self._xml_tree.getroot()
+
+
+        # Iterate over all shape elements and remove the ones with matching IDs
+        for shape_id in shapes_ids:
+            # Construct the ID string to match
+            id_str = f"elm__{shape_id}"
+            # Find all shape elements with this ID
+            for shape in root.findall(f".//shape[@id='{id_str}']"):
+                # Remove the shape element from its parent
+                root.remove(shape)
+
+        # Write the modified XML back to the file or to a new file
+        self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+
+        # Reload scene:
+        self.reload_scene_after_modifying_assets()
+
+        return True
+
+    def reload_scene_after_modifying_assets(self):
+        # TODO: 
+        # - If adding multiple asset to the scene ensure the scene is reloaded only once!
+        
         # Reload Scene, while keeping camera, TX, RX, etc. objects:
         # Reload Mitsuba Scene
         self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml')) 
@@ -454,7 +501,7 @@ class Scene:
         for obj_id,s in enumerate(scene.shapes()):
             name = s.id()
             if name not in self._scene_objects.keys():
-                print(obj_id,s)
+                #print(obj_id,s)
                 # Only meshes are handled
                 if not isinstance(s, mi.Mesh):
                     raise TypeError('Only triangle meshes are supported')
@@ -516,6 +563,9 @@ class Scene:
                     and s_item.is_placeholder):
                     s_item.assign(item)
                     s_item.is_placeholder = False
+                elif (isinstance(s_item, AssetObject) and isinstance(item, AssetObject)):
+                    print(f"Warning - Asset {name} already present in scene has been removed from the scene. If you want to keep both, use a different name.")
+                    self.remove(name)                
                 else:
                     msg = f"Name '{name}' is already used by another item of"\
                            " the scene"
@@ -537,11 +587,11 @@ class Scene:
             self._cameras[name] = item
             item.scene = self
         elif isinstance(item, AssetObject):
+            self._preview_widget = None # Reset preview widget
+            self.append_asset_to_scene(item)
             self._asset_objects[name] = item
             item.scene = self
-            self.append_asset_to_scene(item)
-             
-
+            
     def remove(self, name):
         # pylint: disable=line-too-long
         """
@@ -573,6 +623,8 @@ class Scene:
             del self._cameras[name]
 
         elif isinstance(item, AssetObject):
+            self._preview_widget = None # Reset preview widget
+            self.remove_asset(item)
             del self._asset_objects[name]
 
         elif isinstance(item, RadioMaterial):
