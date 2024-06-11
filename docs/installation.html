@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; Sionna 0.17.0 documentation</title>
+  <title>Installation &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -396,6 +396,18 @@
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -411,6 +423,7 @@
 <li class="toctree-l2"><a class="reference internal" href="em_primer.html#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="em_primer.html#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="em_primer.html#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="em_primer.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/sionna.html">API Documentation</a><ul>
@@ -838,9 +851,21 @@
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="api/rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#rotate">rotate</a></li>
@@ -986,7 +1011,7 @@ You can alternatively test them on <a class="reference external" href="https://c
 Although not necessary, we recommend running Sionna in a <a class="reference external" href="https://www.docker.com">Docker container</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Sionna requires <a class="reference external" href="https://www.tensorflow.org/install">TensorFlow 2.10-2.15</a> and Python 3.8-3.11.
+<p>Sionna requires <a class="reference external" href="https://www.tensorflow.org/install">TensorFlow 2.13-2.15</a> and Python 3.8-3.11.
 We recommend Ubuntu 22.04.
 Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.</p>
 <p>To run the ray tracer on CPU, <a class="reference external" href="https://llvm.org">LLVM</a> is required by DrJit. Please check the <a class="reference external" href="https://drjit.readthedocs.io/en/latest/firststeps-py.html#llvm-backend">installation instructions for the LLVM backend</a>.
@@ -1007,7 +1032,7 @@ e.g., using <a class="reference external" href="https://docs.conda.io">conda</a>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sionna</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="go">0.17.0</span>
+<span class="go">0.18.0</span>
 </pre></div>
 </div>
 <p>3.) Once Sionna is installed, you can run the <a class="reference external" href="https://nvlabs.github.io/sionna/examples/Hello_World.html">Sionna “Hello, World!” example</a>, have a look at the <a class="reference external" href="https://nvlabs.github.io/sionna/quickstart.html">quick start guide</a>, or at the <a class="reference external" href="https://nvlabs.github.io/sionna/tutorials.html">tutorials</a>.</p>
@@ -1054,7 +1079,7 @@ e.g., using <a class="reference external" href="https://docs.conda.io">conda</a>
 </div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sionna</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="go">0.17.0</span>
+<span class="go">0.18.0</span>
 </pre></div>
 </div>
 </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Low-Density Parity-Check (LDPC) &mdash; Sionna 0.17.0 documentation</title>
+  <title>Low-Density Parity-Check (LDPC) &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
@@ -398,6 +398,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -413,6 +425,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../em_primer.html#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../em_primer.html#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../em_primer.html#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../em_primer.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="sionna.html">API Documentation</a><ul class="current">
@@ -840,9 +853,21 @@
 <li class="toctree-l4"><a class="reference internal" href="rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="rt.html#rotate">rotate</a></li>
@@ -1230,7 +1255,7 @@ leading to</p>
 Please note that the training of some check node types may be not supported.</p>
 <div class="figure align-default" id="id23">
 <img alt="../_images/weighted_bp.png" src="../_images/weighted_bp.png" />
-<p class="caption"><span class="caption-number">Fig. 5 </span><span class="caption-text">Fig. 1: Weighted BP as proposed in <a class="reference internal" href="#nachmani" id="id11"><span>[Nachmani]</span></a>.</span><a class="headerlink" href="#id23" title="Permalink to this image"></a></p>
+<p class="caption"><span class="caption-number">Fig. 8 </span><span class="caption-text">Fig. 1: Weighted BP as proposed in <a class="reference internal" href="#nachmani" id="id11"><span>[Nachmani]</span></a>.</span><a class="headerlink" href="#id23" title="Permalink to this image"></a></p>
 </div>
 <p>For numerical stability, the decoder applies LLR clipping of
 +/- 20 to the input LLRs.</p>

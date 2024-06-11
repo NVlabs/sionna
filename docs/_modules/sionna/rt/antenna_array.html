@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.antenna_array &mdash; Sionna 0.17.0 documentation</title>
+  <title>sionna.rt.antenna_array &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -394,6 +394,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -409,6 +421,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -836,9 +849,21 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
@@ -965,7 +990,6 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.markers</span> <span class="kn">import</span> <span class="n">MarkerStyle</span>
 <span class="kn">from</span> <span class="nn">.antenna</span> <span class="kn">import</span> <span class="n">Antenna</span>
-<span class="kn">from</span> <span class="nn">sionna.constants</span> <span class="kn">import</span> <span class="n">SPEED_OF_LIGHT</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">scene</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">rotate</span>
 
@@ -1157,10 +1181,8 @@
         <span class="n">antenna</span> <span class="o">=</span> <span class="n">Antenna</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">polarization</span><span class="p">,</span> <span class="n">polarization_model</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
 
         <span class="c1"># Compute antenna positions</span>
-        <span class="n">frequency</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span><span class="o">.</span><span class="n">frequency</span>
-        <span class="n">wavelength</span> <span class="o">=</span> <span class="n">SPEED_OF_LIGHT</span><span class="o">/</span><span class="n">frequency</span>
-        <span class="n">d_v</span> <span class="o">=</span> <span class="n">vertical_spacing</span><span class="o">*</span><span class="n">wavelength</span>
-        <span class="n">d_h</span> <span class="o">=</span> <span class="n">horizontal_spacing</span><span class="o">*</span><span class="n">wavelength</span>
+        <span class="n">d_v</span> <span class="o">=</span> <span class="n">vertical_spacing</span>
+        <span class="n">d_h</span> <span class="o">=</span> <span class="n">horizontal_spacing</span>
         <span class="n">positions</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">array_size</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
@@ -1175,6 +1197,36 @@
                   <span class="p">(</span><span class="n">num_rows</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">d_v</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">positions</span> <span class="o">+=</span> <span class="n">offset</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">antenna</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_positions_set</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        [array_size, 3], `tf.float` : Get/set  array of relative positions</span>
+<span class="sd">        :math:`(x,y,z)` [m] of each antenna (dual-polarized antennas are</span>
+<span class="sd">        counted as a single antenna and share the same position).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions_set</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Scale positions by wavelength&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">Scene</span><span class="p">(),</span> <span class="s2">&quot;wavelength&quot;</span><span class="p">):</span>
+                <span class="n">wavelength</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span><span class="o">.</span><span class="n">wavelength</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">wavelength</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span><span class="o">*</span><span class="n">wavelength</span>
+        <span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Return provided positions&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span>
+
+    <span class="nd">@positions</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">positions</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`positions` must have dtype=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">positions</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_positions</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rdtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_positions_set</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="PlanarArray.show"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.PlanarArray.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;show()</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.utils &mdash; Sionna 0.17.0 documentation</title>
+  <title>sionna.rt.utils &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -394,6 +394,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -409,6 +421,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -836,9 +849,21 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
@@ -1017,7 +1042,7 @@
     <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">r_1</span><span class="p">,</span> <span class="n">r_2</span><span class="p">,</span> <span class="n">r_3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">rot_mat</span></div>
 
-<div class="viewcode-block" id="rotate"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.rotate">[docs]</a><span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">angles</span><span class="p">):</span>
+<div class="viewcode-block" id="rotate"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.rotate">[docs]</a><span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">inverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rotates points ``p`` by the ``angles`` according</span>
 <span class="sd">    to the 3D rotation defined in :eq:`rotation`</span>
@@ -1034,6 +1059,11 @@
 <span class="sd">        rotations about the axes :math:`(z, y, x)`,</span>
 <span class="sd">        respectively.</span>
 
+<span class="sd">    inverse : bool</span>
+<span class="sd">        If `True`, the inverse rotation is applied,</span>
+<span class="sd">        i.e., the transpose of the rotation matrix is used.</span>
+<span class="sd">        Defaults to `False`</span>
+
 <span class="sd">    Output</span>
 <span class="sd">    ------</span>
 <span class="sd">    : [...,3]</span>
@@ -1047,7 +1077,7 @@
 
     <span class="c1"># Rotation around ``center``</span>
     <span class="c1"># [..., 3]</span>
-    <span class="n">rot_p</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matvec</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+    <span class="n">rot_p</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matvec</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">transpose_a</span><span class="o">=</span><span class="n">inverse</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">rot_p</span></div>
 
@@ -1219,6 +1249,25 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="o">-</span><span class="n">one</span><span class="p">,</span> <span class="n">one</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">res</span></div>
 
+<div class="viewcode-block" id="outer"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.outer">[docs]</a><span class="k">def</span> <span class="nf">outer</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the outer product between u and v</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    u : [...,3]</span>
+<span class="sd">        First vector</span>
+
+<span class="sd">    v : [...,3]</span>
+<span class="sd">        Second vector</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    : [...,3,3]</span>
+<span class="sd">        Outer product between ``u`` and ``v``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">v</span><span class="p">[</span><span class="o">...</span><span class="p">,</span><span class="n">tf</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,:]</span></div>
+
 <div class="viewcode-block" id="normalize"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.normalize">[docs]</a><span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Normalizes ``v`` to unit norm</span>
@@ -1349,10 +1398,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a TensorFlow eager tensor from a Mitsuba/DrJIT tensor</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># When there is only one input, the .tf() methods crashes.</span>
-    <span class="c1"># The following hack takes care of this corner case</span>
     <span class="n">dr</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">mi_tensor</span><span class="p">)</span>
     <span class="n">dr</span><span class="o">.</span><span class="n">sync_thread</span><span class="p">()</span>
+    <span class="c1"># When there is only one input, the .tf() methods crashes.</span>
+    <span class="c1"># The following hack takes care of this corner case</span>
     <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">mi_tensor</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">mi_tensor</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">mi_tensor</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">tf_tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">mi_tensor</span><span class="o">.</span><span class="n">tf</span><span class="p">(),</span> <span class="n">dtype</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span>
@@ -1524,9 +1573,11 @@
 
 <span class="k">def</span> <span class="nf">scene_scale</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
     <span class="n">bbox</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span><span class="o">.</span><span class="n">bbox</span><span class="p">()</span>
-    <span class="n">tx_positions</span><span class="p">,</span> <span class="n">rx_positions</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
-    <span class="n">devices</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="p">,</span> <span class="n">tx_positions</span><span class="p">),</span>
-                <span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">receivers</span><span class="p">,</span> <span class="n">rx_positions</span><span class="p">))</span>
+    <span class="n">tx_positions</span><span class="p">,</span> <span class="n">rx_positions</span><span class="p">,</span> <span class="n">ris_positions</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="n">devices</span> <span class="o">=</span> <span class="p">((</span><span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="p">,</span> <span class="n">tx_positions</span><span class="p">),</span>
+               <span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">receivers</span><span class="p">,</span> <span class="n">rx_positions</span><span class="p">),</span>
+               <span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">ris</span><span class="p">,</span> <span class="n">ris_positions</span><span class="p">)</span>
+              <span class="p">)</span>
     <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">destination</span> <span class="ow">in</span> <span class="n">devices</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">rd</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">p</span> <span class="o">=</span> <span class="n">rd</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -1534,7 +1585,7 @@
             <span class="n">destination</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span>
 
     <span class="n">sc</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">*</span> <span class="n">bbox</span><span class="o">.</span><span class="n">bounding_sphere</span><span class="p">()</span><span class="o">.</span><span class="n">radius</span>
-    <span class="k">return</span> <span class="n">sc</span><span class="p">,</span> <span class="n">tx_positions</span><span class="p">,</span> <span class="n">rx_positions</span><span class="p">,</span> <span class="n">bbox</span>
+    <span class="k">return</span> <span class="n">sc</span><span class="p">,</span> <span class="n">tx_positions</span><span class="p">,</span> <span class="n">rx_positions</span><span class="p">,</span> <span class="n">ris_positions</span><span class="p">,</span> <span class="n">bbox</span>
 
 <span class="k">def</span> <span class="nf">fibonacci_lattice</span><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1688,6 +1739,13 @@
     <span class="c1"># Compute rotated points</span>
     <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matvec</span><span class="p">(</span><span class="n">rot_mat</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
 
+    <span class="c1"># Numerical errors can cause sampling from the other hemisphere.</span>
+    <span class="c1"># Correct the sampled vector to avoid sampling in the wrong hemisphere.</span>
+    <span class="n">normals</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">dot</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">s</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">points</span> <span class="o">-</span> <span class="mf">2.</span><span class="o">*</span><span class="n">s</span><span class="o">*</span><span class="n">normals</span>
+
     <span class="k">if</span> <span class="n">num_samples</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
         <span class="n">points</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
@@ -1751,6 +1809,112 @@
           <span class="n">mi_transform_t</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">angles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="o">@</span> <span class="n">mi_transform_t</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">angles</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="o">@</span> <span class="n">mi_transform_t</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">angles</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">gen_basis_from_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a pair of vectors (x,y) such that (x,y,z) is an orthonormal basis.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    z : [..., 3], tf.float</span>
+<span class="sd">        Unit vector</span>
+
+<span class="sd">    epsilon : (), tf.float</span>
+<span class="sd">        Small value used to avoid errors due to numerical precision</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    x : [..., 3], tf.float</span>
+<span class="sd">        Unit vector</span>
+
+<span class="sd">    y : [..., 3], tf.float</span>
+<span class="sd">        Unit vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">gen_orthogonal_vector</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+    <span class="n">x</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">cross</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">compute_spreading_factor</span><span class="p">(</span><span class="n">rho_1</span><span class="p">,</span> <span class="n">rho_2</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the spreading factor</span>
+<span class="sd">    :math:`\sqrt{\frac{\rho_1 \rho_2}{(\rho_1 + s)(\rho_2 + s)}}`</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    rho_1, rho_2 : [...], tf.float</span>
+<span class="sd">        Principal radii of curvature</span>
+
+<span class="sd">    s : [...], tf.float</span>
+<span class="sd">        Position along the axial ray at which to evaluate the squared</span>
+<span class="sd">        spreading factor</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    : float</span>
+<span class="sd">        Squared spreading factor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># In the case of a spherical wave, when the origin (s = 0) is set to unique</span>
+    <span class="c1"># caustic point, then both principal radii of curvature are set to zero.</span>
+    <span class="c1"># The spreading factor is then equal to 1/s.</span>
+    <span class="n">spherical</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">rho_1</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span> <span class="n">tf</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">rho_2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">))</span>
+    <span class="n">a2_spherical</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">reciprocal_no_nan</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="c1"># General formula for the spreading factor</span>
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rho_1</span><span class="o">*</span><span class="n">rho_2</span><span class="o">/</span><span class="p">((</span><span class="n">rho_1</span><span class="o">+</span><span class="n">s</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">rho_2</span><span class="o">+</span><span class="n">s</span><span class="p">)))</span>
+
+    <span class="n">a2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">spherical</span><span class="p">,</span> <span class="n">a2_spherical</span><span class="p">,</span> <span class="n">a2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a2</span>
+
+<span class="k">def</span> <span class="nf">mitsuba_rectangle_to_world</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ris</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the `to_world` transformation that maps a default Mitsuba rectangle</span>
+<span class="sd">    to the rectangle that defines the coverage map surface.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    ------</span>
+<span class="sd">    center : [3], tf.float</span>
+<span class="sd">        Center of the rectangle</span>
+
+<span class="sd">    orientation : [3], tf.float</span>
+<span class="sd">        Orientation of the rectangle.</span>
+<span class="sd">        An orientation of `(0,0,0)` correspond to a rectangle oriented such that</span>
+<span class="sd">        z+ is its normal.</span>
+
+<span class="sd">    size : [2], tf.float</span>
+<span class="sd">        Scale of the rectangle.</span>
+<span class="sd">        The width of the rectangle (in the local X direction) is scale[0]</span>
+<span class="sd">        and its height (in the local Y direction) scale[1].</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    -------</span>
+<span class="sd">    to_world : :class:`mitsuba.ScalarTransform4f`</span>
+<span class="sd">        Rectangle to world transformation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">orientation</span> <span class="o">=</span> <span class="mf">180.</span> <span class="o">*</span> <span class="n">orientation</span> <span class="o">/</span> <span class="n">PI</span>
+
+    <span class="n">trans</span> <span class="o">=</span> \
+        <span class="n">mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>\
+        <span class="o">@</span> <span class="n">mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">orientation</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>\
+        <span class="o">@</span> <span class="n">mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">orientation</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>\
+        <span class="o">@</span> <span class="n">mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="n">orientation</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">ris</span><span class="p">:</span>
+        <span class="c1"># The RIS normal points at [1,0,0].</span>
+        <span class="c1"># We hence rotate the normal of the rectangle which points</span>
+        <span class="c1"># at [0,0,1] by 90 degrees around the [0,1,0] axis.</span>
+        <span class="n">trans</span> <span class="o">=</span> <span class="n">trans</span>\
+            <span class="nd">@mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">angle</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+
+        <span class="c1"># size = [width (=y), height (=z)]</span>
+        <span class="c1"># Since the RIS is rotated w.r.t to rectangle,</span>
+        <span class="c1"># The z axis corresponds to the x axis</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">trans</span>
+            <span class="nd">@mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="o">.</span><span class="n">scale</span><span class="p">([</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">])</span>
     <span class="p">)</span>
 </pre></div>
 

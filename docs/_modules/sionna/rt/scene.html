@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.scene &mdash; Sionna 0.17.0 documentation</title>
+  <title>sionna.rt.scene &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
@@ -394,6 +394,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -409,6 +421,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../em_primer.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/sionna.html">API Documentation</a><ul>
@@ -836,9 +849,21 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/rt.html#rotate">rotate</a></li>
@@ -975,10 +1000,11 @@
 <span class="kn">from</span> <span class="nn">.antenna_array</span> <span class="kn">import</span> <span class="n">AntennaArray</span>
 <span class="kn">from</span> <span class="nn">.camera</span> <span class="kn">import</span> <span class="n">Camera</span>
 <span class="kn">from</span> <span class="nn">.radio_device</span> <span class="kn">import</span> <span class="n">RadioDevice</span>
-<span class="kn">from</span> <span class="nn">sionna.constants</span> <span class="kn">import</span> <span class="n">SPEED_OF_LIGHT</span>
+<span class="kn">from</span> <span class="nn">sionna.constants</span> <span class="kn">import</span> <span class="n">SPEED_OF_LIGHT</span><span class="p">,</span> <span class="n">PI</span>
 <span class="kn">from</span> <span class="nn">.itu_materials</span> <span class="kn">import</span> <span class="n">instantiate_itu_materials</span>
 <span class="kn">from</span> <span class="nn">.radio_material</span> <span class="kn">import</span> <span class="n">RadioMaterial</span>
 <span class="kn">from</span> <span class="nn">.receiver</span> <span class="kn">import</span> <span class="n">Receiver</span>
+<span class="kn">from</span> <span class="nn">.ris</span> <span class="kn">import</span> <span class="n">RIS</span>
 <span class="kn">from</span> <span class="nn">.scene_object</span> <span class="kn">import</span> <span class="n">SceneObject</span>
 <span class="kn">from</span> <span class="nn">.solver_paths</span> <span class="kn">import</span> <span class="n">SolverPaths</span><span class="p">,</span> <span class="n">PathsTmpData</span>
 <span class="kn">from</span> <span class="nn">.solver_cm</span> <span class="kn">import</span> <span class="n">SolverCoverageMap</span>
@@ -1035,6 +1061,10 @@
             <span class="n">instance</span><span class="o">.</span><span class="n">_transmitters</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="c1"># Receivers</span>
             <span class="n">instance</span><span class="o">.</span><span class="n">_receivers</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># Reconfigurable intelligent surfaces</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">_ris</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># Reconfigurable intelligent surfaces</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">_ris</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="c1"># Cameras</span>
             <span class="n">instance</span><span class="o">.</span><span class="n">_cameras</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="c1"># Transmitter antenna array</span>
@@ -1152,6 +1182,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wavenumber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        float (read-only) :  Wavenumber :math:`k=2\pi/\lambda` [m^-1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">PI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="o">.</span><span class="n">real_dtype</span><span class="p">)</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synthetic_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        bool : Get/set if the antenna arrays are applied synthetically.</span>
@@ -1188,6 +1225,14 @@
 <span class="sd">             of receivers in the scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ris</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        `dict` (read-only), { &quot;name&quot;, :class:`~sionna.rt.RIS`} : Dictionary</span>
+<span class="sd">             of reconfigurable intelligent surfaces (RIS) in the scene</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">radio_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1266,13 +1311,17 @@
 
 <span class="sd">        Output</span>
 <span class="sd">        ------</span>
-<span class="sd">        item : :class:`~sionna.rt.SceneObject` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | `None`</span>
+<span class="sd">        item : :class:`~sionna.rt.SceneObject` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | `None`</span>
 <span class="sd">            Retrieved item. Returns `None` if no corresponding item was found in the scene.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transmitters</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transmitters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radio_materials</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radio_materials</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span><span class="p">:</span>
@@ -1282,21 +1331,23 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Scene.add"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Scene.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds a transmitter, receiver, radio material, or camera to the scene.</span>
+<span class="sd">        Adds a transmitter, receiver, RIS, radio material, or camera to the scene.</span>
 
 <span class="sd">        If a different item with the same name as ``item`` is already part of the scene,</span>
 <span class="sd">        an error is raised.</span>
 
 <span class="sd">        Input</span>
 <span class="sd">        ------</span>
-<span class="sd">        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`</span>
+<span class="sd">        item : :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.RadioMaterial` | :class:`~sionna.rt.Camera`</span>
 <span class="sd">            Item to add to the scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Camera</span><span class="p">))</span>
          <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RadioDevice</span><span class="p">))</span>
          <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RadioMaterial</span><span class="p">))</span> <span class="p">):</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;The input must be a Transmitter, Receiver, Camera, or&quot;</span>\
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;The input must be a Transmitter, Receiver, RIS, Camera, or&quot;</span>\
                       <span class="s2">&quot; RadioMaterial&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
 
@@ -1318,13 +1369,24 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># This item was already added.</span>
                 <span class="k">return</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Transmitter</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_transmitters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
             <span class="n">item</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
             <span class="n">item</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RIS</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+            <span class="c1"># Manually assign object_id to each RIS</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">max_id</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">object_id</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">max_id</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">max_id</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">object_id</span> <span class="o">=</span> <span class="n">max_id</span>
+            <span class="c1"># Set scene propety and radio material</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">radio_material</span> <span class="o">=</span> <span class="s2">&quot;itu_metal&quot;</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RadioMaterial</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_radio_materials</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
             <span class="n">item</span><span class="o">.</span><span class="n">frequency_update</span><span class="p">()</span>
@@ -1335,7 +1397,7 @@
 <div class="viewcode-block" id="Scene.remove"><a class="viewcode-back" href="../../../api/rt.html#sionna.rt.Scene.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Removes a transmitter, receiver, camera, or radio material from the</span>
+<span class="sd">        Removes a transmitter, receiver, RIS, camera, or radio material from the</span>
 <span class="sd">        scene.</span>
 
 <span class="sd">        In the case of a radio material, it must not be used by any object of</span>
@@ -1359,6 +1421,12 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">):</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
 
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RIS</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RIS</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Camera</span><span class="p">):</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cameras</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
 
@@ -1370,14 +1438,14 @@
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radio_materials</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Only Transmitters, Receivers, Cameras, or RadioMaterials&quot;</span>\
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Only Transmitters, Receivers, RIS, Cameras, or RadioMaterials&quot;</span>\
                   <span class="s2">&quot; can be removed&quot;</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">trace_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;fibonacci&quot;</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">),</span>
                     <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">scattering</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scat_keep_prob</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+                    <span class="n">scattering</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ris</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scat_keep_prob</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
                     <span class="n">edge_diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -1441,6 +1509,14 @@
 <span class="sd">            Only works with the Fibonacci method.</span>
 <span class="sd">            Defaults to `False`.</span>
 
+<span class="sd">        ris : bool</span>
+<span class="sd">            If set to `True`, then the paths involving RIS are computed.</span>
+<span class="sd">            Defaults to `True`.</span>
+
+<span class="sd">        ris : bool</span>
+<span class="sd">            If set to `True`, then the paths involving RIS are computed.</span>
+<span class="sd">            Defaults to `True`.</span>
+
 <span class="sd">        scat_keep_prob : float</span>
 <span class="sd">            Probability with which to keep scattered paths.</span>
 <span class="sd">            This is helpful to reduce the number of scattered paths computed,</span>
@@ -1469,6 +1545,12 @@
 <span class="sd">        scat_paths : :class:`~sionna.rt.Paths`</span>
 <span class="sd">            Computed scattered paths</span>
 
+<span class="sd">        ris_paths : :class:`~sionna.rt.Paths`</span>
+<span class="sd">            Computed paths involving RIS</span>
+
+<span class="sd">        ris_paths : :class:`~sionna.rt.Paths`</span>
+<span class="sd">            Computed paths involving RIS</span>
+
 <span class="sd">        spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
 <span class="sd">            Additional data required to compute the EM fields of the specular</span>
 <span class="sd">            paths</span>
@@ -1480,6 +1562,14 @@
 <span class="sd">        scat_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
 <span class="sd">            Additional data required to compute the EM fields of the scattered</span>
 <span class="sd">            paths</span>
+
+<span class="sd">        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
+<span class="sd">            Additional data required to compute the EM fields of the paths</span>
+<span class="sd">            involving RIS</span>
+
+<span class="sd">        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
+<span class="sd">            Additional data required to compute the EM fields of the paths</span>
+<span class="sd">            involving RIS</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">scat_keep_prob</span> <span class="o">&lt;</span> <span class="mf">0.</span> <span class="ow">or</span> <span class="n">scat_keep_prob</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
@@ -1497,14 +1587,15 @@
                                                <span class="n">los</span><span class="o">=</span><span class="n">los</span><span class="p">,</span> <span class="n">reflection</span><span class="o">=</span><span class="n">reflection</span><span class="p">,</span>
                                                <span class="n">diffraction</span><span class="o">=</span><span class="n">diffraction</span><span class="p">,</span>
                                                <span class="n">scattering</span><span class="o">=</span><span class="n">scattering</span><span class="p">,</span>
+                                               <span class="n">ris</span><span class="o">=</span><span class="n">ris</span><span class="p">,</span>
                                                <span class="n">scat_keep_prob</span><span class="o">=</span><span class="n">scat_keep_prob</span><span class="p">,</span>
                                                <span class="n">edge_diffraction</span><span class="o">=</span><span class="n">edge_diffraction</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">paths</span>
 
-    <span class="k">def</span> <span class="nf">compute_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_paths</span><span class="p">,</span> <span class="n">diff_paths</span><span class="p">,</span> <span class="n">scat_paths</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">compute_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_paths</span><span class="p">,</span> <span class="n">diff_paths</span><span class="p">,</span> <span class="n">scat_paths</span><span class="p">,</span> <span class="n">ris_paths</span><span class="p">,</span>
                        <span class="n">spec_paths_tmp</span><span class="p">,</span> <span class="n">diff_paths_tmp</span><span class="p">,</span> <span class="n">scat_paths_tmp</span><span class="p">,</span>
-                       <span class="n">check_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scat_random_phases</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">ris_paths_tmp</span><span class="p">,</span> <span class="n">check_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scat_random_phases</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">testing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp, check_scene=True, scat_random_phases=True)</span>
 <span class="sd">        Computes the EM fields corresponding to traced paths</span>
@@ -1539,6 +1630,12 @@
 <span class="sd">        scat_paths : :class:`~sionna.rt.Paths`</span>
 <span class="sd">            Scattered paths</span>
 
+<span class="sd">        ris_paths : :class:`~sionna.rt.Paths`</span>
+<span class="sd">            Computed paths involving RIS</span>
+
+<span class="sd">        ris_paths : :class:`~sionna.rt.Paths`</span>
+<span class="sd">            Computed paths involving RIS</span>
+
 <span class="sd">        spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
 <span class="sd">            Additional data required to compute the EM fields of the specular</span>
 <span class="sd">            paths</span>
@@ -1550,6 +1647,14 @@
 <span class="sd">        scat_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
 <span class="sd">            Additional data required to compute the EM fields of the scattered</span>
 <span class="sd">            paths</span>
+
+<span class="sd">        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
+<span class="sd">            Additional data required to compute the EM fields of the paths</span>
+<span class="sd">            involving RIS</span>
+
+<span class="sd">        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`</span>
+<span class="sd">            Additional data required to compute the EM fields of the paths</span>
+<span class="sd">            involving RIS</span>
 
 <span class="sd">        check_scene : bool</span>
 <span class="sd">            If set to `True`, checks that the scene is well configured before</span>
@@ -1573,7 +1678,8 @@
 
         <span class="c1"># Compute the fields and merge the paths</span>
         <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solver_paths</span><span class="o">.</span><span class="n">compute_fields</span><span class="p">(</span><span class="n">spec_paths</span><span class="p">,</span> <span class="n">diff_paths</span><span class="p">,</span>
-            <span class="n">scat_paths</span><span class="p">,</span> <span class="n">spec_paths_tmp</span><span class="p">,</span> <span class="n">diff_paths_tmp</span><span class="p">,</span> <span class="n">scat_paths_tmp</span><span class="p">,</span>
+            <span class="n">scat_paths</span><span class="p">,</span> <span class="n">ris_paths</span><span class="p">,</span> <span class="n">spec_paths_tmp</span><span class="p">,</span> <span class="n">diff_paths_tmp</span><span class="p">,</span>
+            <span class="n">scat_paths_tmp</span><span class="p">,</span> <span class="n">ris_paths_tmp</span><span class="p">,</span>
             <span class="n">scat_random_phases</span><span class="p">,</span> <span class="n">testing</span><span class="p">)</span>
         <span class="n">sources</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">paths_as_dict</span> <span class="o">=</span> <span class="n">output</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
         <span class="n">paths</span> <span class="o">=</span> <span class="n">Paths</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
@@ -1600,9 +1706,10 @@
 
     <span class="k">def</span> <span class="nf">compute_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;fibonacci&quot;</span><span class="p">,</span>
                       <span class="n">num_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">),</span> <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scattering</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scat_keep_prob</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
-                      <span class="n">edge_diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">check_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="n">scat_random_phases</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">testing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                      <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scattering</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ris</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">scat_keep_prob</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">edge_diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">check_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scat_random_phases</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">testing</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Computes propagation paths</span>
@@ -1737,9 +1844,14 @@
 <span class="sd">            Defaults to `False`.</span>
 
 <span class="sd">        scattering : bool</span>
-<span class="sd">            if set to `True`, then the scattered paths are computed.</span>
+<span class="sd">            If set to `True`, then the scattered paths are computed.</span>
+<span class="sd">            If set to `True`, then the scattered paths are computed.</span>
 <span class="sd">            Only works with the Fibonacci method.</span>
 <span class="sd">            Defaults to `False`.</span>
+
+<span class="sd">        ris : bool</span>
+<span class="sd">            If set to `True`, then paths involving RIS are computed.</span>
+<span class="sd">            Defaults to `True`.</span>
 
 <span class="sd">        scat_keep_prob : float</span>
 <span class="sd">            Probability with which a scattered path is kept.</span>
@@ -1774,7 +1886,7 @@
 
         <span class="c1"># Trace the paths</span>
         <span class="n">traced_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_paths</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">los</span><span class="p">,</span>
-            <span class="n">reflection</span><span class="p">,</span> <span class="n">diffraction</span><span class="p">,</span> <span class="n">scattering</span><span class="p">,</span> <span class="n">scat_keep_prob</span><span class="p">,</span>
+            <span class="n">reflection</span><span class="p">,</span> <span class="n">diffraction</span><span class="p">,</span> <span class="n">scattering</span><span class="p">,</span> <span class="n">ris</span><span class="p">,</span> <span class="n">scat_keep_prob</span><span class="p">,</span>
             <span class="n">edge_diffraction</span><span class="p">,</span> <span class="n">check_scene</span><span class="p">)</span>
 
         <span class="c1"># Compute the fields and merge the paths</span>
@@ -1798,6 +1910,7 @@
                      <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">scattering</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">ris</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">edge_diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">check_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="c1"># pylint: disable=line-too-long</span>
@@ -2056,6 +2169,10 @@
 <span class="sd">            If set to `True`, then the scattered paths are computed.</span>
 <span class="sd">            Defaults to `False`.</span>
 
+<span class="sd">        ris : bool</span>
+<span class="sd">            If set to `True`, then paths involving RIS are computed.</span>
+<span class="sd">            Defaults to `True`.</span>
+
 <span class="sd">        edge_diffraction : bool</span>
 <span class="sd">            If set to `False`, only diffraction on wedges, i.e., edges that</span>
 <span class="sd">            connect two primitives, is considered.</span>
@@ -2147,6 +2264,7 @@
                                  <span class="n">reflection</span><span class="o">=</span><span class="n">reflection</span><span class="p">,</span>
                                  <span class="n">diffraction</span><span class="o">=</span><span class="n">diffraction</span><span class="p">,</span>
                                  <span class="n">scattering</span><span class="o">=</span><span class="n">scattering</span><span class="p">,</span>
+                                 <span class="n">ris</span><span class="o">=</span><span class="n">ris</span><span class="p">,</span>
                                  <span class="n">edge_diffraction</span><span class="o">=</span><span class="n">edge_diffraction</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">output</span>
@@ -2178,10 +2296,11 @@
 
 <span class="sd">            scene.preview()</span>
 
-<span class="sd">        Color coding:</span>
+<span class="sd">        Default color coding:</span>
 
 <span class="sd">        * Green: Receiver</span>
 <span class="sd">        * Blue: Transmitter</span>
+<span class="sd">        * Red: Reconfigurable Intelligent Surface (RIS)</span>
 
 <span class="sd">        Controls:</span>
 
@@ -2281,6 +2400,7 @@
             <span class="n">fig</span><span class="o">.</span><span class="n">plot_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">show_devices</span><span class="p">:</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">plot_radio_devices</span><span class="p">(</span><span class="n">show_orientations</span><span class="o">=</span><span class="n">show_orientations</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">plot_ris</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">coverage_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fig</span><span class="o">.</span><span class="n">plot_coverage_map</span><span class="p">(</span>
                 <span class="n">coverage_map</span><span class="p">,</span> <span class="n">tx</span><span class="o">=</span><span class="n">cm_tx</span><span class="p">,</span> <span class="n">db_scale</span><span class="o">=</span><span class="n">cm_db_scale</span><span class="p">,</span>
@@ -2649,6 +2769,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_transmitters</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ris</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cameras</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_radio_materials</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -2753,7 +2875,7 @@
                 <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_name_used</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; already used by another item&quot;</span><span class="p">)</span>
-            <span class="n">obj</span> <span class="o">=</span> <span class="n">SceneObject</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_id</span><span class="o">=</span><span class="n">obj_id</span><span class="p">,</span> <span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">mi_shape</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">SceneObject</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_id</span><span class="o">=</span><span class="n">obj_id</span><span class="p">,</span> <span class="n">mi_shape</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">radio_material</span> <span class="o">=</span> <span class="n">mat_name</span>
 

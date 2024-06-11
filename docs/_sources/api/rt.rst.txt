@@ -23,6 +23,7 @@ The paper `Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling 
 .. include:: rt_radio_device.rst.txt
 .. include:: rt_antenna_array.rst.txt
 .. include:: rt_antenna.rst.txt
+.. include:: rt_ris.rst.txt
 .. include:: rt_utils.rst.txt
 
 References:

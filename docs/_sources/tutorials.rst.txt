@@ -51,4 +51,5 @@ Ray Tracing
     examples/Sionna_Ray_Tracing_Diffraction.ipynb
     examples/Sionna_Ray_Tracing_Scattering.ipynb
     examples/Sionna_Ray_Tracing_Mobility.ipynb
+    examples/Sionna_Ray_Tracing_RIS.ipynb
 

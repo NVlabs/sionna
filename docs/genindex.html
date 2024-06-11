@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; Sionna 0.17.0 documentation</title>
+  <title>Index &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -394,6 +394,18 @@
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -409,6 +421,7 @@
 <li class="toctree-l2"><a class="reference internal" href="em_primer.html#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="em_primer.html#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="em_primer.html#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="em_primer.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/sionna.html">API Documentation</a><ul>
@@ -836,9 +849,21 @@
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="api/rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#rotate">rotate</a></li>
@@ -1021,6 +1046,10 @@
         <li><a href="api/rt.html#sionna.rt.DirectivePattern.alpha_r">(sionna.rt.DirectivePattern property)</a>
 </li>
       </ul></li>
+      <li><a href="api/rt.html#sionna.rt.RIS.amplitude_profile">amplitude_profile (sionna.rt.RIS property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.AmplitudeProfile">AmplitudeProfile (class in sionna.rt)</a>
+</li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_ind_pol1">ant_ind_pol1 (sionna.channel.tr38901.PanelArray property)</a>
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_ind_pol2">ant_ind_pol2 (sionna.channel.tr38901.PanelArray property)</a>
@@ -1029,10 +1058,10 @@
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_pol2">ant_pol2 (sionna.channel.tr38901.PanelArray property)</a>
 </li>
-      <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_pos">ant_pos (sionna.channel.tr38901.PanelArray property)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_pos">ant_pos (sionna.channel.tr38901.PanelArray property)</a>
+</li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_pos_pol1">ant_pos_pol1 (sionna.channel.tr38901.PanelArray property)</a>
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.ant_pos_pol2">ant_pos_pol2 (sionna.channel.tr38901.PanelArray property)</a>
@@ -1171,7 +1200,29 @@
 </li>
       <li><a href="api/rt.html#sionna.rt.CoverageMap.cell_centers">cell_centers (sionna.rt.CoverageMap property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.cell_grid">cell_grid (sionna.rt.DiscreteAmplitudeProfile property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile.cell_grid">(sionna.rt.DiscretePhaseProfile property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.RIS.cell_grid">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
+      <li><a href="api/rt.html#sionna.rt.CellGrid.cell_positions">cell_positions (sionna.rt.CellGrid property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.RIS.cell_positions">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
       <li><a href="api/rt.html#sionna.rt.CoverageMap.cell_size">cell_size (sionna.rt.CoverageMap property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.RIS.cell_world_positions">cell_world_positions (sionna.rt.RIS property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.CellGrid.cell_y_positions">cell_y_positions (sionna.rt.CellGrid property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.CellGrid.cell_z_positions">cell_z_positions (sionna.rt.CellGrid property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.CellGrid">CellGrid (class in sionna.rt)</a>
 </li>
       <li><a href="api/mapping.html#sionna.mapping.Constellation.center">center (sionna.mapping.Constellation property)</a>
 
@@ -1244,6 +1295,8 @@
       <li><a href="api/rt.html#sionna.rt.Receiver.color">color (sionna.rt.Receiver property)</a>
 
       <ul>
+        <li><a href="api/rt.html#sionna.rt.RIS.color">(sionna.rt.RIS property)</a>
+</li>
         <li><a href="api/rt.html#sionna.rt.Transmitter.color">(sionna.rt.Transmitter property)</a>
 </li>
       </ul></li>
@@ -1369,15 +1422,19 @@
 </li>
       <li><a href="api/fec.scrambling.html#sionna.fec.scrambling.Descrambler">Descrambler (class in sionna.fec.scrambling)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/mimo.html#sionna.mimo.StreamManagement.detection_desired_ind">detection_desired_ind (sionna.mimo.StreamManagement property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/mimo.html#sionna.mimo.StreamManagement.detection_undesired_ind">detection_undesired_ind (sionna.mimo.StreamManagement property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.antenna.dipole_pattern">dipole_pattern() (in module sionna.rt.antenna)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.DirectivePattern">DirectivePattern (class in sionna.rt)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile">DiscreteAmplitudeProfile (class in sionna.rt)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile">DiscretePhaseProfile (class in sionna.rt)</a>
 </li>
       <li><a href="api/nr.html#sionna.nr.PUSCHConfig.dmrs">dmrs (sionna.nr.PUSCHConfig property)</a>
 </li>
@@ -1477,10 +1534,12 @@
 </li>
       <li><a href="api/rt.html#sionna.rt.scene.floor_wall">floor_wall (in module sionna.rt.scene)</a>
 </li>
-      <li><a href="api/nr.html#sionna.nr.CarrierConfig.frame_duration">frame_duration (sionna.nr.CarrierConfig property)</a>
+      <li><a href="api/rt.html#sionna.rt.RIS.focusing_lens">focusing_lens() (sionna.rt.RIS method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nr.html#sionna.nr.CarrierConfig.frame_duration">frame_duration (sionna.nr.CarrierConfig property)</a>
+</li>
       <li><a href="api/nr.html#sionna.nr.CarrierConfig.frame_number">frame_number (sionna.nr.CarrierConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Scene.frequency">frequency (sionna.rt.Scene property)</a>
@@ -1743,6 +1802,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nr.html#sionna.nr.PUSCHConfig.l_bar">l_bar (sionna.nr.PUSCHConfig property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.LagrangeProfileInterpolator.lagrange_polynomials">lagrange_polynomials() (sionna.rt.LagrangeProfileInterpolator static method)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.LagrangeProfileInterpolator">LagrangeProfileInterpolator (class in sionna.rt)</a>
+</li>
       <li><a href="api/rt.html#sionna.rt.BackscatteringPattern.lambda_">lambda_ (sionna.rt.BackscatteringPattern property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.LambertianPattern">LambertianPattern (class in sionna.rt)</a>
@@ -1842,6 +1905,8 @@
       <ul>
         <li><a href="api/rt.html#sionna.rt.Receiver.look_at">(sionna.rt.Receiver method)</a>
 </li>
+        <li><a href="api/rt.html#sionna.rt.RIS.look_at">(sionna.rt.RIS method)</a>
+</li>
         <li><a href="api/rt.html#sionna.rt.SceneObject.look_at">(sionna.rt.SceneObject method)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.Transmitter.look_at">(sionna.rt.Transmitter method)</a>
@@ -1889,14 +1954,14 @@
         <li><a href="api/ofdm.html#sionna.ofdm.MaximumLikelihoodDetector">(class in sionna.ofdm)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/mimo.html#sionna.mimo.MaximumLikelihoodDetectorWithPrior">MaximumLikelihoodDetectorWithPrior (class in sionna.mimo)</a>
 
       <ul>
         <li><a href="api/ofdm.html#sionna.ofdm.MaximumLikelihoodDetectorWithPrior">(class in sionna.ofdm)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nr.html#sionna.nr.TBConfig.mcs_index">mcs_index (sionna.nr.TBConfig property)</a>
 </li>
       <li><a href="api/nr.html#sionna.nr.TBConfig.mcs_table">mcs_table (sionna.nr.TBConfig property)</a>
@@ -1915,6 +1980,12 @@
 
       <ul>
         <li><a href="api/ofdm.html#sionna.ofdm.MMSEPICDetector">(class in sionna.ofdm)</a>
+</li>
+      </ul></li>
+      <li><a href="api/rt.html#sionna.rt.AmplitudeProfile.mode_powers">mode_powers (sionna.rt.AmplitudeProfile property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.mode_powers">(sionna.rt.DiscreteAmplitudeProfile property)</a>
 </li>
       </ul></li>
       <li><a href="api/nr.html#sionna.nr.CarrierConfig.mu">mu (sionna.nr.CarrierConfig property)</a>
@@ -2002,6 +2073,8 @@
       <ul>
         <li><a href="api/rt.html#sionna.rt.Receiver.name">(sionna.rt.Receiver property)</a>
 </li>
+        <li><a href="api/rt.html#sionna.rt.RIS.name">(sionna.rt.RIS property)</a>
+</li>
         <li><a href="api/rt.html#sionna.rt.SceneObject.name">(sionna.rt.SceneObject property)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.Transmitter.name">(sionna.rt.Transmitter property)</a>
@@ -2061,14 +2134,20 @@
       </ul></li>
       <li><a href="api/nr.html#sionna.nr.TBEncoder.num_cbs">num_cbs (sionna.nr.TBEncoder property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nr.html#sionna.nr.PUSCHDMRSConfig.num_cdm_groups_without_data">num_cdm_groups_without_data (sionna.nr.PUSCHDMRSConfig property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.CellGrid.num_cells">num_cells (sionna.rt.CellGrid property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.RIS.num_cells">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
       <li><a href="api/rt.html#sionna.rt.CoverageMap.num_cells_x">num_cells_x (sionna.rt.CoverageMap property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.CoverageMap.num_cells_y">num_cells_y (sionna.rt.CoverageMap property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.CDL.num_clusters">num_clusters (sionna.channel.tr38901.CDL property)</a>
 
       <ul>
@@ -2082,7 +2161,13 @@
       <li><a href="api/nr.html#sionna.nr.LayerMapper.num_codewords">num_codewords (sionna.nr.LayerMapper property)</a>
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.num_cols">num_cols (sionna.channel.tr38901.PanelArray property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.CellGrid.num_cols">(sionna.rt.CellGrid property)</a>
 </li>
+        <li><a href="api/rt.html#sionna.rt.RIS.num_cols">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.num_cols_per_panel">num_cols_per_panel (sionna.channel.tr38901.PanelArray property)</a>
 </li>
       <li><a href="api/nr.html#sionna.nr.PUSCHPilotPattern.num_data_symbols">num_data_symbols (sionna.nr.PUSCHPilotPattern property)</a>
@@ -2123,6 +2208,18 @@
 </li>
       <li><a href="api/nr.html#sionna.nr.LayerMapper.num_layers1">num_layers1 (sionna.nr.LayerMapper property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.AmplitudeProfile.num_modes">num_modes (sionna.rt.AmplitudeProfile property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.num_modes">(sionna.rt.DiscreteAmplitudeProfile property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile.num_modes">(sionna.rt.DiscretePhaseProfile property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.PhaseProfile.num_modes">(sionna.rt.PhaseProfile property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.RIS.num_modes">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
       <li><a href="api/nr.html#sionna.nr.PUSCHPilotPattern.num_ofdm_symbols">num_ofdm_symbols (sionna.nr.PUSCHPilotPattern property)</a>
 
       <ul>
@@ -2152,7 +2249,13 @@
       <li><a href="api/ofdm.html#sionna.ofdm.ResourceGrid.num_resource_elements">num_resource_elements (sionna.ofdm.ResourceGrid property)</a>
 </li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.num_rows">num_rows (sionna.channel.tr38901.PanelArray property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.CellGrid.num_rows">(sionna.rt.CellGrid property)</a>
 </li>
+        <li><a href="api/rt.html#sionna.rt.RIS.num_rows">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.num_rows_per_panel">num_rows_per_panel (sionna.channel.tr38901.PanelArray property)</a>
 </li>
       <li><a href="api/mimo.html#sionna.mimo.StreamManagement.num_rx">num_rx (sionna.mimo.StreamManagement property)</a>
@@ -2232,6 +2335,8 @@
 </li>
         <li><a href="api/rt.html#sionna.rt.Receiver.orientation">(sionna.rt.Receiver property)</a>
 </li>
+        <li><a href="api/rt.html#sionna.rt.RIS.orientation">(sionna.rt.RIS property)</a>
+</li>
         <li><a href="api/rt.html#sionna.rt.SceneObject.orientation">(sionna.rt.SceneObject property)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.Transmitter.orientation">(sionna.rt.Transmitter property)</a>
@@ -2244,6 +2349,8 @@
       <li><a href="api/fec.ldpc.html#sionna.fec.ldpc.encoding.LDPC5GEncoder.out_int">out_int (sionna.fec.ldpc.encoding.LDPC5GEncoder property)</a>
 </li>
       <li><a href="api/fec.ldpc.html#sionna.fec.ldpc.encoding.LDPC5GEncoder.out_int_inv">out_int_inv (sionna.fec.ldpc.encoding.LDPC5GEncoder property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.outer">outer() (in module sionna.rt)</a>
 </li>
       <li><a href="api/fec.ldpc.html#sionna.fec.ldpc.decoding.LDPCBPDecoder.output_dtype">output_dtype (sionna.fec.ldpc.decoding.LDPCBPDecoder property)</a>
 
@@ -2297,6 +2404,12 @@
 </li>
       <li><a href="api/fec.interleaving.html#sionna.fec.interleaving.RowColumnInterleaver.perm_seq_inv">perm_seq_inv (sionna.fec.interleaving.RowColumnInterleaver property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.RIS.phase_gradient_reflector">phase_gradient_reflector() (sionna.rt.RIS method)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.RIS.phase_profile">phase_profile (sionna.rt.RIS property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.PhaseProfile">PhaseProfile (class in sionna.rt)</a>
+</li>
       <li><a href="api/rt.html#sionna.rt.phi_hat">phi_hat() (in module sionna.rt)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Paths.phi_r">phi_r (sionna.rt.Paths property)</a>
@@ -2331,10 +2444,10 @@
 </li>
       <li><a href="api/fec.polar.html#sionna.fec.polar.decoding.Polar5GDecoder">Polar5GDecoder (class in sionna.fec.polar.decoding)</a>
 </li>
-      <li><a href="api/fec.polar.html#sionna.fec.polar.encoding.Polar5GEncoder">Polar5GEncoder (class in sionna.fec.polar.encoding)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/fec.polar.html#sionna.fec.polar.encoding.Polar5GEncoder">Polar5GEncoder (class in sionna.fec.polar.encoding)</a>
+</li>
       <li><a href="api/fec.polar.html#sionna.fec.polar.decoding.Polar5GDecoder.polar_dec">polar_dec (sionna.fec.polar.decoding.Polar5GDecoder property)</a>
 </li>
       <li><a href="api/fec.polar.html#sionna.fec.polar.decoding.PolarBPDecoder">PolarBPDecoder (class in sionna.fec.polar.decoding)</a>
@@ -2364,6 +2477,8 @@
       <ul>
         <li><a href="api/rt.html#sionna.rt.Receiver.position">(sionna.rt.Receiver property)</a>
 </li>
+        <li><a href="api/rt.html#sionna.rt.RIS.position">(sionna.rt.RIS property)</a>
+</li>
         <li><a href="api/rt.html#sionna.rt.SceneObject.position">(sionna.rt.SceneObject property)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.Transmitter.position">(sionna.rt.Transmitter property)</a>
@@ -2384,6 +2499,8 @@
       <li><a href="api/nr.html#sionna.nr.PUSCHConfig.precoding_matrix">precoding_matrix (sionna.nr.PUSCHConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Scene.preview">preview() (in module sionna.rt.Scene)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.ProfileInterpolator">ProfileInterpolator (class in sionna.rt)</a>
 </li>
       <li><a href="api/fec.turbo.html#sionna.fec.turbo.TurboEncoder.punct_pattern">punct_pattern (sionna.fec.turbo.TurboEncoder property)</a>
 </li>
@@ -2497,6 +2614,10 @@
 </li>
       <li><a href="api/rt.html#sionna.rt.Paths.reverse_direction">reverse_direction (sionna.rt.Paths property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.RIS">RIS (class in sionna.rt)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.Scene.ris">ris (sionna.rt.Scene property)</a>
+</li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.RMa">RMa (class in sionna.channel.tr38901)</a>
 </li>
       <li><a href="api/signal.html#sionna.signal.RootRaisedCosineFilter">RootRaisedCosineFilter (class in sionna.signal)</a>
@@ -2585,6 +2706,12 @@
         <li><a href="api/channel.wireless.html#sionna.channel.tr38901.UMi.set_topology">(sionna.channel.tr38901.UMi method)</a>
 </li>
       </ul></li>
+      <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.shape">shape (sionna.rt.DiscreteAmplitudeProfile property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile.shape">(sionna.rt.DiscretePhaseProfile property)</a>
+</li>
+      </ul></li>
       <li><a href="api/channel.wireless.html#sionna.channel.tr38901.PanelArray.show">show() (sionna.channel.tr38901.PanelArray method)</a>
 
       <ul>
@@ -2601,6 +2728,10 @@
         <li><a href="api/ofdm.html#sionna.ofdm.ResourceGrid.show">(sionna.ofdm.ResourceGrid method)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.CoverageMap.show">(sionna.rt.CoverageMap method)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.show">(sionna.rt.DiscreteAmplitudeProfile method)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile.show">(sionna.rt.DiscretePhaseProfile method)</a>
 </li>
         <li><a href="api/rt.html#sionna.rt.PlanarArray.show">(sionna.rt.PlanarArray method)</a>
 </li>
@@ -2656,6 +2787,8 @@
       <li><a href="api/rt.html#sionna.rt.CoverageMap.size">size (sionna.rt.CoverageMap property)</a>
 
       <ul>
+        <li><a href="api/rt.html#sionna.rt.RIS.size">(sionna.rt.RIS property)</a>
+</li>
         <li><a href="api/rt.html#sionna.rt.Scene.size">(sionna.rt.Scene property)</a>
 </li>
       </ul></li>
@@ -2667,6 +2800,18 @@
 </li>
       <li><a href="api/rt.html#sionna.rt.Scene.solver_paths">solver_paths (sionna.rt.Scene property)</a>
 </li>
+      <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.spacing">spacing (sionna.rt.DiscreteAmplitudeProfile property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile.spacing">(sionna.rt.DiscretePhaseProfile property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.LagrangeProfileInterpolator.spacing">(sionna.rt.LagrangeProfileInterpolator property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.ProfileInterpolator.spacing">(sionna.rt.ProfileInterpolator property)</a>
+</li>
+        <li><a href="api/rt.html#sionna.rt.RIS.spacing">(sionna.rt.RIS property)</a>
+</li>
+      </ul></li>
       <li><a href="api/channel.wireless.html#sionna.channel.FlatFadingChannel.spatial_corr">spatial_corr (sionna.channel.FlatFadingChannel property)</a>
 
       <ul>
@@ -2891,10 +3036,22 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/rt.html#sionna.rt.SceneObject.velocity">velocity (sionna.rt.SceneObject property)</a>
+      <li><a href="api/rt.html#sionna.rt.DiscreteAmplitudeProfile.values">values (sionna.rt.DiscreteAmplitudeProfile property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.DiscretePhaseProfile.values">(sionna.rt.DiscretePhaseProfile property)</a>
 </li>
+      </ul></li>
+      <li><a href="api/rt.html#sionna.rt.RIS.velocity">velocity (sionna.rt.RIS property)</a>
+
+      <ul>
+        <li><a href="api/rt.html#sionna.rt.SceneObject.velocity">(sionna.rt.SceneObject property)</a>
+</li>
+      </ul></li>
       <li><a href="api/fec.utils.html#sionna.fec.utils.verify_gm_pcm">verify_gm_pcm() (in module sionna.fec.utils)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/rt.html#sionna.rt.antenna.visualize">visualize() (in module sionna.rt.antenna)</a>
 
       <ul>
@@ -2905,8 +3062,6 @@
         <li><a href="api/rt.html#sionna.rt.LambertianPattern.visualize">(sionna.rt.LambertianPattern method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/fec.conv.html#sionna.fec.conv.ViterbiDecoder">ViterbiDecoder (class in sionna.fec.conv)</a>
 </li>
   </ul></td>
@@ -2920,6 +3075,8 @@
       <li><a href="api/nr.html#sionna.nr.PUSCHDMRSConfig.w_t">w_t (sionna.nr.PUSCHDMRSConfig property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.Scene.wavelength">wavelength (sionna.rt.Scene property)</a>
+</li>
+      <li><a href="api/rt.html#sionna.rt.Scene.wavenumber">wavenumber (sionna.rt.Scene property)</a>
 </li>
       <li><a href="api/rt.html#sionna.rt.RadioMaterial.well_defined">well_defined (sionna.rt.RadioMaterial property)</a>
 </li>
@@ -2941,6 +3098,8 @@
         <li><a href="api/signal.html#sionna.signal.SincFilter.window">(sionna.signal.SincFilter property)</a>
 </li>
       </ul></li>
+      <li><a href="api/rt.html#sionna.rt.RIS.world_normal">world_normal (sionna.rt.RIS property)</a>
+</li>
       <li><a href="api/channel.wireless.html#sionna.channel.wrap_angle_0_360">wrap_angle_0_360() (in module sionna.channel)</a>
 </li>
   </ul></td>

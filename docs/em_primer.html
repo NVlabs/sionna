@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Primer on Electromagnetics &mdash; Sionna 0.17.0 documentation</title>
+  <title>Primer on Electromagnetics &mdash; Sionna 0.18.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
@@ -398,6 +398,18 @@
 <li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_Mobility.html#Summary">Summary</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html">Tutorial on Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Background-Information">Background Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Reproducing-Results-from-the-Literature">Reproducing Results from the Literature</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#RIS-with-Multiple-Reradiation-Modes">RIS with Multiple Reradiation Modes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Coverage-Enhancement-with-RIS">Coverage Enhancement with RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Gradient-Based-RIS-Optimization">Gradient-Based RIS Optimization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#Summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="examples/Sionna_Ray_Tracing_RIS.html#References">References</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -413,6 +425,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#reflection-and-refraction">Reflection and Refraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#diffraction">Diffraction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#scattering">Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/sionna.html">API Documentation</a><ul>
@@ -840,9 +853,21 @@
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#polarization-model-2">polarization_model_2</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="api/rt.html#reconfigurable-intelligent-surfaces-ris">Reconfigurable Intelligent Surfaces (RIS)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#ris">RIS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#phaseprofile">PhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#discretephaseprofile">DiscretePhaseProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#amplitudeprofile">AmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#discreteamplitudeprofile">DiscreteAmplitudeProfile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#profileinterpolator">ProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#lagrangeprofileinterpolator">LagrangeProfileInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#cellgrid">CellGrid</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api/rt.html#utility-functions">Utility Functions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#cross">cross</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#dot">dot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/rt.html#outer">outer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#normalize">normalize</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#phi-hat">phi_hat</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/rt.html#rotate">rotate</a></li>
@@ -1247,9 +1272,9 @@ V_\text{R} &amp;= \sqrt{\left(\frac{\lambda}{4\pi}\right)^2 G_\text{R}G_\text{T}
 <div class="math notranslate nohighlight">
 \[\mathbf{E}_\text{i} = E_{\text{i},s} \hat{\mathbf{e}}_{\text{i},s} + E_{\text{i},p} \hat{\mathbf{e}}_{\text{i},p}\]</div>
 <p>which are both orthogonal to the incident wave vector, i.e., <span class="math notranslate nohighlight">\(\hat{\mathbf{e}}_{\text{i},s}^{\mathsf{T}} \hat{\mathbf{e}}_{\text{i},p}=\hat{\mathbf{e}}_{\text{i},s}^{\mathsf{T}} \hat{\mathbf{k}}_\text{i}=\hat{\mathbf{e}}_{\text{i},p}^{\mathsf{T}} \hat{\mathbf{k}}_\text{i} =0\)</span>.</p>
-<div class="figure align-center" id="id29">
+<div class="figure align-center" id="id42">
 <span id="fig-reflection"></span><a class="reference internal image-reference" href="_images/reflection.svg"><img alt="_images/reflection.svg" src="_images/reflection.svg" width="90%" /></a>
-<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Reflection and refraction of a plane wave at a plane interface between two materials.</span><a class="headerlink" href="#id29" title="Permalink to this image"></a></p>
+<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Reflection and refraction of a plane wave at a plane interface between two materials.</span><a class="headerlink" href="#id42" title="Permalink to this image"></a></p>
 </div>
 <p><a class="reference internal" href="#fig-reflection"><span class="std std-numref">Fig. 1</span></a> shows reflection and refraction of the incoming wave at the plane interface between two materials with relative permittivities <span class="math notranslate nohighlight">\(\eta_1\)</span> and <span class="math notranslate nohighlight">\(\eta_2\)</span>. The coordinate system is chosen such that the wave vectors of the incoming, reflected, and transmitted waves lie within the plane of incidence, which is chosen to be the x-z plane. The normal vector of the interface <span class="math notranslate nohighlight">\(\hat{\mathbf{n}}\)</span> is pointing toward the negative z axis.
 The incoming wave is must be represented in a different basis, i.e., in the form two different orthogonal polarization components <span class="math notranslate nohighlight">\(E_{\text{i}, \perp}\)</span> and <span class="math notranslate nohighlight">\(E_{\text{i}, \parallel}\)</span>, i.e.,</p>
@@ -1269,7 +1294,7 @@ The incoming wave is must be represented in a different basis, i.e., in the form
         \hat{\mathbf{e}}_{\text{i},\parallel}^\mathsf{T}\hat{\mathbf{e}}_{\text{i},s} &amp; \hat{\mathbf{e}}_{\text{i},\parallel}^\mathsf{T}\hat{\mathbf{e}}_{\text{i},p}
     \end{bmatrix}
  \begin{bmatrix}E_{\text{i},s} \\ E_{\text{i},p}\end{bmatrix} =
- \mathbf{W}\left(\hat{\mathbf{e}}_{\text{i},\perp}, \hat{\mathbf{e}}_{\text{i},\parallel}, \hat{\mathbf{e}}_{\text{i},s}, \hat{\mathbf{e}}_{\text{i},p}\right)
+ \mathbf{W}\left(\hat{\mathbf{e}}_{\text{i},\perp}, \hat{\mathbf{e}}_{\text{i},\parallel}, \hat{\mathbf{e}}_{\text{i},s}, \hat{\mathbf{e}}_{\text{i},p}\right) \begin{bmatrix}E_{\text{i},s} \\ E_{\text{i},p}\end{bmatrix}
 \end{align}\end{split}\]</div>
 <p>where we have defined the following matrix-valued function</p>
 <div class="math notranslate nohighlight" id="equation-w">
@@ -1347,9 +1372,9 @@ The incoming wave is must be represented in a different basis, i.e., in the form
 <p>While modern geometrical optics (GO) <a class="reference internal" href="#kline" id="id9"><span>[Kline]</span></a>, <a class="reference internal" href="#luneberg" id="id10"><span>[Luneberg]</span></a> can accurately describe phase and polarization properties of electromagnetic fields undergoing reflection and refraction (transmission) as described above, they fail to account for the phenomenon of diffraction, e.g., bending of waves around corners. This leads to the undesired and physically incorrect effect that the field abruptly falls to zero at geometrical shadow boundaries (for incident and reflected fields).</p>
 <p>Joseph Keller presented in <a class="reference internal" href="#keller62" id="id11"><span>[Keller62]</span></a> a method which allowed the incorporation of diffraction into GO which is known as the geometrical theory of diffraction (GTD). He introduced the notion of diffracted rays that follow the law of edge diffraction, i.e., the diffracted and incident rays make the same angle with the edge at the point of diffraction and lie on opposite sides of the plane normal to the edge. The GTD suffers, however from several shortcomings, most importantly the fact that the diffracted field is infinite at shadow boundaries.</p>
 <p>The uniform theory of diffraction (UTD) <a class="reference internal" href="#kouyoumjian74" id="id12"><span>[Kouyoumjian74]</span></a> alleviates this problem and provides solutions that are uniformly valid, even at shadow boundaries. For a great introduction to the UTD, we refer to <a class="reference internal" href="#mcnamara90" id="id13"><span>[McNamara90]</span></a>. While <a class="reference internal" href="#kouyoumjian74" id="id14"><span>[Kouyoumjian74]</span></a> deals with diffraction at edges of perfectly conducting surfaces, it was heuristically extended to finitely conducting wedges in <a class="reference internal" href="#luebbers84" id="id15"><span>[Luebbers84]</span></a>. This solution, which is also recomended by the ITU <a class="reference internal" href="#iturp52615" id="id16"><span>[ITURP52615]</span></a>, is implemented in Sionna. However, both <a class="reference internal" href="#luebbers84" id="id17"><span>[Luebbers84]</span></a> and <a class="reference internal" href="#iturp52615" id="id18"><span>[ITURP52615]</span></a> only deal with two-dimensional scenes where source and observation lie in the same plane, orthogonal to the edge. We will provide below the three-dimensional version of <a class="reference internal" href="#luebbers84" id="id19"><span>[Luebbers84]</span></a>, following the defintitions of (Ch. 6) <a class="reference internal" href="#mcnamara90" id="id20"><span>[McNamara90]</span></a>. A similar result can be found, e.g., in (Eq. 6-29—6-39) <a class="reference internal" href="#metis" id="id21"><span>[METIS]</span></a>.</p>
-<div class="figure align-center" id="id30">
+<div class="figure align-center" id="id43">
 <span id="fig-kellers-cone"></span><a class="reference internal image-reference" href="_images/kellers_cone.svg"><img alt="_images/kellers_cone.svg" src="_images/kellers_cone.svg" width="80%" /></a>
-<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">Incident and diffracted rays for an infinitely long wedge in an edge-fixed coordinate system.</span><a class="headerlink" href="#id30" title="Permalink to this image"></a></p>
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">Incident and diffracted rays for an infinitely long wedge in an edge-fixed coordinate system.</span><a class="headerlink" href="#id43" title="Permalink to this image"></a></p>
 </div>
 <p>We consider an infinitely long wedge with unit norm edge vector <span class="math notranslate nohighlight">\(\hat{\mathbf{e}}\)</span>, as shown in <a class="reference internal" href="#fig-kellers-cone"><span class="std std-numref">Fig. 2</span></a>. An incident ray of a spherical wave with field phasor <span class="math notranslate nohighlight">\(\mathbf{E}_i(S')\)</span> at point <span class="math notranslate nohighlight">\(S'\)</span> propagates in the direction <span class="math notranslate nohighlight">\(\hat{\mathbf{s}}'\)</span> and is diffracted at point <span class="math notranslate nohighlight">\(Q_d\)</span> on the edge. The diffracted ray of interest (there are infinitely many on Keller’s cone) propagates
 in the direction <span class="math notranslate nohighlight">\(\hat{\mathbf{s}}\)</span> towards the point of observation <span class="math notranslate nohighlight">\(S\)</span>. We denote by <span class="math notranslate nohighlight">\(s'=\lVert S'-Q_d \rVert\)</span> and <span class="math notranslate nohighlight">\(s=\lVert Q_d - S\rVert\)</span> the lengths of the incident and diffracted path segments, respectively. By the law of edge diffraction, the angles <span class="math notranslate nohighlight">\(\beta_0'\)</span> and <span class="math notranslate nohighlight">\(\beta_0\)</span> between the edge and the incident and diffracted rays, respectively, satisfy:</p>
@@ -1367,9 +1392,9 @@ The corresponding component unit vectors are defined as</p>
     \hat{\boldsymbol{\beta}}_0 &amp;=  \hat{\boldsymbol{\phi}} \times \hat{\mathbf{s}}.
 \end{align}\end{split}\]</div>
 <p><a class="reference internal" href="#fig-diffraction"><span class="std std-numref">Fig. 3</span></a> below shows the top view on the wedge that we need for some additional definitions.</p>
-<div class="figure align-center" id="id31">
+<div class="figure align-center" id="id44">
 <span id="fig-diffraction"></span><a class="reference internal image-reference" href="_images/diffraction.svg"><img alt="_images/diffraction.svg" src="_images/diffraction.svg" width="80%" /></a>
-<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">Top view on the wedge with edge vector pointing upwards.</span><a class="headerlink" href="#id31" title="Permalink to this image"></a></p>
+<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">Top view on the wedge with edge vector pointing upwards.</span><a class="headerlink" href="#id44" title="Permalink to this image"></a></p>
 </div>
 <p>The wedge has two faces called <em>0-face</em> and <em>n-face</em>, respectively, with surface normal vectors <span class="math notranslate nohighlight">\(\hat{\mathbf{n}}_0\)</span> and <span class="math notranslate nohighlight">\(\hat{\mathbf{n}}_n\)</span>. The exterior wedge angle is <span class="math notranslate nohighlight">\(n\pi\)</span>, with <span class="math notranslate nohighlight">\(1\le n \le 2\)</span>. Note that the surfaces are chosen such that <span class="math notranslate nohighlight">\(\hat{\mathbf{e}} = \hat{\mathbf{n}}_0 \times \hat{\mathbf{n}}_n\)</span>. For <span class="math notranslate nohighlight">\(n=2\)</span>, the wedge reduces to a screen and the choice of the <em>0-face</em> and <em>n-face</em> is arbitrary as they point in opposite directions.</p>
 <p>The incident and diffracted rays have angles <span class="math notranslate nohighlight">\(\phi'\)</span> and <span class="math notranslate nohighlight">\(\phi\)</span> measured with respect to the <em>0-face</em> in the plane perpendicular to the edge.
@@ -1463,9 +1488,9 @@ We distinguish between two types of reflection, specular and diffuse. The former
 <div class="math notranslate nohighlight" id="equation-scattering-coefficient">
 <span class="eqno">(37)<a class="headerlink" href="#equation-scattering-coefficient" title="Permalink to this equation"></a></span>\[R = \sqrt{1-S^2}.\]</div>
 <p>Whenever a material has a scattering coefficient <span class="math notranslate nohighlight">\(S&gt;0\)</span>, the Fresnel reflection coefficents in <a class="reference internal" href="#equation-fresnel">(33)</a> must be multiplied by <span class="math notranslate nohighlight">\(R\)</span>. These <em>reduced</em> coefficients must then be also used in the compuation of the diffraction coefficients <a class="reference internal" href="#equation-diff-mat">(35)</a>.</p>
-<div class="figure align-center" id="id32">
+<div class="figure align-center" id="id45">
 <span id="fig-scattering"></span><a class="reference internal image-reference" href="_images/scattering.svg"><img alt="_images/scattering.svg" src="_images/scattering.svg" width="80%" /></a>
-<p class="caption"><span class="caption-number">Fig. 4 </span><span class="caption-text">Diffuse and specular reflection of an incoming wave.</span><a class="headerlink" href="#id32" title="Permalink to this image"></a></p>
+<p class="caption"><span class="caption-number">Fig. 4 </span><span class="caption-text">Diffuse and specular reflection of an incoming wave.</span><a class="headerlink" href="#id45" title="Permalink to this image"></a></p>
 </div>
 <p>Let us consider an incoming locally planar linearly polarized wave with field phasor <span class="math notranslate nohighlight">\(\mathbf{E}_\text{i}(\mathbf{q})\)</span> at the scattering point <span class="math notranslate nohighlight">\(\mathbf{q}\)</span> on the surface, as shown in <a class="reference internal" href="#fig-scattering"><span class="std std-numref">Fig. 4</span></a>. We focus on the scattered field of and infinitesimally small surface element <span class="math notranslate nohighlight">\(dA\)</span> in the direction <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_\text{s}\)</span>. Note that the surface normal <span class="math notranslate nohighlight">\(\hat{\mathbf{n}}\)</span> has an arbitrary orientation with respect to the global coordinate system, whose <span class="math notranslate nohighlight">\((x,y,z)\)</span> axes are shown in green dotted lines.
 The incoming field phasor can be represented by two arbitrary orthogonal polarization components (both orthogonal to the incoming wave vector <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_i\)</span>):</p>
@@ -1532,6 +1557,67 @@ This model adds a scattering lobe to the directive model described above which p
 <div class="math notranslate nohighlight">
 \[F_{\alpha, \beta}(\theta_i)^{-1} = \Lambda F_\alpha(\theta_i) + (1-\Lambda)F_\beta(\theta_i)\]</div>
 </div>
+</div>
+<div class="section" id="reconfigurable-intelligent-surfaces-ris">
+<span id="ris-primer"></span><h2>Reconfigurable Intelligent Surfaces (RIS)<a class="headerlink" href="#reconfigurable-intelligent-surfaces-ris" title="Permalink to this headline"></a></h2>
+<p>Metasurfaces can manipulate electromagnetic waves in a way that traditional materials cannot. For example, they can be used to create anomalous reflections, focalization, as well as polarization changes. A reconfigurable intelligent surface (RIS) is a special type of metasurface that can be dynamically controlled to achieve favorable propagation conditions in a specific enviroment. While many different ways to model RIS have been proposed in the literature <a class="reference internal" href="#di-renzo20" id="id29"><span>[Di-Renzo20]</span></a>, we adopt here the ones described in <a class="reference internal" href="#degli-esposti22" id="id30"><span>[Degli-Esposti22]</span></a> and <a class="reference internal" href="#vitucci24" id="id31"><span>[Vitucci24]</span></a>. The former will be used for the computation of channel impulse responses (CIRs) (see <a class="reference internal" href="api/rt.html#sionna.rt.Scene.compute_paths" title="sionna.rt.Scene.compute_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_paths()</span></code></a>) while the latter will serve for the computation of coverage maps (see <a class="reference internal" href="api/rt.html#sionna.rt.Scene.coverage_map" title="sionna.rt.Scene.coverage_map"><code class="xref py py-meth docutils literal notranslate"><span class="pre">coverage_map()</span></code></a>).</p>
+<p>We consider only lossless RIS, i.e., there is no power dissipation. For waves incident on the front side of an RIS, only the reradiated modes but neither specular nor diffuse reflections are created. For waves incident on the back side, an RIS behaves like a perfect absorber. For coverage maps, diffraction around the RIS’ edges is ignored.</p>
+<p>An RIS consists of a regular grid of unit cells which impose a spatial modulation, i.e., phase and amplitude changes, on an incident wave. This leads in turn to the creation of <span class="math notranslate nohighlight">\(M\ge 1\)</span> reradiated modes. Let us denote by <span class="math notranslate nohighlight">\((y,z)\)</span> a generic point on the RIS, and by <span class="math notranslate nohighlight">\(\chi_m(y,z)\)</span> and <span class="math notranslate nohighlight">\(A_m(y,z)\)</span> the phase and amplitude modulation coefficients of the <span class="math notranslate nohighlight">\(m\text{th}\)</span> reradiation mode, respectively. We assume that the RIS’ normal <span class="math notranslate nohighlight">\(\hat{\mathbf{n}}\)</span> points toward the positive <span class="math notranslate nohighlight">\(x\)</span>-axis.</p>
+<p>The spatial modulation coefficient <span class="math notranslate nohighlight">\(\Gamma(y,z)\)</span> is then given as (Eq.12) <a class="reference internal" href="#degli-esposti22" id="id32"><span>[Degli-Esposti22]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-spatial-modulation-coefficient">
+<span class="eqno">(43)<a class="headerlink" href="#equation-spatial-modulation-coefficient" title="Permalink to this equation"></a></span>\[\Gamma(y,z) = \sum_{m=1}^M \sqrt{p_m} A_m(y,z) e^{j \chi_m(y,z)}\]</div>
+<p>where <span class="math notranslate nohighlight">\(p_m\)</span> is the reradiation intensity coefficient of the <span class="math notranslate nohighlight">\(m\text{th}\)</span> mode. For power conservation reasons, we need to impose that <span class="math notranslate nohighlight">\(\sum_{m=1}^M p_m=1\)</span> and that the normalized surface integral of <span class="math notranslate nohighlight">\(|A_m(y,z)|^2\)</span> across the RIS equals one for all <span class="math notranslate nohighlight">\(m\)</span>.</p>
+<div class="figure align-center" id="id46">
+<span id="fig-ris"></span><a class="reference internal image-reference" href="_images/ris.svg"><img alt="_images/ris.svg" src="_images/ris.svg" width="50%" /></a>
+<p class="caption"><span class="caption-number">Fig. 5 </span><span class="caption-text">Incident and reradiated field from a reconfigurable intelligent surface (RIS).</span><a class="headerlink" href="#id46" title="Permalink to this image"></a></p>
+</div>
+<p>Consider now an RIS as shown in <a class="reference internal" href="#fig-ris"><span class="std std-numref">Fig. 5</span></a> with an incident electro-magnetic wave with field phasor <span class="math notranslate nohighlight">\(\mathbf{E}_i(S)\)</span> at point <span class="math notranslate nohighlight">\(S\in\mathbb{R}^3\)</span>, where <span class="math notranslate nohighlight">\(E_{i,\theta}(S)\)</span> and <span class="math notranslate nohighlight">\(E_{i,\varphi}(S)\)</span> denote the vertical and horizontal field components, respectively.  The reradiated field from the RIS at point <span class="math notranslate nohighlight">\(S'\)</span> is computed as (Eq.30) <a class="reference internal" href="#degli-esposti22" id="id33"><span>[Degli-Esposti22]</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-ris-field">
+<span class="eqno">(44)<a class="headerlink" href="#equation-ris-field" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+\mathbf{E}_r(S') =&amp; \sum_{u=1}^{N_Y}\sum_{v=1}^{N_Z} \Gamma(y_u, z_v) \frac{3\lambda}{16\pi} (1+\cos\theta_i(y_u, z_v)) (1+\cos\theta_r(y_u, z_v)) \\
+&amp;\quad \times \frac{e^{-jk_0(s_i(y_u, z_v) + s_r(y_u, z_v))}}{s_i(y_u, z_v) s_r(y_u, z_v)} \left( E_{i,\theta}(S) \hat{\boldsymbol{\theta}}(\hat{\mathbf{k}}_r(y_u,z_v))  + E_{i,\varphi}(S) \hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}}_r(y_u,z_v)) \right)
+\end{align}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(N_Y\)</span> and <span class="math notranslate nohighlight">\(N_Z\)</span> are the number of columns and rows of the regular grid of unit cells with coordinates <span class="math notranslate nohighlight">\((y_u, z_v)\)</span> for <span class="math notranslate nohighlight">\(1\leq u \leq N_Y\)</span> and <span class="math notranslate nohighlight">\(1\leq v \leq N_Z\)</span>, <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_i(y_u,z_v)\)</span> and  <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_r(y_u,z_v)\)</span> are the directions of the incident and reradiated waves at position <span class="math notranslate nohighlight">\((y_u,z_v)\)</span>, <span class="math notranslate nohighlight">\(\theta_i(y_u, z_v)\)</span>  and <span class="math notranslate nohighlight">\(\theta_r(y_u, z_v)\)</span> are the angles between the RIS’s normal and the incident and reradiated directions, respectively, and <span class="math notranslate nohighlight">\(s_i(y_u, z_v)\)</span> and <span class="math notranslate nohighlight">\(s_r(y_u, z_v)\)</span> are the distances between the unit cell <span class="math notranslate nohighlight">\((y_u, z_v)\)</span> and <span class="math notranslate nohighlight">\(S, S'\)</span>, respectively. With a slight abuse of notation, we denote by <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\theta}}(\hat{\mathbf{k}})\)</span> and <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}})\)</span> the spherical unit vectors <a class="reference internal" href="#equation-spherical-vecs">(1)</a> for angles defined by <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}\)</span> according to <a class="reference internal" href="#equation-theta-phi">(2)</a>. One can observe from the last equation that the RIS does not impact the polarization.
+Note that <a class="reference internal" href="#equation-ris-field">(44)</a> is only used in <a class="reference internal" href="api/rt.html#sionna.rt.Scene.compute_paths" title="sionna.rt.Scene.compute_paths"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_paths()</span></code></a> for the computation of the channel impulse response.</p>
+<div class="figure align-center" id="id47">
+<span id="fig-ris-ray"></span><a class="reference internal image-reference" href="_images/ris_ray.svg"><img alt="_images/ris_ray.svg" src="_images/ris_ray.svg" width="35%" /></a>
+<p class="caption"><span class="caption-number">Fig. 6 </span><span class="caption-text">An RIS anomalously reflects an incoming ray due to its phase gradient <span class="math notranslate nohighlight">\(\nabla\chi_m\)</span>.</span><a class="headerlink" href="#id47" title="Permalink to this image"></a></p>
+</div>
+<p>For the computation of coverage maps, the ray-based model from <a class="reference internal" href="#vitucci24" id="id34"><span>[Vitucci24]</span></a> is used. <a class="reference internal" href="#fig-ris-ray"><span class="std std-numref">Fig. 6</span></a> shows how an RIS anomalously reflects an incident ray, intersecting the RIS at point <span class="math notranslate nohighlight">\(\mathbf{q}\in\mathbb{R}^3\)</span> in the y-z plane.
+The incident ray with propagation direction <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_i\)</span>, representing a locally-plane wavefront, acquires an incident phase gradient <span class="math notranslate nohighlight">\(\nabla\chi_i\)</span> on the RIS’ surface which can be computed as (Eq.9) <a class="reference internal" href="#vitucci24" id="id35"><span>[Vitucci24]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-incident-phase-gradient">
+<span class="eqno">(45)<a class="headerlink" href="#equation-incident-phase-gradient" title="Permalink to this equation"></a></span>\[\nabla \chi_i = -k_0 \left(\mathbf{I} - \hat{\mathbf{n}}\hat{\mathbf{n}}^\textsf{T} \right) \hat{\mathbf{k}}_i.\]</div>
+<p>Each of the RIS’ reradiation modes gives rise to an additional phase gradient <span class="math notranslate nohighlight">\(\nabla\chi_m\)</span> at the point of intersection, which results in the total phase gradient (Eq.11) <a class="reference internal" href="#vitucci24" id="id36"><span>[Vitucci24]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-total-phase-gradient">
+<span class="eqno">(46)<a class="headerlink" href="#equation-total-phase-gradient" title="Permalink to this equation"></a></span>\[\nabla \chi(\mathbf{q}) =  \nabla \chi_i +  \nabla \chi_m(\mathbf{q}).\]</div>
+<p>It is this total phase gradient that determines the direction of the reflected ray <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_r\)</span>
+for reradiation mode <span class="math notranslate nohighlight">\(m\)</span> which can be computed as (Eq.13) <a class="reference internal" href="#vitucci24" id="id37"><span>[Vitucci24]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-ris-reflected-direction">
+<span class="eqno">(47)<a class="headerlink" href="#equation-ris-reflected-direction" title="Permalink to this equation"></a></span>\[\hat{\mathbf{k}}_r = -\frac{\nabla \chi(\mathbf{q})}{k_0} + \sqrt{1-\left\lVert\frac{\nabla \chi(\mathbf{q})}{k_0} \right\rVert^2} \hat{\mathbf{n}}.\]</div>
+<p>From the last equation, it becomes clear that the phase profile and its derivative must be computed at  arbitrary positions on the RIS’ surface. However, in Sionna RT, phase and amplitude profiles are only configured as discrete values on a regular grid with <span class="math notranslate nohighlight">\(\lambda/2\)</span> spacing. For this reason, the discrete profiles are interpolated using a <a class="reference internal" href="api/rt.html#sionna.rt.ProfileInterpolator" title="sionna.rt.ProfileInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProfileInterpolator</span></code></a>, such as the <a class="reference internal" href="api/rt.html#sionna.rt.LagrangeProfileInterpolator" title="sionna.rt.LagrangeProfileInterpolator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LagrangeProfileInterpolator</span></code></a>. It is important to keep in mind that the phase profile typically varies on the wavelength-scale across the RIS, and the amplitude profile at an even larger scale. Both profiles must be carefully chosen to represent a physically realistic device (see, e.g., the discussion after (Eq.16) <a class="reference internal" href="#vitucci24" id="id38"><span>[Vitucci24]</span></a> ).</p>
+<div class="figure align-center" id="id48">
+<span id="asticmatic-ray-tube"></span><a class="reference internal image-reference" href="_images/asticmatic_ray_tube.svg"><img alt="_images/asticmatic_ray_tube.svg" src="_images/asticmatic_ray_tube.svg" width="80%" /></a>
+<p class="caption"><span class="caption-number">Fig. 7 </span><span class="caption-text">Infinitely narrow asticmatic ray tube.</span><a class="headerlink" href="#id48" title="Permalink to this image"></a></p>
+</div>
+<p>A side-effect of the anomalous ray reflection is that the reflected wavefront generally has a different shape as that of the incoming wavefront. The shape of an astigmatic wave (or ray tube), as shown in <a class="reference internal" href="#asticmatic-ray-tube"><span class="std std-numref">Fig. 7</span></a>, is represented by the curvature matrix <span class="math notranslate nohighlight">\(\mathbf{Q}(s)\in\mathbb{R}^{3\times 3}\)</span> along its propagation path (see, e.g., (Appenix I) <a class="reference internal" href="#kouyoumjian74" id="id39"><span>[Kouyoumjian74]</span></a> ), which can be written as</p>
+<div class="math notranslate nohighlight" id="equation-curvature-matrix">
+<span class="eqno">(48)<a class="headerlink" href="#equation-curvature-matrix" title="Permalink to this equation"></a></span>\[\mathbf{Q}(s) = \frac{1}{\rho_1 + s} \hat{\mathbf{x}}_1\hat{\mathbf{x}}_1^\textsf{T} + \frac{1}{\rho_2 + s} \hat{\mathbf{x}}_2\hat{\mathbf{x}}_2^\textsf{T}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\rho_1\)</span> and <span class="math notranslate nohighlight">\(\rho_2\)</span> are the principal radii of curvature, and <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}_1\)</span>
+and <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}_2\)</span> are the corresponding principal directions; both orthogonal to the propagation direction <span class="math notranslate nohighlight">\(\mathbf{s}\)</span>, where <span class="math notranslate nohighlight">\(s\)</span> denotes a point on the ray with respect to a reference point <span class="math notranslate nohighlight">\(s=0\)</span>.</p>
+<p>For an incoming ray with curvature matrix <span class="math notranslate nohighlight">\(\mathbf{Q}_i(\mathbf{q})\)</span> at the intersection point, the curvature matrix <span class="math notranslate nohighlight">\(\mathbf{Q}_r(\mathbf{q})\)</span> of the outgoing ray can be computed as (Eq.22) <a class="reference internal" href="#vitucci24" id="id40"><span>[Vitucci24]</span></a></p>
+<div class="math notranslate nohighlight" id="equation-ris-curvature-matrix">
+<span class="eqno">(49)<a class="headerlink" href="#equation-ris-curvature-matrix" title="Permalink to this equation"></a></span>\[\mathbf{Q}_r(\mathbf{q}) = \mathbf{L}^\textsf{T}\left(\mathbf{Q}_i(\mathbf{q}) - \frac{1}{k_0}\mathbf{H}_{\chi_m}(\mathbf{q}) \right)\mathbf{L}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{H}_{\chi_m}(\mathbf{q})\in\mathbb{R}^{3\times 3}\)</span> is the Hessian matrix of the phase profile <span class="math notranslate nohighlight">\(\chi_m\)</span> at the intersection point and</p>
+<div class="math notranslate nohighlight" id="equation-ris-l-matrix">
+<span class="eqno">(50)<a class="headerlink" href="#equation-ris-l-matrix" title="Permalink to this equation"></a></span>\[\mathbf{L} = \mathbf{I}-\frac{\hat{\mathbf{k}}_r \hat{\mathbf{n}}^\textsf{T}}{\hat{\mathbf{k}}_r^\textsf{T}\hat{\mathbf{n}}}.\]</div>
+<p>The principal radii of curvature of the reflected ray <span class="math notranslate nohighlight">\(\rho_1^r\)</span> and <span class="math notranslate nohighlight">\(\rho_2^r\)</span> are the  non-zero eigenvalues of <span class="math notranslate nohighlight">\(\mathbf{Q}_r(\mathbf{q})\)</span> while the principal directions <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}_1^r\)</span> and <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}_2^r\)</span> are given by the associated eigenvectors.
+With these definitions, we are now able to express the reflected field at point <span class="math notranslate nohighlight">\(\mathbf{r} = \mathbf{q}+s\hat{\mathbf{k}}_r\)</span> as a function of the incoming field at point <span class="math notranslate nohighlight">\(\mathbf{q}\)</span> (Eq.23) <a class="reference internal" href="#vitucci24" id="id41"><span>[Vitucci24]</span></a>:</p>
+<div class="math notranslate nohighlight" id="equation-ris-ray-field">
+<span class="eqno">(51)<a class="headerlink" href="#equation-ris-ray-field" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+ \mathbf{E}_{r,m}(\mathbf{r}) =&amp;   \sqrt{p_m} A_m(\mathbf{q}) e^{j \chi_m(\mathbf{q})} \sqrt{\frac{\rho_1^r \rho_2^r}{(\rho_1^r + s)(\rho_2^r + s)}}  \\
+ &amp;\quad \times\left(E_{i,\theta}(\mathbf{q}) \hat{\boldsymbol{\theta}}(\hat{\mathbf{k}}_r) +  E_{i,\varphi}(\mathbf{q}) \hat{\boldsymbol{\varphi}}(\hat{\mathbf{k}}_r)\right) e^{-jk_0 s}
+\end{align}\end{split}\]</div>
+<p>where we have assumed, as in <a class="reference internal" href="#equation-ris-field">(44)</a>, that the RIS does not realize any polarization transformation.</p>
 <dl>
 <dt>References:</dt><dd><dl class="citation">
 <dt class="label" id="atan2"><span class="brackets"><a class="fn-backref" href="#id2">atan2</a></span></dt>
@@ -1547,6 +1633,12 @@ This model adds a scattering lobe to the directive model described above which p
 </dd>
 <dt class="label" id="degli-esposti11"><span class="brackets"><a class="fn-backref" href="#id25">Degli-Esposti11</a></span></dt>
 <dd><p>Vittorio Degli-Esposti et al., “<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/5979177">Analysis and Modeling on co- and Cross-Polarized Urban Radio Propagation for Dual-Polarized MIMO Wireless Systems</a>”, IEEE Trans. Antennas Propag, vol. 59, no. 11,  pp.4247-4256, Nov. 2011.</p>
+</dd>
+<dt class="label" id="degli-esposti22"><span class="brackets">Degli-Esposti22</span><span class="fn-backref">(<a href="#id30">1</a>,<a href="#id32">2</a>,<a href="#id33">3</a>)</span></dt>
+<dd><p>Vittorio Degli-Esposti et al., “<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/9713744">Reradiation and Scattering From a Reconfigurable Intelligent Surface: A General Macroscopic Model</a>”, IEEE Trans. Antennas Propag, vol. 70, no. 10,  pp.8691-8706, Oct. 2022.</p>
+</dd>
+<dt class="label" id="di-renzo20"><span class="brackets"><a class="fn-backref" href="#id29">Di-Renzo20</a></span></dt>
+<dd><p>Marco Di Renzo et al., “<a class="reference external" href="https://ieeexplore.ieee.org/document/9140329">Smart Radio Environments Empowered by Reconfigurable Intelligent Surfaces: How It Works, State of Research, and The Road Ahead</a>”, IEEE J. Sel. Areas Commun., vol. 38, no. 11 pp.2450-2525, Nov. 2020.</p>
 </dd>
 <dt class="label" id="fresnel"><span class="brackets"><a class="fn-backref" href="#id23">Fresnel</a></span></dt>
 <dd><p>Wikipedia, “<a class="reference external" href="https://en.wikipedia.org/wiki/Fresnel_integral">Fresnel integral</a>,” accessed 21 Apr. 2023.</p>
@@ -1565,7 +1657,7 @@ This model adds a scattering lobe to the directive model described above which p
 <li><p>Kline, “An Asymptotic Solution of Maxwell’s Equations,” Commun. Pure Appl. Math., vol. 4, 1951.</p></li>
 </ol>
 </dd>
-<dt class="label" id="kouyoumjian74"><span class="brackets">Kouyoumjian74</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id14">2</a>)</span></dt>
+<dt class="label" id="kouyoumjian74"><span class="brackets">Kouyoumjian74</span><span class="fn-backref">(<a href="#id12">1</a>,<a href="#id14">2</a>,<a href="#id39">3</a>)</span></dt>
 <dd><p>R.G. Kouyoumjian, “<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/1451581/authors#authors">A uniform geometrical theory of diffraction for an edge in a perfectly conducting surface</a>,” Proc. of the IEEE, vol. 62, no. 11, Nov. 1974.</p>
 </dd>
 <dt class="label" id="luebbers84"><span class="brackets">Luebbers84</span><span class="fn-backref">(<a href="#id15">1</a>,<a href="#id17">2</a>,<a href="#id19">3</a>)</span></dt>
@@ -1586,6 +1678,9 @@ This model adds a scattering lobe to the directive model described above which p
 <dd><ol class="upperalpha simple" start="4">
 <li><p>Tse, P. Viswanath, “<a class="reference external" href="https://web.stanford.edu/~dntse/wireless_book.html">Fundamentals of Wireless Communication</a>”, Cambridge University Press, 2005.</p></li>
 </ol>
+</dd>
+<dt class="label" id="vitucci24"><span class="brackets">Vitucci24</span><span class="fn-backref">(<a href="#id31">1</a>,<a href="#id34">2</a>,<a href="#id35">3</a>,<a href="#id36">4</a>,<a href="#id37">5</a>,<a href="#id38">6</a>,<a href="#id40">7</a>,<a href="#id41">8</a>)</span></dt>
+<dd><p>Enrico Maria Vittuci et al., “<a class="reference external" href="https://ieeexplore.ieee.org/abstract/document/10419169">An Efficient Ray-Based Modeling Approach for Scattering From Reconfigurable Intelligent Surfaces</a>”, IEEE Trans. Antennas Propag, vol. 72, no. 3,  pp.2673-2685, Mar. 2024.</p>
 </dd>
 <dt class="label" id="wiesbeck"><span class="brackets"><a class="fn-backref" href="#id1">Wiesbeck</a></span></dt>
 <dd><ol class="upperalpha simple" start="14">

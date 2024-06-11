@@ -695,7 +695,7 @@
     "It is important to understand that each layer is transmitted using a different DMRS port. That means that the number of DMRS ports is independent of the number of antenna ports.\n",
     "\n",
     "In the next cell, we will configure a single transmitter with four antenna ports, sending two layers on DMRS ports 0 and 1.\n",
-    "We can then choose among different precoding matrices with the help of the transmit transmit precoding matrix identifier (TPMI). "
+    "We can then choose among different precoding matrices with the help of the transmit precoding matrix identifier (TPMI). "
    ]
   },
   {
@@ -802,8 +802,8 @@
    "source": [
     "pusch_config.dmrs.additional_position = 1\n",
     "\n",
-    "# In order to reduce the number of figures, we only limit us here \n",
-    "# to the pilot pattern of the first stream\n",
+    "# In order to reduce the number of figures, we here only show \n",
+    "# the pilot pattern of the first stream\n",
     "PUSCHTransmitter(pusch_config).pilot_pattern.show(stream_ind = 0);"
    ]
   },
@@ -815,8 +815,8 @@
     "### How to control the number of available DMRS ports?\n",
     "\n",
     "There are two factors that determine the available number of DMRS ports, i.e., layers, that can be transmitted. \n",
-    "The first is the DMRS Configuration and the second the length of a DMRS symbol. Both parameters can take to values so that there are four options in total.\n",
-    "In the previous example, the DMRS Configuration Type 1 was used. In this case, there are two CDM groups and each groups uses either odd or even subcarriers. This leads to four available DMRS ports.\n",
+    "The first is the DMRS Configuration and the second the length of a DMRS symbol. Both parameters can take two values so that there are four options in total.\n",
+    "In the previous example, the DMRS Configuration Type 1 was used. In this case, there are two CDM groups and each group uses either odd or even subcarriers. This leads to four available DMRS ports.\n",
     "With DMRS Configuration Type 2, there are three CDM groups and each group uses two pairs of adjacent subcarriers per PRB, i.e., four pilot-carrying subcarriers. That means that there are six available DMRS ports.\n",
     "\n",
     "\n",
@@ -939,7 +939,7 @@
     "The pilot pattern is now composed of four 2x2 blocks within a PRB. These blocks are used by the four DMRS ports within the same CDM group. This means that we can now support up to twelve layers! \n",
     "\n",
     "Let's create a setup with three transmitters, each sending four layers using four antenna ports. We choose the DMRS ports for each transmitters such that they belong to the CDM group. This is not necessary and you are free to choose any desired allocation. \n",
-    "It is however important to understand, thet for channel estimation to work, the channel is supposed to be static over 2x2 blocks of resource elements. This is in general the case for low mobility scenarios and channels with not too large delay spread. You can see from the results below that the pilot sequences of the DMRS ports in the same CDM group are indeed orthogonal over the 2x2 blocks."
+    "It is however important to understand, that for channel estimation to work, the channel is supposed to be static over 2x2 blocks of resource elements. This is in general the case for low mobility scenarios and channels with not too large delay spread. You can see from the results below that the pilot sequences of the DMRS ports in the same CDM group are indeed orthogonal over the 2x2 blocks."
    ]
   },
   {
@@ -1192,7 +1192,7 @@
    "source": [
     "## Looking into the PUSCHTransmitter\n",
     "\n",
-    "We have used the ``PUSCHTransmitter`` class already multiple times without speaking about what it actually does. In short, it generates for every configured transmitter a batch of random information bits of length ``pusch_config.tb_size`` and outputs either a frequency fo time-domain representation of the transmitted OFDM waveform from each of the antenna ports of each transmitter.\n",
+    "We have used the ``PUSCHTransmitter`` class already multiple times without speaking about what it actually does. In short, it generates for every configured transmitter a batch of random information bits of length ``pusch_config.tb_size`` and outputs either a frequency to time-domain representation of the transmitted OFDM waveform from each of the antenna ports of each transmitter.\n",
     "\n",
     "However, under the hood it implements the sequence of layers shown in the following figure: "
    ]
@@ -1736,7 +1736,7 @@
     "We will now compare the PUSCH BLER performance over the 3GPP 38.901 UMi channel model with different detectors and either perfect or imperfect CSI.\n",
     "Note that these simulations might take some time depending or you available hardware. You can reduce the `batch_size` if the model does not fit into the memory of your GPU. Running the simulations in the time domain will significantly increase the complexity and you might need to decrease the `batch_size` further. The code will also run on CPU if not GPU is available. \n",
     "\n",
-    "Note that the XLA compilation step can take several minutes (but the simulations will be much quicker compared to eager or graph mode.\n",
+    "Note that the XLA compilation step can take several minutes, but the simulations will be much faster compared to eager or graph mode.\n",
     "\n",
     "If you do not want to run the simulation yourself, you can skip the next cell and visualize the results in the next cell."
    ]
@@ -1911,12 +1911,6 @@
     "\n",
     "Please have a look at the [API documentation](https://nvlabs.github.io/sionna/api/sionna.html) of the various components or the other available [tutorials](https://nvlabs.github.io/sionna/tutorials.html) to learn more."
    ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "468507f5",
-   "metadata": {},
-   "source": []
   }
  ],
  "metadata": {
