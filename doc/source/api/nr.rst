@@ -106,6 +106,18 @@ PUSCHTransmitter
    :exclude-members: build, call
    :members:
 
+PUSCHTransformDeprecoder
+------------------------
+.. autoclass:: sionna.nr.PUSCHTransformDeprecoder
+   :exclude-members: call
+   :members:
+
+PUSCHTransformPrecoder
+----------------------
+.. autoclass:: sionna.nr.PUSCHTransformPrecoder
+   :exclude-members: call
+   :members:
+
 
 Transport Block
 ***************

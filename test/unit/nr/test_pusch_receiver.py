@@ -43,7 +43,7 @@ def run_test(pusch_configs, channel_estimator="perfect", domain="freq", num_rx=1
     stream_management = None
     if num_rx==2:
         rx_tx_association = np.eye(2, dtype=bool)
-        stream_management = StreamManagement(rx_tx_association, pusch_config.num_layers)
+        stream_management = StreamManagement(rx_tx_association, pusch_configs[0].num_layers)
 
     pusch_receiver = PUSCHReceiver(pusch_transmitter,
                                    stream_management=stream_management,
@@ -288,4 +288,15 @@ class TestPUSCHReceiver(unittest.TestCase):
         ber = run_test(pusch_configs, channel_estimator="perfect", domain="time", dtype=tf.complex128)
         self.assertEqual(ber, 0.0)
         ber = run_test(pusch_configs, channel_estimator=None, domain="time", dtype=tf.complex128)
+        self.assertEqual(ber, 0.0)
+
+    def test_08(self):
+        """Transform precoding"""
+        tf.random.set_seed(1)
+        pusch_config = PUSCHConfig()
+        pusch_config.n_size_bwp = 273
+        pusch_config.tb.mcs_index = 16
+        pusch_config.transform_precoding = True
+        pusch_configs = [pusch_config]
+        ber = run_test(pusch_configs, channel_estimator=None, batch_size=2)
         self.assertEqual(ber, 0.0)

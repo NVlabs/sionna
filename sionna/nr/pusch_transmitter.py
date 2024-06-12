@@ -14,6 +14,7 @@ from .config import Config
 from .pusch_config import PUSCHConfig, check_pusch_configs
 from .pusch_pilot_pattern import PUSCHPilotPattern
 from .pusch_precoder import PUSCHPrecoder
+from .pusch_transform_precoder import PUSCHTransformPrecoder
 from .tb_encoder import TBEncoder
 from .layer_mapping import LayerMapper
 
@@ -169,8 +170,14 @@ class PUSCHTransmitter(Layer):
                             num_tx=self._num_tx,
                             num_streams_per_tx=self._num_layers,
                             cyclic_prefix_length=self._cyclic_prefix_length,
+                            num_guard_carriers=(0, self._num_subcarriers - self._num_effective_subcarriers),
                             pilot_pattern=self._pilot_pattern,
                             dtype=dtype)
+
+        # Create PUSCHTransformPrecoder
+        if self._transform_precoding:
+            self._transform_precoder = PUSCHTransformPrecoder(self.resource_grid.num_effective_subcarriers,
+                                                              dtype=dtype)
 
         # Create ResourceGridMapper
         self._resource_grid_mapper = ResourceGridMapper(self._resource_grid,
@@ -227,8 +234,14 @@ class PUSCHTransmitter(Layer):
         # Map to layers
         x_layer = self._layer_mapper(x_map)
 
+        # (Optionally) apply PUSCH transform precoding (DFT-s-OFDM)
+        if self._transform_precoding:
+            x_trans_pre = self._transform_precoder(x_layer)
+        else:
+            x_trans_pre = x_layer
+
         # Apply resource grid mapping
-        x_grid = self._resource_grid_mapper(x_layer)
+        x_grid = self._resource_grid_mapper(x_trans_pre)
 
         # (Optionally) apply PUSCH precoding
         if self._precoding=="codebook":

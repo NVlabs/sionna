@@ -6,8 +6,9 @@
 """
 # pylint: disable=line-too-long
 
+import functools
 import numpy as np
-from .utils import generate_prng_seq
+from .utils import generate_prng_seq, generate_low_papr_seq_type_1
 from .config import Config
 from sionna import nr
 from .utils import calculate_tb_size
@@ -233,7 +234,7 @@ class PUSCHConfig(Config):
             assert value in range(65536), "n_rnti must be in [0, 65535]"
         self._n_rnti = value
 
-    #---transform_precoding---#
+    #---precoding---#
     @property
     def precoding(self):
         """
@@ -427,9 +428,9 @@ class PUSCHConfig(Config):
             used for DMRS generation
         """
         if self.dmrs.config_type==1:
-            n_max = self.num_resource_blocks*12//4 -1
+            n_max = self.num_effective_subcarriers//4 -1
         elif self.dmrs.config_type==2:
-            n_max = self.num_resource_blocks*12//6 -1
+            n_max = self.num_effective_subcarriers//6 -1
         return list(range(n_max+1))
 
     @property
@@ -451,12 +452,48 @@ class PUSCHConfig(Config):
             return self.n_size_bwp
 
     @property
+    def num_effective_resource_blocks(self):
+        """
+        int, read-only : Number of allocated resource blocks for the
+            PUSCH transmissions, that are actually used (can differ from
+            num_subcarriers when transform precoding is enabled,
+            because of constraints on the largest prime factor of the
+            subcarrier count)
+        """
+        @functools.lru_cache
+        def adjust_prbs_to_prime_factor_constraints(prbs):
+            # Decreases the number of PRBs until the largest prime factor is at most 5
+            for eff_prbs in range(prbs, 1, -1):
+                n = eff_prbs
+                for p in [2, 3, 5]:
+                    while n % p == 0:
+                        n /= p
+                if n == 1:
+                    return eff_prbs
+
+        if self.transform_precoding:
+            return adjust_prbs_to_prime_factor_constraints(self.num_resource_blocks)
+        else:
+            return self.num_resource_blocks
+
+    @property
     def num_subcarriers(self):
         """
         int, read-only : Number of allocated subcarriers for the
             PUSCH transmissions
         """
         return 12*self.num_resource_blocks
+
+    @property
+    def num_effective_subcarriers(self):
+        """
+        int, read-only : Number of allocated subcarriers for the
+            PUSCH transmissions, that are actually used (can differ from
+            num_subcarriers when transform precoding is enabled,
+            because of constraints on the largest prime factor of the
+            subcarrier count)
+        """
+        return 12 * self.num_effective_resource_blocks
 
     @property
     def num_res_per_prb(self):
@@ -488,7 +525,7 @@ class PUSCHConfig(Config):
             resource elements in the resource grid. `True` corresponds to
             resource elements on which no data is transmitted.
         """
-        mask = np.zeros([self.num_subcarriers,
+        mask = np.zeros([self.num_effective_subcarriers,
                          self.carrier.num_symbols_per_slot],
                          dtype=bool)
 
@@ -503,7 +540,7 @@ class PUSCHConfig(Config):
                 cdm_ind[:,i] = np.array([0,1, 6, 7])+2*i
 
         for i in self.dmrs_symbol_indices:
-            for j in range(self.num_resource_blocks):
+            for j in range(self.num_effective_resource_blocks):
                 for k in range(num_cdm_groups):
                     mask[cdm_ind[:, k] + 12*j, i] = True
         return mask
@@ -518,7 +555,7 @@ class PUSCHConfig(Config):
             This property returns for each configured DMRS port an empty
             resource grid filled with DMRS signals as defined in
             Section 6.4.1.1 [3GPP38211]. Not all possible options are implemented,
-            e.g., frequency hopping and transform precoding are not available.
+            e.g., frequency hopping is not available.
 
             This property provides the *unprecoded* DMRS for each configured DMRS port.
             Precoding might be applied to map the DMRS to the antenna ports. However,
@@ -536,7 +573,7 @@ class PUSCHConfig(Config):
 
         # Generate empty resource grid for each port
         a_tilde = np.zeros([len(self.dmrs.dmrs_port_set),
-                            self.num_subcarriers,
+                            self.num_effective_subcarriers,
                             self.carrier.num_symbols_per_slot],
                             dtype=complex)
 
@@ -546,15 +583,23 @@ class PUSCHConfig(Config):
             # For every l_prime
             for l_prime in self.l_prime:
 
-                # Compute c_init
                 l = l_bar + l_prime
-                c_init = self.c_init(l)
 
-                # Generate RNG
-                c = generate_prng_seq(2*self.num_subcarriers, c_init=c_init)
+                if self.transform_precoding:
+                    if self.dmrs.n_sid is None:
+                        n_id = self.carrier.n_cell_id
+                    else:
+                        n_id = self.dmrs.n_sid
+                    r = generate_low_papr_seq_type_1(self.num_effective_subcarriers // 2, n_id % 30, 0, 0)
+                else:
+                    # Compute c_init
+                    c_init = self.c_init(l)
 
-                # Map to QAM
-                r = 1/np.sqrt(2)*((1-2*c[::2]) + 1j*(1-2*c[1::2]))
+                    # Generate RNG
+                    c = generate_prng_seq(2*self.num_effective_subcarriers, c_init=c_init)
+
+                    # Map to QAM
+                    r = 1/np.sqrt(2)*((1-2*c[::2]) + 1j*(1-2*c[1::2]))
 
                 # For every port in the dmrs port set
                 for j_ind, _ in enumerate(self.dmrs.dmrs_port_set):
@@ -625,8 +670,38 @@ class PUSCHConfig(Config):
 
                 w /= np.sqrt(2)
 
+            # Table 6.3.1.5-2
+            elif self.transform_precoding and self.num_antenna_ports == 4:
+                w = np.zeros([28, 4, 1], complex)
+
+                # TPMI index 0-7
+                w[:8,0,0] = [  1,  0,  0,  0,  1,  1,  1,  1]
+                w[:8,1,0] = [  0,  1,  0,  0,  0,  0,  0,  0]
+                w[:8,2,0] = [  0,  0,  1,  0,  1, -1, 1j,-1j]
+                w[:8,3,0] = [  0,  0,  0,  1,  0,  0,  0,  0]
+
+                # TPMI index 8-15
+                w[8:16,0,0] = [  0,  0,  0,  0,  1,  1,  1,  1]
+                w[8:16,1,0] = [  1,  1,  1,  1,  1,  1,  1,  1]
+                w[8:16,2,0] = [  0,  0,  0,  0,  1, 1j, -1,-1j]
+                w[8:16,3,0] = [  1, -1, 1j,-1j, -1, 1j,  1,-1j]
+
+                # TPMI index 16-23
+                w[16:24,0,0] = [  1,  1,  1,  1,  1,  1,  1,  1]
+                w[16:24,1,0] = [ 1j, 1j, 1j, 1j, -1, -1, -1, -1]
+                w[16:24,2,0] = [  1, 1j, -1,-1j,  1, 1j, -1,-1j]
+                w[16:24,3,0] = [ 1j,  1,-1j, -1,  1,-1j, -1, 1j]
+
+                # TPMI index 24-27
+                w[24:28,0,0] = [  1,  1,  1,  1]
+                w[24:28,1,0] = [-1j,-1j,-1j,-1j]
+                w[24:28,2,0] = [  1, 1j, -1,-1j]
+                w[24:28,3,0] = [-1j, -1, 1j,  1]
+
+                w /= 2
+
             # Table 6.3.1.5-3
-            elif self.num_antenna_ports==4:
+            elif not self.transform_precoding and self.num_antenna_ports==4:
                 w = np.zeros([28,4,1], complex)
 
                 # TPMI index 0-7
@@ -825,7 +900,7 @@ class PUSCHConfig(Config):
         n_re_per_prb = self.num_res_per_prb - self.num_ov
 
         # number of allocated REs
-        n_re = n_re_per_prb * self.num_resource_blocks
+        n_re = n_re_per_prb * self.num_effective_resource_blocks
 
         # total number of bits per slot
         num_coded_bits = int(self.tb.tb_scaling * self.tb.num_bits_per_symbol \
@@ -842,7 +917,7 @@ class PUSCHConfig(Config):
 
         # number of allocated REs
         # the max. number of REs per PRB is limited to 156 in 38.214
-        n_re = min(156, n_re_per_prb) * self.num_resource_blocks
+        n_re = min(156, n_re_per_prb) * self.num_effective_resource_blocks
 
         # include tb_scaling as defined in Tab. 5.1.3.2-2 38.214
         target_tb_size = int(self.tb.target_coderate * self.tb.tb_scaling \
@@ -923,6 +998,14 @@ class PUSCHConfig(Config):
             # Check that num_layers==num_antenna_ports
             assert self.num_layers == self.num_antenna_ports,\
                 "num_layers must be == num_antenna_ports"
+
+        if self.transform_precoding:
+            assert self.num_layers == 1,\
+                "When transform precoding is used, only a single MIMO layer is supported"
+            assert self.dmrs.config_type == 1, \
+                "When transform precoding is used, DMRS config type must be 1"
+            assert self.dmrs.num_cdm_groups_without_data == 2, \
+                "When transform precoding is used, num_cdm_groups_without_data must be 2"
 
         # Check Tables 6.4.1.1.3-3/4 are valid
         if self.dmrs.length==1:
@@ -1033,11 +1116,13 @@ def check_pusch_configs(pusch_configs):
         "num_tx" : len(pusch_configs),
         "num_layers" : pc.num_layers,
         "num_subcarriers" : pc.num_subcarriers,
+        "num_effective_subcarriers": pc.num_effective_subcarriers,
         "num_ofdm_symbols" : pc.symbol_allocation[1],
         "subcarrier_spacing" : pc.carrier.subcarrier_spacing*1e3,
         "num_antenna_ports" : pc.num_antenna_ports,
         "precoding" : pc.precoding,
         "precoding_matrices" : [],
+        "transform_precoding" : pc.transform_precoding,
         "pusch_config" : pc,
         "carrier_config" : pc.carrier,
         "num_coded_bits" : pc.num_coded_bits,

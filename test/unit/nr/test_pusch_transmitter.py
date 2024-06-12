@@ -76,3 +76,22 @@ class TestPUSCHTransmitter(unittest.TestCase):
         for i in range(0,83):
             test_name = f"unit/nr/pusch_test_configs/test_{i}"
             self.assertTrue(run_test(test_name))
+
+    def test_against_reference_transform_precoding(self):
+        """Test PUSCHTransmitter output against reference MATLAB implementation
+        with transform precoding enabled"""
+        pusch_config = PUSCHConfig()
+        pusch_config.carrier.subcarrier_spacing = 30
+        pusch_config.carrier.n_size_grid = 273
+        pusch_config.carrier.n_cell_id = 1
+        pusch_config.n_rnti = 42
+        pusch_config.tb.mcs_index = 9
+        pusch_config.transform_precoding = True
+        pusch_config.dmrs.n_sid = 3
+
+        ref_data = np.load("unit/nr/pusch_transmitter_transform_precoding.npz")
+
+        pusch_transmitter = PUSCHTransmitter(pusch_config, return_bits=False)
+        x_grid = pusch_transmitter(ref_data["bits"])
+
+        np.testing.assert_array_almost_equal(x_grid, ref_data["grid"])
