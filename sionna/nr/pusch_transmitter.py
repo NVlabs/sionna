@@ -183,7 +183,13 @@ class PUSCHTransmitter(Layer):
 
         # (Optionally) Create OFDMModulator
         if self._output_domain=="time":
-            self._ofdm_modulator = OFDMModulator(self._cyclic_prefix_length)
+            symbols_per_block = (self._carrier_config.num_slots_per_subframe *
+                             self._carrier_config.num_symbols_per_slot // 2)
+            self._ofdm_modulator = OFDMModulator(
+                cyclic_prefix_length=self._cyclic_prefix_length,
+                cyclic_prefix_length_first_symbol=
+                    self._cyclic_prefix_length_first_symbol,
+                symbols_per_block=symbols_per_block)
 
     #########################################
     # Public methods and properties

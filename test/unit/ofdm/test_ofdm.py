@@ -50,6 +50,35 @@ class TestOFDMModulator(unittest.TestCase):
         with self.assertRaises(AssertionError):
             x_time = modulator(x)
 
+    def test_nonuniform_cyclic_prefix(self):
+        batch_size = 64
+        fft_size = 128
+        num_ofdm_symbols = 14
+        cp_length_first_symbol = 24
+        cp_length_other_symbols = 16
+
+        for symbols_per_block in [7, 10, 20]:
+            modulator = OFDMModulator(cp_length_other_symbols, cp_length_first_symbol,
+                                      symbols_per_block)
+            qam_source = QAMSource(4)
+            x = qam_source([batch_size, num_ofdm_symbols, fft_size])
+            x_time = modulator(x)
+
+            x_np = x.numpy()
+            x_np = np.fft.ifft(np.fft.ifftshift(x_np, axes=-1), norm="ortho")
+            x_time_np = np.empty(shape=(batch_size, 0))
+            for i in range(num_ofdm_symbols):
+                if i % symbols_per_block == 0:
+                    x_time_np = np.concatenate([x_time_np,
+                                                x_np[..., i, -cp_length_first_symbol:],
+                                                x_np[..., i, :]], axis=-1)
+                else:
+                    x_time_np = np.concatenate([x_time_np,
+                                                x_np[..., i, -cp_length_other_symbols:],
+                                                x_np[..., i, :]], axis=-1)
+
+            np.testing.assert_array_almost_equal(x_time, x_time_np)
+
     def test_higher_dimensions(self):
         batch_size = [64, 12, 6]
         fft_size = 72
@@ -75,6 +104,25 @@ class TestOFDMDemodulator(unittest.TestCase):
             x_time = modulator(x)
             x_hat = demodulator(x_time)
             self.assertTrue(np.max(np.abs(x-x_hat))<1e-6)
+
+    def test_nonuniform_cyclic_prefix(self):
+        batch_size = 64
+        fft_size = 128
+        num_ofdm_symbols = 14
+        cp_length_first_symbol = 24
+        cp_length_other_symbols = 16
+
+        for symbols_per_block in [7, 10, 20]:
+            modulator = OFDMModulator(cp_length_other_symbols,
+                cp_length_first_symbol, symbols_per_block)
+            demodulator = OFDMDemodulator(fft_size, 0, cp_length_other_symbols,
+                                          cp_length_first_symbol, symbols_per_block)
+            qam_source = QAMSource(4)
+            x = qam_source([batch_size, num_ofdm_symbols, fft_size])
+            x_time = modulator(x)
+            x_hat = demodulator(x_time)
+
+            np.testing.assert_array_almost_equal(x, x_hat)
 
     def test_higher_dimensions(self):
         batch_size = [64, 12, 6]
@@ -105,7 +153,7 @@ class TestOFDMDemodulator(unittest.TestCase):
 
 class TestOFDMModDemod(unittest.TestCase):
     def test_end_to_end(self):
-        """E2E test verying that all shapes can be properly inferred (see Issue #7)"""
+        """E2E test verifying that all shapes can be properly inferred (see Issue #7)"""
         class E2ESystem(Model):
             def __init__(self, cp_length, padding):
                 super().__init__()
@@ -115,12 +163,12 @@ class TestOFDMModDemod(unittest.TestCase):
                 self.num_ofdm_symbols = 14
                 self.qam = QAMSource(4)
                 self.mod = OFDMModulator(self.cp_length)
-                self.demod  = OFDMDemodulator(self.fft_size, 0, self.cp_length)
+                self.demod = OFDMDemodulator(self.fft_size, 0, self.cp_length)
 
             @tf.function(jit_compile=True)
             def call(self, batch_size):
                 x_rg = self.qam([batch_size, 1, 1, self.num_ofdm_symbols, self.fft_size])
-                x_time  = self.mod(x_rg)
+                x_time = self.mod(x_rg)
                 pad = tf.zeros_like(x_time)[...,:self.padding]
                 x_time = tf.concat([x_time, pad], axis=-1)
                 x_f = self.demod(x_time)
@@ -184,7 +232,7 @@ class TestResourceGridDemapper(unittest.TestCase):
             x_rg = rg_mapper(x)
             x_time = modulator(x_rg)
             y = demodulator(x_time)
-            # Stack inputs to ResourceGridDemppaer to simulate the data_dim dimension
+            # Stack inputs to ResourceGridDemapper to simulate the data_dim dimension
             y = tf.stack([y,y,y], axis=-1)
             x_hat = rg_demapper(y)
             x = tf.stack([x,x,x], axis=-1)

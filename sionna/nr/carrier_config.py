@@ -244,15 +244,27 @@ class CarrierConfig(Config):
     @property
     def cyclic_prefix_length(self):
         r"""
-        float, read-only : Cyclic prefix length
+        float, read-only : Cyclic prefix length of all symbols except for the
+            first symbol in each half subframe
             :math:`N_{\text{CP},l}^{\mu} \cdot T_{\text{c}}` [s]
         """
         if self.cyclic_prefix=="extended":
-            cp =  512*self.kappa*2**(-self.mu)
+            cp = 512*self.kappa*2**(-self.mu)
         else:
             cp = 144*self.kappa*2**(-self.mu)
-            if self.slot_number in [0, 7*2**self.mu]:
-                cp += 16*self.kappa
+        return cp*self.t_c
+
+    @property
+    def cyclic_prefix_length_first_symbol(self):
+        r"""
+        float, read-only : Cyclic prefix length of first symbol in each
+            half subframe
+            :math:`N_{\text{CP},l}^{\mu} \cdot T_{\text{c}}` [s]
+        """
+        if self.cyclic_prefix=="extended":
+            cp = 512*self.kappa*2**(-self.mu)
+        else:
+            cp = 144*self.kappa*2**(-self.mu) + 16*self.kappa
         return cp*self.t_c
 
     #-------------------#

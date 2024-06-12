@@ -156,10 +156,16 @@ class PUSCHReceiver(Layer):
             assert l_min is not None, \
                 "l_min must be provided for input_domain==time"
             self._l_min = l_min
+            symbols_per_block = (
+                pusch_transmitter._carrier_config.num_slots_per_subframe *
+                pusch_transmitter._carrier_config.num_symbols_per_slot // 2)
             self._ofdm_demodulator = OFDMDemodulator(
                 fft_size=pusch_transmitter._num_subcarriers,
                 l_min=self._l_min,
-                cyclic_prefix_length=pusch_transmitter._cyclic_prefix_length)
+                cyclic_prefix_length=pusch_transmitter._cyclic_prefix_length,
+                cyclic_prefix_length_first_symbol=
+                    pusch_transmitter._cyclic_prefix_length_first_symbol,
+                symbols_per_block=symbols_per_block)
 
         # Use or create default ChannelEstimator
         self._perfect_csi = False
