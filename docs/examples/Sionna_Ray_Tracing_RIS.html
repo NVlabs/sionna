@@ -1309,9 +1309,9 @@ div.rendered_html tbody tr:hover {
 </div>
 <div class="section" id="Background-Information">
 <h2>Background Information<a class="headerlink" href="#Background-Information" title="Permalink to this headline"></a></h2>
-<p>For background information on reconfigurable intelligent surfaces (RIS), we refer to the relevant sections of the <a class="reference external" href="https://nvlabs.github.io/sionna/em_primer.htmll#reconfigurable-intelligent-surfaces-ris">EM Primer</a> and the <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.htm#reconfigurable-intelligent-surfaces-ris">API Documentation</a>.</p>
+<p>For background information on reconfigurable intelligent surfaces (RIS), we refer to the relevant sections of the <a class="reference external" href="https://nvlabs.github.io/sionna/em_primer.html#reconfigurable-intelligent-surfaces-ris">EM Primer</a> and the <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#reconfigurable-intelligent-surfaces-ris">API Documentation</a>.</p>
 <p>RIS are modeled in Sionna as radio devices, like transmitters and receivers, which can be placed at arbitrary positions in a scene.</p>
-<p>Every RIS has a <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.htm#sionna.rt.PhaseProfile">phase profile</a> and an <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.htm#sionna.rt.AmplitdueProfile">amplitude profile</a> which determine together the reradiated electro-magnetic field. These profiles are assumed to be discrete, i.e., a unique value can be configured for a regular grid of points (or unit cells) on the RIS with <span class="math notranslate nohighlight">\(\lambda/2\)</span> spacing. These values are then interpolated to obtain continuous phase
+<p>Every RIS has a <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.PhaseProfile">phase profile</a> and an <a class="reference external" href="https://nvlabs.github.io/sionna/api/rt.html#sionna.rt.AmplitdueProfile">amplitude profile</a> which determine together the reradiated electro-magnetic field. These profiles are assumed to be discrete, i.e., a unique value can be configured for a regular grid of points (or unit cells) on the RIS with <span class="math notranslate nohighlight">\(\lambda/2\)</span> spacing. These values are then interpolated to obtain continuous phase
 and amplitude profiles over the RIS.</p>
 <p>Most properties of RIS can be made trainable by assigning a <a class="reference external" href="https://www.tensorflow.org/api_docs/python/tf/Variable">tf.Variable</a> to them.</p>
 <p>The computation of propagation paths assumes the model from <a class="reference external" href="#References">[1]</a> while coverage maps are based on <a class="reference external" href="#References">[2]</a>.</p>
@@ -1439,7 +1439,7 @@ and amplitude profiles over the RIS.</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-RIS size (width, height) [m]:  [6.9951572 6.9951572]
+RIS size (width, height) [m]:  [6.9951577 6.9951577]
 Number of cells:  19600
 Velocity vector [m/s]:  [0. 0. 0.]
 </pre></div></div>
@@ -1461,8 +1461,8 @@ Velocity vector [m/s]:  [0. 0. 0.]
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-&lt;sionna.rt.ris.DiscretePhaseProfile object at 0x7f734c2519c0&gt;
-&lt;sionna.rt.ris.DiscreteAmplitudeProfile object at 0x7f734c251900&gt;
+&lt;sionna.rt.ris.DiscretePhaseProfile object at 0x7f30f5180dc0&gt;
+&lt;sionna.rt.ris.DiscreteAmplitudeProfile object at 0x7f30f5180e80&gt;
 </pre></div></div>
 </div>
 <p>Each profile is defined by a tensor of shape <code class="docutils literal notranslate"><span class="pre">[num_modes,</span> <span class="pre">num_rows,</span> <span class="pre">num_cols]</span></code> containing either amplitude or phase values [rad] for every reradiation mode. Let us inspect the default values of these tensors.</p>
@@ -1782,7 +1782,7 @@ difference between both results becomes smaller in the far field.</p>
 <span class="n">ris</span><span class="o">.</span><span class="n">phase_gradient_reflector</span><span class="p">(</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
 
 <span class="c1"># Compute coverage map without RIS</span>
-<span class="n">cm_no_ris</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">coverage_map</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mf">10e6</span><span class="p">,</span>
+<span class="n">cm_no_ris</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">coverage_map</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span> <span class="c1">#increase for better resolution</span>
                         <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                         <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1796,7 +1796,7 @@ difference between both results becomes smaller in the far field.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Coverage without RIS&quot;</span><span class="p">);</span>
 
 <span class="c1"># Compute coverage map with RIS</span>
-<span class="n">cm_ris</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">coverage_map</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mf">10e6</span><span class="p">,</span>
+<span class="n">cm_ris</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">coverage_map</span><span class="p">(</span><span class="n">num_samples</span><span class="o">=</span><span class="mf">2e6</span><span class="p">,</span> <span class="c1">#increase for better resolution</span>
                         <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                         <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -1822,9 +1822,11 @@ difference between both results becomes smaller in the far field.</p>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area docutils container">
-<img alt="../_images/examples_Sionna_Ray_Tracing_RIS_31_0.png" src="../_images/examples_Sionna_Ray_Tracing_RIS_31_0.png" />
-</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipykernel_221734/1079635823.py:58: RuntimeWarning: divide by zero encountered in log10
+  plt.imshow(10*np.log10(cm_ris._value[0]/cm_no_ris._value[0]), origin=&#39;lower&#39;, vmin=0)
+</pre></div></div>
 </div>
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
@@ -1833,11 +1835,18 @@ difference between both results becomes smaller in the far field.</p>
 <img alt="../_images/examples_Sionna_Ray_Tracing_RIS_31_1.png" src="../_images/examples_Sionna_Ray_Tracing_RIS_31_1.png" />
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <img alt="../_images/examples_Sionna_Ray_Tracing_RIS_31_2.png" src="../_images/examples_Sionna_Ray_Tracing_RIS_31_2.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_Sionna_Ray_Tracing_RIS_31_3.png" src="../_images/examples_Sionna_Ray_Tracing_RIS_31_3.png" />
 </div>
 </div>
 <p>As expected, the coverage has significantly improved in a small area around the receiver. We can also visualize the coverage map together with the RIS as follows:</p>
