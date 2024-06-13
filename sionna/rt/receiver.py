@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -40,9 +40,9 @@ class Receiver(RadioDevice):
         This parameter is ignored if ``look_at`` is not `None`.
         Defaults to [0,0,0].
 
-    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | None
+    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | None
         A position or the instance of a :class:`~sionna.rt.Transmitter`,
-        :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
+        :class:`~sionna.rt.Receiver`, :class:`~sionna.rt.RIS`, or :class:`~sionna.rt.Camera` to look at.
         If set to `None`, then ``orientation`` is used to orientate the device.
 
     color : [3], float

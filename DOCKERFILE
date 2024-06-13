@@ -1,9 +1,12 @@
-FROM tensorflow/tensorflow:2.13.0-gpu-jupyter
+FROM tensorflow/tensorflow:2.15.0-gpu-jupyter
 EXPOSE 8888
 COPY . /tmp/
 WORKDIR /tmp/
 RUN make install
-RUN apt-get install llvm -y
+RUN apt-get update && \
+    apt-get install llvm -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/apt/
 RUN pip install --upgrade ipykernel
 RUN pip install --upgrade jupyterlab
 RUN rm -R /tf/* && cp /tmp/examples/* /tf

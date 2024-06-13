@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Integration tests for MIMO OFDM transmissions over the CDL channel model"""
@@ -22,7 +22,7 @@ try:
     import sionna
 except ImportError as e:
     import sys
-    sys.path.append("../../")
+    sys.path.append("../")
 
 import sionna
 import numpy as np

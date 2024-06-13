@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -9,18 +9,20 @@ receiver.
 
 import tensorflow as tf
 
-from .oriented_object import OrientedObject
+from .object import Object
 from .utils import normalize, theta_phi_from_unit_vec
 from sionna.constants import PI
 
 
-class RadioDevice(OrientedObject):
+class RadioDevice(Object):
     # pylint: disable=line-too-long
     r"""RadioDevice(name, position, orientation=[0.,0.,0.], look_at=None, dtype=tf.complex64)
 
     Class defining a generic radio device.
 
-    :class:`~sionna.rt.Transmitter` and :class:`~sionna.rt.Receiver`
+    :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`,
+    and :class:`~sionna.rt.RIS`
+
     inherit from this class and should be used.
 
     Parameters
@@ -38,9 +40,9 @@ class RadioDevice(OrientedObject):
         This parameter is ignored if ``look_at`` is not `None`.
         Defaults to [0,0,0].
 
-    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | None
+    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | None
         A position or the instance of a :class:`~sionna.rt.Transmitter`,
-        :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
+        :class:`~sionna.rt.Receiver`, :class:`~sionna.rt.RIS`, or :class:`~sionna.rt.Camera` to look at.
         If set to `None`, then ``orientation`` is used to orientate the device.
 
     color : [3], float
@@ -54,23 +56,25 @@ class RadioDevice(OrientedObject):
 
     def __init__(self,
                  name,
-                 position,
+                 position=None,
                  orientation=(0.,0.,0.),
                  look_at=None,
                  color=(0,0,0),
-                 dtype=tf.complex64):
+                 dtype=tf.complex64,
+                 **kwargs):
 
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
         self._dtype = dtype
         self._rdtype = dtype.real_dtype
-        self.position = position
-        self.orientation = orientation
         self.color = color
 
-        # Initialize the base class OrientedObject
         # Position and orientation are set through this call
-        super().__init__(name, position, orientation, look_at)
+        super().__init__(name=name,
+                         position=position,
+                         orientation=orientation,
+                         look_at=look_at,
+                         **kwargs)
 
     @property
     def position(self):
@@ -112,7 +116,7 @@ class RadioDevice(OrientedObject):
         # pylint: disable=line-too-long
         r"""
         Sets the orientation so that the x-axis points toward a
-        position, radio device, or camera.
+        position, radio device, RIS, or camera.
 
         Given a point :math:`\mathbf{x}\in\mathbb{R}^3` with spherical angles
         :math:`\theta` and :math:`\varphi`, the orientation of the radio device
@@ -120,19 +124,20 @@ class RadioDevice(OrientedObject):
 
         Input
         -----
-        target : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | str
+        target : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | str
             A position or the name or instance of a
-            :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`, or
+            :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`,
+            :class:`~sionna.rt.RIS`, or
             :class:`~sionna.rt.Camera` in the scene to look at.
         """
         # Get position to look at
         if isinstance(target, str):
             obj = self.scene.get(target)
-            if not isinstance(obj, OrientedObject):
-                raise ValueError(f"No camera or device named '{target}' found.")
+            if not isinstance(obj, Object):
+                raise ValueError(f"No camera, device, or object named '{target}' found.")
             else:
                 target = obj.position
-        elif isinstance(target, OrientedObject):
+        elif isinstance(target, Object):
             target = target.position
         else:
             target = tf.cast(target, dtype=self._rdtype)
