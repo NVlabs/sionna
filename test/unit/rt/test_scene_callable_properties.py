@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -102,16 +102,21 @@ class TestSceneCallableProp(unittest.TestCase):
 
             def __init__(self, test_class):
 
+                floor_id = objects_id['floor']
+                wall_id = objects_id['wall']
+                size = np.maximum(floor_id, wall_id) + 1
+                indices = [[floor_id], [wall_id]]
+
                 # Use the materials complex relative permittivities
-                etas = {objects_id['floor'] : scene.radio_materials[rms['floor']].complex_relative_permittivity,
-                        objects_id['wall'] : scene.radio_materials[rms['wall']].complex_relative_permittivity}
-                s = {objects_id['floor'] : scs['floor'],
-                    objects_id['wall'] : scs['wall']}
-                x = {objects_id['floor'] : xpd['floor'],
-                    objects_id['wall'] : xpd['wall']}
-                self._etas = tf.stack([etas[0], etas[1]], axis=0)
-                self._s = tf.stack([s[0], s[1]], axis=0)
-                self._x = tf.stack([x[0], x[1]], axis=0)
+                etas = {floor_id : scene.radio_materials[rms['floor']].complex_relative_permittivity,
+                        wall_id : scene.radio_materials[rms['wall']].complex_relative_permittivity}
+                s = {floor_id : scs['floor'],
+                    wall_id : scs['wall']}
+                x = {floor_id : xpd['floor'],
+                    wall_id : xpd['wall']}
+                self._etas = tf.scatter_nd(indices, [etas[floor_id], etas[wall_id]], [size])
+                self._s = tf.scatter_nd(indices, [s[floor_id], s[wall_id]], [size])
+                self._x = tf.scatter_nd(indices, [x[floor_id], x[wall_id]], [size])
 
                 self.test_class = test_class
 
@@ -208,16 +213,21 @@ class TestSceneCallableProp(unittest.TestCase):
 
             def __init__(self, test_class):
 
+                floor_id = objects_id['floor']
+                wall_id = objects_id['wall']
+                size = np.maximum(floor_id, wall_id) + 1
+                indices = [[floor_id], [wall_id]]
+
                 # Use the materials complex relative permittivities
-                etas = {objects_id['floor'] : scene.radio_materials[rms['floor']].complex_relative_permittivity,
-                        objects_id['wall'] : scene.radio_materials[rms['wall']].complex_relative_permittivity}
-                s = {objects_id['floor'] : scs['floor'],
-                    objects_id['wall'] : scs['wall']}
-                x = {objects_id['floor'] : xpd['floor'],
-                    objects_id['wall'] : xpd['wall']}
-                self._etas = tf.stack([etas[0], etas[1]], axis=0)
-                self._s = tf.stack([s[0], s[1]], axis=0)
-                self._x = tf.stack([x[0], x[1]], axis=0)
+                etas = {floor_id : scene.radio_materials[rms['floor']].complex_relative_permittivity,
+                        wall_id : scene.radio_materials[rms['wall']].complex_relative_permittivity}
+                s = {floor_id : scs['floor'],
+                     wall_id : scs['wall']}
+                x = {floor_id : xpd['floor'],
+                     wall_id : xpd['wall']}
+                self._etas = tf.scatter_nd(indices, [etas[floor_id], etas[wall_id]], [size])
+                self._s = tf.scatter_nd(indices, [s[floor_id], s[wall_id]], [size])
+                self._x = tf.scatter_nd(indices, [x[floor_id], x[wall_id]], [size])
 
                 self.test_class = test_class
 

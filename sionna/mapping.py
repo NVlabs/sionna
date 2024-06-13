@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layers for (de)mapping, constellation class, and utility functions"""
@@ -365,7 +365,9 @@ class Constellation(Layer):
             x = x - tf.reduce_mean(x)
         if self._normalize:
             energy = tf.reduce_mean(tf.square(tf.abs(x)))
-            energy_sqrt = tf.cast(tf.sqrt(energy), self._dtype)
+            energy_sqrt = tf.complex(tf.sqrt(energy),
+                                     tf.constant(0.,
+                                    dtype=tf.as_dtype(self._dtype).real_dtype))
             x = x / energy_sqrt
         return x
 
@@ -980,6 +982,8 @@ class Demapper(Layer):
                                               dtype.real_dtype,
                                               **kwargs)
 
+        self._no_threshold = tf.cast(np.finfo(dtype.as_numpy_dtype).tiny, dtype.real_dtype)
+
     @property
     def constellation(self):
         return self._constellation
@@ -1001,6 +1005,8 @@ class Demapper(Layer):
         # Add a dummy dimension for broadcasting. This is not needed when no
         # is a scalar, but also does not do any harm.
         no = tf.expand_dims(no, axis=-1)
+        # Deal with zero or very small values.
+        no = tf.math.maximum(no, self._no_threshold)
 
         # Compute exponents
         exponents = -squared_dist/no

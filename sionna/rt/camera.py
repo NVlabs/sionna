@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -7,12 +7,12 @@ Implements a camera for rendering of the scene.
 A camera defines a viewpoint for rendering.
 """
 
-from .oriented_object import OrientedObject
+from .object import Object
 import mitsuba as mi
 import numpy as np
 
 
-class Camera(OrientedObject):
+class Camera(Object):
     # pylint: disable=line-too-long
     r"""Camera(name, position, orientation=[0.,0.,0.], look_at=None)
 
@@ -38,10 +38,10 @@ class Camera(OrientedObject):
         This parameter is ignored if ``look_at`` is not `None`.
         Defaults to `[0,0,0]`.
 
-    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.Camera` | None
-        A position or instance of :class:`~sionna.rt.Transmitter`,
-        :class:`~sionna.rt.Receiver`, or :class:`~sionna.rt.Camera` to look at.
-        If set to `None`, then ``orientation`` is used to orientate the camera.
+    look_at : [3], float | :class:`~sionna.rt.Transmitter` | :class:`~sionna.rt.Receiver` | :class:`~sionna.rt.RIS` | :class:`~sionna.rt.Camera` | None
+        A position or the instance of a :class:`~sionna.rt.Transmitter`,
+        :class:`~sionna.rt.Receiver`, :class:`~sionna.rt.RIS`, or :class:`~sionna.rt.Camera` to look at.
+        If set to `None`, then ``orientation`` is used to orientate the device.
     """
 
     # The convention of Mitsuba for camera is Y as up and look toward Z+.
@@ -59,7 +59,6 @@ class Camera(OrientedObject):
         # Initialized to identity.
         self._to_world = mi.ScalarTransform4f()
 
-        # Initialize the base class OrientedObject
         # Position and orientation are set through this call
         super().__init__(name, position, orientation, look_at)
 
@@ -134,7 +133,7 @@ class Camera(OrientedObject):
                        " is not part of the scene"
                 raise ValueError(msg)
             item = self.scene.get(target)
-            if not isinstance(item, OrientedObject):
+            if not isinstance(item, Object):
                 msg = f"No radio device or camera named '{target}' found."
                 raise ValueError(msg)
             else:

@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -46,7 +46,7 @@ class ScatteringPattern(ABC):
     Input
     -----
     k_i : [batch_size, 3], dtype.real_dtype
-        Tensor of incomning directions
+        Tensor of incoming directions
 
     k_s : [batch_size,3], dtype.real_dtype
         Tensor of outgoing directions

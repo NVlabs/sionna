@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -163,13 +163,13 @@ class PathsTmpData:
     def to_dict(self):
         # pylint: disable=line-too-long
         r"""
-        Returns the properties of the paths as a dictionnary which values are
+        Returns the properties of the paths as a dictionary which values are
         tensors
 
         Output
         -------
         : `dict`
-            Dictionnary defining the paths
+            Dictionary defining the paths
         """
         members_names = dir(self)
         members_objects = [getattr(self, attr) for attr in members_names]
@@ -183,9 +183,9 @@ class PathsTmpData:
     def from_dict(self, data_dict):
         # pylint: disable=line-too-long
         r"""
-        Set the paths from a dictionnary which values are tensors
+        Set the paths from a dictionary which values are tensors
 
-        The format of the dictionnary is expected to be the same as the one
+        The format of the dictionary is expected to be the same as the one
         returned by :meth:`~sionna.rt.Paths.to_dict()`.
 
         Input
@@ -330,6 +330,9 @@ class SolverPaths(SolverBase):
         if set to `True`, then the scattered paths are computed.
         Only works with the Fibonacci method.
 
+    ris : bool
+        If set to `True`, then the paths involving RIS are computed.
+
     scat_keep_prob : float
         Probability with which to keep scattered paths.
         This is helpful to reduce the number of scattered paths computed,
@@ -352,7 +355,8 @@ class SolverPaths(SolverBase):
 
 
     def trace_paths(self, max_depth, method, num_samples, los, reflection,
-                 diffraction, scattering, scat_keep_prob, edge_diffraction):
+                    diffraction, scattering, ris, scat_keep_prob,
+                    edge_diffraction):
         # pylint: disable=line-too-long
         r"""
         Traces the paths.
@@ -393,6 +397,9 @@ class SolverPaths(SolverBase):
             if set to `True`, then the scattered paths are computed.
             Only works with the Fibonacci method.
 
+        ris : bool
+            If set to `True`, then the paths involving RIS are computed.
+
         scat_keep_prob : float
             Probability with which to keep scattered paths.
             This is helpful to reduce the number of scattered paths computed,
@@ -414,6 +421,12 @@ class SolverPaths(SolverBase):
         scat_paths : Paths
             The computed scattered paths
 
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
         spec_paths_tmp : PathsTmpData
             Additional data required to compute the EM fields of the specular
             paths
@@ -425,8 +438,11 @@ class SolverPaths(SolverBase):
         scat_paths_tmp : PathsTmpData
             Additional data required to compute the EM fields of the scattered
             paths
-        """
 
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
+        """
         scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
         # Disable scattering if the probability of keeping a path is 0
         scattering = tf.logical_and(scattering,
@@ -484,6 +500,11 @@ class SolverPaths(SolverBase):
             # [num_targets = num_rx*rx_array_size, 3]
             targets = tf.reshape(targets, [-1, 3])
 
+        ##############################################
+        # Builds the Mitsuba scene with RIS for
+        # testing intersections with RIS
+        ##############################################
+        mi_ris_scene = self._build_mi_ris_objects()
 
         ##############################################
         # Generate candidate paths
@@ -518,7 +539,7 @@ class SolverPaths(SolverBase):
             #     Coordinates of the intersection points.
             output = self._list_candidates_fibonacci(max_depth,
                                         sources, num_samples, los, reflection,
-                                        scattering)
+                                        scattering, mi_ris_scene)
             candidates = output[0]
             los_prim = output[1]
             candidates_scat = output[2]
@@ -537,7 +558,8 @@ class SolverPaths(SolverBase):
 
             # Using the image method, computes the non-obstructed specular paths
             # interacting with the ``candidates`` primitives
-            self._spec_image_method(candidates, spec_paths, spec_paths_tmp)
+            self._spec_image_method(candidates, spec_paths, spec_paths_tmp,
+                                    mi_ris_scene)
 
             # Compute paths length, delays, angles and directions of arrivals
             # and departures for the specular paths
@@ -589,7 +611,8 @@ class SolverPaths(SolverBase):
                 diff_wedges_indices, diff_vertices =\
                     self._check_wedges_visibility(targets, sources,
                                                   diff_wedges_indices,
-                                                  diff_vertices)
+                                                  diff_vertices,
+                                                  mi_ris_scene)
 
             diff_paths = Paths(sources=sources, targets=targets,
                                scene=self._scene, types=Paths.DIFFRACTED)
@@ -615,7 +638,8 @@ class SolverPaths(SolverBase):
 
             scat_paths, scat_paths_tmp = self._scat_test_rx_blockage(targets,sources,
                                                                 candidates_scat,
-                                                                hit_points)
+                                                                hit_points,
+                                                                mi_ris_scene)
             scat_paths, scat_paths_tmp =\
                 self._compute_directions_distances_delays_angles(scat_paths,
                                                                  scat_paths_tmp,
@@ -636,11 +660,24 @@ class SolverPaths(SolverBase):
         scat_paths_tmp.num_samples = num_samples
         scat_paths_tmp.scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
 
-        return spec_paths, diff_paths, scat_paths, spec_paths_tmp,\
-            diff_paths_tmp, scat_paths_tmp
+        ##############################################
+        # RIS paths
+        ##############################################
+        ris_paths = Paths(sources=sources, targets=targets, scene=self._scene,
+                           types=Paths.RIS)
+        ris_paths_tmp = PathsTmpData(sources, targets, self._dtype)
 
-    def compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp,
-        diff_paths_tmp, scat_paths_tmp, scat_random_phases, testing):
+        if ris and len(self._scene.ris)>0:
+            ris_paths, ris_paths_tmp = self._ris_paths(ris_paths,
+                                                       ris_paths_tmp,
+                                                       mi_ris_scene)
+
+        return spec_paths, diff_paths, scat_paths, ris_paths, spec_paths_tmp,\
+            diff_paths_tmp, scat_paths_tmp, ris_paths_tmp
+
+    def compute_fields(self, spec_paths, diff_paths, scat_paths, ris_paths,
+                       spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
+                       ris_paths_tmp, scat_random_phases, testing):
         r"""
         Computes the EM fields for a set of traced paths.
 
@@ -655,6 +692,12 @@ class SolverPaths(SolverBase):
         scat_paths : Paths
             Scattered paths
 
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
+        ris_paths : :class:`~sionna.rt.Paths`
+            Computed paths involving RIS
+
         spec_paths_tmp : PathsTmpData
             Additional data required to compute the EM fields of the specular
             paths
@@ -666,6 +709,14 @@ class SolverPaths(SolverBase):
         scat_paths_tmp : PathsTmpData
             Additional data required to compute the EM fields of the scattered
             paths
+
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
+
+        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the paths
+            involving RIS
 
         scat_random_phases : bool
             If set to `True` and if scattering is enabled, random uniform phase
@@ -683,7 +734,7 @@ class SolverPaths(SolverBase):
             Coordinates of the targets
 
         list : Paths as a list
-            The computed paths as a dictionnary of tensors, i.e., the output of
+            The computed paths as a dictionary of tensors, i.e., the output of
             `Paths.to_dict()`.
             Returning the paths as a list of tensors is required to enable
             the execution of this function in graph mode.
@@ -732,7 +783,7 @@ class SolverPaths(SolverBase):
 
         # Returns: relative_permittivities, denoted by `etas`,
         # scattering_coefficients, xpd_coefficients,
-        # alpha_r, alpha_i and lambda_
+        # alpha_r, alpha_i, lambda_, and velocities
         object_properties = self._build_scene_object_properties_tensors()
         etas = object_properties[0]
         scattering_coefficient = object_properties[1]
@@ -740,6 +791,7 @@ class SolverPaths(SolverBase):
         alpha_r = object_properties[3]
         alpha_i = object_properties[4]
         lambda_ = object_properties[5]
+        velocity = object_properties[6]
 
         ##############################################
         # LoS and Specular paths
@@ -747,12 +799,16 @@ class SolverPaths(SolverBase):
 
         if spec_paths.objects.shape[3] > 0:
 
-            # Compute the EM transition matrices
+            # Compute the EM transition matrices and Doppler shifts
             spec_mat_t = self._spec_transition_matrices(etas,
                     scattering_coefficient, spec_paths, spec_paths_tmp, False)
+            spec_paths.doppler = self._compute_doppler_shifts(spec_paths,
+                                                              spec_paths_tmp,
+                                                              velocity)
             all_paths = all_paths.merge(spec_paths)
-            # Only the transition matrix and vector of incidence/reflection are
-            # required for the computation of the paths coefficients
+            # Only the transition matrix, vector of incidence/reflection, and
+            # Doppler shifts are required for the computation of the paths
+            # coefficients
             all_paths_tmp.mat_t = tf.concat([all_paths_tmp.mat_t, spec_mat_t],
                                             axis=-3)
             all_paths_tmp.k_tx = tf.concat([all_paths_tmp.k_tx,
@@ -771,10 +827,13 @@ class SolverPaths(SolverBase):
 
         if diff_paths.objects.shape[3] > 0:
 
-            # Compute the transition matrices
+            # Compute the transition matrices and Doppler shifts
             diff_mat_t =\
                 self._compute_diffraction_transition_matrices(etas,
                             scattering_coefficient, diff_paths, diff_paths_tmp)
+            diff_paths.doppler = self._compute_doppler_shifts(diff_paths,
+                                                              diff_paths_tmp,
+                                                              velocity)
             all_paths = all_paths.merge(diff_paths)
             # Only the transition matrix and vector of incidence/reflection are
             # required for the computation of the paths coefficients
@@ -797,8 +856,12 @@ class SolverPaths(SolverBase):
         if scat_paths.objects.shape[3] > 0:
 
             # Compute transition matrices up to the scattering point
+            # as well as Doppler shifts
             scat_mat_t = self._spec_transition_matrices(etas,
                     scattering_coefficient, scat_paths, scat_paths_tmp, True)
+            scat_paths.doppler = self._compute_doppler_shifts(scat_paths,
+                                                              scat_paths_tmp,
+                                                              velocity)
 
             all_paths = all_paths.merge(scat_paths)
             # The transition matrix and vector of incidence/reflection are
@@ -823,6 +886,31 @@ class SolverPaths(SolverBase):
             # If testing, the transition matrices are also returned
             if testing:
                 scat_paths_tmp.mat_t = scat_mat_t
+
+        ############################################
+        # RIS paths
+        ############################################
+        if ris_paths.objects.shape[3] > 0:
+            # Compute the transition matrices and Doppler shifts
+            ris_mat_t = self._ris_transition_matrices(ris_paths, ris_paths_tmp)
+            ris_paths.doppler = self._compute_doppler_shifts(ris_paths,
+                                                             ris_paths_tmp,
+                                                             velocity)
+
+            all_paths = all_paths.merge(ris_paths)
+            # Only the transition matrix and vector of incidence/reflection are
+            # required for the computation of the paths coefficients
+            all_paths_tmp.mat_t = tf.concat([all_paths_tmp.mat_t, ris_mat_t],
+                                            axis=-3)
+            all_paths_tmp.k_tx = tf.concat([all_paths_tmp.k_tx,
+                                            ris_paths_tmp.k_tx],
+                                           axis=-2)
+            all_paths_tmp.k_rx = tf.concat([all_paths_tmp.k_rx,
+                                            ris_paths_tmp.k_rx],
+                                           axis=-2)
+            # If testing, the transition matrices are also returned
+            if testing:
+                ris_paths_tmp.mat_t = ris_mat_t
 
         #################################################
         # Splitting the sources (targets) dimension into
@@ -854,13 +942,13 @@ class SolverPaths(SolverBase):
             all_paths.phi_t = tf.reshape(all_paths.phi_t, batch_dims)
             all_paths.theta_r = tf.reshape(all_paths.theta_r, batch_dims)
             all_paths.phi_r = tf.reshape(all_paths.phi_r, batch_dims)
+            all_paths.doppler = tf.reshape(all_paths.doppler, batch_dims)
             # [num_rx, rx_array_size, num_tx, tx_array_size, max_num_paths, 2,2]
             all_paths_tmp.mat_t = tf.reshape(all_paths_tmp.mat_t,
                                              batch_dims + [2,2])
             # [num_rx, rx_array_size, num_tx, tx_array_size, max_num_paths, 3]
             all_paths_tmp.k_tx = tf.reshape(all_paths_tmp.k_tx, batch_dims+[3])
             all_paths_tmp.k_rx = tf.reshape(all_paths_tmp.k_rx, batch_dims+[3])
-
         ####################################################
         # Compute the channel coefficients
         ####################################################
@@ -877,7 +965,7 @@ class SolverPaths(SolverBase):
                                                        lambda_, scat_keep_prob,
                                                        scat_random_phases)
 
-        # If using synthetic array, adds the antenna dimentions by applying
+        # If using synthetic array, adds the antenna dimensions by applying
         # synthetic phase shifts
         if self._scene.synthetic_array:
             all_paths.a = self._apply_synthetic_array(rx_rot_mat, tx_rot_mat,
@@ -903,6 +991,8 @@ class SolverPaths(SolverBase):
                                      axis=5)
             phi_r = tf.expand_dims(tf.expand_dims(all_paths.phi_r, axis=2),
                                    axis=5)
+            doppler = tf.expand_dims(tf.expand_dims(all_paths.doppler, axis=2),
+                                   axis=5)
             # [num_rx, num_rx_patterns, rx_array_size, num_tx, num_tx_patterns,
             #   tx_array_size, max_num_paths]
             mask = tf.tile(mask, [1, num_rx_patterns, 1, 1, num_tx_patterns,
@@ -917,6 +1007,8 @@ class SolverPaths(SolverBase):
                                         num_tx_patterns, 1, 1])
             phi_r = tf.tile(phi_r, [1, num_rx_patterns, 1, 1,
                                     num_tx_patterns, 1, 1])
+            doppler = tf.tile(doppler, [1, num_rx_patterns, 1, 1,
+                                    num_tx_patterns, 1, 1])
             # [num_rx, num_rx_ant = num_rx_patterns*num_rx_ant,
             #   ... num_tx, num_tx_ant = num_tx_patterns*tx_array_size,
             #   ... max_num_paths]
@@ -926,6 +1018,7 @@ class SolverPaths(SolverBase):
             all_paths.phi_t = flatten_dims(flatten_dims(phi_t, 2, 1), 2, 3)
             all_paths.theta_r = flatten_dims(flatten_dims(theta_r, 2, 1), 2, 3)
             all_paths.phi_r = flatten_dims(flatten_dims(phi_r, 2, 1), 2, 3)
+            all_paths.doppler = flatten_dims(flatten_dims(doppler, 2, 1), 2, 3)
 
         # If testing, additinal data is returned
         if testing:
@@ -936,7 +1029,6 @@ class SolverPaths(SolverBase):
                         scat_paths_tmp.to_dict() )
         else:
             output = (sources, targets, all_paths.to_dict())
-
         return output
 
     ##################################################################
@@ -1078,7 +1170,7 @@ class SolverPaths(SolverBase):
         return all_candidates, los_candidates
 
     def _list_candidates_fibonacci(self, max_depth, sources, num_samples,
-                                   los, reflection, scattering):
+                                   los, reflection, scattering, mi_ris_scene):
         r"""
         Generate potential candidate paths made of reflections only and the
         LoS. Rays direction are arranged in a Fibonacci lattice on the unit
@@ -1114,6 +1206,9 @@ class SolverPaths(SolverBase):
 
         scattering : bool
             if set to `True`, then the scattered paths are computed
+
+        mi_ris_scene : mi.Scene
+            Mistuba scene containing the RIS
 
         Output
         -------
@@ -1180,8 +1275,17 @@ class SolverPaths(SolverBase):
                 # Intersect ray against the scene to find the next hitted
                 # primitive
                 si = self._mi_scene.ray_intersect(ray, active)
+                # Required to split the kernel as intersections are next tested
+                # with another scene
+                dr.eval(si)
+                # Intersect with the RIS
+                si_ris = mi_ris_scene.ray_intersect(ray, active)
+                dr.eval(si_ris)
 
-                active &= si.is_valid()
+                # Intersection valid if not obstructed by RIS
+                valid_int = si.is_valid() & (si.t < si_ris.t)
+
+                active &= valid_int
 
                 # Record which primitives were hit
                 shape_i = dr.gather(mi.Int32, self._shape_indices,
@@ -1294,11 +1398,10 @@ class SolverPaths(SolverBase):
             max_depth = 0
 
         # Remove duplicates
-        if max_depth_ref > 0:
-            candidates_ref, _ = tf.raw_ops.UniqueV2(
-                x=candidates_ref,
-                axis=[1]
-            )
+        candidates_ref, _ = tf.raw_ops.UniqueV2(
+            x=candidates_ref,
+            axis=[1]
+        )
 
         # Add line-of-sight to list of candidates for reflection if
         # required
@@ -2055,7 +2158,8 @@ class SolverPaths(SolverBase):
 
         return mask, valid_vertices, valid_objects, valid_normals
 
-    def _spec_image_method(self, candidates, paths, spec_paths_tmp):
+    def _spec_image_method(self, candidates, paths, spec_paths_tmp,
+                           mi_ris_scene):
         # pylint: disable=line-too-long
         r"""
         Evaluates a list of candidate paths ``candidates`` and keep only the
@@ -2072,6 +2176,9 @@ class SolverPaths(SolverBase):
 
         paths : :class:`~sionna.rt.Paths`
             Paths to update
+
+        mi_ris_scene : mi.Scene
+            Mistuba scene containing the RIS
         """
 
         sources = paths.sources
@@ -2170,7 +2277,8 @@ class SolverPaths(SolverBase):
             # [num_targets*num_sources*num_samples]
             blk = self._test_obstruction(tf.reshape(current, [-1, 3]),
                                          tf.reshape(d, [-1, 3]),
-                                         tf.reshape(maxt, [-1]))
+                                         tf.reshape(maxt, [-1]),
+                                         mi_ris_scene)
 
             # The following call:
             # - Discards paths that are blocked
@@ -2213,7 +2321,8 @@ class SolverPaths(SolverBase):
         # [num_targets*num_sources*num_samples]
         val = self._test_obstruction(tf.reshape(current, [-1, 3]),
                                      tf.reshape(d, [-1, 3]),
-                                     tf.reshape(maxt, [-1]))
+                                     tf.reshape(maxt, [-1]),
+                                     mi_ris_scene)
         # [num_targets, num_sources, num_samples, 3]
         blk = tf.reshape(val, tf.shape(maxt))
         # Discard paths for which the shooted ray has zero-length, i.e., when
@@ -2748,7 +2857,7 @@ class SolverPaths(SolverBase):
         return wedges_indices, inter_point
 
     def _check_wedges_visibility(self, targets, sources, wedges_indices,
-                                 vertices):
+                                 vertices, mi_ris_scene):
         r"""
         Discard the wedges that are not valid due to obstruction by updating the
         mask and removing the wedges related to no valid links.
@@ -2766,6 +2875,9 @@ class SolverPaths(SolverBase):
 
         vertices : [num_targets, num_sources, max_num_paths, 3], tf.float
             Coordinates of the interaction points on the intersected wedges
+
+        mi_ris_scene : mi.Scene
+            Mistuba scene containing the RIS
 
         Output
         -------
@@ -2809,7 +2921,8 @@ class SolverPaths(SolverBase):
         d,maxt = tf.linalg.normalize(wedges_points - sources, axis=1)
         maxt = tf.squeeze(maxt, axis=1)
         # [batch_size]
-        valid_t2w = tf.logical_not(self._test_obstruction(sources, d, maxt))
+        valid_t2w = tf.logical_not(self._test_obstruction(sources, d, maxt,
+                                                          mi_ris_scene))
 
         # Check visibility between wedge and receiver
         # Ray origin
@@ -2818,7 +2931,8 @@ class SolverPaths(SolverBase):
         d,maxt = tf.linalg.normalize(wedges_points - targets, axis=1)
         maxt = tf.squeeze(maxt, axis=1)
         # [batch_size]
-        valid_w2r = tf.logical_not(self._test_obstruction(targets, d, maxt))
+        valid_w2r = tf.logical_not(self._test_obstruction(targets, d, maxt,
+                                                          mi_ris_scene))
 
         # Mask obstructed wedges
         # [batch_size]
@@ -3253,7 +3367,8 @@ class SolverPaths(SolverBase):
     # Methods used for computing the scattered paths
     ##################################################################
 
-    def _scat_test_rx_blockage(self, targets, sources, candidates, hit_points):
+    def _scat_test_rx_blockage(self, targets, sources, candidates, hit_points,
+                               mi_ris_scene):
         r"""
         Test if the LoS between the hit points and the target is blocked.
         Blocked paths are masked out.
@@ -3261,16 +3376,19 @@ class SolverPaths(SolverBase):
         Input
         -----
         targets : [num_targets, 3], tf.float
-            Coordinates of the targets.
+            Coordinates of the targets
 
         sources : [num_sources, 3], tf.float
-            Coordinates of the sources.
+            Coordinates of the sources
 
         candidates : [max_depth, num_sources, num_paths_per_source], int
-            Sequence of primitives hit at `hit_points`.
+            Sequence of primitives hit at `hit_points`
 
         hit_points : [max_depth, num_sources, num_paths_per_source, 3], tf.float
-            Intersection points.
+            Intersection points
+
+        mi_ris_scene : mi.Scene
+            Mistuba scene containing the RIS
 
         Output
         -------
@@ -3307,7 +3425,7 @@ class SolverPaths(SolverBase):
         # Test for blockage
         # [max_depth * num_targets * num_sources * num_paths]
         blocked = self._test_obstruction(ray_origins, ray_directions,
-                                          rays_lengths)
+                                          rays_lengths, mi_ris_scene)
         # [max_depth, num_targets, num_sources, num_paths]
         blocked = tf.reshape(blocked,
                              [max_depth, num_targets, num_sources, -1])
@@ -3859,6 +3977,128 @@ class SolverPaths(SolverBase):
         return paths, paths_tmp
 
     ##################################################################
+    # Methods used for computing paths involving RIS
+    ##################################################################
+
+    def _ris_paths(self, paths, paths_tmp, mi_ris_scene):
+        sources = paths.sources
+        targets = paths.targets
+        num_sources = tf.shape(sources)[0]
+        num_targets = tf.shape(targets)[0]
+
+        # Concatenate the cell positions of all RIS
+        # [num_ris*num_cells, 3]
+        cells = [r.cell_world_positions for r in self._scene.ris.values()]
+        cells = tf.concat(cells, axis=0)
+
+        # Broadcast cell positions to vertices
+        # [max_depths=1, num_targets, num_sources, max_num_paths=num_cells, 3]
+        vertices = tf.reshape(cells, [1, 1, 1, -1, 3])
+        vertices = tf.repeat(vertices, num_targets, axis=1)
+        vertices = tf.repeat(vertices, num_sources, axis=2)
+        paths.vertices = vertices
+
+        # Create object tensor
+        objects = []
+        for obj in self._scene.ris.values():
+            objects.extend([obj.object_id]*obj.num_cells)
+        objects = tf.cast(objects, tf.int32)
+        objects = tf.reshape(objects, [1, 1, 1, -1])
+        objects = tf.repeat(objects, num_targets, axis=1)
+        objects = tf.repeat(objects, num_sources, axis=2)
+        paths.objects = objects
+
+        # Compute directions, angles, etc
+        paths, paths_tmp = self._compute_directions_distances_delays_angles(
+                                                    paths, paths_tmp, False)
+
+        # Compute TX-RIS and RIS-RX rays
+        # Directions
+        # [num_targets, num_sources, max_num_paths, 3]
+        d_tx_ris = paths_tmp.k_tx
+        d_ris_rx = -paths_tmp.k_rx
+
+        # Lengths
+        # [num_targets, num_sources, max_num_paths]
+        maxt_tx_ris = paths_tmp.distances[0]
+        maxt_ris_rx = paths_tmp.distances[1]
+
+        # Origins
+        # [num_targets, num_sources, max_num_paths, 3]
+        o_tx_ris = tf.expand_dims(tf.expand_dims(sources, axis=0), axis=2)
+        o_tx_ris = tf.broadcast_to(o_tx_ris, d_tx_ris.shape)
+        o_ris_rx = vertices[0]
+
+        # Test obstruction of rays
+        mask_tx_ris = self._test_obstruction(tf.reshape(o_tx_ris, [-1,3]),
+                                             tf.reshape(d_tx_ris, [-1,3]),
+                                             tf.reshape(maxt_tx_ris, [-1]),
+                                             mi_ris_scene)
+
+        mask_ris_rx = self._test_obstruction(tf.reshape(o_ris_rx, [-1,3]),
+                                             tf.reshape(d_ris_rx, [-1,3]),
+                                             tf.reshape(maxt_ris_rx, [-1]),
+                                             mi_ris_scene)
+
+        mask_ris = tf.logical_or(mask_tx_ris, mask_ris_rx)
+        mask_ris = tf.reshape(mask_ris, [num_targets, num_sources, -1])
+        mask_ris = tf.logical_not(mask_ris)
+
+        # Only consider paths that have a positive angle with the RIS normal
+        # Create tensor with RIS normals for all paths
+        n_hat = []
+        for r in self._scene.ris.values():
+            n_hat.append(tf.repeat(r.world_normal[tf.newaxis,...],
+                                   r.num_cells, axis=0))
+        n_hat = tf.concat(n_hat, axis=0)
+        n_hat = n_hat[tf.newaxis, tf.newaxis,...]
+
+        # Compute dot products between RIS normals and incoming/outgoing rays
+        cos_theta_i = dot(-d_tx_ris, n_hat)
+        cos_theta_m = dot(d_ris_rx, n_hat)
+
+        # Store dot products for later field computation
+        paths_tmp.cos_theta_i = cos_theta_i
+        paths_tmp.cos_theta_m = cos_theta_m
+
+        # Only keep paths with positive dot products
+        mask_ris = tf.logical_and(mask_ris, tf.greater(cos_theta_i, 0.))
+        mask_ris = tf.logical_and(mask_ris, tf.greater(cos_theta_m, 0.))
+        paths.mask = mask_ris
+        paths.targets_sources_mask = paths.mask
+
+        # Set delays to -1 for masked paths
+        paths.tau = tf.where(mask_ris, paths.tau, tf.cast(-1, self._rdtype))
+
+        return paths, paths_tmp
+
+    def _ris_transition_matrices(self, ris_paths, ris_paths_tmp):
+
+        # Compute spatial modulation coefficients for all RIS
+        sc = [tf.reduce_sum(r(), axis=0) for r in self._scene.ris.values()]
+        sc = tf.concat(sc, axis=0)
+        sc = sc[tf.newaxis, tf.newaxis,...]
+        coef = (1+ris_paths_tmp.cos_theta_i)*(1+ris_paths_tmp.cos_theta_m)
+        coef *= tf.cast(3*self._scene.wavelength/16/PI, self._rdtype)
+        coef /= tf.reduce_prod(ris_paths_tmp.distances, axis=0)
+        coef = tf.complex(coef, tf.cast(0, self._rdtype))
+        coef *= sc
+
+        # Set coefficients of masked paths to zero
+        coef = tf.where(ris_paths.mask, coef, tf.cast(0, coef.dtype))
+
+        # Create transition matrices from coefficients
+        # We assume here that the polarization remains unchanged, i.e.,
+        # The incomning field is already decomposed in theta/phi components
+        # and the outgoing field is represented in theta/phi components
+        coef = coef[...,tf.newaxis,tf.newaxis]
+        ris_mat_t = coef*tf.eye(2, batch_shape=[1,1,1], dtype=self._dtype)
+
+        return ris_mat_t
+
+
+
+    ##################################################################
     # Utilities
     ##################################################################
 
@@ -4005,6 +4245,7 @@ class SolverPaths(SolverBase):
             # theta_r, phi_r: [num_targets, num_sources, max_num_paths]
             theta_r, phi_r = theta_phi_from_unit_vec(k_rx)
 
+        if not scattering and paths.types is not Paths.RIS:
             # Remove duplicated paths.
             # Paths intersecting an edge belonging to two different triangles
             # can be considered twice.
@@ -4038,7 +4279,10 @@ class SolverPaths(SolverBase):
 
         # Updates the object storing the paths
         if not scattering:
-            paths.mask = mask
+            if paths.types is not Paths.RIS:
+                paths.mask = mask
+            if paths.types is not Paths.RIS:
+                paths.mask = mask
             paths.tau = tau
             # In the case of scattering, the angles of arrival are not computed
             # by this function
@@ -4053,8 +4297,69 @@ class SolverPaths(SolverBase):
         paths_tmp.k_r = k_r
         paths_tmp.k_tx = k_i[0]
         paths_tmp.total_distance = total_distance
+        if paths.types is Paths.RIS:
+            paths_tmp.distances = distances
+        if paths.types is Paths.RIS:
+            paths_tmp.distances = distances
 
         return paths, paths_tmp
+
+    def _compute_doppler_shifts(self, paths, paths_tmp, velocity):
+        # pylint: disable=line-too-long
+        """
+        Computes the Doppler shift resulting from the movement
+        of objects in the scene for every path.
+
+        The Doppler shift resulting from the movement of the
+        transmitter and receiver are added later when the function
+        :method:`~sionna.rt.Paths.apply_doppler` is called.
+
+        Input
+        ------
+        paths : :class:`~sionna.rt.Paths`
+            Paths to update
+
+        paths_tmp : :class:`~sionna.rt.PathsTmpData`
+            Addtional quantities required for paths computation
+
+        velocity : [num_shapes, 3]
+            Velocity vectors of all objects in the scene
+
+        Output
+        ------
+        doppler : [num_targets, num_sources, max_num_paths]
+            Doppler shifts for all paths due to the movement ob objects
+        """
+
+        # Compute Doppler shift for every path segment
+        # Difference of outgoing and incoming direction vectors for every
+        # intersection point
+        # k_diff : [max_depth, num_targets, num_sources, max_num_paths, 3]
+        k_diff = paths_tmp.k_i[1:]-paths_tmp.k_i[:-1]
+
+        # Get velocity for all involved objects of each path
+        objects_mask = paths.objects==-1
+        if paths.types==2:
+            # For diffracted paths, path.objects indicates wedge ids
+            # that we need to convert to object ids. Since each wedge
+            # consists of two objects, we simply pick the first.
+            # This assumes that both objects move at the same speed,
+            # which is justified as the wedge would otherwise be destroyed
+            valid_wedges_idx = tf.where(objects_mask, 0, paths.objects)
+            valid_objects = tf.gather(self._wedges_objects[:,0],
+                                      valid_wedges_idx, axis=0)
+        else:
+            valid_objects = tf.where(objects_mask, 0, paths.objects)
+        # [max_depth, num_targets, num_sources, max_num_paths, 3]
+        velocity = tf.gather(velocity, valid_objects, axis=0)
+
+        # Compute Doppler shift per path
+        #[num_targets, num_sources, max_num_paths]
+        doppler = tf.reduce_sum(velocity*k_diff, axis=-1)
+        doppler = tf.where(objects_mask, tf.constant(0, doppler.dtype), doppler)
+        doppler = tf.reduce_sum(doppler, axis=0)
+        doppler /= self._scene.wavelength
+        return doppler
 
     def _get_tx_rx_rotation_matrices(self):
         r"""
