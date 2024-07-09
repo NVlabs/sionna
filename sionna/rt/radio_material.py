@@ -8,10 +8,13 @@ A radio material provides the EM radio properties for a specific material.
 """
 
 import tensorflow as tf
+import numpy as np
 
 from . import scene
 from sionna.constants import DIELECTRIC_PERMITTIVITY_VACUUM, PI
 from .scattering_pattern import ScatteringPattern, LambertianPattern
+
+from .bsdf import BSDF
 
 class RadioMaterial:
     # pylint: disable=line-too-long
@@ -105,6 +108,7 @@ class RadioMaterial:
                  xpd_coefficient=0.0,
                  scattering_pattern=None,
                  frequency_update_callback=None,
+                 bsdf=None,
                  dtype=tf.complex64):
 
         if not isinstance(name, str):
@@ -127,6 +131,18 @@ class RadioMaterial:
         if frequency_update_callback is None:
             self.relative_permittivity = relative_permittivity
             self.conductivity = conductivity
+
+        if bsdf is not None:
+            if not isinstance(bsdf, BSDF):
+                raise TypeError("`bsdf` must be a BSDF")
+            bsdf.name = f"mat-{self._name}"
+            self._bsdf = bsdf
+        else:
+            rgb = np.random.rand(3)
+            bsdf_name = f"mat-{self._name}"
+            self._bsdf = BSDF(name=bsdf_name,xml_tree=None,rgb=rgb)
+            self._bsdf.is_placeholder = True # (since the material's bsdf is created randomly)
+
 
         # Save the callback for when the frequency is updated
         # or if the RadioMaterial is added to a scene
@@ -330,6 +346,8 @@ class RadioMaterial:
         Add an object to the set of objects using this material
         """
         self._objects_using.add(object_id)
+        if self._bsdf is not None:
+            self._bsdf.add_object_using(object_id)
 
     def discard_object_using(self, object_id):
         """
@@ -338,6 +356,12 @@ class RadioMaterial:
         assert object_id in self._objects_using,\
             f"Object with id {object_id} is not in the set of {self.name}"
         self._objects_using.discard(object_id)
+        if self._bsdf is not None:
+            self._bsdf.discard_object_using(object_id)
+
+    def reset_objects_using(self):
+        self._objects_using = set()
+        self._bsdf.reset_objects_using()
 
     @property
     def is_placeholder(self):
@@ -368,3 +392,32 @@ class RadioMaterial:
         self.xpd_coefficient = rm.xpd_coefficient
         self.scattering_pattern = rm.scattering_pattern
         self.frequency_update_callback = rm.frequency_update_callback
+
+    @property
+    def bsdf(self):
+        """
+        bool : Get the material bsdf
+        """
+        return self._bsdf
+    
+    @bsdf.setter
+    def bsdf(self, bsdf):
+        if not isinstance(bsdf, BSDF):
+            raise TypeError("`bsdf` must be a BSDF")
+        bsdf.name = f"mat-{self._name}"
+        self._bsdf = bsdf
+
+        if self._scene is not None:
+            self._bsdf.scene = self._scene
+
+    @property
+    def scene(self):
+        """
+        scene : Get/set the scene
+        """
+        return self._scene
+    
+    @scene.setter
+    def scene(self, scene):
+        self._scene = scene
+        self._bsdf.scene = self._scene

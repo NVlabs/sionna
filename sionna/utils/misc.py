@@ -6,12 +6,16 @@
 
 import numpy as np
 import tensorflow as tf
+import time
+import os
+import shutil
+
 from tensorflow.keras.layers import Layer
 from tensorflow.experimental.numpy import log10 as _log10
 from tensorflow.experimental.numpy import log2 as _log2
+
 from sionna.utils.metrics import count_errors, count_block_errors
 from sionna.mapping import Mapper, Constellation
-import time
 from sionna import signal
 
 
@@ -956,3 +960,20 @@ def empirical_psd(x, show=True, oversampling=1.0, ylim=(-30,3)):
     print(  "Warning: The alias utils.empirical_psd will not be included in"
             " Sionna 1.0. Please use signal.empirical_psd instead.")
     return signal.empirical_psd(x, show, oversampling, ylim)
+
+def copy_and_rename_files(source_dir, destination_dir, prefix):
+    # Walk through the source directory
+    for root, dirs, files in os.walk(source_dir):
+        # Create corresponding directories in the destination
+        relative_path = os.path.relpath(root, source_dir)
+        dest_path = os.path.join(destination_dir, relative_path)
+        os.makedirs(dest_path, exist_ok=True)
+        
+        # Copy and rename files
+        for file in files:
+            source_file = os.path.join(root, file)
+            # Create the new filename with the prefix
+            new_filename = prefix + file
+            dest_file = os.path.join(dest_path, new_filename)
+            shutil.copy2(source_file, dest_file)
+            print(f"Copied {os.path.abspath(source_file)} to {os.path.abspath(dest_file)}")

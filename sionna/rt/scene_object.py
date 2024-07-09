@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
+#
 """
 Class representing objects in the scene
 """
@@ -55,6 +56,9 @@ class SceneObject(Object):
 
         # Set velocity vector
         self.velocity = tf.cast([0,0,0], dtype=self._rdtype)
+
+        # Set center of rotation. This parameter is used for nested asset objects rotations.
+        self._center_of_rotation = tf.cast([0,0,0], dtype=self._rdtype)
 
         if self._dtype == tf.complex64:
             self._mi_point_t = mi.Point3f
@@ -142,6 +146,19 @@ class SceneObject(Object):
         if not tf.shape(v)==3:
             raise ValueError("`velocity` must have shape [3]")
         self._velocity = tf.cast(v, self._rdtype)
+
+    @property
+    def center_of_rotation(self):
+        """
+        [3], tf.float : Get/set the center of rotation of the object
+        """
+        return self._center_of_rotation
+
+    @center_of_rotation.setter
+    def center_of_rotation(self, c):
+        if not tf.shape(c)==3:
+            raise ValueError("`center_of_rotation` must have shape [3]")
+        self._center_of_rotation = tf.cast(c, self._rdtype)
 
     @property
     def position(self):
@@ -269,12 +286,12 @@ class SceneObject(Object):
         inv_cur_rotation = cur_rotation.inverse()
 
         # Build the transform.
-        # The object is first translated to the origin, then rotated, then
+        # The object is first translated to the origin (shifted by its distance to center_of_rotation), then rotated, then
         # translated back to its current position
-        transform =  (  self._mi_transform_t.translate(self.position.numpy())
+        transform =  (  self._mi_transform_t.translate(self.position.numpy() + self._center_of_rotation.numpy())
                       @ new_rotation
                       @ inv_cur_rotation
-                      @ self._mi_transform_t.translate(-self.position.numpy()) )
+                      @ self._mi_transform_t.translate(-self.position.numpy() - self._center_of_rotation.numpy()))
 
         ## Update Mitsuba vertices
 
