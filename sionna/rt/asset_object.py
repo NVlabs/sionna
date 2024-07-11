@@ -13,15 +13,17 @@ import tensorflow as tf
 
 
 import numpy as np
-import mitsuba as mi
+# import mitsuba as mi
 import xml.etree.ElementTree as ET
 import warnings
+from importlib_resources import files
 
-from .radio_material import RadioMaterial
-from .object import Object
+# from .radio_material import RadioMaterial
+# from .object import Object
+from . import assets
 
 from ..utils.misc import copy_and_rename_files
-from .utils import normalize, theta_phi_from_unit_vec
+# from .utils import normalize, theta_phi_from_unit_vec
 from sionna.constants import PI
 
 
@@ -37,6 +39,9 @@ class AssetObject():
     while maintaining their relative positions and orientations. The asset is associated with an XML file descriptor pointing to one or multiple mesh 
     (.ply) files. A RadioMaterial can be assigned to the asset, which will be applied to all its shapes. If no material is provided, materials will be 
     inferred from the BSDF descriptors in the asset XML file.
+
+    Note: When exporting an asset in Blender with the Mitsuba (Sionna) file format, it's important to set Z-axis as "up" and Y-axis as "forward". 
+    This should align the coordinates correctly.
 
     Parameters
     ----------
@@ -75,6 +80,10 @@ class AssetObject():
         # - Modify radio material properties of asset already added to a scene?
         # - Define the look_at method?
         # - Define asset library and method to automaticaly load asset (based on string e.g. asset = load_asset("cube"))
+        # - Random init transform on multishaped asset can move the shape relative to each other...
+        # - Management/update of the asset when altering properties of scene object (e.g. delete one of the scene object? change the material? etc.)
+        # - Shapes = list not dict
+        # - Add assets example path (+ redesign the two persons asset so that there is a perfect symetrie)
         
         if dtype not in (tf.complex64, tf.complex128):
             raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
@@ -85,7 +94,8 @@ class AssetObject():
         self._name = name
 
         # Initialize shapes associated with asset
-        self._shapes = {} #Attributed when added to a scene
+        self._shapes = {} #Attributed when added to a scene >>> NO NEED TO SAVE THE MATERIAL? OR NEED TO UPDATE ON MATERIAL CHANGE...
+        
 
         # Asset's XML and meshes sources directory
         self._filename = filename
@@ -105,6 +115,7 @@ class AssetObject():
         # Init boolean flag: Used for inital transforms applied when adding the asset to a scene
         self._position_init = True
         self._orientation_init = True
+        self._random_position_init_bias = np.random.random(3) # Initial (temporary) position transform to avoid ovelapping asset which mess with mitsuba load_scene method.
 
         # (Initial) position and orientation of the asset
         self._position = tf.cast(position, dtype=self._rdtype)
@@ -125,20 +136,27 @@ class AssetObject():
 
     @property
     def scene(self):
-        """
-        :class:`~sionna.rt.Scene` : Get/set the scene
+        r"""
+        :class:`~sionna.rt.Scene` : Get the scene
         """
         return self._scene
 
     @scene.setter
     def scene(self, scene):
+        r"""
+        :class:`~sionna.rt.Scene` : Set the scene
+        """
         # Affect the scene to the current asset
         self._scene = scene
+
+        # Affect scene's dtype to the current asset
+        self.dtype = scene.dtype   
         
-        # Reset position/orientation init boolean flag (if adding the an already used asset to a different scene?)
+        # Reset position/orientation init boolean flag (if adding  an already used asset to a different scene?)
+        # >>>Probably not necessary since the init flag are reset in the load_scene_object meth...
         self._position_init = True
         self._orientation_init = True  
-
+        
         # Move asset's meshes to the scene's meshes directory
         asset_path = os.path.dirname(self.filename)
         meshes_source_dir = os.path.join(asset_path, 'meshes')
@@ -167,6 +185,23 @@ class AssetObject():
         return self._xml_tree
 
     @property
+    def dtype(self):
+        r"""
+        `tf.complex64 | tf.complex128` : Datatype used in tensors
+        """
+        return self._dtype
+    
+    @dtype.setter
+    def dtype(self, new_dtype):
+        if new_dtype not in (tf.complex64, tf.complex128):
+            raise ValueError("`dtype` must be tf.complex64 or tf.complex128`")
+        self._dtype = new_dtype
+        self._rdtype = new_dtype.real_dtype
+
+        self._position = tf.cast(self._position, dtype=self._rdtype)
+        self._orientation = tf.cast(self._orientation, dtype=self._rdtype)
+
+    @property
     def position(self):
         return self._position
 
@@ -175,7 +210,7 @@ class AssetObject():
         # Move all shapes associated to assed while keeping their relative positions
         position = tf.cast(new_position, dtype=self._rdtype)
         if self._position_init:
-            diff = position
+            diff = position - self._random_position_init_bias # Correct the initial position bias initally added to avoid mitsuba to merge edges at the same position
             self._position_init = False
         else:
             diff = position - self._position
@@ -183,9 +218,7 @@ class AssetObject():
 
         for shape_id in self.shapes:
             scene_object = self._scene.get(shape_id)
-            old_position = scene_object.position
-            new_position = old_position + diff
-            scene_object.position = new_position
+            scene_object.position += diff
         
     @property
     def orientation(self):
@@ -204,7 +237,10 @@ class AssetObject():
             scene_object.orientation = orientation
             scene_object.center_of_rotation = old_center_of_rotation
                 
-    
+    @property
+    def random_position_init_bias(self):
+        return self._random_position_init_bias
+
     @property
     def position_init(self):
         return self._position_init
@@ -334,3 +370,16 @@ class AssetObject():
     #     beta = theta-PI/2 # Rotation around y-axis
     #     gamma = 0.0 # Rotation around x-axis
     #     self.orientation = (alpha, beta, gamma)
+
+
+#
+# Module variables for example asset files
+#
+test_asset = str(files(assets).joinpath("test_asset/test_asset.xml"))
+# pylint: disable=C0301
+"""
+Example asset containing two 1x1x1m cubes spaced by 1m along the y-axis.
+"""
+
+
+

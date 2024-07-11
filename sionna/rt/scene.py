@@ -42,7 +42,7 @@ from .renderer import render, coverage_map_color_mapping
 from .utils import expand_to_rank
 from .paths import Paths
 from . import scenes
-#from ..utils import append_xml_scene_asset_to_scene
+
 
 
 
@@ -462,7 +462,7 @@ class Scene:
                 shape_name = shape_id[5:]
             else:
                 shape_name = shape_id
-            new_shape_id = f"{asset.name}-{shape_name}"
+            new_shape_id = f"{asset.name}_{shape_name}"
             shapes[new_shape_id] = {}
             shape.set('id',f"mesh-{new_shape_id}")
             shape.set('name',f"mesh-{new_shape_id}")  
@@ -480,7 +480,7 @@ class Scene:
             # ET.SubElement(transform, 'rotate', x="1", angle=f"{orientation[2]*360/(2*np.pi)}")
 
             # Add (temporary) position bias
-            position = np.random.random(3)*1e-9 #asset.position
+            position = asset.random_position_init_bias
             translate_value = f"{position[0]} {position[1]} {position[2]}"
             ET.SubElement(transform, 'translate', value=translate_value)
             
@@ -502,10 +502,29 @@ class Scene:
 
             # We then check if the material is already in use within the current Sionna scene (if so the BSDF is already described within 
             # the scene xml file, since the materials are instantiated based on the xml BSDFs in the first place).
+
+
+            # >>> MATERIAL / BSDF MANAGEMENT TO BE IMPROVED THOROUGHLY !
             if material_name not in self._radio_materials: # 
                 # If the material does not exist in Sionna scene data structure, check if the BSDF is not already present in the XML scene descriptor 
-                # (if so the material should be instantiated during the next load_scene_objects() call)
+                # (if so the material should be instantiated during the next load_scene_objects() call) >> THIS IS FALSE (all itu_materia are added to self.radio_material at scene init!
                 
+                bsdfs_in_root = [bsdf.get('id') for bsdf in root.findall('./bsdf')]
+                if bsdf_name not in bsdfs_in_root:
+                    # If not add the asset's bsdf to the xml file 
+                    if asset.radio_material is None: # >> USELESS? if asset.radio_material is None and not in self._radio_materials then it will never work
+                        # Find the bsdf element with the specific bsdf name from the asset xml file and append it to the scene xml file
+                        bsdf = root_to_append.find(f".//bsdf[@id='{bsdf_name}']")
+                    else:
+                        # Or, if defined, use the asset's material's BSDF, and add the material to the scene's materials
+                        bsdf = asset.radio_material.bsdf.xml_tree
+                        self.add(asset.radio_material) 
+                    root.append(bsdf)
+
+            # Quick Fix: when adding asset with a "conventional" sionna material which is not defined in the scene xml 
+            # {if material_name not in self._radio_materials} returns True and the XML is not updated
+            else:
+                # check if the BSDF is present in the XML scene descriptor 
                 bsdfs_in_root = [bsdf.get('id') for bsdf in root.findall('./bsdf')]
                 if bsdf_name not in bsdfs_in_root:
                     # If not add the asset's bsdf to the xml file 
@@ -515,7 +534,7 @@ class Scene:
                     else:
                         # Or, if defined, use the asset's material's BSDF, and add the material to the scene's materials
                         bsdf = asset.radio_material.bsdf.xml_tree
-                        self.add(asset.radio_material) 
+                        #self.add(asset.radio_material) 
                     root.append(bsdf)
             
             # Add the shape to the scene's xml descriptor
@@ -527,6 +546,7 @@ class Scene:
         
         # Store the asset's shapes properties
         asset.shapes = shapes
+        print(asset.name,asset.shapes)
 
         return True
     
@@ -579,33 +599,33 @@ class Scene:
     #     xml_bsdf = root.find(f".//bsdf[@id='{bsdf_name}']")
     #     root.remove(xml_bsdf)
 
-    def update_bsdf(self, updated_bsdf):
-        """
-        Update one bsdf in the xml file of the scene, before reloading the scene for updating the rendering.
+    # def update_bsdf(self, updated_bsdf):
+    #     """
+    #     Update one bsdf in the xml file of the scene, before reloading the scene for updating the rendering.
 
-        Input
-        -----
-        updated_bsdf : :class:`~sionna.rt.BSDF`: the updated BSDF.  
-        Output
-        ------
-        bool : True
-        """  
-        # Find and replace the specific bsdf element
-        root = self._xml_tree.getroot()
-        bsdf_element = root.find(f".//bsdf[@id='{updated_bsdf.name}'][@name='{updated_bsdf.name}']")
+    #     Input
+    #     -----
+    #     updated_bsdf : :class:`~sionna.rt.BSDF`: the updated BSDF.  
+    #     Output
+    #     ------
+    #     bool : True
+    #     """  
+    #     # Find and replace the specific bsdf element
+    #     root = self._xml_tree.getroot()
+    #     bsdf_element = root.find(f".//bsdf[@id='{updated_bsdf.name}'][@name='{updated_bsdf.name}']")
         
-        # Replace the old bsdf element with the new one
-        if bsdf_element is not None:
-            root.remove(bsdf_element)
-            root.append(updated_bsdf.xml_tree)
+    #     # Replace the old bsdf element with the new one
+    #     if bsdf_element is not None:
+    #         root.remove(bsdf_element)
+    #         root.append(updated_bsdf.xml_tree)
 
-        # Reload the scene >> Should be simplified
-        self.reload_scene_after_modifying_assets()
+    #     # Reload the scene >> Should be simplified
+    #     self._reload_scene_after_modifying_assets()
 
-        return True
+    #     return True
         
 
-    def reload_scene_after_modifying_assets(self):
+    def _reload_scene_after_modifying_assets(self):
         """
         Reload the scene after adding or removing asset(s) object to the scene, and the corresponding RT solvers, while keeping all cameras, TX, RX, RIS, etc. objects in place
         Input
@@ -732,7 +752,7 @@ class Scene:
                 item.scene = self
   
         if need_to_reload_scene:
-            self.reload_scene_after_modifying_assets()
+            self._reload_scene_after_modifying_assets()
 
             
     def remove(self, name_list):
@@ -795,7 +815,7 @@ class Scene:
                 raise TypeError(msg)
         
         if need_to_reload_scene:
-            self.reload_scene_after_modifying_assets()
+            self._reload_scene_after_modifying_assets()
 
     
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
@@ -2207,7 +2227,7 @@ class Scene:
             if mat_name.startswith("mat-"):
                 mat_name = mat_name[4:]
             mat = self.get(mat_name)
-
+            
             if (mat is not None) and (not isinstance(mat, RadioMaterial)):
                 raise ValueError(f"Name'{name}' already used by another item")
             elif mat is None:
