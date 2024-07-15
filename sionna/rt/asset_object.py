@@ -13,13 +13,12 @@ import tensorflow as tf
 
 
 import numpy as np
-# import mitsuba as mi
 import xml.etree.ElementTree as ET
 import warnings
 from importlib_resources import files
 
-# from .radio_material import RadioMaterial
-# from .object import Object
+from .radio_material import RadioMaterial
+from .bsdf import BSDF
 from . import assets
 
 from ..utils.misc import copy_and_rename_files
@@ -51,17 +50,23 @@ class AssetObject():
     filename : str
         Path to the asset XML file.
 
-    position : tuple of 3x float, optional
-        Initial position of the asset (default is (0., 0., 0.)).
+    position : tuple of 3x float, optional,  (default is (0., 0., 0.))
+        Initial position of the asset.
 
-    orientation : tuple of 3x float, optional
-        Initial orientation of the asset in radians (default is (0., 0., 0.)).
+    orientation : tuple of 3x float, optional,  (default is (0., 0., 0.))
+        Initial orientation of the asset in radians.
 
-    radio_material : :class:`~sionna.rt.RadioMaterial`:, optional
+    radio_material : :class:`~sionna.rt.RadioMaterial`:, optional (default is None)
         If set, the radio material is to be associated with all the asset's shapes. If not specified, materials will be inferred from the BSDF descriptors in the XML file.
 
-    dtype : tf.DType, optional
-        Datatype for all computations, inputs, and outputs. Defaults to `tf.complex64`.
+    overwrite_scene_bsdfs : :boolean:, optional, (default is False)
+    If True replace all existing bsdf from the scene by the ones specified in the asset files. Otherwise, replace only placeholder scene's bsdfs.
+
+    overwrite_scene_radio_materials : :boolean:, optional, (default is False)
+    If True update all existing radio_materials from the scene by the ones specified in the asset files. Otherwise, replace only placeholder scene's radio_materials.
+        
+    dtype : tf.DType, optional  (default is `tf.complex64`)
+        Datatype for all computations, inputs, and outputs.
     """
 
 
@@ -71,6 +76,8 @@ class AssetObject():
                  position=(0.,0.,0.), 
                  orientation=(0.,0.,0.), 
                  radio_material=None,
+                 overwrite_scene_bsdfs = False,
+                 overwrite_scene_radio_materials = False,
                  dtype=tf.complex64
                 ):
 
@@ -94,9 +101,8 @@ class AssetObject():
         self._name = name
 
         # Initialize shapes associated with asset
-        self._shapes = {} #Attributed when added to a scene >>> NO NEED TO SAVE THE MATERIAL? OR NEED TO UPDATE ON MATERIAL CHANGE...
+        self._shapes = {} #Attributed when added to a scene 
         
-
         # Asset's XML and meshes sources directory
         self._filename = filename
         self._xml_tree = ET.parse(filename)
@@ -130,9 +136,20 @@ class AssetObject():
 
         # Material (If multiple shapes within the asset >> Associate the same material to all shapes)
         self._radio_material = radio_material
-
+        self._overwrite_scene_bsdfs = overwrite_scene_bsdfs # If true, replace scene's bsdfs when adding asset even when they are not placeholder bsdf
+        self._overwrite_scene_radio_materials = overwrite_scene_radio_materials # If true, update scene's materials when adding asset even when they are not placeholder material
+        
         # Init scene propertie
         self._scene = None
+
+        # Structure to store original asset bsdfs as specified in the asset XML file
+        self._original_assets_bsdfs = {}
+
+
+
+
+
+        
 
     @property
     def scene(self):
@@ -144,8 +161,13 @@ class AssetObject():
     @scene.setter
     def scene(self, scene):
         r"""
-        :class:`~sionna.rt.Scene` : Set the scene
-        """
+        :class:`~sionna.rt.Scene` : Set the scene to current asset
+        """ 
+        if self._scene != None and self._scene != self: 
+            msg = f"The asset '{self}' is already assigned to another Scene '{self._scene}'. " \
+            "Assets object instance can only be assigned to a single scene."
+            raise RuntimeError(msg)
+        
         # Affect the scene to the current asset
         self._scene = scene
 
@@ -162,6 +184,125 @@ class AssetObject():
         meshes_source_dir = os.path.join(asset_path, 'meshes')
         destination_dir = os.path.join(self._scene.tmp_directory_path, self._meshes_folder_path)
         copy_and_rename_files(meshes_source_dir,destination_dir,prefix='')
+        
+        # Get the root of the asset's XML
+        root_to_append = self._xml_tree.getroot()
+        
+        # 1 Update Materials
+        # Adding material to the  scene will trigger radio_material.scene setter/bsdf.scene setter >>> Update/set bsdf in scene xml 
+        if self._radio_material is not None:
+            if isinstance(self._radio_material, str):
+                mat = self._scene.get(self.radio_material)
+                if (mat is not None) and (not isinstance(mat, RadioMaterial)):
+                    # If the radio material does not exist, but an item of the scene already uses that name.
+                    raise ValueError(f"RadioMaterial name'{self._radio_material}' already used by another item, can't create placeholder material")
+                elif mat is None:
+                    # If the radio material does not exist and the name is available, then a placeholder is used. 
+                    # In this case, the user is in charge of defining the radio material properties afterward.
+                    mat = RadioMaterial(self._radio_material)
+                    mat.is_placeholder = True
+                    self._scene.add(mat)
+                self._radio_material = mat
+            elif isinstance(self._radio_material, RadioMaterial):
+                mat = self._scene.get(self._radio_material.name)
+                if isinstance(mat, RadioMaterial) and self._overwrite_scene_radio_materials:
+                    # There exist a different instance of RadioMaterial with the same name but the user explicitely specified that 
+                    # he wants to replace existing scene materials by the one from the asset, even if the existing material is not a placeholder.
+                    mat.assign(self._radio_material)
+                    self._radio_material = mat
+                else:
+                    # The scene.add() method will trigger an error if there exist an item with the same name or non-placeholder radio material which is not the same object.
+                    # If there exist a placeholder radio material with same name, it will be updated with the asset radio material properties
+                    # If the asset's radio material is a radio material from the scene (same object), then the asset radio material will not be (re)added to the scene.
+                    # See scene.add() method for more details.
+                    self._scene.add(self._radio_material) 
+            else:
+                raise TypeError(f"Asset 'radio_material' must be of type 'str', or 'RadioMaterial'")
+
+        else:
+            # When no radio_material are specified, add all the bsdf of the asset to the xml file. Overwrite existing bsdfs if the corresponding material's bsdfs are placeholder
+            bsdfs_to_append = root_to_append.findall('bsdf')  
+            for bsdf in bsdfs_to_append:  
+                bsdf_name = bsdf.get('id')
+                       
+                # Store original bsdfs, if needed
+                self._original_assets_bsdfs[f"origin_{bsdf_name}"] = BSDF(name=f"origin_{bsdf_name}", xml_element=bsdf)
+
+                # Change naming to adhere to Sionna conventions 
+                if bsdf_name.startswith('mat-'):
+                    mat_name = bsdf_name[4:]
+                else:
+                    mat_name = bsdf_name
+                bsdf.set('id',f"mat-{mat_name}")
+                mat = self._scene.get(mat_name)
+                if (mat is not None):
+                    if not isinstance(mat, RadioMaterial): #>>> NECESSARY? This will be handled at add() of the placeholder material?
+                        # If the radio material does not exist, but an item of the scene already uses that name.
+                        raise ValueError(f"RadioMaterial name'{mat_name}' already used by another item, can't create placeholder material")
+                    else:
+                        # A radio material exists in the scene with that name.
+                        if mat.bsdf.is_placeholder or self._overwrite_scene_bsdfs:
+                            # If the material bsdf is a placeholder (or the user explicitely want to overwrite existing bsdfs) then the existing bsdf  
+                            # is updated with the bsdf of the asset.
+                            mat.bsdf.xml_element = bsdf
+                        else:
+                            # If the material bsdf is not a placeholder then we keep the original scene bsdf
+                            pass
+                else:
+                    # If the radio material does not exist and the name is available, then a placeholder is used. 
+                    # In this case, the user is in charge of defining the radio material properties afterward.
+                    # The asset's bsdf is affected to the newly material
+                    material_bsdf = BSDF(name=f"mat-{mat_name}",xml_element=bsdf)
+                    mat = RadioMaterial(mat_name, bsdf=material_bsdf)
+                    mat.is_placeholder = True
+                    self._scene.add(mat)
+
+        
+        # 2 Update geometry
+        # Find all shapes elements in the asset 
+        shapes_to_append = root_to_append.findall('shape')  
+           
+        # Append each shape to the parent element in the original scene while adapting their ids
+        for shape in shapes_to_append:
+            # Define the shape name
+            shape_id = shape.get('id')
+            if shape_id.startswith('mesh-'):
+                shape_name = shape_id[5:]
+            else:
+                shape_name = shape_id
+            new_shape_id = f"{self._name}_{shape_name}"
+            self._shapes[new_shape_id] = None
+            shape.set('id',f"mesh-{new_shape_id}")
+            shape.set('name',f"mesh-{new_shape_id}")  
+            
+            # Define shape transforms - Add (temporary) position bias
+            # IT SEEMS THAT MITSUBA AUTOMATICALLY MERGE VERTEX AT THE SAME POSITION, WHEN LOADING THE SCENE (i.e it is not possible to add the same asset twice at the same position)
+            # Hence, as a quick fix, we apply a small random transforms within the xml scene descriptor to ensure that two asset never share the same position before calling mi.load() function. 
+            # The correct, position and orientation are then applied when loading the scene objects (self._scene._load_scene_objects() method) after calling mi.load() function.
+            transform = ET.SubElement(shape, 'transform', name="to_world")
+            position = self._random_position_init_bias
+            translate_value = f"{position[0]} {position[1]} {position[2]}"
+            ET.SubElement(transform, 'translate', value=translate_value)
+            
+            ref = shape.find('ref')
+            if self._radio_material is not None:
+                # If the specified material has been get/set from/to the scene: specify the correct bsdf name in the shape descriptor (for all shapes of the asset)
+                ref.set('id',f"mat-{self._radio_material.name}")
+                self._scene.add(self._radio_material)
+
+            # When no radio material is specified for the asset we consider per shape radio materials definition based on the xml descriptor of the asset
+            else:
+                bsdf_name = ref.get('id')
+                if bsdf_name.startswith('mat-'):
+                    mat_name = bsdf_name[4:]
+                else:
+                    mat_name = bsdf_name
+                ref.set('id',f"mat-{mat_name}")
+                
+
+            # Add shape to xml
+            self._scene.append_to_xml(shape, overwrite=False)
+
 
     @property
     def shapes(self):
@@ -209,7 +350,7 @@ class AssetObject():
     def position(self, new_position):
         # Move all shapes associated to assed while keeping their relative positions
         position = tf.cast(new_position, dtype=self._rdtype)
-        if self._position_init:
+        if self._position_init and self._scene is not None:
             diff = position - self._random_position_init_bias # Correct the initial position bias initally added to avoid mitsuba to merge edges at the same position
             self._position_init = False
         else:
@@ -217,8 +358,13 @@ class AssetObject():
         self._position = position
 
         for shape_id in self.shapes:
-            scene_object = self._scene.get(shape_id)
-            scene_object.position += diff
+            
+            scene_object = self.shapes[shape_id] 
+            print(shape_id)
+            print(self._scene._scene_objects)
+            print(scene_object,scene_object.position)
+            if scene_object is not None:
+                scene_object.position += diff
         
     @property
     def orientation(self):
@@ -229,13 +375,16 @@ class AssetObject():
         # Rotate all shapes associated to asset while keeping their relative positions (i.e. rotate arround the asset position)
         orientation = tf.cast(new_orientation, dtype=self._rdtype)
         self._orientation = orientation
+
         for shape_id in self.shapes:
-            scene_object = self._scene.get(shape_id)
-            old_center_of_rotation = scene_object.center_of_rotation
-            new_center_of_rotation = (self._position - scene_object.position)
-            scene_object.center_of_rotation = new_center_of_rotation
-            scene_object.orientation = orientation
-            scene_object.center_of_rotation = old_center_of_rotation
+            scene_object = self.shapes[shape_id] 
+            if scene_object is not None:
+                scene_object = self._scene.get(shape_id)
+                old_center_of_rotation = scene_object.center_of_rotation
+                new_center_of_rotation = (self._position - scene_object.position)
+                scene_object.center_of_rotation = new_center_of_rotation
+                scene_object.orientation = orientation
+                scene_object.center_of_rotation = old_center_of_rotation
                 
     @property
     def random_position_init_bias(self):
@@ -272,46 +421,47 @@ class AssetObject():
         """
         return self._radio_material
 
-
-    ############################## SceneObject properties to be extended to AssetObject ###################
-    # @radio_material.setter
-    # def radio_material(self, mat):
-    #     # Note: _radio_material is set at __init__, but pylint doesn't see it.
-    #     if mat is None:
-    #         mat_obj = None
-
-    #     elif isinstance(mat, str):
-    #         if self._scene == None:
-    #             err_msg = f"No scene have been affected to current AssetObject"
-    #             raise TypeError(err_msg)
-            
-    #         mat_obj = self.scene.get(mat)
-    #         if (mat_obj is None) or (not isinstance(mat_obj, RadioMaterial)):
-    #             err_msg = f"Unknown radio material '{mat}'"
-    #             raise TypeError(err_msg)
-
-    #     elif not isinstance(mat, RadioMaterial):
-    #         err_msg = ("The material must be a material name (str) or an "
-    #                     "instance of RadioMaterial")
-    #         raise TypeError(err_msg)
-
-    #     else:
-    #         mat_obj = mat
-
-    #     self._radio_material = mat_obj
-
-    #     for shape_id in self.shapes:
-    #         scene_object = self._scene.get(shape_id)
-    #         previous_radio_material = scene_object.radio_material
-    #         scene_object.radio_material = self._radio_material
-
-    #         if not previous_radio_material.is_used:
-    #             warnings.warn(f"RadioMaterial {previous_radio_material.name} is not used anymore, it will be deleted from the scene")
-    #             bsdf_name = previous_radio_material.bsdf.name
-    #             self._scene.remove(previous_radio_material.name)
-    #             self._scene.remove_bsdf(bsdf_name)
+    @radio_material.setter
+    def radio_material(self, mat):
+        if not isinstance(mat, RadioMaterial) or not isinstance(mat, str):
+            err_msg = f"Radio material must be of type 'str' or 'sionna.rt.RadioMaterial"
+            raise TypeError(err_msg)
         
-    #     self._scene.reload_scene_after_modifying_assets()
+        mat_obj = mat
+
+        # If the asset as been added to a scene
+        if self._scene is not None:
+            if isinstance(mat, str):
+                mat_obj = self.scene.get(mat)
+                if (mat_obj is None) or (not isinstance(mat_obj, RadioMaterial)):
+                    err_msg = f"Unknown radio material '{mat}'"
+                    raise TypeError(err_msg)
+                
+            for shape_name in self._shapes:
+                # Get the current radio material of the scene object corresponding to that shape.
+                scene_object = self.get(shape_name)
+                # prev_material = scene_object.radio_material
+                
+                # Update the material of the scene object
+                scene_object.radio_material = mat_obj
+
+                # DEPRECATED: (Problematic if deleting base sionna material e.g. itu_wood, the user should rather use force_material_update when adding an asset to remove existing material properties)
+                # Check if the previous material is still in use. If not:
+                # - (1) remove the material from the scene's material
+                # - (2) remove the bsdf from the scene's xml file
+                # if not prev_material.is_used:
+                #     warnings.warn(f"RadioMaterial {prev_material.name} is not used anymore, it will be deleted from the scene")
+                #     bsdf_name = prev_material.bsdf.name
+                #     self._scene.remove(prev_material.name)
+                #     self._scene.remove_from_xml(bsdf_name,"bsdf") 
+          
+
+        # Store the new asset material (which is now the same for all asset's shape)
+        self._radio_material = mat_obj
+
+            
+    ############################## SceneObject properties to be extended to AssetObject ###################
+    
 
 
     # @property

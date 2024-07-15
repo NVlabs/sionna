@@ -106,6 +106,18 @@ class TestAddAssetObject(unittest.TestCase):
         self.assertTrue(scene.get("asset_0_cube_0") == None) 
         self.assertTrue(scene.get("asset_0_cube_1") == None) 
 
+    def test_asset_shape_dictionary(self):
+        # Instanciation of the dict is correct when adding asset
+        # What appens we deleteing the asset
+        # What if loading a second asset / reload scene
+        # What if overwrting the asset
+        # What if deleting one SceneObject of a composite asset? Does it still work for the remaining object?
+        self.assertTrue(False)
+
+    def test_add_xml_remove_xml(self):
+        # oerwrite?
+        self.assertTrue(False)
+
 
 class TestAssetPosition(unittest.TestCase):
     """Tests related to the change of an asset's position"""
@@ -211,7 +223,7 @@ class TestAssetPosition(unittest.TestCase):
         cube_1_position_1 = tf.Variable(cube_1_object.position)
 
         # Or manually reload the scene
-        scene._reload_scene_after_modifying_assets()
+        scene.reload_scene()
 
         asset_0_position_2 = tf.Variable(asset_0.position)
         cube_0_position_2 = tf.Variable(cube_0_object.position)
@@ -363,13 +375,153 @@ class TestAssetOrientation(unittest.TestCase):
         paths = scene.compute_paths(los=False, diffraction=False, max_depth=1)
         self.assertEqual(tf.squeeze(paths.tau).shape, [0])
 
+class TestAssetMaterial(unittest.TestCase):
+    """Tests related to the asset's materials"""
 
+    def test_no_asset_material_set_before_adding_asset(self):
+        """Test showing that specifying no asset material before adding the asset work when the asset is added to scene"""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset) # test asset is made of metal and wood
 
-#
-# reload scene
-#
-# Multiple assets / asset list vs not list
-#
+        prev_glass = scene.get("itu_glass")
+        prev_wood = scene.get("itu_wood")
+        prev_metal =scene.get("itu_metal")
+        prev_glass_bsdf = prev_glass.bsdf
+        prev_wood_bsdf = prev_wood.bsdf
+        prev_metal_bsdf = prev_metal.bsdf
+        prev_glass_bsdf_xml = prev_glass.bsdf.xml_element
+        prev_wood_bsdf_xml = prev_wood.bsdf.xml_element
+        prev_metal_bsdf_xml = prev_metal.bsdf.xml_element
+
+        # Before adding asset none of these materials are used and the bsdf are all placeholders
+        self.assertTrue(not prev_glass.is_used)
+        self.assertTrue(not prev_wood.is_used)
+        self.assertTrue(not prev_metal.is_used)
+        self.assertTrue(prev_glass_bsdf.is_placeholder)
+        self.assertTrue(prev_wood_bsdf.is_placeholder)
+        self.assertTrue(prev_metal_bsdf.is_placeholder)
+
+        # Add the asset
+        scene.add(asset)
+
+        # After adding the asset, the asset radio material is still None (since it has never been specified)
+        # When adding asset to scene, the material are specified on a per shape basis (using the asset xml) since no material have been specified.
+        self.assertTrue(asset.radio_material == None)
+        self.assertTrue(scene.get("asset_0").radio_material == None)
+
+        # After adding the asset, the material the asset use are now used and their bsdf are not placeholders anymore
+        new_glass = scene.get("itu_glass")
+        new_wood = scene.get("itu_wood")
+        new_metal =scene.get("itu_metal")
+        new_glass_bsdf = new_glass.bsdf
+        new_wood_bsdf = new_wood.bsdf
+        new_metal_bsdf = new_metal.bsdf
+        self.assertTrue(not new_glass.is_used)
+        self.assertTrue(new_wood.is_used)
+        self.assertTrue(new_metal.is_used)
+        self.assertTrue(new_glass_bsdf.is_placeholder)
+        self.assertTrue(not new_wood_bsdf.is_placeholder)
+        self.assertTrue(not new_metal_bsdf.is_placeholder)
+        self.assertTrue(asset.shapes['asset_0_cube_0'].object_id in scene.get("itu_wood").using_objects)
+        self.assertTrue(asset.shapes['asset_0_cube_1'].object_id in scene.get("itu_metal").using_objects)
+
+        # After adding asset, the material object instance and bsdf should not change
+        new_glass = scene.get("itu_glass")
+        new_wood = scene.get("itu_wood")
+        new_metal =scene.get("itu_metal")
+        new_glass_bsdf = new_glass.bsdf
+        new_wood_bsdf = new_wood.bsdf
+        new_metal_bsdf = new_metal.bsdf
+        new_glass_bsdf_xml = new_glass_bsdf.xml_element
+        new_wood_bsdf_xml = new_wood_bsdf.xml_element
+        new_metal_bsdf_xml = new_metal_bsdf.xml_element
+
+        self.assertTrue(new_glass is prev_glass)
+        self.assertTrue(new_wood is prev_wood)
+        self.assertTrue(new_metal is prev_metal)
+        self.assertTrue(new_glass_bsdf is prev_glass_bsdf)
+        self.assertTrue(new_wood_bsdf is prev_wood_bsdf)
+        self.assertTrue(new_metal_bsdf is prev_metal_bsdf)
+
+        # Although the bsdf and material object are the same, the bsdf xml_element shoud have been updated
+        self.assertTrue(prev_glass_bsdf_xml == new_glass_bsdf_xml)
+        self.assertTrue(not prev_wood_bsdf_xml == new_wood_bsdf_xml)
+        self.assertTrue(not prev_metal_bsdf_xml == new_metal_bsdf_xml)
+        
+    def test_str_asset_material_set_before_adding_asset(self):
+        """Test showing that specifying asset material as a str before adding the asset work when the asset is added to scene"""
+        # str existing material
+
+        # str non existing material
+        self.assertTrue(False)
+        
+    # set material after adding assset to scene
+
+    # are itu init material placeholders
+
+    # are itu init material bsdf placeholders
+
+    # are material placeholder replaced by asset material when specified
+
+    # are bsdf placeholder replaced by asset's bsdf when specified
+
+    # what if adding an asset with material and bsdf non placeholder to the scene with a material non placeholder with placeholder bsdf? does the material stay unchanged while the bsdf updated?
+
+    # scene init replace placeholder bsdf?
+
+    # creation of asset:
+        # Set no material use shape dependant material
+            # Create placeholder when necessary
+            # Use scene material otherwise
+            # Replace the bsdf when and only when they  are placeholder
+        # Set material with str with name of an alreeady existing material
+        # Set material with str with name of a non existing material
+        # Set material with RadioMaterial
+        # Set material with RadioMaterial from the scene
+        # Set material with RadioMaterial that has an already existing name
+        # Set material with wrong type
+        
+    # Asset removal delete material when not in use anymore
+
+    # Previous asset related material are not impact new material
+
+    # trying to replace a non placeholder material (e..g from a previous asset add) raise a warning and does not change the non placeholder material
+
+    # Asset add/remove update well object_id in material and corresponding bsdf
+
+    # changing bsdf of a material
+
+    # changing material of an asset 
+        # Using str
+        # Using RM
+        # Using wrong type
+        # Need to reload scene?
+
+    # Asset material update change propagation properties
+
+    # Reload scene
+
+    # change (material) properties of an object belonging to an asset where self._material is not None 
+    # should update asset material to None (ie not all scene object have the same material anymore)
+
+    # change asset material should update shape xmL?  
+
+    # Who is in charge of reloading scene? automatic when changing bsdf? (maybe add a scene.bypass_reload scene to avoid intempestive reload)
+
+    # Check if material is not str or RadioMaterial
+
+    # Check if object_id are removed from material and bsdf object_using sets when scene_objects are cleared
+
+    # Check objects_using syncrho between material and bsdf
+
+    # Overwrite bsdf and or material when placeholder or when asked by user. For material check that assign works well (including for object_ids)
+
+    # Problem? change a property (material, position, speed, etc.) of a non-asset scene object, then add an asset >>> trigger scene reload, this should revert the scene object properties... > non wanted
+
+    # Check availability of origin_bsdfs in corresponding data structure
+
+    # Test assign method radio_material assign also the object_id and bsdf
+
 # BSDF/Material + secure API when adding an asset with an existing material to the scene? modyfing material properties 
 # => At least add a warning stating that the asset material has not been taken into account since there is already a material with that name
 #

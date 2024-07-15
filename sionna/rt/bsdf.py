@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+import numpy as np
 import tensorflow as tf
 import xml.etree.ElementTree as ET
 
@@ -26,17 +27,16 @@ class BSDF:
     name : str
         Unique name of the bsdf
  
-    xml_tree : `:class:~Element`, optional 
-        XML Element tree instance from xml.etree.ElementTree library (default is None).
+    xml_element : `:class:~Element`, optional 
+        XML Element  instance from xml.etree.ElementTree.Element library (default is None).
 
     rgb: tuple of 3x float, optional
         RGB color of the asset (default is None).
     """
 
-    # TODO: - Update scene after change of BSDF?
     def __init__(self,
                 name,
-                xml_tree = None,
+                xml_element = None,
                 rgb = None,
                 ):
 
@@ -44,30 +44,30 @@ class BSDF:
             raise TypeError("`name` must be a string")
         self._name = name
 
-        # XML Tree or RGB color of the BSDF
-        if xml_tree is None and rgb is None:
-            raise TypeError("Either `xml_tree` or `rgb` must be set")
-        
-        if xml_tree is not None:
+
+        if xml_element is not None:
             # Store the specified XML descriptor
-            self._xml_tree = xml_tree
-            self._xml_tree.set('id',f"{self._name}")
-            self._xml_tree.set('name',f"{self._name}")  
+            self._xml_element = xml_element
+            self._xml_element.set('id',f"{self._name}")
+            self._xml_element.set('name',f"{self._name}")  
        
         else:
-            if len(rgb) != 3 and max(rgb) > 1 and min(rgb) < 0:
+            if rgb is None:
+                # If neither RGB or XML element are specified a random color is chosen
+                rgb = np.random.rand(3)
+            elif len(rgb) != 3 and max(rgb) > 1 and min(rgb) < 0:
                 raise TypeError("`rgb` must be a list of 3 floats comprised between 0 and 1")
             self._rgb = rgb
 
             # Create a default bsdf element
-            self._xml_tree = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
+            self._xml_element = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
             rgb_value = f"{self._rgb[0]} {self._rgb[1]} {self._rgb[2]}"
-            ET.SubElement(self._xml_tree, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
+            ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
+        
 
         # By default we assume the bsdf not to be a placeholder (i.e. it is defined by the user). 
         # When the bsdf is automatically instantiated during the creation of a material, then _is_placeholder argument is set to True    
         self._is_placeholder = False
-            
 
         # Set of objects identifiers that use this bsdf
         self._objects_using = set()
@@ -91,15 +91,15 @@ class BSDF:
         str (read-only) : Name of the BSDF
         """
         self._name = name
-        self._xml_tree.set('id',f"{self._name}")
-        self._xml_tree.set('name',f"{self._name}") 
+        self._xml_element.set('id',f"{self._name}")
+        self._xml_element.set('name',f"{self._name}") 
 
     @property
-    def xml_tree(self):
+    def xml_element(self):
         """
         str (read-only) : XML tree description of the BSDF
         """
-        return self._xml_tree
+        return self._xml_element
     
     @property
     def rgb(self):
@@ -108,34 +108,35 @@ class BSDF:
         """
         return self._rgb
     
-    @xml_tree.setter
-    def xml_tree(self, xml_tree):
+    @xml_element.setter
+    def xml_element(self, xml_element):
         """
         `:~class:Element:`  : XML tree (see ElementTree library)
         """
         # Store the specified XML descriptor and change the name to match that of the bsdf/material
-        self._xml_tree = xml_tree
-        self._xml_tree.set('id',f"{self._name}")
-        self._xml_tree.set('name',f"{self._name}")  
+        self._xml_element = xml_element
+        self._xml_element.set('id',f"{self._name}")
+        self._xml_element.set('name',f"{self._name}")  
         
         self._is_placeholder = False
 
         if self._scene is not None:
-            self.update_scene_bsdf()
+            self._scene.append_to_xml(self._xml_element, overwrite=True)
+            self._scene.reload_scene()
 
-    # Setter for the xml_tree argument with an additional parameter, allowing to control the update of the scene
-    def set_xml_tree(self, xml_tree, update_scene): 
-        """
-        `:~class:Element:`  : XML tree (see ElementTree library)
-        """
-        self._xml_tree = xml_tree
-        self._xml_tree.set('id',f"{self._name}")
-        self._xml_tree.set('name',f"{self._name}")  
+    # # Setter for the xml_element argument with an additional parameter, allowing to control the update of the scene
+    # def set_xml_element(self, xml_element, update_scene): 
+    #     """
+    #     `:~class:Element:`  : XML tree (see ElementTree library)
+    #     """
+    #     self._xml_element = xml_element
+    #     self._xml_element.set('id',f"{self._name}")
+    #     self._xml_element.set('name',f"{self._name}")  
         
-        self._is_placeholder = False
+    #     self._is_placeholder = False
 
-        if self._scene is not None and update_scene:
-            self.update_scene_bsdf()
+    #     if self._scene is not None and update_scene:
+    #         self.update_scene_bsdf()
 
     @rgb.setter
     def rgb(self, rgb):
@@ -147,17 +148,18 @@ class BSDF:
         self._rgb = rgb
 
         # Create a default bsdf element
-        self._xml_tree = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
+        self._xml_element = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
         rgb_value = f"{self._rgb[0]} {self._rgb[1]} {self._rgb[2]}"
-        ET.SubElement(self._xml_tree, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
+        ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
         
         self._is_placeholder = False
 
         if self._scene is not None:
-            self.update_scene_bsdf()
+            self._scene.append_to_xml(self._xml_element, overwrite=True)
+            self._scene.reload_scene()
 
-    def update_scene_bsdf(self):
-        self._scene.update_bsdf(self)
+    # def update_scene_bsdf(self):
+    #     self._scene.update_bsdf(self)
 
     @property
     def use_counter(self):
@@ -211,6 +213,11 @@ class BSDF:
     @scene.setter
     def scene(self, scene):
         self._scene = scene
+        existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=False)
+        if existing_bsdf is not None:
+            self._xml_element = existing_bsdf
+            self._is_placeholder = False
+        self._scene.reload_scene()
 
     @property
     def is_placeholder(self):

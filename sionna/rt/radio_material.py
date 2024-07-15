@@ -138,10 +138,9 @@ class RadioMaterial:
             bsdf.name = f"mat-{self._name}"
             self._bsdf = bsdf
         else:
-            rgb = np.random.rand(3)
             bsdf_name = f"mat-{self._name}"
-            self._bsdf = BSDF(name=bsdf_name,xml_tree=None,rgb=rgb)
-            self._bsdf.is_placeholder = True # (since the material's bsdf is created randomly)
+            self._bsdf = BSDF(name=bsdf_name) # Since neither rgb nor xml_element are specified, a placeholder bsdf is created with random rgb color
+            self._bsdf.is_placeholder = True
 
 
         # Save the callback for when the frequency is updated
@@ -392,6 +391,11 @@ class RadioMaterial:
         self.xpd_coefficient = rm.xpd_coefficient
         self.scattering_pattern = rm.scattering_pattern
         self.frequency_update_callback = rm.frequency_update_callback
+        self.bsdf = rm.bsdf
+
+        for obj_id in rm.using_objects:
+            self.add_object_using(obj_id)
+
 
     @property
     def bsdf(self):
@@ -409,6 +413,8 @@ class RadioMaterial:
 
         if self._scene is not None:
             self._bsdf.scene = self._scene
+            for obj_id in self._objects_using:
+                self._bsdf.add_object_using(obj_id)
 
     @property
     def scene(self):
@@ -421,3 +427,4 @@ class RadioMaterial:
     def scene(self, scene):
         self._scene = scene
         self._bsdf.scene = self._scene
+
