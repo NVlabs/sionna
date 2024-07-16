@@ -935,6 +935,33 @@ def complex_normal(shape, var=1.0, dtype=tf.complex64):
 
     return x
 
+def complex_uniform_disk(shape, var=1.0, dtype=tf.complex64):
+    # pylint: disable=line-too-long
+    r"""
+    Sample uniform circle on complex plane.
+
+    Input
+    -----
+    shape : tf.shape, or list
+        The desired shape.
+
+    var : float
+        The total variance., i.e., each complex dimension has
+        variance ``var/2``.
+
+    dtype: tf.complex
+        The desired dtype. Defaults to `tf.complex64`.
+
+    Output
+    ------
+    : ``shape``, ``dtype``
+        Tensor of random variables sampled from a uniform complex disk with radius :math:`\sqrt{2 \cdot \text{var}}`.
+    """
+    # Sample theta and R uniform, r = sqrt(2R)
+    r = tf.complex(tf.random.uniform(shape, minval=0, maxval=var, dtype=dtype.real_dtype), tf.cast(0.0, dtype.real_dtype))
+    theta = tf.complex(tf.random.uniform(shape, minval=0, maxval=2*np.pi, dtype=dtype.real_dtype), tf.cast(0.0, dtype.real_dtype))
+    return tf.sqrt(2*r)*tf.exp(1j*theta)
+
 ###########################################################
 # Deprecated aliases that will not be included in the next
 # major release
