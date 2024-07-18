@@ -360,6 +360,20 @@ class TBConfig(Config):
                 "n_id must be in range from 0 to 1023"
             self._n_id = value
 
+    @property
+    def transform_precoding(self):
+        """
+        bool, False (default): Use transform precoding
+        """
+        self._ifndef("transform_precoding", False)
+        return self._transform_precoding
+
+    @transform_precoding.setter
+    def transform_precoding(self, value):
+        assert isinstance(value, bool), \
+            """transform_precoding must be bool"""
+        self._transform_precoding = value
+
     ###
     ### Derived (read-only) parameters
     ###
@@ -375,7 +389,8 @@ class TBConfig(Config):
         MCS"""
         _, r = select_mcs(self._mcs_index,
                           self._mcs_table,
-                          channel_type=self._channel_type)
+                          channel_type=self._channel_type,
+                          transform_precoding=self.transform_precoding)
         return r
 
     @property
@@ -384,7 +399,8 @@ class TBConfig(Config):
         int, read-only: Modulation order as defined by the selected MCS"""
         m, _ = select_mcs(self._mcs_index,
                           self._mcs_table,
-                          channel_type=self._channel_type)
+                          channel_type=self._channel_type,
+                          transform_precoding=self.transform_precoding)
         return m
 
     @property
