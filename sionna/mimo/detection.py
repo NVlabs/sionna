@@ -52,6 +52,11 @@ class LinearDetector(Layer):
         constellation point indices instead of soft-values.
         Defaults to `False`.
 
+    post_equalizer_transformation: None or Layer
+        Optional layer that applies a transformation after the equalizer and
+        before the demapper. This can be used to apply transform precoding
+        when DFT-s-OFDM is enabled in NR PUSCH.
+
     dtype : One of [tf.complex64, tf.complex128] tf.DType (dtype)
         The dtype of ``y``. Defaults to tf.complex64.
         The output dtype is the corresponding real dtype (tf.float32 or tf.float64).
@@ -96,11 +101,13 @@ class LinearDetector(Layer):
                  num_bits_per_symbol=None,
                  constellation=None,
                  hard_out=False,
+                 post_equalizer_transformation=None,
                  dtype=tf.complex64,
                  **kwargs):
         super().__init__(dtype=dtype, **kwargs)
         self._output = output
         self._hard_out = hard_out
+        self._post_equalizer_transformation = post_equalizer_transformation
 
         # Determine the equalizer to use
         if isinstance(equalizer, str):
@@ -137,6 +144,8 @@ class LinearDetector(Layer):
 
     def call(self, inputs):
         x_hat, no_eff = self._equalizer(*inputs)
+        if self._post_equalizer_transformation is not None:
+            x_hat = self._post_equalizer_transformation(x_hat)
         z = self._demapper([x_hat, no_eff])
 
         # Reshape to the expected output shape

@@ -28,7 +28,7 @@ class TestPUSCHDMRS(unittest.TestCase):
     """Tests for the PUSCHDMRS Class"""
 
     def test_against_reference_1(self):
-        """Test that DMRS pattenrs match a reference implementation"""
+        """Test that DMRS patterns match a reference implementation"""
         reference_dmrs = np.load("unit/nr/reference_dmrs_1.npy")
         pusch_config = PUSCHConfig()
         pusch_config.carrier.n_size_grid = 1
@@ -52,7 +52,7 @@ class TestPUSCHDMRS(unittest.TestCase):
         self.assertTrue(np.allclose(pilots, reference_dmrs))
 
     def test_against_reference_2(self):
-        """Test that DMRS pattenrs match a reference implementation"""
+        """Test that DMRS patterns match a reference implementation"""
         reference_dmrs = np.load("unit/nr/reference_dmrs_2.npy")
         pusch_config = PUSCHConfig()
         pusch_config.carrier.n_size_grid = 4
@@ -75,9 +75,31 @@ class TestPUSCHDMRS(unittest.TestCase):
         pilots = np.transpose(np.array(p))
         self.assertTrue(np.allclose(pilots, reference_dmrs))
 
+    def  test_against_reference_transform_precoding(self):
+        """Test that DMRS patterns match a reference implementation"""
+        reference_dmrs = np.load("unit/nr/reference_dmrs_transform_precoding.npy")
+        pusch_config = PUSCHConfig()
+        pusch_config.transform_precoding = True
+
+        pusch_config.carrier.subcarrier_spacing = 30
+        pusch_config.carrier.n_size_grid = 273
+        pusch_config.dmrs.config_type = 1
+        pusch_config.dmrs.length = 1
+        pusch_config.dmrs.additional_position = 0
+        pusch_config.dmrs.num_cdm_groups_without_data = 2
+        p = []
+        for n_cell_id in [0, 1, 10, 24, 99, 1006]:
+            pusch_config.carrier.n_cell_id = n_cell_id
+            a = pusch_config.dmrs_grid
+            pilots = np.concatenate([a[0, :, 2], a[0, :, 3], a[0, :, 10], a[0, :, 11]])
+            pilots = pilots[np.where(pilots)]/np.sqrt(2)
+            p.append(pilots)
+        pilots = np.transpose(np.array(p))
+        self.assertTrue(np.allclose(pilots, reference_dmrs))
+
     def test_orthogonality_over_resource_grid(self):
         """Test that DMRS for different ports are orthogonal
-           accross a resource grid by computing the LS estimate
+           across a resource grid by computing the LS estimate
            on a noise less block-constant channel
         """
         def ls_estimate(pusch_config):
@@ -179,7 +201,7 @@ class TestPUSCHDMRS(unittest.TestCase):
 
 
     def test_precoding_against_reference(self):
-        "Test precoded DMRS against reference implementation"
+        """Test precoded DMRS against reference implementation"""
 
         pusch_config = PUSCHConfig()
         pusch_config.carrier.n_size_grid = 1
