@@ -359,8 +359,10 @@ class RadioMaterial:
             self._bsdf.discard_object_using(object_id)
 
     def reset_objects_using(self):
+        # for obj_id in self._objects_using:
+        #     self._bsdf.discard_object_using(obj_id)
         self._objects_using = set()
-        self._bsdf.reset_objects_using()
+        self._bsdf.reset_objects_using() #
 
     @property
     def is_placeholder(self):
@@ -391,10 +393,22 @@ class RadioMaterial:
         self.xpd_coefficient = rm.xpd_coefficient
         self.scattering_pattern = rm.scattering_pattern
         self.frequency_update_callback = rm.frequency_update_callback
-        self.bsdf = rm.bsdf
 
-        for obj_id in rm.using_objects:
-            self.add_object_using(obj_id)
+        #if self._bsdf.is_placeholder and not rm.is_placeholder and self._scene != None:
+        #existing_bsdf = self._scene.append_to_xml(rm.bsdf.xml_element, overwrite=True)
+
+        # The default beahviour when updating/modyfing a radio material is to not automatically reload the scene (which can break the diffenrtiability)
+        if self._scene is not None:
+            b_tmp = self._scene.bypass_reload_scene
+            self._scene.bypass_reload_scene = True
+
+        self.bsdf.assign(rm.bsdf)
+
+        if self._scene is not None:
+            self._scene.bypass_scene_reload = b_tmp
+
+        # for obj_id in rm.using_objects:
+        #     self.add_object_using(obj_id)
 
 
     @property
@@ -409,10 +423,16 @@ class RadioMaterial:
         if not isinstance(bsdf, BSDF):
             raise TypeError("`bsdf` must be a BSDF")
         bsdf.name = f"mat-{self._name}"
+
+        # Reset object using this material from current bsdf
+        for obj_id in self._objects_using:
+            self._bsdf.discard_object_using(obj_id)
+
         self._bsdf = bsdf
 
         if self._scene is not None:
             self._bsdf.scene = self._scene
+            self._bsdf.reset_objects_using() #
             for obj_id in self._objects_using:
                 self._bsdf.add_object_using(obj_id)
 
