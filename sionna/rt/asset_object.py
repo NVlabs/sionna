@@ -23,10 +23,14 @@ from importlib_resources import files
 from .radio_material import RadioMaterial
 from .bsdf import BSDF
 from .object import Object
+from .object import Object
 
 from ..utils.misc import copy_and_rename_files
 from .utils import normalize, theta_phi_from_unit_vec
+from .utils import normalize, theta_phi_from_unit_vec
 from sionna.constants import PI
+
+from . import assets
 
 from . import assets
 
