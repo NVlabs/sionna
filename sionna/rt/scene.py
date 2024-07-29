@@ -622,35 +622,41 @@ class Scene:
 
     #     return True
 
-    # def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
-    #     """"
-    #     Update the XML file such that the shape with id 'shape_name' now reference BSDF with id 'bsdf_name'
-    #     Parameters:
-    #     -----------
-    #     shape_name : str
-    #         The name of the shape to be udpated
+    def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
+        """"
+        Update the XML file such that the shape with id 'shape_name' now reference BSDF with id 'bsdf_name'
+        Parameters:
+        -----------
+        shape_name : str
+            The name of the shape to be udpated
             
-    #     bsdf_name : str
-    #         The name of the updated shape's bsdf 
-    #     Returns
-    #     ------
-    #     bool  
-    #         True if success, False otherwise
-    #     """    
-    #     root = self._xml_tree.getroot()
-    #     shapes_in_root = root.findall('shape')
-    #     for shape in shapes_in_root:
-    #         if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
-    #             ref = shape.find('ref')
-    #             ref.set('id',f"{bsdf_name}")
-    #             ref.set('name','bsdf')   
-    #             # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
-    #             ET.indent(self._xml_tree, space="\t", level=0)
-    #             self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-    #             return True
+        bsdf_name : str
+            The name of the updated shape's bsdf 
+        Returns
+        ------
+        bool  
+            True if success, False otherwise
+        """    
+        if shape_name[:5] != 'mesh':
+            shape_name = f"mesh-{shape_name}"
+
+        if bsdf_name[:3] != 'mat':
+            bsdf_name = f"mat-{bsdf_name}"
+
+        root = self._xml_tree.getroot()
+        shapes_in_root = root.findall('shape')
+        for shape in shapes_in_root:
+            if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
+                ref = shape.find('ref')
+                ref.set('id',f"{bsdf_name}")
+                ref.set('name','bsdf')   
+                # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
+                ET.indent(self._xml_tree, space="\t", level=0)
+                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+                return True
             
-    #     warnings.warn(f"No shape element with name {shape_name} in root to update.")
-    #     return False 
+        warnings.warn(f"No shape element with name {shape_name} in root to update.")
+        return False 
 
     def reload_scene(self):
         """

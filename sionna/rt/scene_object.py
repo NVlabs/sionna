@@ -47,7 +47,7 @@ class SceneObject(Object):
 
         # Set the radio material
         self.radio_material = radio_material
-
+        
         # Set the object id
         self.object_id = object_id
 
@@ -160,6 +160,9 @@ class SceneObject(Object):
 
         # Add the RadioMaterial to the scene if not already done
         self.scene.add(self._radio_material)
+
+        # Update shape's bsdf in the xml file accordingly
+        self._scene.update_shape_bsdf_xml(shape_name=f"mesh-{self._name}", bsdf_name=self.radio_material.bsdf.name)
 
         # Update the asset radio material if the scene object belong to an asset:
         if self._asset_object is not None:

@@ -133,9 +133,47 @@ class TestBSDF(unittest.TestCase):
     """Tests related to the BSDF class"""
 
     def test_bsdf_modification_update_shape_bsdf(self):
-        """Check that the modification of a material and/or bsdf leads to the update of the corresponding shape's bsdf in the XML file."""
-        # Are the shape's bsdf updated accordingly?
-        self.assertTrue(False)
+        """Check that the modification/setup of a material and/or bsdf leads to the update of the corresponding shape's bsdf in the XML file."""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+
+        # Add asset with mat
+        asset = AssetObject("asset_0", sionna.rt.asset_object.test_asset_1, radio_material='itu_metal')
+        scene.add(asset)
+
+        root = scene._xml_tree.getroot()
+        elements_in_root = root.findall('shape')  
+        for elt in elements_in_root:
+            if id == elt.get('id') == "mesh-asset_0_cube_0":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_metal")
+
+        for elt in elements_in_root:
+            if id == elt.get('id') == "mesh-asset_0_cube_1":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_metal")
+
+        # Change scene object material
+        scene.get("asset_0_cube_0").radio_material = 'itu_wood'
+        for elt in elements_in_root:
+            if elt.get('id') == "mesh-asset_0_cube_0":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_wood")
+
+        scene.get("asset_0_cube_1").radio_material = 'itu_glass'
+        for elt in elements_in_root:
+            if elt.get('id') == "mesh-asset_0_cube_1":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_glass")
+
+        
 
     def test_itu_materials_bsdfs_are_placeholders(self):
         """Test showing that Sionna base materials'bsdfs are placeholders, except when they are defined in the scene XML file"""
