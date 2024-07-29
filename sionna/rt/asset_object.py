@@ -531,5 +531,20 @@ test_asset = str(files(assets).joinpath("test_asset/test_asset.xml"))
 Example asset containing two 1x1x1m cubes spaced by 1m along the y-axis.
 """
 
+body = str(files(assets).joinpath("body/body.xml"))
+# pylint: disable=C0301
+r"""
+Example asset containing one human body
+"""
 
+monkey = str(files(assets).joinpath("monkey/monkey.xml"))
+# pylint: disable=C0301
+r"""
+Example asset containing one monkey head
+"""
 
+two_persons = str(files(assets).joinpath("two_persons/two_persons.xml"))
+# pylint: disable=C0301
+r"""
+Example asset containing two human bodies
+"""
