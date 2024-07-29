@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from .object import Object
 from .radio_material import RadioMaterial
+from .asset_object import AssetObject
 import drjit as dr
 import mitsuba as mi
 from .utils import mi_to_tf_tensor, angles_to_mitsuba_rotation, normalize,\
@@ -71,6 +72,9 @@ class SceneObject(Object):
             self._mi_scalar_t = mi.Float64
             self._mi_transform_t = mi.Transform4d
 
+        # Store if the SceneObject belongs to an AssetObject
+        self._asset_object = None
+
     @property
     def object_id(self):
         r"""
@@ -81,6 +85,19 @@ class SceneObject(Object):
     @object_id.setter
     def object_id(self, v):
         self._object_id = v
+
+
+
+    @property
+    def asset_object(self):
+        r"""
+        int : Get/set the asset_object of this object
+        """
+        return self._asset_object
+
+    @asset_object.setter
+    def asset_object(self, a):
+        self._asset_object = a
 
     @property
     def radio_material(self):
@@ -133,6 +150,12 @@ class SceneObject(Object):
 
         # Add the RadioMaterial to the scene if not already done
         self.scene.add(self._radio_material)
+
+        # Update the asset radio material if the scene object belong to an asset:
+        if self._asset_object is not None:
+            self._scene.get(self.asset_object).update_radio_material()
+        
+
 
     @property
     def velocity(self):

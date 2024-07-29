@@ -6,6 +6,7 @@
 import numpy as np
 import tensorflow as tf
 import xml.etree.ElementTree as ET
+import copy
 
 from . import scene
 
@@ -59,7 +60,7 @@ class BSDF:
                 raise TypeError("`rgb` must be a list of 3 floats comprised between 0 and 1")
             self._rgb = rgb
 
-            # Create a default bsdf element
+            # Create a default RGB bsdf element
             self._xml_element = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
             rgb_value = f"{self._rgb[0]} {self._rgb[1]} {self._rgb[2]}"
             ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
@@ -94,6 +95,22 @@ class BSDF:
         self._xml_element.set('id',f"{self._name}")
         self._xml_element.set('name',f"{self._name}") 
 
+        # if self._scene is not None:
+        #     # When the name of the bsdf is updated, we must also update the XML file:
+        #     # - The bsdf name must be changed
+        #     # - The corresponding shapes's bsdf references must be updated
+        #     self._scene.append_to_xml(self._xml_element, overwrite=True)
+            
+        #     for object_id in self.using_objects:
+        #         for shape_name in self._scene._scene_objects:
+        #             shape = self._scene._scene_objects[shape_name]
+        #             shape_id = shape.object_id
+        #             if shape_id == object_id:
+        #                 self._scene.update_shape_bsdf_xml(shape_name, self._name)
+        #                 break 
+            
+        #     self._scene.reload_scene()
+
     @property
     def xml_element(self):
         """
@@ -113,6 +130,13 @@ class BSDF:
         """
         `:~class:Element:`  : XML tree (see ElementTree library)
         """
+        if not isinstance(xml_element, ET.Element):
+            raise TypeError("`element` must be an ET.Element descriptor of a BSDF.")
+
+        # Check if the root element is <bsdf>
+        if xml_element.tag != 'bsdf':
+            raise ValueError("The root element must be <bsdf>.")
+
         # Store the specified XML descriptor and change the name to match that of the bsdf/material
         self._xml_element = xml_element
         self._xml_element.set('id',f"{self._name}")
@@ -141,9 +165,9 @@ class BSDF:
     @rgb.setter
     def rgb(self, rgb):
         """
-        `:~class:Element:`  : XML tree (see ElementTree library)
+        `:list[float, float, float]:`  : RGB float triplet with values comprised between 0 and 1
         """
-        if len(rgb) != 3 and max(rgb) > 1 and min(rgb) < 0:
+        if len(rgb) != 3 or max(rgb) > 1 or min(rgb) < 0:
             raise TypeError("`rgb` must be a list of 3 floats comprised between 0 and 1")
         self._rgb = rgb
 
@@ -189,7 +213,14 @@ class BSDF:
         Add an object to the set of objects using this BSDF
         """
         self._objects_using.add(object_id)
-        #self._objects_using.append(object_id)
+        
+        # # Update the corresponding shapes's XML to reference the correct bsdf
+        # for shape_name in self._scene._scene_objects:
+        #     shape = self._scene._scene_objects[shape_name]
+        #     shape_id = shape.object_id
+        #     if shape_id == object_id:
+        #         self._scene.update_shape_bsdf_xml(shape_name, self._name)
+        #         break 
 
     def discard_object_using(self, object_id):
         """
@@ -213,10 +244,40 @@ class BSDF:
     @scene.setter
     def scene(self, scene):
         self._scene = scene
+
         existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=False)
+        
         if existing_bsdf is not None:
             self._xml_element = existing_bsdf
             self._is_placeholder = False
+        self._scene.reload_scene()
+
+    def assign(self, b):
+        """
+        Assign new values to the BSDF properties from another
+        BSDF ``b``.
+
+        Input
+        ------
+        b : :class:`~sionna.rt.BSDF
+            BSDF from which to assign the new values
+        """
+        if not isinstance(b, BSDF):
+            raise TypeError("`b` is not a BSDF")
+
+        # When assigning a the bsdf attributes we should not use the same objects:
+        self._rgb = b.rgb.copy()
+        self._xml_element = copy.deepcopy(b.xml_element)
+
+        # Since assign method does not replace the object itself, the we should update the name of the assigned bsdf before updating xml file
+        self._xml_element.set('id',f"{self._name}")
+        self._xml_element.set('name',f"{self._name}")  
+
+        existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=True)
+
+        # for obj_id in b.using_objects:
+        #     self.add_object_using(obj_id)
+
         self._scene.reload_scene()
 
     @property
