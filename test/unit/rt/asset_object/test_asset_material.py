@@ -28,7 +28,7 @@ if gpus:
         print(e)
         
         
-class TestSetAssetMaterial(unittest.TestCase):
+class TestAssetMaterial(unittest.TestCase):
     """Tests related to the asset's materials definition before adding the asset to a scene"""
 
     def test_xml_asset_material(self):

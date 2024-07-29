@@ -670,7 +670,7 @@ class Scene:
             self._preview_widget = None 
             
             # Clear the scene objects (To be improved?)
-            self._scene_objects.clear()
+            # self._scene_objects.clear()
 
             # Clear the object using the materials of the scene (without removing the materials and their properties)
             for mat_name in self._radio_materials:
@@ -2263,6 +2263,10 @@ class Scene:
         """
         Load the scene objects available in the scene
         """
+        # Local copy of previous SceneObjects:
+        tmp_scene_objects = self._scene_objects.copy()
+        self._scene_objects.clear()
+
         # Parse all shapes in the scene
         scene = self._scene
         objects_id = dr.reinterpret_array_v(mi.UInt32,scene.shapes_dr()).tf()#[obj_id for obj_id,s in enumerate(scene.shapes())] #
@@ -2307,7 +2311,14 @@ class Scene:
             obj.scene = self
             obj.radio_material = mat_name
 
+            # Assign previous SceneObject properties (if it exists) to the newly created object
+            if name in tmp_scene_objects:
+                obj.assign(tmp_scene_objects[name])
+
             self._scene_objects[name] = obj
+
+        # Clear the tmp scene objects dict.
+        tmp_scene_objects.clear()
 
         # Apply the initial position and orientation transform for all assets
         for asset_name in self._asset_objects:
@@ -2326,9 +2337,12 @@ class Scene:
             
             asset.update_radio_material()
 
-            asset.position_init = True
-            asset.position = asset.position
-            asset.orientation = asset.orientation
+            # asset.position_init = True
+            # asset.position = asset.position
+            # asset.orientation = asset.orientation
+            if asset.position_init:
+                asset.position = asset.position
+                asset.orientation = asset.orientation
 
             
         

@@ -15,7 +15,10 @@ import tensorflow as tf
 import numpy as np
 import xml.etree.ElementTree as ET
 import warnings
+import copy
+
 from importlib_resources import files
+
 
 from .radio_material import RadioMaterial
 from .bsdf import BSDF
@@ -60,10 +63,10 @@ class AssetObject():
         If set, the radio material is to be associated with all the asset's shapes. If not specified, materials will be inferred from the BSDF descriptors in the XML file.
 
     overwrite_scene_bsdfs : :boolean:, optional, (default is False)
-    If True replace all existing bsdf from the scene by the ones specified in the asset files. Otherwise, replace only placeholder scene's bsdfs.
+        If True replace all existing bsdf from the scene by the ones specified in the asset files. Otherwise, replace only placeholder scene's bsdfs.
 
     overwrite_scene_radio_materials : :boolean:, optional, (default is False)
-    If True update all existing radio_materials from the scene by the ones specified in the asset files. Otherwise, replace only placeholder scene's radio_materials.
+        If True update all existing radio_materials from the scene by the ones specified in the asset files. Otherwise, replace only placeholder scene's radio_materials.
         
     dtype : tf.DType, optional  (default is `tf.complex64`)
         Datatype for all computations, inputs, and outputs.
@@ -139,12 +142,13 @@ class AssetObject():
         self._scene = None
 
         # Structure to store original asset bsdfs as specified in the asset XML file, if needed
-        # self._original_bsdfs = {}
-        # root_to_append = self._xml_tree.getroot()
-        # bsdfs_to_append = root_to_append.findall('bsdf')  
-        # for bsdf in bsdfs_to_append:  
-        #     bsdf_name = bsdf.get('id')
-        #     self._original_bsdfs[f"origin_{bsdf_name}"] = BSDF(name=f"origin_{bsdf_name}", xml_element=bsdf)
+        self._original_bsdfs = {}
+        root_to_append = self._xml_tree.getroot()
+        bsdfs_to_append = root_to_append.findall('bsdf')  
+        for bsdf in bsdfs_to_append:  
+            bsdf = copy.deepcopy(bsdf)
+            bsdf_name = bsdf.get('id')
+            self._original_bsdfs[f"{bsdf_name}"] = BSDF(name=f"{bsdf_name}", xml_element=bsdf)
         
 
     def __del__(self):
@@ -369,7 +373,6 @@ class AssetObject():
                     else:
                         mat_name = bsdf_name
                     ref.set('id',f"mat-{mat_name}")
-                    
 
                 # Add shape to xml
                 self._scene.append_to_xml(shape, overwrite=False)
@@ -480,6 +483,7 @@ class AssetObject():
     def orientation(self, new_orientation):
         # Rotate all shapes associated to asset while keeping their relative positions (i.e. rotate arround the asset position)
         orientation = tf.cast(new_orientation, dtype=self._rdtype)
+        diff = orientation - self._orientation
         self._orientation = orientation
 
         for shape_id in self.shapes:
@@ -487,9 +491,9 @@ class AssetObject():
             if scene_object is not None:
                 scene_object = self._scene.get(shape_id)
                 old_center_of_rotation = scene_object.center_of_rotation
-                new_center_of_rotation = (self._position - scene_object.position)
+                new_center_of_rotation = self._position - scene_object.position#self._position#(
                 scene_object.center_of_rotation = new_center_of_rotation
-                scene_object.orientation = orientation
+                scene_object.orientation += diff
                 scene_object.center_of_rotation = old_center_of_rotation
                 
     @property
@@ -652,7 +656,13 @@ Example asset containing two 1x1x1m cubes spaced by 1m along the y-axis, with ma
 test_asset_2 = str(files(assets).joinpath("test/test_asset_2/test_asset_2.xml"))
 # pylint: disable=C0301
 """
-Example asset containing two 1x1x1m cubes spaced by 1m along the y-axis, with mat-custom_rm_1 and custom_rm_2 materials..
+Example asset containing two 1x1x1m cubes spaced by 1m along the y-axis, with mat-custom_rm_1 and custom_rm_2 materials.
+"""
+
+test_asset_3 = str(files(assets).joinpath("test/test_asset_3/test_asset_3.xml"))
+# pylint: disable=C0301
+"""
+Example asset containing a single 1x1x1m cubes with mat-itu_marble material.
 """
 
 monkey = str(files(assets).joinpath("monkey/monkey.xml"))
@@ -661,4 +671,14 @@ monkey = str(files(assets).joinpath("monkey/monkey.xml"))
 Example asset containing the famous "Suzanne" monkey head from Blender with mat-itu_marble material.
 """
 
+body = str(files(assets).joinpath("body/body.xml"))
+# pylint: disable=C0301
+"""
+Example asset containing a single body with mat-itu_marble material.
+"""
 
+two_persons = str(files(assets).joinpath("two_persons/two_persons.xml"))
+# pylint: disable=C0301
+"""
+Example asset containing two persons with mat-itu_marble material.
+"""

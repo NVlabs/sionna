@@ -134,3 +134,25 @@ class TestAssetOrientation(unittest.TestCase):
 
         paths = scene.compute_paths(los=False, diffraction=False, max_depth=1)
         self.assertEqual(tf.squeeze(paths.tau).shape, [0])
+
+    def test_reverse_orientation_transform(self):
+        """Test showing that reversing the transform get the object to its initial coordinates"""
+        scene = load_scene() # Empty scene
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        scene.add(asset)
+
+        init_pos_cube_0 = scene.get('asset_0_cube_0').position
+        init_pos_cube_1 = scene.get('asset_0_cube_1').position
+
+        random_rotation = np.random.random(3)
+        asset.orientation += +random_rotation
+        asset.orientation += -random_rotation
+
+        epsilon = 1e-5
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(init_pos_cube_0 - scene.get('asset_0_cube_0').position),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(init_pos_cube_1 - scene.get('asset_0_cube_1').position),epsilon)))
+
+
+    def test_look_at(self):
+        self.assertTrue(False)
+        

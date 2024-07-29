@@ -27,8 +27,36 @@ if gpus:
         print(e)
 
         
-class TestAddAssetObject(unittest.TestCase):
+class TestAssetAdd(unittest.TestCase):
     """Tests related to the AssetObject class"""
+
+    # def setUp(self):
+    #     import os
+    #     import shutil
+
+    #     self.tmp_directory_path = 'tmp/'
+    #     try:
+    #         if os.path.exists(self.tmp_directory_path):
+    #             # Remove the directory and all its contents
+    #             shutil.rmtree(self.tmp_directory_path)
+    #     # Recreate an empty dir
+    #         os.makedirs(self.tmp_directory_path)
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
+
+    # def tearDown(self):
+    #     import os
+    #     import shutil
+
+    #     self.tmp_directory_path = 'tmp/'
+    #     try:
+    #         if os.path.exists(self.tmp_directory_path):
+    #             # Remove the directory and all its contents
+    #             shutil.rmtree(self.tmp_directory_path)
+    #     # Recreate an empty dir
+    #         os.makedirs(self.tmp_directory_path)
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
     
     def test_add_asset(self):
         """Adding asset to scene"""

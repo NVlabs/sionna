@@ -243,14 +243,15 @@ class BSDF:
 
     @scene.setter
     def scene(self, scene):
-        self._scene = scene
+        if scene is not None:
+            self._scene = scene
 
-        existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=False)
-        
-        if existing_bsdf is not None:
-            self._xml_element = existing_bsdf
-            self._is_placeholder = False
-        self._scene.reload_scene()
+            existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=False)
+            
+            if existing_bsdf is not None:
+                self._xml_element = existing_bsdf
+                self._is_placeholder = False
+            self._scene.reload_scene()
 
     def assign(self, b):
         """

@@ -13,8 +13,10 @@ import unittest
 import tensorflow as tf
 import xml.etree.ElementTree as ET
 import sys
+import numpy as np
 
 from sionna.rt import *
+from sionna.constants import PI
 
 gpus = tf.config.list_physical_devices('GPU')
 print('Number of GPUs available :', len(gpus))
@@ -28,7 +30,7 @@ if gpus:
         print(e)
         
 
-class TestAssetMaterialMisc(unittest.TestCase):
+class TestAssetMisc(unittest.TestCase):
     """Miscellaneous tests related to asset's materials data structures and methods"""  
     def test_placeholder_material_replaced_by_asset_material(self):
         """Check that material placeholder replaced by asset material if asset material is defined (ie non placeholder).
@@ -398,20 +400,20 @@ class TestAssetMaterialMisc(unittest.TestCase):
         """ Check that when changing material properties of a SceneObject belonging to an asset update the asset_material property"""  
         # Single shape asset >>> replace old material by new one
         scene = load_scene(sionna.rt.scene.floor_wall)
-        asset = AssetObject("asset_0", sionna.rt.asset_object.monkey)
+        asset = AssetObject("asset_0", sionna.rt.asset_object.test_asset_3)
         self.assertTrue(asset.radio_material == None)
 
         scene.add(asset)
         
         itu_marble = scene.get('itu_marble')
         self.assertTrue(asset.radio_material == itu_marble)
-        scene_obj = scene.get("asset_0_monkey")
+        scene_obj = scene.get("asset_0_cube")
         self.assertTrue(scene_obj.radio_material == itu_marble)
 
         itu_metal = scene.get('itu_metal')
         scene_obj.radio_material = itu_metal
         self.assertTrue(asset.radio_material == itu_metal)
-        scene_obj = scene.get("asset_0_monkey")
+        scene_obj = scene.get("asset_0_cube")
         self.assertTrue(scene_obj.radio_material == itu_metal)
 
         # Multi-shape asset with single material to multiple material 
@@ -461,9 +463,142 @@ class TestAssetMaterialMisc(unittest.TestCase):
 
     def test_reload_scene_keep_asset_properties(self):
         """Check that when the scene is reloaded, the properties of the asset object are kept, 
-        even if they were previously changed by user (e.g. position, radio material.radio_material)"""
-        self.asserTrue(False)
-    
+        even if they were previously changed by user (e.g. position, radio material.radio_material), 
+        aswell as the asset constituent"""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1, radio_material="itu_metal")
+        
+        self.assertTrue(np.equal(asset.position, [0,0,0]).all())
+        self.assertTrue(np.equal(asset.orientation, [0,0,0]).all())
+        self.assertEqual(asset.radio_material, 'itu_metal')
+
+        scene.add(asset)
+
+        epsilon = 1e-5
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [0,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [0,-1,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].position - [0,+1,0]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [0,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [0,0,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].orientation - [0,0,0]),epsilon)))
+        
+        itu_metal = scene.get('itu_metal')
+        self.assertEqual(asset.radio_material, itu_metal)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_metal)
+        self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_metal)
+
+        # Changing whole asset properties
+        asset.position += [5,2,1]
+        asset.orientation += [PI / 2, 0, 0]
+        asset.radio_material = 'itu_wood'
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [6,+2,1]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].position - [4,+2,1]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [PI/2,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [PI/2,0,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].orientation - [PI/2,0,0]),epsilon)))
+        
+        itu_wood = scene.get('itu_wood')
+        self.assertEqual(asset.radio_material, itu_wood)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_wood)
+        self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_wood)
+
+        # Reload scene
+        scene.reload_scene()
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [6,+2,1]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].position - [4,+2,1]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [PI/2,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [PI/2,0,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].orientation - [PI/2,0,0]),epsilon)))
+        
+        itu_wood = scene.get('itu_wood')
+        self.assertEqual(asset.radio_material, itu_wood)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_wood)
+        self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_wood)
+
+    def test_reload_scene_keep_asset_scene_object_properties(self):
+        """Check that when the scene is reloaded, the properties of the asset object are kept, 
+        even if the scene object of the asset were previously changed by user individually (e.g. position, radio material.radio_material)"""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1, radio_material="itu_metal")
+        
+        self.assertTrue(np.equal(asset.position, [0,0,0]).all())
+        self.assertTrue(np.equal(asset.orientation, [0,0,0]).all())
+        self.assertEqual(asset.radio_material, 'itu_metal')
+
+        scene.add(asset)
+
+        epsilon = 1e-5
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [0,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [0,-1,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].position - [0,+1,0]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [0,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [0,0,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].orientation - [0,0,0]),epsilon)))
+        
+        itu_metal = scene.get('itu_metal')
+        self.assertEqual(asset.radio_material, itu_metal)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_metal)
+        self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_metal)
+
+        # Changing whole asset properties
+        asset.position += [5,2,1]
+        asset.orientation += [PI / 2, 0, 0]
+        asset.radio_material = 'itu_wood'
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [6,+2,1]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].position - [4,+2,1]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [PI/2,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [PI/2,0,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].orientation - [PI/2,0,0]),epsilon)))
+        
+        itu_wood = scene.get('itu_wood')
+        self.assertEqual(asset.radio_material, itu_wood)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_wood)
+        self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_wood)
+
+        # Changing individual asset's scene object properties
+        asset.shapes['asset_0_cube_0'].position += [-2,+3,-5]
+        asset.shapes['asset_0_cube_0'].orientation += [0, PI/2, 0]
+        asset.shapes['asset_0_cube_0'].radio_material = 'itu_glass'
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [4,+5,-4]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [PI/2,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [PI/2,PI/2,0]),epsilon)))
+        
+        itu_glass = scene.get('itu_glass')
+        self.assertEqual(asset.radio_material, None)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_glass)
+
+        # Reload scene
+        scene.reload_scene()
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [4,+5,-4]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].position - [4,+2,1]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [PI/2,0,0]), epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].orientation - [PI/2,PI/2,0]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_1'].orientation - [PI/2,0,0]),epsilon)))
+        
+        itu_wood = scene.get('itu_wood')
+        itu_glass = scene.get('itu_glass')
+        self.assertEqual(asset.radio_material, None)
+        self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_glass)
+        self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_wood)
         
     def test_update_asset_material_object_using(self):
         """Check that changing the material of an AssetObject or a SceneObject, update the object_using sets of the material and its bsdf accordingly"""
@@ -485,9 +620,9 @@ class TestAssetMaterialMisc(unittest.TestCase):
         brick_obj = brick.using_objects.numpy().tolist() 
         metal_obj = metal.using_objects.numpy().tolist() 
 
-        self.assertTrue(len(concrete_obj) == 3)
-        self.assertTrue(len(brick_obj) == 1)
-        self.assertTrue(len(metal_obj) == 2)
+        self.assertEqual(len(concrete_obj), 3)
+        self.assertEqual(len(brick_obj), 1)
+        self.assertEqual(len(metal_obj), 2)
 
         self.assertTrue([scene.get("floor").object_id, scene.get("asset_1_cube_0").object_id, scene.get("asset_1_cube_1").object_id].sort() == concrete_obj.sort())
         self.assertTrue([scene.get("wall").object_id] == brick_obj)
@@ -512,11 +647,11 @@ class TestAssetMaterialMisc(unittest.TestCase):
         glass_obj = glass.using_objects.numpy().tolist() 
         wood_obj = wood.using_objects.numpy().tolist() 
 
-        self.assertTrue(len(concrete_obj) == 0)
-        self.assertTrue(len(brick_obj) == 2)
-        self.assertTrue(len(metal_obj) == 0)
-        self.assertTrue(len(glass_obj) == 2)
-        self.assertTrue(len(wood_obj) == 2)
+        self.assertEqual(len(concrete_obj), 0)
+        self.assertEqual(len(brick_obj), 2)
+        self.assertEqual(len(metal_obj), 0)
+        self.assertEqual(len(glass_obj), 2)
+        self.assertEqual(len(wood_obj), 2)
 
         self.assertTrue([scene.get("asset_1_cube_0").object_id, scene.get("asset_1_cube_1").object_id].sort() == glass_obj.sort())
         self.assertTrue([scene.get("floor").object_id, scene.get("wall").object_id].sort() == brick_obj.sort())
@@ -525,6 +660,21 @@ class TestAssetMaterialMisc(unittest.TestCase):
 
     def test_original_asset_bsdf_are_stored(self):
         """Test showing that the asset's original bsdfs are propely stored in the asset data-structure"""
+        # single-material asset
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_3) 
+        asset_xml_root = asset._xml_tree.getroot()
+        bsdfs_in_asset_xml = asset_xml_root.findall('bsdf')
+        bsdf_ids = [bsdf.get('id') for bsdf in bsdfs_in_asset_xml]
+
+        for id in bsdf_ids:
+            self.assertTrue(id in asset.original_bsdfs)
+            for bsdf in bsdfs_in_asset_xml:
+                if bsdf.get('id') == id:
+                    self.assertTrue(bsdf,asset.original_bsdfs[id].xml_element) 
+        self.assertEqual([b for b in asset.original_bsdfs].sort(),['mat-itu_marble'].sort()) 
+                    
+
+        # Multi-material asset
         asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1) 
         asset_xml_root = asset._xml_tree.getroot()
         bsdfs_in_asset_xml = asset_xml_root.findall('bsdf')
@@ -534,4 +684,5 @@ class TestAssetMaterialMisc(unittest.TestCase):
             self.assertTrue(id in asset.original_bsdfs)
             for bsdf in bsdfs_in_asset_xml:
                 if bsdf.get('id') == id:
-                    self.assertTrue(bsdf,asset.original_bsdfs[id].xml_tree) 
+                    self.assertTrue(bsdf,asset.original_bsdfs[id].xml_element) 
+        self.assertEqual([b for b in asset.original_bsdfs].sort(),['mat-itu_metal','mat-itu_wood'].sort()) 

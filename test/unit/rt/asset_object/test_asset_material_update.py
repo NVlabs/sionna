@@ -29,7 +29,7 @@ if gpus:
         print(e)
         
         
-class TestUpdateAssetMaterial(unittest.TestCase):
+class TestAssetMaterialUpdate(unittest.TestCase):
     """Tests related to the update of asset's materials (i.e. after adding the asset to a scene)"""    
     def test_str_asset_material_update(self):
         """Test showing that changing asset material as a `str` after adding the asset works. Here the material name point to an existing scene material"""

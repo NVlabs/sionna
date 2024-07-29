@@ -75,6 +75,17 @@ class SceneObject(Object):
         # Store if the SceneObject belongs to an AssetObject
         self._asset_object = None
 
+    def assign(self, s):
+        if not isinstance(s, self.__class__):
+            err_msg = f"s must be an instance of `SceneObject`."
+            raise TypeError(err_msg)
+        
+        self.position = s.position
+        self.orientation = s.orientation
+        self.center_of_rotation = s.center_of_rotation
+        self.radio_material = s.radio_material
+        self.velocity = s.velocity
+        
     @property
     def object_id(self):
         r"""
@@ -309,13 +320,20 @@ class SceneObject(Object):
         inv_cur_rotation = cur_rotation.inverse()
 
         # Build the transform.
-        # The object is first translated to the origin (shifted by its distance to center_of_rotation), then rotated, then
+        # The object is first translated to the origin (shifted by its distance to center of rotation), then rotated, then
         # translated back to its current position
+
         transform =  (  self._mi_transform_t.translate(self.position.numpy() + self._center_of_rotation.numpy())
                       @ new_rotation
                       @ inv_cur_rotation
                       @ self._mi_transform_t.translate(-self.position.numpy() - self._center_of_rotation.numpy()))
-
+        
+        # transform =  (  self._mi_transform_t.translate(self.position.numpy() + (self._center_of_rotation.numpy() - self.position.numpy()))
+        #         @ new_rotation
+        #         @ inv_cur_rotation
+        #         @ self._mi_transform_t.translate(-self.position.numpy() - (self._center_of_rotation.numpy() - self.position.numpy())))
+        
+        
         ## Update Mitsuba vertices
 
         # Scene parameters
@@ -430,11 +448,16 @@ class SceneObject(Object):
         solver_paths.wedges_e_hat.scatter_nd_update(wedges_ind, wedges_e_hat)
         solver_paths.wedges_normals.scatter_nd_update(wedges_ind,
                                                       wedges_normals)
+        
+        
 
+        # Update orientation property
         self._orientation = new_orient
 
         # Trigger scene callback
         self._scene.scene_geometry_updated()
+
+
 
     def look_at(self, target):
         # pylint: disable=line-too-long

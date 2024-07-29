@@ -530,6 +530,14 @@ class TestSceneReload(unittest.TestCase):
         self.assertTrue(scene_obj.radio_material == scene.get('itu_glass')) 
         self.assertTrue(new_scene_obj.radio_material == scene.get('itu_glass')) 
 
+    def test_(self):
+        self.assertTrue(False)
+        # SO.assign()
+        # self.orientation = s.orientation
+        # self.radio_material = s.radio_material
+        # self.velocity = s.velocity
+        # self.center_of_rotation = s.center_of_rotation
+
     def test_scene_reload(self):
         """Check that the scene is properly reloaded when necessary and only when necessary"""
         # Reload when:

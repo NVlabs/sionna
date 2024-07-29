@@ -30,7 +30,7 @@ if gpus:
         print(e)
 
 
-class TestDelAsset(unittest.TestCase):
+class TestAssetDelete(unittest.TestCase):
     """Tests related to the deletion an asset object"""
 
     def test_(self):
