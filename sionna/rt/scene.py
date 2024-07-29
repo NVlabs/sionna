@@ -2342,6 +2342,7 @@ class Scene:
             # asset.orientation = asset.orientation
             if asset.position_init:
                 asset.position = asset.position
+            if asset.orientation_init:
                 asset.orientation = asset.orientation
 
             
