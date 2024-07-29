@@ -284,18 +284,11 @@ class TestRadioMaterial(unittest.TestCase):
 
         root = scene._xml_tree.getroot()
         bsdfs_in_root = root.findall('bsdf')
+        bsdfs_in_root = [bsdf.get('id') for bsdf in bsdfs_in_root]
         self.assertTrue("mat-custom_rm_1" in bsdfs_in_root)
         self.assertTrue("mat-custom_rm_2" in bsdfs_in_root)
-        self.assertTrue("mat-custom_rm_3" in bsdfs_in_root)
+        self.assertTrue("mat-mat-custom_rm_3" in bsdfs_in_root)
         self.assertTrue("mat-custom_rm_4" in bsdfs_in_root)
-
-        # # The only exception to the perfect match between a material and its BSDF is when a bsdf from a given 
-        # # material is set (not assigned!) as the bsdf of another material. Then the bsdf name is set to match the 
-        # # latest material to which it has been set.
-        # itu_wood = scene.get('itu_wood')
-        # itu_metal = scene.get('itu_metal')
-        # itu_wood.bsdf = itu_metal.bsdf
-        self.assertTrue(False)
 
     def test_new_radio_material_assignation_to_scene_object(self):
         """Check that the assignation of a new radio_material (i.e. not present at scene init) to a scene object is working."""
@@ -433,39 +426,17 @@ class TestObjectUsingMatBSDFSync(unittest.TestCase):
         self.assertEqual(new_itu_concrete.using_objects.numpy().tolist(), new_itu_concrete.bsdf.using_objects.numpy().tolist())
 
     def test_setting_used_bsdf_to_material_bsdf(self):
-        """Test setting a used BSDF (i.e. BSDF used by another material too) to a material's BSDF"""
-        itu_concrete = self.scene.get('itu_concrete')   
-        itu_concrete_bsdf = itu_concrete.bsdf   
-        itu_concrete_bsdf_obj_using = itu_concrete_bsdf.using_objects.numpy().tolist() 
-        itu_brick = self.scene.get('itu_brick') 
-        itu_brick_bsdf = itu_brick.bsdf  
-        itu_brick_bsdf_obj_using = itu_brick_bsdf.using_objects.numpy().tolist() 
+        """Check that assigning a used bsdf (i.e. BSDF used by another material too) to another radiomaterial triggers an error"""
+        itu_concrete = self.scene.get('itu_concrete')
+        itu_brick= self.scene.get('itu_brick')
 
-        itu_brick.bsdf = itu_concrete.bsdf
+        self.assertTrue(itu_concrete.bsdf.is_used)
 
-        new_itu_concrete = self.scene.get('itu_concrete')  
-        new_itu_concrete_bsdf = new_itu_concrete.bsdf    
-        new_itu_concrete_obj_using = new_itu_concrete.using_objects.numpy().tolist() 
-        new_itu_concrete_bsdf_obj_using = new_itu_concrete_bsdf.using_objects.numpy().tolist() 
-        new_itu_brick = self.scene.get('itu_brick')   
-        new_itu_brick_bsdf = new_itu_brick.bsdf  
-        new_itu_brick_obj_using = new_itu_brick.using_objects.numpy().tolist() 
-        new_itu_brick_bsdf_obj_using = new_itu_brick_bsdf.using_objects.numpy().tolist() 
+        with self.assertRaises(ValueError) as context:
+            itu_brick.bsdf = itu_concrete.bsdf
+        self.assertEqual(str(context.exception), "Can't assign an already used BSDF to another material")
 
-        self.assertTrue(new_itu_concrete.is_used)
-        self.assertTrue(new_itu_brick.is_used)
-        self.assertTrue(new_itu_concrete_bsdf.is_used)
-        self.assertTrue(new_itu_brick_bsdf.is_used)
-        self.assertTrue(itu_concrete_bsdf.is_used)
-        self.assertFalse(itu_brick_bsdf.is_used)
-        self.assertTrue(new_itu_brick_bsdf is new_itu_concrete.bsdf)
         
-        self.assertEqual(new_itu_concrete_obj_using, itu_concrete_bsdf_obj_using)
-        self.assertEqual(new_itu_brick_obj_using, itu_brick_bsdf_obj_using)
-        self.assertNotEqual(new_itu_concrete_obj_using, new_itu_concrete_bsdf_obj_using)
-        self.assertNotEqual(new_itu_brick_obj_using, new_itu_brick_bsdf_obj_using)
-        self.assertEqual(new_itu_concrete_bsdf_obj_using, new_itu_brick_bsdf_obj_using)
-        self.assertEqual((new_itu_concrete_bsdf_obj_using).sort(), (itu_concrete_bsdf_obj_using + itu_brick_bsdf_obj_using).sort())
 
 
 class TestSceneReload(unittest.TestCase):

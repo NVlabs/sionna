@@ -422,6 +422,10 @@ class RadioMaterial:
     def bsdf(self, bsdf):
         if not isinstance(bsdf, BSDF):
             raise TypeError("`bsdf` must be a BSDF")
+        
+        if bsdf.is_used:
+            raise ValueError("Can't assign an already used BSDF to another material")
+        
         bsdf.name = f"mat-{self._name}"
 
         # Reset object using this material from current bsdf
