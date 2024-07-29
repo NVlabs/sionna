@@ -154,5 +154,25 @@ class TestAssetOrientation(unittest.TestCase):
 
 
     def test_look_at(self):
-        self.assertTrue(False)
+        scene = load_scene() # Empty scene
+        asset_0 = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1, position=[0,0,0])
+        asset_1 = AssetObject(name="asset_1", filename=sionna.rt.asset_object.test_asset_1, position=[2,2,0])
+        scene.add([asset_0,asset_1]) 
+
+        epsilon = 1e-5
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([0,-1,0]) - scene.get('asset_0_cube_0').position),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([0,+1,0]) - scene.get('asset_0_cube_1').position),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([2,+1,0]) - scene.get('asset_1_cube_0').position),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([2,+3,0]) - scene.get('asset_1_cube_1').position),epsilon)))
+
+        asset_0.look_at(asset_1)
+        epsilon = 1e-5
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([+np.sqrt(2)/2,-np.sqrt(2)/2,0]) - scene.get('asset_0_cube_0').position),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([-np.sqrt(2)/2,+np.sqrt(2)/2,0]) - scene.get('asset_0_cube_1').position),epsilon)))
+
+        asset_1.look_at([0,0,0])
+        epsilon = 1e-5
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([2-np.sqrt(2)/2,2+np.sqrt(2)/2,0]) - scene.get('asset_1_cube_0').position),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([2+np.sqrt(2)/2,2-np.sqrt(2)/2,0]) - scene.get('asset_1_cube_1').position),epsilon)))
+
         

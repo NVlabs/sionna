@@ -22,11 +22,13 @@ from importlib_resources import files
 
 from .radio_material import RadioMaterial
 from .bsdf import BSDF
-from . import assets
+from .object import Object
 
 from ..utils.misc import copy_and_rename_files
-# from .utils import normalize, theta_phi_from_unit_vec
+from .utils import normalize, theta_phi_from_unit_vec
 from sionna.constants import PI
+
+from . import assets
 
 
 class AssetObject():
@@ -642,51 +644,45 @@ class AssetObject():
         
         self._bypass_update = False
            
-    ############################## SceneObject properties to be extended to AssetObject ###################
     
+    def look_at(self, target):
+        # pylint: disable=line-too-long
+        r"""
+        Sets the orientation of the asset so that the x-axis points toward an
+        ``Object``.
 
-
-    
-
-    
-    # def look_at(self, target):
-    #     # pylint: disable=line-too-long
-    #     r"""
-    #     Sets the orientation so that the x-axis points toward an
-    #     ``Object``.
-
-    #     Input
-    #     -----
-    #     target : [3], float | :class:`sionna.rt.Object` | str
-    #         A position or the name or instance of an
-    #         :class:`sionna.rt.Object` in the scene to point toward to
-    #     """
-    #     # Get position to look at
-    #     if isinstance(target, str):
-    #         if self._scene == None:
-    #             err_msg = f"No scene have been affected to current AssetObject"
-    #             raise TypeError(err_msg)
+        Input
+        -----
+        target : [3], float | :class:`sionna.rt.Object` | str
+            A position or the name or instance of an
+            :class:`sionna.rt.Object` in the scene to point toward to
+        """
+        # Get position to look at
+        if isinstance(target, str):
+            if self._scene == None:
+                err_msg = f"No scene have been affected to current AssetObject"
+                raise TypeError(err_msg)
             
-    #         obj = self.scene.get(target)
-    #         if not isinstance(obj, Object) or not isinstance(obj, AssetObject):
-    #             raise ValueError(f"No camera, device, or object named '{target}' found.")
-    #         else:
-    #             target = obj.position
-    #     elif isinstance(target, Object) or isinstance(target, AssetObject):
-    #         target = target.position
-    #     else:
-    #         target = tf.cast(target, dtype=self._rdtype)
-    #         if not target.shape[0]==3:
-    #             raise ValueError("`target` must be a three-element vector)")
+            obj = self.scene.get(target)
+            if not isinstance(obj, Object) or not isinstance(obj, AssetObject):
+                raise ValueError(f"No camera, device, asset or object named '{target}' found.")
+            else:
+                target = obj.position
+        elif isinstance(target, Object) or isinstance(target, AssetObject):
+            target = target.position
+        else:
+            target = tf.cast(target, dtype=self._rdtype)
+            if not target.shape[0]==3:
+                raise ValueError("`target` must be a three-element vector)")
 
-    #     # Compute angles relative to LCS
-    #     x = target - self.position
-    #     x, _ = normalize(x)
-    #     theta, phi = theta_phi_from_unit_vec(x)
-    #     alpha = phi # Rotation around z-axis
-    #     beta = theta-PI/2 # Rotation around y-axis
-    #     gamma = 0.0 # Rotation around x-axis
-    #     self.orientation = (alpha, beta, gamma)
+        # Compute angles relative to LCS
+        x = target - self.position
+        x, _ = normalize(x)
+        theta, phi = theta_phi_from_unit_vec(x)
+        alpha = phi # Rotation around z-axis
+        beta = theta-PI/2 # Rotation around y-axis
+        gamma = 0.0 # Rotation around x-axis
+        self.orientation = (alpha, beta, gamma)
 
 
 #

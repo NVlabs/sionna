@@ -10,7 +10,6 @@ import tensorflow as tf
 
 from .object import Object
 from .radio_material import RadioMaterial
-from .asset_object import AssetObject
 import drjit as dr
 import mitsuba as mi
 from .utils import mi_to_tf_tensor, angles_to_mitsuba_rotation, normalize,\
