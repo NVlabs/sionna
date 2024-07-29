@@ -56,7 +56,7 @@ class SceneObject(Object):
         self._mi_shape = mi_shape
 
         # Set velocity vector
-        self.velocity = tf.cast([0,0,0], dtype=self._rdtype)
+        self._velocity = tf.cast([0,0,0], dtype=self._rdtype)
 
         # Set center of rotation. This parameter is used for nested asset objects rotations.
         self._center_of_rotation = tf.cast([0,0,0], dtype=self._rdtype)
@@ -180,6 +180,9 @@ class SceneObject(Object):
         if not tf.shape(v)==3:
             raise ValueError("`velocity` must have shape [3]")
         self._velocity = tf.cast(v, self._rdtype)
+
+        if self._asset_object is not None:
+            self._scene.get(self.asset_object).update_velocity()
 
     @property
     def center_of_rotation(self):

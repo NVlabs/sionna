@@ -129,6 +129,11 @@ class AssetObject():
         # else:
         #     self.look_at(look_at)
 
+        # Velocity
+        self._velocity = tf.cast([0,0,0], dtype=self._rdtype)
+
+
+
         # Material (If multiple shapes within the asset >> Associate the same material to all shapes)
         if radio_material != None:
             if not isinstance(radio_material,str) and not isinstance(radio_material,RadioMaterial):
@@ -149,6 +154,9 @@ class AssetObject():
             bsdf = copy.deepcopy(bsdf)
             bsdf_name = bsdf.get('id')
             self._original_bsdfs[f"{bsdf_name}"] = BSDF(name=f"{bsdf_name}", xml_element=bsdf)
+
+        # Bypass update flag - internal flag used to avoid intempestiv update trigger by shape modification called within an asset method
+        self._bypass_update = False
         
 
     def __del__(self):
@@ -409,21 +417,44 @@ class AssetObject():
             del self._shapes[key]
 
     def update_radio_material(self):
-        asset_mats = []
-        for shape_name in self._shapes:
-            shape = self._shapes[shape_name]
-            shape_radio_material = shape.radio_material
+        """Check that all asset's shapes share the same radio_material. If not assign None to the asset radio_material parameter."""
+        if not self._bypass_update:
+            asset_mats = []
+            for shape_name in self._shapes:
+                shape = self._shapes[shape_name]
+                shape_radio_material = shape.radio_material
 
-            # Store the asset material(s)
-            if shape_radio_material not in asset_mats:
-                asset_mats.append(shape_radio_material)
-            
-        if len(asset_mats) == 1:
-            # If there is a single material used by all shapes of an asset, the general asset material property is set to that material
-            self._radio_material = asset_mats[0]
-        else:
-            # Otherwise, it is set to None
-            self._radio_material = None
+                # Store the asset material(s)
+                if shape_radio_material not in asset_mats:
+                    asset_mats.append(shape_radio_material)
+                
+            if len(asset_mats) == 1:
+                # If there is a single material used by all shapes of an asset, the general asset material property is set to that material
+                self._radio_material = asset_mats[0]
+            else:
+                # Otherwise, it is set to None
+                self._radio_material = None
+
+    def update_velocity(self):
+        """Check that all asset's shapes share the same velocity. If not assign None to the asset velocity parameter."""
+        if not self._bypass_update:
+
+            shape_names = list(self._shapes.keys())
+
+            first_shape_velocity = self._shapes[shape_names[0]].velocity
+
+            for shape_name in shape_names[1:]:
+                shape = self._shapes[shape_name]
+                shape_velocity = shape.velocity
+
+                if not np.array_equal(shape_velocity, first_shape_velocity):
+                    # Not all shapes share the same velocity vector
+                    self._velocity = None
+                    return
+                
+                first_shape_velocity = shape_velocity
+            # All shapes share the same velocity vector
+            self._velocity = shape_velocity
 
     @property
     def filename(self):
@@ -537,6 +568,7 @@ class AssetObject():
             err_msg = f"Radio material must be of type 'str' or 'sionna.rt.RadioMaterial"
             raise TypeError(err_msg)
         
+
         mat_obj = mat
 
         # If the asset as been added to a scene
@@ -557,6 +589,8 @@ class AssetObject():
                 self._radio_material = mat_obj 
                 self._scene.add(mat_obj)
 
+            # set asset update bypass to True so that the asset material is not re-updated at each asset shape modification
+            self._bypass_update = True
             for shape_name in self._shapes:
                 
                 # Get the current radio material of the scene object corresponding to that shape.
@@ -576,32 +610,43 @@ class AssetObject():
                 #     self._scene.remove(prev_material.name)
                 #     self._scene.remove_from_xml(bsdf_name,"bsdf") 
             self._scene.bypass_reload_scene = b_tmp
+
+            self._bypass_update = False
           
 
         # Store the new asset material (which is now the same for all asset's shape)
         self._radio_material = mat_obj
 
-            
+        
+
+
+    @property
+    def velocity(self):
+        """
+        [3], tf.float : Get/set the velocity vector to all shapees of the asset[m/s]
+        """
+        return self._velocity
+
+    @velocity.setter
+    def velocity(self, v):
+        if not tf.shape(v)==3:
+            raise ValueError("`velocity` must have shape [3]")
+        self._velocity = tf.cast(v, self._rdtype)
+
+        # set asset update bypass to True so that the asset material is not re-updated at each asset shape modification
+        self._bypass_update = True
+        
+        for shape_id in self.shapes:
+            scene_object = self._scene.get(shape_id)
+            scene_object.velocity = self._velocity
+        
+        self._bypass_update = False
+           
     ############################## SceneObject properties to be extended to AssetObject ###################
     
 
 
-    # @property
-    # def velocity(self):
-    #     """
-    #     [3], tf.float : Get/set the velocity vector [m/s]
-    #     """
-    #     return self._velocity
-
-    # @velocity.setter
-    # def velocity(self, v):
-    #     if not tf.shape(v)==3:
-    #         raise ValueError("`velocity` must have shape [3]")
-    #     self._velocity = tf.cast(v, self._rdtype)
-
-    #     for shape_id in self.shapes:
-    #         scene_object = self._scene.get(shape_id)
-    #         scene_object.velocity = self._velocity
+    
 
     
     # def look_at(self, target):
