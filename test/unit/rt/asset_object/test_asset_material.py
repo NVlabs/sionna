@@ -28,7 +28,7 @@ if gpus:
         print(e)
         
         
-class TestSetAssetMaterial(unittest.TestCase):
+class TestAssetMaterial(unittest.TestCase):
     """Tests related to the asset's materials definition before adding the asset to a scene"""
 
     def test_xml_asset_material(self):
@@ -64,6 +64,7 @@ class TestSetAssetMaterial(unittest.TestCase):
 
         # Add the asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         # After adding the asset, the asset radio material is a dictionary where each key is a material name, and the value are the list of scene object using these material within the asset
@@ -115,7 +116,8 @@ class TestSetAssetMaterial(unittest.TestCase):
         self.assertFalse(prev_metal_bsdf_xml == new_metal_bsdf_xml)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
     def test_xml_asset_material_unknown(self):
         """Check that specifying asset material as None works even when the asset_xml file refering to unknown scene materials,
@@ -129,6 +131,7 @@ class TestSetAssetMaterial(unittest.TestCase):
 
         # Add the asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         # After adding the asset, the asset radio material are placeholder RadioMaterials
@@ -148,7 +151,8 @@ class TestSetAssetMaterial(unittest.TestCase):
         # self.assertTrue(asset.radio_material == {scene_custom_rm_2.name: [scene.get("asset_0_cube_0")],scene_custom_rm_1.name:[scene.get("asset_0_cube_1")]})
         
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
 
     def test_str_asset_material(self):
@@ -183,6 +187,7 @@ class TestSetAssetMaterial(unittest.TestCase):
 
         # Add the asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         # After adding the asset, the asset radio material is the "itu_metal" RadioMaterial from scene
@@ -238,7 +243,8 @@ class TestSetAssetMaterial(unittest.TestCase):
         self.assertTrue(prev_metal_bsdf_xml == new_metal_bsdf_xml)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
     def test_str_asset_material_unknown(self):
         """Check that specifying asset material as a `str` refering to an unknown scene material, leads to the creation of a placeholder material (and bsdf)"""
@@ -251,6 +257,7 @@ class TestSetAssetMaterial(unittest.TestCase):
 
         # Add the asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         # After adding the asset, the asset radio material is the "custom_rm" placeholder RadioMaterial
@@ -262,7 +269,8 @@ class TestSetAssetMaterial(unittest.TestCase):
         self.assertTrue(scene_custom_rm.is_used)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
        
     def test_radio_material_asset_material(self):
@@ -300,6 +308,7 @@ class TestSetAssetMaterial(unittest.TestCase):
 
         # Add the asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         # After adding the asset, the asset radio material is the new custom_rm
@@ -360,7 +369,8 @@ class TestSetAssetMaterial(unittest.TestCase):
         self.assertTrue(prev_metal_bsdf_xml == new_metal_bsdf_xml)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
      
     def test_radio_material_from_scene_asset_material(self):
         """Test showing that specifying asset material as a RadioMaterial from the scene before adding the asset work when the asset is added to scene"""
@@ -395,6 +405,7 @@ class TestSetAssetMaterial(unittest.TestCase):
 
         # Add the asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         # After adding the asset, the asset radio material is the itu_wood RadioMaterial.
@@ -449,7 +460,8 @@ class TestSetAssetMaterial(unittest.TestCase):
         self.assertTrue(prev_metal_bsdf_xml == new_metal_bsdf_xml)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
   
     def test_already_used_name_asset_material(self):
         """Test showing that specifying asset material with a name already in use(item or other RadioMaterial) already present in the scene doesn't work when the asset is added to scene"""

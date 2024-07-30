@@ -10,7 +10,6 @@ import tensorflow as tf
 
 from .object import Object
 from .radio_material import RadioMaterial
-from .asset_object import AssetObject
 import drjit as dr
 import mitsuba as mi
 from .utils import mi_to_tf_tensor, angles_to_mitsuba_rotation, normalize,\
@@ -48,7 +47,7 @@ class SceneObject(Object):
 
         # Set the radio material
         self.radio_material = radio_material
-
+        
         # Set the object id
         self.object_id = object_id
 
@@ -56,7 +55,7 @@ class SceneObject(Object):
         self._mi_shape = mi_shape
 
         # Set velocity vector
-        self.velocity = tf.cast([0,0,0], dtype=self._rdtype)
+        self._velocity = tf.cast([0,0,0], dtype=self._rdtype)
 
         # Set center of rotation. This parameter is used for nested asset objects rotations.
         self._center_of_rotation = tf.cast([0,0,0], dtype=self._rdtype)
@@ -75,6 +74,15 @@ class SceneObject(Object):
         # Store if the SceneObject belongs to an AssetObject
         self._asset_object = None
 
+    def delete_from_scene(self):
+        # Remove shape from XML
+        self._scene.remove_from_xml(f"mesh-{self._name}","shape")
+
+        # Discard the scene object from the objects using this material
+        self._radio_material.discard_object_using(self.object_id) 
+
+
+
     @property
     def object_id(self):
         r"""
@@ -84,9 +92,36 @@ class SceneObject(Object):
 
     @object_id.setter
     def object_id(self, v):
+        if self._scene != None:
+            self.radio_material.discard_object_using(self._object_id)
+            self.radio_material.add_object_using(v)
+        
         self._object_id = v
+        
 
+    @property
+    def mi_shape(self):
+        r"""
+        int : Get/set the Mitsuba shape of this object
+        """
+        return self._mi_shape
+       
+    def update_mi_shape(self, mi_shape, object_id):
+        tmp_position = self.position
+        tmp_orientation = self.orientation
+        tmp_center_of_rotation = self.center_of_rotation
 
+        if self._radio_material is not None:
+            self.radio_material.discard_object_using(self._object_id)
+            self.radio_material.add_object_using(object_id)
+        
+        self._object_id = object_id
+
+        self._mi_shape = mi_shape
+        
+        self.position = tmp_position
+        self.center_of_rotation = tmp_center_of_rotation
+        self.orientation = tmp_orientation
 
     @property
     def asset_object(self):
@@ -151,6 +186,9 @@ class SceneObject(Object):
         # Add the RadioMaterial to the scene if not already done
         self.scene.add(self._radio_material)
 
+        # Update shape's bsdf in the xml file accordingly
+        self._scene.update_shape_bsdf_xml(shape_name=f"mesh-{self._name}", bsdf_name=self.radio_material.bsdf.name)
+
         # Update the asset radio material if the scene object belong to an asset:
         if self._asset_object is not None:
             self._scene.get(self.asset_object).update_radio_material()
@@ -169,6 +207,9 @@ class SceneObject(Object):
         if not tf.shape(v)==3:
             raise ValueError("`velocity` must have shape [3]")
         self._velocity = tf.cast(v, self._rdtype)
+
+        if self._asset_object is not None:
+            self._scene.get(self.asset_object).update_velocity()
 
     @property
     def center_of_rotation(self):
@@ -309,13 +350,20 @@ class SceneObject(Object):
         inv_cur_rotation = cur_rotation.inverse()
 
         # Build the transform.
-        # The object is first translated to the origin (shifted by its distance to center_of_rotation), then rotated, then
+        # The object is first translated to the origin (shifted by its distance to center of rotation), then rotated, then
         # translated back to its current position
+
         transform =  (  self._mi_transform_t.translate(self.position.numpy() + self._center_of_rotation.numpy())
                       @ new_rotation
                       @ inv_cur_rotation
                       @ self._mi_transform_t.translate(-self.position.numpy() - self._center_of_rotation.numpy()))
-
+        
+        # transform =  (  self._mi_transform_t.translate(self.position.numpy() + (self._center_of_rotation.numpy() - self.position.numpy()))
+        #         @ new_rotation
+        #         @ inv_cur_rotation
+        #         @ self._mi_transform_t.translate(-self.position.numpy() - (self._center_of_rotation.numpy() - self.position.numpy())))
+        
+        
         ## Update Mitsuba vertices
 
         # Scene parameters
@@ -430,11 +478,16 @@ class SceneObject(Object):
         solver_paths.wedges_e_hat.scatter_nd_update(wedges_ind, wedges_e_hat)
         solver_paths.wedges_normals.scatter_nd_update(wedges_ind,
                                                       wedges_normals)
+        
+        
 
+        # Update orientation property
         self._orientation = new_orient
 
         # Trigger scene callback
         self._scene.scene_geometry_updated()
+
+
 
     def look_at(self, target):
         # pylint: disable=line-too-long

@@ -27,22 +27,54 @@ if gpus:
         print(e)
 
         
-class TestAddAssetObject(unittest.TestCase):
+class TestAssetAdd(unittest.TestCase):
     """Tests related to the AssetObject class"""
+
+    # def setUp(self):
+    #     import os
+    #     import shutil
+
+    #     self.tmp_directory_path = 'tmp/'
+    #     try:
+    #         if os.path.exists(self.tmp_directory_path):
+    #             # Remove the directory and all its contents
+    #             shutil.rmtree(self.tmp_directory_path)
+    #     # Recreate an empty dir
+    #         os.makedirs(self.tmp_directory_path)
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
+
+    # def tearDown(self):
+    #     import os
+    #     import shutil
+
+    #     self.tmp_directory_path = 'tmp/'
+    #     try:
+    #         if os.path.exists(self.tmp_directory_path):
+    #             # Remove the directory and all its contents
+    #             shutil.rmtree(self.tmp_directory_path)
+    #     # Recreate an empty dir
+    #         os.makedirs(self.tmp_directory_path)
+    #     except Exception as e:
+    #         print(f"An error occurred: {e}")
     
     def test_add_asset(self):
         """Adding asset to scene"""
         scene = load_scene(sionna.rt.scene.floor_wall)
         asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
-        ref_obj = scene.get("floor")
         scene.add(asset)
         self.assertTrue("asset_0" in scene.asset_objects)
         self.assertTrue(isinstance(scene.get("asset_0"),AssetObject)) 
         self.assertTrue(isinstance(scene.get("asset_0_cube_0"),SceneObject)) 
         self.assertTrue(isinstance(scene.get("asset_0_cube_1"),SceneObject)) 
 
-        # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+    def test_add_asset_keep_scene_object_ref(self):
+        """Check that adding asset to scene does not impact other SceneObject"""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        ref_obj = scene.get("floor")
+        scene.add(asset)
+        self.assertTrue(ref_obj == scene.get("floor"))
 
     def test_add_asset_list(self):
         """Adding list of asset to scene"""

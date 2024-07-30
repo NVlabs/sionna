@@ -114,18 +114,18 @@ class TestBSDFUpdate(unittest.TestCase):
         scene = load_scene(sionna.rt.scene.floor_wall)
         placeholder_bsdf = scene.get("itu_glass").bsdf
         self.assertTrue(placeholder_bsdf.is_placeholder)
-        ref_obj = scene.get("floor")
+        ref_obj = scene.get("floor").mi_shape
         placeholder_bsdf.rgb = (0.5, 0.5, 0.5)
-        self.assertNotEqual(ref_obj, scene.get("floor")) 
+        self.assertNotEqual(ref_obj, scene.get("floor").mi_shape) 
 
     def test_scene_reload_on_non_placeholder_bsdf_update(self):
         """Test that the scene is reloaded when the BSDF is updated"""
         scene = load_scene(sionna.rt.scene.floor_wall)
         non_placeholder_bsdf = scene.get("itu_concrete").bsdf
         self.assertFalse(non_placeholder_bsdf.is_placeholder)
-        ref_obj = scene.get("floor")
+        ref_obj = scene.get("floor").mi_shape
         non_placeholder_bsdf.rgb = (0.5, 0.5, 0.5)
-        self.assertNotEqual(ref_obj, scene.get("floor")) 
+        self.assertNotEqual(ref_obj, scene.get("floor").mi_shape) 
 
 
 
@@ -133,9 +133,47 @@ class TestBSDF(unittest.TestCase):
     """Tests related to the BSDF class"""
 
     def test_bsdf_modification_update_shape_bsdf(self):
-        """Check that the modification of a material and/or bsdf leads to the update of the corresponding shape's bsdf in the XML file."""
-        # Are the shape's bsdf updated accordingly?
-        self.assertTrue(False)
+        """Check that the modification/setup of a material and/or bsdf leads to the update of the corresponding shape's bsdf in the XML file."""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+
+        # Add asset with mat
+        asset = AssetObject("asset_0", sionna.rt.asset_object.test_asset_1, radio_material='itu_metal')
+        scene.add(asset)
+
+        root = scene._xml_tree.getroot()
+        elements_in_root = root.findall('shape')  
+        for elt in elements_in_root:
+            if id == elt.get('id') == "mesh-asset_0_cube_0":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_metal")
+
+        for elt in elements_in_root:
+            if id == elt.get('id') == "mesh-asset_0_cube_1":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_metal")
+
+        # Change scene object material
+        scene.get("asset_0_cube_0").radio_material = 'itu_wood'
+        for elt in elements_in_root:
+            if elt.get('id') == "mesh-asset_0_cube_0":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_wood")
+
+        scene.get("asset_0_cube_1").radio_material = 'itu_glass'
+        for elt in elements_in_root:
+            if elt.get('id') == "mesh-asset_0_cube_1":
+                break
+
+        bsdf = elt.find('ref').get('id')
+        self.assertEqual(bsdf, "mat-itu_glass")
+
+        
 
     def test_itu_materials_bsdfs_are_placeholders(self):
         """Test showing that Sionna base materials'bsdfs are placeholders, except when they are defined in the scene XML file"""
@@ -246,18 +284,11 @@ class TestRadioMaterial(unittest.TestCase):
 
         root = scene._xml_tree.getroot()
         bsdfs_in_root = root.findall('bsdf')
+        bsdfs_in_root = [bsdf.get('id') for bsdf in bsdfs_in_root]
         self.assertTrue("mat-custom_rm_1" in bsdfs_in_root)
         self.assertTrue("mat-custom_rm_2" in bsdfs_in_root)
-        self.assertTrue("mat-custom_rm_3" in bsdfs_in_root)
+        self.assertTrue("mat-mat-custom_rm_3" in bsdfs_in_root)
         self.assertTrue("mat-custom_rm_4" in bsdfs_in_root)
-
-        # # The only exception to the perfect match between a material and its BSDF is when a bsdf from a given 
-        # # material is set (not assigned!) as the bsdf of another material. Then the bsdf name is set to match the 
-        # # latest material to which it has been set.
-        # itu_wood = scene.get('itu_wood')
-        # itu_metal = scene.get('itu_metal')
-        # itu_wood.bsdf = itu_metal.bsdf
-        self.assertTrue(False)
 
     def test_new_radio_material_assignation_to_scene_object(self):
         """Check that the assignation of a new radio_material (i.e. not present at scene init) to a scene object is working."""
@@ -265,6 +296,7 @@ class TestRadioMaterial(unittest.TestCase):
         rm = RadioMaterial('new')
         scene.add(rm)
         scene_obj = scene.get('floor')
+        scene_obj_mi_shape = scene_obj.mi_shape
         scene_obj.radio_material = rm
 
         concrete = scene.get('itu_concrete')
@@ -275,9 +307,10 @@ class TestRadioMaterial(unittest.TestCase):
         scene.reload_scene()
         new_scene_obj = scene.get('floor')
         self.assertTrue(new_scene_obj.radio_material == rm)
-        self.assertTrue(new_scene_obj.object_id not in concrete.using_objects)
+        self.assertFalse(new_scene_obj.object_id in concrete.using_objects)
         self.assertTrue(new_scene_obj.object_id in rm.using_objects)
-        self.assertTrue(new_scene_obj is not scene_obj)
+        self.assertTrue(new_scene_obj is scene_obj)
+        self.assertFalse(new_scene_obj.mi_shape is scene_obj_mi_shape)
 
 class TestObjectUsingMatBSDFSync(unittest.TestCase):
     """Tests related to synchronization of objects_using between material and BSDF"""
@@ -395,39 +428,17 @@ class TestObjectUsingMatBSDFSync(unittest.TestCase):
         self.assertEqual(new_itu_concrete.using_objects.numpy().tolist(), new_itu_concrete.bsdf.using_objects.numpy().tolist())
 
     def test_setting_used_bsdf_to_material_bsdf(self):
-        """Test setting a used BSDF (i.e. BSDF used by another material too) to a material's BSDF"""
-        itu_concrete = self.scene.get('itu_concrete')   
-        itu_concrete_bsdf = itu_concrete.bsdf   
-        itu_concrete_bsdf_obj_using = itu_concrete_bsdf.using_objects.numpy().tolist() 
-        itu_brick = self.scene.get('itu_brick') 
-        itu_brick_bsdf = itu_brick.bsdf  
-        itu_brick_bsdf_obj_using = itu_brick_bsdf.using_objects.numpy().tolist() 
+        """Check that assigning a used bsdf (i.e. BSDF used by another material too) to another radiomaterial triggers an error"""
+        itu_concrete = self.scene.get('itu_concrete')
+        itu_brick= self.scene.get('itu_brick')
 
-        itu_brick.bsdf = itu_concrete.bsdf
+        self.assertTrue(itu_concrete.bsdf.is_used)
 
-        new_itu_concrete = self.scene.get('itu_concrete')  
-        new_itu_concrete_bsdf = new_itu_concrete.bsdf    
-        new_itu_concrete_obj_using = new_itu_concrete.using_objects.numpy().tolist() 
-        new_itu_concrete_bsdf_obj_using = new_itu_concrete_bsdf.using_objects.numpy().tolist() 
-        new_itu_brick = self.scene.get('itu_brick')   
-        new_itu_brick_bsdf = new_itu_brick.bsdf  
-        new_itu_brick_obj_using = new_itu_brick.using_objects.numpy().tolist() 
-        new_itu_brick_bsdf_obj_using = new_itu_brick_bsdf.using_objects.numpy().tolist() 
+        with self.assertRaises(ValueError) as context:
+            itu_brick.bsdf = itu_concrete.bsdf
+        self.assertEqual(str(context.exception), "Can't assign an already used BSDF to another material")
 
-        self.assertTrue(new_itu_concrete.is_used)
-        self.assertTrue(new_itu_brick.is_used)
-        self.assertTrue(new_itu_concrete_bsdf.is_used)
-        self.assertTrue(new_itu_brick_bsdf.is_used)
-        self.assertTrue(itu_concrete_bsdf.is_used)
-        self.assertFalse(itu_brick_bsdf.is_used)
-        self.assertTrue(new_itu_brick_bsdf is new_itu_concrete.bsdf)
         
-        self.assertEqual(new_itu_concrete_obj_using, itu_concrete_bsdf_obj_using)
-        self.assertEqual(new_itu_brick_obj_using, itu_brick_bsdf_obj_using)
-        self.assertNotEqual(new_itu_concrete_obj_using, new_itu_concrete_bsdf_obj_using)
-        self.assertNotEqual(new_itu_brick_obj_using, new_itu_brick_bsdf_obj_using)
-        self.assertEqual(new_itu_concrete_bsdf_obj_using, new_itu_brick_bsdf_obj_using)
-        self.assertEqual((new_itu_concrete_bsdf_obj_using).sort(), (itu_concrete_bsdf_obj_using + itu_brick_bsdf_obj_using).sort())
 
 
 class TestSceneReload(unittest.TestCase):
@@ -470,6 +481,7 @@ class TestSceneReload(unittest.TestCase):
 
         # change scene SceneObject property:
         scene_obj = scene.get('floor')
+        scene_obj_mi_shape = scene_obj.mi_shape
         original_pos = scene_obj.position
         new_pos = [7,9,1]
 
@@ -489,7 +501,8 @@ class TestSceneReload(unittest.TestCase):
         new_scene_obj = scene.get('floor')
 
         # Check position after reload
-        self.assertTrue(not new_scene_obj is scene_obj)
+        self.assertTrue(new_scene_obj is scene_obj)
+        self.assertFalse(new_scene_obj.mi_shape is scene_obj_mi_shape)
         self.assertTrue(np.equal(scene_obj.position,new_pos).all) 
         self.assertTrue(np.equal(new_scene_obj.position,new_pos).all) 
 
@@ -503,6 +516,7 @@ class TestSceneReload(unittest.TestCase):
 
         # change scene SceneObject property:
         scene_obj = scene.get('floor')
+        scene_obj_mi_shape = scene_obj.mi_shape
         original_pos = scene_obj.position
         new_pos = [7,9,1]
 
@@ -522,13 +536,15 @@ class TestSceneReload(unittest.TestCase):
         new_scene_obj = scene.get('floor')
 
         # Check position after reload
-        self.assertTrue(not new_scene_obj is scene_obj)
+        self.assertTrue(new_scene_obj is scene_obj)
+        self.assertFalse(new_scene_obj.mi_shape is scene_obj_mi_shape)
         self.assertTrue(np.equal(scene_obj.position,new_pos).all) 
         self.assertTrue(np.equal(new_scene_obj.position,new_pos).all) 
 
         # Check material after reload
         self.assertTrue(scene_obj.radio_material == scene.get('itu_glass')) 
         self.assertTrue(new_scene_obj.radio_material == scene.get('itu_glass')) 
+
 
     def test_scene_reload(self):
         """Check that the scene is properly reloaded when necessary and only when necessary"""
@@ -537,29 +553,39 @@ class TestSceneReload(unittest.TestCase):
         scene = load_scene(sionna.rt.scene.floor_wall)
         asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1) # create a metal asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         #   - After removing assets
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.remove("asset_0")
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         #   - After changing/setting bsdf
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         metal = scene.get("itu_metal")
         metal.bsdf.rgb = (0.5,0.2,0.9)
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         # - After manually calling scene.reload()
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.reload_scene()
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         # - Not when changing material of an object (user has to manually trigger the reload):
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         ref_obj.radio_material = "itu_glass"   
         self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape == scene.get("floor").mi_shape)
                  
     def test_scene_reload_via_ray(self):
         """Check that the scene is properly reloaded and the propagation properties are thus changed"""

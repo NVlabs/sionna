@@ -20,6 +20,7 @@ import tensorflow as tf
 import xml.etree.ElementTree as ET
 import drjit as dr
 import warnings
+import weakref
 
 
 
@@ -43,7 +44,7 @@ from .utils import expand_to_rank
 from .paths import Paths
 from . import scenes
 
-#from ..utils import WeakRefProxy
+from ..utils import WeakRefDict
 
 
 
@@ -357,7 +358,8 @@ class Scene:
         `dict` (read-only), { "name", :class:`~sionna.rt.SceneObject`} : Dictionary
             of scene objects
         """
-        return dict(self._scene_objects)
+        #return dict(self._scene_objects)
+        return WeakRefDict(self._scene_objects)
     
     @property
     def asset_objects(self):
@@ -441,7 +443,8 @@ class Scene:
         if name in self._radio_materials:
             return self._radio_materials[name]
         if name in self._scene_objects:
-            return self._scene_objects[name]
+            #return self._scene_objects[name]
+            return weakref.proxy(self._scene_objects[name])
         if name in self._cameras:
             return self._cameras[name]
         if name in self._asset_objects:
@@ -622,35 +625,41 @@ class Scene:
 
     #     return True
 
-    # def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
-    #     """"
-    #     Update the XML file such that the shape with id 'shape_name' now reference BSDF with id 'bsdf_name'
-    #     Parameters:
-    #     -----------
-    #     shape_name : str
-    #         The name of the shape to be udpated
+    def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
+        """"
+        Update the XML file such that the shape with id 'shape_name' now reference BSDF with id 'bsdf_name'
+        Parameters:
+        -----------
+        shape_name : str
+            The name of the shape to be udpated
             
-    #     bsdf_name : str
-    #         The name of the updated shape's bsdf 
-    #     Returns
-    #     ------
-    #     bool  
-    #         True if success, False otherwise
-    #     """    
-    #     root = self._xml_tree.getroot()
-    #     shapes_in_root = root.findall('shape')
-    #     for shape in shapes_in_root:
-    #         if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
-    #             ref = shape.find('ref')
-    #             ref.set('id',f"{bsdf_name}")
-    #             ref.set('name','bsdf')   
-    #             # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
-    #             ET.indent(self._xml_tree, space="\t", level=0)
-    #             self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-    #             return True
+        bsdf_name : str
+            The name of the updated shape's bsdf 
+        Returns
+        ------
+        bool  
+            True if success, False otherwise
+        """    
+        if shape_name[:5] != 'mesh':
+            shape_name = f"mesh-{shape_name}"
+
+        if bsdf_name[:3] != 'mat':
+            bsdf_name = f"mat-{bsdf_name}"
+
+        root = self._xml_tree.getroot()
+        shapes_in_root = root.findall('shape')
+        for shape in shapes_in_root:
+            if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
+                ref = shape.find('ref')
+                ref.set('id',f"{bsdf_name}")
+                ref.set('name','bsdf')   
+                # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
+                ET.indent(self._xml_tree, space="\t", level=0)
+                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+                return True
             
-    #     warnings.warn(f"No shape element with name {shape_name} in root to update.")
-    #     return False 
+        warnings.warn(f"No shape element with name {shape_name} in root to update.")
+        return False 
 
     def reload_scene(self):
         """
@@ -670,12 +679,12 @@ class Scene:
             self._preview_widget = None 
             
             # Clear the scene objects (To be improved?)
-            self._scene_objects.clear()
+            # self._scene_objects.clear()
 
             # Clear the object using the materials of the scene (without removing the materials and their properties)
-            for mat_name in self._radio_materials:
-                mat = self.get(mat_name)
-                mat.reset_objects_using()
+            # for mat_name in self._radio_materials:
+            #     mat = self.get(mat_name)
+            #     mat.reset_objects_using()
      
 
             # # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
@@ -746,9 +755,9 @@ class Scene:
                         warnings.warn(f"Asset {name} already present in scene has been removed from the scene. If you want to keep both, use a different name.")
                         need_to_reload_scene = True
                         #self.remove_asset(s_item)
-                        s_item.scene = None
-                        del self._asset_objects[name]
-                        # self.remove(name)                
+                        # s_item.scene = None
+                        # del self._asset_objects[name]
+                        self.remove(name)                
                     else:
                         msg = f"Name '{name}' is already used by another item of"\
                             " the scene"
@@ -839,11 +848,25 @@ class Scene:
                 need_to_reload_scene = True
                 #self.remove_asset(item)
                 b_tmp = self._bypass_reload_scene
-                self._bypass_reload_scene = True # all self.reload_scene() call will be by-passed 
+                self._bypass_reload_scene = True # all self.reload_scene() call will be by-passed
+                for shape_name in item.shapes:
+                    obj = self.get(shape_name) 
+                    obj.delete_from_scene() 
+                    del self._scene_objects[shape_name]
                 item.scene = None
                 del self._asset_objects[name]
                 self._bypass_reload_scene = b_tmp
 
+            elif isinstance(item, SceneObject):
+                if item.asset_object is not None :
+                    msg = "Can't remove a SceneObject part of an AssetObject. Try removing the complete AssetObject instead."
+                    raise ValueError(msg)
+                need_to_reload_scene = True
+                b_tmp = self._bypass_reload_scene
+                self._bypass_reload_scene = True # all self.reload_scene() call will be by-passed  
+                item.delete_from_scene()               
+                del self._scene_objects[name]
+                self._bypass_reload_scene = b_tmp
 
             elif isinstance(item, RadioMaterial):
                 if item.is_used:
@@ -853,13 +876,14 @@ class Scene:
                 del self._radio_materials[name]
 
             else:
-                msg = "Only Transmitters, Receivers, RIS, Cameras, AssetObject, or RadioMaterials"\
+                msg = "Only Transmitters, Receivers, RIS, Cameras, AssetObject, SceneObject or RadioMaterials"\
                     " can be removed"
                 raise TypeError(msg)
         
         if need_to_reload_scene:
             self.reload_scene()
-
+  
+    
     
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
                     los=True, reflection=True, diffraction=False,
@@ -2263,6 +2287,10 @@ class Scene:
         """
         Load the scene objects available in the scene
         """
+        # Local copy of previous SceneObjects:
+        # tmp_scene_objects = self._scene_objects.copy()
+        # self._scene_objects.clear()
+
         # Parse all shapes in the scene
         scene = self._scene
         objects_id = dr.reinterpret_array_v(mi.UInt32,scene.shapes_dr()).tf()#[obj_id for obj_id,s in enumerate(scene.shapes())] #
@@ -2301,13 +2329,27 @@ class Scene:
             if name.startswith('mesh-'):
                 name = name[5:]
             
-            if self._is_name_used(name):
+            if self._is_name_used(name) and not name in self._scene_objects:
                 raise ValueError(f"Name'{name}' already used by another item")
-            obj = SceneObject(name, object_id=obj_id, mi_shape=s, dtype=self._dtype)
-            obj.scene = self
-            obj.radio_material = mat_name
+            
+            if name not in self._scene_objects:
+                obj = SceneObject(name, object_id=obj_id, mi_shape=s, dtype=self._dtype)
+                obj.scene = self
+                obj.radio_material = mat_name
+                self._scene_objects[name] = obj
+            else:
+                obj = self._scene_objects[name]
+                obj.update_mi_shape(mi_shape=s,object_id=obj_id)
+                
 
-            self._scene_objects[name] = obj
+            # Assign previous SceneObject properties (if it exists) to the newly created object
+            # if name in tmp_scene_objects:
+            #     obj.assign(tmp_scene_objects[name])
+
+            #self._scene_objects[name] = obj
+
+        # Clear the tmp scene objects dict.
+        # tmp_scene_objects.clear()
 
         # Apply the initial position and orientation transform for all assets
         for asset_name in self._asset_objects:
@@ -2315,20 +2357,26 @@ class Scene:
             # corresponding scene shapes since the scene objects are not yet constructed. To apply these initial parameters, now that the scene objects 
             # have been instantiated, we call the position and orientation setter functions on the initial position and orientation values.
             asset = self.get(asset_name)
+            if asset.init:
+                # Append the scene objects to the shapes of the asset
+                for obj_name in asset.shapes:
+                    #shape name is the name of a newly created SceneObject
+                    #asset.shapes[obj_name] = WeakRefProxy(self.get(obj_name))
+                    obj = self.get(obj_name)
+                    obj.asset_object = asset.name
+                    asset.update_shape(key=obj_name, value=obj)
+                
+                # Check that all asset's shape share the same radio_material
+                asset.update_radio_material()
 
-            # Append the scene objects to the shapes of the asset
-            for shape_name in asset.shapes:
-                #shape name is the name of a newly created SceneObject
-                #asset.shapes[shape_name] = WeakRefProxy(self.get(shape_name))
-                shape = self.get(shape_name)
-                shape.asset_object = asset.name
-                asset.update_shape(key=shape_name, value=shape)
+                # asset.position_init = True
+                # asset.position = asset.position
+                # asset.orientation = asset.orientation
             
-            asset.update_radio_material()
+                asset.position = asset.position
+                asset.orientation = asset.orientation
 
-            asset.position_init = True
-            asset.position = asset.position
-            asset.orientation = asset.orientation
+                asset.init = False
 
             
         
