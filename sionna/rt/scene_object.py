@@ -74,7 +74,15 @@ class SceneObject(Object):
         # Store if the SceneObject belongs to an AssetObject
         self._asset_object = None
 
-        
+    def delete_from_scene(self):
+        # Remove shape from XML
+        self._scene.remove_from_xml(f"mesh-{self._name}","shape")
+
+        # Discard the scene object from the objects using this material
+        self._radio_material.discard_object_using(self.object_id) 
+
+
+
     @property
     def object_id(self):
         r"""

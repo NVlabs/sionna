@@ -20,6 +20,7 @@ import tensorflow as tf
 import xml.etree.ElementTree as ET
 import drjit as dr
 import warnings
+import weakref
 
 
 
@@ -43,7 +44,7 @@ from .utils import expand_to_rank
 from .paths import Paths
 from . import scenes
 
-#from ..utils import WeakRefProxy
+from ..utils import WeakRefDict
 
 
 
@@ -357,7 +358,8 @@ class Scene:
         `dict` (read-only), { "name", :class:`~sionna.rt.SceneObject`} : Dictionary
             of scene objects
         """
-        return dict(self._scene_objects)
+        #return dict(self._scene_objects)
+        return WeakRefDict(self._scene_objects)
     
     @property
     def asset_objects(self):
@@ -441,7 +443,8 @@ class Scene:
         if name in self._radio_materials:
             return self._radio_materials[name]
         if name in self._scene_objects:
-            return self._scene_objects[name]
+            #return self._scene_objects[name]
+            return weakref.proxy(self._scene_objects[name])
         if name in self._cameras:
             return self._cameras[name]
         if name in self._asset_objects:
@@ -752,9 +755,9 @@ class Scene:
                         warnings.warn(f"Asset {name} already present in scene has been removed from the scene. If you want to keep both, use a different name.")
                         need_to_reload_scene = True
                         #self.remove_asset(s_item)
-                        s_item.scene = None
-                        del self._asset_objects[name]
-                        # self.remove(name)                
+                        # s_item.scene = None
+                        # del self._asset_objects[name]
+                        self.remove(name)                
                     else:
                         msg = f"Name '{name}' is already used by another item of"\
                             " the scene"
@@ -845,11 +848,25 @@ class Scene:
                 need_to_reload_scene = True
                 #self.remove_asset(item)
                 b_tmp = self._bypass_reload_scene
-                self._bypass_reload_scene = True # all self.reload_scene() call will be by-passed 
+                self._bypass_reload_scene = True # all self.reload_scene() call will be by-passed
+                for shape_name in item.shapes:
+                    obj = self.get(shape_name) 
+                    obj.delete_from_scene() 
+                    del self._scene_objects[shape_name]
                 item.scene = None
                 del self._asset_objects[name]
                 self._bypass_reload_scene = b_tmp
 
+            elif isinstance(item, SceneObject):
+                if item.asset_object is not None :
+                    msg = "Can't remove a SceneObject part of an AssetObject. Try removing the complete AssetObject instead."
+                    raise ValueError(msg)
+                need_to_reload_scene = True
+                b_tmp = self._bypass_reload_scene
+                self._bypass_reload_scene = True # all self.reload_scene() call will be by-passed  
+                item.delete_from_scene()               
+                del self._scene_objects[name]
+                self._bypass_reload_scene = b_tmp
 
             elif isinstance(item, RadioMaterial):
                 if item.is_used:
@@ -859,13 +876,14 @@ class Scene:
                 del self._radio_materials[name]
 
             else:
-                msg = "Only Transmitters, Receivers, RIS, Cameras, AssetObject, or RadioMaterials"\
+                msg = "Only Transmitters, Receivers, RIS, Cameras, AssetObject, SceneObject or RadioMaterials"\
                     " can be removed"
                 raise TypeError(msg)
         
         if need_to_reload_scene:
             self.reload_scene()
-
+  
+    
     
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
                     los=True, reflection=True, diffraction=False,

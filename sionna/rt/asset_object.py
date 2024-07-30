@@ -165,10 +165,10 @@ class AssetObject():
         self._bypass_update = False
         
 
-    def __del__(self):
-        # If the user delete the asset object before removing it from the scene
-        if self._scene is not None:
-            self._scene.remove(self._name)
+    # def __del__(self):
+    #     # If the user delete the asset object before removing it from the scene, if there is only one reference
+    #     if self._scene is not None:
+    #         self._scene.remove(self._name)
 
     @property
     def original_bsdfs(self):
@@ -208,39 +208,11 @@ class AssetObject():
         # if scene != None:
         #     if not isinstance(scene,Scene):
         #         raise TypeError("`scene` must be `Scene` (or None)")
-           
-
         if self._scene != None and scene == None:
             # If scene is set to None, reset the asset's shapes and remove corresponding SceneObjects
             # Iterate over all the shape elements of the asset
-            for shape_name in list(self._shapes.keys()):
-                # Find all shape elements with this name (normally there is only one...)
-                # for shape in root.findall(f".//shape[@id='mesh-{shape_name}']"):
-                #     # Remove the shape element from the scene xml file
-                #     root.remove(shape)
-                self._scene.remove_from_xml(f"mesh-{shape_name}","shape")
-                
-                # Update the corresponding BSDFs
-                # Get the radio material of the Sionna scene object corresponding to that shape.
-                scene_object = self._scene.get(shape_name)
-                radio_material = scene_object.radio_material
-                # Discard the scene object from the objects using this material
-                radio_material.discard_object_using(scene_object.object_id)
-                
-                # # DEPRECATED: (Problematic if deleting base sionna material e.g. itu_wood, the user should rather use force_material_update when adding an asset to remove existing material properties)
-                # # Check if the previous material is still in use. If not:
-                # # - (1) remove the material from the scene's material
-                # # - (2) remove the bsdf from the scene's xml file
-                # if not radio_material.is_used:
-                #     warnings.warn(f"RadioMaterial {radio_material.name} is not used anymore, it will be deleted from the scene")
-                #     bsdf_name = radio_material.bsdf.name
-                #     self.remove(radio_material.name)
-                #     #xml_bsdf = root.find(f".//bsdf[@id='{bsdf_name}']")
-                #     #root.remove(xml_bsdf)
-                #     self.remove_from_xml(bsdf_name,"bsdf")
-
-                # Remove the scene object               
-                del scene_object
+            # for shape_name in list(self._shapes.keys()):
+            #     self._scene.remove(shape_name)
 
             # Clear the asset's shapes dictionnary
             self._shapes.clear()
