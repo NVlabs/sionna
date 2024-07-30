@@ -74,16 +74,6 @@ class SceneObject(Object):
         # Store if the SceneObject belongs to an AssetObject
         self._asset_object = None
 
-    def assign(self, s):
-        if not isinstance(s, self.__class__):
-            err_msg = f"s must be an instance of `SceneObject`."
-            raise TypeError(err_msg)
-        
-        self.position = s.position
-        self.orientation = s.orientation
-        self.center_of_rotation = s.center_of_rotation
-        self.radio_material = s.radio_material
-        self.velocity = s.velocity
         
     @property
     def object_id(self):
@@ -94,9 +84,36 @@ class SceneObject(Object):
 
     @object_id.setter
     def object_id(self, v):
+        if self._scene != None:
+            self.radio_material.discard_object_using(self._object_id)
+            self.radio_material.add_object_using(v)
+        
         self._object_id = v
+        
 
+    @property
+    def mi_shape(self):
+        r"""
+        int : Get/set the Mitsuba shape of this object
+        """
+        return self._mi_shape
+       
+    def update_mi_shape(self, mi_shape, object_id):
+        tmp_position = self.position
+        tmp_orientation = self.orientation
+        tmp_center_of_rotation = self.center_of_rotation
 
+        if self._radio_material is not None:
+            self.radio_material.discard_object_using(self._object_id)
+            self.radio_material.add_object_using(object_id)
+        
+        self._object_id = object_id
+
+        self._mi_shape = mi_shape
+        
+        self.position = tmp_position
+        self.center_of_rotation = tmp_center_of_rotation
+        self.orientation = tmp_orientation
 
     @property
     def asset_object(self):

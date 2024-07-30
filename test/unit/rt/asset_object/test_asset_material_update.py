@@ -73,6 +73,7 @@ class TestAssetMaterialUpdate(unittest.TestCase):
 
         # Now we change the asset material using a string pointing to an existing material
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         asset.radio_material = "itu_glass"
 
         # After changing the asset material, the asset radio material is the "itu_glass" RadioMaterial from scene
@@ -94,6 +95,7 @@ class TestAssetMaterialUpdate(unittest.TestCase):
         # The material change should not trigger an auto reload of the scene. To update the view (i.e. bsdf related), the user must trigger scene.reload()
         # which might break differentiability...
         self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape == scene.get("floor").mi_shape)
 
 
     def test_str_asset_material_unknown_update(self):
@@ -152,6 +154,7 @@ class TestAssetMaterialUpdate(unittest.TestCase):
 
         # Now we change the asset material using a new RadioMaterial object 
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         asset.radio_material = RadioMaterial(name="custom_rm")
 
         # After changing the asset material, the asset radio material is the "itu_glass" RadioMaterial from scene
@@ -174,6 +177,7 @@ class TestAssetMaterialUpdate(unittest.TestCase):
         # The material change should not trigger an auto reload of the scene (default behaviour). To update the view (i.e. bsdf related), the user must trigger scene.reload()
         # which might break differentiability...
         self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape == scene.get("floor").mi_shape)
 
      
     def test_radio_material_from_scene_asset_material_update(self):
@@ -217,6 +221,7 @@ class TestAssetMaterialUpdate(unittest.TestCase):
 
         # Now we change the asset material using a RadioMaterial object from the scene
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         asset.radio_material = scene.get("itu_glass")
 
         # After changing the asset material, the asset radio material is the "itu_glass" RadioMaterial from scene
@@ -238,6 +243,7 @@ class TestAssetMaterialUpdate(unittest.TestCase):
         # The material change should not trigger an auto reload of the scene. To update the view (i.e. bsdf related), the user must trigger scene.reload()
         # which might break differentiability...
         self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape == scene.get("floor").mi_shape)
 
     
     def test_already_used_name_asset_material_update(self):

@@ -78,6 +78,7 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(itu_metal_scene.is_placeholder)
 
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         new_itu_metal_scene = scene.get('itu_metal')
@@ -95,7 +96,8 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(scene.get('asset_0_cube_1').radio_material==itu_metal_scene)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
 
     def test_placeholder_bsdf_replaced_by_asset_bsdf(self):
@@ -157,6 +159,7 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(itu_metal_scene.relative_permittivity==1.0)
 
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         new_itu_metal_scene = scene.get('itu_metal')
@@ -176,7 +179,8 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(scene.get('asset_0_cube_1').radio_material==itu_metal_scene) 
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))  
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
     def test_non_placeholder_material_replaced_by_asset_material_if_overwrite(self):
         """Check that material non-placeholder replaced by asset material when specified"""
@@ -220,6 +224,7 @@ class TestAssetMisc(unittest.TestCase):
         # Both the asset and the scene material are non-placeholders, but the overwrite arg. from the asset is set to True
         # Thus, adding asset to scene should not raise an error.
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
         
         new_itu_metal_scene = scene.get('itu_metal')
@@ -237,7 +242,8 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(scene.get('asset_0_cube_1').radio_material==itu_metal_scene)
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
 
     def test_non_placeholder_bsdf_replaced_by_asset_bsdf_if_overwrite(self):
@@ -300,6 +306,7 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(itu_metal_scene.relative_permittivity==1.0)
 
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
 
         new_itu_metal_scene = scene.get('itu_metal')
@@ -319,7 +326,8 @@ class TestAssetMisc(unittest.TestCase):
         self.assertTrue(scene.get('asset_0_cube_1').radio_material==itu_metal_scene)  
 
         # Check that the scene is automatically reloaded
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
 
     

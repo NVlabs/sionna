@@ -679,9 +679,9 @@ class Scene:
             # self._scene_objects.clear()
 
             # Clear the object using the materials of the scene (without removing the materials and their properties)
-            for mat_name in self._radio_materials:
-                mat = self.get(mat_name)
-                mat.reset_objects_using()
+            # for mat_name in self._radio_materials:
+            #     mat = self.get(mat_name)
+            #     mat.reset_objects_using()
      
 
             # # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
@@ -2270,8 +2270,8 @@ class Scene:
         Load the scene objects available in the scene
         """
         # Local copy of previous SceneObjects:
-        tmp_scene_objects = self._scene_objects.copy()
-        self._scene_objects.clear()
+        # tmp_scene_objects = self._scene_objects.copy()
+        # self._scene_objects.clear()
 
         # Parse all shapes in the scene
         scene = self._scene
@@ -2311,20 +2311,27 @@ class Scene:
             if name.startswith('mesh-'):
                 name = name[5:]
             
-            if self._is_name_used(name):
+            if self._is_name_used(name) and not name in self._scene_objects:
                 raise ValueError(f"Name'{name}' already used by another item")
-            obj = SceneObject(name, object_id=obj_id, mi_shape=s, dtype=self._dtype)
-            obj.scene = self
-            obj.radio_material = mat_name
+            
+            if name not in self._scene_objects:
+                obj = SceneObject(name, object_id=obj_id, mi_shape=s, dtype=self._dtype)
+                obj.scene = self
+                obj.radio_material = mat_name
+                self._scene_objects[name] = obj
+            else:
+                obj = self._scene_objects[name]
+                obj.update_mi_shape(mi_shape=s,object_id=obj_id)
+                
 
             # Assign previous SceneObject properties (if it exists) to the newly created object
-            if name in tmp_scene_objects:
-                obj.assign(tmp_scene_objects[name])
+            # if name in tmp_scene_objects:
+            #     obj.assign(tmp_scene_objects[name])
 
-            self._scene_objects[name] = obj
+            #self._scene_objects[name] = obj
 
         # Clear the tmp scene objects dict.
-        tmp_scene_objects.clear()
+        # tmp_scene_objects.clear()
 
         # Apply the initial position and orientation transform for all assets
         for asset_name in self._asset_objects:
@@ -2332,24 +2339,26 @@ class Scene:
             # corresponding scene shapes since the scene objects are not yet constructed. To apply these initial parameters, now that the scene objects 
             # have been instantiated, we call the position and orientation setter functions on the initial position and orientation values.
             asset = self.get(asset_name)
+            if asset.init:
+                # Append the scene objects to the shapes of the asset
+                for obj_name in asset.shapes:
+                    #shape name is the name of a newly created SceneObject
+                    #asset.shapes[obj_name] = WeakRefProxy(self.get(obj_name))
+                    obj = self.get(obj_name)
+                    obj.asset_object = asset.name
+                    asset.update_shape(key=obj_name, value=obj)
+                
+                # Check that all asset's shape share the same radio_material
+                asset.update_radio_material()
 
-            # Append the scene objects to the shapes of the asset
-            for shape_name in asset.shapes:
-                #shape name is the name of a newly created SceneObject
-                #asset.shapes[shape_name] = WeakRefProxy(self.get(shape_name))
-                shape = self.get(shape_name)
-                shape.asset_object = asset.name
-                asset.update_shape(key=shape_name, value=shape)
+                # asset.position_init = True
+                # asset.position = asset.position
+                # asset.orientation = asset.orientation
             
-            asset.update_radio_material()
-
-            # asset.position_init = True
-            # asset.position = asset.position
-            # asset.orientation = asset.orientation
-            if asset.position_init:
                 asset.position = asset.position
-            if asset.orientation_init:
                 asset.orientation = asset.orientation
+
+                asset.init = False
 
             
         

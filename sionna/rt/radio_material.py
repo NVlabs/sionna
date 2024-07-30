@@ -435,10 +435,12 @@ class RadioMaterial:
         self._bsdf = bsdf
 
         if self._scene is not None:
-            self._bsdf.scene = self._scene
+            
             self._bsdf.reset_objects_using() #
             for obj_id in self._objects_using:
                 self._bsdf.add_object_using(obj_id)
+
+            self._bsdf.scene = self._scene
 
     @property
     def scene(self):

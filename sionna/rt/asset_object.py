@@ -124,8 +124,7 @@ class AssetObject():
 
         # Position & Orientation properties
         # Init boolean flag: Used for inital transforms applied when adding the asset to a scene
-        self._position_init = True
-        self._orientation_init = True
+        self._init = True
         self._random_position_init_bias = np.random.random(3) # Initial (temporary) position transform to avoid ovelapping asset which mess with mitsuba load_scene method.
 
         # (Initial) position and orientation of the asset
@@ -263,8 +262,7 @@ class AssetObject():
             
             # Reset position/orientation init boolean flag (if adding  an already used asset to a different scene?)
             # >>>Probably not necessary since the init flag are reset in the load_scene_object meth...
-            self._position_init = True
-            self._orientation_init = True  
+            self._init = True 
             
             # Move asset's meshes to the scene's meshes directory
             asset_path = os.path.dirname(self.filename)
@@ -539,9 +537,8 @@ class AssetObject():
     def position(self, new_position):
         # Move all shapes associated to assed while keeping their relative positions
         position = tf.cast(new_position, dtype=self._rdtype)
-        if self._position_init and self._scene is not None:
+        if self._init and self._scene is not None:
             diff = position - self._random_position_init_bias # Correct the initial position bias initally added to avoid mitsuba to merge edges at the same position
-            self._position_init = False
         else:
             diff = position - self._position
         self._position = position
@@ -560,9 +557,8 @@ class AssetObject():
     def orientation(self, new_orientation):
         # Rotate all shapes associated to asset while keeping their relative positions (i.e. rotate arround the asset position)
         orientation = tf.cast(new_orientation, dtype=self._rdtype)
-        if self._orientation_init and self._scene is not None:
+        if self._init and self._scene is not None:
             diff = orientation
-            self._orientation_init = False
         else:
             diff = orientation - self._orientation
 
@@ -583,22 +579,14 @@ class AssetObject():
         return self._random_position_init_bias
 
     @property
-    def position_init(self):
-        return self._position_init
+    def init(self):
+        return self._init
     
-    @position_init.setter
-    def position_init(self, position_init):
+    @init.setter
+    def init(self, init):
         # Set the asset in its init state (for initial position and rotation definition)
-        self._position_init = position_init
+        self._init = init
 
-    @property
-    def orientation_init(self):
-        return self._orientation_init
-    
-    @orientation_init.setter
-    def orientation_init(self, orientation_init):
-        # Set the asset in its init state (for initial position and rotation definition)
-        self._orientation_init = orientation_init
 
 
     @property

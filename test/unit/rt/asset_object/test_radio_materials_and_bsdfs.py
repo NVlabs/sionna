@@ -114,18 +114,18 @@ class TestBSDFUpdate(unittest.TestCase):
         scene = load_scene(sionna.rt.scene.floor_wall)
         placeholder_bsdf = scene.get("itu_glass").bsdf
         self.assertTrue(placeholder_bsdf.is_placeholder)
-        ref_obj = scene.get("floor")
+        ref_obj = scene.get("floor").mi_shape
         placeholder_bsdf.rgb = (0.5, 0.5, 0.5)
-        self.assertNotEqual(ref_obj, scene.get("floor")) 
+        self.assertNotEqual(ref_obj, scene.get("floor").mi_shape) 
 
     def test_scene_reload_on_non_placeholder_bsdf_update(self):
         """Test that the scene is reloaded when the BSDF is updated"""
         scene = load_scene(sionna.rt.scene.floor_wall)
         non_placeholder_bsdf = scene.get("itu_concrete").bsdf
         self.assertFalse(non_placeholder_bsdf.is_placeholder)
-        ref_obj = scene.get("floor")
+        ref_obj = scene.get("floor").mi_shape
         non_placeholder_bsdf.rgb = (0.5, 0.5, 0.5)
-        self.assertNotEqual(ref_obj, scene.get("floor")) 
+        self.assertNotEqual(ref_obj, scene.get("floor").mi_shape) 
 
 
 
@@ -296,6 +296,7 @@ class TestRadioMaterial(unittest.TestCase):
         rm = RadioMaterial('new')
         scene.add(rm)
         scene_obj = scene.get('floor')
+        scene_obj_mi_shape = scene_obj.mi_shape
         scene_obj.radio_material = rm
 
         concrete = scene.get('itu_concrete')
@@ -306,9 +307,10 @@ class TestRadioMaterial(unittest.TestCase):
         scene.reload_scene()
         new_scene_obj = scene.get('floor')
         self.assertTrue(new_scene_obj.radio_material == rm)
-        self.assertTrue(new_scene_obj.object_id not in concrete.using_objects)
+        self.assertFalse(new_scene_obj.object_id in concrete.using_objects)
         self.assertTrue(new_scene_obj.object_id in rm.using_objects)
-        self.assertTrue(new_scene_obj is not scene_obj)
+        self.assertTrue(new_scene_obj is scene_obj)
+        self.assertFalse(new_scene_obj.mi_shape is scene_obj_mi_shape)
 
 class TestObjectUsingMatBSDFSync(unittest.TestCase):
     """Tests related to synchronization of objects_using between material and BSDF"""
@@ -479,6 +481,7 @@ class TestSceneReload(unittest.TestCase):
 
         # change scene SceneObject property:
         scene_obj = scene.get('floor')
+        scene_obj_mi_shape = scene_obj.mi_shape
         original_pos = scene_obj.position
         new_pos = [7,9,1]
 
@@ -498,7 +501,8 @@ class TestSceneReload(unittest.TestCase):
         new_scene_obj = scene.get('floor')
 
         # Check position after reload
-        self.assertTrue(not new_scene_obj is scene_obj)
+        self.assertTrue(new_scene_obj is scene_obj)
+        self.assertFalse(new_scene_obj.mi_shape is scene_obj_mi_shape)
         self.assertTrue(np.equal(scene_obj.position,new_pos).all) 
         self.assertTrue(np.equal(new_scene_obj.position,new_pos).all) 
 
@@ -512,6 +516,7 @@ class TestSceneReload(unittest.TestCase):
 
         # change scene SceneObject property:
         scene_obj = scene.get('floor')
+        scene_obj_mi_shape = scene_obj.mi_shape
         original_pos = scene_obj.position
         new_pos = [7,9,1]
 
@@ -531,7 +536,8 @@ class TestSceneReload(unittest.TestCase):
         new_scene_obj = scene.get('floor')
 
         # Check position after reload
-        self.assertTrue(not new_scene_obj is scene_obj)
+        self.assertTrue(new_scene_obj is scene_obj)
+        self.assertFalse(new_scene_obj.mi_shape is scene_obj_mi_shape)
         self.assertTrue(np.equal(scene_obj.position,new_pos).all) 
         self.assertTrue(np.equal(new_scene_obj.position,new_pos).all) 
 
@@ -539,13 +545,6 @@ class TestSceneReload(unittest.TestCase):
         self.assertTrue(scene_obj.radio_material == scene.get('itu_glass')) 
         self.assertTrue(new_scene_obj.radio_material == scene.get('itu_glass')) 
 
-    def test_(self):
-        self.assertTrue(False)
-        # SO.assign()
-        # self.orientation = s.orientation
-        # self.radio_material = s.radio_material
-        # self.velocity = s.velocity
-        # self.center_of_rotation = s.center_of_rotation
 
     def test_scene_reload(self):
         """Check that the scene is properly reloaded when necessary and only when necessary"""
@@ -554,29 +553,39 @@ class TestSceneReload(unittest.TestCase):
         scene = load_scene(sionna.rt.scene.floor_wall)
         asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1) # create a metal asset
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.add(asset)
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         #   - After removing assets
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.remove("asset_0")
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         #   - After changing/setting bsdf
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         metal = scene.get("itu_metal")
         metal.bsdf.rgb = (0.5,0.2,0.9)
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         # - After manually calling scene.reload()
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         scene.reload_scene()
-        self.assertTrue(ref_obj != scene.get("floor"))
+        self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
         # - Not when changing material of an object (user has to manually trigger the reload):
         ref_obj = scene.get("floor")
+        ref_obj_mi_shape = ref_obj.mi_shape
         ref_obj.radio_material = "itu_glass"   
         self.assertTrue(ref_obj == scene.get("floor"))
+        self.assertTrue(ref_obj_mi_shape == scene.get("floor").mi_shape)
                  
     def test_scene_reload_via_ray(self):
         """Check that the scene is properly reloaded and the propagation properties are thus changed"""
