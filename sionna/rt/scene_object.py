@@ -74,15 +74,6 @@ class SceneObject(Object):
         # Store if the SceneObject belongs to an AssetObject
         self._asset_object = None
 
-    def delete_from_scene(self):
-        # Remove shape from XML
-        self._scene.remove_from_xml(f"mesh-{self._name}","shape")
-
-        # Discard the scene object from the objects using this material
-        self._radio_material.discard_object_using(self.object_id) 
-
-
-
     @property
     def object_id(self):
         r"""
@@ -96,8 +87,7 @@ class SceneObject(Object):
             self.radio_material.discard_object_using(self._object_id)
             self.radio_material.add_object_using(v)
         
-        self._object_id = v
-        
+        self._object_id = v    
 
     @property
     def mi_shape(self):
@@ -105,28 +95,11 @@ class SceneObject(Object):
         int : Get/set the Mitsuba shape of this object
         """
         return self._mi_shape
-       
-    def update_mi_shape(self, mi_shape, object_id):
-        tmp_position = self.position
-        tmp_orientation = self.orientation
-        tmp_center_of_rotation = self.center_of_rotation
-
-        if self._radio_material is not None:
-            self.radio_material.discard_object_using(self._object_id)
-            self.radio_material.add_object_using(object_id)
-        
-        self._object_id = object_id
-
-        self._mi_shape = mi_shape
-        
-        self.position = tmp_position
-        self.center_of_rotation = tmp_center_of_rotation
-        self.orientation = tmp_orientation
 
     @property
     def asset_object(self):
         r"""
-        int : Get/set the asset_object of this object
+        int : Get/set the parent asset_object of this object if it exists
         """
         return self._asset_object
 
@@ -193,8 +166,6 @@ class SceneObject(Object):
         if self._asset_object is not None:
             self._scene.get(self.asset_object).update_radio_material()
         
-
-
     @property
     def velocity(self):
         """
@@ -208,13 +179,14 @@ class SceneObject(Object):
             raise ValueError("`velocity` must have shape [3]")
         self._velocity = tf.cast(v, self._rdtype)
 
+        # Update the asset velocity if the scene object belong to an asset:
         if self._asset_object is not None:
             self._scene.get(self.asset_object).update_velocity()
 
     @property
     def center_of_rotation(self):
         """
-        [3], tf.float : Get/set the center of rotation of the object
+        [3], tf.float : Get/set the center of rotation of the object. By default, the center of rotation is (0,0,0) (i.e. the object turn around its AABB center).
         """
         return self._center_of_rotation
 
@@ -479,15 +451,11 @@ class SceneObject(Object):
         solver_paths.wedges_normals.scatter_nd_update(wedges_ind,
                                                       wedges_normals)
         
-        
-
         # Update orientation property
         self._orientation = new_orient
 
         # Trigger scene callback
         self._scene.scene_geometry_updated()
-
-
 
     def look_at(self, target):
         # pylint: disable=line-too-long
@@ -523,3 +491,55 @@ class SceneObject(Object):
         beta = theta-PI/2 # Rotation around y-axis
         gamma = 0.0 # Rotation around x-axis
         self.orientation = (alpha, beta, gamma)
+           
+    def update_mi_shape(self, mi_shape, object_id):
+        """
+        Update the Mitsuba shape and object ID of the SceneObject.
+
+        This method updates the Mitsuba shape and object ID of the SceneObject while preserving its current position and orientation. It also updates the radio material object counter accordingly.
+
+        Parameters
+        ----------
+        mi_shape : mitsuba.Shape
+            The new Mitsuba shape to assign to the SceneObject.
+        object_id : int
+            The new object ID to assign to the SceneObject.
+
+        Notes
+        -----
+        - The position and orientation of the SceneObject are temporarily stored and then reapplied after updating the Mitsuba shape and object ID.
+        - The radio material usage is updated to reflect the new object ID.
+        """
+        tmp_position = self.position
+        tmp_orientation = self.orientation
+
+        # Reset the _orientation parameter to its default value without triggering shape update
+        self._orientation = tf.cast([0,0,0], dtype=self._rdtype) 
+
+        if self._radio_material is not None:
+            self.radio_material.discard_object_using(self._object_id)
+            self.radio_material.add_object_using(object_id)
+        
+        self._object_id = object_id
+
+        self._mi_shape = mi_shape
+        
+        self.position = tmp_position
+        self.orientation = tmp_orientation
+    
+    def delete_from_scene(self):
+        """
+        Delete the SceneObject from the scene.
+
+        This method removes the SceneObject from the scene by deleting its shape from the XML representation and discarding it from the set of objects using its radio material.
+
+        Notes
+        -----
+        - The shape is removed from the scene's XML representation.
+        - The SceneObject is discarded from the set of objects using its radio material.
+        """
+        # Remove shape from XML
+        self._scene.remove_from_xml(f"mesh-{self._name}","shape")
+
+        # Discard the scene object from the objects using this material
+        self._radio_material.discard_object_using(self.object_id) 
