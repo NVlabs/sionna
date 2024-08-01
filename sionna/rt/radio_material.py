@@ -44,6 +44,9 @@ class RadioMaterial:
     such as a Keras layer implementing a neural network. In the former case, it
     could be set to a trainable variable:
 
+    Additionally, a radio material can be associated with a :class:`~sionna.rt.BSDF` object to define 
+    its rendering properties in more detail. The BSDF can be specified at instantiation or assigned later.
+
     .. code-block:: Python
 
         mat = RadioMaterial("my_mat")
@@ -93,6 +96,11 @@ class RadioMaterial:
 
         If set to `None`, the material properties are constant and equal
         to ``relative_permittivity`` and ``conductivity``.
+        Defaults to `None`.
+    
+    bsdf : :class:`~sionna.rt.BSDF` | `None`
+        An optional BSDF object to describe the rendering properties of the material.
+        If not provided, a placeholder BSDF with a random RGB color is created.
         Defaults to `None`.
 
     dtype : tf.complex64 or tf.complex128
@@ -322,6 +330,85 @@ class RadioMaterial:
         """
         tf_objects_using = tf.cast(tuple(self._objects_using), tf.int32)
         return tf_objects_using
+    
+    @property
+    def bsdf(self):
+        """
+        :class:`~sionna.rt.BSDF` : Get the BSDF associated with the radio material.
+        """
+        return self._bsdf
+    
+    @bsdf.setter
+    def bsdf(self, bsdf):
+        """
+        Set the BSDF for the radio material.
+
+        Parameters
+        ----------
+        bsdf : :class:`~sionna.rt.BSDF`
+            The BSDF to associate with the radio material.
+
+        Raises
+        ------
+        TypeError
+            If `bsdf` is not an instance of :class:`~sionna.rt.BSDF`.
+        ValueError
+            If the BSDF is already used by another material.
+        """
+        
+        if not isinstance(bsdf, BSDF):
+            raise TypeError("`bsdf` must be a BSDF")
+        
+        if bsdf.is_used:
+            raise ValueError("Can't assign an already used BSDF to another material")
+        
+        bsdf.name = f"mat-{self._name}"
+
+        # Reset object using this material from current bsdf
+        for obj_id in self._objects_using:
+            self._bsdf.discard_object_using(obj_id)
+
+        self._bsdf = bsdf
+
+        if self._scene is not None:
+            
+            self._bsdf.reset_objects_using() #
+            for obj_id in self._objects_using:
+                self._bsdf.add_object_using(obj_id)
+
+            self._bsdf.scene = self._scene
+
+    def assign(self, rm):
+        """
+        Assign new values to the radio material properties from another
+        radio material ``rm``
+
+        Input
+        ------
+        rm : :class:`~sionna.rt.RadioMaterial
+            Radio material from which to assign the new values
+        """
+        if not isinstance(rm, RadioMaterial):
+            raise TypeError("`rm` is not a RadioMaterial")
+        self.relative_permittivity = rm.relative_permittivity
+        self.conductivity = rm.conductivity
+        self.scattering_coefficient = rm.scattering_coefficient
+        self.xpd_coefficient = rm.xpd_coefficient
+        self.scattering_pattern = rm.scattering_pattern
+        self.frequency_update_callback = rm.frequency_update_callback
+
+        # The default beahviour when updating/modyfing a radio material is to not automatically reload the scene (which can break the diffenrtiability)
+        if self._scene is not None:
+            b_tmp = self._scene.bypass_reload
+            self._scene.bypass_reload = True
+
+        self.bsdf.assign(rm.bsdf)
+
+        if self._scene is not None:
+            self._scene.bypass_scene_reload = b_tmp
+
+        # No that a RadioMaterial has been assigned, the RadioMaterial is not a placeholder anymore
+        self.is_placeholder = False
 
     ##############################################
     # Internal methods.
@@ -359,10 +446,8 @@ class RadioMaterial:
             self._bsdf.discard_object_using(object_id)
 
     def reset_objects_using(self):
-        # for obj_id in self._objects_using:
-        #     self._bsdf.discard_object_using(obj_id)
         self._objects_using = set()
-        self._bsdf.reset_objects_using() #
+        self._bsdf.reset_objects_using() 
 
     @property
     def is_placeholder(self):
@@ -374,73 +459,6 @@ class RadioMaterial:
     @is_placeholder.setter
     def is_placeholder(self, v):
         self._is_placeholder = v
-
-    def assign(self, rm):
-        """
-        Assign new values to the radio material properties from another
-        radio material ``rm``
-
-        Input
-        ------
-        rm : :class:`~sionna.rt.RadioMaterial
-            Radio material from which to assign the new values
-        """
-        if not isinstance(rm, RadioMaterial):
-            raise TypeError("`rm` is not a RadioMaterial")
-        self.relative_permittivity = rm.relative_permittivity
-        self.conductivity = rm.conductivity
-        self.scattering_coefficient = rm.scattering_coefficient
-        self.xpd_coefficient = rm.xpd_coefficient
-        self.scattering_pattern = rm.scattering_pattern
-        self.frequency_update_callback = rm.frequency_update_callback
-
-        #if self._bsdf.is_placeholder and not rm.is_placeholder and self._scene != None:
-        #existing_bsdf = self._scene.append_to_xml(rm.bsdf.xml_element, overwrite=True)
-
-        # The default beahviour when updating/modyfing a radio material is to not automatically reload the scene (which can break the diffenrtiability)
-        if self._scene is not None:
-            b_tmp = self._scene.bypass_reload_scene
-            self._scene.bypass_reload_scene = True
-
-        self.bsdf.assign(rm.bsdf)
-
-        if self._scene is not None:
-            self._scene.bypass_scene_reload = b_tmp
-
-        # for obj_id in rm.using_objects:
-        #     self.add_object_using(obj_id)
-
-
-    @property
-    def bsdf(self):
-        """
-        bool : Get the material bsdf
-        """
-        return self._bsdf
-    
-    @bsdf.setter
-    def bsdf(self, bsdf):
-        if not isinstance(bsdf, BSDF):
-            raise TypeError("`bsdf` must be a BSDF")
-        
-        if bsdf.is_used:
-            raise ValueError("Can't assign an already used BSDF to another material")
-        
-        bsdf.name = f"mat-{self._name}"
-
-        # Reset object using this material from current bsdf
-        for obj_id in self._objects_using:
-            self._bsdf.discard_object_using(obj_id)
-
-        self._bsdf = bsdf
-
-        if self._scene is not None:
-            
-            self._bsdf.reset_objects_using() #
-            for obj_id in self._objects_using:
-                self._bsdf.add_object_using(obj_id)
-
-            self._bsdf.scene = self._scene
 
     @property
     def scene(self):

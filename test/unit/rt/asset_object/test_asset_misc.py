@@ -516,7 +516,7 @@ class TestAssetMisc(unittest.TestCase):
         self.assertEqual(asset.shapes['asset_0_cube_1'].radio_material, itu_wood)
 
         # Reload scene
-        scene.reload_scene()
+        scene.reload()
 
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [6,+2,1]),epsilon)))
@@ -592,7 +592,7 @@ class TestAssetMisc(unittest.TestCase):
         self.assertEqual(asset.shapes['asset_0_cube_0'].radio_material, itu_glass)
 
         # Reload scene
-        scene.reload_scene()
+        scene.reload()
 
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [5,2,1]), epsilon)))
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.shapes['asset_0_cube_0'].position - [4,+5,-4]),epsilon)))

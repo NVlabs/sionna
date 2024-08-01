@@ -154,6 +154,20 @@ class TestAssetMaterial(unittest.TestCase):
         self.assertTrue(ref_obj == scene.get("floor"))
         self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 
+    def test_xml_asset_material_unknown_existing_item(self):
+        """Check that specifying asset material as None does not work if the bsdf name in the asset_xml are the same as existing item (not radio materials) 
+        within the scen, thus preventing the creation  of a placeholder material (and bsdf)"""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_4) # radio material = None >>> use material name from the XML file "floor"
+        
+        self.assertTrue(asset.radio_material == None)
+        self.assertTrue(scene.get("floor") != None)
+
+        # Add the asset
+        with self.assertRaises(ValueError) as context:
+            scene.add(asset)
+        self.assertEqual(str(context.exception), "Name 'floor' is already used by another item of the scene")
+
 
     def test_str_asset_material(self):
         """Test showing that specifying asset material as a `str` before adding the asset work when the asset is added to scene. Here the material name point to an existing scene material"""

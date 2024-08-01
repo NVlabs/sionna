@@ -106,7 +106,7 @@ class TestXMLChange(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             out = scene.append_to_xml(other_elt, overwrite=False)
-        self.assertEqual(str(context.exception), "`element` must be an instance of ``ET.Element`` of type <shape> or <bsdf>")
+        self.assertEqual(str(context.exception), "`element` must be an instance of `ET.Element` of type <shape> or <bsdf>")
                              
         elements_in_root = root.findall('other')  
         ids_in_root = [elt.get('id') for elt in elements_in_root]
@@ -121,7 +121,7 @@ class TestXMLChange(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             out = scene.append_to_xml(other_elt, overwrite=True)
-        self.assertEqual(str(context.exception), "`element` must be an instance of ``ET.Element`` of type <shape> or <bsdf>")
+        self.assertEqual(str(context.exception), "`element` must be an instance of `ET.Element` of type <shape> or <bsdf>")
 
         elements_in_root = root.findall('other')  
         ids_in_root = [elt.get('id') for elt in elements_in_root]
@@ -423,4 +423,56 @@ class TestXMLChange(unittest.TestCase):
         elements_in_root = root.findall('shape')  
         ids_in_root = [elt.get('id') for elt in elements_in_root]
         self.assertFalse('mesh-wrong' in ids_in_root)
+
+    def test_update_shape_bsdf_xml(self): 
+        """Check that the scene.update_shape_bsdf_xml() method does change the XML when specifying an existing shape name"""
+        scene = load_scene(sionna.rt.scene.floor_wall)
+        root = scene._xml_tree.getroot()
+        elements_in_root = root.findall('shape')  
+        ids_in_root = [elt.get('id') for elt in elements_in_root]
+        self.assertTrue('mesh-floor' in ids_in_root)
+        for elt in elements_in_root:
+            if elt.get('id') == 'mesh-floor':
+                break
+        ref = elt.find('ref')
+        bsdf = ref.get('id')
+        self.assertTrue(bsdf == 'mat-itu_concrete')
+        
+        scene.update_shape_bsdf_xml(shape_name='mesh-floor',bsdf_name='mat-itu_glass')
+        elements_in_root = root.findall('shape')  
+        ids_in_root = [elt.get('id') for elt in elements_in_root]
+        self.assertTrue('mesh-floor' in ids_in_root)
+        for elt in elements_in_root:
+            if elt.get('id') == 'mesh-floor':
+                break
+        ref = elt.find('ref')
+        bsdf = ref.get('id')
+        self.assertTrue(bsdf == 'mat-itu_glass')
+
+        scene.update_shape_bsdf_xml(shape_name='floor',bsdf_name='mat-itu_wood')
+        elements_in_root = root.findall('shape')  
+        ids_in_root = [elt.get('id') for elt in elements_in_root]
+        self.assertTrue('mesh-floor' in ids_in_root)
+        for elt in elements_in_root:
+            if elt.get('id') == 'mesh-floor':
+                break
+        ref = elt.find('ref')
+        bsdf = ref.get('id')
+        self.assertTrue(bsdf == 'mat-itu_wood')
+
+        scene.update_shape_bsdf_xml(shape_name='floor',bsdf_name='plastic')
+        elements_in_root = root.findall('shape')  
+        ids_in_root = [elt.get('id') for elt in elements_in_root]
+        self.assertTrue('mesh-floor' in ids_in_root)
+        for elt in elements_in_root:
+            if elt.get('id') == 'mesh-floor':
+                break
+        ref = elt.find('ref')
+        bsdf = ref.get('id')
+        self.assertTrue(bsdf == 'mat-plastic')
+
+
+        with self.assertWarns(UserWarning) as context:
+            scene.update_shape_bsdf_xml(shape_name='wrong',bsdf_name='plastic')
+        self.assertEqual(str(context.warning), "No shape element with name mesh-wrong in root to update.")
      

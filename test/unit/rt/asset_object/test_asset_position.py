@@ -132,7 +132,7 @@ class TestAssetPosition(unittest.TestCase):
         cube_1_position_1 = tf.Variable(cube_1_object.position)
 
         # Or manually reload the scene
-        scene.reload_scene()
+        scene.reload()
 
         asset_0_position_2 = tf.Variable(asset_0.position)
         cube_0_position_2 = tf.Variable(cube_0_object.position)
