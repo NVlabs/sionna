@@ -225,6 +225,43 @@ class TestBSDF(unittest.TestCase):
             bsdf.rgb = new_rgb
         self.assertEqual(str(context.exception), "`rgb` must be a list of 3 floats comprised between 0 and 1")
 
+    def test_color_setter_bsdf(self):
+        """Check that the bsdf color setter works as expected"""
+        bsdf = BSDF("bsdf")
+
+        # Valid RGB triplet
+        prev_rgb = bsdf.rgb
+        new_rgb = (0.5,0.2,0.6)
+        bsdf.color = new_rgb
+        self.assertEqual(bsdf.color, None)
+        self.assertTrue(np.equal(bsdf.rgb, new_rgb).all())
+        self.assertTrue(not np.equal(bsdf.rgb, prev_rgb).all())
+
+        # Valid color name
+        prev_rgb = bsdf.rgb
+        new_color = 'Red'
+        bsdf.color = new_color
+        self.assertEqual(bsdf.color, 'red')
+        self.assertTrue(np.equal(bsdf.rgb, (1,0,0)).all())
+        self.assertTrue(not np.equal(bsdf.rgb, prev_rgb).all())
+
+        # Invalid format or values
+        prev_rgb = bsdf.rgb
+        new_rgb = (0.5,0.2,0.6,0.9)
+        with self.assertRaises(TypeError) as context:
+            bsdf.color = new_rgb
+        self.assertEqual(str(context.exception), "`color` must be a list of 3 `float` between 0 and 1, or a valid `str` color name.")
+
+        new_rgb = (256,45,18)
+        with self.assertRaises(TypeError) as context:
+            bsdf.color = new_rgb
+        self.assertEqual(str(context.exception), "`color` must be a list of 3 `float` between 0 and 1, or a valid `str` color name.")
+
+        new_rgb = "(0.5,0.2,0.6)"
+        with self.assertRaises(TypeError) as context:
+            bsdf.color = new_rgb
+        self.assertEqual(str(context.exception), "Unknown color name '(0.5,0.2,0.6)'.")
+
     def test_xml_element_setter_bsdf(self):
         """Check that the bsdf xml_element setter works as expected"""
         bsdf = BSDF("bsdf")
@@ -247,7 +284,65 @@ class TestBSDF(unittest.TestCase):
             bsdf.xml_element = xml_element
         self.assertEqual(str(context.exception), "The root element must be <bsdf>.")
     
+    def test_set_bsdf(self):
+        """Check that the bsdf init method works as expected"""
+        
+        # Name is set
+        bsdf = BSDF("bsdf")
+        self.assertEqual(bsdf.name, "bsdf")
+        self.assertEqual(bsdf.color, None)
+        self.assertEqual(len(bsdf.rgb), 3)
 
+        # If xml_element is defined it will be used no matter the color argument
+        xml_str = '<bsdf type="diffuse"><rgb value="0.9 0.3 0.2" name="reflectance" /></bsdf>'
+        xml_element = ET.fromstring(xml_str)
+        bsdf = BSDF("bsdf",xml_element=xml_element)
+
+        self.assertEqual(bsdf.color, None)
+        self.assertEqual(bsdf.rgb, None)
+        self.assertEqual(bsdf.xml_element, xml_element)
+
+        color = 'red'
+        bsdf = BSDF("bsdf",xml_element=xml_element,color=color)
+
+        self.assertEqual(bsdf.color, None)
+        self.assertEqual(bsdf.rgb, None)
+        self.assertEqual(bsdf.xml_element, xml_element)
+
+        color = (1,1,1)
+        bsdf = BSDF("bsdf",xml_element=xml_element,color=color)
+
+        self.assertEqual(bsdf.color, None)
+        self.assertEqual(bsdf.rgb, None)
+        self.assertEqual(bsdf.xml_element, xml_element)
+        
+        # Valid RGB triplet
+        color = (1,1,1)
+        bsdf = BSDF("bsdf",color=color)
+        self.assertEqual(bsdf.color, None)
+        self.assertTrue(np.equal(bsdf.rgb, color).all())
+
+        # Valid color name
+        color = 'Red'
+        bsdf = BSDF("bsdf",color=color)
+        self.assertEqual(bsdf.color, 'red')
+        self.assertTrue(np.equal(bsdf.rgb, (1,0,0)).all())
+
+        # Invalid color or XML element
+        color = (0.5,0.2,0.6,0.9)
+        with self.assertRaises(TypeError) as context: 
+            bsdf = BSDF("bsdf",color=color)
+        self.assertEqual(str(context.exception), "`color` must be a list of 3 `float` between 0 and 1, or a valid `str` color name.")
+
+        color = (256,45,18)
+        with self.assertRaises(TypeError) as context:
+            bsdf = BSDF("bsdf",color=color)
+        self.assertEqual(str(context.exception), "`color` must be a list of 3 `float` between 0 and 1, or a valid `str` color name.")
+
+        color = "(0.5,0.2,0.6)"
+        with self.assertRaises(TypeError) as context:
+            bsdf = BSDF("bsdf",color=color)
+        self.assertEqual(str(context.exception), "Unknown color name '(0.5,0.2,0.6)'.")
 
 class TestRadioMaterial(unittest.TestCase):
     """Tests related to the RadioMaterial class"""
@@ -304,7 +399,7 @@ class TestRadioMaterial(unittest.TestCase):
         self.assertTrue(scene_obj.object_id not in concrete.using_objects)
         self.assertTrue(scene_obj.object_id in rm.using_objects)
 
-        scene.reload_scene()
+        scene.reload()
         new_scene_obj = scene.get('floor')
         self.assertTrue(new_scene_obj.radio_material == rm)
         self.assertFalse(new_scene_obj.object_id in concrete.using_objects)
@@ -456,7 +551,7 @@ class TestSceneReload(unittest.TestCase):
         self.assertTrue(mat.is_used)
         self.assertTrue(bsdf.is_used)
 
-        scene.reload_scene()
+        scene.reload()
 
         new_mat = scene.get("itu_concrete")
         new_bsdf = new_mat.bsdf
@@ -496,8 +591,8 @@ class TestSceneReload(unittest.TestCase):
         self.assertTrue(scene_obj.radio_material == scene.get('itu_glass')) 
 
         # Reload
-        self.assertTrue(scene._bypass_reload_scene != True)
-        scene.reload_scene()
+        self.assertTrue(scene._bypass_reload != True)
+        scene.reload()
         new_scene_obj = scene.get('floor')
 
         # Check position after reload
@@ -531,7 +626,7 @@ class TestSceneReload(unittest.TestCase):
         self.assertTrue(scene_obj.radio_material == scene.get('itu_glass')) 
 
         # Reload by adding an asset
-        self.assertTrue(scene._bypass_reload_scene != True)
+        self.assertTrue(scene._bypass_reload != True)
         scene.add(asset)
         new_scene_obj = scene.get('floor')
 
@@ -576,7 +671,7 @@ class TestSceneReload(unittest.TestCase):
         # - After manually calling scene.reload()
         ref_obj = scene.get("floor")
         ref_obj_mi_shape = ref_obj.mi_shape
-        scene.reload_scene()
+        scene.reload()
         self.assertTrue(ref_obj == scene.get("floor"))
         self.assertTrue(ref_obj_mi_shape != scene.get("floor").mi_shape)
 

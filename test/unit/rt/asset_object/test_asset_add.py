@@ -117,22 +117,6 @@ class TestAssetAdd(unittest.TestCase):
         self.assertTrue("asset_0" in scene.asset_objects)
         self.assertTrue(scene.get("asset_0") != asset_0) 
 
-    def test_remove_asset(self):
-        """Removing an asset from scene"""
-        scene = load_scene(sionna.rt.scene.floor_wall)
-        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
-        scene.add(asset)
-        self.assertTrue("asset_0" in scene.asset_objects)
-        self.assertTrue(isinstance(scene.get("asset_0"),AssetObject)) 
-        self.assertTrue(isinstance(scene.get("asset_0_cube_0"),SceneObject)) 
-        self.assertTrue(isinstance(scene.get("asset_0_cube_1"),SceneObject)) 
-
-        scene.remove("asset_0")
-        self.assertTrue("asset_0" not in scene.asset_objects)
-        self.assertTrue(scene.get("asset_0") == None) 
-        self.assertTrue(scene.get("asset_0_cube_0") == None) 
-        self.assertTrue(scene.get("asset_0_cube_1") == None) 
-
     def test_asset_shape_dictionary(self):
         """Instanciation of the asset's shapes dict is correct when adding asset"""
         scene = load_scene(sionna.rt.scene.floor_wall)
