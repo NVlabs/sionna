@@ -258,20 +258,20 @@ class BSDF:
             raise TypeError("`b` is not a BSDF")
 
         # When assigning a the bsdf attributes we should not use the same objects:
-        self._rgb = b.rgb.copy()
+        self._rgb = copy.copy(b.rgb)
+        self._color = copy.copy(b.color)
         self._xml_element = copy.deepcopy(b.xml_element)
 
         # Since assign method does not replace the object itself, the we should update the name of the assigned bsdf before updating xml file
         self._xml_element.set('id',f"{self._name}")
-        self._xml_element.set('name',f"{self._name}")  
-
-        existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=True)
-
+        self._xml_element.set('name',f"{self._name}")
+        
         # No that a BSDF has been assigned, the BSDF is not a placeholder anymore
         self.is_placeholder = False
 
-        # Reload scene
-        self._scene.reload()
+        if self._scene is not None:
+            self._scene.append_to_xml(self._xml_element, overwrite=True)
+            self._scene.reload()
 
     ##############################################
     # Internal methods.
