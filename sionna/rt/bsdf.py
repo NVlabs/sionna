@@ -13,7 +13,8 @@ import matplotlib.colors as mcolors
 
 class BSDF:
     # pylint: disable=line-too-long
-    r"""
+    r"""BSDF(name, xml_element=None, color=None)
+
     Class implementing a BSDF descriptor
 
     BSDF stands for bidirectional scattering distribution function. Essentially, it's a mathematical function that determines the probability that a 
@@ -22,14 +23,14 @@ class BSDF:
     within a scene that use a given bsdf.
 
     Parameters
-    -----------
+    ----------
     name : str
         Unique name of the bsdf
  
     xml_element : :class:`ET.Element`, optional 
         XML Element  instance from xml.etree.ElementTree.Element library (default is None).
 
-    color: [3], float, or `str`, optional
+    color: [3], `float`, or `str`, optional
         RGB color triplet or color name `str` of the asset (default is None).
     """
 
@@ -86,36 +87,23 @@ class BSDF:
 
     @property
     def name(self):
-        """
-        str: Get the name of the BSDF.
+        r"""
+        str: Get/Set the name of the BSDF.
         """
         return self._name
     
     @name.setter
     def name(self, name):
-        """
-        Set the name of the BSDF.
-
-        Parameters
-        ----------
-        name : str
-            The new name of the BSDF.
-        """
         self._name = name
         self._xml_element.set('id',f"{self._name}")
         self._xml_element.set('name',f"{self._name}") 
 
     @property
     def xml_element(self):
-        """
-        :class:`ET.Element` : XML tree description of the BSDF.
-        """
-        return self._xml_element
+        r"""
+        :class:`ET.Element` : Get the XML element description of the BSDF.
         
-    @xml_element.setter
-    def xml_element(self, xml_element):
-        """
-        Set the XML element of the BSDF.
+        Set the XML element of the BSDF:
 
         Parameters
         ----------
@@ -129,6 +117,11 @@ class BSDF:
         ValueError
             If the root element is not <bsdf>.
         """
+        return self._xml_element
+        
+    @xml_element.setter
+    def xml_element(self, xml_element):
+        
         if not isinstance(xml_element, ET.Element):
             raise TypeError("`element` must be an ET.Element descriptor of a BSDF.")
 
@@ -153,15 +146,10 @@ class BSDF:
 
     @property
     def rgb(self):
-        """
+        r"""
         [3], float : RGB color of the BSDF.
-        """
-        return self._rgb
-    
-    @rgb.setter
-    def rgb(self, rgb):
-        """
-        Set the RGB color of the BSDF.
+
+        Set the RGB color of the BSDF:
 
         Parameters
         ----------
@@ -173,6 +161,11 @@ class BSDF:
         TypeError
             If `rgb` is not a list of 3 floats between 0 and 1.
         """
+        return self._rgb
+    
+    @rgb.setter
+    def rgb(self, rgb):
+        
         if len(rgb) != 3 or max(rgb) > 1 or min(rgb) < 0:
             raise TypeError("`rgb` must be a list of 3 floats comprised between 0 and 1")
         self._rgb = rgb
@@ -191,14 +184,9 @@ class BSDF:
 
     @property
     def color(self):
-        """
+        r"""
         str or None : Color name of the BSDF or None.
-        """
-        return self._color
 
-    @color.setter
-    def color(self, color):
-        """
         Set the color of the BSDF.
 
         Parameters
@@ -211,6 +199,11 @@ class BSDF:
         TypeError
             If the input is not a list of 3 floats between 0 and 1, or a valid color name.
         """
+        return self._color
+
+    @color.setter
+    def color(self, color):
+        
         if isinstance(color, str):
             color,rgb = self._color_name_to_rgb(color)
         elif len(color) == 3 and max(color) <= 1 and min(color) >= 0:
@@ -234,7 +227,7 @@ class BSDF:
             self._scene.reload()
 
     def assign(self, b):
-        """
+        r"""
         Assign new values to the BSDF properties from another
         BSDF ``b``.
 
@@ -268,7 +261,7 @@ class BSDF:
     ##############################################
 
     def _color_name_to_rgb(self,color):
-        """
+        r"""
         Convert a color name to an RGB triplet.
 
         Parameters
@@ -302,20 +295,20 @@ class BSDF:
 
     @property
     def use_counter(self):
-        """
+        r"""
         int : Number of scene objects using this BSDF
         """
         return len(self._objects_using)
 
     @property
     def is_used(self):
-        """bool : Indicator if the BSDF is used by at least one object of
+        r"""bool : Indicator if the BSDF is used by at least one object of
         the scene"""
         return self.use_counter > 0
 
     @property
     def using_objects(self):
-        """
+        r"""
         [num_using_objects], tf.int : Identifiers of the objects using this
         BSDF
         """
@@ -323,13 +316,13 @@ class BSDF:
         return tf_objects_using
 
     def add_object_using(self, object_id):
-        """
+        r"""
         Add an object to the set of objects using this BSDF
         """
         self._objects_using.add(object_id)
         
     def discard_object_using(self, object_id):
-        """
+        r"""
         Remove an object from the set of objects using this BSDF
         """
         assert object_id in self._objects_using,\
@@ -341,7 +334,7 @@ class BSDF:
 
     @property
     def scene(self):
-        """
+        r"""
         :class:`~sionna.rt.Scene` : Get/set the scene
         """
         return self._scene
@@ -360,7 +353,7 @@ class BSDF:
 
     @property
     def is_placeholder(self):
-        """
+        r"""
         bool : Get/set if this bsdf is a placeholder. A bsdf is considered a placeholder when it has been randomly defined upon instantiation of a RadioMaterial(random rgb tuple)
         """
         return self._is_placeholder

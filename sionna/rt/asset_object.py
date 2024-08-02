@@ -250,24 +250,12 @@ class AssetObject():
     @property
     def position(self):
         r"""
-        [3], tf.float : Get the position of the asset
-        """
-        return self._position
-
-    @position.setter
-    def position(self, new_position):
-        r"""
-        Set the position of the asset.
+        [3], tf.float : Get/Set the position of the asset
 
         This method updates the position of the asset and moves all associated shapes
         while keeping their relative positions. If the asset is being initialized and
         is part of a scene, it corrects the initial position bias that was added to
         avoid overlapping shapes.
-
-        Parameters
-        ----------
-        new_position : [3], float
-            The new position of the asset.
 
         Notes
         -----
@@ -277,6 +265,10 @@ class AssetObject():
         position (or the initial position bias) and applies this difference to all
         associated shapes to move them accordingly.
         """
+        return self._position
+
+    @position.setter
+    def position(self, new_position):
         # Move all shapes associated to assed while keeping their relative positions
         position = tf.cast(new_position, dtype=self._rdtype)
         if self._init and self._scene is not None:
@@ -294,33 +286,25 @@ class AssetObject():
     @property
     def orientation(self):
         r"""
-        [3], tf.float : Get/set the orientation of the asset
-        """
-        return self._orientation
+        [3], tf.float : Get/Set the orientation of the asset.
 
-    @orientation.setter
-    def orientation(self, new_orientation):
-        r"""
-        Set the orientation of the asset.
-
-        This method updates the orientation of the asset and rotates all associated shapes
-        while keeping their relative positions. If the asset is being initialized and
-        is part of a scene, it applies the new orientation directly.
-
-        Parameters
-        ----------
-        new_orientation : [3], float
-            The new orientation of the asset in radians.
+        This property updates the orientation of the asset and rotates all associated shapes
+        while keeping their relative positions. 
 
         Notes
         -----
         - If the asset is being initialized (`self._init` is `True`) and is part of a scene,
         the new orientation is applied directly.
         - The method calculates the difference between the new orientation and the current
-        orientation (or applies the new orientation directly if initializing) and applies
+        orientation and applies
         this difference to all associated shapes to rotate them accordingly.
-        - The rotation is performed around a center of rotation shifted by the asset's position.
+        - The rotation is performed around a center of rotation shifted by the asset's position 
+        (i.e.all shapes are rotated around the asset position).
         """
+        return self._orientation
+
+    @orientation.setter
+    def orientation(self, new_orientation):
         # Rotate all shapes associated to asset while keeping their relative positions (i.e. rotate arround the asset position)
         orientation = tf.cast(new_orientation, dtype=self._rdtype)
         if self._init and self._scene is not None:
@@ -341,36 +325,11 @@ class AssetObject():
                 scene_object.center_of_rotation = old_center_of_rotation
                 
     @property
-    def random_position_init_bias(self):
-        r"""
-        [3], float : Get the random initial position bias
-        """
-        return self._random_position_init_bias
-
-    @property
-    def init(self):
-        r"""
-        bool : Get/set the asset initialization flag used for initial position and rotation definition.
-        """
-        return self._init
-    
-    @init.setter
-    def init(self, init):
-        self._init = init
-
-    @property
     def radio_material(self):
         r"""
-        :class:`~sionna.rt.RadioMaterial` : Get the radio material of the object. 
-        """
-        return self._radio_material
+        :class:`~sionna.rt.RadioMaterial` : Get/Set the radio material of the object. 
 
-    @radio_material.setter
-    def radio_material(self, mat):
-        r"""
-        Set the radio material of the asset.
-
-        This method updates the radio material of the asset and ensures that all
+        This property updates the radio material of the asset and ensures that all
         associated shapes use the same material. If the asset is part of a scene,
         it checks if the material already exists in the scene and handles any
         conflicts appropriately.
@@ -406,6 +365,10 @@ class AssetObject():
             If the material specified as `RadioMaterial` has a name already in 
             use by an item of the scene
         """
+        return self._radio_material
+
+    @radio_material.setter
+    def radio_material(self, mat):
         if not isinstance(mat, RadioMaterial) and not isinstance(mat, str):
             err_msg = f"Radio material must be of type 'str' or 'sionna.rt.RadioMaterial"
             raise TypeError(err_msg)
@@ -482,7 +445,70 @@ class AssetObject():
         if not isinstance(d, dict):
             raise ValueError("Expected a dictionary")
         self._shapes = d
+
+    def look_at(self, target):
+        # pylint: disable=line-too-long
+        r"""
+        Sets the orientation of the asset so that the x-axis points toward an
+        ``Object``.
+
+        Input
+        -----
+        target : [3], float | :class:`sionna.rt.Object` | str
+            A position or the name or instance of an
+            :class:`sionna.rt.Object` in the scene to point toward to
+        """
+        # Get position to look at
+        if isinstance(target, str):
+            if self._scene == None:
+                err_msg = f"No scene have been affected to current AssetObject"
+                raise TypeError(err_msg)
+            
+            obj = self.scene.get(target)
+            if not isinstance(obj, Object) or not isinstance(obj, AssetObject):
+                raise ValueError(f"No camera, device, asset or object named '{target}' found.")
+            else:
+                target = obj.position
+        elif isinstance(target, Object) or isinstance(target, AssetObject):
+            target = target.position
+        else:
+            target = tf.cast(target, dtype=self._rdtype)
+            if not target.shape[0]==3:
+                raise ValueError("`target` must be a three-element vector)")
+
+        # Compute angles relative to LCS
+        x = target - self.position
+        x, _ = normalize(x)
+        theta, phi = theta_phi_from_unit_vec(x)
+        alpha = phi # Rotation around z-axis
+        beta = theta-PI/2 # Rotation around y-axis
+        gamma = 0.0 # Rotation around x-axis
+        self.orientation = (alpha, beta, gamma)
+
+    ##############################################
+    # Internal methods.
+    # Should not be appear in the user
+    # documentation
+    ##############################################
+
+    @property
+    def random_position_init_bias(self):
+        r"""
+        [3], float : Get the random initial position bias
+        """
+        return self._random_position_init_bias
+
+    @property
+    def init(self):
+        r"""
+        bool : Get/set the asset initialization flag used for initial position and rotation definition.
+        """
+        return self._init
     
+    @init.setter
+    def init(self, init):
+        self._init = init
+
     @property
     def scene(self):
         r"""
@@ -813,47 +839,6 @@ class AssetObject():
                 first_shape_velocity = shape_velocity
             # All shapes share the same velocity vector
             self._velocity = shape_velocity
-
-    def look_at(self, target):
-        # pylint: disable=line-too-long
-        r"""
-        Sets the orientation of the asset so that the x-axis points toward an
-        ``Object``.
-
-        Input
-        -----
-        target : [3], float | :class:`sionna.rt.Object` | str
-            A position or the name or instance of an
-            :class:`sionna.rt.Object` in the scene to point toward to
-        """
-        # Get position to look at
-        if isinstance(target, str):
-            if self._scene == None:
-                err_msg = f"No scene have been affected to current AssetObject"
-                raise TypeError(err_msg)
-            
-            obj = self.scene.get(target)
-            if not isinstance(obj, Object) or not isinstance(obj, AssetObject):
-                raise ValueError(f"No camera, device, asset or object named '{target}' found.")
-            else:
-                target = obj.position
-        elif isinstance(target, Object) or isinstance(target, AssetObject):
-            target = target.position
-        else:
-            target = tf.cast(target, dtype=self._rdtype)
-            if not target.shape[0]==3:
-                raise ValueError("`target` must be a three-element vector)")
-
-        # Compute angles relative to LCS
-        x = target - self.position
-        x, _ = normalize(x)
-        theta, phi = theta_phi_from_unit_vec(x)
-        alpha = phi # Rotation around z-axis
-        beta = theta-PI/2 # Rotation around y-axis
-        gamma = 0.0 # Rotation around x-axis
-        self.orientation = (alpha, beta, gamma)
-
-
            
     
     

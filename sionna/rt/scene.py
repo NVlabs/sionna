@@ -426,182 +426,6 @@ class Scene:
             return self._asset_objects[name]
         return None
 
-    def append_to_xml(self, element:ET.Element, overwrite=False):
-        # pylint: disable=line-too-long
-        """
-        Append an XML Element of type <bsdf> or <shape> to the XML Tree of the scene (at root level).
-
-        Input
-        -----
-        element : :class:`ET.Element`
-            An XML element of type <shape> or <bsdf> to be appended to the scene's XML tree.
-            
-        overwrite : bool, optional
-            If True, overwrite an existing element with the same `id`. If `False`, raise a warning if an element
-            with the same `id` already exists. Default is `False`.
-
-        Output
-        ------
-        :class:`ET.Element` or `None`
-            Returns the existing element if it already exists. Otherwise, returns `None`.
-
-        Raises
-        ------
-        ValueError
-            If the provided `element` is not of type <shape> or <bsdf>.
-
-        Notes
-        -----
-        - This method modifies the scene's XML tree by appending the provided element at the root level.
-        - If an element with the same `id` already exists, a warning is raised and the existing element is returned.
-        - If `overwrite` is True, the existing element with the same `id` is removed before appending the new element.
-        - The modified XML tree is written back to the scene XML file.
-        """
-        # Check if element contains a single BSDF or Shape element at root level:
-        element_type = element.tag
-        if element_type not in ['shape','bsdf']:
-            raise ValueError("`element` must be an instance of `ET.Element` of type <shape> or <bsdf>")
-        element_id = element.get('id')
-            
-        root = self._xml_tree.getroot()
-        elements_in_root = root.findall(f'{element_type}')  
-        ids_in_root = [elt.get('id') for elt in elements_in_root]
-
-        if element_id not in ids_in_root:
-            root.append(element)
-        else:
-            for e in elements_in_root:
-                if e.get('id') == element_id:
-                    break
-            if overwrite:
-                warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Overwriting with new element.")
-                self.remove_from_xml(element_id,element_type)
-                ET.indent(self._xml_tree, space="\t", level=0)
-                root.append(element)
-                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-                return e
-            else:
-                warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Set 'overwrite=True' to overwrite.")
-                return e
-                
-            
-        # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
-        ET.indent(self._xml_tree, space="\t", level=0)
-        self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-        return None
-    
-    def remove_from_xml(self, element_id:str, element_type=None):
-        # pylint: disable=line-too-long
-        """
-        Remove an XML Element of type in valid_element_types = ['bsdf','shape'] 
-        from the xml_tree of the scene (at root level) based on its id (type helps for the search). 
-        """
-        """
-        Remove an XML Element of type 'bsdf' or 'shape' from the XML tree of the scene (at root level) based on its id.
-
-        This method modifies the scene's XML tree by removing the specified element at the root level. If the element
-        with the specified `id` and `element_type` is not found, a warning is raised.
-
-        Input
-        -----
-        element_id : str
-            The id of the XML element to be removed.
-
-        element_type : str ('bsdf'|'shape'), optional
-            The type of the XML element to be removed. Valid types are 'bsdf' and 'shape'.
-            If `None`, all types are searched. Default is `None`.
-
-        Output
-        ------
-        :class:`ET.Element` or `None`
-            Returns the removed element if it was found and removed. Otherwise, returns `None`.
-
-        Raises
-        ------
-        ValueError
-            If the provided `element_type` is not one of the valid types ('bsdf' or 'shape').
-
-        Notes
-        -----
-        - This method modifies the scene's XML tree by removing the specified element at the root level.
-        - If the element with the specified `id` and `element_type` is not found, a warning is raised.
-        - The modified XML tree is written back to the scene XML file.
-        """
-
-        valid_element_types = ['bsdf','shape']
-        root = self._xml_tree.getroot()
-        if element_type is not None:
-            if element_type not in valid_element_types:
-                raise ValueError(f"`element_type` must be string. Valid types are {str(valid_element_types)}.")
-            elements_in_root = root.findall(f'{element_type}')  
-        else:
-            elements_in_root = []
-            for t in valid_element_types:
-                elements_in_root += root.findall(f'{t}')  
-
-        for e in elements_in_root:
-            if e.get('id') == element_id:
-                root.remove(e)
-                # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
-                ET.indent(self._xml_tree, space="\t", level=0)
-                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-                return e
-        
-        if element_type == None:
-            warnings.warn(f"No {str(valid_element_types)} element with name {element_id} in root to remove.")
-        else:
-            warnings.warn(f"No {element_type} element with name {element_id} in root to remove.")
-        return None
-
-    def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
-        # pylint: disable=line-too-long
-        """
-        Update the XML file such that the shape with id 'shape_name' now references the BSDF with id 'bsdf_name'.
-
-        This method modifies the scene's XML tree by updating the specified shape to reference the specified BSDF.
-        The modified XML tree is written back to the scene XML file.
-
-        Input
-        -----
-        shape_name : str
-            The name of the shape to be updated. If the name does not start with 'mesh-', it will be prefixed with 'mesh-'.
-
-        bsdf_name : str
-            The name of the BSDF to be referenced by the shape. If the name does not start with 'mat-', it will be prefixed with 'mat-'.
-
-        Output
-        ------
-        bool
-            Returns `True` if the update was successful, `False` otherwise.
-
-        Notes
-        -----
-        - This method modifies the scene's XML tree by updating the specified shape to reference the specified BSDF.
-        - If the shape with the specified `shape_name` is not found, a warning is raised and the method returns `False`.
-        - The modified XML tree is written back to the scene XML file.
-        """
-        if shape_name[:5] != 'mesh':
-            shape_name = f"mesh-{shape_name}"
-
-        if bsdf_name[:3] != 'mat':
-            bsdf_name = f"mat-{bsdf_name}"
-
-        root = self._xml_tree.getroot()
-        shapes_in_root = root.findall('shape')
-        for shape in shapes_in_root:
-            if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
-                ref = shape.find('ref')
-                ref.set('id',f"{bsdf_name}")
-                ref.set('name','bsdf')   
-
-                # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
-                ET.indent(self._xml_tree, space="\t", level=0)
-                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-                return True
-            
-        warnings.warn(f"No shape element with name {shape_name} in root to update.")
-        return False 
-
     def reload(self):
         # pylint: disable=line-too-long
         """
@@ -623,7 +447,7 @@ class Scene:
         -----
         - This method resets the preview widget, reloads the XML file with Mitsuba, reinitializes the solvers, and reloads the scene objects.
         - The :meth:`~sionna.rt.Scene._load_scene_objects()` method is called to ensure that all scene objects are correctly instantiated/updated based on the current state of the scene.
-        - If `self._bypass_reload` is `True`, the method does nothing and returns `False`.
+        - If :attr:`bypass_reload` is `True`, the method does nothing and returns `False`.
         """
 
         if not self._bypass_reload:
@@ -2109,7 +1933,7 @@ class Scene:
     # Should not be appear in the user
     # documentation
     ##############################################
-
+    
     @property
     def mi_scene(self):
         """
@@ -2144,6 +1968,182 @@ class Scene:
         :class:`~sionna.rt.InteractiveDisplay` : Get the preview widget
         """
         return self._preview_widget
+
+    def append_to_xml(self, element:ET.Element, overwrite=False):
+        # pylint: disable=line-too-long
+        """
+        Append an XML Element of type <bsdf> or <shape> to the XML Tree of the scene (at root level).
+
+        Input
+        -----
+        element : :class:`ET.Element`
+            An XML element of type <shape> or <bsdf> to be appended to the scene's XML tree.
+            
+        overwrite : bool, optional
+            If True, overwrite an existing element with the same `id`. If `False`, raise a warning if an element
+            with the same `id` already exists. Default is `False`.
+
+        Output
+        ------
+        :class:`ET.Element` or `None`
+            Returns the existing element if it already exists. Otherwise, returns `None`.
+
+        Raises
+        ------
+        ValueError
+            If the provided `element` is not of type <shape> or <bsdf>.
+
+        Notes
+        -----
+        - This method modifies the scene's XML tree by appending the provided element at the root level.
+        - If an element with the same `id` already exists, a warning is raised and the existing element is returned.
+        - If `overwrite` is True, the existing element with the same `id` is removed before appending the new element.
+        - The modified XML tree is written back to the scene XML file.
+        """
+        # Check if element contains a single BSDF or Shape element at root level:
+        element_type = element.tag
+        if element_type not in ['shape','bsdf']:
+            raise ValueError("`element` must be an instance of `ET.Element` of type <shape> or <bsdf>")
+        element_id = element.get('id')
+            
+        root = self._xml_tree.getroot()
+        elements_in_root = root.findall(f'{element_type}')  
+        ids_in_root = [elt.get('id') for elt in elements_in_root]
+
+        if element_id not in ids_in_root:
+            root.append(element)
+        else:
+            for e in elements_in_root:
+                if e.get('id') == element_id:
+                    break
+            if overwrite:
+                warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Overwriting with new element.")
+                self.remove_from_xml(element_id,element_type)
+                ET.indent(self._xml_tree, space="\t", level=0)
+                root.append(element)
+                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+                return e
+            else:
+                warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Set 'overwrite=True' to overwrite.")
+                return e
+                
+            
+        # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
+        ET.indent(self._xml_tree, space="\t", level=0)
+        self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+        return None
+    
+    def remove_from_xml(self, element_id:str, element_type=None):
+        # pylint: disable=line-too-long
+        """
+        Remove an XML Element of type in valid_element_types = ['bsdf','shape'] 
+        from the xml_tree of the scene (at root level) based on its id (type helps for the search). 
+        """
+        """
+        Remove an XML Element of type 'bsdf' or 'shape' from the XML tree of the scene (at root level) based on its id.
+
+        This method modifies the scene's XML tree by removing the specified element at the root level. If the element
+        with the specified `id` and `element_type` is not found, a warning is raised.
+
+        Input
+        -----
+        element_id : str
+            The id of the XML element to be removed.
+
+        element_type : str ('bsdf'|'shape'), optional
+            The type of the XML element to be removed. Valid types are 'bsdf' and 'shape'.
+            If `None`, all types are searched. Default is `None`.
+
+        Output
+        ------
+        :class:`ET.Element` or `None`
+            Returns the removed element if it was found and removed. Otherwise, returns `None`.
+
+        Raises
+        ------
+        ValueError
+            If the provided `element_type` is not one of the valid types ('bsdf' or 'shape').
+
+        Notes
+        -----
+        - This method modifies the scene's XML tree by removing the specified element at the root level.
+        - If the element with the specified `id` and `element_type` is not found, a warning is raised.
+        - The modified XML tree is written back to the scene XML file.
+        """
+
+        valid_element_types = ['bsdf','shape']
+        root = self._xml_tree.getroot()
+        if element_type is not None:
+            if element_type not in valid_element_types:
+                raise ValueError(f"`element_type` must be string. Valid types are {str(valid_element_types)}.")
+            elements_in_root = root.findall(f'{element_type}')  
+        else:
+            elements_in_root = []
+            for t in valid_element_types:
+                elements_in_root += root.findall(f'{t}')  
+
+        for e in elements_in_root:
+            if e.get('id') == element_id:
+                root.remove(e)
+                # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
+                ET.indent(self._xml_tree, space="\t", level=0)
+                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+                return e
+        
+        if element_type == None:
+            warnings.warn(f"No {str(valid_element_types)} element with name {element_id} in root to remove.")
+        else:
+            warnings.warn(f"No {element_type} element with name {element_id} in root to remove.")
+        return None
+
+    def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
+        # pylint: disable=line-too-long
+        """
+        Update the XML file such that the shape with id 'shape_name' now references the BSDF with id 'bsdf_name'.
+
+        This method modifies the scene's XML tree by updating the specified shape to reference the specified BSDF.
+        The modified XML tree is written back to the scene XML file.
+
+        Input
+        -----
+        shape_name : str
+            The name of the shape to be updated. If the name does not start with 'mesh-', it will be prefixed with 'mesh-'.
+
+        bsdf_name : str
+            The name of the BSDF to be referenced by the shape. If the name does not start with 'mat-', it will be prefixed with 'mat-'.
+
+        Output
+        ------
+        bool
+            Returns `True` if the update was successful, `False` otherwise.
+
+        Notes
+        -----
+        - This method modifies the scene's XML tree by updating the specified shape to reference the specified BSDF.
+        - If the shape with the specified `shape_name` is not found, a warning is raised and the method returns `False`.
+        - The modified XML tree is written back to the scene XML file.
+        """
+        if shape_name[:5] != 'mesh':
+            shape_name = f"mesh-{shape_name}"
+
+        if bsdf_name[:3] != 'mat':
+            bsdf_name = f"mat-{bsdf_name}"
+
+        root = self._xml_tree.getroot()
+        shapes_in_root = root.findall('shape')
+        for shape in shapes_in_root:
+            if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
+                ref = shape.find('ref')
+                ref.set('id',f"{bsdf_name}")
+                ref.set('name','bsdf')   
+
+                # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
+                ET.indent(self._xml_tree, space="\t", level=0)
+                self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+                return True
+            
+        warnings.warn(f"No shape element with name {shape_name} in root to update.")
+        return False 
 
     def scene_geometry_updated(self):
         """
