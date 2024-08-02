@@ -333,10 +333,12 @@ class RadioMaterial:
     
     @property
     def bsdf(self):
-        """
-        :class:`~sionna.rt.BSDF` : Get the BSDF associated with the radio material.
+        r"""Get/set the BSDF associated with the radio material.
 
-        Set the BSDF for the radio material.
+        Returns
+        -------
+        :class:`~sionna.rt.BSDF`
+            The BSDF associated with the radio material.
 
         Parameters
         ----------
@@ -348,7 +350,7 @@ class RadioMaterial:
         TypeError
             If `bsdf` is not an instance of :class:`~sionna.rt.BSDF`.
         ValueError
-            If the BSDF is already used by another material.
+            If the BSDF is already used by another :class:`~sionna.rt.RadioMaterial`.
         """
         return self._bsdf
     

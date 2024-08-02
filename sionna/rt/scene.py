@@ -2289,7 +2289,7 @@ class Scene:
                 for obj_name in asset.shapes:
                     # shape name is the name of a newly created SceneObject
                     obj = self.get(obj_name)
-                    obj.asset_object = asset.name
+                    obj.set_asset_object(asset.name)
                     asset.update_shape(key=obj_name, value=obj)
                 
                 # Check that all asset's shape share the same radio_material

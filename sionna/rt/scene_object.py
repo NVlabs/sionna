@@ -77,7 +77,7 @@ class SceneObject(Object):
     @property
     def object_id(self):
         r"""
-        int : Get/set the identifier of this object
+        int : Get the identifier of this object
         """
         return self._object_id
 
@@ -92,20 +92,16 @@ class SceneObject(Object):
     @property
     def mi_shape(self):
         r"""
-        int : Get/set the Mitsuba shape of this object
+        :class:`mitsuba.Shape` : Get the Mitsuba shape of this object
         """
         return self._mi_shape
 
     @property
     def asset_object(self):
         r"""
-        int : Get/set the parent asset_object of this object if it exists
+        str (read-only): Get the parent :class:`~sionna.rt.AssetObject` name of this object if it exists
         """
         return self._asset_object
-
-    @asset_object.setter
-    def asset_object(self, a):
-        self._asset_object = a
 
     @property
     def radio_material(self):
@@ -491,6 +487,12 @@ class SceneObject(Object):
         beta = theta-PI/2 # Rotation around y-axis
         gamma = 0.0 # Rotation around x-axis
         self.orientation = (alpha, beta, gamma)
+
+    ##############################################
+    # Internal methods.
+    # Should not be appear in the user
+    # documentation
+    ##############################################
            
     def update_mi_shape(self, mi_shape, object_id):
         """
@@ -543,3 +545,21 @@ class SceneObject(Object):
 
         # Discard the scene object from the objects using this material
         self._radio_material.discard_object_using(self.object_id) 
+
+    def set_asset_object(self, a):
+        """
+        Internal method to set the asset_object attribute.
+
+        Parameters
+        ----------
+        a : str
+            The new value for the asset_object attribute.
+
+        Raises
+        ------
+        TypeError
+            If `a` is not a string.
+        """
+        if not isinstance(a, str):
+            raise TypeError("`asset_object` must be a string")
+        self._asset_object = a

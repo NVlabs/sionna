@@ -8,6 +8,7 @@ import tensorflow as tf
 import xml.etree.ElementTree as ET
 import copy
 import matplotlib.colors as mcolors
+import warnings
 
 
 
@@ -88,7 +89,7 @@ class BSDF:
     @property
     def name(self):
         r"""
-        str: Get/Set the name of the BSDF.
+        str (read-only): Get the name of the BSDF.
         """
         return self._name
     
@@ -98,27 +99,38 @@ class BSDF:
         self._xml_element.set('id',f"{self._name}")
         self._xml_element.set('name',f"{self._name}") 
 
+        # nName should be read-only - temporary warning
+        warnings.warn(
+            "The 'bsdf.name' setter will be deprecated",
+            FutureWarning,
+            stacklevel=2
+        )
+        
+
     @property
     def xml_element(self):
         r"""
-        :class:`ET.Element` : Get the XML element description of the BSDF.
-        
-        Set the XML element of the BSDF:
+        Get/set the XML element description of the BSDF.
+
+        Returns
+        -------
+        xml_element : :class:`ET.Element`
+            The XML element descriptor of the BSDF.
 
         Parameters
         ----------
-        :class:`ET.Element` : ET.Element
-            new XML element descriptor of the bsdf(see ElementTree library).
+        xml_element : :class:`ET.Element`
+            The new XML element descriptor of the BSDF (see ElementTree library).
 
         Raises
         ------
         TypeError
-            If `xml_element` is not an instance of ET.Element.
+            If `xml_element` is not an instance of :class:`ET.Element`.
         ValueError
             If the root element is not <bsdf>.
         """
         return self._xml_element
-        
+       
     @xml_element.setter
     def xml_element(self, xml_element):
         
@@ -147,14 +159,17 @@ class BSDF:
     @property
     def rgb(self):
         r"""
-        [3], float : RGB color of the BSDF.
+        Get/set the RGB color of the BSDF.
 
-        Set the RGB color of the BSDF:
+        Returns
+        -------
+        rgb : list of float
+            A list of 3 floats representing the RGB color of the BSDF, with values between 0 and 1.
 
         Parameters
         ----------
-        rgb : [3], float
-            RGB float triplet with values comprised between 0 and 1.
+        rgb : list of float
+            A list of 3 floats representing the RGB color, with values between 0 and 1.
 
         Raises
         ------
@@ -185,13 +200,16 @@ class BSDF:
     @property
     def color(self):
         r"""
-        str or None : Color name of the BSDF or None.
+        Get/set the color of the BSDF.
 
-        Set the color of the BSDF.
+        Returns
+        -------
+        str or None
+            Color name of the BSDF or None.
 
         Parameters
         ----------
-        color : [3], float or `str`
+        color : list of float or str
             RGB float triplet with values comprised between 0 and 1, or a color name.
 
         Raises
