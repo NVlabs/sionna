@@ -405,7 +405,7 @@ class RadioMaterial:
         self.bsdf.assign(rm.bsdf)
 
         if self._scene is not None:
-            self._scene.bypass_scene_reload = b_tmp
+            self._scene.bypass_reload = b_tmp
 
         # No that a RadioMaterial has been assigned, the RadioMaterial is not a placeholder anymore
         self.is_placeholder = False

@@ -476,8 +476,8 @@ class Scene:
             if overwrite:
                 warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Overwriting with new element.")
                 self.remove_from_xml(element_id,element_type)
-                ET.indent(self._xml_tree, space="\t", level=0)
                 root.append(element)
+                ET.indent(self._xml_tree, space="\t", level=0)
                 self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
                 return e
             else:
