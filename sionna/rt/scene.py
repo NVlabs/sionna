@@ -2301,6 +2301,7 @@ class Scene:
                 # have been instantiated, we call the position and orientation setter functions on the initial position and orientation values.
                 asset.position = asset.position
                 asset.orientation = asset.orientation
+                asset.velocity = asset.velocity
 
                 asset.init = False
 

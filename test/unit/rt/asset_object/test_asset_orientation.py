@@ -229,5 +229,31 @@ class TestAssetOrientation(unittest.TestCase):
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([2-np.sqrt(2)/2,2+np.sqrt(2)/2,0]) - scene.get('asset_1_cube_0').position),epsilon)))
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(np.array([2+np.sqrt(2)/2,2-np.sqrt(2)/2,0]) - scene.get('asset_1_cube_1').position),epsilon)))
 
+    def test_orientation_without_scene(self):
+        """Check that orientation is properly set even if the scene is not set yet"""
+        epsilon = 1e-5
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [0,0,0]),epsilon)))
 
-        
+        asset.orientation = [0, 0, PI / 2]
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation - [0, 0, PI / 2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [0, 0, 0]),epsilon)))
+
+        scene = load_scene()
+        scene.add(asset)
+        scene_asset = scene.get("asset_0")
+        cube_0_object = scene.get("asset_0_cube_0")
+        cube_1_object = scene.get("asset_0_cube_1")
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.orientation  - [0, 0, PI / 2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [0, 0, 0]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(scene_asset.orientation - [0, 0, PI / 2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(scene_asset.position - [0, 0, 0]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_0_object.orientation - [0, 0, PI / 2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_0_object.position - [0,0,-1]),epsilon)))
+
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_1_object.orientation  - [0, 0, PI / 2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_1_object.position  - [0,0,+1]),epsilon)))
+
+      
