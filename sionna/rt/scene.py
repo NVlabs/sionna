@@ -2012,6 +2012,10 @@ class Scene:
 
         if element_id not in ids_in_root:
             root.append(element)
+            # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
+            ET.indent(self._xml_tree, space="\t", level=0)
+            self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+            return None
         else:
             for e in elements_in_root:
                 if e.get('id') == element_id:
@@ -2026,19 +2030,9 @@ class Scene:
             else:
                 warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Set 'overwrite=True' to overwrite.")
                 return e
-                
-            
-        # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
-        ET.indent(self._xml_tree, space="\t", level=0)
-        self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
-        return None
     
     def remove_from_xml(self, element_id:str, element_type=None):
         # pylint: disable=line-too-long
-        """
-        Remove an XML Element of type in valid_element_types = ['bsdf','shape'] 
-        from the xml_tree of the scene (at root level) based on its id (type helps for the search). 
-        """
         """
         Remove an XML Element of type 'bsdf' or 'shape' from the XML tree of the scene (at root level) based on its id.
 
