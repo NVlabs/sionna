@@ -367,7 +367,7 @@ class RadioMaterial:
         return self._bsdf
 
     @bsdf.setter
-    def bsdf(self, bsdf):        
+    def bsdf(self, bsdf):
         if not isinstance(bsdf, BSDF):
             raise TypeError("`bsdf` must be a BSDF")
 

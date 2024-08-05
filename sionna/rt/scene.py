@@ -14,7 +14,6 @@ from importlib_resources import files
 
 import matplotlib
 import matplotlib.pyplot as plt
-import numpy as np
 import mitsuba as mi
 import tensorflow as tf
 import xml.etree.ElementTree as ET
@@ -30,7 +29,6 @@ from .radio_device import RadioDevice
 from sionna.constants import SPEED_OF_LIGHT, PI
 from .itu_materials import instantiate_itu_materials
 from .radio_material import RadioMaterial
-from .bsdf import BSDF
 from .receiver import Receiver
 from .ris import RIS
 from .scene_object import SceneObject
@@ -80,7 +78,7 @@ class Scene:
     # loaded at a time.
     _instance = None
 
-    
+
     def __new__(cls, *args, **kwargs): # pylint: disable=unused-argument
         if cls._instance is None:
             instance = object.__new__(cls)
@@ -140,12 +138,12 @@ class Scene:
                     # Remove the directory and all its contents
                     shutil.rmtree(self.tmp_directory_path)
                     #print(f"Old scene directory '{self.tmp_directory_path}' has been removed.")
-                    
+
                 # Recreate an empty dir
                 os.makedirs(self.tmp_directory_path)
             except Exception as e:
-                raise RuntimeError(f"An error occurred while initializing the scene: {e}")
-            
+                raise RuntimeError(f"An error occurred while initializing the scene: {e}") from e
+
             if dtype not in (tf.complex64, tf.complex128):
                 msg = "`dtype` must be tf.complex64 or tf.complex128`"
                 raise ValueError(msg)
@@ -162,13 +160,13 @@ class Scene:
             # Keep track of the Mitsuba scene
             if env_filename == "__empty__":
                 # Set an empty scene
-                """
-                self._scene_dict = {"type": "scene",
-                                            "integrator": {
-                                                "type": "path",
-                                            }}
-                self._scene = mi.load_dict(self._scene_dict)
-                """
+                # """
+                # self._scene_dict = {"type": "scene",
+                #                             "integrator": {
+                #                                 "type": "path",
+                #                             }}
+                # self._scene = mi.load_dict(self._scene_dict)
+                # """
                 #self._scene_string = '<scene version="2.1.0"><integrator type="path"/></scene>'
                 # Create an empty scene xml descriptor
                 scene = ET.Element('scene', version="2.1.0")
@@ -199,7 +197,7 @@ class Scene:
             instantiate_itu_materials(self._dtype)
 
             # Load the scene in mitsuba
-            self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))            
+            self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
             self._scene_params = mi.traverse(self._scene)
 
             # Instantiate the solver
@@ -254,7 +252,7 @@ class Scene:
 
         # Update radio materials
         for mat in self.radio_materials.values():
-            mat.frequency_update()      
+            mat.frequency_update()
 
 
     @property
@@ -335,7 +333,7 @@ class Scene:
         the class by the user and can thus be garbage collected if there are no strong references to them elsewhere i.e. when they are deleted within scene class. 
         """
         return {k:weakref.proxy(v) for k,v in self._scene_objects.items()}
-    
+
     @property
     def asset_objects(self):
         # pylint: disable=line-too-long
@@ -451,10 +449,10 @@ class Scene:
 
         if not self._bypass_reload:
             # Reset the preview widget
-            self._preview_widget = None  
+            self._preview_widget = None
 
             # Reloade the xml file with mitsuba
-            self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml')) 
+            self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
 
             # Get the scene parameters
             self._scene_params = mi.traverse(self._scene)
@@ -464,16 +462,16 @@ class Scene:
 
             # (Re)-instantiate the solver for coverage map
             self._solver_cm = SolverCoverageMap(self, solver=self._solver_paths, dtype=self._dtype)
-            
+
             # (Re)load the scene objects
             self._load_scene_objects()
-            
+
             return True
         else:
             return False
 
 
-    
+
     def add(self, item_list):
         # pylint: disable=line-too-long
         """
@@ -496,15 +494,15 @@ class Scene:
         - If an `AssetObject` is added, the scene is reloaded to reflect the changes.
         - The :meth:`~sionna.rt.Scene.reload()` method is called if the scene needs to be reloaded after adding the items.
         """
-        
-        if type(item_list) is not list:
+
+        if not isinstance(item_list, list):
             item_list = [item_list]
 
         need_to_reload_scene = False
         for item in item_list:
             if ( (not isinstance(item, Camera))
             and (not isinstance(item, RadioDevice))
-            and (not isinstance(item, RadioMaterial)) 
+            and (not isinstance(item, RadioMaterial))
             and (not isinstance(item, AssetObject))):
                 err_msg = "The input must be a Transmitter, Receiver, RIS, Camera, , AssetObject or"\
                         " RadioMaterial"
@@ -523,11 +521,11 @@ class Scene:
                         s_item.is_placeholder = False
                         item.frequency_update()
                         continue # Since the material is updated, no need to add it to self._radio_materials. Continue to next item in item_list.
-                        
+
                     elif (isinstance(s_item, AssetObject) and isinstance(item, AssetObject)):
                         warnings.warn(f"Asset {name} already present in scene has been removed from the scene. If you want to keep both, use a different name.")
                         need_to_reload_scene = True
-                        self.remove(name)                
+                        self.remove(name)
                     else:
                         msg = f"Name '{name}' is already used by another item of"\
                             " the scene"
@@ -567,12 +565,12 @@ class Scene:
                 self._asset_objects[name] = item
                 item.scene = self
                 self._bypass_reload = b_tmp
-                
-  
+
+
         if need_to_reload_scene:
             self.reload()
 
-            
+
     def remove(self, name_list):
         # pylint: disable=line-too-long
         """
@@ -592,7 +590,7 @@ class Scene:
         - If a `RadioMaterial` is removed, it must not be used by any object in the scene.
         - The :meth:`~sionna.rt.Scene.reload()` method is called if the scene needs to be reloaded after removing the items.
         """
-        if type(name_list) is not list:
+        if not isinstance(name_list, list):
             name_list = [name_list]
 
         need_to_reload_scene = False
@@ -624,8 +622,8 @@ class Scene:
                 b_tmp = self._bypass_reload
                 self._bypass_reload = True # all self.reload() call will be by-passed
                 for shape_name in item.shapes:
-                    obj = self.get(shape_name) 
-                    obj.delete_from_scene() 
+                    obj = self.get(shape_name)
+                    obj.delete_from_scene()
                     del self._scene_objects[shape_name]
                 item.scene = None
                 del self._asset_objects[name]
@@ -637,8 +635,8 @@ class Scene:
                     raise ValueError(msg)
                 need_to_reload_scene = True
                 b_tmp = self._bypass_reload
-                self._bypass_reload = True # all self.reload() call will be by-passed  
-                item.delete_from_scene()               
+                self._bypass_reload = True # all self.reload() call will be by-passed
+                item.delete_from_scene()
                 del self._scene_objects[name]
                 self._bypass_reload = b_tmp
 
@@ -653,12 +651,12 @@ class Scene:
                 msg = "Only Transmitters, Receivers, RIS, Cameras, AssetObject, SceneObject or RadioMaterials"\
                     " can be removed"
                 raise TypeError(msg)
-        
+
         if need_to_reload_scene:
             self.reload()
-  
-    
-    
+
+
+
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
                     los=True, reflection=True, diffraction=False,
                     scattering=False, ris=True, scat_keep_prob=0.001,
@@ -1879,12 +1877,12 @@ class Scene:
     @radio_material_callable.setter
     def radio_material_callable(self, rm_callable):
         self._radio_material_callable = rm_callable
-    
+
     @property
     def bypass_reload(self):
         """Boolean parameter that defines if the scene.reload() method should be bypassed when called, to avoid any automatic reload."""
         return self._bypass_reload
-        
+
     @bypass_reload.setter
     def bypass_reload(self, b:bool):
         self._bypass_reload = b
@@ -1932,7 +1930,7 @@ class Scene:
     # Should not be appear in the user
     # documentation
     ##############################################
-    
+
     @property
     def mi_scene(self):
         """
@@ -2004,9 +2002,9 @@ class Scene:
         if element_type not in ['shape','bsdf']:
             raise ValueError("`element` must be an instance of `ET.Element` of type <shape> or <bsdf>")
         element_id = element.get('id')
-            
+
         root = self._xml_tree.getroot()
-        elements_in_root = root.findall(f'{element_type}')  
+        elements_in_root = root.findall(f'{element_type}')
         ids_in_root = [elt.get('id') for elt in elements_in_root]
 
         if element_id not in ids_in_root:
@@ -2029,7 +2027,7 @@ class Scene:
             else:
                 warnings.warn(f"Element of type {element_type} with id: {element_id} is already present in xml file. Set 'overwrite=True' to overwrite.")
                 return e
-    
+
     def remove_from_xml(self, element_id:str, element_type=None):
         # pylint: disable=line-too-long
         """
@@ -2069,11 +2067,11 @@ class Scene:
         if element_type is not None:
             if element_type not in valid_element_types:
                 raise ValueError(f"`element_type` must be string. Valid types are {str(valid_element_types)}.")
-            elements_in_root = root.findall(f'{element_type}')  
+            elements_in_root = root.findall(f'{element_type}')
         else:
             elements_in_root = []
             for t in valid_element_types:
-                elements_in_root += root.findall(f'{t}')  
+                elements_in_root += root.findall(f'{t}')
 
         for e in elements_in_root:
             if e.get('id') == element_id:
@@ -2082,14 +2080,14 @@ class Scene:
                 ET.indent(self._xml_tree, space="\t", level=0)
                 self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
                 return e
-        
-        if element_type == None:
+
+        if element_type is None:
             warnings.warn(f"No {str(valid_element_types)} element with name {element_id} in root to remove.")
         else:
             warnings.warn(f"No {element_type} element with name {element_id} in root to remove.")
         return None
 
-    def update_shape_bsdf_xml(self, shape_name, bsdf_name): 
+    def update_shape_bsdf_xml(self, shape_name, bsdf_name):
         # pylint: disable=line-too-long
         """
         Update the XML file such that the shape with id 'shape_name' now references the BSDF with id 'bsdf_name'.
@@ -2128,15 +2126,15 @@ class Scene:
             if shape.get('id') == shape_name or f"mesh-{shape.get('id')}" == shape_name:
                 ref = shape.find('ref')
                 ref.set('id',f"{bsdf_name}")
-                ref.set('name','bsdf')   
+                ref.set('name','bsdf')
 
                 # Write the modified scene XML tree back to the XML file before reloading the file with mitsuba
                 ET.indent(self._xml_tree, space="\t", level=0)
                 self._xml_tree.write(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
                 return True
-            
+
         warnings.warn(f"No shape element with name {shape_name} in root to update.")
-        return False 
+        return False
 
     def scene_geometry_updated(self):
         """
@@ -2243,11 +2241,11 @@ class Scene:
             # Setup the material based on the shape bsdf's name
             bsdf = s.bsdf()
             mat_name = bsdf.id()
-                       
+
             if mat_name.startswith("mat-"):
                 mat_name = mat_name[4:]
             mat = self.get(mat_name)
-            
+
             if (mat is not None) and (not isinstance(mat, RadioMaterial)):
                 raise ValueError(f"Name'{name}' already used by another item")
             elif mat is None:
@@ -2260,10 +2258,10 @@ class Scene:
             name = s.id()
             if name.startswith('mesh-'):
                 name = name[5:]
-            
+
             if self._is_name_used(name) and not name in self._scene_objects:
                 raise ValueError(f"Name'{name}' already used by another item")
-            
+
             if name not in self._scene_objects:
                 obj = SceneObject(name, object_id=obj_id, mi_shape=s, dtype=self._dtype)
                 obj.scene = self
@@ -2284,20 +2282,20 @@ class Scene:
                     obj = self.get(obj_name)
                     obj.set_asset_object(asset.name)
                     asset.update_shape(key=obj_name, value=obj)
-                
+
                 # Check that all asset's shape share the same radio_material
                 asset.update_radio_material()
 
                 # Apply the initial position and orientation transform of the asset
-                # When the asset is constructed, the position and orientation parameters are set by the user (or to default) but not applied to the 
-                # corresponding scene shapes since the scene objects are not yet constructed. To apply these initial parameters, now that the scene objects 
+                # When the asset is constructed, the position and orientation parameters are set by the user (or to default) but not applied to the
+                # corresponding scene shapes since the scene objects are not yet constructed. To apply these initial parameters, now that the scene objects
                 # have been instantiated, we call the position and orientation setter functions on the initial position and orientation values.
                 asset.position = asset.position
                 asset.orientation = asset.orientation
                 asset.velocity = asset.velocity
 
                 asset.init = False
-    
+
     def _is_name_used(self, name):
         """
         Returns `True` if ``name`` is used by a scene object, a transmitter,

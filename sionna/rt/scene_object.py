@@ -326,12 +326,12 @@ class SceneObject(Object):
                       @ new_rotation
                       @ inv_cur_rotation
                       @ self._mi_transform_t.translate(-self.position.numpy() - self._center_of_rotation.numpy()))
-        
+
         # transform =  (  self._mi_transform_t.translate(self.position.numpy() + (self._center_of_rotation.numpy() - self.position.numpy()))
         #         @ new_rotation
         #         @ inv_cur_rotation
         #         @ self._mi_transform_t.translate(-self.position.numpy() - (self._center_of_rotation.numpy() - self.position.numpy())))
-        
+
         ## Update Mitsuba vertices
 
         # Scene parameters
@@ -446,7 +446,7 @@ class SceneObject(Object):
         solver_paths.wedges_e_hat.scatter_nd_update(wedges_ind, wedges_e_hat)
         solver_paths.wedges_normals.scatter_nd_update(wedges_ind,
                                                       wedges_normals)
-        
+
         # Update orientation property
         self._orientation = new_orient
 
@@ -493,7 +493,7 @@ class SceneObject(Object):
     # Should not be appear in the user
     # documentation
     ##############################################
-           
+
     def update_mi_shape(self, mi_shape, object_id):
         """
         Update the Mitsuba shape and object ID of the SceneObject.
@@ -516,19 +516,19 @@ class SceneObject(Object):
         tmp_orientation = self.orientation
 
         # Reset the _orientation parameter to its default value without triggering shape update
-        self._orientation = tf.cast([0,0,0], dtype=self._rdtype) 
+        self._orientation = tf.cast([0,0,0], dtype=self._rdtype)
 
         if self._radio_material is not None:
             self.radio_material.discard_object_using(self._object_id)
             self.radio_material.add_object_using(object_id)
-        
+
         self._object_id = object_id
 
         self._mi_shape = mi_shape
-        
+
         self.position = tmp_position
         self.orientation = tmp_orientation
-    
+
     def delete_from_scene(self):
         """
         Delete the SceneObject from the scene.
@@ -544,7 +544,7 @@ class SceneObject(Object):
         self._scene.remove_from_xml(f"mesh-{self._name}","shape")
 
         # Discard the scene object from the objects using this material
-        self._radio_material.discard_object_using(self.object_id) 
+        self._radio_material.discard_object_using(self.object_id)
 
     def set_asset_object(self, a):
         """

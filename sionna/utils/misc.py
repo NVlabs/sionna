@@ -940,7 +940,8 @@ def complex_normal(shape, var=1.0, dtype=tf.complex64):
     return x
 
 def copy_and_rename_files(source_dir, destination_dir, prefix):
-    """
+    # pylint: disable=line-too-long
+    r"""
     Copy and rename files from a source directory to a destination directory.
 
     This function walks through the source directory, creates corresponding directories
@@ -979,7 +980,7 @@ def copy_and_rename_files(source_dir, destination_dir, prefix):
         relative_path = os.path.relpath(root, source_dir)
         dest_path = os.path.join(destination_dir, relative_path)
         os.makedirs(dest_path, exist_ok=True)
-        
+
         # Copy and rename files
         for file in files:
             source_file = os.path.join(root, file)

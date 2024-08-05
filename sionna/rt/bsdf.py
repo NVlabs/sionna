@@ -3,13 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+"""
+Base class for BSDF.
+"""
+
 import numpy as np
 import tensorflow as tf
 import xml.etree.ElementTree as ET
 import copy
 import matplotlib.colors as mcolors
-import warnings
-
 
 
 class BSDF:
@@ -65,7 +67,7 @@ class BSDF:
                 rgb = color
                 color = None
             else:
-                raise TypeError("`color` must be a list of 3 `float` between 0 and 1, or a valid `str` color name.")                
+                raise TypeError("`color` must be a list of 3 `float` between 0 and 1, or a valid `str` color name.")
 
             self._rgb = rgb
             self._color = color
@@ -76,8 +78,8 @@ class BSDF:
             ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
 
 
-        # By default we assume the bsdf not to be a placeholder (i.e. it is defined by the user). 
-        # When the bsdf is automatically instantiated, e.g. during the creation of a material, then _is_placeholder argument is set to True by the parent object.    
+        # By default we assume the bsdf not to be a placeholder (i.e. it is defined by the user).
+        # When the bsdf is automatically instantiated, e.g. during the creation of a material, then _is_placeholder argument is set to True by the parent object.
         self._is_placeholder = False
 
         # Radio material
@@ -88,7 +90,7 @@ class BSDF:
         r"""
         str (read-only): Get the name of the BSDF.
         """
-        return self._name        
+        return self._name
 
     @property
     def xml_element(self):
@@ -324,10 +326,7 @@ class BSDF:
         r"""
         bool : Return True if the radio_material of the BSDF is set, False otherwise.
         """
-        if self.radio_material is not None:
-            return True
-        else:
-            return False
+        return bool(self.radio_material is not None)
 
     @property
     def is_placeholder(self):
@@ -346,7 +345,7 @@ class BSDF:
         """
         if self.scene is not None:
             existing_bsdf = self.scene.append_to_xml(self._xml_element, overwrite=overwrite)
-            
+
             if existing_bsdf is not None:
                 if not overwrite:
                     self._xml_element = existing_bsdf
@@ -374,7 +373,7 @@ class BSDF:
         """
         if not isinstance(color,str):
             raise TypeError("`color` must be a `str`.")
-        
+
         # Dictionary mapping color names to RGB values using matplotlib
         color_names = {name: mcolors.to_rgb(color) for name, color in mcolors.CSS4_COLORS.items()}
 

@@ -208,7 +208,7 @@ def instantiate_itu_materials(dtype):
     #########################################
     # Floorboard
     #########################################
-    
+
     def floorboard_properties(f_hz):
         f_ghz = f_hz / 1e9
         if f_ghz < 50.0 or f_ghz > 100.0:
