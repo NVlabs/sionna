@@ -181,7 +181,6 @@ class RadioMaterial:
 
         self._bsdf.radio_material = self
 
-
     @property
     def name(self):
         """
@@ -376,11 +375,10 @@ class RadioMaterial:
         if bsdf.has_radio_material:
              raise ValueError("Can't set an already used BSDF to another material. Prefer the assign method.")
         
-
-
         self._bsdf.radio_material = None
         self._bsdf = bsdf
         self._bsdf.radio_material = self
+        self._bsdf.set_scene(overwrite=True)
 
 
     def assign(self, rm):

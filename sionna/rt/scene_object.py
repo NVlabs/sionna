@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from .object import Object
 from .radio_material import RadioMaterial
+from .asset_object import AssetObject
 import drjit as dr
 import mitsuba as mi
 from .utils import mi_to_tf_tensor, angles_to_mitsuba_rotation, normalize,\
@@ -468,11 +469,11 @@ class SceneObject(Object):
         # Get position to look at
         if isinstance(target, str):
             obj = self.scene.get(target)
-            if not isinstance(obj, Object):
+            if not isinstance(obj, Object) and not isinstance(obj, AssetObject):
                 raise ValueError(f"No camera, device, or object named '{target}' found.")
             else:
                 target = obj.position
-        elif isinstance(target, Object):
+        elif isinstance(target, Object) or not isinstance(obj, AssetObject):
             target = target.position
         else:
             target = tf.cast(target, dtype=self._rdtype)

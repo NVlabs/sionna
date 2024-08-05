@@ -452,7 +452,7 @@ class AssetObject():
                 raise TypeError(err_msg)
             
             obj = self.scene.get(target)
-            if not isinstance(obj, Object) or not isinstance(obj, AssetObject):
+            if not isinstance(obj, Object) and not isinstance(obj, AssetObject):
                 raise ValueError(f"No camera, device, asset or object named '{target}' found.")
             else:
                 target = obj.position
