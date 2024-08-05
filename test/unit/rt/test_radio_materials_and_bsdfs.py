@@ -531,7 +531,7 @@ class TestObjectUsingMatBSDFSync(unittest.TestCase):
 
         with self.assertRaises(ValueError) as context:
             itu_brick.bsdf = itu_concrete.bsdf
-        self.assertEqual(str(context.exception), "Can't assign an already used BSDF to another material")
+        self.assertEqual(str(context.exception), "Can't set an already used BSDF to another material. Prefer the assign method.")
 
         
 

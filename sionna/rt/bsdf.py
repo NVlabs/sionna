@@ -83,8 +83,8 @@ class BSDF:
         # Set of objects identifiers that use this bsdf
         self._objects_using = set()
 
-        # Scene 
-        self._scene = None
+        # Radio material
+        self._radio_material = None
 
     @property
     def name(self):
@@ -93,18 +93,18 @@ class BSDF:
         """
         return self._name
     
-    @name.setter
-    def name(self, name):
-        self._name = name
-        self._xml_element.set('id',f"{self._name}")
-        self._xml_element.set('name',f"{self._name}") 
+    # @name.setter
+    # def name(self, name):
+    #     self._name = name
+    #     self._xml_element.set('id',f"{self._name}")
+    #     self._xml_element.set('name',f"{self._name}") 
 
-        # nName should be read-only - temporary warning
-        warnings.warn(
-            "The 'bsdf.name' setter will be deprecated",
-            FutureWarning,
-            stacklevel=2
-        )
+    #     # nName should be read-only - temporary warning
+    #     warnings.warn(
+    #         "The 'bsdf.name' setter will be deprecated",
+    #         FutureWarning,
+    #         stacklevel=2
+    #     )
         
 
     @property
@@ -152,9 +152,9 @@ class BSDF:
         self._rgb = None
         self._color = None
 
-        if self._scene is not None:
-            self._scene.append_to_xml(self._xml_element, overwrite=True)
-            self._scene.reload()
+        if self.scene is not None:
+            self.scene.append_to_xml(self._xml_element, overwrite=True)
+            self.scene.reload()
 
     @property
     def rgb(self):
@@ -193,10 +193,10 @@ class BSDF:
         
         self._is_placeholder = False
 
-        if self._scene is not None:
-            self._scene.append_to_xml(self._xml_element, overwrite=True)
-            self._scene.reload()
-
+        if self.scene is not None:
+            self.scene.append_to_xml(self._xml_element, overwrite=True)
+            self.scene.reload()
+        
     @property
     def color(self):
         r"""
@@ -240,9 +240,9 @@ class BSDF:
         
         self._is_placeholder = False
 
-        if self._scene is not None:
-            self._scene.append_to_xml(self._xml_element, overwrite=True)
-            self._scene.reload()
+        if self.scene is not None:
+            self.scene.append_to_xml(self._xml_element, overwrite=True)
+            self.scene.reload()
 
     def assign(self, b):
         r"""
@@ -269,14 +269,107 @@ class BSDF:
         # No that a BSDF has been assigned, the BSDF is not a placeholder anymore
         self.is_placeholder = False
 
-        if self._scene is not None:
-            self._scene.append_to_xml(self._xml_element, overwrite=True)
-            self._scene.reload()
+        if self.scene is not None:
+            self.scene.append_to_xml(self._xml_element, overwrite=True)
+            self.scene.reload()
 
     ##############################################
     # Internal methods.
     # Should not be documented.
     ##############################################
+
+    @property
+    def use_counter(self):
+        r"""
+        int : Number of scene objects using this BSDF
+        """
+        if self.radio_material is not None:
+            return self.radio_material.use_counter
+        else:
+            return set()
+
+    @property
+    def is_used(self):
+        r"""
+        bool : Indicator if the BSDF is used by at least one object of the scene
+        """
+        if self.radio_material is not None:
+            return self.radio_material.is_used
+        else:
+            return False
+
+    @property
+    def using_objects(self):
+        r"""
+        [num_using_objects], tf.int : Identifiers of the objects using this BSDF
+        """
+        if self.radio_material is not None:
+            return self.radio_material.using_objects
+        else:
+            return tf.cast(tuple(set()), tf.int32)
+
+    @property
+    def scene(self):
+        r"""
+        :class:`~sionna.rt.Scene` : Get/set the scene
+        """
+        if self._radio_material is not None:
+            return self._radio_material.scene 
+        else:
+            return None
+
+    @property
+    def radio_material(self):
+        r"""
+        :class:`~sionna.rt.RadioMaterial` : Get/set the BSDF's RadioMaterial
+        """
+        return self._radio_material
+
+    @radio_material.setter
+    def radio_material(self, radio_material):
+        if radio_material is not None:
+            self._radio_material = radio_material
+
+            self._name = f"mat-{self._radio_material.name}"
+            self._xml_element.set('id',f"{self._name}")
+            self._xml_element.set('name',f"{self._name}")
+
+            self.set_scene(overwrite=True)
+        else:
+            self._radio_material = None
+
+    @property
+    def has_radio_material(self):
+        r"""
+        bool : Return True if the radio_material of the BSDF is set, False otherwise.
+        """
+        if self.radio_material is not None:
+            return True
+        else:
+            return False
+
+    @property
+    def is_placeholder(self):
+        r"""
+        bool : Get/set if this bsdf is a placeholder. A bsdf is considered a placeholder when it has been randomly defined upon instantiation of a RadioMaterial(random rgb tuple)
+        """
+        return self._is_placeholder
+
+    @is_placeholder.setter
+    def is_placeholder(self, v):
+        self._is_placeholder = v
+
+    def set_scene(self, overwrite=False):
+        r"""
+        Set the BSDF XML to the scene.
+        """
+        if self.scene is not None:
+            existing_bsdf = self.scene.append_to_xml(self._xml_element, overwrite=overwrite)
+            
+            if existing_bsdf is not None:
+                self._xml_element = existing_bsdf
+                self._is_placeholder = False
+            self.scene.reload()
 
     def _color_name_to_rgb(self,color):
         r"""
@@ -311,74 +404,6 @@ class BSDF:
         else:
             raise TypeError(f"Unknown color name '{color}'.")
 
-    @property
-    def use_counter(self):
-        r"""
-        int : Number of scene objects using this BSDF
-        """
-        return len(self._objects_using)
-
-    @property
-    def is_used(self):
-        r"""bool : Indicator if the BSDF is used by at least one object of
-        the scene"""
-        return self.use_counter > 0
-
-    @property
-    def using_objects(self):
-        r"""
-        [num_using_objects], tf.int : Identifiers of the objects using this
-        BSDF
-        """
-        tf_objects_using = tf.cast(tuple(self._objects_using), tf.int32)
-        return tf_objects_using
-
-    def add_object_using(self, object_id):
-        r"""
-        Add an object to the set of objects using this BSDF
-        """
-        self._objects_using.add(object_id)
-        
-    def discard_object_using(self, object_id):
-        r"""
-        Remove an object from the set of objects using this BSDF
-        """
-        assert object_id in self._objects_using,\
-            f"Object with id {object_id} is not in the set of {self.name}"
-        self._objects_using.discard(object_id)
-
-    def reset_objects_using(self):
-        self._objects_using = set()
-
-    @property
-    def scene(self):
-        r"""
-        :class:`~sionna.rt.Scene` : Get/set the scene
-        """
-        return self._scene
-
-    @scene.setter
-    def scene(self, scene):
-        if scene is not None:
-            self._scene = scene
-
-            existing_bsdf = self._scene.append_to_xml(self._xml_element, overwrite=False)
-            
-            if existing_bsdf is not None:
-                self._xml_element = existing_bsdf
-                self._is_placeholder = False
-            self._scene.reload()
-
-    @property
-    def is_placeholder(self):
-        r"""
-        bool : Get/set if this bsdf is a placeholder. A bsdf is considered a placeholder when it has been randomly defined upon instantiation of a RadioMaterial(random rgb tuple)
-        """
-        return self._is_placeholder
-
-    @is_placeholder.setter
-    def is_placeholder(self, v):
-        self._is_placeholder = v
 
 
     

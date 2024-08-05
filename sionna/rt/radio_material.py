@@ -9,6 +9,7 @@ A radio material provides the EM radio properties for a specific material.
 
 import tensorflow as tf
 import numpy as np
+import warnings
 
 from . import scene
 from sionna.constants import DIELECTRIC_PERMITTIVITY_VACUUM, PI
@@ -140,15 +141,7 @@ class RadioMaterial:
             self.relative_permittivity = relative_permittivity
             self.conductivity = conductivity
 
-        if bsdf is not None:
-            if not isinstance(bsdf, BSDF):
-                raise TypeError("`bsdf` must be a BSDF")
-            bsdf.name = f"mat-{self._name}"
-            self._bsdf = bsdf
-        else:
-            bsdf_name = f"mat-{self._name}"
-            self._bsdf = BSDF(name=bsdf_name) # Since neither rgb nor xml_element are specified, a placeholder bsdf is created with random rgb color
-            self._bsdf.is_placeholder = True
+
 
 
         # Save the callback for when the frequency is updated
@@ -166,6 +159,27 @@ class RadioMaterial:
 
         # Set of objects identifiers that use this material
         self._objects_using = set()
+
+        # Set scene to None
+        self._scene = None
+
+        # Init material BSDF
+        if bsdf is not None:
+            if not isinstance(bsdf, BSDF):
+                raise TypeError("`bsdf` must be a BSDF")
+            if bsdf.has_radio_material:
+                warnings.warn("The input BSDF is already associated with another material. Creating a dummy BSDF and assigning the input BSDF.")
+                bsdf_name = f"mat-{self._name}"
+                new_bsdf = BSDF(name=bsdf_name)
+                new_bsdf.assign(bsdf)
+                bsdf = new_bsdf
+            self._bsdf = bsdf
+        else:
+            bsdf_name = f"mat-{self._name}"
+            self._bsdf = BSDF(name=bsdf_name) # Since neither rgb nor xml_element are specified, a placeholder bsdf is created with random rgb color
+            self._bsdf.is_placeholder = True
+
+        self._bsdf.radio_material = self
 
 
     @property
@@ -359,24 +373,15 @@ class RadioMaterial:
         if not isinstance(bsdf, BSDF):
             raise TypeError("`bsdf` must be a BSDF")
         
-        if bsdf.is_used:
-            raise ValueError("Can't assign an already used BSDF to another material")
+        if bsdf.has_radio_material:
+             raise ValueError("Can't set an already used BSDF to another material. Prefer the assign method.")
         
-        bsdf.name = f"mat-{self._name}"
 
-        # Reset object using this material from current bsdf
-        for obj_id in self._objects_using:
-            self._bsdf.discard_object_using(obj_id)
 
+        self._bsdf.radio_material = None
         self._bsdf = bsdf
+        self._bsdf.radio_material = self
 
-        if self._scene is not None:
-            
-            self._bsdf.reset_objects_using() #
-            for obj_id in self._objects_using:
-                self._bsdf.add_object_using(obj_id)
-
-            self._bsdf.scene = self._scene
 
     def assign(self, rm):
         """
@@ -432,8 +437,7 @@ class RadioMaterial:
         Add an object to the set of objects using this material
         """
         self._objects_using.add(object_id)
-        if self._bsdf is not None:
-            self._bsdf.add_object_using(object_id)
+
 
     def discard_object_using(self, object_id):
         """
@@ -442,12 +446,11 @@ class RadioMaterial:
         assert object_id in self._objects_using,\
             f"Object with id {object_id} is not in the set of {self.name}"
         self._objects_using.discard(object_id)
-        if self._bsdf is not None:
-            self._bsdf.discard_object_using(object_id)
+
 
     def reset_objects_using(self):
         self._objects_using = set()
-        self._bsdf.reset_objects_using() 
+
 
     @property
     def is_placeholder(self):
@@ -470,5 +473,5 @@ class RadioMaterial:
     @scene.setter
     def scene(self, scene):
         self._scene = scene
-        self._bsdf.scene = self._scene
+        self._bsdf.set_scene(overwrite=False)
 
