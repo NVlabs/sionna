@@ -80,9 +80,6 @@ class BSDF:
         # When the bsdf is automatically instantiated, e.g. during the creation of a material, then _is_placeholder argument is set to True by the parent object.    
         self._is_placeholder = False
 
-        # Set of objects identifiers that use this bsdf
-        self._objects_using = set()
-
         # Radio material
         self._radio_material = None
 
@@ -91,21 +88,7 @@ class BSDF:
         r"""
         str (read-only): Get the name of the BSDF.
         """
-        return self._name
-
-    # @name.setter
-    # def name(self, name):
-    #     self._name = name
-    #     self._xml_element.set('id',f"{self._name}")
-    #     self._xml_element.set('name',f"{self._name}")
-
-    #     # nName should be read-only - temporary warning
-    #     warnings.warn(
-    #         "The 'bsdf.name' setter will be deprecated",
-    #         FutureWarning,
-    #         stacklevel=2
-    #     )
-
+        return self._name        
 
     @property
     def xml_element(self):
@@ -333,8 +316,6 @@ class BSDF:
             self._name = f"mat-{self._radio_material.name}"
             self._xml_element.set('id',f"{self._name}")
             self._xml_element.set('name',f"{self._name}")
-
-            self.set_scene(overwrite=True)
         else:
             self._radio_material = None
 
@@ -367,7 +348,8 @@ class BSDF:
             existing_bsdf = self.scene.append_to_xml(self._xml_element, overwrite=overwrite)
             
             if existing_bsdf is not None:
-                self._xml_element = existing_bsdf
+                if not overwrite:
+                    self._xml_element = existing_bsdf
                 self._is_placeholder = False
             self.scene.reload()
 
@@ -404,6 +386,4 @@ class BSDF:
         else:
             raise TypeError(f"Unknown color name '{color}'.")
 
-
-
-    
+        

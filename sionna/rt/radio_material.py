@@ -180,7 +180,6 @@ class RadioMaterial:
 
         self._bsdf.radio_material = self
 
-
     @property
     def name(self):
         """
@@ -380,6 +379,7 @@ class RadioMaterial:
         self._bsdf.radio_material = None
         self._bsdf = bsdf
         self._bsdf.radio_material = self
+        self._bsdf.set_scene(overwrite=True)
 
 
     def assign(self, rm):

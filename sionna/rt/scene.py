@@ -418,7 +418,6 @@ class Scene:
         if name in self._radio_materials:
             return self._radio_materials[name]
         if name in self._scene_objects:
-            #return self._scene_objects[name]
             return weakref.proxy(self._scene_objects[name])
         if name in self._cameras:
             return self._cameras[name]
@@ -2298,11 +2297,6 @@ class Scene:
                 asset.velocity = asset.velocity
 
                 asset.init = False
-
-
-
-            
-        
     
     def _is_name_used(self, name):
         """
