@@ -47,7 +47,7 @@ class SceneObject(Object):
 
         # Set the radio material
         self.radio_material = radio_material
-        
+
         # Set the object id
         self.object_id = object_id
 
@@ -83,11 +83,11 @@ class SceneObject(Object):
 
     @object_id.setter
     def object_id(self, v):
-        if self._scene != None:
+        if self._scene is not None:
             self.radio_material.discard_object_using(self._object_id)
             self.radio_material.add_object_using(v)
-        
-        self._object_id = v    
+
+        self._object_id = v
 
     @property
     def mi_shape(self):
@@ -161,7 +161,7 @@ class SceneObject(Object):
         # Update the asset radio material if the scene object belong to an asset:
         if self._asset_object is not None:
             self._scene.get(self.asset_object).update_radio_material()
-        
+
     @property
     def velocity(self):
         """
@@ -330,7 +330,6 @@ class SceneObject(Object):
         #         @ new_rotation
         #         @ inv_cur_rotation
         #         @ self._mi_transform_t.translate(-self.position.numpy() - (self._center_of_rotation.numpy() - self.position.numpy())))
-        
         
         ## Update Mitsuba vertices
 

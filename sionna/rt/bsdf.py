@@ -50,11 +50,11 @@ class BSDF:
             # Store the specified XML descriptor
             self._xml_element = xml_element
             self._xml_element.set('id',f"{self._name}")
-            self._xml_element.set('name',f"{self._name}")  
+            self._xml_element.set('name',f"{self._name}")
 
             self._rgb = None
             self._color = None
-       
+
         else:
             if color is None:
                 # If neither RGB or XML element are specified a random color is chosen
@@ -74,7 +74,7 @@ class BSDF:
             self._xml_element = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
             rgb_value = f"{self._rgb[0]} {self._rgb[1]} {self._rgb[2]}"
             ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
-        
+
 
         # By default we assume the bsdf not to be a placeholder (i.e. it is defined by the user). 
         # When the bsdf is automatically instantiated, e.g. during the creation of a material, then _is_placeholder argument is set to True by the parent object.    
@@ -92,12 +92,12 @@ class BSDF:
         str (read-only): Get the name of the BSDF.
         """
         return self._name
-    
+
     # @name.setter
     # def name(self, name):
     #     self._name = name
     #     self._xml_element.set('id',f"{self._name}")
-    #     self._xml_element.set('name',f"{self._name}") 
+    #     self._xml_element.set('name',f"{self._name}")
 
     #     # nName should be read-only - temporary warning
     #     warnings.warn(
@@ -105,7 +105,7 @@ class BSDF:
     #         FutureWarning,
     #         stacklevel=2
     #     )
-        
+
 
     @property
     def xml_element(self):
@@ -130,10 +130,10 @@ class BSDF:
             If the root element is not <bsdf>.
         """
         return self._xml_element
-       
+
     @xml_element.setter
     def xml_element(self, xml_element):
-        
+
         if not isinstance(xml_element, ET.Element):
             raise TypeError("`element` must be an ET.Element descriptor of a BSDF.")
 
@@ -144,8 +144,8 @@ class BSDF:
         # Store the specified XML descriptor and change the name to match that of the bsdf/material
         self._xml_element = xml_element
         self._xml_element.set('id',f"{self._name}")
-        self._xml_element.set('name',f"{self._name}")  
-        
+        self._xml_element.set('name',f"{self._name}")
+
         self._is_placeholder = False
 
         # Set color and rgb to `None` since rgb or color are not always present in a complex bsdf xml descriptor
@@ -177,10 +177,10 @@ class BSDF:
             If `rgb` is not a list of 3 floats between 0 and 1.
         """
         return self._rgb
-    
+
     @rgb.setter
     def rgb(self, rgb):
-        
+
         if len(rgb) != 3 or max(rgb) > 1 or min(rgb) < 0:
             raise TypeError("`rgb` must be a list of 3 floats comprised between 0 and 1")
         self._rgb = rgb
@@ -190,13 +190,13 @@ class BSDF:
         self._xml_element = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
         rgb_value = f"{self._rgb[0]} {self._rgb[1]} {self._rgb[2]}"
         ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
-        
+
         self._is_placeholder = False
 
         if self.scene is not None:
             self.scene.append_to_xml(self._xml_element, overwrite=True)
             self.scene.reload()
-        
+
     @property
     def color(self):
         r"""
@@ -221,7 +221,7 @@ class BSDF:
 
     @color.setter
     def color(self, color):
-        
+
         if isinstance(color, str):
             color,rgb = self._color_name_to_rgb(color)
         elif len(color) == 3 and max(color) <= 1 and min(color) >= 0:
@@ -237,7 +237,7 @@ class BSDF:
         self._xml_element = ET.Element('bsdf', attrib={'type': 'diffuse', 'id': self._name, 'name': self._name})
         rgb_value = f"{self._rgb[0]} {self._rgb[1]} {self._rgb[2]}"
         ET.SubElement(self._xml_element, 'rgb', attrib={'value': rgb_value, 'name': 'reflectance'})
-        
+
         self._is_placeholder = False
 
         if self.scene is not None:
@@ -265,7 +265,7 @@ class BSDF:
         # Since assign method does not replace the object itself, the we should update the name of the assigned bsdf before updating xml file
         self._xml_element.set('id',f"{self._name}")
         self._xml_element.set('name',f"{self._name}")
-        
+
         # No that a BSDF has been assigned, the BSDF is not a placeholder anymore
         self.is_placeholder = False
 
@@ -314,7 +314,7 @@ class BSDF:
         :class:`~sionna.rt.Scene` : Get/set the scene
         """
         if self._radio_material is not None:
-            return self._radio_material.scene 
+            return self._radio_material.scene
         else:
             return None
 

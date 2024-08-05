@@ -8,7 +8,6 @@ A radio material provides the EM radio properties for a specific material.
 """
 
 import tensorflow as tf
-import numpy as np
 import warnings
 
 from . import scene
@@ -344,7 +343,7 @@ class RadioMaterial:
         """
         tf_objects_using = tf.cast(tuple(self._objects_using), tf.int32)
         return tf_objects_using
-    
+
     @property
     def bsdf(self):
         r"""Get/set the BSDF associated with the radio material.
@@ -367,15 +366,15 @@ class RadioMaterial:
             If the BSDF is already used by another :class:`~sionna.rt.RadioMaterial`.
         """
         return self._bsdf
-    
+
     @bsdf.setter
     def bsdf(self, bsdf):        
         if not isinstance(bsdf, BSDF):
             raise TypeError("`bsdf` must be a BSDF")
-        
+
         if bsdf.has_radio_material:
-             raise ValueError("Can't set an already used BSDF to another material. Prefer the assign method.")
-        
+            raise ValueError("Can't set an already used BSDF to another material. Prefer the assign method.")
+
 
 
         self._bsdf.radio_material = None
@@ -469,9 +468,9 @@ class RadioMaterial:
         scene : Get/set the scene
         """
         return self._scene
-    
+
     @scene.setter
-    def scene(self, scene):
-        self._scene = scene
+    def scene(self, s):
+        self._scene = s
         self._bsdf.set_scene(overwrite=False)
 
