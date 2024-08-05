@@ -2283,7 +2283,7 @@ class Scene:
                 for obj_name in asset.shapes:
                     # shape name is the name of a newly created SceneObject
                     obj = self.get(obj_name)
-                    obj.asset_object = asset.name
+                    obj.set_asset_object(asset.name)
                     asset.update_shape(key=obj_name, value=obj)
                 
                 # Check that all asset's shape share the same radio_material
@@ -2295,6 +2295,7 @@ class Scene:
                 # have been instantiated, we call the position and orientation setter functions on the initial position and orientation values.
                 asset.position = asset.position
                 asset.orientation = asset.orientation
+                asset.velocity = asset.velocity
 
                 asset.init = False
 

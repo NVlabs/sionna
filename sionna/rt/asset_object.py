@@ -249,6 +249,7 @@ class AssetObject():
 
     @property
     def position(self):
+        # pylint: disable=line-too-long
         r"""
         [3], tf.float : Get/Set the position of the asset
 
@@ -257,13 +258,10 @@ class AssetObject():
         is part of a scene, it corrects the initial position bias that was added to
         avoid overlapping shapes.
 
-        Notes
+        Notes 
         -----
-        - If the asset is being initialized (`self._init` is `True`) and is part of a scene,
-        the initial position bias is corrected.
-        - The method calculates the difference between the new position and the current
-        position (or the initial position bias) and applies this difference to all
-        associated shapes to move them accordingly.
+        - If the asset is being initialized (`self._init` is `True`) and is part of a scene,the initial position bias is corrected.
+        - The method calculates the difference between the new position and the currentposition (or the initial position bias) and applies this difference to all associated shapes to move them accordingly.
         """
         return self._position
 
@@ -285,6 +283,7 @@ class AssetObject():
         
     @property
     def orientation(self):
+        # pylint: disable=line-too-long
         r"""
         [3], tf.float : Get/Set the orientation of the asset.
 
@@ -293,13 +292,9 @@ class AssetObject():
 
         Notes
         -----
-        - If the asset is being initialized (`self._init` is `True`) and is part of a scene,
-        the new orientation is applied directly.
-        - The method calculates the difference between the new orientation and the current
-        orientation and applies
-        this difference to all associated shapes to rotate them accordingly.
-        - The rotation is performed around a center of rotation shifted by the asset's position 
-        (i.e.all shapes are rotated around the asset position).
+        - If the asset is being initialized (`self._init` is `True`) and is part of a scene, the new orientation is applied directly.
+        - The method calculates the difference between the new orientation and the current orientation and applies this difference to all associated shapes to rotate them accordingly.
+        - The rotation is performed around a center of rotation shifted by the asset's position (i.e. all shapes are rotated around the asset position).
         """
         return self._orientation
 
@@ -326,13 +321,11 @@ class AssetObject():
                 
     @property
     def radio_material(self):
+        # pylint: disable=line-too-long
         r"""
         :class:`~sionna.rt.RadioMaterial` : Get/Set the radio material of the object. 
 
-        This property updates the radio material of the asset and ensures that all
-        associated shapes use the same material. If the asset is part of a scene,
-        it checks if the material already exists in the scene and handles any
-        conflicts appropriately.
+        This property updates the radio material of the asset and ensures that all associated shapes use the same material. If the asset is part of a scene, it checks if the material already exists in the scene and handles any conflicts appropriately.
 
         Parameters
         ----------
@@ -342,16 +335,10 @@ class AssetObject():
 
         Notes
         -----
-        - If the asset is part of a scene and the material is specified as a string,
-        it checks if a material with that name already exists in the scene. If it
-        does not exist, an error is raised.
-        - If the material is specified as a `RadioMaterial` instance, it is added to
-        the scene if it does not already exist.
-        - The method temporarily disables scene auto-reload to avoid intempestive reloading
-        at each asset's shape radio material (more precisely BSDF) assignation, or if multiple 
-        asset are added simultaneously
-        - The method sets an internal bypass flag to avoid re-updating the asset
-        material for each shape modification.
+        - If the asset is part of a scene and the material is specified as a string, it checks if a material with that name already exists in the scene. If it does not exist, an error is raised.
+        - If the material is specified as a `RadioMaterial` instance, it is added to the scene if it does not already exist.
+        - The method temporarily disables scene auto-reload to avoid intempestive reloading at each asset's shape radio material (more precisely BSDF) assignation, or if multiple asset are added simultaneously
+        - The method sets an internal bypass flag to avoid re-updating the asset material for each shape modification.
 
         Raises
         ------
@@ -605,7 +592,7 @@ class AssetObject():
 
         Notes
         -----
-        - Mitsuba automatically merges vertices at the same position when loading
+        Mitsuba automatically merges vertices at the same position when loading
         the scene. To avoid this, a small random transform is applied to ensure
         that two assets never share the same position before calling the
         `mi.load()` function. The correct position and orientation are then
@@ -720,12 +707,9 @@ class AssetObject():
 
         Notes
         -----
-        - If a BSDF with the same name already exists in the scene and is a placeholder,
-        it is updated with the BSDF from the asset.
-        - If a BSDF with the same name already exists in the scene and is not a placeholder,
-        it is not overwritten unless the `overwrite_scene_bsdfs` flag is set to `True`.
-        - If a radio material with the same name does not exist in the scene, a new
-        placeholder radio material is created and added to the scene.
+        - If a BSDF with the same name already exists in the scene and is a placeholder, it is updated with the BSDF from the asset.
+        - If a BSDF with the same name already exists in the scene and is not a placeholder, it is not overwritten unless the `overwrite_scene_bsdfs` flag is set to `True`.
+        - If a radio material with the same name does not exist in the scene, a new placeholder radio material is created and added to the scene.
 
         Raises
         ------
@@ -785,9 +769,7 @@ class AssetObject():
         Notes
         -----
         - This method is bypassed if the `_bypass_update` flag is set to `True`.
-        - The method iterates over all shapes of the asset and collects their radio
-        materials. If there is only one unique material, it is assigned to the
-        asset's `radio_material` property. Otherwise, the property is set to `None`.
+        - The method iterates over all shapes of the asset and collects their radio materials. If there is only one unique material, it is assigned to the asset's `radio_material` property. Otherwise, the property is set to `None`.
         """
         if not self._bypass_update:
             asset_mats = []
@@ -817,9 +799,7 @@ class AssetObject():
         Notes
         -----
         - This method is bypassed if the `_bypass_update` flag is set to `True`.
-        - The method iterates over all shapes of the asset and collects their velocities.
-        If all shapes have the same velocity, it is assigned to the asset's `velocity`
-        property. Otherwise, the property is set to `None`.
+        - The method iterates over all shapes of the asset and collects their velocities. If all shapes have the same velocity, it is assigned to the asset's `velocity` property. Otherwise, the property is set to `None`.
         """
         if not self._bypass_update:
 

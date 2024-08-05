@@ -103,3 +103,22 @@ class TestAssetVelocity(unittest.TestCase):
         epsilon = 1e-5 
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_0_object.velocity-random_velocity_2),epsilon)))
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_1_object.velocity-random_velocity),epsilon)))
+
+    def test_velocity_without_scene(self):
+        """Check that velocity is properly set even if the scene is not set yet"""
+        epsilon = 1e-5
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.velocity - [0,0,0]),epsilon)))
+
+        asset.velocity = [4,3,2]
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.velocity - [4,3,2]),epsilon)))
+
+        scene = load_scene()
+        scene.add(asset)
+        scene_asset = scene.get("asset_0")
+        cube_0_object = scene.get("asset_0_cube_0")
+        cube_1_object = scene.get("asset_0_cube_1")
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.velocity - [4,3,2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(scene_asset.velocity -[4,3,2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_0_object.velocity - [4,3,2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_1_object.velocity - [4,3,2]),epsilon)))

@@ -559,3 +559,35 @@ class TestAssetMaterial(unittest.TestCase):
         
         # Since the material is now vacuum, the path has no energy
         self.assertTrue(tf.reduce_sum(tf.squeeze(cir[0])) == 0)
+
+    def test_radio_material_without_scene(self):
+        """Check that material is properly set even if the scene is not set yet"""
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        asset.radio_material = "itu_glass"
+        self.assertEqual(asset.radio_material,"itu_glass")
+
+        scene = load_scene()
+        scene.add(asset)
+        scene_asset = scene.get("asset_0")
+        cube_0_object = scene.get("asset_0_cube_0")
+        cube_1_object = scene.get("asset_0_cube_1")
+        itu_glass = scene.get("itu_glass")
+        self.assertEqual(asset.radio_material,itu_glass)
+        self.assertEqual(scene_asset.radio_material,itu_glass)
+        self.assertEqual(cube_0_object.radio_material,itu_glass)
+        self.assertEqual(cube_1_object.radio_material,itu_glass)
+
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        rm = RadioMaterial("custom_rm")
+        asset.radio_material = rm
+        self.assertEqual(asset.radio_material,rm)
+
+        scene = load_scene()
+        scene.add(asset)
+        scene_asset = scene.get("asset_0")
+        cube_0_object = scene.get("asset_0_cube_0")
+        cube_1_object = scene.get("asset_0_cube_1")
+        self.assertEqual(asset.radio_material,rm)
+        self.assertEqual(scene_asset.radio_material,rm)
+        self.assertEqual(cube_0_object.radio_material,rm)
+        self.assertEqual(cube_1_object.radio_material,rm)

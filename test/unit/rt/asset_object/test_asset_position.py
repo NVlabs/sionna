@@ -175,3 +175,22 @@ class TestAssetPosition(unittest.TestCase):
         asset.position = [+1,-2,+3]
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_0_object.position-[+1,-3,+3]),epsilon)))
         self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_1_object.position-[+1,-1,+3]),epsilon)))
+
+    def test_position_without_scene(self):
+        """Check that position is properly set even if the scene is not set yet"""
+        epsilon = 1e-5
+        asset = AssetObject(name="asset_0", filename=sionna.rt.asset_object.test_asset_1)
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [0,0,0]),epsilon)))
+
+        asset.position = [4,3,2]
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [4,3,2]),epsilon)))
+
+        scene = load_scene()
+        scene.add(asset)
+        scene_asset = scene.get("asset_0")
+        cube_0_object = scene.get("asset_0_cube_0")
+        cube_1_object = scene.get("asset_0_cube_1")
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(asset.position - [4,3,2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(scene_asset.position -[4,3,2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_0_object.position - [4,2,2]),epsilon)))
+        self.assertTrue(tf.reduce_all(tf.math.less_equal(tf.math.abs(cube_1_object.position - [4,4,2]),epsilon)))
