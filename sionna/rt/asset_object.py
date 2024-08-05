@@ -49,6 +49,7 @@ class AssetObject():
     Example asset can be loaded as follows:
 
     .. code-block:: Python
+    
         scene = load_scene()
         asset = AssetObject(name='asset_name', filename=sionna.rt.asset_object.test_asset_1)
         scene.add(asset)
