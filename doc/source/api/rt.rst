@@ -19,7 +19,9 @@ The paper `Sionna RT: Differentiable Ray Tracing for Radio Propagation Modeling 
 .. include:: rt_coverage_map.rst.txt
 .. include:: rt_camera.rst.txt
 .. include:: rt_scene_object.rst.txt
+.. include:: rt_asset_object.rst.txt
 .. include:: rt_radio_material.rst.txt
+.. include:: rt_bsdf.rst.txt
 .. include:: rt_radio_device.rst.txt
 .. include:: rt_antenna_array.rst.txt
 .. include:: rt_antenna.rst.txt
