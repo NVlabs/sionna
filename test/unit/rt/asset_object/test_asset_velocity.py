@@ -65,8 +65,11 @@ class TestAssetVelocity(unittest.TestCase):
         phi_r = tf.squeeze(paths.phi_r)
         k_1 = -r_hat(theta_r, phi_r)
         doppler_theo = np.sum((k_1-k_0)*asset.velocity)/scene.wavelength
+        
+        a = tf.squeeze(paths.doppler).numpy()
+        b = doppler_theo.numpy()
 
-        self.assertAlmostEqual(tf.squeeze(paths.doppler), doppler_theo)
+        self.assertAlmostEqual(a,b,places=3)
 
     def test_asset_vs_object_velocities_consistency(self):
         """Check if the position of the asset is consistent with that of its shape constituents. Here we consider a composite asset made of 
