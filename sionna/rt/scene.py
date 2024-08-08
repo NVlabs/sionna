@@ -183,8 +183,7 @@ class Scene:
 
     @frequency.setter
     def frequency(self, f):
-        if f <= 0.0:
-            raise ValueError("Frequency must be positive")
+        tf.debugging.assert_positive(f, message="Frequency must be positive")
         self._frequency = tf.cast(f, self._dtype.real_dtype)
         # Wavelength [m]
         self._wavelength = tf.cast(SPEED_OF_LIGHT/f,

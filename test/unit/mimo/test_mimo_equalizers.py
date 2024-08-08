@@ -45,6 +45,8 @@ class Model(tf.keras.Model):
             self.s = exp_corr_mat(rho, self.channel._num_rx_ant)
         else:
             self.s = tf.eye(self.channel._num_rx_ant, dtype=tf.complex64)
+        tf.config.experimental.set_virtual_device_configuration(gpus[gpu_num],
+                 [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=40240)])
                  
     @tf.function()
     def call(self, batch_size, no):
