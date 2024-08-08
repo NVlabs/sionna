@@ -465,7 +465,7 @@ class Scene:
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
                     los=True, reflection=True, diffraction=False,
                     scattering=False, ris=True, scat_keep_prob=0.001,
-                    edge_diffraction=False, check_scene=True):
+                    edge_diffraction=False, check_scene=True, refraction=False):
         # pylint: disable=line-too-long
         r"""
         Computes the trajectories of the paths by shooting rays

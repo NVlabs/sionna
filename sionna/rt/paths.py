@@ -91,6 +91,7 @@ class Paths:
     DIFFRACTED = 2
     SCATTERED = 3
     RIS = 4
+    REFRACTION = 5
 
     def __init__(self,
                  sources,
