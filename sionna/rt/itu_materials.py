@@ -10,6 +10,7 @@ These materials are from Table 3 of the Recommendation ITU-R P.2040-2.
 import numpy as np
 from .radio_material import RadioMaterial
 from . import scene
+import tensorflow as tf
 
 def instantiate_itu_materials(dtype):
     #########################################
@@ -31,12 +32,17 @@ def instantiate_itu_materials(dtype):
 
     def concrete_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 100.:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 5.24
-        conductivity = 0.0462*np.power(f_ghz, 0.7822)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1.0), tf.greater(f_ghz, 100.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(5.24)
+            conductivity = 0.0462 * tf.pow(f_ghz, 0.7822)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_concrete",
@@ -50,12 +56,17 @@ def instantiate_itu_materials(dtype):
 
     def brick_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 40.:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 3.91
-        conductivity = 0.0238*np.power(f_ghz, 0.16)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1.0), tf.greater(f_ghz, 40.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(3.91)
+            conductivity = 0.0238 * tf.pow(f_ghz, 0.16)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_brick",
@@ -69,13 +80,17 @@ def instantiate_itu_materials(dtype):
 
     def plasterboard_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 100.:
-            return (-1.0, -1.0)
-
-
-        relative_permittivity = 2.73
-        conductivity = 0.0085*np.power(f_ghz, 0.9395)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1.0), tf.greater(f_ghz, 100.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(2.73)
+            conductivity = 0.0085 * tf.pow(f_ghz, 0.9395)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_plasterboard",
@@ -89,12 +104,17 @@ def instantiate_itu_materials(dtype):
 
     def wood_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 0.001 or f_ghz > 100.:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 1.99
-        conductivity = 0.0047*np.power(f_ghz, 1.0718)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 0.001), tf.greater(f_ghz, 100.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(1.99)
+            conductivity = 0.0047 * tf.pow(f_ghz, 1.0718)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_wood",
@@ -108,16 +128,23 @@ def instantiate_itu_materials(dtype):
 
     def glass_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if 0.1 <= f_ghz <= 100.:
-            relative_permittivity = 6.31
-            conductivity = 0.0036*np.power(f_ghz, 1.3394)
-            return (relative_permittivity, conductivity)
-        elif 220. <= f_ghz <= 450.:
-            relative_permittivity = 5.79
-            conductivity = 0.0004*np.power(f_ghz, 1.658)
-            return (relative_permittivity, conductivity)
-        else:
-            return (-1.0, -1.0)
+        condition1 = tf.logical_and(tf.greater_equal(f_ghz, 0.1), tf.less_equal(f_ghz, 100.0))
+        condition2 = tf.logical_and(tf.greater_equal(f_ghz, 220.0), tf.less_equal(f_ghz, 450.0))
+
+        def true_fn1():
+            relative_permittivity = tf.constant(6.31)
+            conductivity = 0.0036*tf.pow(f_ghz, 1.3394)
+            return relative_permittivity, conductivity
+
+        def true_fn2():
+            relative_permittivity = tf.constant(5.79)
+            conductivity = 0.0004*tf.pow(f_ghz, 1.658)
+            return relative_permittivity, conductivity
+
+        def false_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        return tf.cond(condition1, true_fn1, lambda: tf.cond(condition2, true_fn2, false_fn))
+
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_glass",
@@ -131,16 +158,24 @@ def instantiate_itu_materials(dtype):
 
     def ceiling_board_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if 1. <= f_ghz <= 100.:
-            relative_permittivity = 1.48
-            conductivity = 0.0011*np.power(f_ghz, 1.0750)
-            return (relative_permittivity, conductivity)
-        elif 220. <= f_ghz <= 450.:
-            relative_permittivity = 1.52
-            conductivity = 0.0029*np.power(f_ghz, 1.029)
-            return (relative_permittivity, conductivity)
-        else:
-            return (-1.0, -1.0)
+        condition1 = tf.logical_and(tf.greater_equal(f_ghz, 1.0), tf.less_equal(f_ghz, 100.0))
+        condition2 = tf.logical_and(tf.greater_equal(f_ghz, 220.0), tf.less_equal(f_ghz, 450.0))
+        
+        def true_fn1():
+            relative_permittivity = tf.constant(1.48)
+            conductivity = 0.0011*tf.pow(f_ghz, 1.0750)
+            return relative_permittivity, conductivity
+        
+        def true_fn2():
+            relative_permittivity = tf.constant(1.52)
+            conductivity = 0.0029*tf.pow(f_ghz, 1.029)
+            return relative_permittivity, conductivity
+        
+        def false_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        return tf.cond(condition1, true_fn1, lambda: tf.cond(condition2, true_fn2, false_fn))
+
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_ceiling_board",
@@ -154,12 +189,17 @@ def instantiate_itu_materials(dtype):
 
     def chipboard_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 100.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 2.58
-        conductivity = 0.0217*np.power(f_ghz, 0.7800)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 0.001), tf.greater(f_ghz, 100.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(2.58)
+            conductivity = 0.0217 * tf.pow(f_ghz, 0.7800)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_chipboard",
@@ -173,12 +213,17 @@ def instantiate_itu_materials(dtype):
 
     def plywood_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 40.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 2.71
-        conductivity = 0.33
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1), tf.greater(f_ghz, 40.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(2.71)
+            conductivity = 0.33
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_plywood",
@@ -192,12 +237,17 @@ def instantiate_itu_materials(dtype):
 
     def marble_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 60.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 7.074
-        conductivity = 0.0055*np.power(f_ghz, 0.9262)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1), tf.greater(f_ghz, 60.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(7.074)
+            conductivity = 0.0055*tf.pow(f_ghz, 0.9262)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_marble",
@@ -211,12 +261,17 @@ def instantiate_itu_materials(dtype):
 
     def floorboard_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 50.0 or f_ghz > 100.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 3.66
-        conductivity = 0.0044*np.power(f_ghz, 1.3515)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 50.0), tf.greater(f_ghz, 100.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(3.66)
+            conductivity = 0.0044*tf.pow(f_ghz, 1.3515)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_floorboard",
@@ -230,12 +285,17 @@ def instantiate_itu_materials(dtype):
 
     def metal_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 100.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 1.0
-        conductivity = 1e7
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1), tf.greater(f_ghz, 100.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(1.0)
+            conductivity = 1e7
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_metal",
@@ -249,12 +309,17 @@ def instantiate_itu_materials(dtype):
 
     def very_dry_ground_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 10.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 3.0
-        conductivity = 0.00015*np.power(f_ghz, 2.52)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1), tf.greater(f_ghz, 10.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = tf.constant(3.0)
+            conductivity = 0.00015*tf.pow(f_ghz, 2.52)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_very_dry_ground",
@@ -268,12 +333,17 @@ def instantiate_itu_materials(dtype):
 
     def medium_dry_ground_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 10.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 15.0*np.power(f_ghz, -0.1)
-        conductivity = 0.035*np.power(f_ghz, 1.63)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1), tf.greater(f_ghz, 10.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = 15.0*tf.pow(f_ghz, -0.1)
+            conductivity = 0.035*tf.pow(f_ghz, 1.63)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_medium_dry_ground",
@@ -287,12 +357,17 @@ def instantiate_itu_materials(dtype):
 
     def wet_ground_properties(f_hz):
         f_ghz = f_hz / 1e9
-        if f_ghz < 1.0 or f_ghz > 10.0:
-            return (-1.0, -1.0)
-
-        relative_permittivity = 30.0*np.power(f_ghz, -0.4)
-        conductivity = 0.15*np.power(f_ghz, 1.30)
-        return (relative_permittivity, conductivity)
+        condition = tf.logical_or(tf.less(f_ghz, 1), tf.greater(f_ghz, 10.0))
+        
+        def true_fn():
+            return tf.constant(-1.0), tf.constant(-1.0)
+        
+        def false_fn():
+            relative_permittivity = 30.0*tf.pow(f_ghz, -0.4)
+            conductivity = 0.15*tf.pow(f_ghz, 1.30)
+            return relative_permittivity, conductivity
+        
+        return tf.cond(condition, true_fn, false_fn)
 
     # Materials parameters will be updated when the frequency is set
     rm = RadioMaterial("itu_wet_ground",
