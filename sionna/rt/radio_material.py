@@ -103,6 +103,7 @@ class RadioMaterial:
                  conductivity=0.0,
                  scattering_coefficient=0.0,
                  xpd_coefficient=0.0,
+                 thickness=0.1,
                  scattering_pattern=None,
                  frequency_update_callback=None,
                  dtype=tf.complex64):
@@ -123,6 +124,7 @@ class RadioMaterial:
         self.scattering_pattern = scattering_pattern
         self.scattering_coefficient = scattering_coefficient
         self.xpd_coefficient = xpd_coefficient
+        self.thickness = thickness
 
         if frequency_update_callback is None:
             self.relative_permittivity = relative_permittivity
@@ -151,6 +153,25 @@ class RadioMaterial:
         str (read-only) : Name of the radio material
         """
         return self._name
+
+    @property
+    def thickness(self):
+        r"""
+        tf.float : Get/set the thickness of the material
+            :math:`d_r` :eq:`d`
+        """
+        return self._thickness
+    
+    @thickness.setter
+    def thickness(self, v):
+        if isinstance(v, tf.Variable):
+            if v.dtype != self._rdtype:
+                msg = f"`thickness` must have dtype={self._rdtype}"
+                raise TypeError(msg)
+            else:
+                self._thickness = v
+        else:
+            self._thickness = tf.cast(v, self._rdtype)
 
     @property
     def relative_permittivity(self):
@@ -278,13 +299,15 @@ class RadioMaterial:
 
     @property
     def well_defined(self):
-        """bool : Get if the material is well-defined"""
-        # pylint: disable=chained-comparison
-        return ((self._conductivity >= 0.)
-             and (self.relative_permittivity >= 1.)
-             and (0. <= self.scattering_coefficient <= 1.)
-             and (0. <= self.xpd_coefficient <= 1.)
-             and (0. <= self.scattering_pattern.lambda_ <= 1.))
+        conditions = [
+            tf.greater_equal(self._thickness, 0.),
+            tf.greater_equal(self._conductivity, 0.),
+            tf.greater_equal(self.relative_permittivity, 1.),
+            tf.logical_and(tf.greater_equal(self.scattering_coefficient, 0.), tf.less_equal(self.scattering_coefficient, 1.)),
+            tf.logical_and(tf.greater_equal(self.xpd_coefficient, 0.), tf.less_equal(self.xpd_coefficient, 1.)),
+            tf.logical_and(tf.greater_equal(self.scattering_pattern.lambda_, 0.), tf.less_equal(self.scattering_pattern.lambda_, 1.))
+        ]
+        return tf.reduce_all(conditions)
 
     @property
     def use_counter(self):
@@ -368,3 +391,4 @@ class RadioMaterial:
         self.xpd_coefficient = rm.xpd_coefficient
         self.scattering_pattern = rm.scattering_pattern
         self.frequency_update_callback = rm.frequency_update_callback
+        self.thickness = rm.thickness

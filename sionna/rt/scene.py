@@ -464,8 +464,8 @@ class Scene:
 
     def trace_paths(self, max_depth=3, method="fibonacci", num_samples=int(1e6),
                     los=True, reflection=True, diffraction=False,
-                    scattering=False, ris=True, scat_keep_prob=0.001,
-                    edge_diffraction=False, check_scene=True, refraction=False):
+                    scattering=False, ris=True, refraction=False, scat_keep_prob=0.001,
+                    edge_diffraction=False, check_scene=True):
         # pylint: disable=line-too-long
         r"""
         Computes the trajectories of the paths by shooting rays
@@ -532,8 +532,8 @@ class Scene:
             If set to `True`, then the paths involving RIS are computed.
             Defaults to `True`.
 
-        ris : bool
-            If set to `True`, then the paths involving RIS are computed.
+        refraction : bool
+            If set to `True`, then the paths involving Refraction are computed.
             Defaults to `True`.
 
         scat_keep_prob : float
@@ -570,6 +570,9 @@ class Scene:
         ris_paths : :class:`~sionna.rt.Paths`
             Computed paths involving RIS
 
+        refraction_paths: :class:`~sionna.rt.Paths`
+            Computed paths involving Refraction
+
         spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the specular
             paths
@@ -586,9 +589,8 @@ class Scene:
             Additional data required to compute the EM fields of the paths
             involving RIS
 
-        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
-            Additional data required to compute the EM fields of the paths
-            involving RIS
+        refraction_paths_tmp: :class:`~sionna.rt.PathsTmpData`
+            Additional data required to compute the EM fields of the refracted paths
         """
 
         if scat_keep_prob < 0. or scat_keep_prob > 1.:
@@ -607,14 +609,16 @@ class Scene:
                                                diffraction=diffraction,
                                                scattering=scattering,
                                                ris=ris,
+                                               refraction=refraction,
                                                scat_keep_prob=scat_keep_prob,
                                                edge_diffraction=edge_diffraction)
 
         return paths
 
-    def compute_fields(self, spec_paths, diff_paths, scat_paths, ris_paths,
+    def compute_fields(self, spec_paths, diff_paths, scat_paths, ris_paths, refrac_paths,
                        spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
-                       ris_paths_tmp, check_scene=True, scat_random_phases=True,
+                       ris_paths_tmp, refrac_paths_tmp, 
+                       check_scene=True, scat_random_phases=True,
                        testing=False):
         r"""compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp, check_scene=True, scat_random_phases=True)
         Computes the EM fields corresponding to traced paths
@@ -697,8 +701,9 @@ class Scene:
 
         # Compute the fields and merge the paths
         output = self._solver_paths.compute_fields(spec_paths, diff_paths,
-            scat_paths, ris_paths, spec_paths_tmp, diff_paths_tmp,
+            scat_paths, ris_paths, refrac_paths, spec_paths_tmp, diff_paths_tmp,
             scat_paths_tmp, ris_paths_tmp,
+            refrac_paths_tmp,
             scat_random_phases, testing)
         sources, targets, paths_as_dict = output[:3]
         paths = Paths(sources, targets, self)
@@ -726,6 +731,7 @@ class Scene:
     def compute_paths(self, max_depth=3, method="fibonacci",
                       num_samples=int(1e6), los=True, reflection=True,
                       diffraction=False, scattering=False, ris=True,
+                      refraction=False,
                       scat_keep_prob=0.001, edge_diffraction=False,
                       check_scene=True, scat_random_phases=True,
                       testing=False):
@@ -905,7 +911,7 @@ class Scene:
 
         # Trace the paths
         traced_paths = self.trace_paths(max_depth, method, num_samples, los,
-            reflection, diffraction, scattering, ris, scat_keep_prob,
+            reflection, diffraction, scattering, ris, refraction, scat_keep_prob,
             edge_diffraction, check_scene)
 
         # Compute the fields and merge the paths
@@ -1684,7 +1690,7 @@ class Scene:
         * ``complex_relative_permittivity`` (`[batch_dims]`, `complex`) : Complex relative permittivities :math:`\eta` :eq:`eta`
         * ``scattering_coefficient`` (`[batch_dims]`, `float`) : Scattering coefficients :math:`S\in[0,1]` :eq:`scattering_coefficient`
         * ``xpd_coefficient`` (`[batch_dims]`, `float`) : Cross-polarization discrimination coefficients :math:`K_x\in[0,1]` :eq:`xpd`. Only relevant for the scattered field.
-
+        * ``thickness`` (`[batch_dims]`, `float`) : Thicknesses of the objects :eq:`thickness`
         **Note:** The number of batch dimensions is not necessarily equal to one.
         """
         return self._radio_material_callable
@@ -2040,3 +2046,12 @@ Example scene containing a metallic box
 .. figure:: ../figures/box.png
    :align: center
 """
+
+thick_wall = str(files(scenes).joinpath("thick_wall/thick_wall.xml"))
+# pylint: disable=C0301
+
+thick_wall2 = str(files(scenes).joinpath("thick_wall2/thick_wall2.xml"))
+# pylint: disable=C0301
+
+simple_thickwall = str(files(scenes).joinpath("simple_thickwall/simple_thickwall.xml"))
+# pylint: disable=C0301
