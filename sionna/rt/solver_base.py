@@ -366,6 +366,9 @@ class SolverBase:
         xpd_coefficient : [num_shape], tf.float
             Tensor containing the cross-polarization discrimination
             coefficients of all shapes
+        
+        thickness : [num_shape], tf.float
+            Tensor containing the thickness of all shapes
 
         alpha_r : [num_shape], tf.float
             Tensor containing the alpha_r scattering parameters of all shapes
@@ -400,10 +403,12 @@ class SolverBase:
             relative_permittivity = tf.zeros([0], self._dtype)
             scattering_coefficient = tf.zeros([0], self._rdtype)
             xpd_coefficient = tf.zeros([0], self._rdtype)
+            thickness = tf.zeros([0], self._rdtype)
         else:
             relative_permittivity = tf.zeros([array_size], self._dtype)
             scattering_coefficient = tf.zeros([array_size], self._rdtype)
             xpd_coefficient = tf.zeros([array_size], self._rdtype)
+            thickness = tf.zeros([array_size], self._rdtype)
 
         if sp_callable_set:
             alpha_r = tf.zeros([0], tf.int32)
@@ -439,6 +444,11 @@ class SolverBase:
                         tf.reshape(using_objects, [-1,1]),
                         tf.fill([num_using_objects], rm.xpd_coefficient))
 
+                    thickness = tf.tensor_scatter_nd_update(
+                        thickness,
+                        tf.reshape(using_objects, [-1,1]),
+                        tf.fill([num_using_objects], rm.thickness))
+
                 if not sp_callable_set:
                     alpha_r = tf.tensor_scatter_nd_update(
                         alpha_r,
@@ -473,6 +483,7 @@ class SolverBase:
         return (relative_permittivity,
                scattering_coefficient,
                xpd_coefficient,
+               thickness,
                alpha_r,
                alpha_i,
                lambda_,

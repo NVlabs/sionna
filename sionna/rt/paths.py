@@ -84,6 +84,8 @@ class Paths:
     #     - 1 : Reflected
     #     - 2 : Diffracted
     #     - 3 : Scattered
+    #     - 4 : RIS
+    #     - 5 : Refraction
 
     # Types of paths
     LOS = 0
@@ -324,6 +326,7 @@ class Paths:
         - 2 : Diffracted
         - 3 : Scattered
         - 4 : RIS
+        - 5 : Refraction
         """
         return self._types
 
@@ -613,6 +616,7 @@ class Paths:
             diffraction=True,
             scattering=True,
             ris=True,
+            refraction=True,
             cluster_ris_paths=True,
             num_paths=None):
         # pylint: disable=line-too-long
@@ -697,6 +701,9 @@ class Paths:
         if scattering:
             selection_mask = tf.logical_or(selection_mask,
                                            types == Paths.SCATTERED)
+        if refraction:
+            selection_mask = tf.logical_or(selection_mask,
+                                           types == Paths.REFRACTION)
         if ris:
             if cluster_ris_paths:
                 # Combine path coefficients from every RIS coherently and
