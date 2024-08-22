@@ -1304,7 +1304,8 @@ class SolverPaths(SolverBase):
         # Hit points
         hit_points = []
         hit_points_refraction = []
-
+        hit_points_refraction_simple = []
+        
         # Is the scene empty?
         is_empty = dr.shape(self._shape_indices)[0] == 0
 
@@ -3675,11 +3676,11 @@ class SolverPaths(SolverBase):
 
         # Intersect ray against the scene to find the first hit primitive
         si = self._mi_scene.ray_intersect(ray)
-
+        active_check = si.is_valid()
         # Record object IDs for the first hit
         shape_i = dr.gather(mi.Int32, self._shape_indices,
-                            dr.reinterpret_array_v(mi.UInt32, si.shape))
-        offsets = dr.gather(mi.Int32, self._prim_offsets, shape_i)
+                            dr.reinterpret_array_v(mi.UInt32, si.shape), active_check)
+        offsets = dr.gather(mi.Int32, self._prim_offsets, shape_i, active_check)
         prims_i = offsets + si.prim_index
 
         # Record the hit points
