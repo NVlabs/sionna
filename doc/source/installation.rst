@@ -11,7 +11,7 @@ Although not necessary, we recommend running Sionna in a `Docker container <http
     We recommend Ubuntu 22.04.
     Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
 
-    To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required by DrJit. Please check the `installation instructions for the LLVM backend <https://drjit.readthedocs.io/en/latest/firststeps-py.html#llvm-backend>`_.
+    To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required by DrJit. Please check the `installation instructions for the LLVM backend <https://drjit.readthedocs.io/en/stable/firststeps-py.html#llvm-backend>`_.
     The ray tracing preview requires a recent version of `JupyterLab`. You can upgrade to the latest version via ``pip install --upgrade ipykernel jupyterlab`` (requires restart of `JupyterLab`).
 
     We refer to the `TensorFlow GPU support tutorial <https://www.tensorflow.org/install/gpu>`_ for GPU support and the required driver setup.
