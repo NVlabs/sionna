@@ -4,7 +4,17 @@
 #
 """Utility functions used for testing of the sionna.rt module"""
 
+try:
+    import sionna
+except ImportError as e:
+    import sys
+    sys.path.append("../..")
+    import sionna
+
+from sionna import config
+
 import numpy as np
+
 
 def normalize(v, return_norm=False):
     """Normalizes a vector and optionally returns its norm"""
@@ -81,7 +91,7 @@ def compute_field_component_vectors(k_i, k_r, n_hat):
     # Basis vectors in the incoming plane
     e_i_s = cross(k_i, n_hat)
     if np.sum(np.abs(e_i_s))<1e-4: # In case of normal incidence e_i_s is not uniquely defined, so we select a random orientation
-        e_i_s = cross(n_hat+np.random.normal([3]), n_hat)
+        e_i_s = cross(n_hat+config.np_rng.normal([3]), n_hat)
     e_i_s = normalize(e_i_s)
     e_i_p = normalize(cross(e_i_s, k_i))
 

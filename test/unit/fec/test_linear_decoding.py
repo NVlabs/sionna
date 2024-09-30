@@ -2,28 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-from numpy.lib.npyio import load
 
+import pytest
 import unittest
 import scipy as sp
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 from sionna.fec.utils import GaussianPriorSource, LinearEncoder, load_parity_check_examples, pcm2gm
 from sionna.fec.linear import OSDecoder
 from sionna.utils import BinarySource, ebnodb2no, sim_ber
@@ -163,6 +147,7 @@ class TestOSD(unittest.TestCase):
             pcm[3,27] = 2
             dec = OSDecoder(pcm, is_pcm=True)
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_tf_fun(self):
         """Test that graph and XLA mode are supported."""
 
@@ -227,6 +212,7 @@ class TestOSD(unittest.TestCase):
         model(b2)
         model.summary()
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_reference(self):
         """Test against reference implementations.
 

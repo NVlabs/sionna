@@ -12,6 +12,7 @@ except ImportError as e:
     import sys
     sys.path.append("../../../../")
 import sionna
+from sionna import config
 
 def gen_config_file(filename,
                     n_cell_id,
@@ -82,13 +83,13 @@ for n_size_bwp in [40, 273]:
                     min_cdm_groups = 1 if num_antenna_ports<4 else 2
                     for num_cdm_groups_without_data in range(min_cdm_groups,max_cdm_groups+1):
                         filename = f"test_{i}"
-                        n_cell_id = np.random.randint(0, 1008)
-                        slot_number = np.random.randint(0, 10)
-                        n_rnti = np.random.randint(0, 65536)
+                        n_cell_id = config.np_rng.integers(0, 1008)
+                        slot_number = config.np_rng.integers(0, 10)
+                        n_rnti = config.np_rng.integers(0, 65536)
                         tpmi = 2
                         additional_position = 1
-                        n_scid = np.random.randint(0, 2)
-                        n_id = np.random.randint(0, 65536)
+                        n_scid = config.np_rng.integers(0, 2)
+                        n_id = config.np_rng.integers(0, 65536)
                         mcs_index = 14
                         mcs_table = 1
                         gen_config_file(filename,

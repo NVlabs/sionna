@@ -182,7 +182,7 @@ class Window(ABC, Layer):
 
         if x_dtype.is_floating:
             y = x*w
-        elif x_dtype.is_complex:
+        else: # Complex
             w = tf.complex(w, tf.zeros_like(w))
             y = w*x
 

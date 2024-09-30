@@ -3,28 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("..")
-    import sionna
-
 import unittest
 import numpy as np
 import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
+import sionna
 from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray,\
     BackscatteringPattern, LambertianPattern, ScatteringPattern
 
@@ -90,8 +72,7 @@ class TestSceneCallableProp(unittest.TestCase):
         scene.objects['wall'].radio_material .scattering_coefficient = scs['wall']
         scene.objects['floor'].radio_material.xpd_coefficient = xpd['floor']
         scene.objects['wall'].radio_material.xpd_coefficient = xpd['wall']
-        # Compute paths powers
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         paths = scene.compute_paths(max_depth=3, diffraction=True, edge_diffraction=True, scattering=True)
         a_ref = tf.squeeze(paths.a)
 
@@ -127,6 +108,9 @@ class TestSceneCallableProp(unittest.TestCase):
                 self.test_class.assertTrue(points.shape[:-1] == objects.shape)
                 self.test_class.assertTrue(points.shape[-1] == 3)
 
+                #Eliminate -1 from objects which don't work on CPU
+                objects = tf.where(objects<0, 0, objects)
+
                 s = tf.gather(self._s, objects)
                 x = tf.gather(self._x, objects)
                 e = tf.gather(self._etas, objects)
@@ -139,7 +123,7 @@ class TestSceneCallableProp(unittest.TestCase):
         scene.objects['floor'].radio_material = 'itu_wood'
         scene.objects['wall'].radio_material = 'itu_marble'
         # Compute paths powers
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         paths = scene.compute_paths(max_depth=3, diffraction=True, edge_diffraction=True, scattering=True)
         a_call = tf.squeeze(paths.a)
 
@@ -200,11 +184,11 @@ class TestSceneCallableProp(unittest.TestCase):
         scene.objects['floor'].radio_material.xpd_coefficient = xpd['floor']
         scene.objects['wall'].radio_material.xpd_coefficient = xpd['wall']
         # Compute the coverage map
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         cm_ref = scene.coverage_map(max_depth=3, los=False, diffraction=True,
                                     edge_diffraction=True, scattering=True,
                                     reflection=True, cm_cell_size=(0.1, 0.1))
-        cm_ref = cm_ref.as_tensor()[0]
+        cm_ref = cm_ref.path_gain[0]
 
         ## Callable for radio material
 
@@ -250,11 +234,11 @@ class TestSceneCallableProp(unittest.TestCase):
         scene.objects['floor'].radio_material = 'itu_wood'
         scene.objects['wall'].radio_material = 'itu_marble'
         # Compute paths powers
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         cm_call = scene.coverage_map(max_depth=3, los=False, diffraction=True,
                                      edge_diffraction=True, scattering=True,
                                      reflection=True, cm_cell_size=(0.1, 0.1))
-        cm_call = cm_call.as_tensor()[0]
+        cm_call = cm_call.path_gain[0]
 
         # The coverage map solver uses tf.tensor_scatter_nd_add() to add the
         # contributions of paths to cells of the coverage map.
@@ -299,7 +283,7 @@ class TestSceneCallableProp(unittest.TestCase):
         scene.add(Receiver("rx2", [-22., -22., 1.5], dtype=dtype))
 
         # Reference paths
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         paths_ref = scene.compute_paths(los=False, diffraction=False,
                                         scattering=True, reflection=False)
 
@@ -357,7 +341,7 @@ class TestSceneCallableProp(unittest.TestCase):
             obj.radio_material.scattering_pattern = LambertianPattern()
 
         # Generate paths using the scattering pattern callable
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         paths_callable = scene.compute_paths(los=False, diffraction=False,
                                              scattering=True, reflection=False)
 
@@ -397,12 +381,12 @@ class TestSceneCallableProp(unittest.TestCase):
         # Place tx and rx
         scene.add(Transmitter("tx", [60., 0. , 2.5], dtype=dtype))
         # Reference paths
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         cm_ref = scene.coverage_map(los=False,
                                     diffraction=False,
                                     scattering=True,
                                     reflection=False,
-                                    cm_cell_size=(1, 1)).as_tensor()[0]
+                                    cm_cell_size=(1, 1)).path_gain[0]
 
         # Define a scattering pattern callable
         class ScatteringPatternCallable:
@@ -458,12 +442,12 @@ class TestSceneCallableProp(unittest.TestCase):
             obj.radio_material.scattering_pattern = LambertianPattern()
 
         # Generate paths using the scattering pattern callable
-        tf.random.set_seed(1)
+        sionna.config.seed=1
         cm_callable = scene.coverage_map(los=False,
                                         diffraction=False,
                                         scattering=True,
                                         reflection=False,
-                                        cm_cell_size=(1, 1)).as_tensor()[0]
+                                        cm_cell_size=(1, 1)).path_gain[0]
 
         # Test error
         max_err = tf.reduce_max(tf.math.divide_no_nan(tf.abs(cm_callable - cm_ref), cm_ref)).numpy()

@@ -2,29 +2,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 from tensorflow.python.ops.gen_batch_ops import batch
-
 import unittest
 import numpy as np
 import scipy as sp
 
+from sionna import config
 from sionna.fec.ldpc.decoding import LDPCBPDecoder, LDPC5GDecoder
 from sionna.fec.ldpc.encoding import LDPC5GEncoder
 from sionna.fec.utils import GaussianPriorSource, load_parity_check_examples
@@ -40,7 +24,7 @@ class TestBPDecoding(unittest.TestCase):
         """
 
         # Raise error if PCM contains other elements than 0,1
-        pcm = np.random.uniform(0,2,[100,150]).astype(int)
+        pcm = config.np_rng.uniform(0,2,[100,150]).astype(int)
         pcm[10,20] = 2
         with self.assertRaises(AssertionError):
             dec = LDPCBPDecoder(pcm)
@@ -49,9 +33,9 @@ class TestBPDecoding(unittest.TestCase):
         batch_size = 100
         n = 64
         k = 32
-        pcm = np.random.uniform(0,2,[n-k, n]).astype(int)
+        pcm = config.np_rng.uniform(0,2,[n-k, n]).astype(int)
         dec = LDPCBPDecoder(pcm)
-        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                  tf.cast(n, dtype=tf.int32)],
                                  maxval=100,
                                  dtype=tf.int32)
@@ -62,9 +46,9 @@ class TestBPDecoding(unittest.TestCase):
         batch_size = 100
         n = 64
         k = 32
-        pcm = np.random.uniform(0,2,[n-k, n]).astype(int)
+        pcm = config.np_rng.uniform(0,2,[n-k, n]).astype(int)
         dec = LDPCBPDecoder(pcm)
-        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                  tf.cast(n+1, dtype=tf.int32)],
                                  dtype=tf.float32)
         with self.assertRaises(AssertionError):
@@ -84,7 +68,7 @@ class TestBPDecoding(unittest.TestCase):
 
         # test cn_update_tanh
         for _ in range(Ntrials):
-            msg = np.random.normal(size=[10]) #generate random inputs
+            msg = config.np_rng.normal(size=[10]) #generate random inputs
             x = tf.RaggedTensor.from_row_splits(
                                     values=tf.constant(msg, dtype=tf.float32),
                                     row_splits=[0, len(msg)])
@@ -142,7 +126,7 @@ class TestBPDecoding(unittest.TestCase):
         dec = LDPCBPDecoder(pcm, num_iter=Niter)
         dec2 = LDPCBPDecoder(pcm, num_iter=1, stateful=True)
 
-        llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+        llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
 
         res1 = dec(llr)
 
@@ -172,8 +156,8 @@ class TestBPDecoding(unittest.TestCase):
 
         # test vn updates
         for _ in range(Ntrials):
-            msg = np.random.normal(size=[10]) #generate random inputs
-            msg_ch = np.random.normal(size=[1]) #generate random inputs
+            msg = config.np_rng.normal(size=[10]) #generate random inputs
+            msg_ch = config.np_rng.normal(size=[1]) #generate random inputs
 
             x = tf.RaggedTensor.from_row_splits(
                                         values=tf.constant(msg, dtype=tf.float32),
@@ -193,7 +177,7 @@ class TestBPDecoding(unittest.TestCase):
         pcm, k, n, _ = load_parity_check_examples(2)
 
         dec = LDPCBPDecoder(pcm)
-        llr = tf.random.normal([1, n], mean=4.2, stddev=1)
+        llr = config.tf_rng.normal([1, n], mean=4.2, stddev=1)
         llr = tf.tile(llr, [batch_size,1])
         x = dec(llr).numpy()
         for i in range(batch_size):
@@ -224,7 +208,7 @@ class TestBPDecoding(unittest.TestCase):
                                     trainable=t,
                                     cn_type=cn,
                                     hard_out=False)
-                llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
 
                 with tf.GradientTape() as tape:
                     x = dec(llr)
@@ -277,7 +261,7 @@ class TestBPDecoding(unittest.TestCase):
                 self.assertTrue(np.array_equal(x, np.zeros_like(x)))
 
                 # test that for arbitrary input only 0,1 values are returned
-                llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
                 x = dec(llr).numpy()
                 #x contains only {0,1}
                 self.assertTrue(np.array_equal(x, x.astype(bool)))
@@ -308,7 +292,7 @@ class TestBPDecoding(unittest.TestCase):
                 self.assertTrue(np.array_equal(x, np.zeros_like(x)))
 
                 # test that for arbitrary inputs
-                llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
                 x = run_graph(llr).numpy()
 
                 # execute the graph twice with same input shape
@@ -335,7 +319,7 @@ class TestBPDecoding(unittest.TestCase):
         pcm, k, n, _ = load_parity_check_examples(2)
 
         dec = LDPCBPDecoder(pcm)
-        llr = tf.random.normal([batch_size, n], mean=1., stddev=1)
+        llr = config.tf_rng.normal([batch_size, n], mean=1., stddev=1)
         dec = LDPCBPDecoder(pcm, track_exit=False)
         x = dec(llr)
         self.assertTrue(np.shape(x)[1]==n)
@@ -348,7 +332,7 @@ class TestBPDecoding(unittest.TestCase):
         shapes =[[10, 2, 3, n], [1, 4, n], [10, 2, 3, 3, n]]
 
         for s in shapes:
-            llr = tf.random.normal(s, mean=0, stddev=1)
+            llr = config.tf_rng.normal(s, mean=0, stddev=1)
             llr_ref = tf.reshape(llr, [-1, n])
 
             c = dec(llr)
@@ -360,7 +344,7 @@ class TestBPDecoding(unittest.TestCase):
         # and verify that wrong last dimension raises an error
         with self.assertRaises(tf.errors.InvalidArgumentError):
             s = [10, 2, n-1]
-            llr = tf.random.normal(s, mean=0, stddev=1)
+            llr = config.tf_rng.normal(s, mean=0, stddev=1)
             c = dec(llr)
 
     def test_all_zero(self):
@@ -403,10 +387,10 @@ class TestBPDecoding(unittest.TestCase):
         pcm, k, n, _ = load_parity_check_examples(2)
         dec_32 = LDPCBPDecoder(pcm, output_dtype=tf.float32)
         dec_64 = LDPCBPDecoder(pcm, output_dtype=tf.float64)
-        llr_32 = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr_32 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                     tf.cast(n, dtype=tf.int32)],
                                     dtype=tf.float32)
-        llr_64 = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr_64 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                     tf.cast(n, dtype=tf.int32)],
                                     dtype=tf.float64)
 
@@ -466,7 +450,6 @@ class TestBPDecoding(unittest.TestCase):
         for l in llr_maxs:
             dec.llr_max = l
             y = dec(x).numpy() # run 0 iterations
-            print(np.abs(np.max(y)-l)<1e-6)
 
     def test_cn_minsum(self):
         """Test min_sim implementation of CN update.
@@ -541,7 +524,7 @@ class TestBPDecoding5G(unittest.TestCase):
         k = 64
         enc = LDPC5GEncoder(k, n)
         dec = LDPC5GDecoder(enc)
-        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                  tf.cast(n+1, dtype=tf.int32)],
                                  dtype=tf.float32)
 
@@ -549,7 +532,7 @@ class TestBPDecoding5G(unittest.TestCase):
             dec(llr)
 
         # varying batch-sizes should be supported
-        llr = tf.random.uniform([tf.cast(batch_size+1, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size+1, dtype=tf.int32),
                                  tf.cast(n, dtype=tf.int32)],
                                  dtype=tf.float32)
         dec(llr)
@@ -577,7 +560,7 @@ class TestBPDecoding5G(unittest.TestCase):
         # and verify that wrong last dimension raises an error
         with self.assertRaises(BaseException):
             s = [10, 2, k-1]
-            llr = tf.random.normal(s, mean=0, stddev=1)
+            llr = config.tf_rng.normal(s, mean=0, stddev=1)
             c = dec(llr)
 
     def test_gradient(self):
@@ -596,7 +579,7 @@ class TestBPDecoding5G(unittest.TestCase):
                                     trainable=t,
                                     cn_type=cn,
                                     hard_out=False)
-                llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
 
                 with tf.GradientTape() as tape:
                     x = dec(llr)
@@ -624,10 +607,10 @@ class TestBPDecoding5G(unittest.TestCase):
         enc = LDPC5GEncoder(k, n)
         dec_32 = LDPC5GDecoder(enc, output_dtype=tf.float32)
         dec_64 = LDPC5GDecoder(enc, output_dtype=tf.float64)
-        llr_32 = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr_32 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                  tf.cast(n, dtype=tf.int32)],
                                  dtype=tf.float32)
-        llr_64 = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr_64 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                  tf.cast(n, dtype=tf.int32)],
                                  dtype=tf.float64)
 
@@ -660,7 +643,7 @@ class TestBPDecoding5G(unittest.TestCase):
                                 hard_out=False,
                                 return_infobits=False,
                                 num_iter=0)
-            llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+            llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
             # check if return after 0 iterations equals input
             c_hat = dec(llr)
             self.assertTrue(np.array_equal(c_hat.numpy(), llr.numpy()))
@@ -716,7 +699,7 @@ class TestBPDecoding5G(unittest.TestCase):
                         self.assertTrue(np.array_equal(x, np.zeros_like(x)))
 
                     # test that for arbitrary input only 0,1 values are returned
-                    llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+                    llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
                     x = run_graph(llr).numpy()
 
                     # execute the graph twice
@@ -852,7 +835,7 @@ class TestBPDecoding5G(unittest.TestCase):
         dec = LDPC5GDecoder(enc, num_iter=Niter)
         dec2 = LDPC5GDecoder(enc, num_iter=1, stateful=True)
 
-        llr = tf.random.normal([batch_size, n], mean=4.2, stddev=1)
+        llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
 
         res1 = dec(llr)
 
@@ -883,4 +866,3 @@ class TestBPDecoding5G(unittest.TestCase):
         for l in llr_maxs:
             dec.llr_max = l
             y = dec(x).numpy() # run 0 iterations
-            print(np.abs(np.max(y)-l)<1e-6)

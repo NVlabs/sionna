@@ -2,30 +2,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-from sionna.nr import CarrierConfig, PUSCHConfig, PUSCHTransmitter, PUSCHLSChannelEstimator
-from sionna.channel import RayleighBlockFading, OFDMChannel, AWGN
-from sionna.utils import insert_dims, flatten_last_dims
+from sionna.nr import PUSCHConfig, PUSCHTransmitter, PUSCHLSChannelEstimator
+from sionna.channel import RayleighBlockFading, OFDMChannel
+from sionna.utils import insert_dims
 
 
 def check_channel_estimation(pusch_configs, add_awgn=False):
@@ -82,7 +65,6 @@ class TestPUSCHLSChannelEstimator(unittest.TestCase):
 
     def test_01(self):
         """Test many configurations for a single transmitter without precoding"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.precoding = "non-codebook"
@@ -105,7 +87,6 @@ class TestPUSCHLSChannelEstimator(unittest.TestCase):
 
     def test_02(self):
         """Test many configurations for a single transmitter with precoding"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 5
         pusch_config.precoding = "codebook"
@@ -131,7 +112,6 @@ class TestPUSCHLSChannelEstimator(unittest.TestCase):
 
     def test_03(self):
         """Some tests for multiple transmitters with precoding"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.num_antenna_ports=4

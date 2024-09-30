@@ -52,6 +52,21 @@ zero_forcing_precoder
 ---------------------
 .. autofunction:: sionna.mimo.zero_forcing_precoder
 
+grid_of_beams_dft_ula
+---------------------
+.. autofunction:: sionna.mimo.grid_of_beams_dft_ula
+
+grid_of_beams_dft
+---------------------
+.. autofunction:: sionna.mimo.grid_of_beams_dft
+
+flatten_precoding_mat
+---------------------
+.. autofunction:: sionna.mimo.flatten_precoding_mat
+
+normalize_precoding_power
+-------------------------
+.. autofunction:: sionna.mimo.normalize_precoding_power
 
 Equalization
 ************
@@ -61,7 +76,7 @@ lmmse_equalizer
 .. autofunction:: sionna.mimo.lmmse_equalizer
 
 mf_equalizer
----------------
+------------
 .. autofunction:: sionna.mimo.mf_equalizer
 
 zf_equalizer
@@ -167,17 +182,17 @@ References:
    .. [CovProperRV] `Covariance matrices of real and imaginary parts <https://en.wikipedia.org/wiki/Complex_random_vector#Covariance_matrices_of_real_and_imaginary_parts>`_,
       Wikipedia, accessed 11 September, 2022.
 
-   .. [YH2015] S. Yang and L. Hanzo, `"Fifty Years of MIMO Detection: The Road to Large-Scale MIMOs"
+   .. [YH2015] S\. Yang and L\. Hanzo, `"Fifty Years of MIMO Detection: The Road to Large-Scale MIMOs"
       <https://ieeexplore.ieee.org/abstract/document/7244171>`_,
       IEEE Communications Surveys & Tutorials, vol. 17, no. 4, pp. 1941-1988, 2015.
 
-   .. [FT2015] W. Fu and J. S. Thompson, `"Performance analysis of K-best detection with adaptive modulation"
+   .. [FT2015] W\. Fu and J\. S\. Thompson, `"Performance analysis of K-best detection with adaptive modulation"
       <https://ieeexplore.ieee.org/abstract/document/7454351>`_, IEEE Int. Symp. Wirel. Commun. Sys. (ISWCS), 2015.
 
-   .. [EP2014] J. Céspedes, P. M. Olmos, M. Sánchez-Fernández, and F. Perez-Cruz,
+   .. [EP2014] J\. Céspedes, P\. M\. Olmos, M\. Sánchez-Fernández, and F\. Perez-Cruz,
       `"Expectation Propagation Detection for High-Order High-Dimensional MIMO Systems" <https://ieeexplore.ieee.org/abstract/document/6841617>`_,
       IEEE Trans. Commun., vol. 62, no. 8, pp. 2840-2849, Aug. 2014.
 
-   .. [CST2011] C. Studer, S. Fateh, and D. Seethaler,
+   .. [CST2011] C\. Studer, S\. Fateh, and D\. Seethaler,
       `"ASIC Implementation of Soft-Input Soft-Output MIMO Detection Using MMSE Parallel Interference Cancellation" <https://ieeexplore.ieee.org/abstract/document/5779722>`_,
       IEEE Journal of Solid-State Circuits, vol. 46, no. 7, pp. 1754–1765, July 2011.

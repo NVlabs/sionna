@@ -2,29 +2,14 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 import sionna
 from sionna.mimo import EPDetector
 from sionna.mapping import Constellation, Mapper
-from sionna.utils import BinarySource, QAMSource, PAMSource, compute_ser, compute_ber, ebnodb2no, sim_ber
+from sionna.utils import BinarySource, QAMSource, compute_ser, compute_ber, ebnodb2no, sim_ber
 from sionna.channel import FlatFadingChannel
 from sionna.fec.ldpc.encoding import LDPC5GEncoder
 from sionna.fec.ldpc.decoding import LDPC5GDecoder
@@ -114,8 +99,7 @@ class TestEPDetector(unittest.TestCase):
 
     def test_symbol_errors(self):
         """Test that we get no symbol errors on a noise free channel"""
-        tf.random.set_seed(1)
-        sionna.Config.xla_compat = False
+        sionna.config.xla_compat = False
         num_tx = 3
         num_rx_ant = 7
         num_bits_per_symbols = [2,4,6,8]
@@ -132,8 +116,7 @@ class TestEPDetector(unittest.TestCase):
 
     def test_no_bit_errors(self):
         "Test that we get no uncoded bit errors on a noise free channel"
-        tf.random.set_seed(1)
-        sionna.Config.xla_compat = False
+        sionna.config.xla_compat = False
         num_tx = 3
         num_rx_ant = 7
         num_bits_per_symbols = [2,4,6,8]
@@ -170,9 +153,9 @@ class TestEPDetector(unittest.TestCase):
             evaluate(MIMODetection(2, 6, 4, "bit", True, dtype))
             evaluate(MIMODetection(4, 8, 4, "symbol", False, dtype))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_ser_against_references(self):
-        tf.random.set_seed(2)
-        sionna.Config.xla_compat = False
+        sionna.config.xla_compat = False
         def sim(ep, snr_db):
             ser, _ = sim_ber(ep,
                         [snr_db],
@@ -180,29 +163,36 @@ class TestEPDetector(unittest.TestCase):
                         max_mc_iter=1000,
                         num_target_block_errors=1000,
                         soft_estimates=False,
-                        graph_mode="graph")
+                        graph_mode="graph",
+                        verbose=False)
             return ser[0]
         # Values taken from https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9832663
         # Fig. 8 (a)
         ser = sim(MIMODetection(4, 8, 2, "symbol", False, tf.complex64), 12.0)
-        self.assertTrue(4e-5<=ser<=5e-5)
+        self.assertGreaterEqual(ser, 4e-5)
+        self.assertLessEqual(ser, 5e-5)
 
         # Fig. 8 (b)
         ser = sim(MIMODetection(6, 8, 2, "symbol", False, tf.complex64), 13.0)
-        self.assertTrue(1.5e-4<=ser<=2.5e-4)
+        self.assertGreaterEqual(ser, 1.5e-4)
+        self.assertLessEqual(ser, 2.5e-4)
 
         # Fig. 8 (c)
         ser = sim(MIMODetection(8, 8, 2, "symbol", False, tf.complex64), 18.0)
-        self.assertTrue(3e-5<=ser<=4e-5)
+        self.assertGreaterEqual(ser, 3e-5)
+        self.assertLessEqual(ser, 4e-5)
 
         # Fig. 9 (c)
         ser = sim(MIMODetection(32, 32, 2, "symbol", False, tf.complex64), 13.0)
-        self.assertTrue(7.5e-5<=ser<=9.5e-5)
+        self.assertGreaterEqual(ser, 7e-5)
+        self.assertLessEqual(ser, 8e-5)
 
         # Fig. 10 (c)
         ser = sim(MIMODetection(32, 32, 4, "symbol", False, tf.complex64), 27.0)
-        self.assertTrue(9e-5<=ser<=1e-4)
+        self.assertGreaterEqual(ser, 9e-5)
+        self.assertLessEqual(ser, 1e-4)
 
         # Fig. 11 (c)
         ser = sim(MIMODetection(8, 8, 6, "symbol", False, tf.complex128), 40.0)
-        self.assertTrue(3e-4<=ser<=4e-4)
+        self.assertGreaterEqual(ser, 3e-4)
+        self.assertLessEqual(ser, 4e-4)

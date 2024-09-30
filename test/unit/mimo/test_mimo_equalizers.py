@@ -2,27 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-import sionna
-
 from sionna.utils import QAMSource, matrix_sqrt, complex_normal
 from sionna.channel import FlatFadingChannel
 from sionna.mimo.equalization import lmmse_equalizer, zf_equalizer, mf_equalizer
@@ -69,10 +52,10 @@ class Model(tf.keras.Model):
 
         return err_mean, err_var, no_eff_mean
 
+@pytest.mark.usefixtures("only_gpu")
 class TestMIMOEqualizers(unittest.TestCase):
 
     def test_error_statistics_awgn(self):
-        tf.random.set_seed(1)
         num_tx_ant = 4
         num_rx_ant = 8
         num_bits_per_symbol = 4
@@ -98,7 +81,6 @@ class TestMIMOEqualizers(unittest.TestCase):
                 self.assertTrue(np.abs(err_var-no_eff_mean)/no_eff_mean<1e-3)
 
     def test_error_statistics_colored(self):
-        tf.random.set_seed(1)
         num_tx_ant = 4
         num_rx_ant = 8
         num_bits_per_symbol = 4

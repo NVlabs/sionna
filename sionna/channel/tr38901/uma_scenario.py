@@ -6,10 +6,10 @@
 
 import tensorflow as tf
 
+import sionna
 from sionna import SPEED_OF_LIGHT
 from sionna.utils import log10
 from . import SystemLevelScenario
-
 
 class UMaScenario(SystemLevelScenario):
     r"""
@@ -233,8 +233,8 @@ class UMaScenario(SystemLevelScenario):
         c = tf.where(tf.math.less(h_ut, 13.),
             tf.constant(0., self._dtype.real_dtype), c)
         p = 1./(1.+c)
-        r = tf.random.uniform(shape=[batch_size, num_bs, num_ut], minval=0.0,
-            maxval=1.0, dtype=self._dtype.real_dtype)
+        r = sionna.config.tf_rng.uniform(shape=[batch_size, num_bs, num_ut],
+            minval=0.0, maxval=1.0, dtype=self._dtype.real_dtype)
         r = tf.where(tf.math.less(r, p),
             tf.constant(1.0, self._dtype.real_dtype),
             tf.constant(0.0, self._dtype.real_dtype))
@@ -245,10 +245,10 @@ class UMaScenario(SystemLevelScenario):
         # Therefore, for now, we just sample from a continuous
         # distribution.
         #delta = tf.cast(tf.math.floor((max_value-min_value)/3.), tf.int32)
-        #s = tf.random.uniform(shape=[batch_size, num_bs, num_ut],
+        #s = tf_rng.uniform(shape=[batch_size, num_bs, num_ut],
         #    minval=0, maxval=delta+1, dtype=tf.int32)
         #s = tf.cast(s, tf.float32)*3.+min_value
-        s = tf.random.uniform(shape=[batch_size, num_bs, num_ut],
+        s = sionna.config.tf_rng.uniform(shape=[batch_size, num_bs, num_ut],
            minval=12., maxval=max_value, dtype=self._dtype.real_dtype)
         # Itc could happen that h_ut = 13m, and therefore max_value < 13m
         s = tf.where(tf.math.less(s, 12.0),

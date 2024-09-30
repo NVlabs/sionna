@@ -3,34 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
-from sionna.channel import exp_corr_mat, one_ring_corr_mat, cir_to_time_channel, cir_to_ofdm_channel, time_to_ofdm_channel, ApplyTimeChannel
+import unittest
+import numpy as np
+import tensorflow as tf
+from sionna.channel import exp_corr_mat, one_ring_corr_mat, cir_to_time_channel, time_to_ofdm_channel, ApplyTimeChannel
 from sionna.channel.tr38901 import TDL
 from sionna.ofdm import ResourceGrid, ResourceGridMapper, OFDMModulator, OFDMDemodulator, LSChannelEstimator
 from sionna.mimo import StreamManagement
 from sionna.utils import QAMSource
-
-import pytest
-import unittest
-import warnings
-import numpy as np
-import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
+from sionna import config
 
 def exp_corr_mat_numpy(a, n, dtype=tf.complex64):
     R = np.eye(n, dtype=np.complex64)
@@ -73,7 +54,7 @@ class TestExpCorrMat(unittest.TestCase):
             exp_corr_mat(1.1+1j*0.3, 12)
 
     def test_multiple_dims(self):
-        values = np.random.uniform(0, 1, [2, 4, 3])
+        values = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 11
         dtype = tf.complex128
         R2 = exp_corr_mat(values, n, dtype)
@@ -100,7 +81,7 @@ class TestOneRingCorrMat(unittest.TestCase):
                         self.assertTrue(np.allclose(R1, R2))
 
     def test_multiple_dims(self):
-        phi_degs = np.random.uniform(-np.pi, np.pi, [2, 4, 3])
+        phi_degs = config.np_rng.uniform(-np.pi, np.pi, [2, 4, 3])
         num_ant = 32
         d_h = 0.7
         sigma_phi_deg = 10

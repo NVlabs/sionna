@@ -7,23 +7,6 @@
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
 from sionna.fec.ldpc import LDPCBPDecoder, LDPC5GEncoder, LDPC5GDecoder
 from sionna.utils.metrics import BitwiseMutualInformation
 from sionna.fec.utils import GaussianPriorSource, load_parity_check_examples

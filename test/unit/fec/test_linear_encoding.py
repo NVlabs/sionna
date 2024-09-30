@@ -2,26 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-from numpy.lib.npyio import load
 
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
 from sionna.fec.utils import load_parity_check_examples
 from sionna.fec.linear import LinearEncoder, AllZeroEncoder
 from sionna.utils import BinarySource
@@ -183,7 +168,7 @@ class TestGenericLinearEncoder(unittest.TestCase):
 
         for _ in range(n_trials):
             # sample a random matrix
-            pcm = np.random.uniform(low=0, high=2, size=(n-k, n)).astype(int)
+            pcm = config.np_rng.uniform(low=0, high=2, size=(n-k, n)).astype(int)
 
             # catch internal errors due to non-full rank of pcm (randomly
             # sampled!)

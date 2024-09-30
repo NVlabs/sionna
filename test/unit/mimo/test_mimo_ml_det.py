@@ -2,26 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 import sionna
+from sionna import config
 from sionna.mimo import MaximumLikelihoodDetector
 from sionna.mimo import MaximumLikelihoodDetectorWithPrior
 from sionna.mapping import Constellation
@@ -66,10 +52,10 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
                     batch_size = 8
                     dim1 = 3
                     dim2 = 5
-                    y = tf.complex( tf.random.normal([batch_size, dim1, dim2, num_rx_ant]),
-                                    tf.random.normal([batch_size, dim1, dim2, num_rx_ant]))
-                    h = tf.complex( tf.random.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]),
-                                    tf.random.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]))
+                    y = tf.complex( config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant]),
+                                    config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant]))
+                    h = tf.complex( config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]),
+                                    config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]))
 
                     s = tf.eye(num_rx_ant, dtype=tf.complex64)
                     logits = ml((y,h,s))
@@ -82,8 +68,7 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
     def test_logits_calc_eager(self):
         "Test exponents calculation"
 
-        sionna.Config.xla_compat = False
-        np.random.seed(42)
+        sionna.config.xla_compat = False
 
         def build_vecs(num_bits_per_symbol, num_streams):
             C = Constellation("qam", num_bits_per_symbol)
@@ -116,10 +101,10 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
                     # Prepare for reference computation
                     ref_vecs, ref_c = build_vecs(num_bits_per_symbol, num_streams)
                     # Generate random channel outputs and channels
-                    y = np.random.normal(size=[batch_size, num_rx_ant]) + 1j*np.random.normal(size=[batch_size, num_rx_ant])
-                    h = np.random.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*np.random.normal(size=[batch_size, num_rx_ant, num_streams])
+                    y = config.np_rng.normal(size=[batch_size, num_rx_ant]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant])
+                    h = config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams])
                     # Generate well conditioned covariance matrices
-                    e = np.random.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
+                    e = config.np_rng.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
                     e = np.expand_dims(np.eye(num_rx_ant), axis=0)*np.expand_dims(e, -2)
                     u = unitary_group.rvs(dim=num_rx_ant)
                     u = np.expand_dims(u, axis=0)
@@ -167,8 +152,7 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
     def test_logits_calc_graph(self):
         "Test exponents calculation"
 
-        sionna.Config.xla_compat = False
-        np.random.seed(42)
+        sionna.config.xla_compat = False
 
         def build_vecs(num_bits_per_symbol, num_streams):
             C = Constellation("qam", num_bits_per_symbol)
@@ -201,10 +185,10 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
                     # Prepare for reference computation
                     ref_vecs, ref_c = build_vecs(num_bits_per_symbol, num_streams)
                     # Generate random channel outputs and channels
-                    y = np.random.normal(size=[batch_size, num_rx_ant]) + 1j*np.random.normal(size=[batch_size, num_rx_ant])
-                    h = np.random.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*np.random.normal(size=[batch_size, num_rx_ant, num_streams])
+                    y = config.np_rng.normal(size=[batch_size, num_rx_ant]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant])
+                    h = config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams])
                     # Generate well conditioned covariance matrices
-                    e = np.random.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
+                    e = config.np_rng.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
                     e = np.expand_dims(np.eye(num_rx_ant), axis=0)*np.expand_dims(e, -2)
                     u = unitary_group.rvs(dim=num_rx_ant)
                     u = np.expand_dims(u, axis=0)
@@ -251,11 +235,11 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
                                                     tf.cast(s, tf.complex64)).numpy()
                     self.assertTrue(np.allclose(test_logits, ref_maxlog, atol=1e-5))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_logits_calc_jit(self):
         "Test exponents calculation"
 
-        sionna.Config.xla_compat = True
-        np.random.seed(42)
+        sionna.config.xla_compat = True
 
         def build_vecs(num_bits_per_symbol, num_streams):
             C = Constellation("qam", num_bits_per_symbol)
@@ -288,10 +272,10 @@ class TestSymbolMaximumLikelihoodDetector(unittest.TestCase):
                     # Prepare for reference computation
                     ref_vecs, ref_c = build_vecs(num_bits_per_symbol, num_streams)
                     # Generate random channel outputs and channels
-                    y = np.random.normal(size=[batch_size, num_rx_ant]) + 1j*np.random.normal(size=[batch_size, num_rx_ant])
-                    h = np.random.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*np.random.normal(size=[batch_size, num_rx_ant, num_streams])
+                    y = config.np_rng.normal(size=[batch_size, num_rx_ant]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant])
+                    h = config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams])
                     # Generate well conditioned covariance matrices
-                    e = np.random.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
+                    e = config.np_rng.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
                     e = np.expand_dims(np.eye(num_rx_ant), axis=0)*np.expand_dims(e, -2)
                     u = unitary_group.rvs(dim=num_rx_ant)
                     u = np.expand_dims(u, axis=0)
@@ -375,11 +359,11 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
                     batch_size = 8
                     dim1 = 3
                     dim2 = 5
-                    y = tf.complex( tf.random.normal([batch_size, dim1, dim2, num_rx_ant]),
-                                    tf.random.normal([batch_size, dim1, dim2, num_rx_ant]))
-                    h = tf.complex( tf.random.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]),
-                                    tf.random.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]))
-                    prior = tf.random.normal([batch_size, dim1, dim2, num_streams, num_points])
+                    y = tf.complex( config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant]),
+                                    config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant]))
+                    h = tf.complex( config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]),
+                                    config.tf_rng.normal([batch_size, dim1, dim2, num_rx_ant, num_streams]))
+                    prior = config.tf_rng.normal([batch_size, dim1, dim2, num_streams, num_points])
 
                     s = tf.eye(num_rx_ant, dtype=tf.complex64)
                     logits = ml((y,h,prior,s))
@@ -392,8 +376,7 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
     def test_logits_calc_eager(self):
         "Test exponents calculation"
 
-        sionna.Config.xla_compat = False
-        np.random.seed(42)
+        sionna.config.xla_compat = False
 
         def build_vecs(num_bits_per_symbol, num_streams):
             C = Constellation("qam", num_bits_per_symbol)
@@ -430,12 +413,12 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
                     ref_vecs, ref_vecs_ind, ref_c = build_vecs(num_bits_per_symbol, num_streams)
                     num_vecs = ref_vecs.shape[0]
                     # Generate random channel outputs and channels
-                    y = np.random.normal(size=[batch_size, num_rx_ant]) + 1j*np.random.normal(size=[batch_size, num_rx_ant])
-                    h = np.random.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*np.random.normal(size=[batch_size, num_rx_ant, num_streams])
+                    y = config.np_rng.normal(size=[batch_size, num_rx_ant]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant])
+                    h = config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams])
                     # Generate priors on symbols
-                    prior = np.random.normal(size=[batch_size, num_streams, num_points])
+                    prior = config.np_rng.normal(size=[batch_size, num_streams, num_points])
                     # Generate well conditioned covariance matrices
-                    e = np.random.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
+                    e = config.np_rng.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
                     e = np.expand_dims(np.eye(num_rx_ant), axis=0)*np.expand_dims(e, -2)
                     u = unitary_group.rvs(dim=num_rx_ant)
                     u = np.expand_dims(u, axis=0)
@@ -496,8 +479,7 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
     def test_logits_calc_graph(self):
         "Test exponents calculation"
 
-        sionna.Config.xla_compat = False
-        np.random.seed(42)
+        sionna.config.xla_compat = False
 
         def build_vecs(num_bits_per_symbol, num_streams):
             C = Constellation("qam", num_bits_per_symbol)
@@ -534,12 +516,12 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
                     ref_vecs, ref_vecs_ind, ref_c = build_vecs(num_bits_per_symbol, num_streams)
                     num_vecs = ref_vecs.shape[0]
                     # Generate random channel outputs and channels
-                    y = np.random.normal(size=[batch_size, num_rx_ant]) + 1j*np.random.normal(size=[batch_size, num_rx_ant])
-                    h = np.random.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*np.random.normal(size=[batch_size, num_rx_ant, num_streams])
+                    y = config.np_rng.normal(size=[batch_size, num_rx_ant]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant])
+                    h = config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams])
                     # Generate priors on symbols
-                    prior = np.random.normal(size=[batch_size, num_streams, num_points])
+                    prior = config.np_rng.normal(size=[batch_size, num_streams, num_points])
                     # Generate well conditioned covariance matrices
-                    e = np.random.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
+                    e = config.np_rng.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
                     e = np.expand_dims(np.eye(num_rx_ant), axis=0)*np.expand_dims(e, -2)
                     u = unitary_group.rvs(dim=num_rx_ant)
                     u = np.expand_dims(u, axis=0)
@@ -599,11 +581,11 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
                                                     tf.cast(s, tf.complex64)).numpy()
                     self.assertTrue(np.allclose(test_logits, ref_maxlog, atol=1e-5))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_logits_calc_jit(self):
         "Test exponents calculation"
 
-        sionna.Config.xla_compat = True
-        np.random.seed(42)
+        sionna.config.xla_compat = True
 
         def build_vecs(num_bits_per_symbol, num_streams):
             C = Constellation("qam", num_bits_per_symbol)
@@ -640,12 +622,12 @@ class TestMaximumLikelihoodDetectorWithPrior(unittest.TestCase):
                     ref_vecs, ref_vecs_ind, ref_c = build_vecs(num_bits_per_symbol, num_streams)
                     num_vecs = ref_vecs.shape[0]
                     # Generate random channel outputs and channels
-                    y = np.random.normal(size=[batch_size, num_rx_ant]) + 1j*np.random.normal(size=[batch_size, num_rx_ant])
-                    h = np.random.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*np.random.normal(size=[batch_size, num_rx_ant, num_streams])
+                    y = config.np_rng.normal(size=[batch_size, num_rx_ant]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant])
+                    h = config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams]) + 1j*config.np_rng.normal(size=[batch_size, num_rx_ant, num_streams])
                     # Generate priors on symbols
-                    prior = np.random.normal(size=[batch_size, num_streams, num_points])
+                    prior = config.np_rng.normal(size=[batch_size, num_streams, num_points])
                     # Generate well conditioned covariance matrices
-                    e = np.random.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
+                    e = config.np_rng.uniform(low=0.5, high=2.0, size=[batch_size, num_rx_ant])
                     e = np.expand_dims(np.eye(num_rx_ant), axis=0)*np.expand_dims(e, -2)
                     u = unitary_group.rvs(dim=num_rx_ant)
                     u = np.expand_dims(u, axis=0)

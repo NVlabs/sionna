@@ -591,17 +591,17 @@ References:
       "Base Station (BS) conformance testing Part 1: Conducted conformance testing",
       Release 17
 
-   .. [Tse] D. Tse and P. Viswanath, “Fundamentals of wireless communication“,
-      Cambridge university press, 2005.
+   .. [Tse] D\. Tse and P\. Viswanath, “Fundamentals of wireless communication“,
+      Cambridge University Press, 2005.
 
-   .. [SoS] C. Xiao, Y. R. Zheng and N. C. Beaulieu, "Novel Sum-of-Sinusoids Simulation Models for Rayleigh and Rician Fading Channels," in IEEE Transactions on Wireless Communications, vol. 5, no. 12, pp. 3667-3679, December 2006, doi: 10.1109/TWC.2006.256990.
+   .. [SoS] C\. Xiao, Y\. R\. Zheng and N\. C\. Beaulieu, "Novel Sum-of-Sinusoids Simulation Models for Rayleigh and Rician Fading Channels," in IEEE Transactions on Wireless Communications, vol. 5, no. 12, pp. 3667-3679, December 2006, doi: 10.1109/TWC.2006.256990.
 
-   .. [MAL2018] Ranjan K. Mallik,
+   .. [MAL2018] R\. K\. Mallik,
          "The exponential correlation matrix: Eigen-analysis and
          applications", IEEE Trans. Wireless Commun., vol. 17, no. 7,
          pp. 4690-4705, Jul. 2018.
 
-   .. [BHS2017] Emil Björnson, Jakob Hoydis and Luca Sanguinetti (2017),
+   .. [BHS2017] E\. Björnson, J\. Hoydis, L\. Sanguinetti (2017),
          `“Massive MIMO Networks: Spectral, Energy, and Hardware Efficiency”
          <https://massivemimobook.com>`_,
          Foundations and Trends in Signal Processing:

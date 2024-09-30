@@ -3,13 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("..")
-    import sionna
-
+import unittest
+import numpy as np
+import tensorflow as tf
+import itertools
+import sionna
 from sionna.mimo import StreamManagement
 from sionna.ofdm import ResourceGrid, ResourceGridMapper, LSChannelEstimator, PilotPattern, KroneckerPilotPattern, LMMSEInterpolator, tdl_freq_cov_mat, tdl_time_cov_mat
 from sionna.channel.tr38901 import Antenna, AntennaArray, UMi
@@ -20,23 +18,6 @@ from sionna.utils import QAMSource,ebnodb2no
 from sionna.mapping import Mapper
 from sionna.channel.tr38901 import TDL
 
-import pytest
-import unittest
-import numpy as np
-import tensorflow as tf
-import itertools
-
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 
 def freq_int(h, i, j):
     """Linear interpolation along the second axis on a 2D resource grid
@@ -122,7 +103,6 @@ def check_linear_interpolation(self, pilot_pattern, time_avg=False, mode="eager"
     num_ofdm_symbols = pilot_pattern.num_ofdm_symbols
     fft_size = pilot_pattern.num_effective_subcarriers
     batch_size = 1
-    tf.random.set_seed(1)
     ut_array = Antenna(polarization="single",
                     polarization_type="V",
                     antenna_pattern="omni",
@@ -802,8 +782,6 @@ class TestLMMSEInterpolator(unittest.TestCase):
     def run_test(self, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
                     fft_size, mask, pilots):
 
-        tf.random.set_seed(42)
-
         def _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
                     fft_size, pilot_pattern, ebno_db, exec_mode, dtype):
             if exec_mode == 'xla':
@@ -1084,7 +1062,6 @@ class TestLMMSEInterpolator(unittest.TestCase):
 #     def est_tdl_freq_cov_mat(self, num_samples, model, delay_spread, carrier_frequency,
 #         subcarrier_spacing, ofdm_symbol_duration, fft_size):
 
-#         tf.random.set_seed(42)
 
 #         channel_model = TDL(model, delay_spread, carrier_frequency)
 #         frequencies = subcarrier_frequencies(fft_size, subcarrier_spacing)
@@ -1134,7 +1111,6 @@ class TestLMMSEInterpolator(unittest.TestCase):
 #     def est_tdl_time_cov_mat(self, num_samples, model, carrier_frequency,
 #         subcarrier_spacing, speed, num_ofdm_symbols, los_angle_of_arrival):
 
-#         tf.random.set_seed(42)
 
 #         channel_model = TDL(model, 300e-9, carrier_frequency, min_speed=speed, max_speed=speed,
 #                             los_angle_of_arrival=los_angle_of_arrival)

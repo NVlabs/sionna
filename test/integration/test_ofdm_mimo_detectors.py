@@ -7,25 +7,8 @@
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-    import sionna
-
-from sionna.mimo import StreamManagement, lmmse_equalizer
+import sionna
+from sionna.mimo import StreamManagement
 from sionna.ofdm import ResourceGrid, ResourceGridMapper, RemoveNulledSubcarriers, LinearDetector, EPDetector, KBestDetector, MaximumLikelihoodDetector
 from sionna.channel.tr38901 import AntennaArray, CDL
 from sionna.channel import OFDMChannel
@@ -129,9 +112,6 @@ class TestOFDMMIMODetectors(unittest.TestCase):
     def test_all_detectors_in_all_modes(self):
         """Test for all detectors in all execution modes
         """
-
-        tf.random.set_seed(1)
-
         for detector in ["mf", "lmmse", "zf", "ep", "kbest", "ml"]:
             for output in ["bit", "symbol"]:
                 for mode in ["eager", "graph", "xla"]:

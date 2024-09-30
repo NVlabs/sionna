@@ -2,27 +2,16 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import os
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 from sionna.fec.crc import CRCEncoder, CRCDecoder
 from sionna.utils import BinarySource
+from sionna import config
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 VALID_POLS = ["CRC24A", "CRC24B", "CRC24C", "CRC16", "CRC11", "CRC6"]
 
@@ -145,7 +134,6 @@ class TestCRC(unittest.TestCase):
 
     def test_error_patters(self):
         """"Test that CRC detects random error patterns."""
-
         shapes = [100, 100]
         source = BinarySource()
 
@@ -160,7 +148,10 @@ class TestCRC(unittest.TestCase):
                           tf.zeros([100, (97+crc_enc.crc_length)])], axis=1)
             # shuffling permutes first dim, but we need the second dim
             e = tf.transpose(e, (1,0))
-            e = tf.random.shuffle(e)
+            random_indices = config.tf_rng.uniform(shape=[tf.shape(e)[0]],
+                                                   maxval=tf.shape(e)[0],
+                                                dtype=tf.int32)
+            e = tf.gather(e, random_indices)
             e = tf.transpose(e, (1,0))
             # add error vector
             x += e
@@ -200,7 +191,7 @@ class TestCRC(unittest.TestCase):
 
         for pol in VALID_POLS:
 
-            ref_path = 'codes/crc/'
+            ref_path = test_dir + '/codes/crc/'
 
             # load reference codewords
             u = np.load(ref_path + "crc_u_" + pol + ".npy")

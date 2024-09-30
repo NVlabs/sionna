@@ -82,12 +82,9 @@ polynomial_selector
 
 
 References:
-   .. [Viterbi] A. Viterbi, "Error bounds for convolutional codes and an
-      asymptotically optimum decoding algorithm", IEEE Trans. Inf. Theory, 1967.
+   .. [Viterbi] A\. Viterbi, "Error bounds for convolutional codes and an asymptotically optimum decoding algorithm", IEEE Trans. Inf. Theory, 1967.
 
-   .. [BCJR]  L. Bahl, J. Cocke, F. Jelinek, und J. Raviv, "Optimal Decoding
-      of Linear Codes for Minimizing Symbol Error Rate", IEEE Trans. Inf.
+   .. [BCJR]  L\. Bahl, J\. Cocke, F\. Jelinek, und J\. Raviv, "Optimal Decoding of Linear Codes for Minimizing Symbol Error Rate", IEEE Trans. Inf.
       Theory, March 1974.
 
-   .. [Moon] Todd. K. Moon, "Error Correction Coding: Mathematical
-      Methods and Algorithms", John Wiley & Sons, 2020.
+   .. [Moon] T\. K\. Moon, "Error Correction Coding: Mathematical Methods and Algorithms", John Wiley & Sons, 2020.

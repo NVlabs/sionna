@@ -374,7 +374,7 @@ class PUSCHConfig(Config):
                    [[l_0], [l_0, 10]],
                    [[l_0], [l_0, 10]],
                 ]
-        elif self.mapping_type=="B":
+        else: # mapping_type == "B"
             if self.dmrs.length==1:
                 l_bar = [
                    [[l_0], [l_0],     [l_0],        [l_0]],
@@ -428,7 +428,7 @@ class PUSCHConfig(Config):
         """
         if self.dmrs.config_type==1:
             n_max = self.num_resource_blocks*12//4 -1
-        elif self.dmrs.config_type==2:
+        else: # config_type == 2
             n_max = self.num_resource_blocks*12//6 -1
         return list(range(n_max+1))
 
@@ -473,7 +473,7 @@ class PUSCHConfig(Config):
         # Number of REs on DMRS symbols
         if self.dmrs.config_type==1:
             num_res_dmrs = 12 - 6*self.dmrs.num_cdm_groups_without_data
-        elif self.dmrs.config_type==2:
+        else: # dmrs.config_type == 2
             num_res_dmrs = 12 - 4*self.dmrs.num_cdm_groups_without_data
 
         # Number of REs on data symbols
@@ -568,7 +568,7 @@ class PUSCHConfig(Config):
                             if self.dmrs.config_type==1:
                                 k = 4*n + 2*k_prime + \
                                     self.dmrs.deltas[j_ind]
-                            elif self.dmrs.config_type==2:
+                            else: # config_type == 2
                                 k = 6*n + k_prime + \
                                     self.dmrs.deltas[j_ind]
 
@@ -962,7 +962,7 @@ class PUSCHConfig(Config):
         # Check that symbol allocation is valid
         if self.carrier.cyclic_prefix=="normal":
             max_length = 14
-        elif self.carrier.cyclic_prefix=="extended":
+        else: # cyclic_prefix == "extended"
             max_length = 12
         if self.mapping_type=="A":
             assert self.symbol_allocation[0]==0, \

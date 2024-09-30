@@ -10,7 +10,6 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 import sionna
 
-
 class EDFA(Layer):
     # pylint: disable=line-too-long
     r"""EDFA(g=4.0,f=7.0,f_c=193.55e12,dt=1e-12,with_dual_polarization=False,dtype=tf.complex64,**kwargs)
@@ -163,12 +162,12 @@ class EDFA(Layer):
 
         # Calculate noise signal with given noise power
         n = tf.complex(
-            tf.random.normal(
+            sionna.config.tf_rng.normal(
                 tf.shape(x),
                 tf.cast(0.0, self._rdtype),
                 tf.sqrt(self._p_n_ase / tf.cast(2.0, self._rdtype)),
                 self._rdtype),
-            tf.random.normal(
+            sionna.config.tf_rng.normal(
                 tf.shape(x),
                 tf.cast(0.0, self._rdtype),
                 tf.sqrt(self._p_n_ase / tf.cast(2.0, self._rdtype)),

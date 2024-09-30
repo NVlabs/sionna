@@ -64,7 +64,7 @@ BinaryZChannel
 
 
 References:
-   .. [GumbleSoftmax] E. Jang, G. Shixiang, and Ben Poole. `"Categorical reparameterization with gumbel-softmax,"` arXiv preprint arXiv:1611.01144 (2016).
+   .. [GumbleSoftmax] E\. Jang, G\. Shixiang, and B\. Poole. `"Categorical reparameterization with gumbel-softmax,"` arXiv preprint arXiv:1611.01144 (2016).
 
-   .. [LearningShaping] M. Stark, F. Ait Aoudia, and J. Hoydis. `"Joint learning of geometric and probabilistic constellation shaping,"` 2019 IEEE Globecom Workshops (GC Wkshps). IEEE, 2019.
+   .. [LearningShaping] M\. Stark, F\. Ait Aoudia, and J\. Hoydis. `"Joint learning of geometric and probabilistic constellation shaping,"` 2019 IEEE Globecom Workshops (GC Wkshps). IEEE, 2019.
 

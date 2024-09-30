@@ -55,4 +55,4 @@ from .utils import rotation_matrix, rotate, theta_phi_from_unit_vec,\
                    reflection_coefficient, compute_field_unit_vectors,\
                    gen_orthogonal_vector, mi_to_tf_tensor, fibonacci_lattice,\
                    cot, sign, rot_mat_from_unit_vecs,\
-                       sample_points_on_hemisphere
+                   sample_points_on_hemisphere, watt_to_dbm, dbm_to_watt

@@ -2,31 +2,17 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-import sionna
+from sionna import config
 from sionna.mimo import LinearDetector, MMSEPICDetector
 from sionna.channel import FlatFadingChannel, exp_corr_mat, PerColumnModel
 from sionna.utils import BinarySource, sim_ber, ebnodb2no
 from sionna.mapping import Mapper
 
+@pytest.mark.usefixtures("only_gpu")
 class TestMMSEPICDetector(unittest.TestCase):
 
     # Number of bits per symbol for modulation
@@ -40,8 +26,6 @@ class TestMMSEPICDetector(unittest.TestCase):
 
 
     def run_e2e(self, det, batch_dims, num_rx_ant, num_tx_ant, ebno_dbs, exec_mode, dtype):
-
-        tf.random.set_seed(42)
 
         num_bits_per_symbol = TestMMSEPICDetector.NUM_BITS_PER_SYMBOL
         batch_dims = tf.cast(batch_dims, tf.int32)
@@ -142,6 +126,7 @@ class TestMMSEPICDetector(unittest.TestCase):
         #
         # Test eager - simple precision
         #
+        config.seed = config.seed
         ber_lmmse = self.run_e2e('lmmse',
                                     batch_dims,
                                     num_rx_ant,
@@ -149,6 +134,7 @@ class TestMMSEPICDetector(unittest.TestCase):
                                     ebno_dbs,
                                     'eager',
                                     tf.complex64)
+        config.seed = config.seed
         ber_mmse_pic = self.run_e2e('mmse-pic',
                                     batch_dims,
                                     num_rx_ant,
@@ -157,12 +143,12 @@ class TestMMSEPICDetector(unittest.TestCase):
                                     'eager',
                                     tf.complex64)
         max_err = np.max(np.abs(ber_lmmse-ber_mmse_pic)/np.abs(ber_lmmse))
-        # self.assertTrue(False, f"max err: {max_err}")
-        self.assertTrue(max_err < TestMMSEPICDetector.MAX_ERR)
+        self.assertLess(max_err, TestMMSEPICDetector.MAX_ERR)
 
         #
         # Test graph - simple precision
         #
+        config.seed = config.seed
         ber_lmmse = self.run_e2e('lmmse',
                                 batch_dims,
                                 num_rx_ant,
@@ -170,6 +156,7 @@ class TestMMSEPICDetector(unittest.TestCase):
                                 ebno_dbs,
                                 'graph',
                                 tf.complex64)
+        config.seed = config.seed
         ber_mmse_pic = self.run_e2e('mmse-pic',
                                     batch_dims,
                                     num_rx_ant,
@@ -178,7 +165,7 @@ class TestMMSEPICDetector(unittest.TestCase):
                                     'graph',
                                     tf.complex64)
         max_err = np.max(np.abs(ber_lmmse-ber_mmse_pic)/np.abs(ber_lmmse))
-        self.assertTrue(max_err < TestMMSEPICDetector.MAX_ERR)
+        self.assertLess(max_err, TestMMSEPICDetector.MAX_ERR)
 
         #
         # Test xla - simple precision
@@ -205,6 +192,7 @@ class TestMMSEPICDetector(unittest.TestCase):
         #
         # Test eager - double precision
         #
+        config.seed = config.seed
         ber_lmmse = self.run_e2e('lmmse',
                                 batch_dims,
                                 num_rx_ant,
@@ -212,6 +200,7 @@ class TestMMSEPICDetector(unittest.TestCase):
                                 ebno_dbs,
                                 'eager',
                                 tf.complex128)
+        config.seed = config.seed
         ber_mmse_pic = self.run_e2e('mmse-pic',
                                     batch_dims,
                                     num_rx_ant,
@@ -220,11 +209,12 @@ class TestMMSEPICDetector(unittest.TestCase):
                                     'eager',
                                     tf.complex128)
         max_err = np.max(np.abs(ber_lmmse-ber_mmse_pic)/np.abs(ber_lmmse))
-        self.assertTrue(max_err < TestMMSEPICDetector.MAX_ERR)
+        self.assertLess(max_err, TestMMSEPICDetector.MAX_ERR)
 
         #
         # Test graph - double precision
         #
+        config.seed = config.seed
         ber_lmmse = self.run_e2e('lmmse',
                                 batch_dims,
                                 num_rx_ant,
@@ -232,6 +222,7 @@ class TestMMSEPICDetector(unittest.TestCase):
                                 ebno_dbs,
                                 'graph',
                                 tf.complex128)
+        config.seed = config.seed
         ber_mmse_pic = self.run_e2e('mmse-pic',
                                     batch_dims,
                                     num_rx_ant,
@@ -240,7 +231,7 @@ class TestMMSEPICDetector(unittest.TestCase):
                                     'graph',
                                     tf.complex128)
         max_err = np.max(np.abs(ber_lmmse-ber_mmse_pic)/np.abs(ber_lmmse))
-        self.assertTrue(max_err < TestMMSEPICDetector.MAX_ERR)
+        self.assertLess(max_err, TestMMSEPICDetector.MAX_ERR)
 
         #
         # Test xla - double precision
@@ -283,9 +274,9 @@ class TestMMSEPICDetector(unittest.TestCase):
         # Arbitrary batch dims [8,4,3]
         # 16 rx antennas
         # 2 tx antennas
-        y = tf.random.normal([8,4,3,16,2])
+        y = config.tf_rng.normal([8,4,3,16,2])
         y = tf.complex(y[...,0], y[...,1])
-        h = tf.random.normal([8,4,3,16,2,2])
+        h = config.tf_rng.normal([8,4,3,16,2,2])
         h = tf.complex(h[...,0], h[...,1])
         # Covariance matrix is the identity matrix
         s = tf.eye(16, dtype=tf.complex64)
@@ -314,9 +305,9 @@ class TestMMSEPICDetector(unittest.TestCase):
 
             # 16 rx antennas
             # 2 tx antennas
-            y = tf.random.normal([64,16,2])
+            y = config.tf_rng.normal([64,16,2])
             y = tf.complex(y[...,0], y[...,1])
-            h = tf.random.normal([64,16,2,2])
+            h = config.tf_rng.normal([64,16,2,2])
             h = tf.complex(h[...,0], h[...,1])
             # Covariance matrix is the identity matrix
             s = tf.eye(16, dtype=tf.complex64)
@@ -341,15 +332,15 @@ class TestMMSEPICDetector(unittest.TestCase):
 
         # 16 rx antennas
         # 2 tx antennas
-        y = tf.random.normal([64,16,2])
+        y = config.tf_rng.normal([64,16,2])
         y = tf.complex(y[...,0], y[...,1])
-        h = tf.random.normal([64,16,2,2])
+        h = config.tf_rng.normal([64,16,2,2])
         h = tf.complex(h[...,0], h[...,1])
         # Covariance matrix is the identity matrix
         s = tf.eye(16, dtype=tf.complex64)
         # Zero prior
         # 2 tx
-        prior = tf.random.normal([64,2,4]) # QPSK
+        prior = config.tf_rng.normal([64,2,4]) # QPSK
 
         # Run the detector
         logits = detector((y,h,prior,s))
@@ -368,15 +359,15 @@ class TestMMSEPICDetector(unittest.TestCase):
 
         # 16 rx antennas
         # 2 tx antennas
-        y = tf.random.normal([64,16,2])
+        y = config.tf_rng.normal([64,16,2])
         y = tf.complex(y[...,0], y[...,1])
-        h = tf.random.normal([64,16,2,2])
+        h = config.tf_rng.normal([64,16,2,2])
         h = tf.complex(h[...,0], h[...,1])
         # Covariance matrix is the identity matrix
         s = tf.eye(16, dtype=tf.complex64)
         # Zero prior
         # 2 tx
-        prior = tf.random.normal([64,2,2]) # QPSK
+        prior = config.tf_rng.normal([64,2,2]) # QPSK
 
         # Run the detector
         logits = detector((y,h,prior,s))

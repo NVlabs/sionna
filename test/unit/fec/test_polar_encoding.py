@@ -2,31 +2,17 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 
+import os
 import unittest
 import numpy as np
 import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except Runtime as e:
-        print(e)
-
 from sionna.fec.polar.encoding import PolarEncoder, Polar5GEncoder
 from sionna.utils import BinarySource
 from sionna.fec.polar.utils import generate_5g_ranking, generate_polar_transform_mat
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 class TestPolarEncoding(unittest.TestCase):
     """Testcases for the PolarEncoder layer."""
@@ -378,7 +364,7 @@ class TestPolarEncoding5G(unittest.TestCase):
         cover puncturing, shortening and repetition coding.
         """
 
-        ref_path = '../test/codes/polar/'
+        ref_path = test_dir + '/codes/polar/'
         filename = ['E45_k30_K41',
                     'E70_k32_K43',
                     'E127_k29_K40',

@@ -2,26 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 import unittest
 import numpy as np
 import sionna
+from sionna import config
 from channel_test_utils import *
 from scipy.stats import kstest, norm
 
@@ -79,7 +64,7 @@ class TestLSP(unittest.TestCase):
         1. Sample ``y`` of shape [``batch_size``] from a Gaussian distribution N(mu,std)
         2. x = max(min(x, maxval), minval)
         """
-        x = np.random.normal(size=[batch_size])
+        x = config.np_rng.normal(size=[batch_size])
         x = np.maximum(x, minval)
         x = np.minimum(x, maxval)
         x = std*x+mu
@@ -87,10 +72,6 @@ class TestLSP(unittest.TestCase):
 
     def setUpClass():
         r"""Sample LSPs and pathlosses from all channel models for testing"""
-
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         nb_bs = 1
         fc = TestLSP.CARRIER_FREQUENCY
@@ -498,15 +479,13 @@ class TestLSP(unittest.TestCase):
                                 f"{model}:{submodel}")
 
     # Submodel is not needed for LoS probability
-    @channel_test_on_models(('rma', 'umi', 'uma'), ('foo',))
+    @channel_test_on_models(('rma','umi','uma'), ('foo',))
     def test_los_probability(self, model, submodel):
         """Test LoS probability"""
         d_2d_out = TestLSP.d_2d_out
         h_ut = TestLSP.H_UT
-        #
         los_prob_ref = los_probability(model, d_2d_out, h_ut)
         los_prob = TestLSP.los_prob[model]
-        #
         max_err = np.max(np.abs(los_prob_ref-los_prob))
         self.assertLessEqual(max_err, TestLSP.MAX_ERR_LOS_PROB,
                             f"{model}:{submodel}")

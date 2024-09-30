@@ -618,7 +618,7 @@ class PanelArray:
                 marker_p1 = MarkerStyle("_").get_marker()
             else:
                 marker_p1 = MarkerStyle("|")
-        elif self._polarization == 'dual':
+        else: # 'dual'
             if self._polarization_type == 'cross':
                 marker_p1 = (2, 0, -45)
                 marker_p2 = (2, 0, 45)
@@ -636,7 +636,7 @@ class PanelArray:
         if self._polarization == 'dual':
             pos_pol2 = self._ant_pos_pol2
             plt.plot(pos_pol2[:,1], pos_pol2[:,2],
-                marker=marker_p2, markeredgecolor='black',
+                marker=marker_p2, markeredgecolor='black', # pylint: disable=possibly-used-before-assignment
                 markersize="20", linestyle="None", markeredgewidth="1")
         plt.xlabel("y (m)")
         plt.ylabel("z (m)")

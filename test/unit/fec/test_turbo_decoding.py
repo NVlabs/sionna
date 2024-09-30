@@ -2,32 +2,21 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import pytest
+import os
 from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
 from sionna.fec.turbo import TurboEncoder, TurboDecoder
 from sionna.fec.utils import GaussianPriorSource
 from sionna.utils import BinarySource, sim_ber, ebnodb2no
 from sionna.channel import AWGN
 from sionna.mapping import Mapper, Demapper, Constellation
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 class TestTurboDecoding(unittest.TestCase):
 
@@ -93,7 +82,7 @@ class TestTurboDecoding(unittest.TestCase):
 
             # BPSK symbols with AWGN noise
             bs, n = cw.get_shape().as_list()
-            code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
+            code_syms = 6. * (2. * cw - 1) + config.np_rng.normal(size=[bs,n])
             u_hat = dec(code_syms)
             self.assertTrue(np.array_equal(msg.numpy(), u_hat.numpy()))
 
@@ -172,6 +161,7 @@ class TestTurboDecoding(unittest.TestCase):
         for i in range(bs):
             self.assertTrue(np.array_equal(c[0,:], c[i,:]))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_ber_match(self):
         """Test against results from reference implementation.
         """
@@ -221,11 +211,12 @@ class TestTurboDecoding(unittest.TestCase):
                 self.assertTrue(np.less_equal(ber[idx], ber_ub[num_iters][idx]))
                 self.assertTrue(np.greater_equal(ber[idx], ber_lb[num_iters][idx]))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_ref_implementation(self):
         r"""Test against pre-decoded noisy codewords from reference
         implementation.
         """
-        ref_path = 'codes/turbo/'
+        ref_path = test_dir + '/codes/turbo/'
         r = 1/3
         ks = [40, 112, 168]
         enc = TurboEncoder(rate=1/3, terminate=True, constraint_length=4)
@@ -271,6 +262,7 @@ class TestTurboDecoding(unittest.TestCase):
         with self.assertRaises(TypeError):
             x = dec(llr_c)
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_tf_fun(self):
         """Test that tf.function decorator works include xla compiler test."""
 

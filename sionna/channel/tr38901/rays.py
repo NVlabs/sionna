@@ -9,9 +9,9 @@ channel simulation scenario and LSPs.
 
 import tensorflow as tf
 
+from sionna import config
 from sionna.utils import log10
 from sionna.channel.utils import deg_2_rad, wrap_angle_0_360
-
 
 class Rays:
     # pylint: disable=line-too-long
@@ -279,8 +279,9 @@ class RaysGenerator:
         # Generating random cluster delays
         # We don't start at 0 to avoid numerical errors
         delay_spread = tf.expand_dims(delay_spread, axis=3)
-        x = tf.random.uniform(shape=[batch_size, num_bs, num_ut,
-            num_clusters_max], minval=1e-6, maxval=1.0,
+        x = config.tf_rng.uniform(shape=[batch_size, num_bs, num_ut,
+                                         num_clusters_max],
+                                  minval=1e-6, maxval=1.0,
             dtype=self._scenario.dtype.real_dtype)
 
         # Moving to linear domain
@@ -346,7 +347,7 @@ class RaysGenerator:
             axis=3)
 
         # Generate unnormalized cluster powers
-        z = tf.random.normal(shape=[batch_size, num_bs, num_ut,
+        z = config.tf_rng.normal(shape=[batch_size, num_bs, num_ut,
             num_clusters_max], mean=0.0, stddev=cluster_shadowing_std_db,
             dtype=self._scenario.dtype.real_dtype)
 
@@ -440,11 +441,11 @@ class RaysGenerator:
                                                                 )/c_phi)
 
         # Introducing random variation
-        random_sign = tf.random.uniform(shape=[batch_size, num_bs, 1,
+        random_sign = config.tf_rng.uniform(shape=[batch_size, num_bs, 1,
             num_clusters_max], minval=0, maxval=2, dtype=tf.int32)
         random_sign = 2*random_sign - 1
         random_sign = tf.cast(random_sign, self._scenario.dtype.real_dtype)
-        random_comp = tf.random.normal(shape=[batch_size, num_bs, num_ut,
+        random_comp = config.tf_rng.normal(shape=[batch_size, num_bs, num_ut,
             num_clusters_max], mean=0.0, stddev=azimuth_spread/7.0,
             dtype=self._scenario.dtype.real_dtype)
         azimuth_angles = (random_sign*azimuth_angles_prime + random_comp
@@ -600,11 +601,11 @@ class RaysGenerator:
         zenith_angles_prime = -zenith_spread*tf.math.log(z)/c_theta
 
         # Random component
-        random_sign = tf.random.uniform(shape=[batch_size, num_bs, 1,
+        random_sign = config.tf_rng.uniform(shape=[batch_size, num_bs, 1,
             num_clusters_max], minval=0, maxval=2, dtype=tf.int32)
         random_sign = 2*random_sign - 1
         random_sign = tf.cast(random_sign, self._scenario.dtype.real_dtype)
-        random_comp = tf.random.normal(shape=[batch_size, num_bs, num_ut,
+        random_comp = config.tf_rng.normal(shape=[batch_size, num_bs, num_ut,
             num_clusters_max], mean=0.0, stddev=zenith_spread/7.0,
             dtype=self._scenario.dtype.real_dtype)
 
@@ -721,7 +722,7 @@ class RaysGenerator:
 
         # Create randomly shuffled indices by arg-sorting samples from a random
         # normal distribution
-        random_numbers = tf.random.normal([batch_size, num_bs, 1,
+        random_numbers = config.tf_rng.normal([batch_size, num_bs, 1,
                 scenario.num_clusters_max, scenario.rays_per_cluster])
         shuffled_indices = tf.argsort(random_numbers)
         shuffled_indices = tf.tile(shuffled_indices, [1, 1, num_ut, 1, 1])
@@ -806,7 +807,7 @@ class RaysGenerator:
 
         # XPR are assumed to follow a log-normal distribution.
         # Generate XPR in log-domain
-        x = tf.random.normal(shape=[batch_size, num_bs, num_ut, num_clusters,
+        x = config.tf_rng.normal(shape=[batch_size, num_bs, num_ut, num_clusters,
             num_rays_per_cluster], mean=mu_xpr, stddev=std_xpr,
             dtype=self._scenario.dtype.real_dtype)
         # To linear domain

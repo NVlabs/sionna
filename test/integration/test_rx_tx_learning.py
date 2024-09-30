@@ -7,24 +7,8 @@
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
 import sionna
+from sionna import config
 import numpy as np
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Layer, Dense
@@ -323,7 +307,7 @@ class TestRxTraining(unittest.TestCase):
     def test_e2e_rx_eager_inference(self):
         model = E2ESystemTrainableRX()
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size],
+            ebno_db = config.tf_rng.uniform([batch_size],
                         minval=-20.0, maxval=40.0, dtype=tf.float32)
             loss = model(batch_size, ebno_db)
             loss = loss.numpy()
@@ -333,7 +317,7 @@ class TestRxTraining(unittest.TestCase):
     def test_e2e_rx_eager_gradient(self):
         model = E2ESystemTrainableRX()
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size],
+            ebno_db = config.tf_rng.uniform([batch_size],
                             minval=-20.0, maxval=40.0, dtype=tf.float32)
             with tf.GradientTape() as tape:
                 loss = model(batch_size, ebno_db)
@@ -352,7 +336,7 @@ class TestRxTraining(unittest.TestCase):
             return model(batch_size, ebno_db)
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             loss = graph_call(batch_size, ebno_db)
             loss = loss.numpy()
@@ -371,7 +355,7 @@ class TestRxTraining(unittest.TestCase):
             return grads
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             grads = graph_call(batch_size, ebno_db)
             grads = grads.numpy()
@@ -389,7 +373,7 @@ class TestRxTraining(unittest.TestCase):
             return model(batch_size, ebno_db)
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             loss = xla_call(batch_size, ebno_db)
             loss = loss.numpy()
@@ -413,7 +397,7 @@ class TestRxTraining(unittest.TestCase):
             return grads
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             grads = xla_call(batch_size, ebno_db)
             grads = grads.numpy()
@@ -427,7 +411,7 @@ class TestTxRxTraining(unittest.TestCase):
     def test_e2e_txrx_eager_inference(self):
         model = E2ESystemTrainableRXTX()
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size],
+            ebno_db = config.tf_rng.uniform([batch_size],
                         minval=-20.0, maxval=40.0, dtype=tf.float32)
             loss = model(batch_size, ebno_db)
             loss = loss.numpy()
@@ -437,7 +421,7 @@ class TestTxRxTraining(unittest.TestCase):
     def test_e2e_txrx_eager_gradient(self):
         model = E2ESystemTrainableRXTX()
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size],
+            ebno_db = config.tf_rng.uniform([batch_size],
                             minval=-20.0, maxval=40.0, dtype=tf.float32)
             with tf.GradientTape() as tape:
                 loss = model(batch_size, ebno_db)
@@ -456,7 +440,7 @@ class TestTxRxTraining(unittest.TestCase):
             return model(batch_size, ebno_db)
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             loss = graph_call(batch_size, ebno_db)
             loss = loss.numpy()
@@ -475,7 +459,7 @@ class TestTxRxTraining(unittest.TestCase):
             return grads
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             grads = graph_call(batch_size, ebno_db)
             grads = grads.numpy()
@@ -493,7 +477,7 @@ class TestTxRxTraining(unittest.TestCase):
             return model(batch_size, ebno_db)
 
         for _ in range(10):
-            ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+            ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
                                             dtype=tf.float32)
             loss = xla_call(batch_size, ebno_db)
             loss = loss.numpy()
@@ -517,7 +501,7 @@ class TestTxRxTraining(unittest.TestCase):
     #         return grads
 
     #     for _ in range(10):
-    #         ebno_db = tf.random.uniform([batch_size], minval=-20.0, maxval=40.0,
+    #         ebno_db = config.tf_rng.uniform([batch_size], minval=-20.0, maxval=40.0,
     #                                         dtype=tf.float32)
     #         grads = xla_call(batch_size, ebno_db)
     #         grads = grads.numpy()

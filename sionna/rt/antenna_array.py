@@ -227,14 +227,14 @@ class PlanarArray(AntennaArray):
         counted as a single antenna and share the same position).
         """
         if not self._positions_set:
-            """Scale positions by wavelength"""
+            # Scale positions by wavelength
             if hasattr(scene.Scene(), "wavelength"):
                 wavelength = scene.Scene().wavelength
             else:
                 wavelength = tf.cast(1, self._rdtype)
             return self._positions*wavelength
         else:
-            """Return provided positions"""
+            # Return provided positions
             return self._positions
 
     @positions.setter
