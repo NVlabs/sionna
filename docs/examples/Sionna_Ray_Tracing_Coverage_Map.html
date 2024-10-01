@@ -875,6 +875,15 @@
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gpu_num</span><span class="si">}</span><span class="s2">&quot;</span>
 <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CPP_MIN_LOG_LEVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
 
+<span class="c1"># Import Sionna</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sionna</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Install Sionna if package is not already installed</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install sionna&quot;</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">sionna</span>
+
 <span class="c1"># Configure the notebook to use only a single GPU and allocate only as much memory as needed</span>
 <span class="c1"># For more details, see https://www.tensorflow.org/guide/gpu</span>
 <span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
@@ -911,15 +920,6 @@
     <span class="k">if</span> <span class="nb">eval</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
         <span class="k">return</span>
     <span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">run_cell</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
-
-<span class="c1"># Import Sionna</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">sionna</span>
-<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="c1"># Install Sionna if package is not already installed</span>
-    <span class="kn">import</span> <span class="nn">os</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install sionna&quot;</span><span class="p">)</span>
-    <span class="kn">import</span> <span class="nn">sionna</span>
 
 <span class="c1"># Set random seed for reproducibility</span>
 <span class="n">sionna</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
