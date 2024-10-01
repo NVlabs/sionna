@@ -168,7 +168,9 @@ class PUSCHTransmitter(Layer):
                             subcarrier_spacing=self._subcarrier_spacing,
                             num_tx=self._num_tx,
                             num_streams_per_tx=self._num_layers,
-                            cyclic_prefix_length=self._cyclic_prefix_length,
+                            # TODO: pass vector of cyclic prefix lengths
+                            # (requires rewrite of channel simulation code)
+                            cyclic_prefix_length=self._cyclic_prefix_length[1],
                             pilot_pattern=self._pilot_pattern,
                             dtype=dtype)
 
