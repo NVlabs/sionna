@@ -7,6 +7,14 @@ We love to see how Sionna is used by other researchers! For this reason, you fin
 If you want your paper/project and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
 .. made-with-sionna::
+    :title: Physically Consistent RIS: From Reradiation Mode Optimization to Practical Realization
+    :authors: Javad Shabanpour, Constantin Simovski, Giovanni Geraci
+    :year: 2024
+    :version: 0.18
+    :link_arxiv: https://arxiv.org/abs/2409.17738
+    :abstract: We propose a practical framework for designing a physically consistent reconfigurable intelligent surface (RIS) to overcome the inefficiency of the conventional phase gradient approach. For a section of Cape Town and across three different coverage enhancement scenarios, we optimize the amplitude of the RIS reradiation modes using Sionna ray tracing and a gradient-based learning technique. We then determine the required RIS surface/sheet impedance given the desired amplitudes for the reradiation modes, design the corresponding unitcells, and validate the performance through full-wave numerical simulations using CST Microwave Studio. We further validate our approach by fabricating a RIS using the parallel plate waveguide technique and conducting experimental measurements that align with our theoretical predictions.
+
+.. made-with-sionna::
     :title: Design of a Standard-Compliant Real-Time Neural Receiver for 5G NR
     :authors: Reinhard Wiesmayr, Sebastian Cammerer, Fayçal Aït Aoudia, Jakob Hoydis, Jakub Zakrzewski, Alexander Keller
     :year: September 2024
