@@ -421,9 +421,20 @@ cir_to_ofdm_channel
 Rayleigh block fading
 ======================
 
+RayleighBlockFading
+---------------------
+
 .. autoclass:: sionna.channel.RayleighBlockFading
    :members:
    :exclude-members: call, build
+
+MultiTapRayleighBlockFading
+----------------------------
+
+.. autoclass:: sionna.channel.MultiTapRayleighBlockFading
+   :members:
+   :exclude-members: call, build
+
 
 3GPP 38.901 channel models
 ===========================
