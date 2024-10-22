@@ -861,3 +861,9 @@ two_persons = str(files(assets).joinpath("two_persons/two_persons.xml"))
 """
 Example asset containing two persons with mat-itu_marble material.
 """
+
+simple_reflector = str(files(assets).joinpath("simple_reflector/simple_reflector.xml"))
+# pylint: disable=C0301
+"""
+Example asset containing a single mat-itu_metal reflector.
+"""
