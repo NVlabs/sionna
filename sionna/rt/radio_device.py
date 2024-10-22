@@ -10,6 +10,7 @@ receiver.
 import tensorflow as tf
 
 from .object import Object
+from .asset_object import AssetObject
 from .utils import normalize, theta_phi_from_unit_vec
 from sionna.constants import PI
 
@@ -129,15 +130,17 @@ class RadioDevice(Object):
             :class:`~sionna.rt.Transmitter`, :class:`~sionna.rt.Receiver`,
             :class:`~sionna.rt.RIS`, or
             :class:`~sionna.rt.Camera` in the scene to look at.
-        """
+        """           
+
+
         # Get position to look at
         if isinstance(target, str):
             obj = self.scene.get(target)
-            if not isinstance(obj, Object):
-                raise ValueError(f"No camera, device, or object named '{target}' found.")
+            if not isinstance(obj, Object) and not isinstance(obj, AssetObject):
+                raise ValueError(f"No camera, device, asset or object named '{target}' found.")
             else:
                 target = obj.position
-        elif isinstance(target, Object):
+        elif isinstance(target, (Object, AssetObject)):
             target = target.position
         else:
             target = tf.cast(target, dtype=self._rdtype)
