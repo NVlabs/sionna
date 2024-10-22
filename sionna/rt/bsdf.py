@@ -134,8 +134,16 @@ class BSDF:
         self._is_placeholder = False
 
         # Set color and rgb to `None` since rgb or color are not always present in a complex bsdf xml descriptor
-        self._rgb = None
-        self._color = None
+        #If rgb is defined (and only rgb) set rgb to the corresponding values:
+        if len(self._xml_element) == 1 and self._xml_element[0].tag == 'rgb':
+            rgb = self._xml_element[0]
+            if 'value' in rgb.attrib:
+                self._rgb = [float(x) for x in rgb.attrib['value'].split()]
+            else:
+                self._rgb = None
+        else:
+            self._rgb = None 
+        self._color = None 
 
         if self.scene is not None:
             self.scene.append_to_xml(self._xml_element, overwrite=True)
@@ -348,7 +356,20 @@ class BSDF:
 
             if existing_bsdf is not None:
                 if not overwrite:
+                    # Set the existing bsdf from the XML as the BSDF xml_element (and update rgb/color parameters accordingly)
                     self._xml_element = existing_bsdf
+
+                    # If rgb is defined (and only rgb) set rgb to the corresponding values:
+                    if len(self._xml_element) == 1 and self._xml_element[0].tag == 'rgb':
+                        rgb = self._xml_element[0]
+                        if 'value' in rgb.attrib:
+                            self._rgb = [float(x) for x in rgb.attrib['value'].split()]
+                        else:
+                            self._rgb = None
+                    else:
+                        self._rgb = None
+
+                    self._color = None
                 self._is_placeholder = False
             self.scene.reload()
 
