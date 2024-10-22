@@ -222,6 +222,9 @@ class Scene:
             # By-pass reload() method is deactivated after scene init.
             self._bypass_reload = False
 
+            # By-pass scene geometry update is set to False by default, hence the scene geometry is automatically update e.g. when moving a scene object
+            # self._bypass_scene_geometry_update = False
+
 
     @property
     def cameras(self):
@@ -523,9 +526,13 @@ class Scene:
                         continue # Since the material is updated, no need to add it to self._radio_materials. Continue to next item in item_list.
 
                     elif (isinstance(s_item, AssetObject) and isinstance(item, AssetObject)):
+                        #print(f"Asset {name} already present in scene has been removed from the scene. If you want to keep both, use a different name.",s_item,item)
                         warnings.warn(f"Asset {name} already present in scene has been removed from the scene. If you want to keep both, use a different name.")
                         need_to_reload_scene = True
+                        b_tmp = self._bypass_reload
+                        self._bypass_reload = True # all self.reload() call will be by-passed
                         self.remove(name)
+                        self._bypass_reload = b_tmp
                     else:
                         msg = f"Name '{name}' is already used by another item of"\
                             " the scene"
@@ -2141,7 +2148,7 @@ class Scene:
         Callback to trigger when the scene geometry is updated
         """
         # Update the scene geometry in the preview
-        if self._preview_widget:
+        if self._preview_widget: #and not self._bypass_scene_geometry_update:
             self._preview_widget.redraw_scene_geometry()
 
     def _clear(self):
