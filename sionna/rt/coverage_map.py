@@ -506,19 +506,10 @@ class CoverageMap:
             If set to `True`, then the position of the RIS are shown.
             Defaults to `False`.
 
-        show_association : bool
-            If set to `True`, then the cell-to-transmitter association
-            is shown ina second figure (based on the selected metric).
-            Defaults to `False`.
-
         Output
         ------
         : :class:`~matplotlib.pyplot.Figure`
             Figure showing the coverage map
-
-        : :class:`~matplotlib.pyplot.Figure`
-            Figure showing the cell-to-transmitter association
-            Only returned if ``show_association`` is `True`.
         """
 
         if metric not in ["path_gain", "rss", "sinr"]:
