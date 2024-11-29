@@ -39,7 +39,7 @@ e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `ten
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.19.0
+    0.19.1
 
 3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
 
@@ -111,4 +111,4 @@ e.g., using `conda <https://docs.conda.io>`_.
 
     >>> import sionna
     >>> print(sionna.__version__)
-    0.19.0
+    0.19.1
