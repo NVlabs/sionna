@@ -122,6 +122,10 @@ complex_normal
 --------------
 .. autofunction:: sionna.utils.complex_normal
 
+complex_uniform_disk
+----------------------
+.. autofunction:: sionna.utils.complex_uniform_disk
+
 log2
 ----
 .. autofunction:: sionna.utils.log2
