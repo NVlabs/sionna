@@ -6,6 +6,7 @@
 Ray tracing algorithm that uses the image method to compute all pure reflection
 paths.
 """
+import time
 
 import mitsuba as mi
 import drjit as dr
@@ -444,6 +445,8 @@ class SolverPaths(SolverBase):
             Additional data required to compute the EM fields of the paths
             involving RIS
         """
+        self.times = []
+        
         scat_keep_prob = tf.cast(scat_keep_prob, self._rdtype)
         # Disable scattering if the probability of keeping a path is 0
         scattering = tf.logical_and(scattering,
@@ -540,9 +543,12 @@ class SolverPaths(SolverBase):
             #       Sequence of primitives hit at `hit_points`.
             # hit_points : [max_depth, num_sources, num_paths_per_source, 3]
             #     Coordinates of the intersection points.
+            start = time.perf_counter_ns()
             output = self._list_candidates_fibonacci(max_depth,
                                         sources, num_samples, los, reflection,
                                         scattering, ris_objects)
+            stop = time.perf_counter_ns()
+            self.times.append(stop - start)
             candidates = output[0]
             los_prim = output[1]
             candidates_scat = output[2]
@@ -559,10 +565,13 @@ class SolverPaths(SolverBase):
         spec_paths_tmp = PathsTmpData(sources, targets, self._dtype)
         if los or reflection:
 
+            start = time.perf_counter_ns()
             # Using the image method, computes the non-obstructed specular paths
             # interacting with the ``candidates`` primitives
             self._spec_image_method(candidates, spec_paths, spec_paths_tmp,
                                     ris_objects)
+            stop = time.perf_counter_ns()
+            self.times.append(stop - start)
 
             # Compute paths length, delays, angles and directions of arrivals
             # and departures for the specular paths
@@ -676,7 +685,7 @@ class SolverPaths(SolverBase):
                                                        ris_objects)
 
         return spec_paths, diff_paths, scat_paths, ris_paths, spec_paths_tmp,\
-            diff_paths_tmp, scat_paths_tmp, ris_paths_tmp
+            diff_paths_tmp, scat_paths_tmp, ris_paths_tmp, self.times
 
     def compute_fields(self, spec_paths, diff_paths, scat_paths, ris_paths,
                        spec_paths_tmp, diff_paths_tmp, scat_paths_tmp,
