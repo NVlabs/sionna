@@ -583,10 +583,6 @@ class Scene:
             If set to `True`, then the paths involving RIS are computed.
             Defaults to `True`.
 
-        ris : bool
-            If set to `True`, then the paths involving RIS are computed.
-            Defaults to `True`.
-
         scat_keep_prob : float
             Probability with which to keep scattered paths.
             This is helpful to reduce the number of scattered paths computed,
@@ -618,9 +614,6 @@ class Scene:
         ris_paths : :class:`~sionna.rt.Paths`
             Computed paths involving RIS
 
-        ris_paths : :class:`~sionna.rt.Paths`
-            Computed paths involving RIS
-
         spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the specular
             paths
@@ -637,9 +630,6 @@ class Scene:
             Additional data required to compute the EM fields of the paths
             involving RIS
 
-        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
-            Additional data required to compute the EM fields of the paths
-            involving RIS
         """
 
         if scat_keep_prob < 0. or scat_keep_prob > 1.:

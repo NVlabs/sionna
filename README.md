@@ -4,6 +4,7 @@ Used for exfiltrating candidate path and choosing initial candidate paths to eva
 For our purposes the installation process should look like this (assuming cuda and video drivers are already configured)
 
 Create conda env with python 3.10 or 3.11
+
 ```
 conda activate [new env]
 make install

@@ -7,6 +7,15 @@ We love to see how Sionna is used by other researchers! For this reason, you fin
 If you want your paper/project and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
 .. made-with-sionna::
+    :title: Advancing Spectrum Anomaly Detection through Digital Twins
+    :authors: Anton Schösser, Friedrich Burmeister, Philipp Schulz, Mohd Danish Khursheed, Sinuo Ma, Gerhard Fettweis
+    :year: 2024
+    :version: 0.15.1
+    :link_arxiv: https://www.techrxiv.org/users/775914/articles/883996-advancing-spectrum-anomaly-detection-through-digital-twins
+    :link_github: https://github.com/akdd11/advancing-spectrum-anomaly-detection
+    :abstract: 6th generation (6G) cellular networks are expected to enable various safety-critical use cases, e.g., in the industrial domain, which require flawless operation of the network. Thus, resilience is one of the key requirements for 6G. A particularly critical point is that 6G, as any other wireless technology, is based on the open radio medium, making it susceptible to interference. Especially intentional interference, i.e., jamming, can severely degrade the network operability. Therefore, a new approach for detecting anomalies in the radio spectrum using a digital twin (DT) of the radio environment is presented in this work. This allows the integration of contextual awareness in the anomaly detection process and is thereby superior to state-of-the-art methods  for spectrum anomaly detection. We propose a suitable system architecture and discuss the tasks of machine learning (ML) therein, particularly for reducing the computational complexity and to detect anomalies in an unsupervised manner. The feasibility of the approach is demonstrated by ray tracing simulations. The results indicate a strong detection capability in case of an accurate DT and thereby illustrate the potential of DTs to enhance monitoring of  wireless networks in the future.
+
+.. made-with-sionna::
     :title: Physically Consistent RIS: From Reradiation Mode Optimization to Practical Realization
     :authors: Javad Shabanpour, Constantin Simovski, Giovanni Geraci
     :year: 2024

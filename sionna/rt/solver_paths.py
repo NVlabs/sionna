@@ -426,9 +426,6 @@ class SolverPaths(SolverBase):
         ris_paths : :class:`~sionna.rt.Paths`
             Computed paths involving RIS
 
-        ris_paths : :class:`~sionna.rt.Paths`
-            Computed paths involving RIS
-
         spec_paths_tmp : PathsTmpData
             Additional data required to compute the EM fields of the specular
             paths
@@ -4260,11 +4257,12 @@ class SolverPaths(SolverBase):
                 # triangles can be considered twice.
                 # Note that this is rare, as intersections rarely occur on
                 # edges.
-                # The similarity measure used to distinguish paths if the
-                # distance between the angles of arrivals and departures.
-                # [num_targets, num_sources, max_num_paths, 4]
-                sim = tf.stack([theta_t, phi_t, theta_r, phi_r], axis=3)
-                # [num_targets, num_sources, max_num_paths, max_num_paths, 4]
+                # Paths are considered different if they have different
+                # angles of departure, angles of arrival, and total length.
+                # [num_targets, num_sources, max_num_paths, 5]
+                sim = tf.stack([theta_t, phi_t, theta_r, phi_r, total_distance],
+                               axis=3)
+                # [num_targets, num_sources, max_num_paths, max_num_paths, 5]
                 sim = tf.expand_dims(sim, axis=2) - tf.expand_dims(sim, axis=3)
                 # [num_targets, num_sources, max_num_paths, max_num_paths]
                 sim = tf.reduce_sum(tf.square(sim), axis=4)
