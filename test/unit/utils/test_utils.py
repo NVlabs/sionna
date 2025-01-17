@@ -2,34 +2,16 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 
 import unittest
 import numpy as np
 import tensorflow as tf
-
 from sionna.utils.metrics import BitErrorRate, BitwiseMutualInformation, compute_ber, compute_bler, count_block_errors, count_errors
-from sionna.utils import ebnodb2no
 from sionna.fec.interleaving import RandomInterleaver
 from sionna.utils import sim_ber, complex_normal, SymbolSource, BinarySource, QAMSource, PAMSource
 from sionna.fec.utils import GaussianPriorSource
 from sionna.mapping import SymbolDemapper, Demapper, Constellation
 from sionna.channel import AWGN
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except Runtime as e:
-        print(e)
 
 
 class ber_tester():
@@ -95,7 +77,6 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(np.allclose(ber[:-1], ber_true[:-1]))
 
         # check that last ber is 0
-        print(ber)
         self.assertTrue(np.allclose(ber[-1], np.zeros_like(ber[-1])))
 
     def test_ber_sim_multi(self):

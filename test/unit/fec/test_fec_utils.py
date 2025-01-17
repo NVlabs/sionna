@@ -2,29 +2,17 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-from numpy.lib.npyio import load
-
+import os
 import unittest
 import pytest  # required for filter warnings
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 from sionna.fec.utils import bin2int_tf, j_fun, j_fun_inv, j_fun_tf, j_fun_inv_tf, GaussianPriorSource, llr2mi, bin2int, int2bin, int2bin_tf, alist2mat, load_alist, gm2pcm, pcm2gm, verify_gm_pcm, make_systematic, load_parity_check_examples, generate_reg_ldpc, int_mod_2
 from sionna.utils import log2, log10
+from sionna import config
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 class TestFECUtils(unittest.TestCase):
     """Test FEC utilities."""
@@ -250,7 +238,7 @@ class TestFECUtils(unittest.TestCase):
         """Test to load example alist files.
         """
 
-        path = "codes/ldpc/wimax_576_0.5.alist"
+        path = test_dir + "/codes/ldpc/wimax_576_0.5.alist"
 
         # load file
         alist = load_alist(path)
@@ -411,8 +399,6 @@ class TestFECUtils(unittest.TestCase):
     def test_generate_reg_ldpc(self):
         """Test LDPC generator function."""
 
-        # fix seed of rng
-        np.random.seed(1337)
         # v,c,n
         params = [[3,6,100],
                   [1,10,1000],
@@ -440,14 +426,14 @@ class TestFECUtils(unittest.TestCase):
         s = [10, 20, 30]
 
         # int inputs
-        x = tf.random.uniform(s, minval=-2**30, maxval=2**30, dtype=tf.int32)
+        x = config.tf_rng.uniform(s, minval=-2**30, maxval=2**30, dtype=tf.int32)
 
         y = int_mod_2(x)
         y_ref = tf.math.mod(tf.cast(x, tf.float64), 2.)
         self.assertTrue(np.array_equal(y.numpy(), y_ref.numpy()))
 
         # float inputs
-        x = tf.random.uniform(s, minval=-1000, maxval=1000, dtype=tf.float32)
+        x = config.tf_rng.uniform(s, minval=-1000, maxval=1000, dtype=tf.float32)
 
         y = int_mod_2(x)
         # model implicit cast

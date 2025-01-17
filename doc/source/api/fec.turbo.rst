@@ -81,7 +81,7 @@ puncture_pattern
 .. autofunction:: sionna.fec.turbo.utils.puncture_pattern
 
 References:
-   .. [Berrou] C. Berrou, A. Glavieux, P. Thitimajshima, "Near Shannon limit error-correcting coding and decoding: Turbo-codes", IEEE ICC, 1993.
+   .. [Berrou] C\. Berrou, A\. Glavieux, P\. Thitimajshima, "Near Shannon limit error-correcting coding and decoding: Turbo-codes", IEEE ICC, 1993.
 
    .. [3GPPTS36212_Turbo] ETSI 3GPP TS 36.212 "Evolved Universal Terrestrial
       Radio Access (EUTRA); Multiplexing and channel coding", v.15.3.0, 2018-09.

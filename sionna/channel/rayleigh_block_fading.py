@@ -5,7 +5,7 @@
 """Class for simulating Rayleigh block fading"""
 
 import tensorflow as tf
-
+from sionna import config
 from . import ChannelModel
 
 class RayleighBlockFading(ChannelModel):
@@ -94,24 +94,24 @@ class RayleighBlockFading(ChannelModel):
 
         # Fading coefficients
         std = tf.cast(tf.sqrt(0.5), dtype=self._dtype.real_dtype)
-        h_real = tf.random.normal(shape=[   batch_size,
-                                            self.num_rx,
-                                            self.num_rx_ant,
-                                            self.num_tx,
-                                            self.num_tx_ant,
-                                            1, # One path
-                                            1], # Same response over the block
-                                            stddev=std,
-                                            dtype = self._dtype.real_dtype)
-        h_img = tf.random.normal(shape=[    batch_size,
+        h_real = config.tf_rng.normal(shape=[batch_size,
+                                             self.num_rx,
+                                             self.num_rx_ant,
+                                             self.num_tx,
+                                             self.num_tx_ant,
+                                             1, # One path
+                                             1], # Same response over the block
+                                      stddev=std,
+                                      dtype = self._dtype.real_dtype)
+        h_img = config.tf_rng.normal(shape=[batch_size,
                                             self.num_rx,
                                             self.num_rx_ant,
                                             self.num_tx,
                                             self.num_tx_ant,
                                             1, # One cluster
                                             1], # Same response over the block
-                                            stddev=std,
-                                            dtype = self._dtype.real_dtype)
+                                     stddev=std,
+                                     dtype = self._dtype.real_dtype)
         h = tf.complex(h_real, h_img)
         # Tile the response over the block
         h = tf.tile(h, [1, 1, 1, 1, 1, 1, num_time_steps])

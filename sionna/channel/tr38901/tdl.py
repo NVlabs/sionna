@@ -11,6 +11,7 @@ import numpy as np
 import tensorflow as tf
 
 from sionna import PI, SPEED_OF_LIGHT
+from sionna import config
 from sionna.utils import insert_dims, expand_to_rank, matrix_sqrt, split_dim, flatten_last_dims
 from sionna.channel import ChannelModel
 
@@ -272,6 +273,7 @@ class TDL(ChannelModel):
                 delay_spread = 300e-9
 
         # Load model parameters
+        # pylint: disable=possibly-used-before-assignment
         self._load_parameters(parameters_fname)
 
         self._num_rx_ant = num_rx_ant
@@ -392,44 +394,44 @@ class TDL(ChannelModel):
         # Generate random maximum Doppler shifts for each sample
         # The Doppler shift is different for each TX-RX link, but shared by
         # all RX ant and TX ant couple for a given link.
-        doppler = tf.random.uniform([   batch_size,
-                                        1, # num rx
-                                        1, # num rx ant
-                                        1, # num tx
-                                        1, # num tx ant
-                                        1, # num clusters
-                                        1, # num time steps
-                                        1], # num sinusoids
+        doppler = config.tf_rng.uniform([batch_size,
+                                         1, # num rx
+                                         1, # num rx ant
+                                         1, # num tx
+                                         1, # num tx ant
+                                         1, # num clusters
+                                         1, # num time steps
+                                         1], # num sinusoids
                                         self._min_doppler,
                                         self._max_doppler,
                                         self._real_dtype)
 
         # Eq. (7) in the paper [TDL] (see class docstring)
         # The angle of arrival is different for each TX-RX link.
-        theta = tf.random.uniform([ batch_size,
-                                    1, # num rx
-                                    1, # 1 RX antenna
-                                    1, # num tx
-                                    1, # 1 TX antenna
-                                    self._num_clusters,
-                                    1, # num time steps
-                                    self._num_sinusoids],
-                                    -PI/tf.cast(self._num_sinusoids,
-                                                self._real_dtype),
-                                    PI/tf.cast( self._num_sinusoids,
-                                                self._real_dtype),
-                                    self._real_dtype)
+        theta = config.tf_rng.uniform([batch_size,
+                                       1, # num rx
+                                       1, # 1 RX antenna
+                                       1, # num tx
+                                       1, # 1 TX antenna
+                                       self._num_clusters,
+                                       1, # num time steps
+                                       self._num_sinusoids],
+                                      -PI/tf.cast(self._num_sinusoids,
+                                                  self._real_dtype),
+                                      PI/tf.cast(self._num_sinusoids,
+                                                 self._real_dtype),
+                                      self._real_dtype)
         alpha = self._alpha_const + theta
 
         # Eq. (6a)-(6c) in the paper [TDL] (see class docstring)
-        phi = tf.random.uniform([   batch_size,
-                                    1, # 1 RX
-                                    self._num_rx_ant, # 1 RX antenna
-                                    1, # 1 TX
-                                    self._num_tx_ant, # 1 TX antenna
-                                    self._num_clusters,
-                                    1, # Phase shift is shared by all time steps
-                                    self._num_sinusoids],
+        phi = config.tf_rng.uniform([batch_size,
+                                     1, # 1 RX
+                                     self._num_rx_ant, # 1 RX antenna
+                                     1, # 1 TX
+                                     self._num_tx_ant, # 1 TX antenna
+                                     self._num_clusters,
+                                     1, # Phase shift shared by all time steps
+                                     self._num_sinusoids],
                                     -PI,
                                     PI,
                                     self._real_dtype)
@@ -453,16 +455,16 @@ class TDL(ChannelModel):
             # distribution
 
             # Specular component phase shift
-            phi_0 = tf.random.uniform([ batch_size,
-                                        1, # num rx
-                                        1, # 1 RX antenna
-                                        1, # num tx
-                                        1, # 1 TX antenna
-                                        1, # only the first tap is concerned
-                                        1], # Shared by all time steps
-                                        -PI,
-                                        PI,
-                                        self._real_dtype)
+            phi_0 = config.tf_rng.uniform([batch_size,
+                                           1, # num rx
+                                           1, # 1 RX antenna
+                                           1, # num tx
+                                           1, # 1 TX antenna
+                                           1, # only the first tap is concerned
+                                           1], # Shared by all time steps
+                                          -PI,
+                                          PI,
+                                          self._real_dtype)
             # Remove the sinusoids dim
             doppler = tf.squeeze(doppler, axis=-1)
             sample_times = tf.squeeze(sample_times, axis=-1)

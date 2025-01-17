@@ -11,6 +11,7 @@ import mitsuba as mi
 import drjit as dr
 import tensorflow as tf
 
+from sionna import config
 from sionna.constants import SPEED_OF_LIGHT, PI
 from sionna.utils.tensors import expand_to_rank, insert_dims, flatten_dims,\
     split_dim
@@ -424,9 +425,6 @@ class SolverPaths(SolverBase):
         ris_paths : :class:`~sionna.rt.Paths`
             Computed paths involving RIS
 
-        ris_paths : :class:`~sionna.rt.Paths`
-            Computed paths involving RIS
-
         spec_paths_tmp : PathsTmpData
             Additional data required to compute the EM fields of the specular
             paths
@@ -492,11 +490,11 @@ class SolverPaths(SolverBase):
             targets = rx_pos
         else:
             # [num_tx, tx_array_size, 3]
-            sources = tf.expand_dims(tx_pos, axis=1) + tx_rel_ant_pos
+            sources = tf.expand_dims(tx_pos, axis=1) + tx_rel_ant_pos # pylint: disable=possibly-used-before-assignment
             # [num_sources = num_tx*tx_array_size, 3]
             sources = tf.reshape(sources, [-1, 3])
             # [num_rx, rx_array_size, 3]
-            targets = tf.expand_dims(rx_pos, axis=1) + rx_rel_ant_pos
+            targets = tf.expand_dims(rx_pos, axis=1) + rx_rel_ant_pos # pylint: disable=possibly-used-before-assignment
             # [num_targets = num_rx*rx_array_size, 3]
             targets = tf.reshape(targets, [-1, 3])
 
@@ -504,7 +502,7 @@ class SolverPaths(SolverBase):
         # Builds the Mitsuba scene with RIS for
         # testing intersections with RIS
         ##############################################
-        mi_ris_scene = self._build_mi_ris_objects()
+        ris_objects, _ = self._build_mi_ris_objects()
 
         ##############################################
         # Generate candidate paths
@@ -524,6 +522,8 @@ class SolverPaths(SolverBase):
             #     list of all the primitives in the scene.
             candidates, los_prim = self._list_candidates_exhaustive(max_depth,
                                                                 los, reflection)
+            candidates_scat = None
+            hit_points = None
         elif method == 'fibonacci':
             # Sample sequences of primitives using shoot-and-bounce
             # with length up to ``max_depth`` and by arranging the initial
@@ -539,7 +539,7 @@ class SolverPaths(SolverBase):
             #     Coordinates of the intersection points.
             output = self._list_candidates_fibonacci(max_depth,
                                         sources, num_samples, los, reflection,
-                                        scattering, mi_ris_scene)
+                                        scattering, ris_objects)
             candidates = output[0]
             los_prim = output[1]
             candidates_scat = output[2]
@@ -559,7 +559,7 @@ class SolverPaths(SolverBase):
             # Using the image method, computes the non-obstructed specular paths
             # interacting with the ``candidates`` primitives
             self._spec_image_method(candidates, spec_paths, spec_paths_tmp,
-                                    mi_ris_scene)
+                                    ris_objects)
 
             # Compute paths length, delays, angles and directions of arrivals
             # and departures for the specular paths
@@ -612,7 +612,7 @@ class SolverPaths(SolverBase):
                     self._check_wedges_visibility(targets, sources,
                                                   diff_wedges_indices,
                                                   diff_vertices,
-                                                  mi_ris_scene)
+                                                  ris_objects)
 
             diff_paths = Paths(sources=sources, targets=targets,
                                scene=self._scene, types=Paths.DIFFRACTED)
@@ -639,7 +639,7 @@ class SolverPaths(SolverBase):
             scat_paths, scat_paths_tmp = self._scat_test_rx_blockage(targets,sources,
                                                                 candidates_scat,
                                                                 hit_points,
-                                                                mi_ris_scene)
+                                                                ris_objects)
             scat_paths, scat_paths_tmp =\
                 self._compute_directions_distances_delays_angles(scat_paths,
                                                                  scat_paths_tmp,
@@ -670,7 +670,7 @@ class SolverPaths(SolverBase):
         if ris and len(self._scene.ris)>0:
             ris_paths, ris_paths_tmp = self._ris_paths(ris_paths,
                                                        ris_paths_tmp,
-                                                       mi_ris_scene)
+                                                       ris_objects)
 
         return spec_paths, diff_paths, scat_paths, ris_paths, spec_paths_tmp,\
             diff_paths_tmp, scat_paths_tmp, ris_paths_tmp
@@ -1170,7 +1170,7 @@ class SolverPaths(SolverBase):
         return all_candidates, los_candidates
 
     def _list_candidates_fibonacci(self, max_depth, sources, num_samples,
-                                   los, reflection, scattering, mi_ris_scene):
+                                   los, reflection, scattering, ris_objects):
         r"""
         Generate potential candidate paths made of reflections only and the
         LoS. Rays direction are arranged in a Fibonacci lattice on the unit
@@ -1207,8 +1207,8 @@ class SolverPaths(SolverBase):
         scattering : bool
             if set to `True`, then the scattered paths are computed
 
-        mi_ris_scene : mi.Scene
-            Mistuba scene containing the RIS
+        ris_objects : list(mi.Rectangle)
+            List of Mitsuba rectangles implementing the RIS
 
         Output
         -------
@@ -1275,15 +1275,11 @@ class SolverPaths(SolverBase):
                 # Intersect ray against the scene to find the next hitted
                 # primitive
                 si = self._mi_scene.ray_intersect(ray, active)
-                # Required to split the kernel as intersections are next tested
-                # with another scene
-                dr.eval(si)
                 # Intersect with the RIS
-                si_ris = mi_ris_scene.ray_intersect(ray, active)
-                dr.eval(si_ris)
+                _, t_ris, _ = self._ris_intersect(ris_objects, ray, active)
 
                 # Intersection valid if not obstructed by RIS
-                valid_int = si.is_valid() & (si.t < si_ris.t)
+                valid_int = si.is_valid() & (si.t < t_ris)
 
                 active &= valid_int
 
@@ -2159,7 +2155,7 @@ class SolverPaths(SolverBase):
         return mask, valid_vertices, valid_objects, valid_normals
 
     def _spec_image_method(self, candidates, paths, spec_paths_tmp,
-                           mi_ris_scene):
+                           ris_objects):
         # pylint: disable=line-too-long
         r"""
         Evaluates a list of candidate paths ``candidates`` and keep only the
@@ -2177,8 +2173,8 @@ class SolverPaths(SolverBase):
         paths : :class:`~sionna.rt.Paths`
             Paths to update
 
-        mi_ris_scene : mi.Scene
-            Mistuba scene containing the RIS
+        ris_objects : list(mi.Rectangle)
+            List of Mitsuba rectangles implementing the RIS
         """
 
         sources = paths.sources
@@ -2278,7 +2274,7 @@ class SolverPaths(SolverBase):
             blk = self._test_obstruction(tf.reshape(current, [-1, 3]),
                                          tf.reshape(d, [-1, 3]),
                                          tf.reshape(maxt, [-1]),
-                                         mi_ris_scene)
+                                         ris_objects)
 
             # The following call:
             # - Discards paths that are blocked
@@ -2322,7 +2318,7 @@ class SolverPaths(SolverBase):
         val = self._test_obstruction(tf.reshape(current, [-1, 3]),
                                      tf.reshape(d, [-1, 3]),
                                      tf.reshape(maxt, [-1]),
-                                     mi_ris_scene)
+                                     ris_objects)
         # [num_targets, num_sources, num_samples, 3]
         blk = tf.reshape(val, tf.shape(maxt))
         # Discard paths for which the shooted ray has zero-length, i.e., when
@@ -2857,7 +2853,7 @@ class SolverPaths(SolverBase):
         return wedges_indices, inter_point
 
     def _check_wedges_visibility(self, targets, sources, wedges_indices,
-                                 vertices, mi_ris_scene):
+                                 vertices, ris_objects):
         r"""
         Discard the wedges that are not valid due to obstruction by updating the
         mask and removing the wedges related to no valid links.
@@ -2876,8 +2872,8 @@ class SolverPaths(SolverBase):
         vertices : [num_targets, num_sources, max_num_paths, 3], tf.float
             Coordinates of the interaction points on the intersected wedges
 
-        mi_ris_scene : mi.Scene
-            Mistuba scene containing the RIS
+        ris_objects : list(mi.Rectangle)
+            List of Mitsuba rectangles implementing the RIS
 
         Output
         -------
@@ -2922,7 +2918,7 @@ class SolverPaths(SolverBase):
         maxt = tf.squeeze(maxt, axis=1)
         # [batch_size]
         valid_t2w = tf.logical_not(self._test_obstruction(sources, d, maxt,
-                                                          mi_ris_scene))
+                                                          ris_objects))
 
         # Check visibility between wedge and receiver
         # Ray origin
@@ -2932,7 +2928,7 @@ class SolverPaths(SolverBase):
         maxt = tf.squeeze(maxt, axis=1)
         # [batch_size]
         valid_w2r = tf.logical_not(self._test_obstruction(targets, d, maxt,
-                                                          mi_ris_scene))
+                                                          ris_objects))
 
         # Mask obstructed wedges
         # [batch_size]
@@ -3368,7 +3364,7 @@ class SolverPaths(SolverBase):
     ##################################################################
 
     def _scat_test_rx_blockage(self, targets, sources, candidates, hit_points,
-                               mi_ris_scene):
+                               ris_objects):
         r"""
         Test if the LoS between the hit points and the target is blocked.
         Blocked paths are masked out.
@@ -3387,8 +3383,8 @@ class SolverPaths(SolverBase):
         hit_points : [max_depth, num_sources, num_paths_per_source, 3], tf.float
             Intersection points
 
-        mi_ris_scene : mi.Scene
-            Mistuba scene containing the RIS
+        ris_objects : list(mi.Rectangle)
+            List of Mitsuba rectangles implementing the RIS
 
         Output
         -------
@@ -3425,7 +3421,7 @@ class SolverPaths(SolverBase):
         # Test for blockage
         # [max_depth * num_targets * num_sources * num_paths]
         blocked = self._test_obstruction(ray_origins, ray_directions,
-                                          rays_lengths, mi_ris_scene)
+                                          rays_lengths, ris_objects)
         # [max_depth, num_targets, num_sources, num_paths]
         blocked = tf.reshape(blocked,
                              [max_depth, num_targets, num_sources, -1])
@@ -3620,7 +3616,8 @@ class SolverPaths(SolverBase):
 
         # Keep valid path with probability `scat_keep_prob`
         # [max_depth, num_targets, num_sources, max_num_paths]
-        random_mask = tf.random.uniform(tf.shape(mask), 0., 1., self._rdtype)
+        random_mask = config.tf_rng.uniform(tf.shape(mask), 0., 1.,
+                                            self._rdtype)
         # [max_depth, num_targets, num_sources, max_num_paths]
         random_mask = tf.less(random_mask, scat_keep_prob)
         # [max_depth, num_targets, num_sources, max_num_paths]
@@ -3980,7 +3977,7 @@ class SolverPaths(SolverBase):
     # Methods used for computing paths involving RIS
     ##################################################################
 
-    def _ris_paths(self, paths, paths_tmp, mi_ris_scene):
+    def _ris_paths(self, paths, paths_tmp, ris_objects):
         sources = paths.sources
         targets = paths.targets
         num_sources = tf.shape(sources)[0]
@@ -4033,12 +4030,12 @@ class SolverPaths(SolverBase):
         mask_tx_ris = self._test_obstruction(tf.reshape(o_tx_ris, [-1,3]),
                                              tf.reshape(d_tx_ris, [-1,3]),
                                              tf.reshape(maxt_tx_ris, [-1]),
-                                             mi_ris_scene)
+                                             ris_objects)
 
         mask_ris_rx = self._test_obstruction(tf.reshape(o_ris_rx, [-1,3]),
                                              tf.reshape(d_ris_rx, [-1,3]),
                                              tf.reshape(maxt_ris_rx, [-1]),
-                                             mi_ris_scene)
+                                             ris_objects)
 
         mask_ris = tf.logical_or(mask_tx_ris, mask_ris_rx)
         mask_ris = tf.reshape(mask_ris, [num_targets, num_sources, -1])
@@ -4089,7 +4086,7 @@ class SolverPaths(SolverBase):
 
         # Create transition matrices from coefficients
         # We assume here that the polarization remains unchanged, i.e.,
-        # The incomning field is already decomposed in theta/phi components
+        # The incoming field is already decomposed in theta/phi components
         # and the outgoing field is represented in theta/phi components
         coef = coef[...,tf.newaxis,tf.newaxis]
         ris_mat_t = coef*tf.eye(2, batch_shape=[1,1,1], dtype=self._dtype)
@@ -4245,37 +4242,40 @@ class SolverPaths(SolverBase):
             # theta_r, phi_r: [num_targets, num_sources, max_num_paths]
             theta_r, phi_r = theta_phi_from_unit_vec(k_rx)
 
-        if not scattering and paths.types is not Paths.RIS:
-            # Remove duplicated paths.
-            # Paths intersecting an edge belonging to two different triangles
-            # can be considered twice.
-            # Note that this is rare, as intersections rarely occur on edges.
-            # The similarity measure used to distinguish paths if the distance
-            # between the angles of arrivals and departures.
-            # [num_targets, num_sources, max_num_paths, 4]
-            sim = tf.stack([theta_t, phi_t, theta_r, phi_r], axis=3)
-            # [num_targets, num_sources, max_num_paths, max_num_paths, 4]
-            sim = tf.expand_dims(sim, axis=2) - tf.expand_dims(sim, axis=3)
-            # [num_targets, num_sources, max_num_paths, max_num_paths]
-            sim = tf.reduce_sum(tf.square(sim), axis=4)
-            sim = tf.equal(sim, tf.zeros_like(sim))
-            # Keep only the paths with no duplicates.
-            # If many paths are identical, keep the one with the highest index
-            # [num_targets, num_sources, max_num_paths, max_num_paths]
-            sim = tf.logical_and(tf.linalg.band_part(sim, 0, -1),
-                                ~tf.eye(tf.shape(sim)[-1],
-                                        dtype=tf.bool,
-                                        batch_shape=tf.shape(sim)[:2]))
-            sim = tf.logical_and(sim, tf.expand_dims(mask, axis=-2))
-            # [num_targets, num_sources, max_num_paths]
-            uniques = tf.reduce_all(~sim, axis=3)
-            # Keep only the unique paths
-            # [num_targets, num_sources, max_num_paths]
-            mask = tf.logical_and(uniques, mask)
+            if paths.types is not Paths.RIS:
+                # Remove duplicated paths.
+                # Paths intersecting an edge belonging to two different
+                # triangles can be considered twice.
+                # Note that this is rare, as intersections rarely occur on
+                # edges.
+                # Paths are considered different if they have different
+                # angles of departure, angles of arrival, and total length.
+                # [num_targets, num_sources, max_num_paths, 5]
+                sim = tf.stack([theta_t, phi_t, theta_r, phi_r, total_distance],
+                               axis=3)
+                # [num_targets, num_sources, max_num_paths, max_num_paths, 5]
+                sim = tf.expand_dims(sim, axis=2) - tf.expand_dims(sim, axis=3)
+                # [num_targets, num_sources, max_num_paths, max_num_paths]
+                sim = tf.reduce_sum(tf.square(sim), axis=4)
+                sim = tf.equal(sim, tf.zeros_like(sim))
+                # Keep only the paths with no duplicates.
+                # If many paths are identical, keep the one with the highest
+                # index.
+                # [num_targets, num_sources, max_num_paths, max_num_paths]
+                sim = tf.logical_and(tf.linalg.band_part(sim, 0, -1),
+                                    ~tf.eye(tf.shape(sim)[-1],
+                                            dtype=tf.bool,
+                                            batch_shape=tf.shape(sim)[:2]))
+                sim = tf.logical_and(sim, tf.expand_dims(mask, axis=-2))
+                # [num_targets, num_sources, max_num_paths]
+                uniques = tf.reduce_all(~sim, axis=3)
+                # Keep only the unique paths
+                # [num_targets, num_sources, max_num_paths]
+                mask = tf.logical_and(uniques, mask)
 
-            # Setting -1 for delays corresponding to non-valid paths
-            # [num_targets, num_sources, max_num_paths]
-            tau = tf.where(mask, tau, -tf.ones_like(tau))
+                # Setting -1 for delays corresponding to non-valid paths
+                # [num_targets, num_sources, max_num_paths]
+                tau = tf.where(mask, tau, -tf.ones_like(tau))
 
         # Updates the object storing the paths
         if not scattering:
@@ -4788,8 +4788,8 @@ class SolverPaths(SolverBase):
             phase_shape = tf.concat([tf.shape(k_x), [2]], axis=0)
             if scat_random_phases:
                 # [num_targets, num_sources, max_num_paths, 2]
-                phases = tf.random.uniform(phase_shape, maxval=2*PI,
-                                        dtype=self._rdtype)
+                phases = config.tf_rng.uniform(phase_shape, maxval=2*PI,
+                                               dtype=self._rdtype)
             else:
                 phases = tf.zeros(phase_shape, dtype=self._rdtype)
             # [num_targets, num_sources, max_num_paths, 2]

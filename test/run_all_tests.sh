@@ -1,3 +1,7 @@
+#
+# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
 #!/bin/bash
 
 # This script runs all tests sequentially
@@ -17,7 +21,7 @@ find_command=$(build_find_command)
 # Evaluate the find command and run pytest on each file
 eval $find_command | while read -r file; do
     echo "Running pytest on $file"
-    pytest "$file"
+    pytest -o addopts="--gpu 0" "$file"
 
     # Check the exit code of pytest
     if [ $? -ne 0 ]; then

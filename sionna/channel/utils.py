@@ -8,6 +8,7 @@ import tensorflow as tf
 import warnings
 
 from sionna import PI
+from sionna import config
 from sionna.utils import expand_to_rank
 
 
@@ -383,7 +384,6 @@ def time_to_ofdm_channel(h_t, rg, l_min):
     .. code-block:: Python
 
         # Setup resource grid and channel model
-        tf.random.set_seed(4)
         sm = StreamManagement(np.array([[1]]), 1)
         rg = ResourceGrid(num_ofdm_symbols=1,
                           fft_size=1024,
@@ -509,14 +509,19 @@ def sample_bernoulli(shape, p, dtype=tf.float32):
     : Tensor of shape ``shape``, bool
         Binary samples
     """
-    z = tf.random.uniform(shape=shape, minval=0.0, maxval=1.0, dtype=dtype)
+    z = config.tf_rng.uniform(shape=shape, minval=0.0, maxval=1.0, dtype=dtype)
     z = tf.math.less(z, p)
     return z
 
-def drop_uts_in_sector(batch_size, num_ut, min_bs_ut_dist, isd,
+def drop_uts_in_sector(batch_size,
+                       num_ut,
+                       min_bs_ut_dist,
+                       isd,
+                       bs_height=0.,
+                       ut_height=0.,
                        dtype=tf.complex64):
     r"""
-    Uniformly sample UT locations from a sector.
+    Uniformly sample UT locations from a sector
 
     The sector from which UTs are sampled is shown in the following figure.
     The BS is assumed to be located at the origin (0,0) of the coordinate
@@ -540,6 +545,14 @@ def drop_uts_in_sector(batch_size, num_ut, min_bs_ut_dist, isd,
     isd : tf.float
         Inter-site distance, i.e., the distance between two adjacent BSs [m]
 
+    bs_height : tf.float
+        BS height, i.e., distance between the BS and the X-Y plane [m].
+        Defaults to 0.
+
+    ut_height : tf.float
+        UT height, i.e., distance between the BS and the X-Y plane [m].
+        Defaults to 0.
+
     dtype : tf.DType
         Datatype to use for internal processing and output.
         If a complex datatype is provided, the corresponding precision of
@@ -549,7 +562,7 @@ def drop_uts_in_sector(batch_size, num_ut, min_bs_ut_dist, isd,
     Output
     ------
     ut_loc : [batch_size, num_ut, 2], tf.float
-        UTs locations in the X-Y plan
+        UT locations in the X-Y plane
     """
 
     if dtype.is_complex:
@@ -559,43 +572,56 @@ def drop_uts_in_sector(batch_size, num_ut, min_bs_ut_dist, isd,
     else:
         raise AssertionError("dtype must be a complex or floating datatype")
 
-    r_min = tf.cast(min_bs_ut_dist, real_dtype)
+    # Cast to real_dtype
+    d_min = tf.cast(min_bs_ut_dist, real_dtype)
+    bs_height = tf.cast(bs_height, real_dtype)
+    ut_height = tf.cast(ut_height, real_dtype)
+
+    # Force the minimum BS-UT distance >= their height difference
+    d_min = tf.maximum(d_min, tf.abs(bs_height - ut_height))
 
     r = tf.cast(isd*0.5, real_dtype)
 
-    # Angles from (-pi/6 pi/6), covering half of the sector and denoted by
+    # Minimum squared distance between BS and UT on the X-Y plane
+    r_min2 = d_min**2 - (bs_height - ut_height)**2
+
+    # Angles from (-pi/6, pi/6), covering half of the sector and denoted by
     # alpha_half, are randomly sampled for all UTs.
-    # Then, the maximum distance UTs can be from the BS, denoted by r_max,
+    # Then, the maximum distance of UTs from the BS, denoted by r_max,
     # is computed for each angle.
-    # Distance between UT - BS are then uniformly sampled from the range
-    # (r_min, r_max)
-    # Each UT is then randomly and uniformly pushed into a half of the sector
+    # For each angles, UT positions are sampled such that their *squared* from
+    # the BTS is uniformly sampled from the range (r_min**2, r_max**2)
+    # Each UT is then randomly and uniformly pushed to a half of the sector
     # by adding either PI/6 or PI/2 to the angle alpha_half
 
     # Sample angles for half of the sector (which half will be decided randomly)
-    alpha_half = tf.random.uniform(shape=[batch_size, num_ut],
-                                   minval=-PI/6.,
-                                   maxval=PI/6.,
-                                   dtype=real_dtype)
+    alpha_half = config.tf_rng.uniform(shape=[batch_size, num_ut],
+                                       minval=-PI/6.,
+                                       maxval=PI/6.,
+                                       dtype=real_dtype)
 
-    # Maximum distance from BS at this angle to be in the sector
-    r_max = r/tf.math.cos(alpha_half)
+    # Maximum distance (computed on the X-Y plane) from BS to a point in
+    # the sector, at each angle in alpha_half
+    r_max = r / tf.math.cos(alpha_half)
 
-    # Randomly sample distance for the UTs
-    distance = tf.random.uniform(shape=[batch_size, num_ut],
-                                 minval=r_min,
-                                 maxval=r_max,
-                                 dtype=real_dtype)
+    # To ensure the UT distribution to be uniformly distributed across the
+    # sector, we sample positions such that their *squared* distance from
+    # the BS is uniformly distributed within (r_min**2, r_max**2)
+    distance2 = config.tf_rng.uniform(shape=[batch_size, num_ut],
+                                      minval=r_min2,
+                                      maxval=r_max**2,
+                                      dtype=real_dtype)
+    distance = tf.sqrt(distance2)
 
     # Randomly assign the UTs to one of the two half of the sector
     side = sample_bernoulli([batch_size, num_ut],
                             tf.cast(0.5, real_dtype),
                             real_dtype)
     side = tf.cast(side, real_dtype)
-    side = 2.*side+1.
+    side = 2.*side + 1.
     alpha = alpha_half + side*PI/6.
 
-    # Set UT location in X-Y coordinate system
+    # Compute UT locations in the X-Y plane
     ut_loc = tf.stack([distance*tf.math.cos(alpha),
                        distance*tf.math.sin(alpha)], axis=-1)
 
@@ -923,50 +949,50 @@ def generate_uts_topology(  batch_size,
                                    num_ut,
                                    min_bs_ut_dist,
                                    isd,
-                                   dtype)
+                                   dtype=dtype)
     if drop_area == 'sector':
         sectors = tf.constant(0, tf.int32)
-    elif drop_area == 'cell':
-        sectors = tf.random.uniform(shape=[batch_size, num_ut],
-                                    minval=0,
-                                    maxval=3,
-                                    dtype=tf.int32)
+    else: # 'cell'
+        sectors = config.tf_rng.uniform(shape=[batch_size, num_ut],
+                                        minval=0,
+                                        maxval=3,
+                                        dtype=tf.int32)
     ut_loc_xy = relocate_uts(ut_loc_xy,
                              sectors,
                              cell_loc_xy)
 
-    ut_loc_z = tf.random.uniform(   shape=[batch_size, num_ut, 1],
-                                    minval=min_ut_height,
-                                    maxval=max_ut_height,
-                                    dtype=real_dtype)
-    ut_loc = tf.concat([    ut_loc_xy,
-                            ut_loc_z], axis=-1)
+    ut_loc_z = config.tf_rng.uniform(shape=[batch_size, num_ut, 1],
+                                     minval=min_ut_height,
+                                     maxval=max_ut_height,
+                                     dtype=real_dtype)
+    ut_loc = tf.concat([ut_loc_xy,
+                        ut_loc_z], axis=-1)
 
     # Randomly generating the UT indoor/outdoor state
-    in_state = sample_bernoulli(   [batch_size, num_ut], indoor_probability,
-                                    real_dtype)
+    in_state = sample_bernoulli([batch_size, num_ut], indoor_probability,
+                                real_dtype)
 
     # Randomly generate the UT velocities
-    ut_vel_angle = tf.random.uniform(   [batch_size, num_ut],
-                                        minval=-PI,
-                                        maxval=PI,
-                                        dtype=real_dtype)
-    ut_vel_norm = tf.random.uniform(    [batch_size, num_ut],
+    ut_vel_angle = config.tf_rng.uniform([batch_size, num_ut],
+                                         minval=-PI,
+                                         maxval=PI,
+                                         dtype=real_dtype)
+    ut_vel_norm = config.tf_rng.uniform([batch_size, num_ut],
                                         minval=min_ut_velocity,
                                         maxval=max_ut_velocity,
                                         dtype=real_dtype)
-    ut_velocities = tf.stack([  ut_vel_norm*tf.math.cos(ut_vel_angle),
-                                ut_vel_norm*tf.math.sin(ut_vel_angle),
-                                tf.zeros([batch_size, num_ut], real_dtype)],
-                                axis=-1)
+    ut_velocities = tf.stack([ut_vel_norm*tf.math.cos(ut_vel_angle),
+                              ut_vel_norm*tf.math.sin(ut_vel_angle),
+                              tf.zeros([batch_size, num_ut], real_dtype)],
+                             axis=-1)
 
     # Randomly generate the UT orientations
-    ut_bearing = tf.random.uniform( [batch_size, num_ut], minval=-0.5*PI,
-                                    maxval=0.5*PI, dtype=real_dtype)
-    ut_downtilt = tf.random.uniform(    [batch_size, num_ut], minval=-0.5*PI,
-                                        maxval=0.5*PI, dtype=real_dtype)
-    ut_slant = tf.random.uniform(   [batch_size, num_ut], minval=-0.5*PI,
-                                    maxval=0.5*PI, dtype=real_dtype)
+    ut_bearing = config.tf_rng.uniform([batch_size, num_ut], minval=-0.5*PI,
+                                maxval=0.5*PI, dtype=real_dtype)
+    ut_downtilt = config.tf_rng.uniform([batch_size, num_ut], minval=-0.5*PI,
+                                 maxval=0.5*PI, dtype=real_dtype)
+    ut_slant = config.tf_rng.uniform([batch_size, num_ut], minval=-0.5*PI,
+                              maxval=0.5*PI, dtype=real_dtype)
     ut_orientations = tf.stack([ut_bearing, ut_downtilt, ut_slant], axis=-1)
 
     return ut_loc, ut_orientations, ut_velocities, in_state
@@ -1308,7 +1334,7 @@ def gen_single_sector_topology_interferers( batch_size,
         Indoor/outdoor state of UTs. `True` means indoor, `False` means
         outdoor. The first ``num_ut`` items along the axis with
         index 1 correspond to the served UTs, whereas the remaining
-        ``num_interferer`` items correspond to the interfeering UTs.
+        ``num_interferer`` items correspond to the interfering UTs.
     """
 
     params = set_3gpp_scenario_parameters(  scenario,
@@ -1363,8 +1389,8 @@ def gen_single_sector_topology_interferers( batch_size,
                                   [isd*tf.math.cos(PI/6.0),
                                    isd*tf.math.sin(PI/6.0)]],
                                  axis=0)
-    cell_index = tf.random.uniform(shape=[batch_size, num_interferer],
-                                  minval=0, maxval=2, dtype=tf.int32)
+    cell_index = config.tf_rng.uniform(shape=[batch_size, num_interferer],
+                                minval=0, maxval=2, dtype=tf.int32)
     inter_cells = tf.gather(inter_cell_center, cell_index)
 
     inter_topology = generate_uts_topology(     batch_size,

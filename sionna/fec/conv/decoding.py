@@ -366,7 +366,7 @@ class ViterbiDecoder(Layer):
             # Sum of LLR*(sign of bit) for each symbol
             bm = tf.math.reduce_sum(llr_sign, axis=-1)
 
-        elif self._method == 'hard':
+        else: # method == 'hard'
             diffabs = tf.math.abs(y-op_mat)
             diffabs = tf.reshape(diffabs,
                                  (-1, self._no, self._num_syms, self._conv_n))

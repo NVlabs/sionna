@@ -2,31 +2,16 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import pytest
+import os
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 import json
-import scipy
 import numpy as np
 from sionna.nr import PUSCHConfig, PUSCHTransmitter
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 def run_test(test_name):
     # Load data
@@ -68,11 +53,12 @@ def run_test(test_name):
     x_grid = tf.transpose(x_grid[0,0], perm=[2,1,0])
     return np.allclose(tf.squeeze(x_grid), grid)
 
+@pytest.mark.usefixtures("only_gpu")
 class TestPUSCHTransmitter(unittest.TestCase):
     """Tests for PUSCHTransmitter"""
 
     def tests_against_reference(self):
         """Test PUSCHTransmitter output against reference"""
         for i in range(0,83):
-            test_name = f"unit/nr/pusch_test_configs/test_{i}"
+            test_name = script_dir+f"/pusch_test_configs/test_{i}"
             self.assertTrue(run_test(test_name))

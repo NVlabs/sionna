@@ -2,33 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("..")
-    import sionna
-
-import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-import itertools
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray
-from utils import *
+import sionna
+from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray, RIS
+from utils import r_hat, dot
 
 class TestCIR(unittest.TestCase):
 
@@ -86,7 +65,6 @@ class TestCIR(unittest.TestCase):
                                         a_theo = a[0]*np.exp(1j*2*np.pi*(f_t+f_r)*t)
                                         self.assertTrue(np.allclose(a, a_theo, atol=1e-6))
 
-
     def test_doppler_synthetic_array(self):
         """Test that Doppler shifts are correctly applied to all paths for a synthetic array"""
         dtype = tf.complex128
@@ -139,7 +117,6 @@ class TestCIR(unittest.TestCase):
                                         f_r = dot(r_hat_r, np.squeeze(v_rx))/scene.wavelength.numpy()
                                         a_theo = a[0]*np.exp(1j*2*np.pi*(f_t+f_r)*t)
                                         self.assertTrue(np.allclose(a, a_theo, atol=1e-6))
-
 
     def test_pad_or_crop_synthetic_array(self):
         """Test padding and cropping of CIR"""
@@ -228,3 +205,80 @@ class TestCIR(unittest.TestCase):
         tau_test = np.take_along_axis(tau.numpy(), ind, axis=-1)
         self.assertTrue(np.allclose(a_test, a_crop))
         self.assertTrue(np.allclose(tau_test, tau_crop))
+
+    def test_ris(self):
+        # Tests that shapes of impulse response match the desired results
+        scene = load_scene(sionna.rt.scene.simple_street_canyon)
+        scene.frequency = 3e9 
+        scene.tx_array = PlanarArray(3,1,0.5,0.5,"iso", "V")
+        scene.rx_array = PlanarArray(1,4,0.5,0.5,"iso", "V")
+        tx1 = Transmitter("tx1", position=[-32,10,32], look_at=[0,0,0])
+        scene.add(tx1)
+        tx2 = Transmitter("tx2", position=[-32,10,33], look_at=[0,0,0])
+        scene.add(tx2)
+        rx1 = Receiver("rx1", position=[22,52,1.7])
+        scene.add(rx1)
+        rx2 = Receiver("rx2", position=[22,52,2.2])
+        scene.add(rx2)
+
+        ris1 = RIS(name="ris1",
+                position=[32,-9,32],
+                num_rows=100,
+                num_cols=100,
+                num_modes=2,
+                look_at=(tx1.position+rx1.position)/2) # Look in between TX and RX
+        scene.add(ris1)
+
+        ris2 = RIS(name="ris2",
+                position=[32,-9,33],
+                num_rows=5,
+                num_cols=5,
+                num_modes=1,
+                look_at=(tx2.position+rx2.position)/2) # Look in between TX and RX
+        scene.add(ris2)
+
+        ris1.phase_gradient_reflector([tx1.position, tx2.position],
+                                     [rx1.position, rx2.position])
+        ris2.phase_gradient_reflector(tx2.position, rx2.position)
+
+        # Test with non-synthetic array
+        scene.synthetic_array = False
+        paths = scene.compute_paths(max_depth=1, num_samples=1e6, scattering=False,
+                                    ris=True, los=False, reflection=False, diffraction=False)
+        paths.apply_doppler(100e6, 7, [10,0,0], [0,10,0])
+        paths.normalize_delays = False
+
+        # Non clustering of RIS paths
+        a, tau = paths.cir(cluster_ris_paths=False)
+        a_target_shape = [1, 2, 4, 2, 3, 10025, 7]
+        tau_target_shape = [1, 2, 4, 2, 3, 10025]
+        self.assertTrue(np.array_equal(a_target_shape, a.shape))
+        self.assertTrue(np.array_equal(tau_target_shape, tau.shape))
+
+        # Clustering of RIS paths
+        a, tau = paths.cir(cluster_ris_paths=True)
+        a_target_shape = [1, 2, 4, 2, 3, 2, 7]
+        tau_target_shape = [1, 2, 4, 2, 3, 2]
+        self.assertTrue(np.array_equal(a_target_shape, a.shape))
+        self.assertTrue(np.array_equal(tau_target_shape, tau.shape))
+
+        # Test with synthetic array
+        scene.synthetic_array = True
+        paths = scene.compute_paths(max_depth=1, num_samples=1e6, scattering=False,
+                                    ris=True, los=False, reflection=False, diffraction=False)
+        paths.apply_doppler(100e6, 7, [10,0,0], [0,10,0])
+        paths.normalize_delays = False
+
+        # Non clustering of RIS paths
+        a, tau = paths.cir(cluster_ris_paths=False)
+        a_target_shape = [1, 2, 4, 2, 3, 10025, 7]
+        tau_target_shape = [1, 2, 2, 10025]
+        self.assertTrue(np.array_equal(a_target_shape, a.shape))
+        self.assertTrue(np.array_equal(tau_target_shape, tau.shape))
+
+        # Clustering of RIS paths
+        a, tau = paths.cir(cluster_ris_paths=True)
+        a_target_shape = [1, 2, 4, 2, 3, 2, 7]
+        tau_target_shape = [1, 2, 2, 2]
+        self.assertTrue(np.array_equal(a_target_shape, a.shape))
+        self.assertTrue(np.array_equal(tau_target_shape, tau.shape))

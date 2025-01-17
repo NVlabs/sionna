@@ -135,9 +135,8 @@ class SolverBase:
         # This list tracks the indices offsets for accessing the triangles
         # making each shape.
         prim_offsets = []
-        objects_id = dr.reinterpret_array_v(mi.UInt32,
-                                            mi_scene.shapes_dr()).tf()
-        for i,s in zip(objects_id, mi_scene.shapes()):
+        mi_shapes = scene.mi_shapes
+        for i,s in enumerate(mi_shapes):
             if not isinstance(s, mi.Mesh):
                 raise ValueError('Only triangle meshes are supported')
             prim_offsets.append(n_prims)
@@ -152,7 +151,7 @@ class SolverBase:
         # Normals to the triangles
         normals = tf.zeros([n_prims, 3], self._rdtype)
         # Loop through the objects in the scene
-        for prim_offset, s in zip(prim_offsets, mi_scene.shapes()):
+        for prim_offset, s in zip(prim_offsets, mi_shapes):
             # Extract the vertices of the shape.
             # Dr.JIT/Mitsuba is used here.
             # Indices of the vertices
@@ -214,14 +213,16 @@ class SolverBase:
 
         # [num_objects]
         self._prim_offsets = mi.Int32(prim_offsets.numpy())
-        dest = dr.reinterpret_array_v(mi.UInt32, mi_scene.shapes_dr())
-        if dr.width(dest) == 0:
+        mi_shapes_ptr = [mi.ShapePtr(s) for s in mi_shapes]
+        ptr_as_int = [dr.reinterpret_array_v(mi.UInt32, p)[0] for p in mi_shapes_ptr]
+        ptr_as_int = mi.UInt(ptr_as_int)
+        if dr.width(ptr_as_int) == 0:
             self._shape_indices = mi.Int32([])
         else:
             # [num_objects]
-            shape_indices = dr.full(mi.Int32, -1, dr.max(dest)[0] + 1)
+            shape_indices = dr.full(mi.Int32, -1, dr.max(ptr_as_int)[0] + 1)
             dr.scatter(shape_indices, dr.arange(mi.Int32, 0,
-                       dr.width(dest)), dest)
+                       dr.width(ptr_as_int)), ptr_as_int)
             dr.eval(shape_indices)
             # [num_objects]
             self._shape_indices = shape_indices
@@ -380,13 +381,13 @@ class SolverBase:
             Tensor containing the velocity vectors of all shapes
         """
 
-        objects_id = dr.reinterpret_array_v(mi.UInt32,
-                                            self._mi_scene.shapes_dr()).tf()
-
-        # Compute the size of the parameter tensors for all object_ids
-        # We start indexing at 1 (not 0) and need to add the number of
-        # RIS is the system
-        array_size  = tf.reduce_max(objects_id) + 1 + len(self._scene.ris)
+        # Compute the size of the tensors that store the properties of all
+        # objects and RIS
+        objects_id = [obj.object_id for obj in self._scene.objects.values()]
+        max_id = 0
+        if len(objects_id) > 0:
+            max_id = tf.reduce_max(objects_id)
+        array_size = max_id + 1 + len(self._scene.ris)
 
         # If a callable is set to obtain radio material properties, then there
         # is no need to build the tensors of material properties
@@ -464,11 +465,11 @@ class SolverBase:
         for obj in self._scene.objects.values():
             velocity = tf.tensor_scatter_nd_update(velocity,
                                                     [[obj.object_id]],
-                                                    [obj.velocity])
+                                                     [obj.velocity])
         for obj in self._scene.ris.values():
             velocity = tf.tensor_scatter_nd_update(velocity,
                                                     [[obj.object_id]],
-                                                    [obj.velocity])
+                                                     [obj.velocity])
 
         return (relative_permittivity,
                scattering_coefficient,
@@ -494,8 +495,8 @@ class SolverBase:
         maxt: [batch_size], tf.float
             Length of the ray
 
-        additional_blockers : mi.Scene | mi.Shape | None
-            Optional Mitsuba scene or shape containing additional blockers.
+        additional_blockers : list(mi.Shape) | None
+            Optional list of Mitsuba shapes containing additional blockers.
             Defaults to `None`.
 
         Output
@@ -528,8 +529,9 @@ class SolverBase:
         val = mi_to_tf_tensor(mi_val, tf.bool)
         # With additional blockers
         if additional_blockers:
-            mi_val = additional_blockers.ray_test(mi_ray)
-            val = tf.logical_or(val, mi_to_tf_tensor(mi_val, tf.bool))
+            for shape in additional_blockers:
+                mi_val = shape.ray_test(mi_ray)
+                val = tf.logical_or(val, mi_to_tf_tensor(mi_val, tf.bool))
         return val
 
     def _extract_wedges(self):
@@ -931,23 +933,69 @@ class SolverBase:
 
         Output
         ------
-        : mi.Scene
-            Mitsuba Scene containing rectangles corresponding to RIS
+        : list(mi.Rectangle)
+            List of Mitsuba rectangles implementing the RIS
+
+        : mi.UInt
+            RIS indices
         """
         # List of all the RIS objects in the scene
         all_ris = list(self._scene.ris.values())
+        num_ris = len(all_ris)
 
         # Creates a scene containing RIS as rectangles
-        scene_dict = {"type": "scene"}
-        for ris in all_ris:
+        mi_ris_objects = []
+        ris_indices = dr.zeros(mi.ShapePtr, num_ris)
+        for i, ris in enumerate(all_ris):
             center = ris.position
             orientation = ris.orientation
             size = ris.size
             mi_to_world = mitsuba_rectangle_to_world(center, orientation, size,
                                                      ris=True)
-            scene_dict[ris.name] = {"type"     : "rectangle",
-                                    "to_world" : mi_to_world
-                                   }
-        mi_ris_scene = mi.load_dict(scene_dict)
+            ris_rect = mi.load_dict({   "type"     : "rectangle",
+                                        "to_world" : mi_to_world
+                                    })
+            mi_ris_objects.append(ris_rect)
+            dr.scatter(ris_indices, mi.ShapePtr(ris_rect), i)
+        ris_indices = dr.reinterpret_array_v(mi.UInt32, ris_indices)
 
-        return mi_ris_scene
+        return mi_ris_objects, ris_indices
+
+    def _ris_intersect(self, ris_objects, ray, active):
+        r"""
+        Test the intersection with the RIS
+
+        Input
+        ------
+        ris_objects : list(mi.Rectangle)
+            List of Mitsuba rectangles implementing the RIS
+
+        Output
+        -------
+        valid : mi.Bool
+            Mask indicating if the intersection is valid
+
+        t : mi.Float
+            Position of the intersection on the ray
+
+        indices : mi.UInt32
+            Indices of the intersected RIS
+        """
+
+        num_rays = dr.shape(ray.d)[1]
+        t = dr.full(mi.Float, float('inf'), num_rays)
+        valid = dr.full(mi.Bool, False, num_rays)
+        indices = dr.full(mi.UInt, 0, num_rays)
+        for ris in ris_objects:
+            si_ris = ris.ray_intersect(ray, active=active)
+            v_ = si_ris.is_valid()
+            t_ = si_ris.t
+            indices_ = dr.reinterpret_array_v(mi.UInt32, si_ris.shape)
+
+            valid |= v_
+            new_closest = v_ & (t_ < t)
+
+            t = dr.select(new_closest, t_, t)
+            indices = dr.select(new_closest, indices_, indices)
+
+        return valid, t, indices

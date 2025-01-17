@@ -2,34 +2,18 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-
-from sionna.utils.tensors import matrix_inv
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 import sionna
+from sionna import config
 from sionna.mimo.utils import complex2real_vector, real2complex_vector
 from sionna.mimo.utils import complex2real_matrix, real2complex_matrix
 from sionna.mimo.utils import complex2real_covariance, real2complex_covariance
-from sionna.mimo.utils import complex2real_channel, real2complex_channel, whiten_channel
+from sionna.mimo.utils import complex2real_channel, whiten_channel
 from sionna.utils import matrix_pinv
-from sionna.utils import matrix_sqrt, complex_normal, matrix_inv
+from sionna.utils import matrix_sqrt, complex_normal
 from sionna.channel.utils import exp_corr_mat
 from sionna.utils import QAMSource
 
@@ -44,7 +28,7 @@ class Complex2Real(unittest.TestCase):
                   [30,20,40]
                  ]
         for shape in shapes:
-            z = tf.random.uniform(shape)
+            z = config.tf_rng.uniform(shape)
             x = tf.math.real(z)
             y = tf.math.imag(z)
 
@@ -68,7 +52,7 @@ class Complex2Real(unittest.TestCase):
                   [12, 45, 64, 42]
                  ]
         for shape in shapes:
-            h = tf.random.uniform(shape)
+            h = config.tf_rng.uniform(shape)
             h_r = tf.math.real(h)
             h_i = tf.math.imag(h)
 
@@ -92,7 +76,7 @@ class Complex2Real(unittest.TestCase):
                  ]
         for shape in batch_dims:
             for n in ns:
-                a = tf.random.uniform(shape,minval=0, maxval=1)
+                a = config.tf_rng.uniform(shape,minval=0, maxval=1)
                 r = exp_corr_mat(a, n)
                 r_r = tf.math.real(r)/2
                 r_i = tf.math.imag(r)/2
@@ -131,6 +115,7 @@ class Complex2Real(unittest.TestCase):
 
         self.assertTrue(np.max(np.abs(rr-r_hat))<1e-3)
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_whiten_channel_noise_covariance(self):
         # Generate channel outputs
         num_rx = 16
@@ -186,6 +171,7 @@ class Complex2Real(unittest.TestCase):
         self.assertTrue(np.max(np.abs(err_rw))<1e-3)
         self.assertTrue(np.max(np.abs(err_wr))<1e-3)
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_whiten_channel_symbol_recovery(self):
         """Check that the whitened channel can be used to receover the symbols"""
         # Generate channel outputs

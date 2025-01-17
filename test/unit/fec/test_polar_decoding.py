@@ -2,26 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 
+import os
 import unittest
 import pytest # for pytest filterwarnings
 import numpy as np
+import tensorflow as tf
 
 from sionna.fec.polar.encoding import PolarEncoder, Polar5GEncoder
 from sionna.fec.polar.decoding import PolarSCDecoder, PolarSCLDecoder, PolarBPDecoder
@@ -32,6 +18,9 @@ from sionna.utils import BinarySource
 from sionna.fec.polar.utils import generate_5g_ranking
 from sionna.channel import AWGN
 from sionna.mapping import Mapper, Demapper
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 class TestPolarDecodingSC(unittest.TestCase):
 
@@ -244,7 +233,7 @@ class TestPolarDecodingSC(unittest.TestCase):
         """Test against pre-calculated results from internal implementation.
         """
 
-        ref_path = '../test/codes/polar/'
+        ref_path = test_dir + '/codes/polar/'
         filename = ["P_128_37", "P_128_110", "P_256_128"]
 
         for f in filename:
@@ -331,6 +320,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
 
     # Filter warnings related to large resource allocation
     @pytest.mark.filterwarnings("ignore: Required resource allocation")
+    @pytest.mark.usefixtures("only_gpu")
     def test_output_dim(self):
         """Test that output dims are correct (=n) and output is the all-zero
          codeword."""
@@ -536,6 +526,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
         # both version should yield same result
         self.assertTrue(np.array_equal(c, c_res))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
         """
@@ -563,6 +554,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
                     for i in range(bs):
                         self.assertTrue(np.array_equal(c[0,:,:], c[i,:,:]))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_tf_fun(self):
         """Test that graph mode works and XLA is supported."""
 
@@ -611,6 +603,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
 
     # Filter warnings related to large ressource allocation
     @pytest.mark.filterwarnings("ignore: Required ressource allocation")
+    @pytest.mark.usefixtures("only_gpu")
     def test_ref_implementation(self):
         """Test against pre-calculated results from internal implementation.
 
@@ -619,7 +612,7 @@ class TestPolarDecodingSCL(unittest.TestCase):
         Remark: results are for SC only, i.e., list_size=1.
         """
 
-        ref_path = '../test/codes/polar/'
+        ref_path = test_dir + '/codes/polar/'
         filename = ["P_128_37", "P_128_110", "P_256_128"]
 
         for f in filename:
@@ -921,7 +914,7 @@ class TestPolarDecodingBP(unittest.TestCase):
             # all values are finite (not nan and not inf)
             self.assertTrue(np.sum(np.abs(1 - np.isfinite(c)))==0)
 
-
+    @pytest.mark.usefixtures("only_gpu")
     def test_tf_fun(self):
         """Test that graph mode works and XLA is supported."""
 
@@ -961,6 +954,7 @@ class TestPolarDecodingBP(unittest.TestCase):
         #u = source([bs+1, n])
         #x = run_graph_xla(u).numpy()
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_ref_implementation(self):
         """Test against Numpy reference implementation.
 
@@ -1231,6 +1225,7 @@ class TestPolarDecoding5G(unittest.TestCase):
             for i in range(bs):
                 self.assertTrue(np.array_equal(c[0,:,:], c[i,:,:]))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_tf_fun(self):
         """Test that tf.function decorator works
         include xla compiler test."""

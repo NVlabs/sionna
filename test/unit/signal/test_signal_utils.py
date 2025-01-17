@@ -2,26 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-from numpy.lib.npyio import load
 
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
 from sionna.signal import convolve
 
 class TestConvolve(unittest.TestCase):
@@ -44,19 +29,19 @@ class TestConvolve(unittest.TestCase):
                 inp_dtype = dtypes[0]
                 ker_dtype = dtypes[1]
                 if inp_dtype.is_complex:
-                    inp = tf.complex(tf.random.uniform([64, 100],
+                    inp = tf.complex(config.tf_rng.uniform([64, 100],
                                         dtype=inp_dtype.real_dtype),
-                                     tf.random.uniform([64, 100],
+                                     config.tf_rng.uniform([64, 100],
                                         dtype=inp_dtype.real_dtype))
                 else:
-                    inp = tf.random.uniform([64, 100], dtype=inp_dtype)
+                    inp = config.tf_rng.uniform([64, 100], dtype=inp_dtype)
                 if ker_dtype.is_complex:
-                    ker = tf.complex(tf.random.uniform([10],
+                    ker = tf.complex(config.tf_rng.uniform([10],
                                         dtype=ker_dtype.real_dtype),
-                                     tf.random.uniform([10],
+                                     config.tf_rng.uniform([10],
                                         dtype=ker_dtype.real_dtype))
                 else:
-                    ker = tf.random.uniform([10], dtype=ker_dtype)
+                    ker = config.tf_rng.uniform([10], dtype=ker_dtype)
                 out = convolve(inp, ker, padding)
                 self.assertEqual(out.dtype, expected_type[dtypes])
 
@@ -68,8 +53,8 @@ class TestConvolve(unittest.TestCase):
         #######################################
         input_shape = [64, 16, 24, 100]
         kernel_length = 8
-        inp = tf.random.uniform(input_shape, dtype=tf.float32)
-        ker = tf.random.uniform([kernel_length], dtype=tf.float32)
+        inp = config.tf_rng.uniform(input_shape, dtype=tf.float32)
+        ker = config.tf_rng.uniform([kernel_length], dtype=tf.float32)
         #########################
         # 'valid' padding
         #########################
@@ -93,8 +78,8 @@ class TestConvolve(unittest.TestCase):
         #######################################
         input_shape = [64, 16, 24, 100]
         kernel_length = 5
-        inp = tf.random.uniform(input_shape, dtype=tf.float32)
-        ker = tf.random.uniform([kernel_length], dtype=tf.float32)
+        inp = config.tf_rng.uniform(input_shape, dtype=tf.float32)
+        ker = config.tf_rng.uniform([kernel_length], dtype=tf.float32)
         #########################
         # 'valid' padding
         #########################
@@ -128,20 +113,20 @@ class TestConvolve(unittest.TestCase):
                     inp_dtype = dtypes[0]
                     ker_dtype = dtypes[1]
                     if inp_dtype.is_complex:
-                        inp = tf.complex(tf.random.uniform([1, input_length],
+                        inp = tf.complex(config.tf_rng.uniform([1, input_length],
                                             dtype=inp_dtype.real_dtype),
-                                         tf.random.uniform([1, input_length],
+                                         config.tf_rng.uniform([1, input_length],
                                             dtype=inp_dtype.real_dtype))
                     else:
-                        inp = tf.random.uniform([1, input_length],
+                        inp = config.tf_rng.uniform([1, input_length],
                                                 dtype=inp_dtype)
                     if ker_dtype.is_complex:
-                        ker = tf.complex(tf.random.uniform([kernel_size],
+                        ker = tf.complex(config.tf_rng.uniform([kernel_size],
                                             dtype=ker_dtype.real_dtype),
-                                         tf.random.uniform([kernel_size],
+                                         config.tf_rng.uniform([kernel_size],
                                             dtype=ker_dtype.real_dtype))
                     else:
-                        ker = tf.random.uniform([kernel_size], dtype=ker_dtype)
+                        ker = config.tf_rng.uniform([kernel_size], dtype=ker_dtype)
                     #
                     out = convolve(inp, ker, padding)
                     out_ref = np.convolve(inp.numpy()[0], ker.numpy(),

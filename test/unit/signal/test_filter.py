@@ -2,26 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-from numpy.lib.npyio import load
 
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
 from sionna.signal import CustomFilter, CustomWindow
 
 
@@ -50,12 +35,12 @@ class TestFilter(unittest.TestCase):
                 inp_dtype = dtypes[0]
                 fil_dtype = dtypes[1]
                 if inp_dtype.is_complex:
-                    inp = tf.complex(tf.random.uniform([batch_size, inp_length],
+                    inp = tf.complex(config.tf_rng.uniform([batch_size, inp_length],
                                         dtype=inp_dtype.real_dtype),
-                                     tf.random.uniform([batch_size, inp_length],
+                                     config.tf_rng.uniform([batch_size, inp_length],
                                         dtype=inp_dtype.real_dtype))
                 else:
-                    inp = tf.random.uniform([batch_size, inp_length], dtype=inp_dtype)
+                    inp = config.tf_rng.uniform([batch_size, inp_length], dtype=inp_dtype)
                 #########################
                 # No windowing
                 filt = CustomFilter(span_in_symbols, samples_per_symbol, dtype=fil_dtype)
@@ -72,7 +57,7 @@ class TestFilter(unittest.TestCase):
     def test_shape(self):
         """Test the output shape"""
         input_shape = [16, 8, 24, 1000]
-        inp = tf.random.uniform(input_shape, dtype=tf.float32)
+        inp = config.tf_rng.uniform(input_shape, dtype=tf.float32)
 
         for span_in_symbols in (7, 8):
             for samples_per_symbol in (1, 3, 4):
@@ -117,25 +102,25 @@ class TestFilter(unittest.TestCase):
                     filter_length = span_in_symbols*samples_per_symbol
                     if (filter_length % 2) == 0:
                         filter_length = filter_length + 1
-                    win_coeff = tf.random.normal([filter_length], dtype=tf.float64)
+                    win_coeff = config.tf_rng.normal([filter_length], dtype=tf.float64)
                     window = CustomWindow(length=filter_length, coefficients=win_coeff, dtype=tf.float64)
                     for win in (None, window):
                         for padding in ('valid', 'same', 'full'):
                             if inp_dtype.is_complex:
-                                inp = tf.complex(tf.random.uniform([1, input_length],
+                                inp = tf.complex(config.tf_rng.uniform([1, input_length],
                                                     dtype=inp_dtype.real_dtype),
-                                                tf.random.uniform([1, input_length],
+                                                config.tf_rng.uniform([1, input_length],
                                                     dtype=inp_dtype.real_dtype))
                             else:
-                                inp = tf.random.uniform([1, input_length],
+                                inp = config.tf_rng.uniform([1, input_length],
                                                         dtype=inp_dtype)
                             if fil_dtype.is_complex:
-                                fil_coeff = tf.complex(  tf.random.uniform([filter_length],
+                                fil_coeff = tf.complex(  config.tf_rng.uniform([filter_length],
                                                             dtype=fil_dtype.real_dtype),
-                                                        tf.random.uniform([filter_length],
+                                                        config.tf_rng.uniform([filter_length],
                                                             dtype=fil_dtype.real_dtype))
                             else:
-                                fil_coeff = tf.random.uniform([filter_length], dtype=fil_dtype)
+                                fil_coeff = config.tf_rng.uniform([filter_length], dtype=fil_dtype)
                             filt = CustomFilter(span_in_symbols, samples_per_symbol, coefficients=fil_coeff, window=win, normalize=False, dtype=fil_dtype)
                             # No conjugate
                             out = filt(inp, padding, conjugate=False)
@@ -157,12 +142,12 @@ class TestFilter(unittest.TestCase):
         filter_length = samples_per_symbol*span_in_symbols+1
         for fil_dtype in (tf.float64, tf.complex128):
             if fil_dtype.is_complex:
-                fil_coeff = tf.complex(  tf.random.uniform([filter_length],
+                fil_coeff = tf.complex(  config.tf_rng.uniform([filter_length],
                                             dtype=fil_dtype.real_dtype),
-                                         tf.random.uniform([filter_length],
+                                         config.tf_rng.uniform([filter_length],
                                             dtype=fil_dtype.real_dtype))
             else:
-                fil_coeff = tf.random.uniform([filter_length], dtype=fil_dtype)
+                fil_coeff = config.tf_rng.uniform([filter_length], dtype=fil_dtype)
             filt = CustomFilter(span_in_symbols, samples_per_symbol, coefficients=fil_coeff, window=None, normalize=True, dtype=fil_dtype)
             norm_fil_coeff_ref = fil_coeff/tf.cast(tf.sqrt(tf.reduce_sum(tf.square(tf.abs(fil_coeff)))), fil_dtype)
             max_err = np.max(np.abs(norm_fil_coeff_ref.numpy() - filt.coefficients.numpy()))
@@ -176,17 +161,17 @@ class TestFilter(unittest.TestCase):
         filter_length = samples_per_symbol*span_in_symbols+1
         input_length = 1024
         for fil_dtype in (tf.float64, tf.complex128):
-            inp = tf.complex(tf.random.uniform([batch_size, input_length],
+            inp = tf.complex(config.tf_rng.uniform([batch_size, input_length],
                                 dtype=fil_dtype.real_dtype),
-                             tf.random.uniform([batch_size, input_length],
+                             config.tf_rng.uniform([batch_size, input_length],
                                 dtype=fil_dtype.real_dtype))
             if fil_dtype.is_complex:
-                fil_coeff = tf.complex(  tf.random.uniform([filter_length],
+                fil_coeff = tf.complex(  config.tf_rng.uniform([filter_length],
                                             dtype=fil_dtype.real_dtype),
-                                         tf.random.uniform([filter_length],
+                                         config.tf_rng.uniform([filter_length],
                                             dtype=fil_dtype.real_dtype))
             else:
-                fil_coeff = tf.random.uniform([filter_length], dtype=fil_dtype)
+                fil_coeff = config.tf_rng.uniform([filter_length], dtype=fil_dtype)
             #########################
             # Trainable on
             filt = CustomFilter(span_in_symbols, samples_per_symbol, coefficients=fil_coeff, window=None, trainable=True, dtype=fil_dtype)
@@ -218,17 +203,17 @@ class TestFilter(unittest.TestCase):
         filter_length = samples_per_symbol*span_in_symbols+1
         input_length = 1024
         for fil_dtype in (tf.float64, tf.complex128):
-            inp = tf.complex(tf.random.uniform([batch_size, input_length],
+            inp = tf.complex(config.tf_rng.uniform([batch_size, input_length],
                                 dtype=fil_dtype.real_dtype),
-                             tf.random.uniform([batch_size, input_length],
+                             config.tf_rng.uniform([batch_size, input_length],
                                 dtype=fil_dtype.real_dtype))
             if fil_dtype.is_complex:
-                fil_coeff = tf.complex(  tf.random.uniform([filter_length],
+                fil_coeff = tf.complex(  config.tf_rng.uniform([filter_length],
                                             dtype=fil_dtype.real_dtype),
-                                         tf.random.uniform([filter_length],
+                                         config.tf_rng.uniform([filter_length],
                                             dtype=fil_dtype.real_dtype))
             else:
-                fil_coeff = tf.random.uniform([filter_length], dtype=fil_dtype)
+                fil_coeff = config.tf_rng.uniform([filter_length], dtype=fil_dtype)
             #########################
             # Trainable on
             filt = CustomFilter(span_in_symbols, samples_per_symbol, coefficients=fil_coeff, window=None, trainable=True, dtype=fil_dtype)

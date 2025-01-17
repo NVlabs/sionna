@@ -69,7 +69,7 @@ html_theme_options = {
     'collapse_navigation': False,
     'sticky_navigation': False,
     'display_version': True,
-     'navigation_depth': 5,
+     'navigation_depth': 4,
     }
 html_show_sourcelink = False
 pygments_style = "default"

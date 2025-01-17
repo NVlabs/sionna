@@ -2,29 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-import sionna
 import unittest
 import numpy as np
 from sionna.channel.tr38901 import CDL, PanelArray
 from channel_test_utils import *
-
 
 class TestCDL(unittest.TestCase):
     r"""Test the 3GPP CDL channel model
@@ -49,10 +31,6 @@ class TestCDL(unittest.TestCase):
     MAX_ERR_REL = 1e-2
 
     def setUpClass():
-
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Dict for storing the samples
         TestCDL.powers = {}

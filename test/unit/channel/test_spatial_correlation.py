@@ -2,32 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
-from sionna.channel import exp_corr_mat, one_ring_corr_mat, KroneckerModel, PerColumnModel
-from sionna.utils import complex_normal, matrix_sqrt
-
-import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-
-from sionna.utils.tensors import matrix_sqrt
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
+from sionna.channel import exp_corr_mat, one_ring_corr_mat, KroneckerModel, PerColumnModel
+from sionna.utils import complex_normal, matrix_sqrt
 
 class TestKroneckerModel(unittest.TestCase):
     """Unittest for the KroneckerModel"""
@@ -65,7 +45,7 @@ class TestKroneckerModel(unittest.TestCase):
         K = 4
         dtype = tf.complex128
         batch_size = 128
-        r_tx = exp_corr_mat(np.random.uniform(size=[batch_size]), K, dtype)
+        r_tx = exp_corr_mat(config.np_rng.uniform(size=[batch_size]), K, dtype)
         r_rx = exp_corr_mat(0.99, M, dtype)
         kron = KroneckerModel(r_tx, r_rx)
         h = complex_normal([batch_size, M, K], dtype=dtype)
@@ -81,7 +61,7 @@ class TestKroneckerModel(unittest.TestCase):
         dtype = tf.complex128
         batch_size = 10
         r_tx = exp_corr_mat(0.4, K, dtype)
-        r_rx = exp_corr_mat(np.random.uniform(size=[batch_size]), M, dtype)
+        r_rx = exp_corr_mat(config.np_rng.uniform(size=[batch_size]), M, dtype)
         kron = KroneckerModel(r_tx, r_rx)
         h = complex_normal([batch_size, M, K], dtype=dtype)
         h_corr = kron(h)
@@ -95,8 +75,8 @@ class TestKroneckerModel(unittest.TestCase):
         K = 4
         dtype = tf.complex128
         batch_size = 10
-        r_tx = exp_corr_mat(np.random.uniform(size=[batch_size]), K, dtype)
-        r_rx = exp_corr_mat(np.random.uniform(size=[batch_size]), M, dtype)
+        r_tx = exp_corr_mat(config.np_rng.uniform(size=[batch_size]), K, dtype)
+        r_rx = exp_corr_mat(config.np_rng.uniform(size=[batch_size]), M, dtype)
         kron = KroneckerModel(r_tx, r_rx)
         h = complex_normal([batch_size, M, K], dtype=dtype)
         h_corr = kron(h)
@@ -110,8 +90,8 @@ class TestKroneckerModel(unittest.TestCase):
         K = 4
         dtype = tf.complex128
         batch_size = 10
-        r_tx = exp_corr_mat(np.random.uniform(size=[batch_size]), K, dtype)
-        r_rx = exp_corr_mat(np.random.uniform(size=[batch_size]), M, dtype)
+        r_tx = exp_corr_mat(config.np_rng.uniform(size=[batch_size]), K, dtype)
+        r_rx = exp_corr_mat(config.np_rng.uniform(size=[batch_size]), M, dtype)
         kron = KroneckerModel(r_tx, r_rx)
         h = complex_normal([M, K], dtype=dtype)
         h_corr = kron(h)
@@ -171,7 +151,7 @@ class TestPerColumnModel(unittest.TestCase):
         K = 4
         dtype = tf.complex64
         batch_size = 24
-        r_rx = one_ring_corr_mat(np.random.uniform(size=[batch_size, K]), M, dtype=dtype)
+        r_rx = one_ring_corr_mat(config.np_rng.uniform(size=[batch_size, K]), M, dtype=dtype)
         onering = PerColumnModel(r_rx)
 
         @tf.function()
@@ -196,12 +176,12 @@ class TestPerColumnModel(unittest.TestCase):
         @tf.function()
         def func():
             h = complex_normal([batch_size, M, K], dtype=dtype)
-            r_rx = one_ring_corr_mat(tf.random.uniform([batch_size, K], -90, 90), M, dtype=dtype)
+            r_rx = one_ring_corr_mat(config.tf_rng.uniform([batch_size, K], -90, 90), M, dtype=dtype)
             onering.r_rx = r_rx
             h_corr = onering(h)
             return h, h_corr, r_rx
 
-        tf.random.set_seed(1)
+
         h, h_corr, r_rx = func()
         for i in range(batch_size):
             for k in range(K):

@@ -18,8 +18,8 @@ from .utils import paths_to_segments, scene_scale, mitsuba_rectangle_to_world
 
 def render(scene, camera, paths, show_paths, show_devices, num_samples,
            resolution, fov,
-           coverage_map=None, cm_tx=0, cm_db_scale=True,
-           cm_vmin=None, cm_vmax=None):
+           coverage_map=None, cm_tx=None, cm_db_scale=True,
+           cm_vmin=None, cm_vmax=None, cm_metric="path_gain"):
     r"""
     Renders two images with path tracing:
     1. Base scene with the meshes
@@ -50,11 +50,12 @@ def render(scene, camera, paths, show_paths, show_devices, num_samples,
         An optional coverage map to overlay in the scene for visualization.
         Defaults to `None`.
 
-    cm_tx : int | str
+    cm_tx : int | str | None
         When `coverage_map` is specified, controls which of the transmitters
         to display the coverage map for. Either the transmitter's name
-        or index can be given.
-        Defaults to `0`.
+        or index can be given. If `None`, the maximum metric over all
+        transmitters is shown.
+        Defaults to `None`.
 
     cm_db_scale: bool
         Use logarithmic scale for coverage map visualization, i.e. the
@@ -67,6 +68,10 @@ def render(scene, camera, paths, show_paths, show_devices, num_samples,
         the colormap covers.
         If set to None, then covers the complete range.
         Defaults to `None`.
+
+    cm_metric : str, one of ["path_gain", "rss", "sinr"]
+        Metric of the coverage map to be displayed.
+        Defaults to `path_gain`.
 
     num_samples : int
         Number of rays thrown per pixel.
@@ -102,7 +107,7 @@ def render(scene, camera, paths, show_paths, show_devices, num_samples,
         if coverage_map is not None:
             coverage_map = _coverage_map_to_textured_rectangle(
                 coverage_map, tx=cm_tx, db_scale=cm_db_scale,
-                vmin=cm_vmin, vmax=cm_vmax,
+                vmin=cm_vmin, vmax=cm_vmax, cm_metric=cm_metric,
                 viewpoint=sensor.world_transform().translation())
 
         s2 = results_to_mitsuba_scene(scene, paths=paths,
@@ -347,12 +352,19 @@ def results_to_mitsuba_scene(scene, paths, show_paths, show_devices,
 
 def _coverage_map_to_textured_rectangle(coverage_map, tx=0, db_scale=True,
                                         vmin=None, vmax=None,
+                                        cm_metric="path_gain",
                                         viewpoint=None):
     to_world = coverage_map.to_world()
     # Resample values from cell centers to cell corners
-    coverage_map = resample_to_corners(
-        coverage_map[tx, :, :].numpy().squeeze()
-    )
+    cm = getattr(coverage_map, cm_metric).numpy()
+    if tx is None:
+        cm = np.max(cm, axis=0)
+    else:
+        cm = cm[tx]
+    # Ensure that dBm is correctly computed for RSS
+    if cm_metric=="rss" and db_scale:
+        cm *= 1000
+    coverage_map = resample_to_corners(cm.squeeze())
 
     texture, opacity = _coverage_map_texture(
         coverage_map, db_scale=db_scale, vmin=vmin, vmax=vmax)

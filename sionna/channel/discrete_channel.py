@@ -6,6 +6,7 @@
 
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
+from sionna import config
 from sionna.utils import expand_to_rank
 
 class BinaryMemorylessChannel(Layer):
@@ -197,14 +198,14 @@ class BinaryMemorylessChannel(Layer):
         # this implementation follows https://arxiv.org/pdf/1611.01144v5.pdf
         # and https://arxiv.org/pdf/1906.07748.pdf
 
-        u1 = tf.random.uniform(shape=shape,
-                               minval=0.,
-                               maxval=1.,
-                               dtype=tf.float32)
-        u2 = tf.random.uniform(shape=shape,
-                               minval=0.,
-                               maxval=1.,
-                               dtype=tf.float32)
+        u1 = config.tf_rng.uniform(shape=shape,
+                                          minval=0.,
+                                          maxval=1.,
+                                          dtype=tf.float32)
+        u2 = config.tf_rng.uniform(shape=shape,
+                                   minval=0.,
+                                   maxval=1.,
+                                   dtype=tf.float32)
         u = tf.stack((u1, u2), axis=-1)
 
         # sample Gumble distribution

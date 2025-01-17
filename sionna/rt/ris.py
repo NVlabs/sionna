@@ -11,7 +11,6 @@ from abc import abstractmethod
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-from sionna.constants import SPEED_OF_LIGHT
 from .radio_device import RadioDevice
 from .scene_object import SceneObject
 from . import scene
@@ -444,11 +443,11 @@ class DiscreteProfile(Profile):
             half a wavelength
         """
         if hasattr(scene.Scene(), "wavelength"):
-            wavelength = scene.Scene().wavelength
+            wavelength = tf.cast(scene.Scene().wavelength, self._rdtype)
             return wavelength/tf.cast(2, self._rdtype)
         else:
             # Scene is not initialized
-            return tf.cast(0.5, self._rdtype) 
+            return tf.cast(0.5, self._rdtype)
 
     def show(self, mode=0):
         r"""Visualizes the profile as a 3D plot
@@ -575,7 +574,7 @@ class ProfileInterpolator(ABC):
             half a wavelength
         """
         if hasattr(scene.Scene(), "wavelength"):
-            wavelength = scene.Scene().wavelength
+            wavelength = tf.cast(scene.Scene().wavelength, self._rdtype)
             return wavelength/tf.cast(2,  self._rdtype)
         else:
             # Scene is not initialized
@@ -1115,7 +1114,7 @@ class DiscretePhaseProfile(DiscreteProfile, PhaseProfile):
 
     A class instance is a callable that returns the profile values,
     gradients and Hessians at given points.
-    
+
     Parameters
     ----------
     cell_grid : :class:`~sionna.rt.CellGrid`
@@ -1401,7 +1400,7 @@ class RIS(RadioDevice, SceneObject):
             half a wavelength
         """
         if hasattr(scene.Scene(), "wavelength"):
-            wavelength = scene.Scene().wavelength
+            wavelength = tf.cast(scene.Scene().wavelength, self._rdtype)
             return wavelength/tf.cast(2, self._rdtype)
         else:
             # Scene is not initialized
@@ -1466,7 +1465,7 @@ class RIS(RadioDevice, SceneObject):
         (e.g., Eq.(12) [Vitucci24]_):
 
         .. math::
-            \nabla\chi_m = -k_0\left( \mathbf{I}- \hat{\mathbf{n}}\hat{\mathbf{n}}^\textsf{T} \right) \left(\hat{\mathbf{k}}_i - \hat{\mathbf{k}}_r  \right).
+            \nabla\chi_m = k_0\left( \mathbf{I}- \hat{\mathbf{n}}\hat{\mathbf{n}}^\textsf{T} \right) \left(\hat{\mathbf{k}}_i - \hat{\mathbf{k}}_r  \right).
 
         The phase profile is obtained by assigning zero phase to the first
         unit cell and evolving the other phases linearly according to the gradient

@@ -59,7 +59,7 @@ Descrambler
    :exclude-members: call, build
 
 References:
-   .. [Pfister03] J. Hou, P.Siegel, L. Milstein, and H. Pfister, "Capacity
+   .. [Pfister03] J\. Hou, P\. Siegel, L\. Milstein, and H\. Pfister, "Capacity
       approaching bandwidth-efficient coded modulation schemes
       based on low-density parity-check codes," IEEE Trans. Inf. Theory,
       Sep. 2003.

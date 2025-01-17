@@ -127,34 +127,34 @@ time_frequency_vector
 
 
 References:
-   .. [HT1973] R. H. Hardin and F. D. Tappert,
+   .. [HT1973] R\. H\. Hardin and F\. D\. Tappert,
          "Applications of the Split-Step Fourier Method to the Numerical Solution of Nonlinear and Variable Coefficient Wave Equations.",
          SIAM Review Chronicles, Vol. 15, No. 2, Part 1, p 423, 1973.
 
-   .. [FMF1976] J. A. Fleck, J. R. Morris, and M. D. Feit,
+   .. [FMF1976] J\. A\. Fleck, J\. R\. Morris, and M\. D\. Feit,
          "Time-dependent Propagation of High Energy Laser Beams Through the Atmosphere",
          Appl. Phys., Vol. 10, pp 129–160, 1976.
 
-   .. [MFFP2009] N. J. Muga, M. C. Fugihara, M. F. S. Ferreira, and A. N. Pinto,
+   .. [MFFP2009] N\. J\. Muga, M\. C\. Fugihara, M\. F\. S\. Ferreira, and A\. N\. Pinto,
          "ASE Noise Simulation in Raman Amplification Systems",
          Conftele, 2009.
 
-   .. [A2012] G. P. Agrawal,
+   .. [A2012] G\. P\. Agrawal,
          "Fiber-optic Communication Systems",
-         4th ed. Wiley series in microwave and optical engineering 222. New York: Wiley, 2010.
+         4th ed. Wiley Series in Microwave and Optical Engineering 222. New York: Wiley, 2010.
 
-   .. [EKWFG2010] R. J. Essiambre, G. Kramer, P. J. Winzer, G. J. Foschini, and B. Goebel,
+   .. [EKWFG2010] R\. J\. Essiambre, G\. Kramer, P\. J\. Winzer, G\. J\. Foschini, and B\. Goebel,
          "Capacity Limits of Optical Fiber Networks",
          Journal of Lightwave Technology 28, No. 4, 2010.
 
-   .. [BGT2000] D. M. Baney, P. Gallion, and R. S. Tucker,
+   .. [BGT2000] D\. M\. Baney, P\. Gallion, and R\. S\. Tucker,
          "Theory and Measurement Techniques for the Noise Figure of Optical Amplifiers",
          Optical Fiber Technology 6, No. 2, 2000.
 
-   .. [GD1991] C.R. Giles, and E. Desurvire,
+   .. [GD1991] C\. R\. Giles, and E\. Desurvire,
          "Modeling Erbium-Doped Fiber Amplifiers",
          Journal of Lightwave Technology 9, No. 2, 1991.
 
-   .. [WMC1991] P. K. A. Wai, C. R. Menyuk, and H. H. Chen,
+   .. [WMC1991] P\. K\. A\. Wai, C\. R\. Menyuk, and H\. H\. Chen,
          "Stability of Solitons in Randomly Varying Birefringent Fibers",
          Optics Letters, No. 16, 1991.

@@ -2,30 +2,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
-
+from sionna import config
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 from sionna.fec.interleaving import RandomInterleaver, RowColumnInterleaver, Deinterleaver, Turbo3GPPInterleaver
 from sionna.utils import BinarySource
 from sionna.fec.scrambling import Scrambler
-
 
 class TestRandomInterleaver(unittest.TestCase):
     """Test random interleaver for consistency."""
@@ -119,13 +102,13 @@ class TestRandomInterleaver(unittest.TestCase):
         cases = np.array([[1e2+2, 1e1],[1e2+1, 1e1+1]])
 
         for m in [True, False]:
-            llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+            llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                      tf.cast(seq_length, dtype=tf.int32)])
             for c in cases:
                 for states in [True, False]:
                     S = RandomInterleaver(keep_batch_constant=m,
                                           keep_state=states)
-                    llr = tf.random.uniform([tf.cast(c[0], dtype=tf.int32),
+                    llr = config.tf_rng.uniform([tf.cast(c[0], dtype=tf.int32),
                                             tf.cast(c[1], dtype=tf.int32)])
                     S(llr)
 
@@ -140,7 +123,7 @@ class TestRandomInterleaver(unittest.TestCase):
 
         for s in shapes:
             #check soft-value scrambling (flipp sign)
-            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32),
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32),
                                     minval=-100,
                                     maxval=100)
             for a in range(0, len(s)):
@@ -184,13 +167,13 @@ class TestRandomInterleaver(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 # axis out bounds...must raise error
                 i = RandomInterleaver(axis=len(s))
-                llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+                llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
                 i(llr)
 
         # cannot permute batch_dim only
         with self.assertRaises(AssertionError):
             i = RandomInterleaver(axis=1)
-            llr = tf.random.uniform(tf.constant([10], dtype=tf.int32),
+            llr = config.tf_rng.uniform(tf.constant([10], dtype=tf.int32),
                                     minval=-10,
                                     maxval=10)
             i(llr)
@@ -234,7 +217,7 @@ class TestRandomInterleaver(unittest.TestCase):
         for m in modes:
             for s in shapes:
                 #check soft-value scrambling (flipp sign)
-                llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+                llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
                 i = RandomInterleaver(keep_batch_constant=m)
                 x1 = run_graph(llr)
                 x2 = run_graph_xla(llr)
@@ -381,11 +364,11 @@ class TestInterleaverRC(unittest.TestCase):
         depths = [1, 2, 4, 7, 8]
         for d in depths:
             i = RowColumnInterleaver(row_depth=d)
-            llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+            llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                      tf.cast(seq_length, dtype=tf.int32)])
             i(llr)
             for c in cases:
-                llr = tf.random.uniform([tf.cast(c[0], dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(c[0], dtype=tf.int32),
                                          tf.cast(c[1], dtype=tf.int32)])
                 # should run without error
                 i(llr)
@@ -395,11 +378,11 @@ class TestInterleaverRC(unittest.TestCase):
 
         for d in depths:
             i = RowColumnInterleaver(row_depth=d)
-            llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+            llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                             tf.cast(seq_length, dtype=tf.int32)])
             i(llr)
             for c in cases:
-                llr = tf.random.uniform([tf.cast(c[0], dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(c[0], dtype=tf.int32),
                                          tf.cast(c[1], dtype=tf.int32)])
                 i(llr)
 
@@ -410,7 +393,7 @@ class TestInterleaverRC(unittest.TestCase):
         batch_size = int(1e2)
 
         # check soft-value scrambling (flip sign)
-        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                             tf.cast(seq_length, dtype=tf.int32)])
 
         depths = [1, 2, 4, 7, 8]
@@ -433,7 +416,7 @@ class TestInterleaverRC(unittest.TestCase):
 
         for s in shapes:
             #check soft-value scrambling (flip sign)
-            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
             for a in range(0,len(s)):
                 depths = [2, 4, 7, 8]
                 for d in depths:
@@ -464,7 +447,7 @@ class TestInterleaverRC(unittest.TestCase):
 
         for s in shapes:
             #check soft-value scrambling (flip sign)
-            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
             for a in range(0,len(s)):
                 depths = [2, 4, 7, 8]
                 for d in depths:
@@ -488,7 +471,7 @@ class TestInterleaverRC(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 i = RowColumnInterleaver(row_depth=4, axis=len(s))
                 # axis is out bounds; must raise an error
-                llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+                llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
                 i(llr)
 
     def test_keras(self):
@@ -536,7 +519,7 @@ class TestDeinterleaver(unittest.TestCase):
         inter_rc = RowColumnInterleaver(row_depth=3)
         deinter_rc = Deinterleaver(inter_rc)
 
-        x = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        x = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                tf.cast(seq_length, dtype=tf.int32)])
 
         y = inter_rc(x)
@@ -573,7 +556,7 @@ class TestDeinterleaver(unittest.TestCase):
 
         for s in shapes:
             # check soft-value scrambling (flip sign)
-            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
             for a in range(0,len(s)):
                 depths = [2, 4, 7, 8]
                 for d in depths:
@@ -592,7 +575,7 @@ class TestDeinterleaver(unittest.TestCase):
     def test_axis(self):
         """Test that deinterleaver operates on correct axis."""
 
-        x = tf.random.uniform([10, 20, 20, 20])
+        x = config.tf_rng.uniform([10, 20, 20, 20])
 
         for a in (1, 2, 3, -1, -2):
 
@@ -627,13 +610,13 @@ class TestDeinterleaver(unittest.TestCase):
 
             # tf.uniform does not support complex dtypes
             if dt_in is (tf.complex64):
-                x = tf.random.uniform([10, 20], maxval=10, dtype=tf.float32)
+                x = config.tf_rng.uniform([10, 20], maxval=10, dtype=tf.float32)
                 x = tf.complex(x, tf.zeros_like(x))
             elif dt_in is (tf.complex128):
-                x = tf.random.uniform([10, 20], maxval=10, dtype=tf.float64)
+                x = config.tf_rng.uniform([10, 20], maxval=10, dtype=tf.float64)
                 x = tf.complex(x, tf.zeros_like(x))
             else:
-                x = tf.random.uniform([10, 20], maxval=10, dtype=dt_in)
+                x = config.tf_rng.uniform([10, 20], maxval=10, dtype=dt_in)
 
             # test RowColumnInterleaver
             inter_rc = RowColumnInterleaver(row_depth=3,
@@ -728,11 +711,11 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
         # test that bs can be variable
         cases = np.array([[1e2+2, 1e1], [1e2+1, 1e1+1]])
 
-        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                 tf.cast(seq_length, dtype=tf.int32)])
         for c in cases:
                 i = Turbo3GPPInterleaver()
-                llr = tf.random.uniform([tf.cast(c[0], dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(c[0], dtype=tf.int32),
                                          tf.cast(c[1], dtype=tf.int32)])
                 i(llr)
 
@@ -745,7 +728,7 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
 
         for s in shapes:
             #check soft-value scrambling (flipp sign)
-            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32),
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32),
                                     minval=-100,
                                     maxval=100)
             for a in range(0, len(s)):
@@ -777,7 +760,7 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
         # k>6144
         i = Turbo3GPPInterleaver(axis=-1)
         s = [10, 6145]
-        llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+        llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
         with self.assertRaises(AssertionError):
             i(llr)
 
@@ -787,13 +770,13 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 # axis out bounds...must raise error
                 i = Turbo3GPPInterleaver(axis=len(s))
-                llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+                llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
                 i(llr)
 
         # cannot permute batch_dim only
         with self.assertRaises(AssertionError):
             i = Turbo3GPPInterleaver(axis=1)
-            llr = tf.random.uniform(tf.constant([10], dtype=tf.int32),
+            llr = config.tf_rng.uniform(tf.constant([10], dtype=tf.int32),
                                     minval=-10,
                                     maxval=10)
             i(llr)
@@ -834,7 +817,7 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
         shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,9]]
         for s in shapes:
             #check soft-value scrambling (flip sign)
-            llr = tf.random.uniform(tf.constant(s, dtype=tf.int32))
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
             i = Turbo3GPPInterleaver()
             x1 = run_graph(llr)
             x2 = run_graph_xla(llr)
@@ -847,10 +830,10 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
 
         # test for variable lengths
         i = Turbo3GPPInterleaver()
-        llr = tf.random.uniform(tf.constant((10,100), dtype=tf.int32))
+        llr = config.tf_rng.uniform(tf.constant((10,100), dtype=tf.int32))
         x = run_graph(llr)
         x = run_graph_xla(llr)
-        llr = tf.random.uniform(tf.constant((10,101), dtype=tf.int32))
+        llr = config.tf_rng.uniform(tf.constant((10,101), dtype=tf.int32))
         x = run_graph(llr)
         x = run_graph_xla(llr)
 

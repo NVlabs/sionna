@@ -2,25 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 import sionna
 from sionna.mimo import KBestDetector, MaximumLikelihoodDetector
 from sionna.mapping import Constellation, Mapper
@@ -330,7 +315,6 @@ class TestKBestDetector(unittest.TestCase):
         return
 
     def test_llr_against_ml_qam(self):
-        tf.random.set_seed(1)
         num_tx = 3
         num_rx_ant = 8
         batch_size = 100
@@ -355,7 +339,6 @@ class TestKBestDetector(unittest.TestCase):
                     self.assertTrue(fun(ebno_db, num_bits_per_symbol, k, real_rep))
 
     def test_llr_against_ml_pam(self):
-        tf.random.set_seed(1)
         num_tx = 3
         num_rx_ant = 8
         batch_size = 100
@@ -378,10 +361,10 @@ class TestKBestDetector(unittest.TestCase):
                 k = (2**num_bits_per_symbol)**num_tx
                 self.assertTrue(fun(ebno_db, num_bits_per_symbol, k))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_e2e_uncoded_ber_vs_ml(self):
         """Test uncoded BER against ML for some points also in XLA mode"""
         sionna.config.xla_compat=True
-        tf.random.set_seed(1)
         num_tx = 3
         num_rx_ant = 6
         num_bits_per_symbol = 4 
@@ -400,10 +383,10 @@ class TestKBestDetector(unittest.TestCase):
                                   num_target_block_errors=1000)
         self.assertTrue(np.allclose(kbest_ber, ml_ber, atol=1e-3))
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_e2e_coded_ber_vs_ml(self):
         """Test coded BER against ML for some points also in XLA mode"""
         sionna.config.xla_compat=True
-        tf.random.set_seed(1)
         num_tx = 3
         num_rx_ant = 6
         num_bits_per_symbol = 4 

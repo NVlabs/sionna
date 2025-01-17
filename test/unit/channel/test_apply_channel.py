@@ -3,28 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
-from sionna.channel import ApplyTimeChannel, ApplyOFDMChannel
-
-import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna.channel import ApplyTimeChannel, ApplyOFDMChannel
+from sionna import config
 
 class TestApplyTimeChannel(unittest.TestCase):
 
@@ -39,11 +22,11 @@ class TestApplyTimeChannel(unittest.TestCase):
         for num_time_samples in NUM_TIME_SAMPLES:
             for l_tot in L_TOT:
                 apply = ApplyTimeChannel(num_time_samples, l_tot, False)
-                x = tf.random.normal([batch_size,
+                x = config.tf_rng.normal([batch_size,
                                       num_tx,
                                       num_tx_ant,
                                       num_time_samples])
-                h_time = tf.random.normal([batch_size,
+                h_time = config.tf_rng.normal([batch_size,
                                            num_rx,
                                            num_rx_ant,
                                            num_tx,
@@ -88,12 +71,12 @@ class TestApplyOFDMChannel(unittest.TestCase):
         apply = ApplyOFDMChannel(False)
         for num_ofdm_symbols in NUM_OFDM_SYMBOLS:
             for fft_size in FFT_SIZE:
-                x = tf.random.normal([batch_size,
+                x = config.tf_rng.normal([batch_size,
                                       num_tx,
                                       num_tx_ant,
                                       num_ofdm_symbols,
                                       fft_size])
-                h_freq = tf.random.normal([batch_size,
+                h_freq = config.tf_rng.normal([batch_size,
                                            num_rx,
                                            num_rx_ant,
                                            num_tx,

@@ -2,33 +2,20 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import os
 from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-
+from sionna import config
 from sionna.utils.misc import ebnodb2no
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 from sionna.fec.conv import ConvEncoder, ViterbiDecoder, BCJRDecoder
 from sionna.fec.utils import GaussianPriorSource
 from sionna.utils import BinarySource
 from sionna.channel import AWGN
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 class TestViterbiDecoding(unittest.TestCase):
 
@@ -150,7 +137,7 @@ class TestViterbiDecoding(unittest.TestCase):
 
                 # BPSK symbols with AWGN noise
                 bs, n = cw.get_shape().as_list()
-                code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
+                code_syms = 6. * (2. * cw - 1) + config.np_rng.normal(size=[bs,n])
                 if api_mode=="poly":
                     u_hat = ViterbiDecoder(
                         gen_poly=enc.gen_poly, method='soft_llr', rsc=rsc)(code_syms)
@@ -257,7 +244,7 @@ class TestViterbiDecoding(unittest.TestCase):
     def test_ref_implementation(self):
         """Test against pre-decoded results from reference implementation.
         """
-        ref_path = 'codes/conv/'
+        ref_path = test_dir + '/codes/conv/'
         gs = [
             ['101', '111'],
             ['1101', '1111'],
@@ -462,7 +449,7 @@ class TestBCJRDecoding(unittest.TestCase):
 
                 # BPSK symbols with AWGN noise
                 bs, n = cw.get_shape().as_list()
-                code_syms = 6. * (2. * cw - 1) + np.random.randn(bs,n)
+                code_syms = 6. * (2. * cw - 1) + config.np_rng.normal(size=[bs,n])
                 if api_mode=="poly":
                     u_hat = BCJRDecoder(gen_poly=enc.gen_poly,
                                         algorithm=alg, rsc=rsc)(code_syms)
@@ -572,7 +559,7 @@ class TestBCJRDecoding(unittest.TestCase):
         """Test against pre-decoded results from reference implementation.
         """
 
-        ref_path = 'codes/conv/'
+        ref_path = test_dir + '/codes/conv/'
         gs = [
             ['101', '111'],
             ['1101', '1111'],

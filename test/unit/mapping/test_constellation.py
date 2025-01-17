@@ -3,27 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-from sionna.mapping import pam_gray, pam, qam, Constellation
-
-import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
+from sionna.mapping import pam_gray, pam, qam, Constellation
 
 def bpsk(b):
     return 1-2*b[0]
@@ -136,7 +120,7 @@ class TestConstellation(unittest.TestCase):
     def test_initial_value(self):
         constellation_type = "custom"
         for num_bits_per_symbol in range(1,10):
-            initial_value = np.random.normal(size=[2**num_bits_per_symbol]) + 1j*np.random.normal(size=[2**num_bits_per_symbol])
+            initial_value = config.np_rng.normal(size=[2**num_bits_per_symbol]) + 1j*config.np_rng.normal(size=[2**num_bits_per_symbol])
             
             c = Constellation(constellation_type, num_bits_per_symbol, initial_value=initial_value, normalize=False, center=False)
             self.assertTrue (np.allclose(c.points, initial_value))
@@ -222,8 +206,8 @@ class TestConstellationDTypes(unittest.TestCase):
                 for center in [True, False]:
                     for trainable in [True, False]:
                         for dtype in [tf.complex64, tf.complex128]:
-                            initial_value = np.random.normal(size=[2**num_bits_per_symbol]) + \
-                                            1j*np.random.normal(size=[2**num_bits_per_symbol])
+                            initial_value = config.np_rng.normal(size=[2**num_bits_per_symbol]) + \
+                                            1j*config.np_rng.normal(size=[2**num_bits_per_symbol])
                             c = Constellation("custom",
                                               num_bits_per_symbol,
                                               initial_value,

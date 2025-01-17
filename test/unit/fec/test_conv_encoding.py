@@ -2,27 +2,16 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
+import os
 from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 from sionna.fec.conv import ConvEncoder
 from sionna.utils import BinarySource
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 
 class TestConvEncoding(unittest.TestCase):
 
@@ -202,7 +191,7 @@ class TestConvEncoding(unittest.TestCase):
     def test_ref_implementation(self):
         r"""Test against pre-encoded codewords from reference implementation.
         """
-        ref_path = 'codes/conv/'
+        ref_path = test_dir + '/codes/conv/'
         gs = [
             ['101', '111'],
             ['1101', '1111'],

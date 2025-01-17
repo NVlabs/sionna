@@ -292,8 +292,8 @@ class LDPC5GEncoder(Layer):
         num_bits_per_symbol: int
             Number of symbols per QAM symbol, i.e., the modulation order.
 
-        Outputs
-        -------
+        Output
+        ------
         (perm_seq, perm_seq_inv):
             Tuple:
 

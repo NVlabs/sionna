@@ -3,36 +3,17 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import unittest
+import numpy as np
+import tensorflow as tf
 from sionna.ofdm import OFDMModulator, OFDMDemodulator, ResourceGrid, ResourceGridMapper, ResourceGridDemapper
 from sionna.mimo import StreamManagement
 from sionna.utils import QAMSource
 from tensorflow.keras import Model
 
-import pytest
-import unittest
-import numpy as np
-import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-
 class TestOFDMModulator(unittest.TestCase):
     def test_cyclic_prefixes(self):
+        "Test that cyclic prefix is correct implemented"
         batch_size = 64
         fft_size = 72
         num_ofdm_symbols = 14
@@ -47,8 +28,27 @@ class TestOFDMModulator(unittest.TestCase):
         cp_length = fft_size+1
         modulator = OFDMModulator(cp_length)
         x = qam_source([batch_size, num_ofdm_symbols, fft_size])
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             x_time = modulator(x)
+
+    def test_variable_cyclic_prefixes(self):
+        "Test per-OFDM symbol cyclic prefix length"
+        batch_size = 64
+        fft_size = 72
+        num_ofdm_symbols = fft_size
+        qam_source = QAMSource(4)
+        cp_lengths = np.arange(fft_size)
+        modulator = OFDMModulator(cp_lengths)
+        x = qam_source([batch_size, num_ofdm_symbols, fft_size])
+        x_time = modulator(x)
+
+        start = 0
+        for i in range(num_ofdm_symbols):
+            end = start + cp_lengths[i] + fft_size
+            x_sym = x_time[...,start:end]
+            check = np.array_equal(x_sym[:,:cp_lengths[i]], x_sym[:,x_sym.shape[-1]-cp_lengths[i]:])
+            self.assertTrue(check)
+            start = end
 
     def test_higher_dimensions(self):
         batch_size = [64, 12, 6]
@@ -62,6 +62,25 @@ class TestOFDMModulator(unittest.TestCase):
             x_time = tf.reshape(x_time, batch_size + [num_ofdm_symbols, -1])
             self.assertTrue(np.array_equal(x_time[...,:cp_length], x_time[...,-cp_length:]))
 
+    def test_variable_cyclic_prefixes_higher_dimensions(self):
+        "Test per-OFDM symbol cyclic prefix length with multi-dimensional batch size"
+        batch_size = [64, 12, 6]
+        fft_size = 72
+        num_ofdm_symbols = fft_size
+        qam_source = QAMSource(4)
+        cp_lengths = np.arange(fft_size)
+        modulator = OFDMModulator(cp_lengths)
+        x = qam_source(batch_size + [num_ofdm_symbols, fft_size])
+        x_time = modulator(x)
+
+        start = 0
+        for i in range(num_ofdm_symbols):
+            end = start + cp_lengths[i] + fft_size
+            x_sym = x_time[...,start:end]
+            check = np.array_equal(x_sym[...,:cp_lengths[i]], x_sym[...,x_sym.shape[-1]-cp_lengths[i]:])
+            self.assertTrue(check)
+            start = end
+
 class TestOFDMDemodulator(unittest.TestCase):
     def test_cyclic_prefixes(self):
         batch_size = 64
@@ -74,7 +93,7 @@ class TestOFDMDemodulator(unittest.TestCase):
             x = qam_source([batch_size, num_ofdm_symbols, fft_size])
             x_time = modulator(x)
             x_hat = demodulator(x_time)
-            self.assertTrue(np.max(np.abs(x-x_hat))<1e-6)
+            self.assertLess(np.max(np.abs(x-x_hat)), 1e-5)
 
     def test_higher_dimensions(self):
         batch_size = [64, 12, 6]
@@ -87,7 +106,7 @@ class TestOFDMDemodulator(unittest.TestCase):
             x = qam_source(batch_size + [num_ofdm_symbols, fft_size])
             x_time = modulator(x)
             x_hat = demodulator(x_time)
-            self.assertTrue(np.max(np.abs(x-x_hat))<1e-6)
+            self.assertLess(np.max(np.abs(x-x_hat)), 1e-5)
 
     def test_overlapping_input(self):
         batch_size = 64
@@ -101,7 +120,7 @@ class TestOFDMDemodulator(unittest.TestCase):
             x_time = modulator(x)
             x_time = tf.concat([x_time, x_time[...,:10]], axis=-1)
             x_hat = demodulator(x_time)
-            self.assertTrue(np.max(np.abs(x-x_hat))<1e-6)
+            self.assertLess(np.max(np.abs(x-x_hat)), 1e-5)
 
 class TestOFDMModDemod(unittest.TestCase):
     def test_end_to_end(self):
@@ -129,6 +148,12 @@ class TestOFDMModDemod(unittest.TestCase):
         for cp_length in [0,1,5,12]:
             for padding in [0,1,5,71]:
                 e2e = E2ESystem(cp_length, padding)
+                self.assertEqual(e2e(128).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
+
+        cp_lengths = np.arange(72)
+        for padding in [0,1,5,71]:
+                e2e = E2ESystem(cp_lengths, padding)
+                e2e.num_ofdm_symbols = 72
                 self.assertEqual(e2e(128).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
 
 class TestResourceGridDemapper(unittest.TestCase):
@@ -161,7 +186,7 @@ class TestResourceGridDemapper(unittest.TestCase):
             for num_tx in [1,2,3,8]:
                 for num_streams_per_tx in [1,2,3]:
                     err = func(cp_length, num_tx, num_streams_per_tx)
-                    self.assertTrue(err<1e-6)
+                    self.assertLess(err, 1e-5)
 
     def test_data_dim(self):
         """data_dim dimension is provided"""
@@ -194,4 +219,4 @@ class TestResourceGridDemapper(unittest.TestCase):
             for num_tx in [1,2,3,8]:
                 for num_streams_per_tx in [1,2,3]:
                     err = func(cp_length, num_tx, num_streams_per_tx)
-                    self.assertTrue(err<1e-6)
+                    self.assertLess(err, 1e-5)

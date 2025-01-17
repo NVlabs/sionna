@@ -11,6 +11,7 @@ import tensorflow as tf
 from tensorflow import sin, cos, acos
 
 from sionna import PI, SPEED_OF_LIGHT
+import sionna
 
 class Topology:
     # pylint: disable=line-too-long
@@ -475,8 +476,11 @@ class ChannelCoefficientsGenerator:
         phi : [shape] + [4], tf.float
             Phases for all polarization combinations
         """
-        phi = tf.random.uniform(tf.concat([shape, [4]], axis=0), minval=-PI,
-            maxval=PI, dtype=self._dtype.real_dtype)
+        phi = sionna.config.tf_rng.uniform(
+                             tf.concat([shape, [4]], axis=0),
+                             minval=-PI,
+                             maxval=PI,
+                             dtype=self._dtype.real_dtype)
 
         return phi
 
@@ -745,7 +749,7 @@ class ChannelCoefficientsGenerator:
         else:
             # Assign polarization reponse according to polarization to each
             # antenna
-            pol_tx = tf.stack([pol1_tx, pol2_tx], 0)
+            pol_tx = tf.stack([pol1_tx, pol2_tx], 0) # pylint: disable=possibly-used-before-assignment
             ant_ind_pol2 = self._tx_array.ant_ind_pol2
             num_ant_pol2 = ant_ind_pol2.shape[0]
             # O = Pol 1, 1 = Pol 2, we only scatter the indices for Pol 1,
@@ -765,7 +769,7 @@ class ChannelCoefficientsGenerator:
         else:
             # Assign polarization response according to polarization to each
             # antenna
-            pol_rx = tf.stack([f_rx_pol1, f_rx_pol2], 0)
+            pol_rx = tf.stack([f_rx_pol1, f_rx_pol2], 0) # pylint: disable=possibly-used-before-assignment
             ant_ind_pol2 = self._rx_array.ant_ind_pol2
             num_ant_pol2 = ant_ind_pol2.shape[0]
             # O = Pol 1, 1 = Pol 2, we only scatter the indices for Pol 1,
