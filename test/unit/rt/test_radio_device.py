@@ -3,31 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("..")
-    import sionna
-
 import unittest
 import numpy as np
 import tensorflow as tf
-
 from sionna.rt import rotation_matrix, r_hat, theta_phi_from_unit_vec, \
                       load_scene, PlanarArray, Transmitter, Receiver, compute_gain
 from sionna.constants import PI
 
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 
 def theta_prime_phi_prime(angles, theta, phi):
     rot_mat = rotation_matrix(angles)

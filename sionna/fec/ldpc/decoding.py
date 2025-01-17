@@ -1336,7 +1336,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
         if not self._stateful:
             x_hat = super().call(llr_5g)
         else:
-            x_hat,msg_vn = super().call([llr_5g, msg_vn])
+            x_hat,msg_vn = super().call([llr_5g, msg_vn]) # pylint: disable=used-before-assignment
 
         if self._return_infobits: # return only info bits
             # reconstruct u_hat # code is systematic

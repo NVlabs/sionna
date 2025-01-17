@@ -40,8 +40,10 @@ class SceneObject(Object):
         self._dtype = dtype
         self._rdtype = dtype.real_dtype
 
-        # Orientation of the object is initialized to (0,0,0)
+        # Set initial orientation of the object
         self._orientation = tf.cast(orientation, dtype=self._rdtype)
+        # Set velocity vector
+        self._velocity = tf.zeros((3,), dtype=self._rdtype)
 
         # Initialize the base class Object
         super().__init__(name, **kwargs)
@@ -219,11 +221,13 @@ class SceneObject(Object):
 
         # Scene parameters
         scene_params = self._scene.mi_scene_params
+        vp_key = self._vertex_params_name(self.name)
+
         # Real dtype
         rdtype = self._scene.dtype.real_dtype
         new_position = tf.cast(new_position, rdtype)
         # [num_vertices*3]
-        vertices = scene_params[f'mesh-{self.name}.vertex_positions']
+        vertices = scene_params[vp_key]
         # [num_vertices,3]
         vertices = mi_to_tf_tensor(vertices, rdtype)
         vertices = tf.reshape(vertices, [-1, 3])
@@ -239,7 +243,7 @@ class SceneObject(Object):
         fltn_translated_vertices = tf.reshape(translated_vertices, [-1])
         fltn_translated_vertices = self._mi_scalar_t(fltn_translated_vertices)
         #
-        scene_params[f'mesh-{self.name}.vertex_positions'] =\
+        scene_params[vp_key] =\
             fltn_translated_vertices
         scene_params.update()
 
@@ -249,8 +253,7 @@ class SceneObject(Object):
         mi_shape = self._mi_shape
         solver_paths = self._scene.solver_paths
 
-        shape_ind = solver_paths.shape_indices[obj_id]
-        prim_offset = solver_paths.prim_offsets[shape_ind]
+        prim_offset = solver_paths.prim_offsets[obj_id]
 
         face_indices3 = mi_shape.face_indices(dr.arange(mi.UInt32,
                                                         mi_shape.face_count()))
@@ -336,8 +339,10 @@ class SceneObject(Object):
 
         # Scene parameters
         scene_params = self._scene.mi_scene_params
+        vp_key = self._vertex_params_name(self.name)
+
         # [num_vertices*3]
-        vertices = scene_params[f'mesh-{self.name}.vertex_positions']
+        vertices = scene_params[vp_key]
         # [num_vertices,3]
         vertices = dr.unravel(self._mi_point_t, vertices)
         # Apply the transform
@@ -345,7 +350,7 @@ class SceneObject(Object):
         # Cast to Mitsuba type to object the Mitsuba scene
         fltn_vertices = tf.reshape(vertices, [-1])
         fltn_vertices = tf.cast(fltn_vertices, tf.float32)
-        scene_params[f'mesh-{self.name}.vertex_positions'] = fltn_vertices
+        scene_params[vp_key] = fltn_vertices
         scene_params.update()
 
         ## Update Sionna vertices
@@ -354,8 +359,7 @@ class SceneObject(Object):
         mi_shape = self._mi_shape
         solver_paths = self._scene.solver_paths
 
-        shape_ind = solver_paths.shape_indices[obj_id]
-        prim_offset = solver_paths.prim_offsets[shape_ind]
+        prim_offset = solver_paths.prim_offsets[obj_id]
 
         face_indices3 = mi_shape.face_indices(dr.arange(mi.UInt32,
                                                         mi_shape.face_count()))
@@ -469,7 +473,8 @@ class SceneObject(Object):
         if isinstance(target, str):
             obj = self.scene.get(target)
             if not isinstance(obj, Object) and not isinstance(obj, AssetObject):
-                raise ValueError(f"No camera, device, or object named '{target}' found.")
+                msg = f"No camera, device, or object named '{target}' found."
+                raise ValueError(msg)
             else:
                 target = obj.position
         elif isinstance(target, Object) or not isinstance(obj, AssetObject):
@@ -563,3 +568,18 @@ class SceneObject(Object):
         if not isinstance(a, str):
             raise TypeError("`asset_object` must be a string")
         self._asset_object = a
+        
+    def _vertex_params_name(self, mesh_id, scene_params=None):
+        """
+        Since any `mesh-` prefix was removed from `self.name`, we may need
+        to add it back here before trying to access the vertex positions
+        variable in the scene parameters object.
+        """
+        if scene_params is None:
+            scene_params = self._scene.mi_scene_params
+
+        key = mesh_id + ".vertex_positions"
+        with_prefix = 'mesh-' + key
+        if with_prefix in scene_params:
+            return with_prefix
+        return key

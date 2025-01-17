@@ -2,29 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("..")
-    import sionna
-
+import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 from sionna.constants import PI
 from sionna.rt import ScatteringPattern, LambertianPattern, DirectivePattern, BackscatteringPattern
 from sionna.rt.utils import r_hat
@@ -56,6 +37,7 @@ class TestNormalization(unittest.TestCase):
        over the hemisphere for different angles of arrival.
     """
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_lambertian_pattern(self):
         dtypes = [tf.complex64]
         k_is = [[-0.7071,0., -0.7071],
@@ -70,6 +52,7 @@ class TestNormalization(unittest.TestCase):
                 res = integrate_pattern(pattern, k_i, dtype)
                 self.assertTrue(np.abs(res-1)<1e-3)
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_directive_pattern(self):
         dtypes = [tf.complex64]
         k_is = [[-0.7071,0., -0.7071],
@@ -86,6 +69,7 @@ class TestNormalization(unittest.TestCase):
                     res = integrate_pattern(pattern, k_i, dtype)
                     self.assertTrue(np.abs(res-1)<1e-2)
 
+    @pytest.mark.usefixtures("only_gpu")
     def test_backscattering_pattern(self):
         dtypes = [tf.complex64]
         k_is = [[-0.7071,0., -0.7071],

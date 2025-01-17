@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import warnings
 from importlib_resources import files, as_file
+from sionna import config
 from sionna.fec.ldpc import codes
 from sionna.utils import log2
 from sionna.nr.utils import generate_prng_seq as generate_prng_seq_utils
@@ -142,10 +143,10 @@ class GaussianPriorSource(Layer):
 
         # generate LLRs with Gaussian approximation (BPSK, all-zero cw)
         # Use negative mean as we generate logits with definition p(b=1)/p(b=0)
-        llr = tf.random.normal(output_shape,
-                                mean=-1.*mu_llr,
-                                stddev=sigma_llr,
-                                dtype=super().dtype)
+        llr = config.tf_rng.normal(output_shape,
+                                   mean=-1.*mu_llr,
+                                   stddev=sigma_llr,
+                                   dtype=super().dtype)
         return llr
 
 def llr2mi(llr, s=None, reduce_dims=True):

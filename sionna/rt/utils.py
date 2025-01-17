@@ -10,7 +10,8 @@ import tensorflow as tf
 import mitsuba as mi
 import drjit as dr
 
-from sionna.utils import expand_to_rank
+from sionna import config
+from sionna.utils import expand_to_rank, log10
 from sionna import PI
 
 def rotation_matrix(angles):
@@ -741,10 +742,10 @@ def sample_points_on_hemisphere(normals, num_samples=1):
     shape = [batch_size, num_samples]
 
     # Sample phi uniformly distributed on [0,2*PI]
-    phi = tf.random.uniform(shape, maxval=2*PI, dtype=dtype)
+    phi = config.tf_rng.uniform(shape, maxval=2*PI, dtype=dtype)
 
     # Generate samples of theta for uniform distribution on the hemisphere
-    u = tf.random.uniform(shape, maxval=1, dtype=dtype)
+    u = config.tf_rng.uniform(shape, maxval=1, dtype=dtype)
     theta = tf.acos(u)
 
     # Transform spherical to Cartesian coordinates
@@ -936,3 +937,35 @@ def mitsuba_rectangle_to_world(center, orientation, size, ris=False):
     return (trans
             @mi.ScalarTransform4f.scale([0.5 * size[0], 0.5 * size[1], 1])
     )
+
+def watt_to_dbm(power):
+    r""" Converts :math:`P_{W}` [W] to :math:`P_{dBm}` [dBm] via the formula:
+    :math:`P_{dBm} = 30 + 10 \log_{10}(P_W)`
+
+    Input
+    ------
+    power : float
+        Power [W]
+
+    Output
+    -------
+     : float
+        Power [dBm]
+    """
+    return 30 + 10 * log10(power)
+
+def dbm_to_watt(dbm):
+    r""" Converts dBm to Watt via the formula:
+    :math:`P_W = 10^{\frac{P_{dBm}-30}{10}}`
+
+    Input
+    ------
+    dbm : float
+        Power [dBm]
+
+    Output
+    -------
+     : float
+        Power [W]
+    """
+    return tf.pow(10, (dbm - 30) / 10)

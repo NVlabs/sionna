@@ -3,34 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("..")
-    import sionna
-
 import unittest
 import numpy as np
 import tensorflow as tf
 from tensorflow.experimental.numpy import swapaxes
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 import sionna
 from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray
 from sionna.rt.utils import r_hat
 from sionna.channel import cir_to_ofdm_channel, subcarrier_frequencies
-from sionna.signal import fft, ifft
+from sionna.signal import fft
 from sionna.constants import SPEED_OF_LIGHT
 
 def compute_doppler_spectrum(scene, paths, tx_velocities, rx_velocities):

@@ -3,29 +3,14 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 """Test NR receiver components."""
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-from sionna.nr import TBEncoder, TBDecoder, calculate_tb_size
+from sionna.nr import TBEncoder, TBDecoder
 from sionna.utils import BinarySource
 
+@pytest.mark.usefixtures("only_gpu")
 class TestTBDecoder(unittest.TestCase):
     """Test TBDecoder"""
 

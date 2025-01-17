@@ -1712,7 +1712,7 @@ class LMMSEInterpolator(BaseChannelInterpolator):
                 err_var_mask = tf.cast(pilot_mask == 1,
                                             cov_mat_freq.dtype.real_dtype)
             # Space
-            elif o == 's':
+            else:
                 interpolator = SpatialChannelFilter(cov_mat_space,
                                                     last_step=last_step)
                 err_var_mask = tf.cast(pilot_mask == 1,
@@ -1933,7 +1933,7 @@ def tdl_freq_cov_mat(model, subcarrier_spacing, fft_size, delay_spread,
         parameters_fname = "TDL-C.json"
     elif model == 'D':
         parameters_fname = "TDL-D.json"
-    elif model == 'E':
+    else: # 'E'
         parameters_fname = "TDL-E.json"
     source = files(models).joinpath(parameters_fname)
     # pylint: disable=unspecified-encoding
@@ -2059,7 +2059,7 @@ def tdl_time_cov_mat(model, speed, carrier_frequency, ofdm_symbol_duration,
         parameters_fname = "TDL-C.json"
     elif model == 'D':
         parameters_fname = "TDL-D.json"
-    elif model == 'E':
+    else: # 'E'
         parameters_fname = "TDL-E.json"
     source = files(models).joinpath(parameters_fname)
     # pylint: disable=unspecified-encoding

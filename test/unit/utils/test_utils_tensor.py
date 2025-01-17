@@ -3,32 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna as sn
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-    import sionna as sn
-
-from sionna.utils.misc import complex_normal
-from sionna.utils.tensors import matrix_sqrt, matrix_inv, matrix_sqrt_inv, matrix_pinv, flatten_last_dims, flatten_dims, expand_to_rank
-from sionna.channel import exp_corr_mat
-
 import unittest
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
+from sionna import config
+from sionna.utils.misc import complex_normal
+from sionna.utils.tensors import matrix_sqrt, matrix_inv, matrix_sqrt_inv, matrix_pinv, flatten_last_dims, flatten_dims, expand_to_rank
+from sionna.channel import exp_corr_mat
 
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
 
 class TestFlattenLastDims(unittest.TestCase):
     def test_jit_mode(self):
@@ -140,7 +123,7 @@ class TestMatrixSqrt(unittest.TestCase):
         self.assertTrue(np.allclose(R, R_hat))
 
     def test_multi_dim(self):
-        a = np.random.uniform(0, 1, [2, 4, 3])
+        a = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 32
         R = exp_corr_mat(a, n, tf.complex128)
         R_sqrt = matrix_sqrt(R)
@@ -148,11 +131,11 @@ class TestMatrixSqrt(unittest.TestCase):
         self.assertTrue(np.allclose(R, R_hat))
 
     def test_xla(self):
-        a = np.random.uniform(0, 1, [2, 4, 3])
+        a = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 32
         R64 = exp_corr_mat(a, n, tf.complex64)
         R128 = exp_corr_mat(a, n, tf.complex128)
-        sn.config.xla_compat=True
+        config.xla_compat=True
         @tf.function(jit_compile=True)
         def func(R):
             return matrix_sqrt(R)
@@ -172,7 +155,7 @@ class TestMatrixInv(unittest.TestCase):
             self.assertTrue(np.allclose(I, tf.eye(n, dtype=R.dtype)))
 
     def test_multi_dim(self):
-        a = np.random.uniform(0, 1, [2, 4, 3])
+        a = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 32
         R = exp_corr_mat(a, n, tf.complex128)
         R_inv = matrix_inv(R)
@@ -180,11 +163,11 @@ class TestMatrixInv(unittest.TestCase):
         self.assertTrue(np.allclose(I, exp_corr_mat(0, n, tf.complex128)))
 
     def test_xla(self):
-        a = np.random.uniform(0, 1, [2, 4, 3])
+        a = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 32
         R64 = exp_corr_mat(a, n, tf.complex64)
         R128 = exp_corr_mat(a, n, tf.complex128)
-        sn.config.xla_compat=True
+        config.xla_compat=True
         @tf.function(jit_compile=True)
         def func(R):
             return matrix_inv(R)
@@ -206,7 +189,7 @@ class TestMatrixSqrtInv(unittest.TestCase):
             self.assertTrue(np.allclose(I, tf.eye(n, dtype=R.dtype)))
 
     def test_multi_dim(self):
-        a = np.random.uniform(0, 1, [2, 4, 3])
+        a = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 32
         R = exp_corr_mat(a, n, tf.complex128)
         R_sqrt = matrix_sqrt(R)
@@ -215,12 +198,12 @@ class TestMatrixSqrtInv(unittest.TestCase):
         self.assertTrue(np.allclose(I, exp_corr_mat(0, n, tf.complex128)))
 
     def test_xla(self):
-        a = np.random.uniform(0, 1, [2, 4, 3])
+        a = config.np_rng.uniform(0, 1, [2, 4, 3])
         n = 32
         R64 = exp_corr_mat(a, n, tf.complex64)
         R128 = exp_corr_mat(a, n, tf.complex128)
 
-        sn.config.xla_compat=True
+        config.xla_compat=True
         @tf.function(jit_compile=True)
         def func(R):
             return matrix_sqrt_inv(R)
@@ -254,7 +237,7 @@ class TestMatrixPinv(unittest.TestCase):
         n = 32
         A64 = complex_normal(a + [n, n//2], dtype=tf.complex64)
         A128 = complex_normal(a + [n, n//2], dtype=tf.complex128)
-        sn.config.xla_compat=True
+        config.xla_compat=True
         @tf.function(jit_compile=True)
         def func(A):
             return matrix_pinv(A)

@@ -7,7 +7,7 @@ import tensorflow as tf
 import numpy as np
 from functools import wraps
 from sionna.channel.utils import sample_bernoulli
-
+from sionna import config
 
 ####################################################################
 # Utility functions
@@ -50,15 +50,15 @@ def generate_random_loc(bs, n, x_range, y_range, z_range, share_loc=False,
     """
 
     if share_loc:
-        loc_x = tf.random.uniform([1, n], x_range[0], x_range[1], dtype)
-        loc_y = tf.random.uniform([1, n], y_range[0], y_range[1], dtype)
-        loc_z = tf.random.uniform([1, n], z_range[0], z_range[1], dtype)
+        loc_x = config.tf_rng.uniform([1, n], x_range[0], x_range[1], dtype)
+        loc_y = config.tf_rng.uniform([1, n], y_range[0], y_range[1], dtype)
+        loc_z = config.tf_rng.uniform([1, n], z_range[0], z_range[1], dtype)
         loc = tf.stack([loc_x, loc_y, loc_z], axis=2)
         loc = tf.tile(loc, [bs, 1, 1])
     else:
-        loc_x = tf.random.uniform([bs, n], x_range[0], x_range[1], dtype)
-        loc_y = tf.random.uniform([bs, n], y_range[0], y_range[1], dtype)
-        loc_z = tf.random.uniform([bs, n], z_range[0], z_range[1], dtype)
+        loc_x = config.tf_rng.uniform([bs, n], x_range[0], x_range[1], dtype)
+        loc_y = config.tf_rng.uniform([bs, n], y_range[0], y_range[1], dtype)
+        loc_z = config.tf_rng.uniform([bs, n], z_range[0], z_range[1], dtype)
         loc = tf.stack([loc_x, loc_y, loc_z], axis=2)
 
     return loc
@@ -1349,7 +1349,7 @@ xpr_std = {  'umi'   :  {   'los'   :   3.0,
 
 def delays(model, submodel, batch_size, num_clusters, ds, k):
     """Reference implementation: Delays"""
-    x = np.random.uniform(size=[batch_size, num_clusters], low=1e-6,
+    x = config.np_rng.uniform(size=[batch_size, num_clusters], low=1e-6,
                             high=1.0)
     x = -r_tau[model][submodel]*ds*np.log(x)
     x = np.sort(x - np.min(x, axis=1, keepdims=True), axis=1)
@@ -1363,7 +1363,7 @@ def delays(model, submodel, batch_size, num_clusters, ds, k):
 
 def powers(model, submodel, batch_size, num_clusters, unscaled_tau, ds, k):
     """Reference implementation: Powers"""
-    z = np.random.normal(size=[batch_size, num_clusters], loc=0.0,
+    z = config.np_rng.normal(size=[batch_size, num_clusters], loc=0.0,
                             scale=zeta[model][submodel])
     rt = r_tau[model][submodel]
     p = np.exp(-unscaled_tau*(rt-1.)/(rt*ds))*np.power(10.0, -z/10.0)
@@ -1383,9 +1383,9 @@ def aoa(model, submodel, batch_size, num_clusters, asa, p, los_aoa, k=None):
         k = 10.0*np.log10(k)
         c = c*(1.1035-0.028*k-0.002*np.square(k)+0.0001*np.power(k,3))
     aoa_prime = a*np.sqrt(-np.log(p/np.max(p, axis=1, keepdims=True)))/c
-    x = np.random.randint(0, 2, size=[batch_size, num_clusters])
+    x = config.np_rng.integers(0, 2, size=[batch_size, num_clusters])
     x = 2*x-1
-    y = np.random.normal(size=[batch_size, num_clusters], loc=0.0,
+    y = config.np_rng.normal(size=[batch_size, num_clusters], loc=0.0,
                             scale=asa/7.0)
     aoa = x*aoa_prime + y
     if submodel == 'los':
@@ -1422,9 +1422,9 @@ def aod(model, submodel, batch_size, num_clusters, asd, p, los_aod, k=None):
         k = 10.0*np.log10(k)
         c = c*(1.1035-0.028*k-0.002*np.square(k)+0.0001*np.power(k,3))
     aod_prime = a*np.sqrt(-np.log(p/np.max(p, axis=1, keepdims=True)))/c
-    x = np.random.randint(0, 2, size=[batch_size, num_clusters])
+    x = config.np_rng.integers(0, 2, size=[batch_size, num_clusters])
     x = 2*x-1
-    y = np.random.normal(size=[batch_size, num_clusters], loc=0.0,
+    y = config.np_rng.normal(size=[batch_size, num_clusters], loc=0.0,
                             scale=asd/7.0)
     aod = x*aod_prime + y
     if submodel == 'los':
@@ -1460,9 +1460,9 @@ def zoa(model, submodel, batch_size, num_clusters, zsa, p, los_zoa, k=None):
         k = 10.0*np.log10(k)
         c = c*(1.3086+0.0339*k-0.0077*np.square(k)+0.0002*np.power(k,3))
     zoa_prime = -zsa*np.log(p/np.max(p, axis=1, keepdims=True))/c
-    x = np.random.randint(0, 2, size=[batch_size, num_clusters])
+    x = config.np_rng.integers(0, 2, size=[batch_size, num_clusters])
     x = 2*x-1
-    y = np.random.normal(size=[batch_size, num_clusters], loc=0.0,
+    y = config.np_rng.normal(size=[batch_size, num_clusters], loc=0.0,
                             scale=zsa/7.0)
     zoa = x*zoa_prime + y
     if submodel == 'los':
@@ -1501,9 +1501,9 @@ def zod(model, submodel, batch_size, num_clusters, zsd, p, los_zod, offset,
         k = 10.0*np.log10(k)
         c = c*(1.3086+0.0339*k-0.0077*np.square(k)+0.0002*np.power(k,3))
     zod_prime = -zsd*np.log(p/np.max(p, axis=1, keepdims=True))/c
-    x = np.random.randint(0, 2, size=[batch_size, num_clusters])
+    x = config.np_rng.integers(0, 2, size=[batch_size, num_clusters])
     x = 2*x-1
-    y = np.random.normal(size=[batch_size, num_clusters], loc=0.0,
+    y = config.np_rng.normal(size=[batch_size, num_clusters], loc=0.0,
                             scale=zsd/7.0)
     zod = x*zod_prime + y
     if submodel == 'los':
@@ -1536,7 +1536,7 @@ def zod(model, submodel, batch_size, num_clusters, zsd, p, los_zod, offset,
 
 def xpr(model, submodel, batch_size, num_clusters):
     """Reference implementation: XPR"""
-    x = np.random.normal(loc=xpr_mu[model][submodel],
+    x = config.np_rng.normal(loc=xpr_mu[model][submodel],
                             scale=xpr_std[model][submodel],
                             size=[batch_size, num_clusters, 20])
     return np.power(10., x/10.)

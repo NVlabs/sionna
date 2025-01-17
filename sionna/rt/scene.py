@@ -21,12 +21,12 @@ import drjit as dr
 import warnings
 import weakref
 
-
+import numpy as np
 
 from .antenna_array import AntennaArray
 from .camera import Camera
 from .radio_device import RadioDevice
-from sionna.constants import SPEED_OF_LIGHT, PI
+from sionna.constants import SPEED_OF_LIGHT, PI, BOLTZMANN_CONSTANT
 from .itu_materials import instantiate_itu_materials
 from .radio_material import RadioMaterial
 from .receiver import Receiver
@@ -57,7 +57,7 @@ class Scene:
     for which propagation :class:`~sionna.rt.Paths`, channel impulse responses (CIRs) or coverage maps (:class:`~sionna.rt.CoverageMap`) can be computed,
     as well as cameras (:class:`~sionna.rt.Camera`) for rendering.
 
-    The only way to instantiate a scene is by calling :meth:`~sionna.rt.Scene.load_scene()`.
+    The only way to instantiate a scene is by calling :func:`~sionna.rt.load_scene()`.
     Note that only a single scene can be loaded at a time.
 
     Example scenes can be loaded as follows:
@@ -73,6 +73,12 @@ class Scene:
 
     # Default frequency
     DEFAULT_FREQUENCY = 3.5e9 # Hz
+
+    # Default frequency
+    DEFAULT_BANDWIDTH = 1e6 # Hz
+
+    # Default temperature
+    DEFAULT_TEMPERATURE = 293 # K
 
     # This object is a singleton, as it is assumed that only one scene can be
     # loaded at a time.
@@ -156,6 +162,12 @@ class Scene:
             # Set the frequency to the default value
             self.frequency = Scene.DEFAULT_FREQUENCY
 
+            # Set the bandwidth to the default value
+            self.bandwidth = Scene.DEFAULT_BANDWIDTH
+
+            # Set the temperature to the default value
+            self.temperature = Scene.DEFAULT_TEMPERATURE
+
             # Load the scene
             # Keep track of the Mitsuba scene
             if env_filename == "__empty__":
@@ -200,13 +212,6 @@ class Scene:
             self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
             self._scene_params = mi.traverse(self._scene)
 
-            # Instantiate the solver
-            self._solver_paths = SolverPaths(self, dtype=dtype)
-
-            # Solver for coverage map
-            self._solver_cm = SolverCoverageMap(self, solver=self._solver_paths,
-                                                dtype=dtype)
-
             # Load the cameras
             self._load_cameras()
 
@@ -224,7 +229,12 @@ class Scene:
 
             # By-pass scene geometry update is set to False by default, hence the scene geometry is automatically update e.g. when moving a scene object
             # self._bypass_scene_geometry_update = False
+            
+            # Instantiate the solver
+            self._solver_paths = SolverPaths(self, dtype=dtype)
 
+            # Solver for coverage map
+            self._solver_cm = SolverCoverageMap(self, solver=self._solver_paths, dtype=dtype)
 
     @property
     def cameras(self):
@@ -259,16 +269,54 @@ class Scene:
 
 
     @property
+    def temperature(self):
+        """
+        float : Get/set the environment temperature [K]. Used for the
+        computation of :attr:`~sionna.rt.Scene.thermal_noise_power`.
+        Defaults to 293.
+        """
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, v):
+        if v<0:
+            raise ValueError("temperature must be positive")
+        self._temperature = tf.cast(v, self._rdtype)
+
+    @property
+    def bandwidth(self):
+        """
+        float : Get/set the transmission bandwidth [Hz]. Used for the
+        computation of :attr:`~sionna.rt.Scene.thermal_noise_power`.
+        Defaults to 1e6.
+        """
+        return self._bandwidth
+
+    @bandwidth.setter
+    def bandwidth(self, v):
+        if v<0:
+            raise ValueError("bandwidth must be positive")
+        self._bandwidth = tf.cast(v, self._rdtype)
+
+    @property
+    def thermal_noise_power(self):
+        """
+        float : Get the thermal noise power [W]
+        """
+        return self.temperature * tf.cast(BOLTZMANN_CONSTANT, self._rdtype) \
+               * self.bandwidth
+
+    @property
     def wavelength(self):
         """
-        float (read-only) :  Wavelength [m]
+        float (read-only) :  Get the wavelength [m]
         """
         return self._wavelength
 
     @property
     def wavenumber(self):
         r"""
-        float (read-only) :  Wavenumber :math:`k=2\pi/\lambda` [m^-1]
+        float (read-only) :  Get the wavenumber :math:`k=2\pi/\lambda` [m^-1]
         """
         return tf.cast(2*PI, self._dtype.real_dtype)/self._wavelength
 
@@ -670,7 +718,7 @@ class Scene:
                     edge_diffraction=False, check_scene=True):
         # pylint: disable=line-too-long
         r"""
-        Computes the trajectories of the paths by shooting rays
+        Computes the trajectories of the paths by shooting rays.
 
         The EM fields corresponding to the traced paths are not computed.
         They can be computed using :meth:`~sionna.rt.Scene.compute_fields()`:
@@ -734,10 +782,6 @@ class Scene:
             If set to `True`, then the paths involving RIS are computed.
             Defaults to `True`.
 
-        ris : bool
-            If set to `True`, then the paths involving RIS are computed.
-            Defaults to `True`.
-
         scat_keep_prob : float
             Probability with which to keep scattered paths.
             This is helpful to reduce the number of scattered paths computed,
@@ -769,9 +813,6 @@ class Scene:
         ris_paths : :class:`~sionna.rt.Paths`
             Computed paths involving RIS
 
-        ris_paths : :class:`~sionna.rt.Paths`
-            Computed paths involving RIS
-
         spec_paths_tmp : :class:`~sionna.rt.PathsTmpData`
             Additional data required to compute the EM fields of the specular
             paths
@@ -788,9 +829,6 @@ class Scene:
             Additional data required to compute the EM fields of the paths
             involving RIS
 
-        ris_paths_tmp : :class:`~sionna.rt.PathsTmpData`
-            Additional data required to compute the EM fields of the paths
-            involving RIS
         """
 
         if scat_keep_prob < 0. or scat_keep_prob > 1.:
@@ -819,7 +857,7 @@ class Scene:
                        ris_paths_tmp, check_scene=True, scat_random_phases=True,
                        testing=False):
         r"""compute_fields(self, spec_paths, diff_paths, scat_paths, spec_paths_tmp, diff_paths_tmp, scat_paths_tmp, check_scene=True, scat_random_phases=True)
-        Computes the EM fields corresponding to traced paths
+        Computes the EM fields corresponding to traced paths.
 
         Paths can be traced using :meth:`~sionna.rt.Scene.trace_paths()`.
         This method can then be used to finalize the paths calculation by
@@ -933,7 +971,7 @@ class Scene:
                       testing=False):
         # pylint: disable=line-too-long
         r"""
-        Computes propagation paths
+        Computes propagation paths.
 
         This function computes propagation paths between the antennas of
         all transmitters and receivers in the current scene.
@@ -1133,7 +1171,8 @@ class Scene:
                      scattering=False,
                      ris=True,
                      edge_diffraction=False,
-                     check_scene=True):
+                     check_scene=True,
+                     num_runs=1):
         # pylint: disable=line-too-long
         r"""
         This function computes a coverage map for every transmitter in the scene.
@@ -1147,7 +1186,7 @@ class Scene:
         .. math::
             :label: cm_def
 
-            b_{i,j} = \frac{1}{\lvert C \rvert} \int_{C_{i,j}} \lvert h(s) \rvert^2 ds
+            g_{i,j} = \frac{1}{\lvert C \rvert} \int_{C_{i,j}} \lvert h(s) \rvert^2 ds
 
         where :math:`\lvert h(s) \rvert^2` is the squared amplitude
         of the path coefficients :math:`a_i` at position :math:`s=(x,y)`,
@@ -1155,14 +1194,41 @@ class Scene:
         :math:`ds` is the infinitesimal small surface element
         :math:`ds=dx \cdot dy`.
         The dimension indexed by :math:`i` (:math:`j`) corresponds to the :math:`y\, (x)`-axis of the
-        coverage map in its local coordinate system.
+        coverage map in its local coordinate system. The quantity
+        :math:`g_{i,j}` can be seen as the average :attr:`~sionna.rt.CoverageMap.path_gain` across a cell.
+
+        The path gain can be transformed into the received signal strength (:attr:`~sionna.rt.CoverageMap.rss`)
+        by multiplying it with the transmit :attr:`~sionna.rt.Transmitter.power`:
+
+        .. math::
+
+            \mathrm{RSS}_{i,j} = P_{tx} g_{i,j}.
+
+        If a scene has multiple transmitters, the
+        signal-to-interference-plus-noise ratio
+        (:attr:`~sionna.rt.Transmitter.sinr`) for transmitter :math:`k` is then
+        defined as
+
+        .. math::
+
+            \mathrm{SINR}^k_{i,j}=\frac{\mathrm{RSS}^k_{i,j}}{N_0+\sum_{k'\ne k} \mathrm{RSS}^{k'}_{i,j}}
+
+        where :math:`N_0` [W] is the :attr:`~sionna.rt.Scene.thermal_noise_power`, computed as:
+
+        .. math::
+
+            N_0 = B \times T \times k
+
+        where :math:`B` [Hz] is the transmission :attr:`~sionna.rt.Scene.bandwidth`,
+        :math:`T` [K] is the :attr:`~sionna.rt.Scene.temperature`, and
+        :math:`k=1.380649\times 10^{-23}` [J/K] is the Boltzmann constant.
 
         For specularly and diffusely reflected paths, :eq:`cm_def` can be rewritten as an integral over the directions
         of departure of the rays from the transmitter, by substituting :math:`s`
         with the corresponding direction :math:`\omega`:
 
         .. math::
-            b_{i,j} = \frac{1}{\lvert C \rvert} \int_{\Omega} \lvert h\left(s(\omega) \right) \rvert^2 \frac{r(\omega)^2}{\lvert \cos{\alpha(\omega)} \rvert} \mathbb{1}_{\left\{ s(\omega) \in C_{i,j} \right\}} d\omega
+            g_{i,j} = \frac{1}{\lvert C \rvert} \int_{\Omega} \lvert h\left(s(\omega) \right) \rvert^2 \frac{r(\omega)^2}{\lvert \cos{\alpha(\omega)} \rvert} \mathbb{1}_{\left\{ s(\omega) \in C_{i,j} \right\}} d\omega
 
         where the integration is over the unit sphere :math:`\Omega`, :math:`r(\omega)` is the length of
         the path with direction of departure :math:`\omega`, :math:`s(\omega)` is the point
@@ -1186,14 +1252,14 @@ class Scene:
         .. math::
             :label: cm_mc_ref
 
-            \hat{b}_{i,j}^{\text{(ref)}} = \frac{4\pi}{N\lvert C \rvert} \sum_{n=1}^N \lvert h\left(s(\omega_n)\right)  \rvert^2 \frac{r(\omega_n)^2}{\lvert \cos{\alpha(\omega_n)} \rvert} \mathbb{1}_{\left\{ s(\omega_n) \in C_{i,j} \right\}}.
+            \hat{g}_{i,j}^{\text{(ref)}} = \frac{4\pi}{N\lvert C \rvert} \sum_{n=1}^N \lvert h\left(s(\omega_n)\right)  \rvert^2 \frac{r(\omega_n)^2}{\lvert \cos{\alpha(\omega_n)} \rvert} \mathbb{1}_{\left\{ s(\omega_n) \in C_{i,j} \right\}}.
 
         For the diffracted paths, :eq:`cm_def` can be rewritten for any wedge
         with length :math:`L` and opening angle :math:`\Phi` as an integral over the wedge and its opening angle,
         by substituting :math:`s` with the position on the wedge :math:`\ell \in [1,L]` and the angle :math:`\phi \in [0, \Phi]`:
 
         .. math::
-            b_{i,j} = \frac{1}{\lvert C \rvert} \int_{\ell} \int_{\phi} \lvert h\left(s(\ell,\phi) \right) \rvert^2 \mathbb{1}_{\left\{ s(\ell,\phi) \in C_{i,j} \right\}} \left\lVert \frac{\partial r}{\partial \ell} \times \frac{\partial r}{\partial \phi} \right\rVert d\ell d\phi
+            g_{i,j} = \frac{1}{\lvert C \rvert} \int_{\ell} \int_{\phi} \lvert h\left(s(\ell,\phi) \right) \rvert^2 \mathbb{1}_{\left\{ s(\ell,\phi) \in C_{i,j} \right\}} \left\lVert \frac{\partial r}{\partial \ell} \times \frac{\partial r}{\partial \phi} \right\rVert d\ell d\phi
 
         where the integral is over the wedge length :math:`L` and opening angle :math:`\Phi`, and
         :math:`r\left( \ell, \phi \right)` is the reparametrization with respected to :math:`(\ell, \phi)` of the
@@ -1204,7 +1270,7 @@ class Scene:
         .. math::
             :label: cm_mc_diff
 
-            \hat{b}_{i,j}^{\text{(diff)}} = \frac{L\Phi}{N'\lvert C \rvert} \sum_{n=1}^{N'} \lvert h\left(s(\ell_n,\phi_n)\right) \rvert^2 \mathbb{1}_{\left\{ s(\ell_n,\phi_n) \in C_{i,j} \right\}} \left\lVert \left(\frac{\partial r}{\partial \ell}\right)_n \times \left(\frac{\partial r}{\partial \phi}\right)_n \right\rVert.
+            \hat{g}_{i,j}^{\text{(diff)}} = \frac{L\Phi}{N'\lvert C \rvert} \sum_{n=1}^{N'} \lvert h\left(s(\ell_n,\phi_n)\right) \rvert^2 \mathbb{1}_{\left\{ s(\ell_n,\phi_n) \in C_{i,j} \right\}} \left\lVert \left(\frac{\partial r}{\partial \ell}\right)_n \times \left(\frac{\partial r}{\partial \phi}\right)_n \right\rVert.
 
         The output of this function is therefore a real-valued matrix of size ``[num_cells_y, num_cells_x]``,
         for every transmitter, with elements equal to the sum of the contributions of the reflected and scattered paths
@@ -1361,7 +1427,7 @@ class Scene:
             If set to `None`, then defaults to
             :math:`\frac{1}{\sqrt{\text{num_rx_ant}}} [1,\dots,1]^{\mathsf{T}}`.
 
-        precoding_vec : [num_tx_ant], complex | None
+        precoding_vec : [num_tx_ant] | [num_tx, num_tx_ant], complex | None
             Precoding vector.
             If set to `None`, then defaults to
             :math:`\frac{1}{\sqrt{\text{num_tx_ant}}} [1,\dots,1]^{\mathsf{T}}`.
@@ -1404,10 +1470,19 @@ class Scene:
             computing the coverage map. This can add a significant overhead.
             Defaults to `True`.
 
+        num_runs : int, >= 1
+            Number of times the coverage map solver is executed. The returned
+            coverage map is the average over all runs. If set to a value greater
+            than one, a random rotation is applied to the Fibonacci lattice at
+            each run.
+            Using mutiple runs can reduce noise in the coverage map without
+            increasing ``num_samples`` and the related memory footprint.
+            Defaults to 1.
+
         Output
         ------
         :cm : :class:`~sionna.rt.CoverageMap`
-            The coverage maps
+            Coverage map
         """
 
         # Check that all is set to compute the coverage map
@@ -1461,8 +1536,8 @@ class Scene:
                                              self._dtype))
         else:
             combining_vec = tf.cast(combining_vec, self._dtype)
+        num_tx = len(self.transmitters)
         if precoding_vec is None:
-            num_tx = len(self.transmitters)
             precoding_vec = tf.ones([num_tx, self.tx_array.num_ant],
                                     self._dtype)
             precoding_vec /= tf.sqrt(tf.cast(self.tx_array.num_ant,
@@ -1470,6 +1545,8 @@ class Scene:
         else:
             precoding_vec = tf.cast(precoding_vec, self._dtype)
             precoding_vec = expand_to_rank(precoding_vec, 2, 0)
+            if precoding_vec.shape[0] == 1:
+                precoding_vec = tf.tile(precoding_vec, [num_tx, 1])
 
         # [3]
         rx_orientation = tf.cast(rx_orientation, self._rdtype)
@@ -1490,20 +1567,19 @@ class Scene:
                                  diffraction=diffraction,
                                  scattering=scattering,
                                  ris=ris,
-                                 edge_diffraction=edge_diffraction)
+                                 edge_diffraction=edge_diffraction,
+                                 num_runs=num_runs)
 
         return output
 
     def preview(self, paths=None, show_paths=True, show_devices=True,
                 show_orientations=False,
-                coverage_map=None, cm_tx=0, cm_db_scale=True,
-                cm_vmin=None, cm_vmax=None,
-                resolution=(655, 500), fov=45, background='#ffffff'):
+                coverage_map=None, cm_tx=None, cm_db_scale=True,
+                cm_vmin=None, cm_vmax=None, cm_metric="path_gain",
+                resolution=(655, 500), fov=45, background='#ffffff',
+                clip_at=None, clip_plane_orientation=(0, 0, -1)):
         # pylint: disable=line-too-long
-        r"""preview(paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_vmin=None, cm_vmax=None, resolution=(655, 500), fov=45, background='#ffffff')
-
-        In an interactive notebook environment, opens an interactive 3D
-        viewer of the scene.
+        r"""In an interactive notebook environment, opens an interactive 3D viewer of the scene.
 
         The returned value of this method must be the last line of
         the cell so that it is displayed. For example:
@@ -1556,11 +1632,12 @@ class Scene:
             An optional coverage map to overlay in the scene for visualization.
             Defaults to `None`.
 
-        cm_tx : int | str
+        cm_tx : int | str | None
             When `coverage_map` is specified, controls which of the transmitters
             to display the coverage map for. Either the transmitter's name
-            or index can be given.
-            Defaults to `0`.
+            or index can be given. If `None`, the maximum metric over all
+            transmitters is shown.
+            Defaults to `None`.
 
         cm_db_scale: bool
             Use logarithmic scale for coverage map visualization, i.e. the
@@ -1575,6 +1652,10 @@ class Scene:
             set to `True`, or in linear scale otherwise.
             If set to None, then covers the complete range.
             Defaults to `None`.
+
+        cm_metric : str, one of ["path_gain", "rss", "sinr"]
+            Metric of the coverage map to be displayed.
+            Defaults to `path_gain`.
 
         resolution : [2], int
             Size of the viewer figure.
@@ -1618,7 +1699,7 @@ class Scene:
         if coverage_map is not None:
             fig.plot_coverage_map(
                 coverage_map, tx=cm_tx, db_scale=cm_db_scale,
-                vmin=cm_vmin, vmax=cm_vmax)
+                vmin=cm_vmin, vmax=cm_vmax, metric=cm_metric)
 
         # Update the camera state
         if not needs_reset:
@@ -1627,14 +1708,11 @@ class Scene:
         return fig
 
     def render(self, camera, paths=None, show_paths=True, show_devices=True,
-               coverage_map=None, cm_tx=0, cm_db_scale=True,
-               cm_vmin=None, cm_vmax=None, cm_show_color_bar=True,
+               coverage_map=None, cm_tx=None, cm_db_scale=True,
+               cm_vmin=None, cm_vmax=None, cm_metric="path_gain", cm_show_color_bar=True,
                num_samples=512, resolution=(655, 500), fov=45):
         # pylint: disable=line-too-long
-        r"""render(camera, paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_vmin=None, cm_vmax=None, cm_show_color_bar=True, num_samples=512, resolution=(655, 500), fov=45)
-
-        Renders the scene from the viewpoint of a camera or the interactive
-        viewer
+        r"""Renders the scene from the viewpoint of a camera or the interactive viewer
 
         Input
         ------
@@ -1662,11 +1740,12 @@ class Scene:
             An optional coverage map to overlay in the scene for visualization.
             Defaults to `None`.
 
-        cm_tx : int | str
+        cm_tx : int | str | None
             When `coverage_map` is specified, controls which of the transmitters
             to display the coverage map for. Either the transmitter's name
-            or index can be given.
-            Defaults to `0`.
+            or index can be given. If `None`, the maximum metric over all
+            transmitters is shown.
+            Defaults to `None`.
 
         cm_db_scale: bool
             Use logarithmic scale for coverage map visualization, i.e. the
@@ -1681,6 +1760,10 @@ class Scene:
             set to `True`, or in linear scale otherwise.
             If set to None, then covers the complete range.
             Defaults to `None`.
+
+        cm_metric : str, one of ["path_gain", "rss", "sinr"]
+            Metric of the coverage map to be displayed.
+            Defaults to `path_gain`.
 
         cm_show_color_bar: bool
             For coverage map visualization, show the color bar describing the
@@ -1715,6 +1798,7 @@ class Scene:
                        cm_db_scale=cm_db_scale,
                        cm_vmin=cm_vmin,
                        cm_vmax=cm_vmax,
+                       cm_metric=cm_metric,
                        num_samples=num_samples,
                        resolution=resolution,
                        fov=fov)
@@ -1738,14 +1822,25 @@ class Scene:
         im_ax.imshow(to_show)
 
         if show_color_bar:
+            cm = getattr(coverage_map, cm_metric).numpy()
+            if cm_tx is None:
+                cm = np.max(cm, axis=0)
+            else:
+                cm = cm[cm_tx]
+                # Ensure that dBm is correctly computed for RSS
+            if cm_metric=="rss" and cm_db_scale:
+                cm *= 1000
             _, normalizer, color_map = coverage_map_color_mapping(
-                coverage_map[cm_tx, :, :].numpy(), db_scale=cm_db_scale,
+                cm, db_scale=cm_db_scale,
                 vmin=cm_vmin, vmax=cm_vmax)
             mappable = matplotlib.cm.ScalarMappable(
                 norm=normalizer, cmap=color_map)
 
             cax = ax[1]
-            cax.set_title('dB')
+            if cm_metric=="rss" and cm_db_scale:
+                cax.set_title("dBm")
+            else:
+                cax.set_title('dB')
             fig.colorbar(mappable, cax=cax)
 
         # Remove axes and margins
@@ -1754,13 +1849,11 @@ class Scene:
         return fig
 
     def render_to_file(self, camera, filename, paths=None, show_paths=True, show_devices=True,
-                       coverage_map=None, cm_tx=0, cm_db_scale=True,
-                       cm_vmin=None, cm_vmax=None,
+                       coverage_map=None, cm_tx=None, cm_db_scale=True,
+                       cm_vmin=None, cm_vmax=None, cm_metric="path_gain",
                        num_samples=512, resolution=(655, 500), fov=45):
         # pylint: disable=line-too-long
-        r"""render_to_file(camera, filename, paths=None, show_paths=True, show_devices=True, coverage_map=None, cm_tx=0, cm_db_scale=True, cm_vmin=None, cm_vmax=None, num_samples=512, resolution=(655, 500), fov=45)
-
-        Renders the scene from the viewpoint of a camera or the interactive
+        r"""Renders the scene from the viewpoint of a camera or the interactive
         viewer, and saves the resulting image
 
         Input
@@ -1792,11 +1885,12 @@ class Scene:
             An optional coverage map to overlay in the scene for visualization.
             Defaults to `None`.
 
-        cm_tx : int | str
+        cm_tx : int | str | None
             When `coverage_map` is specified, controls which of the transmitters
             to display the coverage map for. Either the transmitter's name
-            or index can be given.
-            Defaults to `0`.
+            or index can be given. If `None`, the maximum metric over all
+            transmitters is shown.
+            Defaults to `None`.
 
         cm_db_scale: bool
             Use logarithmic scale for coverage map visualization, i.e. the
@@ -1811,6 +1905,10 @@ class Scene:
             set to `True`, or in linear scale otherwise.
             If set to None, then covers the complete range.
             Defaults to `None`.
+
+        cm_metric : str, one of ["path_gain", "rss", "sinr"]
+            Metric of the coverage map to be displayed.
+            Defaults to `path_gain`.
 
         num_samples : int
             Number of rays thrown per pixel.
@@ -1835,6 +1933,7 @@ class Scene:
                        cm_db_scale=cm_db_scale,
                        cm_vmin=cm_vmin,
                        cm_vmax=cm_vmax,
+                       cm_metric=cm_metric,
                        num_samples=num_samples,
                        resolution=resolution,
                        fov=fov)
@@ -1931,6 +2030,14 @@ class Scene:
     @scattering_pattern_callable.setter
     def scattering_pattern_callable(self, sp_callable):
         self._scattering_pattern_callable = sp_callable
+
+    @property
+    def mi_shapes(self):
+        # pylint: disable=line-too-long
+        """
+        `list` (read-only), [:class:`mi.Shape`] : List of Mitsuba shapes of the scene. The index of the shapes in this list defines the shapes IDs.
+        """
+        return self._mi_shapes
 
     ##############################################
     # Internal methods.
@@ -2142,6 +2249,14 @@ class Scene:
 
         warnings.warn(f"No shape element with name {shape_name} in root to update.")
         return False
+    
+    @property
+    def mi2sionna_shift_obj_id(self):
+        """
+        int : Value to substract to the Mitsuba IDs (shape pointers) to obtain
+        Sionna IDs
+        """
+        return self._mi2sionna_shift_obj_id
 
     def scene_geometry_updated(self):
         """
@@ -2236,11 +2351,12 @@ class Scene:
         """
         Load the scene objects available in the scene
         """
+
+        # List of shapes indexed by their IDs
+        self._mi_shapes = self._scene.shapes()
+
         # Parse all shapes in the scene
-        scene = self._scene
-        objects_id = dr.reinterpret_array_v(mi.UInt32,scene.shapes_dr()).tf()
-        for obj_id,s in zip(objects_id,scene.shapes()):
-            obj_id = int(obj_id.numpy())
+        for obj_id,s in enumerate(self._mi_shapes):
             # Only meshes are handled
             if not isinstance(s, mi.Mesh):
                 raise TypeError('Only triangle meshes are supported')

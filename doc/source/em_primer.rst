@@ -965,15 +965,15 @@ where we have assumed, as in :eq:`ris_field`, that the RIS does not realize any 
 References:
     .. [atan2] Wikipedia, "`atan2 <https://en.wikipedia.org/wiki/Atan2>`__," accessed 8 Feb. 2023.
 
-    .. [Balanis] A. Balanis, "Advanced Engineering Electromagnetics," John Wiley & Sons, 2012.
+    .. [Balanis] A\. Balanis, "Advanced Engineering Electromagnetics," John Wiley & Sons, 2012.
 
-    .. [Degli-Esposti07] Vittorio Degli-Esposti et al., "`Measurement and modelling of scattering from buildings <https://ieeexplore.ieee.org/abstract/document/4052607>`_," IEEE Trans. Antennas Propag, vol. 55, no. 1,  pp.143-153, Jan. 2007.
+    .. [Degli-Esposti07] V\. Degli-Esposti et al., "`Measurement and modelling of scattering from buildings <https://ieeexplore.ieee.org/abstract/document/4052607>`_," IEEE Trans. Antennas Propag, vol. 55, no. 1,  pp.143-153, Jan. 2007.
 
-    .. [Degli-Esposti11] Vittorio Degli-Esposti et al., "`Analysis and Modeling on co- and Cross-Polarized Urban Radio Propagation for Dual-Polarized MIMO Wireless Systems <https://ieeexplore.ieee.org/abstract/document/5979177>`_", IEEE Trans. Antennas Propag, vol. 59, no. 11,  pp.4247-4256, Nov. 2011.
+    .. [Degli-Esposti11] V\. Degli-Esposti et al., "`Analysis and Modeling on co- and Cross-Polarized Urban Radio Propagation for Dual-Polarized MIMO Wireless Systems <https://ieeexplore.ieee.org/abstract/document/5979177>`_", IEEE Trans. Antennas Propag, vol. 59, no. 11,  pp.4247-4256, Nov. 2011.
 
-    .. [Degli-Esposti22] Vittorio Degli-Esposti et al., "`Reradiation and Scattering From a Reconfigurable Intelligent Surface: A General Macroscopic Model <https://ieeexplore.ieee.org/abstract/document/9713744>`_", IEEE Trans. Antennas Propag, vol. 70, no. 10,  pp.8691-8706, Oct. 2022.
+    .. [Degli-Esposti22] V\. Degli-Esposti et al., "`Reradiation and Scattering From a Reconfigurable Intelligent Surface: A General Macroscopic Model <https://ieeexplore.ieee.org/abstract/document/9713744>`_", IEEE Trans. Antennas Propag, vol. 70, no. 10,  pp.8691-8706, Oct. 2022.
 
-    .. [Di-Renzo20] Marco Di Renzo et al., "`Smart Radio Environments Empowered by Reconfigurable Intelligent Surfaces: How It Works, State of Research, and The Road Ahead <https://ieeexplore.ieee.org/document/9140329>`_", IEEE J. Sel. Areas Commun., vol. 38, no. 11 pp.2450-2525, Nov. 2020.
+    .. [Di-Renzo20] M\. Di Renzo et al., "`Smart Radio Environments Empowered by Reconfigurable Intelligent Surfaces: How It Works, State of Research, and The Road Ahead <https://ieeexplore.ieee.org/document/9140329>`_", IEEE J. Sel. Areas Commun., vol. 38, no. 11 pp.2450-2525, Nov. 2020.
 
     .. [Fresnel] Wikipedia, "`Fresnel integral <https://en.wikipedia.org/wiki/Fresnel_integral>`_," accessed 21 Apr. 2023.
 
@@ -981,29 +981,29 @@ References:
 
     .. [ITURP52615] ITU, "`Recommendation ITU-R P.526-15: Propagation by diffraction <https://www.itu.int/rec/R-REC-P.526/en>`_," Oct. 2019.
 
-    .. [Keller62] J.B. Keller, "`Geometrical Theory of Diffraction <https://opg.optica.org/josa/abstract.cfm?uri=josa-52-2-116>`_," Journal of the Optical Society of America, vol. 52, no. 2, Feb. 1962.
+    .. [Keller62] J\. B\. Keller, "`Geometrical Theory of Diffraction <https://opg.optica.org/josa/abstract.cfm?uri=josa-52-2-116>`_," Journal of the Optical Society of America, vol. 52, no. 2, Feb. 1962.
 
-    .. [Kline] M. Kline, "An Asymptotic Solution of Maxwell's Equations," Commun. Pure Appl. Math., vol. 4, 1951.
+    .. [Kline] M\. Kline, "An Asymptotic Solution of Maxwell's Equations," Commun. Pure Appl. Math., vol. 4, 1951.
 
-    .. [Kouyoumjian74] R.G. Kouyoumjian, "`A uniform geometrical theory of diffraction for an edge in a perfectly conducting surface <https://ieeexplore.ieee.org/abstract/document/1451581/authors#authors>`_," Proc. of the IEEE, vol. 62, no. 11, Nov. 1974.
+    .. [Kouyoumjian74] R\. G\. Kouyoumjian, "`A uniform geometrical theory of diffraction for an edge in a perfectly conducting surface <https://ieeexplore.ieee.org/abstract/document/1451581/authors#authors>`_," Proc. of the IEEE, vol. 62, no. 11, Nov. 1974.
 
-    .. [Luebbers84] R. Luebbers, "`Finite conductivity uniform GTD versus knife edge diffraction in prediction of propagation path loss <https://ieeexplore.ieee.org/abstract/document/1143189>`_," IEEE Trans. Antennas and Propagation, vol. 32, no. 1, Jan. 1984.
+    .. [Luebbers84] R\. Luebbers, "`Finite conductivity uniform GTD versus knife edge diffraction in prediction of propagation path loss <https://ieeexplore.ieee.org/abstract/document/1143189>`_," IEEE Trans. Antennas and Propagation, vol. 32, no. 1, Jan. 1984.
 
-    .. [Luneberg] R.M. Luneberg, "Mathematical Theory of Optics," Brown University Press, 1944.
+    .. [Luneberg] R\. M\. Luneberg, "Mathematical Theory of Optics," Brown University Press, 1944.
 
-    .. [McNamara90] D.A. McNamara, C.W.I. Pistorius, J.A.G. Malherbe, "`Introduction to the Uniform Geometrical Theory of Diffraction <https://us.artechhouse.com/Introduction-to-the-Uniform-Geometrical-Theory-of-Diffraction-P288.aspx>`_," Artech House, 1990.
+    .. [McNamara90] D\. A\. McNamara, C.W.I. Pistorius, J.A.G. Malherbe, "`Introduction to the Uniform Geometrical Theory of Diffraction <https://us.artechhouse.com/Introduction-to-the-Uniform-Geometrical-Theory-of-Diffraction-P288.aspx>`_," Artech House, 1990.
 
     .. [METIS] METIS Deliverable D1.4, "`METIS Channel Models <https://metis2020.com/wp-content/uploads/deliverables/METIS_D1.4_v1.0.pdf>`_", Feb. 2015.
 
-    .. [Tse] D. Tse, P. Viswanath, "`Fundamentals of Wireless Communication <https://web.stanford.edu/~dntse/wireless_book.html>`_", Cambridge University Press, 2005.
+    .. [Tse] D\. Tse, P\. Viswanath, "`Fundamentals of Wireless Communication <https://web.stanford.edu/~dntse/wireless_book.html>`_", Cambridge University Press, 2005.
 
-    .. [Vitucci24] Enrico Maria Vittuci et al., "`An Efficient Ray-Based Modeling Approach for Scattering From Reconfigurable Intelligent Surfaces <https://ieeexplore.ieee.org/abstract/document/10419169>`_", IEEE Trans. Antennas Propag, vol. 72, no. 3,  pp.2673-2685, Mar. 2024.
+    .. [Vitucci24] E\. M\. Vittuci et al., "`An Efficient Ray-Based Modeling Approach for Scattering From Reconfigurable Intelligent Surfaces <https://ieeexplore.ieee.org/abstract/document/10419169>`_", IEEE Trans. Antennas Propag, vol. 72, no. 3,  pp.2673-2685, Mar. 2024.
 
-    .. [Wiesbeck] N. Geng and W. Wiesbeck, "Planungsmethoden für die Mobilkommunikation," Springer, 1998.
+    .. [Wiesbeck] N\. Geng and W\. Wiesbeck, "Planungsmethoden für die Mobilkommunikation," Springer, 1998.
 
     .. [Wikipedia] Wikipedia, "`Maximum power transfer theorem <https://en.wikipedia.org/wiki/Maximum_power_transfer_theorem>`_," accessed 7 Oct. 2022.
 
     .. [Wikipedia_Rodrigues] Wikipedia, "`Rodrigues' rotation formula <https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula>`_," accessed 16 Jun. 2023.
 
-    .. [Pharr] M. Pharr, J. Wenzel, G. Humphreys, "`Physically Based Rendering: From Theory to Implementation <https://www.pbr-book.org/3ed-2018/contents>`_," MIT Press, 2023.
+    .. [Pharr] M\. Pharr, J\. Wenzel, G\. Humphreys, "`Physically Based Rendering: From Theory to Implementation <https://www.pbr-book.org/3ed-2018/contents>`_," MIT Press, 2023.
 

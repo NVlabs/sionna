@@ -8,6 +8,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 from importlib_resources import files, as_file
+from sionna import config
 from sionna.fec.turbo import coeffs
 
 class RowColumnInterleaver(Layer):
@@ -612,10 +613,10 @@ class RandomInterleaver(Layer):
         else:
             # generate new seed for each call
             # Note: not necessarily random if XLA is active
-            seed = tf.random.uniform([2],
-                                     minval=0,
-                                     maxval=2**31-1,
-                                     dtype=tf.int32)
+            seed = config.tf_rng.uniform([2],
+                                         minval=0,
+                                         maxval=2**31-1,
+                                         dtype=tf.int32)
         # select if each sample in batch needs own perm (computational complex!)
         if self._keep_batch_constant:
             batch_size = 1

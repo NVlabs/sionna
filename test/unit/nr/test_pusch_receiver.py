@@ -2,28 +2,10 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-
+import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-import json
-import scipy
 import numpy as np
 import sionna
 from sionna.utils import compute_ber
@@ -98,13 +80,12 @@ def run_test(pusch_configs, channel_estimator="perfect", domain="freq", num_rx=1
     sionna.config.xla_compat=False
     return res
 
-
+@pytest.mark.usefixtures("only_gpu")
 class TestPUSCHReceiver(unittest.TestCase):
     """Tests for PUSCHReceiver"""
 
     def test_01(self):
         """Test perfect and imperfect CSI in all execution modes"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.num_antenna_ports=4
@@ -142,7 +123,6 @@ class TestPUSCHReceiver(unittest.TestCase):
 
     def test_02(self):
         """Multi transmitter, multi stream test"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.num_antenna_ports=4
@@ -168,7 +148,6 @@ class TestPUSCHReceiver(unittest.TestCase):
 
     def test_03(self):
         """Multi transmitter, multi stream, no precoding"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.num_antenna_ports=2
@@ -194,7 +173,6 @@ class TestPUSCHReceiver(unittest.TestCase):
 
     def test_04(self):
         """Very large transport block"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 273
         pusch_config.tb.mcs_index = 26
@@ -213,7 +191,6 @@ class TestPUSCHReceiver(unittest.TestCase):
 
     def test_05(self):
         """Very short transport block"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 1
         pusch_config.num_antenna_ports=1
@@ -232,7 +209,6 @@ class TestPUSCHReceiver(unittest.TestCase):
 
     def test_06(self):
         """Multi transmitter, multi stream, multi receiver test"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.num_antenna_ports=4
@@ -262,7 +238,6 @@ class TestPUSCHReceiver(unittest.TestCase):
 
     def test_07(self):
         """Multi transmitter, multi stream, multi receiver test in tf.complex128"""
-        tf.random.set_seed(1)
         pusch_config = PUSCHConfig()
         pusch_config.n_size_bwp = 4
         pusch_config.num_antenna_ports=4

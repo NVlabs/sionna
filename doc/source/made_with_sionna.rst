@@ -7,6 +7,32 @@ We love to see how Sionna is used by other researchers! For this reason, you fin
 If you want your paper/project and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
 
 .. made-with-sionna::
+    :title: Advancing Spectrum Anomaly Detection through Digital Twins
+    :authors: Anton Schösser, Friedrich Burmeister, Philipp Schulz, Mohd Danish Khursheed, Sinuo Ma, Gerhard Fettweis
+    :year: 2024
+    :version: 0.15.1
+    :link_arxiv: https://www.techrxiv.org/users/775914/articles/883996-advancing-spectrum-anomaly-detection-through-digital-twins
+    :link_github: https://github.com/akdd11/advancing-spectrum-anomaly-detection
+    :abstract: 6th generation (6G) cellular networks are expected to enable various safety-critical use cases, e.g., in the industrial domain, which require flawless operation of the network. Thus, resilience is one of the key requirements for 6G. A particularly critical point is that 6G, as any other wireless technology, is based on the open radio medium, making it susceptible to interference. Especially intentional interference, i.e., jamming, can severely degrade the network operability. Therefore, a new approach for detecting anomalies in the radio spectrum using a digital twin (DT) of the radio environment is presented in this work. This allows the integration of contextual awareness in the anomaly detection process and is thereby superior to state-of-the-art methods  for spectrum anomaly detection. We propose a suitable system architecture and discuss the tasks of machine learning (ML) therein, particularly for reducing the computational complexity and to detect anomalies in an unsupervised manner. The feasibility of the approach is demonstrated by ray tracing simulations. The results indicate a strong detection capability in case of an accurate DT and thereby illustrate the potential of DTs to enhance monitoring of  wireless networks in the future.
+
+.. made-with-sionna::
+    :title: Physically Consistent RIS: From Reradiation Mode Optimization to Practical Realization
+    :authors: Javad Shabanpour, Constantin Simovski, Giovanni Geraci
+    :year: 2024
+    :version: 0.18
+    :link_arxiv: https://arxiv.org/abs/2409.17738
+    :abstract: We propose a practical framework for designing a physically consistent reconfigurable intelligent surface (RIS) to overcome the inefficiency of the conventional phase gradient approach. For a section of Cape Town and across three different coverage enhancement scenarios, we optimize the amplitude of the RIS reradiation modes using Sionna ray tracing and a gradient-based learning technique. We then determine the required RIS surface/sheet impedance given the desired amplitudes for the reradiation modes, design the corresponding unitcells, and validate the performance through full-wave numerical simulations using CST Microwave Studio. We further validate our approach by fabricating a RIS using the parallel plate waveguide technique and conducting experimental measurements that align with our theoretical predictions.
+
+.. made-with-sionna::
+    :title: Design of a Standard-Compliant Real-Time Neural Receiver for 5G NR
+    :authors: Reinhard Wiesmayr, Sebastian Cammerer, Fayçal Aït Aoudia, Jakob Hoydis, Jakub Zakrzewski, Alexander Keller
+    :year: September 2024
+    :version: 0.18
+    :link_arxiv: https://arxiv.org/abs/2409.02912
+    :link_github: https://github.com/NVlabs/neural_rx
+    :abstract: We detail the steps required to deploy a multi-user multiple-input multiple-output (MU-MIMO) neural receiver (NRX) in an actual cellular communication system. This raises several exciting research challenges, including the need for real-time inference and compatibility with the 5G NR standard. As the network configuration in a practical setup can change dynamically within milliseconds, we propose an adaptive NRX architecture capable of supporting dynamic modulation and coding scheme (MCS) configurations without the need for any re-training and without additional inference cost. We optimize the latency of the neural network (NN) architecture to achieve inference times of less than 1ms on an NVIDIA A100 GPU using the TensorRT inference library. These latency constraints effectively limit the size of the NN and we quantify the resulting signal-to-noise ratio (SNR) degradation as less than 0.7 dB when compared to a preliminary non-real-time NRX architecture. Finally, we explore the potential for site-specific adaptation of the receiver by investigating the required size of the training dataset and the number of fine-tuning iterations to optimize the NRX for specific radio environments using a ray tracing-based channel model. The resulting NRX is ready for deployment in a real-time 5G NR system and the source code including the TensorRT experiments is available online.
+
+.. made-with-sionna::
     :title: BostonTwin: the Boston Digital Twin for Ray-Tracing in 6G Networks
     :authors: Paolo Testolina, Michele Polese, Pedram Johari, Tommaso Melodia
     :year: March 2024

@@ -2,28 +2,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 import unittest
 import numpy as np
 import sionna
+from sionna import config
 from channel_test_utils import *
-
 
 class TestChannelCoefficientsGenerator(unittest.TestCase):
     r"""Test the computation of channel coefficients"""
@@ -57,9 +41,6 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
 
     def setUp(self):
 
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-
         fc = TestChannelCoefficientsGenerator.CARRIER_FREQUENCY
 
         # UT and BS arrays have no impact on LSP
@@ -92,11 +73,11 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
         h_ut = TestChannelCoefficientsGenerator.H_UT
         h_bs = TestChannelCoefficientsGenerator.H_BS
 
-        rx_orientations = tf.random.uniform([batch_size, nb_ut, 3], 0.0,
+        rx_orientations = config.tf_rng.uniform([batch_size, nb_ut, 3], 0.0,
                                             2*np.pi, dtype=tf.float64)
-        tx_orientations = tf.random.uniform([batch_size, nb_bs, 3], 0.0,
+        tx_orientations = config.tf_rng.uniform([batch_size, nb_bs, 3], 0.0,
                                             2*np.pi, dtype=tf.float64)
-        ut_velocities = tf.random.uniform([batch_size, nb_ut, 3], 0.0, 5.0,
+        ut_velocities = config.tf_rng.uniform([batch_size, nb_ut, 3], 0.0, 5.0,
                                                 dtype=tf.float64)
 
         scenario = sionna.channel.tr38901.RMaScenario(fc, self.rx_array,
@@ -165,8 +146,8 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
         """Test 3GPP channel coefficient calculation: Unit sphere vector"""
         #
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
-        theta = tf.random.normal(shape=[batch_size]).numpy()
-        phi = tf.random.normal(shape=[batch_size]).numpy()
+        theta = config.tf_rng.normal(shape=[batch_size]).numpy()
+        phi = config.tf_rng.normal(shape=[batch_size]).numpy()
         uvec_ref = self.unit_sphere_vector_ref(theta, phi)
         uvec = self.ccg._unit_sphere_vector(theta, phi).numpy()
         max_err = self.max_rel_err(uvec_ref, uvec)
@@ -196,7 +177,7 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
     def test_forward_rotation_matrix(self):
         """Test 3GPP channel coefficient calculation: Forward rotation matrix"""
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
-        orientation = tf.random.normal(shape=[batch_size,3]).numpy()
+        orientation = config.tf_rng.normal(shape=[batch_size,3]).numpy()
         R_ref = self.forward_rotation_matrix_ref(orientation)
         R = self.ccg._forward_rotation_matrix(orientation).numpy()
         max_err = self.max_rel_err(R_ref, R)
@@ -216,7 +197,7 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
     def test_reverse_rotation_matrix(self):
         """Test 3GPP channel coefficient calculation: Reverse rotation matrix"""
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
-        orientation = tf.random.normal(shape=[batch_size,3]).numpy()
+        orientation = config.tf_rng.normal(shape=[batch_size,3]).numpy()
         R_ref = self.reverse_rotation_matrix_ref(orientation)
         R = self.ccg._reverse_rotation_matrix(orientation).numpy()
         max_err = self.max_rel_err(R_ref, R)
@@ -255,9 +236,9 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
     def test_gcs_to_lcs(self):
         """Test 3GPP channel coefficient calculation: GCS to LCS"""
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
-        orientation = tf.random.normal(shape=[batch_size,3]).numpy()
-        theta = tf.random.normal(shape=[batch_size]).numpy()
-        phi = tf.random.normal(shape=[batch_size]).numpy()
+        orientation = config.tf_rng.normal(shape=[batch_size,3]).numpy()
+        theta = config.tf_rng.normal(shape=[batch_size]).numpy()
+        phi = config.tf_rng.normal(shape=[batch_size]).numpy()
 
         theta_prime_ref, phi_prime_ref = self.gcs_to_lcs_ref(orientation, theta,
                                                             phi)
@@ -303,10 +284,10 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
     def test_l2g_response(self):
         """Test 3GPP channel coefficient calculation: L2G antenna response"""
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
-        orientation = tf.random.normal(shape=[batch_size,3]).numpy()
-        theta = tf.random.normal(shape=[batch_size]).numpy()
-        phi = tf.random.normal(shape=[batch_size]).numpy()
-        F_prime = tf.random.normal(shape=[batch_size,2]).numpy()
+        orientation = config.tf_rng.normal(shape=[batch_size,3]).numpy()
+        theta = config.tf_rng.normal(shape=[batch_size]).numpy()
+        phi = config.tf_rng.normal(shape=[batch_size]).numpy()
+        F_prime = config.tf_rng.normal(shape=[batch_size,2]).numpy()
 
         F_ref = self.l2g_response_ref(F_prime, orientation, theta, phi)
         F = self.ccg._l2g_response( tf.cast(F_prime, tf.float64),
@@ -333,8 +314,8 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
         """Test 3GPP channel coefficient calculation: Rotate position according
         to orientation"""
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
-        orientations = tf.random.normal(shape=[batch_size,3]).numpy()
-        positions = tf.random.normal(shape=[batch_size,3, 1]).numpy()
+        orientations = config.tf_rng.normal(shape=[batch_size,3]).numpy()
+        positions = config.tf_rng.normal(shape=[batch_size,3, 1]).numpy()
 
         pos_r_ref = self.rot_pos_ref(orientations, positions)
         pos_r = self.ccg._rot_pos(  tf.cast(orientations, tf.float64),

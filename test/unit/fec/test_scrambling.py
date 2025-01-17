@@ -2,25 +2,11 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 
 import unittest
 import numpy as np
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except Runtime as e:
-        print(e)
+from sionna import config
 from sionna.fec.scrambling import Descrambler, Scrambler, TB5GScrambler
 from sionna.utils import BinarySource
 from sionna.nr import generate_prng_seq
@@ -38,7 +24,7 @@ class TestScrambler(unittest.TestCase):
             # only different batch_sizes are allowed in this mode
             s = Scrambler(binary=False)
             for batch_size in batch_sizes:
-                llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                          tf.cast(seq_length, dtype=tf.int32)])
                 # build scrambler
                 x = s(llr).numpy()
@@ -48,7 +34,7 @@ class TestScrambler(unittest.TestCase):
         s = Scrambler(binary=False, keep_state=False)
         for seq_length in seq_lengths:
             for batch_size in batch_sizes:
-                llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                          tf.cast(seq_length, dtype=tf.int32)])
                 # build scrambler
                 x = s(llr).numpy()
@@ -63,7 +49,7 @@ class TestScrambler(unittest.TestCase):
         for seed in (None, 1337, 1234, 1003): # test some initial seeds
             for keep_state in (False, True):
                 s = Scrambler(seed=seed, keep_state=keep_state, binary=True)
-                llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                          tf.cast(seq_length, dtype=tf.int32)])
                 # build scrambler
                 s(llr)
@@ -79,7 +65,7 @@ class TestScrambler(unittest.TestCase):
 
         seq_length = int(1e6)
         batch_size = int(1e1)
-        llr = tf.random.uniform([batch_size, seq_length])
+        llr = config.tf_rng.uniform([batch_size, seq_length])
 
         for keep_state in (False, True):
             s = Scrambler(keep_batch_constant=False,
@@ -112,7 +98,7 @@ class TestScrambler(unittest.TestCase):
         seq_length = int(1e5)
         batch_size = int(1e2)
         s = Scrambler(keep_state=False, binary=True)
-        llr = tf.random.uniform([batch_size, seq_length])
+        llr = config.tf_rng.uniform([batch_size, seq_length])
         # generate a random sequence
         x1 = s(tf.zeros_like(llr))
         x2 = s(tf.zeros_like(llr))
@@ -127,7 +113,7 @@ class TestScrambler(unittest.TestCase):
         batch_size = int(1e2)
 
         #check binary scrambling
-        b = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        b = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                tf.cast(seq_length, dtype=tf.int32)],
                                minval=0,
                                maxval=1)
@@ -145,7 +131,7 @@ class TestScrambler(unittest.TestCase):
             s = Scrambler(binary=False,
                           keep_batch_constant=keep_batch,
                           keep_state=True)
-            llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+            llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                      tf.cast(seq_length, dtype=tf.int32)])
             x = s(llr)
             x = s(x)
@@ -166,7 +152,7 @@ class TestScrambler(unittest.TestCase):
         Iff keep_state==True, the scrambled sequences must be constant."""
         seq_length = int(1e5)
         batch_size = int(1e2)
-        llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                  tf.cast(seq_length, dtype=tf.int32)],
                                 minval=-100,
                                 maxval=100)
@@ -452,7 +438,7 @@ class TestTB5GScrambler(unittest.TestCase):
         s = TB5GScrambler()
         for seq_length in seq_lengths:
             for batch_size in batch_sizes:
-                llr = tf.random.uniform([tf.cast(batch_size, dtype=tf.int32),
+                llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
                                          tf.cast(seq_length, dtype=tf.int32)])
                 x = s(llr).numpy()
                 self.assertTrue(np.array_equal(np.array(x.shape),
@@ -484,8 +470,8 @@ class TestTB5GScrambler(unittest.TestCase):
         x_ref = s(tf.zeros((batch_size, seq_length)))
 
         for _ in range(100): # randomly init new scramblers
-            n_rnti=np.random.randint(0, 2**16-1)
-            n_id=np.random.randint(0, 2**10-1)
+            n_rnti=config.np_rng.integers(0, 2**16-1)
+            n_id=config.np_rng.integers(0, 2**10-1)
             if n_rnti==n_rnti_ref and n_id==n_id_ref:
                 continue # skip evaluation if ref init parameters are selected
             s = TB5GScrambler(n_rnti, n_id, binary=True)
@@ -503,7 +489,7 @@ class TestTB5GScrambler(unittest.TestCase):
         batch_size = int(1e2)
 
         #check binary scrambling
-        b = tf.random.uniform([batch_size, seq_length], minval=0, maxval=1)
+        b = config.tf_rng.uniform([batch_size, seq_length], minval=0, maxval=1)
         s = TB5GScrambler(binary=True)
         b = tf.cast(tf.greater(0.5, b), dtype=tf.float32)
         x = s(b)
@@ -512,7 +498,7 @@ class TestTB5GScrambler(unittest.TestCase):
 
         #check soft-value scrambling (flip sign)
         s = TB5GScrambler(binary=False)
-        llr = tf.random.uniform([batch_size, seq_length])
+        llr = config.tf_rng.uniform([batch_size, seq_length])
         x = s(llr)
         x = s(x)
         self.assertTrue(np.array_equal(x.numpy(), llr.numpy()))

@@ -2,33 +2,17 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
-import sionna
+import pytest
 import unittest
 import numpy as np
+from scipy.stats import kstest, rayleigh, rice
+from scipy.special import jv
+import sionna
 from sionna.channel.tr38901 import TDL
 from sionna.channel import exp_corr_mat
 from channel_test_utils import *
-from scipy.stats import kstest, rayleigh, rice
-from scipy.special import jv
 
-
+@pytest.mark.usefixtures("only_gpu")
 class TestTDL(unittest.TestCase):
     r"""Test the 3GPP TDL channel model.
     """
@@ -62,10 +46,6 @@ class TestTDL(unittest.TestCase):
     MAX_ERR = 5e-2
 
     def setUpClass():
-
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Dict for storing the samples
         TestTDL.channel_coeff = {}
@@ -285,9 +265,6 @@ class TestTDL(unittest.TestCase):
     # No need to test on evey channel model for spatial correlation
     def test_spatial_correlation_separate_rx_tx(self):
         """Test spatial Correlation with separate RX and TX correlation"""
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Instantiate the model
         num_rx_ant = 16
@@ -335,9 +312,6 @@ class TestTDL(unittest.TestCase):
     # No need to test on evey channel model for spatial correlation
     def test_spatial_correlation_joint_rx_tx(self):
         """Test spatial Correlation with joint filtering"""
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Instantiate the model
         num_rx_ant = 16
@@ -383,9 +357,6 @@ class TestTDL(unittest.TestCase):
     # No need to test on evey channel model for spatial correlation
     def test_no_spatial_correlation(self):
         """No spatial correlation specified leads to no spatial correlation observed"""
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Instantiate the model
         num_rx_ant = 16
@@ -423,9 +394,6 @@ class TestTDL(unittest.TestCase):
     # No need to test on evey channel model for spatial correlation
     def test_rx_corr_only(self):
         """Test with RX spatial correlation only"""
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Instantiate the model
         num_rx_ant = 16
@@ -473,9 +441,6 @@ class TestTDL(unittest.TestCase):
     # No need to test on evey channel model for spatial correlation
     def test_tx_corr_only(self):
         """Test with TX spatial Correlation only"""
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Instantiate the model
         num_rx_ant = 16
@@ -523,9 +488,6 @@ class TestTDL(unittest.TestCase):
     # No need to test on evey channel model for spatial correlation
     def test_spatial_correlation_all_three_inputs(self):
         """Test spatial correlation with all three inputs"""
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
-        np.random.seed(42)
 
         # Instantiate the model
         num_rx_ant = 16

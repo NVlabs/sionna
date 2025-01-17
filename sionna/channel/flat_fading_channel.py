@@ -117,7 +117,7 @@ class ApplyFlatFadingChannel(tf.keras.layers.Layer):
 
     Output
     ------
-    y : [batch_size, num_rx_ant, num_tx_ant], ``dtype``
+    y : [batch_size, num_rx_ant], ``dtype``
         Channel output.
     """
     def __init__(self, add_awgn=True, dtype=tf.complex64, **kwargs):
@@ -211,7 +211,7 @@ class FlatFadingChannel(tf.keras.layers.Layer):
     (y, h) :
         Tuple or Tensor:
 
-    y : [batch_size, num_rx_ant, num_tx_ant], ``dtype``
+    y : [batch_size, num_rx_ant], ``dtype``
         Channel output.
 
     h : [batch_size, num_rx_ant, num_tx_ant], ``dtype``

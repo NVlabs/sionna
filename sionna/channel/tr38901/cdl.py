@@ -14,6 +14,7 @@ import numpy as np
 from sionna.channel.utils import deg_2_rad
 from sionna.channel import ChannelModel
 from sionna import PI
+from sionna import config
 from sionna.utils.tensors import insert_dims
 from . import Topology, ChannelCoefficientsGenerator
 from . import Rays
@@ -253,7 +254,7 @@ class CDL(ChannelModel):
             parameters_fname = "CDL-C.json"
         elif model == 'D':
             parameters_fname = "CDL-D.json"
-        elif model == 'E':
+        else: # 'E'
             parameters_fname = "CDL-E.json"
         self._load_parameters(parameters_fname)
 
@@ -268,21 +269,21 @@ class CDL(ChannelModel):
 
         ## Topology for generating channel coefficients
         # Sample random velocities
-        v_r = tf.random.uniform(shape=[batch_size, 1],
-                                minval=self._min_speed,
-                                maxval=self._max_speed,
-                                dtype=self._real_dtype)
-        v_phi = tf.random.uniform(  shape=[batch_size, 1],
-                                    minval=0.0,
-                                    maxval=2.*PI,
+        v_r = config.tf_rng.uniform(shape=[batch_size, 1],
+                                    minval=self._min_speed,
+                                    maxval=self._max_speed,
                                     dtype=self._real_dtype)
-        v_theta = tf.random.uniform(    shape=[batch_size, 1],
+        v_phi = config.tf_rng.uniform(shape=[batch_size, 1],
+                                      minval=0.0,
+                                      maxval=2.*PI,
+                                      dtype=self._real_dtype)
+        v_theta = config.tf_rng.uniform(shape=[batch_size, 1],
                                         minval=0.0,
                                         maxval=PI,
                                         dtype=self._real_dtype)
-        velocities = tf.stack([ v_r*cos(v_phi)*sin(v_theta),
-                                v_r*sin(v_phi)*sin(v_theta),
-                                v_r*cos(v_theta)], axis=-1)
+        velocities = tf.stack([v_r*cos(v_phi)*sin(v_theta),
+                               v_r*sin(v_phi)*sin(v_theta),
+                               v_r*cos(v_theta)], axis=-1)
         los = tf.fill([batch_size, 1, 1], self._los)
         los_aoa = tf.tile(self._los_aoa, [batch_size, 1, 1])
         los_zoa = tf.tile(self._los_zoa, [batch_size, 1, 1])
@@ -654,7 +655,7 @@ class CDL(ChannelModel):
 
         # Create randomly shuffled indices by arg-sorting samples from a random
         # normal distribution
-        random_numbers = tf.random.normal(tf.shape(angles))
+        random_numbers = config.tf_rng.normal(tf.shape(angles))
         shuffled_indices = tf.argsort(random_numbers)
         # Shuffling the angles
         shuffled_angles = tf.gather(angles,shuffled_indices, batch_dims=4)

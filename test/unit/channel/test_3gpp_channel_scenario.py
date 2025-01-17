@@ -2,23 +2,7 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
-
 import unittest
 import numpy as np
 import sionna
@@ -52,9 +36,6 @@ class TestScenario(unittest.TestCase):
     NB_UT = 10
 
     def setUp(self):
-
-        # Forcing the seed to make the tests deterministic
-        tf.random.set_seed(42)
 
         batch_size = TestScenario.BATCH_SIZE
         nb_bs = TestScenario.NB_BS

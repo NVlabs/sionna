@@ -11,6 +11,7 @@ the nonlinear Schroedinger equation.
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 import sionna
+from sionna import config
 from sionna.channel import utils
 
 
@@ -302,17 +303,17 @@ class SSFM(Layer):
                         / tf.cast(self._length, self._rdtype) \
                         / tf.cast(2.0, self._rdtype)
             q_n = tf.complex(
-                tf.random.normal(
-                    q.shape,
-                    tf.cast(0.0, self._rdtype),
-                    tf.sqrt(step_noise),
-                    self._rdtype),
-                tf.random.normal(
-                    q.shape,
-                    tf.cast(0.0, self._rdtype),
-                    tf.sqrt(step_noise),
-                    self._rdtype)
-            )
+                config.tf_rng.normal(
+                                     q.shape,
+                                     tf.cast(0.0, self._rdtype),
+                                     tf.sqrt(step_noise),
+                                     self._rdtype),
+                config.tf_rng.normal(
+                                     q.shape,
+                                     tf.cast(0.0, self._rdtype),
+                                     tf.sqrt(step_noise),
+                                     self._rdtype)
+                )
             q = q + q_n
 
         return q

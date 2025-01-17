@@ -8,7 +8,7 @@ import json
 from importlib_resources import files
 import tensorflow as tf
 from abc import ABC, abstractmethod
-
+import sionna
 from sionna import SPEED_OF_LIGHT, PI
 from sionna.utils import log10
 from sionna.channel.utils import sample_bernoulli, rad_2_deg, wrap_angle_0_360
@@ -717,9 +717,11 @@ class SystemLevelScenario(ABC):
             tf.constant(0.0, self._dtype.real_dtype))
 
         # Sample the indoor 2D distances for each BS-UT link
-        self._distance_2d_in = tf.random.uniform(shape=[self.batch_size,
-            self.num_bs, self.num_ut], minval=self.min_2d_in,
-            maxval=self.max_2d_in, dtype=self._dtype.real_dtype)*indoor_mask
+        self._distance_2d_in = sionna.config.tf_rng.uniform(
+            shape=[self.batch_size, self.num_bs, self.num_ut],
+            minval=self.min_2d_in,
+            maxval=self.max_2d_in,
+            dtype=self._dtype.real_dtype) * indoor_mask
         # Compute the outdoor 2D distances
         self._distance_2d_out = self.distance_2d - self._distance_2d_in
         # Compute the indoor 3D distances

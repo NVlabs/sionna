@@ -36,7 +36,8 @@ class OFDMDemodulator(Layer):
     sequence into pieces of size ``cyclic_prefix_length + fft_size``,
     and throws away any trailing symbols. For each piece, the cyclic
     prefix is removed and the ``fft_size``-point discrete Fourier
-    transform is computed.
+    transform is computed. It is also possible that every OFDM symbol
+    has a cyclic prefix of different length.
 
     Since the input sequence starts at time :math:`L_\text{min}`,
     the FFT-window has a timing offset of :math:`L_\text{min}` symbols,
@@ -63,13 +64,15 @@ class OFDMDemodulator(Layer):
         impulse response. It should be the same value as that used by the
         `cir_to_time_channel` function.
 
-    cyclic_prefix_length : int
-        Integer indicating the length of the cyclic prefix that
-        is prepended to each OFDM symbol.
+    cyclic_prefix_length : scalar or [num_ofdm_symbols], int
+        Integer or vector of integers indicating the length of the
+        cyclic prefix that is prepended to each OFDM symbol. None of its
+        elements can be larger than the FFT size.
+        Defaults to 0.
 
     Input
     -----
-    :[...,num_ofdm_symbols*(fft_size+cyclic_prefix_length)+n], tf.complex
+    :[...,num_ofdm_symbols*(fft_size+cyclic_prefix_length)+n] or [...,num_ofdm_symbols*fft_size+sum(cyclic_prefix_length)+n], tf.complex
         Tensor containing the time-domain signal along the last dimension.
         `n` is a nonnegative integer.
 
@@ -82,6 +85,9 @@ class OFDMDemodulator(Layer):
 
     def __init__(self, fft_size, l_min, cyclic_prefix_length=0, **kwargs):
         super().__init__(**kwargs)
+        self._fft_size = None
+        self._l_min = None
+        self._cyclic_prefix_length = None
         self.fft_size = fft_size
         self.l_min = l_min
         self.cyclic_prefix_length = cyclic_prefix_length
@@ -110,23 +116,47 @@ class OFDMDemodulator(Layer):
 
     @cyclic_prefix_length.setter
     def cyclic_prefix_length(self, value):
-        assert value >=0, "`cyclic_prefix_length` must be nonnegative."
-        self._cyclic_prefix_length = int(value)
+        value = tf.cast(value, tf.int32)
+        if not tf.reduce_all(value>=0):
+            msg = "`cyclic_prefix_length` must be nonnegative."
+            raise ValueError(msg)
+        if not 0<= tf.rank(value)<=1:
+            msg = "`cyclic_prefix_length` must be of rank 0 or 1"
+            raise ValueError(msg)
+        self._cyclic_prefix_length = value
 
     def build(self, input_shape): # pylint: disable=unused-argument
+        # Compute phase correction terms to to channel
         tmp = -2 * PI * tf.cast(self.l_min, tf.float32) \
               / tf.cast(self.fft_size, tf.float32) \
               * tf.range(self.fft_size, dtype=tf.float32)
         self._phase_compensation = tf.exp(tf.complex(0., tmp))
 
-        # Compute number of elements that will be truncated
-        self._rest = np.mod(input_shape[-1],
-                                self.fft_size + self.cyclic_prefix_length)
+        if len(self.cyclic_prefix_length.shape)==0:
+            # Compute number of elements that will be truncated
+            self._rest = np.mod(input_shape[-1],
+                                    self.fft_size + self.cyclic_prefix_length)
 
-        # Compute number of full OFDM symbols to be demodulated
-        self._num_ofdm_symbols = np.floor_divide(
+            # Compute number of full OFDM symbols to be demodulated
+            self._num_ofdm_symbols = np.floor_divide(
                                     input_shape[-1]-self._rest,
                                     self.fft_size + self.cyclic_prefix_length)
+        else:
+            # Deal with individual cp lengths for OFDM symbols
+            # Compute the relevant indices to gather for
+            # every OFDM symbol from the time domain input
+            num_ofdm_symbols = self.cyclic_prefix_length.shape[0]
+            row_lengths = self.cyclic_prefix_length + self.fft_size
+            offsets = tf.math.cumsum(tf.concat([[0], row_lengths],
+                                               axis=0)[:-1])
+            offsets = tf.expand_dims(offsets, 1)
+            ind = tf.repeat(tf.range(start=0,
+                                     limit=self.fft_size)[tf.newaxis,:],
+                            repeats=num_ofdm_symbols, axis=0)
+            ind += self.cyclic_prefix_length[:, tf.newaxis]
+            ind += offsets
+            # [num_ofdm_symbols, fft_size]
+            self._ind = ind
 
     def call(self, inputs):
         """Demodulate OFDM waveform onto a resource grid.
@@ -139,17 +169,24 @@ class OFDMDemodulator(Layer):
             `tf.complex64` : The demodulated inputs of shape
             `[...,num_ofdm_symbols, fft_size]`.
         """
+        if len(self.cyclic_prefix_length.shape)==0:
+            # Same CP length for all OFDM symbols
+            # Cut last samples that do not fit into an OFDM symbol
+            inputs = inputs if self._rest==0 else inputs[...,:-self._rest]
 
-        # Cut last samples that do not fit into an OFDM symbol
-        inputs = inputs if self._rest==0 else inputs[...,:-self._rest]
+            # Reshape input to separate OFDM symbols
+            new_shape = tf.concat(
+                            [tf.shape(inputs)[:-1],
+                            [self._num_ofdm_symbols],
+                            [self.fft_size + self.cyclic_prefix_length]], 0)
+            x = tf.reshape(inputs, new_shape)
 
-        # Reshape input to separate OFDM symbols
-        new_shape = tf.concat([tf.shape(inputs)[:-1], [self._num_ofdm_symbols],
-                               [self.fft_size + self.cyclic_prefix_length]], 0)
-        x = tf.reshape(inputs, new_shape)
+            # Remove cyclic prefix
+            x = x[...,self.cyclic_prefix_length:]
 
-        # Remove cyclic prefix
-        x = x[...,self.cyclic_prefix_length:]
+        else:
+            # Individual CP length for OFDM symbols
+            x = tf.gather(inputs, self._ind, axis=-1)
 
         # Compute FFT
         x = fft(x)

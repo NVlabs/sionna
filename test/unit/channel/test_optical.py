@@ -3,31 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-try:
-    import sionna as sn
-except ImportError as e:
-    import sys
-    sys.path.append("../")
-    import sionna as sn
-
 import unittest
 import numpy as np
 import tensorflow as tf
+import sionna
 from sionna.channel import utils
 from sionna.channel.optical import fiber
 from sionna.channel.optical import edfa
-
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    GPU_NUM = 0  # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[GPU_NUM], 'GPU')
-        print('Only GPU number', GPU_NUM, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[GPU_NUM], True)
-    except RuntimeError as e:
-        print(e)
-
 
 class TestOptical(unittest.TestCase):
     def setUp(self):
@@ -504,7 +486,7 @@ class TestOptical(unittest.TestCase):
         t_norm = 1e-12
 
         rho_n = \
-            sn.constants.H * f_c * alpha * length * \
+            sionna.constants.H * f_c * alpha * length * \
             n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
@@ -544,7 +526,7 @@ class TestOptical(unittest.TestCase):
         t_norm = 1e-12
 
         rho_n = \
-            sn.constants.H * f_c * alpha * length * \
+            sionna.constants.H * f_c * alpha * length * \
             n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
@@ -585,7 +567,7 @@ class TestOptical(unittest.TestCase):
         t_norm = 1e-12
 
         rho_n = \
-            sn.constants.H * f_c * alpha * length * \
+            sionna.constants.H * f_c * alpha * length * \
             n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
@@ -627,7 +609,7 @@ class TestOptical(unittest.TestCase):
         t_norm = 1e-12
 
         rho_n = \
-            sn.constants.H * f_c * alpha * length * \
+            sionna.constants.H * f_c * alpha * length * \
             n_sp  # in (W/Hz)
 
         # Calculate noise power depending on simulation bandwidth
@@ -666,7 +648,7 @@ class TestOptical(unittest.TestCase):
             1.0, self._complex_dtype.real_dtype))
         rho_n_ASE = tf.cast(n_sp * (
 		        G - tf.cast(1.0, self._complex_dtype.real_dtype)) *
-                            sn.constants.H * f_c,
+                            sionna.constants.H * f_c,
                             self._complex_dtype.real_dtype)  # Noise density
         # in (W/Hz)
         P_n_ASE = tf.cast(
@@ -692,7 +674,7 @@ class TestOptical(unittest.TestCase):
             1.0, self._complex_dtype.real_dtype))
         rho_n_ASE = tf.cast(n_sp * (
 		        G - tf.cast(1.0, self._complex_dtype.real_dtype)) *
-                            sn.constants.H * f_c,
+                            sionna.constants.H * f_c,
                             self._complex_dtype.real_dtype)  # Noise density
         # in (W/Hz)
         P_n_ASE = tf.cast(

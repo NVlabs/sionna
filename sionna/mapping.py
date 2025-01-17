@@ -9,7 +9,8 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 import matplotlib.pyplot as plt
 
-import sionna as sn
+import sionna
+from sionna import config
 
 def pam_gray(b):
     # pylint: disable=line-too-long
@@ -280,9 +281,9 @@ class Constellation(Layer):
 
             # Randomly initialize points if no initial_value is provided
             if initial_value is None:
-                points = tf.random.uniform(  # pylint: disable=E1123
-                                        [2, 2**self._num_bits_per_symbol],
-                                        minval=-0.05, maxval=0.05,
+                points = config.tf_rng.uniform(  # pylint: disable=E1123
+                                    [2, 2**self._num_bits_per_symbol],
+                                     minval=-0.05, maxval=0.05,
                                     dtype=tf.as_dtype(self._dtype).real_dtype)
                 points  = tf.complex(points[0], points[1])
             else:
@@ -700,12 +701,12 @@ class SymbolLogits2LLRs(Layer):
         if self._with_prior:
             # Expanding `prior` such that it is broadcastable with
             # shape [..., n or 1, 1, num_bits_per_symbol]
-            prior = sn.utils.expand_to_rank(prior, tf.rank(logits), axis=0)
+            prior = sionna.utils.expand_to_rank(prior, tf.rank(logits), axis=0)
             prior = tf.expand_dims(prior, axis=-2)
 
             # Expand the symbol labeling to be broadcastable with prior
             # shape [..., 1, num_points, num_bits_per_symbol]
-            a = sn.utils.expand_to_rank(self._a, tf.rank(prior), axis=0)
+            a = sionna.utils.expand_to_rank(self._a, tf.rank(prior), axis=0)
 
             # Compute the prior probabilities on symbols exponents
             # shape [..., n or 1, num_points]
@@ -725,7 +726,7 @@ class SymbolLogits2LLRs(Layer):
             llr = self._reduce(exp1, axis=-2) - self._reduce(exp0, axis=-2)
 
         if self._hard_out:
-            return sn.utils.hard_decisions(llr)
+            return sionna.utils.hard_decisions(llr)
         else:
             return llr
 
@@ -1257,16 +1258,16 @@ class SymbolDemapper(Layer):
         else:
             y, no = inputs
 
-        points = sn.utils.expand_to_rank(self._constellation.points,
-                                tf.rank(y)+1, axis=0)
+        points = sionna.utils.expand_to_rank(self._constellation.points,
+                                             tf.rank(y)+1, axis=0)
         y = tf.expand_dims(y, axis=-1)
         d = tf.abs(y-points)
 
-        no = sn.utils.expand_to_rank(no, tf.rank(d), axis=-1)
+        no = sionna.utils.expand_to_rank(no, tf.rank(d), axis=-1)
         exp = -d**2 / no
 
         if self._with_prior:
-            prior = sn.utils.expand_to_rank(prior, tf.rank(exp), axis=0)
+            prior = sionna.utils.expand_to_rank(prior, tf.rank(exp), axis=0)
             exp = exp + prior
 
         if self._hard_out:
@@ -1444,7 +1445,7 @@ class LLRs2SymbolLogits(Layer):
 
         # Expand the symbol labeling to be broadcastable with prior
         # shape [1, ..., 1, num_points, num_bits_per_symbol]
-        a = sn.utils.expand_to_rank(self._a, tf.rank(llrs), axis=0)
+        a = sionna.utils.expand_to_rank(self._a, tf.rank(llrs), axis=0)
 
         # Compute the prior probabilities on symbols exponents
         # shape [..., 1, num_points]
@@ -1531,7 +1532,7 @@ class SymbolLogits2Moments(Layer):
         p = tf.math.softmax(logits, axis=-1)
         p_c = tf.complex(p, tf.cast(0.0, self.dtype))
         points = self._constellation.points
-        points = sn.utils.expand_to_rank(points, tf.rank(p), axis=0)
+        points = sionna.utils.expand_to_rank(points, tf.rank(p), axis=0)
 
         mean = tf.reduce_sum(p_c*points, axis=-1, keepdims=True)
         var = tf.reduce_sum(p*tf.square(tf.abs(points - mean)), axis=-1)
@@ -1651,7 +1652,7 @@ class PAM2QAM:
             logits_mat = tf.expand_dims(pam1, -1) + tf.expand_dims(pam2, -2)
 
             # Flatten to a vector
-            logits = sn.utils.flatten_last_dims(logits_mat)
+            logits = sionna.utils.flatten_last_dims(logits_mat)
 
             # Gather symbols in the correct order
             gather_ind = tf.reshape(self._qam_ind, [-1])

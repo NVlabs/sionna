@@ -283,7 +283,7 @@ class PUSCHDMRSConfig(Config):
         if self.config_type==1:
             w_f = np.array([[1, 1,1, 1,1, 1,1, 1],
                             [1,-1,1,-1,1,-1,1,-1]])
-        elif self.config_type==2:
+        else: # config_type == 2
             w_f = np.array([[1, 1,1, 1,1, 1,1, 1,1, 1,1, 1],
                             [1,-1,1,-1,1,-1,1,-1,1,-1,1,-1]])
         return w_f[:, self.dmrs_port_set]
@@ -298,7 +298,7 @@ class PUSCHDMRSConfig(Config):
         if self.config_type==1:
             w_t = np.array([[1,1,1,1, 1, 1, 1, 1],
                            [1,1,1,1,-1,-1,-1,-1]])
-        elif self.config_type==2:
+        else: # config_type == 2
             w_t = np.array([[1,1,1,1,1,1, 1, 1, 1, 1, 1, 1],
                             [1,1,1,1,1,1,-1,-1,-1,-1,-1,-1]])
         return w_t[:, self.dmrs_port_set]

@@ -2,27 +2,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
-try:
-    import sionna
-except ImportError as e:
-    import sys
-    sys.path.append("../")
 
 import unittest
 import numpy as np
 from os import walk # to load generator matrices from files
 import re # regular expressions for generator matrix filenames
 import tensorflow as tf
-gpus = tf.config.list_physical_devices('GPU')
-print('Number of GPUs available :', len(gpus))
-if gpus:
-    gpu_num = 0 # Number of the GPU to be used
-    try:
-        tf.config.set_visible_devices(gpus[gpu_num], 'GPU')
-        print('Only GPU number', gpu_num, 'used.')
-        tf.config.experimental.set_memory_growth(gpus[gpu_num], True)
-    except RuntimeError as e:
-        print(e)
+from sionna import config
 from sionna.fec.ldpc.encoding import LDPC5GEncoder
 from sionna.utils import BinarySource
 
@@ -77,7 +63,7 @@ class TestLDPC5GEncoder(unittest.TestCase):
                 # c) Test that systematic part (excluding first 2z pos) is
                 # valid
                 z = enc._z # access private attribute
-                u = tf.cast(tf.random.uniform([bs, k],
+                u = tf.cast(config.tf_rng.uniform([bs, k],
                                             0,
                                             2,
                                             tf.int32), tf.float32)
@@ -164,7 +150,6 @@ class TestLDPC5GEncoder(unittest.TestCase):
             c_ref = tf.squeeze(c_ref) # remove new dim
             c = c.numpy()
             c_ref = c_ref.numpy()
-            print("Testing for k={}, n={}".format(k, n))
             self.assertTrue(np.array_equal(c, c_ref),
                             "not equal for k={}, n={}".format(k, n))
 
