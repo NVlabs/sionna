@@ -827,8 +827,7 @@ class AssetObject():
             'radio_material': self._radio_material.name,  
             'overwrite_scene_bsdfs': self._overwrite_scene_bsdfs,
             'overwrite_scene_radio_materials': self._overwrite_scene_radio_materials,
-            'dtype': self._dtype.name,
-            'xml_tree': ET.tostring(self._xml_tree.getroot(), encoding='unicode')  # Serialize XML as string
+            'dtype': self._dtype.name
         }
 
     @classmethod
@@ -844,7 +843,6 @@ class AssetObject():
             overwrite_scene_radio_materials=data['overwrite_scene_radio_materials'],
             dtype=tf.dtypes.as_dtype(data['dtype']) 
         )
-        obj._xml_tree = ET.ElementTree(ET.fromstring(data['xml_tree']))
         return obj
 
 
