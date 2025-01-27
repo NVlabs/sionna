@@ -42,6 +42,7 @@ class SceneObject(Object):
 
         # Set initial orientation of the object
         self._orientation = tf.cast(orientation, dtype=self._rdtype)
+        
         # Set velocity vector
         self._velocity = tf.zeros((3,), dtype=self._rdtype)
 
@@ -56,9 +57,6 @@ class SceneObject(Object):
 
         # Set the Mitsuba shape
         self._mi_shape = mi_shape
-
-        # Set velocity vector
-        self._velocity = tf.cast([0,0,0], dtype=self._rdtype)
 
         # Set center of rotation. This parameter is used for nested asset objects rotations.
         self._center_of_rotation = tf.cast([0,0,0], dtype=self._rdtype)
@@ -252,6 +250,11 @@ class SceneObject(Object):
         obj_id = self.object_id
         mi_shape = self._mi_shape
         solver_paths = self._scene.solver_paths
+        
+        shape_ind = solver_paths.shape_indices[obj_id]
+        print(obj_id)
+        print(shape_ind)
+        print(solver_paths.prim_offsets)
 
         prim_offset = solver_paths.prim_offsets[obj_id]
 

@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import mitsuba as mi
 import tensorflow as tf
 import xml.etree.ElementTree as ET
-import drjit as dr
 import warnings
 import weakref
 
@@ -2393,8 +2392,7 @@ class Scene:
             else:
                 obj = self._scene_objects[name]
                 obj.update_mi_shape(mi_shape=s,object_id=obj_id)
-
-
+        
         # Asset initialisation
         for asset_name in self._asset_objects:
             asset = self.get(asset_name)
