@@ -208,11 +208,14 @@ class Scene:
             instantiate_itu_materials(self._dtype)
 
             # Load the scene in mitsuba
-            self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'))
+            self._scene = mi.load_file(os.path.join(self.tmp_directory_path, 'tmp_scene.xml'), parallel=False)
             self._scene_params = mi.traverse(self._scene)
 
             # Load the cameras
             self._load_cameras()
+            
+            # List of shapes indexed by their IDs
+            self._mi_shapes = self._scene.shapes()
 
             # Load the scene objects
             self._load_scene_objects()
@@ -506,13 +509,16 @@ class Scene:
 
             # Get the scene parameters
             self._scene_params = mi.traverse(self._scene)
-
+            
+            # Manually update the scene shapes to be able to run the Solvers
+            self._mi_shapes = self._scene.shapes()
+            
             # (Re)-instantiate the solver
             self._solver_paths = SolverPaths(self, dtype=self._dtype)
 
             # (Re)-instantiate the solver for coverage map
             self._solver_cm = SolverCoverageMap(self, solver=self._solver_paths, dtype=self._dtype)
-
+            
             # (Re)load the scene objects
             self._load_scene_objects()
 
@@ -2351,9 +2357,6 @@ class Scene:
         Load the scene objects available in the scene
         """
 
-        # List of shapes indexed by their IDs
-        self._mi_shapes = self._scene.shapes()
-
         # Parse all shapes in the scene
         for obj_id,s in enumerate(self._mi_shapes):
             # Only meshes are handled
@@ -2391,8 +2394,8 @@ class Scene:
                 self._scene_objects[name] = obj
             else:
                 obj = self._scene_objects[name]
-                obj.update_mi_shape(mi_shape=s,object_id=obj_id)
-        
+                obj.update_mi_shape(mi_shape=s, object_id=obj_id)
+
         # Asset initialisation
         for asset_name in self._asset_objects:
             asset = self.get(asset_name)

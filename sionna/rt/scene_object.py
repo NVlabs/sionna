@@ -251,11 +251,6 @@ class SceneObject(Object):
         mi_shape = self._mi_shape
         solver_paths = self._scene.solver_paths
         
-        shape_ind = solver_paths.shape_indices[obj_id]
-        print(obj_id)
-        print(shape_ind)
-        print(solver_paths.prim_offsets)
-
         prim_offset = solver_paths.prim_offsets[obj_id]
 
         face_indices3 = mi_shape.face_indices(dr.arange(mi.UInt32,
@@ -520,6 +515,7 @@ class SceneObject(Object):
         - The position and orientation of the SceneObject are temporarily stored and then reapplied after updating the Mitsuba shape and object ID.
         - The radio material usage is updated to reflect the new object ID.
         """
+        # Store previous position and orientation to be able to set them again after a new solver has been created.
         tmp_position = self.position
         tmp_orientation = self.orientation
 
