@@ -817,6 +817,35 @@ class AssetObject():
             self._velocity = shape_velocity
 
 
+    def to_dict(self):
+        """Serialize the object to a dictionary."""
+        return {
+            'name': self._name,
+            'filename': self._filename,
+            'position': self._position.numpy().tolist(),  # Convert TensorFlow tensor to list
+            'orientation': self._orientation.numpy().tolist(),
+            'radio_material': self._radio_material.name,  
+            'overwrite_scene_bsdfs': self._overwrite_scene_bsdfs,
+            'overwrite_scene_radio_materials': self._overwrite_scene_radio_materials,
+            'dtype': self._dtype.name
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Deserialize the object from a dictionary."""
+        obj = cls(
+            name=data['name'],
+            filename=data['filename'],
+            position=data['position'],
+            orientation=data['orientation'],
+            radio_material=data['radio_material'],
+            overwrite_scene_bsdfs=data['overwrite_scene_bsdfs'],
+            overwrite_scene_radio_materials=data['overwrite_scene_radio_materials'],
+            dtype=tf.dtypes.as_dtype(data['dtype']) 
+        )
+        return obj
+
+
 
 # Module variables for example asset files
 #
