@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from sionna.utils.tensors import expand_to_rank
+#from sionna.sionna.utils.tensors import expand_to_rank
 from tensorflow.experimental.numpy import swapaxes
 
 

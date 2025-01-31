@@ -7,6 +7,10 @@
 import time
 import numpy as np
 import tensorflow as tf
+import time
+import os
+import shutil
+
 from tensorflow.keras.layers import Layer
 from tensorflow.experimental.numpy import log10 as _log10
 from tensorflow.experimental.numpy import log2 as _log2
@@ -932,6 +936,57 @@ def complex_normal(shape, var=1.0, dtype=tf.complex64):
 
     return x
 
+def copy_and_rename_files(source_dir, destination_dir, prefix):
+    # pylint: disable=line-too-long
+    r"""
+    Copy and rename files from a source directory to a destination directory.
+
+    This function walks through the source directory, creates corresponding directories
+    in the destination directory, and copies files from the source to the destination
+    while renaming them with a specified prefix.
+
+    Parameters
+    ----------
+    source_dir : str
+        The path to the source directory from which files will be copied.
+    destination_dir : str
+        The path to the destination directory where files will be copied to.
+    prefix : str
+        The prefix to add to each filename in the destination directory.
+
+    Notes
+    -----
+    - The directory structure of the source directory is replicated in the destination directory.
+    - If the destination directory or any intermediate directories do not exist, they are created.
+
+    Examples
+    --------
+    .. code-block:: Python
+        copy_and_rename_files('path/to/source', 'path/to/destination', 'prefix_')
+        
+    This will copy all files from 'path/to/source' to 'path/to/destination' and rename them starting with 'prefix_'.
+
+    Raises
+    ------
+    OSError
+        If an error occurs during directory creation or file copying.
+    """
+    # Walk through the source directory
+    for root, dirs, files in os.walk(source_dir):
+        # Create corresponding directories in the destination
+        relative_path = os.path.relpath(root, source_dir)
+        dest_path = os.path.join(destination_dir, relative_path)
+        os.makedirs(dest_path, exist_ok=True)
+
+        # Copy and rename files
+        for file in files:
+            source_file = os.path.join(root, file)
+            # Create the new filename with the prefix
+            new_filename = prefix + file
+            dest_file = os.path.join(dest_path, new_filename)
+            shutil.copy2(source_file, dest_file)
+            # print(f"Copied {os.path.abspath(source_file)} to {os.path.abspath(dest_file)}")
+
 ###########################################################
 # Deprecated aliases that will not be included in the next
 # major release
@@ -953,3 +1008,4 @@ def empirical_psd(x, show=True, oversampling=1.0, ylim=(-30,3)):
     print(  "Warning: The alias utils.empirical_psd will not be included in"
             " Sionna 1.0. Please use signal.empirical_psd instead.")
     return signal.empirical_psd(x, show, oversampling, ylim)
+
