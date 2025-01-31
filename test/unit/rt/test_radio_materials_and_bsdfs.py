@@ -466,7 +466,7 @@ class TestObjectUsingMatBSDFSync(unittest.TestCase):
         self.assertEqual(bsdf.using_objects.numpy().tolist(),[])
         self.assertEqual(new_itu_concrete.using_objects.numpy().tolist(), new_itu_concrete.bsdf.using_objects.numpy().tolist())
         self.assertNotEqual(new_itu_concrete.using_objects.numpy().tolist(),bsdf.using_objects.numpy().tolist())
-        self.assertNotEqual(new_itu_concrete.using_objects.numpy().tolist(),itu_concrete_obj_using)
+        self.assertEqual(new_itu_concrete.using_objects.numpy().tolist(),itu_concrete_obj_using)
 
     def test_assigning_used_bsdf_to_material_bsdf(self):
         """Test assigning a used BSDF to a material's bsdf"""
@@ -499,8 +499,8 @@ class TestObjectUsingMatBSDFSync(unittest.TestCase):
         self.assertEqual(new_itu_concrete.using_objects.numpy().tolist(), new_itu_concrete.bsdf.using_objects.numpy().tolist())
         self.assertEqual(new_itu_brick.using_objects.numpy().tolist(), new_itu_brick.bsdf.using_objects.numpy().tolist())
         self.assertNotEqual(new_itu_brick.using_objects.numpy().tolist(), new_itu_concrete.using_objects.numpy().tolist())
-        self.assertNotEqual(new_itu_concrete.using_objects.numpy().tolist(), itu_concrete_obj_using) #Because of the scene reload triggered by BSDF assign()
-        self.assertNotEqual(new_itu_brick.using_objects.numpy().tolist(), itu_brick_obj_using)
+        self.assertEqual(new_itu_concrete.using_objects.numpy().tolist(), itu_concrete_obj_using) # Because of the scene reload triggered by BSDF assign()
+        self.assertEqual(new_itu_brick.using_objects.numpy().tolist(), itu_brick_obj_using)
 
     def test_setting_new_bsdf_to_material_bsdf(self):
         """Test setting a new BSDF to a material's BSDF"""
@@ -564,7 +564,7 @@ class TestSceneReload(unittest.TestCase):
 
         self.assertTrue(new_mat is mat)
         self.assertTrue(new_bsdf is bsdf)
-        self.assertTrue(new_mat_obj_using != mat_obj_using)
+        self.assertTrue(new_mat_obj_using == mat_obj_using)
         self.assertTrue(len(new_mat_obj_using) == len(mat_obj_using))
 
     def test_reload_scene_keep_scene_object_properties(self):
