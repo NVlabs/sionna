@@ -370,7 +370,7 @@ class TBEncoder(Layer):
         assert input_shapes[-1]==self.k, \
             f"Invalid input shape. Expected TB length is {self.k}."
 
-    def call(self, inputs):
+    def call(self, inputs, ret=[]):
         """Apply transport block encoding procedure."""
 
         # store shapes
@@ -424,4 +424,9 @@ class TBEncoder(Layer):
         output_shape[-1] = np.sum(self._cw_lengths)
         c_tb = tf.reshape(c_scr, output_shape)
 
+        if ret: # if return local outputs
+            lo = {}
+            for r in ret:
+                lo[r] = locals()[r]
+            return c_tb, lo
         return c_tb

@@ -204,12 +204,13 @@ class PUSCHTransmitter(Layer):
         # CarrierConfig is always the same
         self._pusch_configs[0].carrier.show()
         Config.show(self._pusch_configs[0])
+
         for idx,p in enumerate(self._pusch_configs):
             print(f"---- UE {idx} ----")
             p.dmrs.show()
             p.tb.show()
 
-    def call(self, inputs):
+    def call(self, inputs, ret=[]):     # list of returned local outputs
 
         if self._return_bits:
             # inputs defines batch_size
@@ -219,6 +220,8 @@ class PUSCHTransmitter(Layer):
             b = inputs
 
         # Encode transport block
+        # if 'tbe' in ret:
+        #     c, tbe = self._tb_encoder(b, ret=['u', 'u_crc', 'u_cb', 'u_cb_crc', 'c_cb', 'c', 'c_scr' , 'c_tb'])
         c = self._tb_encoder(b)
 
         # Map to constellations
@@ -242,9 +245,38 @@ class PUSCHTransmitter(Layer):
         else:
             x = x_pre
 
+        # Explicitly return requested variables
+        outputs = [x]  # Always return x
+                
         if self._return_bits:
-            return x, b
-        else:
-            return x
+            outputs.append(b)
+
+        if 'c' in ret:
+            outputs.append(c)
+        if 'x_map' in ret:
+            outputs.append(x_map)
+        if 'x_layer' in ret:
+            outputs.append(x_layer)
+        if 'x_grid' in ret:
+            outputs.append(x_grid)
+        if 'x_pre' in ret:
+            outputs.append(x_pre)
+
+        return tuple(outputs)
+        # tx_lo = {}
+        # for r in ret:
+        #     tx_lo[r] = locals()[r]
+        # print(locals())
+        # print(locals()['c'])
+        # if self._return_bits:
+        #     if ret: # if return local outputs
+        #         return x, b, tx_lo
+        #     else: 
+        #         return x, b
+        # else:
+        #     if ret: # if return local outputs
+        #         return x, tx_lo
+        #     else:
+        #         return x
 
 

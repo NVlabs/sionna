@@ -15,6 +15,40 @@ from sionna.utils.metrics import count_errors, count_block_errors
 from sionna.mapping import Mapper, Constellation
 from sionna import signal
 
+# def reset_sionna():
+#     # Reload the main sionna package
+#     importlib.reload(sionna)
+    
+#     # Reload all submodules
+#     importlib.reload(sionna.utils)
+#     importlib.reload(sionna.channel)
+#     importlib.reload(sionna.nr)
+#     importlib.reload(sionna.mimo)
+#     importlib.reload(sionna.mapping)
+#     importlib.reload(sionna.ofdm)
+#     importlib.reload(sionna.fec.ldpc.encoding)
+#     importlib.reload(sionna.fec.ldpc.decoding)
+#     importlib.reload(sionna.channel.tr38901)
+
+#     # Optionally reload other relevant parts
+#     # importlib.reload(sionna.utils)  # If you're using utility functions
+#     # importlib.reload(sionna.channel.utils)  # If you're using channel utilities
+#     # importlib.reload(sionna.nr.PUSCHConfig)  # Specific submodule
+
+#     print("Sionna package and its submodules have been reset.")
+
+
+def array_to_hash(arr, fileName='/tmp/txtFile.txt'):
+    strarr = ' '.join([f"{x:.6f}" for x in np.array(arr).squeeze().flatten()]).replace('j','i')
+    with open(fileName,'w') as f:
+        f.write(strarr)
+    import subprocess
+    # Run the md5sum command and capture the output
+    result = subprocess.run(['md5sum', fileName], capture_output=True, text=True)
+    # Get the output (MD5 checksum) from the result
+    md5_checksum = result.stdout.strip()
+    return md5_checksum
+
 def ebnodb2no(ebno_db, num_bits_per_symbol, coderate, resource_grid=None):
     r"""Compute the noise variance `No` for a given `Eb/No` in dB.
 
@@ -607,6 +641,10 @@ def sim_ber(mc_fun,
         # copy replicas back to single device
         b = strategy.gather(outputs_rep[0], axis=0)
         b_hat = strategy.gather(outputs_rep[1], axis=0)
+        if length(outputs_rep) > 2: # thanhnb
+            x = strategy.gather(outputs_rep[2], axis=0)
+            y = strategy.gather(outputs_rep[3], axis=0)
+            return b, b_hat, x, y
         return b, b_hat
 
      # init table headers
@@ -739,7 +777,7 @@ def sim_ber(mc_fun,
                 iter_count += 1
 
                 if run_multigpu: # distributed execution
-                    b, b_hat = _run_distributed(strategy,
+                    outputs = _run_distributed(strategy,
                                                 mc_fun,
                                                 batch_size,
                                                 ebno_dbs[i])
@@ -747,9 +785,15 @@ def sim_ber(mc_fun,
                     outputs = mc_fun(batch_size=batch_size, ebno_db=ebno_dbs[i])
                     # assume first and second return value is b and b_hat
                     # other returns are ignored
-                    b = outputs[0]
-                    b_hat = outputs[1]
 
+                #   thanhnb
+                b = outputs[0]
+                b_hat = outputs[1]
+                if length(outputs_rep) > 2: # thanhnb
+                    x = strategy.gather(outputs_rep[2], axis=0)
+                    y = strategy.gather(outputs_rep[3], axis=0)
+          
+                
                 if soft_estimates:
                     b_hat = hard_decisions(b_hat)
 

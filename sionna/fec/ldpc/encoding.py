@@ -485,7 +485,7 @@ class LDPC5GEncoder(Layer):
             k_b = 22
         else:
             k_b = 10
-
+        # print(z, i_ls, k_b)
         return z, i_ls, k_b
 
     def _gen_submat(self, bm, k_b, z, bg):
@@ -499,7 +499,11 @@ class LDPC5GEncoder(Layer):
         bm_b = bm[0:g, k_b:(k_b+g)]
         bm_c1 = bm[g:mb, 0:k_b]
         bm_c2 = bm[g:mb, k_b:(k_b+g)]
-
+        # print(bm_a, bm_b, bm_c1, bm_c2)
+        # print(np.linalg.norm(bm_a, 'fro'),
+        #       np.linalg.norm(bm_b, 'fro'),
+        #       np.linalg.norm(bm_c1, 'fro'),
+        #       np.linalg.norm(bm_c2, 'fro'))
         # H could be sliced immediately (but easier to implement if based on B)
         hm_a = self._lift_basegraph(bm_a, z)
 
@@ -510,7 +514,11 @@ class LDPC5GEncoder(Layer):
         hm_c2 = self._lift_basegraph(bm_c2, z)
 
         hm_b_inv = self._find_hm_b_inv(bm_b, z, bg)
-
+        # print(hm_a, hm_b_inv, hm_c1, hm_c2)
+        # print(np.linalg.norm(hm_a.toarray(), 'fro'),
+        #       np.linalg.norm(hm_b_inv.toarray(), 'fro'),
+        #       np.linalg.norm(hm_c1.toarray(), 'fro'),
+        #       np.linalg.norm(hm_c2.toarray(), 'fro'))
         return hm_a, hm_b_inv, hm_c1, hm_c2
 
     def _find_hm_b_inv(self, bm_b, z, bg):
