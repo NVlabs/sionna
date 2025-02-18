@@ -106,10 +106,13 @@ class PUSCHTransformDeprecoder(Layer):
         _check_largest_prime_factor_not_larger_then_5(num_subcarriers)
         self._num_subcarriers = num_subcarriers
 
-    def call(self, y):
+    def call(self, y, no_eff):
         orig_shape = tf.shape(y)
         y_reshaped = tf.reshape(y, [-1, self._num_subcarriers])
         y_transformed = tf.cast(tf.sqrt(float(self._num_subcarriers)),
                                 self._dtype) * tf.signal.ifft(y_reshaped)
         y_result = tf.reshape(y_transformed, orig_shape)
-        return y_result
+
+        # Noise power is evenly spread over all subcarriers by IDFT transform
+        no_eff = tf.ones(y.shape) * tf.reduce_mean(no_eff, axis=-2, keepdims=True)
+        return y_result, no_eff

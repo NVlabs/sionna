@@ -145,7 +145,7 @@ class LinearDetector(Layer):
     def call(self, inputs):
         x_hat, no_eff = self._equalizer(*inputs)
         if self._post_equalizer_transformation is not None:
-            x_hat = self._post_equalizer_transformation(x_hat)
+            x_hat, no_eff = self._post_equalizer_transformation(x_hat, no_eff)
         z = self._demapper([x_hat, no_eff])
 
         # Reshape to the expected output shape
