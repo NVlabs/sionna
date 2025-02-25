@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """Layer for utility functions needed for Turbo Codes."""
@@ -69,6 +69,9 @@ def puncture_pattern(turbo_coderate, conv_coderate):
         pattern = [[1, 1, 0], [1, 0, 1]]
     elif turbo_coderate == 1/3:
         pattern = [[1, 1, 1]]
+    else:
+        raise ValueError("Unsupported coderate!")
+
     turbo_punct_pattern = tf.convert_to_tensor(
         np.asarray(pattern), dtype=bool)
     return turbo_punct_pattern

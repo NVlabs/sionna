@@ -1,5 +1,5 @@
 #
-# SPDX-FileCopyrightText: Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
 """
@@ -1581,8 +1581,8 @@ class SolverCoverageMap(SolverBase):
         return e_field, field_es, field_ep
 
     def _extract_active_ris_rays(self, active_ind, int_point,
-        previous_int_point, primitives, e_field, field_es, field_ep, radii_curv,
-        dirs_curv, angular_opening):
+        previous_int_point, primitives, e_field, field_es, field_ep,
+        samples_tx_indices, k_tx, radii_curv, dirs_curv, angular_opening):
         r"""
         Extracts the active rays hitting a RIS.
 
@@ -1611,6 +1611,12 @@ class SolverCoverageMap(SolverBase):
 
         field_ep : [num_samples, 3], tf.float
             Direction of the P component of the field
+
+        samples_tx_indices : [num_samples], tf.int
+            Index of the source from which the path originates
+
+        k_tx : [num_samples, 3], tf.float
+            Direction of departure from the source
 
         radii_curv : [num_samples, 2], tf.float
             Principal radii of curvature of the ray tubes
@@ -1642,6 +1648,12 @@ class SolverCoverageMap(SolverBase):
             Length of the last path segment, i.e., distance between `int_point`
             and `previous_int_point`
 
+        samples_tx_indices : [num_active_samples], tf.int
+            Index of the source from which the path originates
+
+        k_tx : [num_active_samples, 3], tf.float
+            Direction of departure from the source
+
         act_radii_curv : [num_active_samples, 2], tf.float
             Principal radii of curvature of the ray tubes
 
@@ -1672,6 +1684,12 @@ class SolverCoverageMap(SolverBase):
         # [num_active_samples]
         act_primitives = tf.gather(primitives, active_ind, axis=0)
 
+        # [num_active_samples]
+        act_samples_tx_indices = tf.gather(samples_tx_indices, active_ind,
+                                           axis=0)
+        # [num_active_samples, 3]
+        act_k_tx = tf.gather(k_tx, active_ind, axis=0)
+
         # Direction of arrival
         # [num_active_samples, 3]
         act_k_i,act_dist = normalize(int_point - act_previous_int_point)
@@ -1680,8 +1698,8 @@ class SolverCoverageMap(SolverBase):
         act_angular_opening = tf.gather(angular_opening, active_ind, axis=0)
 
         output = (act_e_field, act_field_es, act_field_ep, int_point, act_k_i,
-                  act_dist, act_radii_curv, act_dirs_curv, act_primitives,
-                  act_angular_opening)
+                  act_dist, act_samples_tx_indices, act_k_tx, act_radii_curv,
+                  act_dirs_curv, act_primitives, act_angular_opening)
 
         return output
 
@@ -2154,7 +2172,7 @@ class SolverCoverageMap(SolverBase):
             # [num_reflected_samples, 2, 3]
             dirs_curv = act_data[17]
             # [num_reflected_samples]
-            angular_opening = act_data[18]
+            angular_opening = act_data[19]
 
         # Compute the reflected field
         e_field, field_es, field_ep, k_r, radii_curv, dirs_curv\
@@ -2313,7 +2331,7 @@ class SolverCoverageMap(SolverBase):
             # [num_scattered_samples, 2, 3]
             dirs_curv = act_data[17]
             # [num_scattered_samples]
-            angular_opening = act_data[18]
+            angular_opening = act_data[19]
 
         # Compute the scattered field
         e_field, field_es, field_ep, k_r, radii_curv, dirs_curv,\
@@ -2424,19 +2442,19 @@ class SolverCoverageMap(SolverBase):
         # Length of the last path segment
         # [num_ris_reflected_samples]
         length = act_data[5]
+        # Index of the intersected source
+        samples_tx_indices = act_data[6]
+        # Direction of departure form the source
+        k_tx = act_data[7]
         # Principal radii and directions of curvatures
         # [num_ris_reflected_samples, 2]
-        radii_curv = act_data[6]
+        radii_curv = act_data[8]
         # [num_ris_reflected_samples, 2, 3]
-        dirs_curv = act_data[7]
+        dirs_curv = act_data[9]
         # [num_ris_reflected_samples]
-        ris_ind = act_data[8]
+        ris_ind = act_data[10]
         # [num_ris_reflected_samples]
-        angular_opening = act_data[9]
-        # Index of the intersected source
-        samples_tx_indices = act_data[14]
-        # Direction of departure form the source
-        k_tx = act_data[15]
+        angular_opening = act_data[11]
 
         # Compute the reflected field
         e_field, field_es, field_ep, k_r, normals, radii_curv, dirs_curv,\
@@ -2944,6 +2962,8 @@ class SolverCoverageMap(SolverBase):
                 # ris_int_point : [num_ris_reflected_samples, 3]
                 # ris_k_r : [num_ris_reflected_samples, 3]
                 # ris_n : [num_ris_reflected_samples, 3]
+                # ris_samples_tx_indices : [num_ris_reflected_samples]
+                # ris_k_tx : [num_ris_reflected_samples, 3]
                 # ris_radii_curv : [num_ris_reflected_samples, 2]
                 # ris_dirs_curv : [num_ris_reflected_samples, 2, 3]
                 # ris_ang_opening : [num_ris_reflected_samples]
