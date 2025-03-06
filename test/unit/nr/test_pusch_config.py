@@ -8,7 +8,7 @@ import unittest
 import numpy as np
 import tensorflow as tf
 import sionna
-from sionna.nr import PUSCHConfig
+from sionna.nr import PUSCHConfig, CarrierConfig
 from sionna import config
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -228,3 +228,44 @@ class TestPUSCHDMRS(unittest.TestCase):
         for i in range(5):
             pusch_config.tpmi = i
             self.assertTrue(np.allclose(pusch_config.dmrs_grid_precoded/np.sqrt(3), ref[i]))
+
+
+class TestCarrierConfig(unittest.TestCase):
+    """Tests for the CarrierConfig Class"""
+
+    def test_cyclic_prefix_length(self):
+        carrier_config = CarrierConfig(subcarrier_spacing=15, slot_number=0)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, ([5.2] + [4.69]*6)*2, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=15, slot_number=1)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, ([5.2] + [4.69]*6)*2, decimal=2)
+
+        carrier_config = CarrierConfig(subcarrier_spacing=30, slot_number=0)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [2.86] + [2.34]*13, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=30, slot_number=1)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [2.86] + [2.34]*13, decimal=2)
+
+        carrier_config = CarrierConfig(subcarrier_spacing=60, slot_number=0)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [1.69] + [1.17]*13, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=60, slot_number=1)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [1.17] * 14, decimal=2)
+
+        carrier_config = CarrierConfig(subcarrier_spacing=60, slot_number=0, cyclic_prefix='extended')
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [4.17] * 12, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=60, slot_number=1, cyclic_prefix='extended')
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [4.17] * 12, decimal=2)
+
+        carrier_config = CarrierConfig(subcarrier_spacing=120, slot_number=0)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [1.11] + [0.59] * 13, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=120, slot_number=1)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [0.59] * 14, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=120, slot_number=2)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [0.59] * 14, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=120, slot_number=3)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [0.59] * 14, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=120, slot_number=4)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [1.11] + [0.59] * 13, decimal=2)
+
+        carrier_config = CarrierConfig(subcarrier_spacing=240, slot_number=0)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [0.81] + [0.29] * 13, decimal=2)
+        carrier_config = CarrierConfig(subcarrier_spacing=240, slot_number=1)
+        np.testing.assert_array_almost_equal(carrier_config.cyclic_prefix_length * 1e6, [0.29] * 14, decimal=2)
