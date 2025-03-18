@@ -1,15 +1,14 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 """Test TB Encoder components."""
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
 from os import walk # to load generator matrices from files
-from sionna.nr import TBEncoder, TBDecoder, calculate_tb_size
-from sionna.utils import BinarySource
+from sionna.phy.nr import TBEncoder, TBDecoder
+from sionna.phy.mapping import BinarySource
 
 @pytest.mark.usefixtures("only_gpu")
 class TestTBEncoder(unittest.TestCase):
@@ -53,9 +52,9 @@ class TestTBEncoder(unittest.TestCase):
                             use_scrambler=True,
                             verbose=False,
                             output_dtype=tf.float32)
-                            
+
             # minsum does not need correctly scaled LLRs
-            decoder = TBDecoder(encoder, cn_type="minsum")
+            decoder = TBDecoder(encoder, cn_update="minsum")
 
             c = encoder(u_ref)
             u,_ = decoder(2*c-1)

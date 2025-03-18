@@ -1,21 +1,19 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
 import sionna
-from sionna import config
-from sionna.mimo.utils import complex2real_vector, real2complex_vector
-from sionna.mimo.utils import complex2real_matrix, real2complex_matrix
-from sionna.mimo.utils import complex2real_covariance, real2complex_covariance
-from sionna.mimo.utils import complex2real_channel, whiten_channel
-from sionna.utils import matrix_pinv
-from sionna.utils import matrix_sqrt, complex_normal
-from sionna.channel.utils import exp_corr_mat
-from sionna.utils import QAMSource
+from sionna.phy import config
+from sionna.phy.mimo.utils import complex2real_vector, real2complex_vector, \
+                                  complex2real_matrix, real2complex_matrix, \
+                                  complex2real_covariance, real2complex_covariance, \
+                                  complex2real_channel, whiten_channel
+from sionna.phy.utils import complex_normal, matrix_pinv
+from sionna.phy.channel.utils import exp_corr_mat
+from sionna.phy.mapping import QAMSource
 
 
 class Complex2Real(unittest.TestCase):
@@ -100,7 +98,7 @@ class Complex2Real(unittest.TestCase):
         n = 8
         r = exp_corr_mat(0.8, 8)
         rr = complex2real_covariance(r)
-        r_12 = matrix_sqrt(r)
+        r_12 = tf.linalg.sqrtm(r)
 
         @tf.function(jit_compile=True)
         def fun():
@@ -121,19 +119,18 @@ class Complex2Real(unittest.TestCase):
         num_rx = 16
         num_tx = 4
         batch_size = 1000000
-        qam_source = QAMSource(8, dtype=tf.complex128)
+        qam_source = QAMSource(8, precision="double")
 
-        r = exp_corr_mat(0.8, num_rx, dtype=tf.complex128)
-        r_12 = matrix_sqrt(r)
-        s = exp_corr_mat(0.5, num_rx, dtype=tf.complex128) + tf.eye(num_rx, dtype=tf.complex128)
-        s_12 = matrix_sqrt(s)
+        r = exp_corr_mat(0.8, num_rx, precision="double")
+        r_12 = tf.linalg.sqrtm(r)
+        s = exp_corr_mat(0.5, num_rx, precision="double") + tf.eye(num_rx, dtype=r.dtype)
+        s_12 = tf.linalg.sqrtm(s)
 
-        sionna.config.xla_compat = True
         @tf.function(jit_compile=True)
         def fun():
             x = qam_source([batch_size, num_tx, 1])
-            h = tf.matmul(tf.expand_dims(r_12,0), complex_normal([batch_size, num_rx, num_tx], dtype=tf.complex128))
-            w = tf.squeeze(tf.matmul(tf.expand_dims(s_12, 0), complex_normal([batch_size, num_rx, 1], dtype=tf.complex128)), -1)
+            h = tf.matmul(tf.expand_dims(r_12,0), complex_normal([batch_size, num_rx, num_tx], precision="double"))
+            w = tf.squeeze(tf.matmul(tf.expand_dims(s_12, 0), complex_normal([batch_size, num_rx, 1], precision="double")), -1)
             hx = tf.squeeze(tf.matmul(h, x), -1)
             y = hx+w
 
@@ -178,18 +175,17 @@ class Complex2Real(unittest.TestCase):
         num_rx = 16
         num_tx = 4
         batch_size = 1000000
-        qam_source = QAMSource(8, dtype=tf.complex128)
-        s = exp_corr_mat(0.5, num_rx, dtype=tf.complex128) + tf.eye(num_rx, dtype=tf.complex128)
-        s_12 = matrix_sqrt(s)
-        r = exp_corr_mat(0.8, num_rx, dtype=tf.complex128)
-        r_12 = matrix_sqrt(r)
+        qam_source = QAMSource(8, precision="double")
+        s = exp_corr_mat(0.5, num_rx, precision="double") + tf.eye(num_rx, dtype=tf.complex128)
+        s_12 = tf.linalg.sqrtm(s)
+        r = exp_corr_mat(0.8, num_rx, precision="double")
+        r_12 = tf.linalg.sqrtm(r)
 
-        sionna.config.xla_compat = True
         @tf.function(jit_compile=True)
         def fun():
             # Noise free transmission
             x = qam_source([batch_size, num_tx, 1])
-            h = tf.matmul(tf.expand_dims(r_12,0), complex_normal([batch_size, num_rx, num_tx], dtype=tf.complex128))
+            h = tf.matmul(tf.expand_dims(r_12,0), complex_normal([batch_size, num_rx, num_tx], precision="double"))
             hx = tf.squeeze(tf.matmul(h, x), -1)
             y = hx
 

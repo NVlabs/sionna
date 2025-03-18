@@ -1,15 +1,12 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 
 import unittest
 import numpy as np
-import tensorflow as tf
-from sionna.nr import LayerMapper, LayerDemapper
-from sionna.utils import BinarySource, hard_decisions
-from sionna.mapping import Mapper, Demapper
-
+from sionna.phy.nr import LayerMapper, LayerDemapper
+from sionna.phy.utils import hard_decisions
+from sionna.phy.mapping import Mapper, Demapper, BinarySource
 
 class TestLayerMapper(unittest.TestCase):
     """Tests for LayerMapper"""
@@ -265,7 +262,7 @@ class TestLayerDemapper(unittest.TestCase):
             u = source((bs, 5, 7, 13*l*mod_order)) # arbitrary dimensions
             x = mapper(u)
             x_l = l_mapper(x)
-            llr_l = demapper((x_l, 0.1))
+            llr_l = demapper(x_l, 0.1)
             l_hat = l_demapper(llr_l)
             u_hat = hard_decisions(l_hat)
 
@@ -286,7 +283,7 @@ class TestLayerDemapper(unittest.TestCase):
             x1 = mapper(u1)
 
             y = lmapper([x0, x1])
-            llr = demapper((y, 0.01))
+            llr = demapper(y, 0.01)
             z0, z1 = ldemapper(llr)
 
             u_hat0 = hard_decisions(z0)

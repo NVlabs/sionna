@@ -1,868 +1,1040 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import tensorflow as tf
 from tensorflow.python.ops.gen_batch_ops import batch
-import unittest
+import pytest
 import numpy as np
 import scipy as sp
+import random
 
-from sionna import config
-from sionna.fec.ldpc.decoding import LDPCBPDecoder, LDPC5GDecoder
-from sionna.fec.ldpc.encoding import LDPC5GEncoder
-from sionna.fec.utils import GaussianPriorSource, load_parity_check_examples
-from sionna.utils import BinarySource
+from sionna.phy import config
+from sionna.phy.fec.ldpc.decoding import LDPCBPDecoder, LDPC5GDecoder, cn_update_minsum, cn_update_phi, cn_update_tanh, vn_update_sum, cn_update_offset_minsum
+from sionna.phy.fec.ldpc.encoding import LDPC5GEncoder
+from sionna.phy.fec.utils import GaussianPriorSource, load_parity_check_examples
+from sionna.phy.utils import hard_decisions, sim_ber, ebnodb2no
+from sionna.phy.mapping import BinarySource
+from sionna.phy.fec.linear import LinearEncoder
+from sionna.phy.channel import AWGN
 
-class TestBPDecoding(unittest.TestCase):
-    "Testcases for LDPCBPDecoder class."
 
-    def test_dtypes(self):
-        """Test against correct dtypes:
-        - input parameters (must be int etc.)
-        - parity-check matrix is only allowed to contain binary values
-        """
+CN_UPDATES = ["min", "boxplus", "boxplus-phi", "offset-minsum"]
 
-        # Raise error if PCM contains other elements than 0,1
-        pcm = config.np_rng.uniform(0,2,[100,150]).astype(int)
-        pcm[10,20] = 2
-        with self.assertRaises(AssertionError):
-            dec = LDPCBPDecoder(pcm)
+#############################
+# Testcases for LDPCBPDecoder
+#############################
 
-        # raise error if llrs are not tf.float32
-        batch_size = 100
-        n = 64
-        k = 32
-        pcm = config.np_rng.uniform(0,2,[n-k, n]).astype(int)
+@pytest.mark.parametrize("r", [0.5, 0.75])
+@pytest.mark.parametrize("n", [64, 100])
+@pytest.mark.parametrize("batch_size", [10])
+def test_pcm_consistency(r, n, batch_size):
+    """Test against correct pcm formats.
+    Parity-check matrix is only allowed to contain binary values
+    """
+    k = int(n*r)
+
+    # Raise error if PCM contains other elements than 0,1
+    pcm = config.np_rng.uniform(0, 2, [n-k, n]).astype(int)
+    # set a random position to 2 (invalid)
+    idx = config.np_rng.uniform(0, n-k, [2,]).astype(int)
+    pcm[idx[0], idx[1]] = 2
+    with pytest.raises(BaseException):
         dec = LDPCBPDecoder(pcm)
-        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                 tf.cast(n, dtype=tf.int32)],
-                                 maxval=100,
-                                 dtype=tf.int32)
-        with self.assertRaises(TypeError):
-            dec(llr)
 
-        # raise error if input shape does not match PCM dim
-        batch_size = 100
-        n = 64
-        k = 32
-        pcm = config.np_rng.uniform(0,2,[n-k, n]).astype(int)
-        dec = LDPCBPDecoder(pcm)
-        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                 tf.cast(n+1, dtype=tf.int32)],
-                                 dtype=tf.float32)
-        with self.assertRaises(AssertionError):
-            dec(llr)
-
-
-    def test_CN(self):
-        """Test that CN function works correctly (i.e., extrinsic and sign preserving). Must be done for all node types.
-
-        Test CN-degree 2 as well for all types. Must be a forwarding node
-        """
-        Ntrials = 100 # nb trials
-        k = 12
-        n = 24
-        enc = LDPC5GEncoder(k, n)
-        dec = LDPC5GDecoder(enc)
-
-        # test cn_update_tanh
-        for _ in range(Ntrials):
-            msg = config.np_rng.normal(size=[10]) #generate random inputs
-            x = tf.RaggedTensor.from_row_splits(
-                                    values=tf.constant(msg, dtype=tf.float32),
-                                    row_splits=[0, len(msg)])
-            y1 = dec._cn_update_tanh(x)
-            y2 = dec._cn_update_phi(x)
-
-            # minsum needs batch dim
-            y3 = dec._cn_update_minsum(tf.expand_dims(x, axis=2))
-            y3 = tf.squeeze(y3, axis=2)
-
-            # both CN functions should yield same results (minsum does NOT!)
-            self.assertTrue(np.allclose(y1.numpy(),y2.numpy(), atol=1e-4))
-
-            # check that sign is correct (treat 0 as positive)
-            s = 2*(msg >= 0).astype(int) - 1
-            s = s*np.prod(s)
-            y1_s = 2*(y1.numpy() >= 0).astype(int) - 1
-            y2_s = 2*(y2.numpy() >= 0).astype(int) - 1
-            y3_s = 2*(y3.numpy() >= 0).astype(int) - 1
-
-            # ignore cases where all CN messages are small; otherwise the sign
-            # becomes random
-            if np.sum(np.abs(y1.numpy()))>1e-3:
-                self.assertTrue(np.allclose(s, y1_s)), "sign tanh"
-                self.assertTrue(np.allclose(s, y2_s)), "sign phi"
-                self.assertTrue(np.allclose(s, y3_s)), "sign minsum"
-
-
-            # test that exact zero input leads to exact zero output
-            msg[-1] = 0.
-            x = tf.RaggedTensor.from_row_splits(
-                                        values=tf.constant(msg,
-                                                           dtype=tf.float32),
-                                        row_splits=[0, len(msg)])
-            y1 = dec._cn_update_tanh(x).numpy()
-            y2 = dec._cn_update_phi(x).numpy()
-
-            # minsum needs batch dim
-            y3 = dec._cn_update_minsum(tf.expand_dims(x, axis=2))
-            y3 = tf.squeeze(y3, axis=2).numpy()
-            # the tanh-implementation is numerically not exact for exact 0
-            # inputs
-            self.assertTrue(np.array_equal(y1[:,:-1], np.zeros_like(y1[:,:-1])))
-            self.assertTrue(np.array_equal(y2[:,:-1], np.zeros_like(y2[:,:-1])))
-            self.assertTrue(np.array_equal(y3[:,:-1], np.zeros_like(y3[:,:-1])))
-
-    def test_int_state(self):
-        """Test internal state functionality of decoder.
-        This implies that Nx1 iterations yield exact same result as N
-        iterations."""
-        batch_size = 1
-        Niter = 5
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        dec = LDPCBPDecoder(pcm, num_iter=Niter)
-        dec2 = LDPCBPDecoder(pcm, num_iter=1, stateful=True)
-
-        llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-
-        res1 = dec(llr)
-
-        res2, msg_vn = dec2([llr, None]) # iter 0 to init msg_vn
-
-        for i in range(Niter-1): # remaining iterations
-            res2,_ = dec2([llr, msg_vn])
-        # results must be the same, otherwise the internal state is not
-        # correctly recovered
-        self.assertTrue(np.allclose(res1,res2))
-
-    def test_phi(self):
-        """Test that phi is self-inverse."""
-        x = np.arange(0.01, 16.6, 0.01)
-        y = LDPCBPDecoder._phi(None, x)
-        z = LDPCBPDecoder._phi(None, y)
-        self.assertTrue(np.allclose(x, z))
-
-    def test_VN(self):
-        """Test that VN function works correctly (i.e., extrinsic).
-        """
-        Ntrials = 1000 # nb trials
-        k = 12
-        n = 24
-        enc = LDPC5GEncoder(k, n)
-        dec = LDPC5GDecoder(enc)
-
-        # test vn updates
-        for _ in range(Ntrials):
-            msg = config.np_rng.normal(size=[10]) #generate random inputs
-            msg_ch = config.np_rng.normal(size=[1]) #generate random inputs
-
-            x = tf.RaggedTensor.from_row_splits(
-                                        values=tf.constant(msg, dtype=tf.float32),
-                                        row_splits=[0, len(msg)])
-
-            y = dec._vn_update(x, msg_ch).numpy()
-
-            y_ref = np.sum(msg) - msg + msg_ch
-            self.assertTrue(np.allclose(y_ref, y, atol=1e-5))
-
-    def test_batch(self):
-        """Test that batch of codewords yields the same results for each batch
-        sample."""
-
-        batch_size = 100
-        Niter = 10
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        dec = LDPCBPDecoder(pcm)
-        llr = config.tf_rng.normal([1, n], mean=4.2, stddev=1)
-        llr = tf.tile(llr, [batch_size,1])
-        x = dec(llr).numpy()
-        for i in range(batch_size):
-            # if decoder runs on GPU, the reduce_prod/reduce_sum in the GPU
-            # yields slightly different result (probably due to scheduling).
-            # This leads to slightly different results within one batch
-            # which is further amplified with more iterations.
-            self.assertTrue(np.allclose(x[0,:],x[i,:],atol=1e-4))
-
-
-    def test_gradient(self):
-        """Test that gradient is accessible and not None."""
-
-        batch_size = 100
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        # check that trainable parameter works as expected
-        dec = LDPCBPDecoder(pcm, trainable=True)
-        self.assertFalse(len(dec.trainable_variables)==0) # trainable variable
-        dec = LDPCBPDecoder(pcm, trainable=False)
-        self.assertTrue(len(dec.trainable_variables)==0) # no trainable variable
-
-        cns = ['boxplus', 'boxplus-phi','minsum']
-        trainable = [True, False]
-        for cn in cns:
-            for t in trainable:
-                dec = LDPCBPDecoder(pcm,
-                                    trainable=t,
-                                    cn_type=cn,
-                                    hard_out=False)
-                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-
-                with tf.GradientTape() as tape:
-                    x = dec(llr)
-                    grads = tape.gradient(x, dec.trainable_variables)
-
-                    # check that gradients exist
-                    self.assertIsNotNone(grads)
-
-                    # check that gradients are provided
-                    if t: # if trainable we should get gradients
-                        self.assertTrue(len(grads)>0), "no gradient found"
-
-                        # and check that array is not None
-                        for g in grads:
-                            self.assertTrue(not g is None), "grad is None"
-                    else:
-                        self.assertTrue(len(grads)==0), \
-                                     "gradient should not exist"
-
-    def test_all_erasure(self):
-        """Test that all-erasure (llr=0) cw yields constant all-zero output."""
-
-        batch_size = 100
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        cns = ['boxplus', 'boxplus-phi', 'minsum']
-        trainable = [True, False]
-        for cn in cns:
-            for t in trainable:
-                dec = LDPCBPDecoder(pcm, trainable=t, cn_type=cn)
-                llr = tf.zeros([batch_size, n])
-                x = dec(llr)
-                self.assertTrue(np.array_equal(x.numpy(), llr.numpy()))
-
-    def test_hard_out(self):
-        """Test hard-out flag yields hard-decided output."""
-
-        batch_size = 100
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        cns = ['boxplus', 'boxplus-phi','minsum']
-        trainable = [True, False]
-        for cn in cns:
-            for t in trainable:
-                dec = LDPCBPDecoder(pcm, trainable=t, cn_type=cn, hard_out=True)
-
-                # test that all zero CW yields hard-decided all-zero cw
-                llr = -10.*tf.ones([batch_size, n]) # all-zero input
-                x = dec(llr).numpy()
-                self.assertTrue(np.array_equal(x, np.zeros_like(x)))
-
-                # test that for arbitrary input only 0,1 values are returned
-                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-                x = dec(llr).numpy()
-                #x contains only {0,1}
-                self.assertTrue(np.array_equal(x, x.astype(bool)))
-
-    def test_tf_fun(self):
-        """Test tf.function"""
-
-        @tf.function
-        def run_graph(llr):
-            return dec(llr)
-
-        @tf.function(jit_compile=True)
-        def run_graph_xla(llr):
-            return dec(llr)
-
-        batch_size = 100
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        cns = ['boxplus', 'boxplus-phi','minsum']
-        trainable = [True, False]
-        for cn in cns:
-            for t in trainable:
-                dec = LDPCBPDecoder(pcm, trainable=t, cn_type=cn, hard_out=True)
-
-                # test that all zero CW yields hard-decided all-zero cw
-                llr = -10.*tf.ones([batch_size, n]) # all-zero input
-                x = dec(llr).numpy()
-                self.assertTrue(np.array_equal(x, np.zeros_like(x)))
-
-                # test that for arbitrary inputs
-                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-                x = run_graph(llr).numpy()
-
-                # execute the graph twice with same input shape
-                x = run_graph(llr).numpy()
-
-                # and change batch_size
-                llr = -10.*tf.ones([2*batch_size, n]) # all-zero input
-                x = run_graph(llr).numpy()
-
-                # and again with jit_compile=True
-                x = run_graph_xla(llr).numpy()
-
-                # execute the graph twice
-                x = run_graph_xla(llr).numpy()
-
-                # and change batch_size
-                llr = -10.*tf.ones([2*batch_size, n]) # all-zero input
-                x = run_graph_xla(llr).numpy()
-
-    def test_output_dim(self):
-        """Test that output dim is n."""
-        batch_size = 100
-        Niter = 10
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        dec = LDPCBPDecoder(pcm)
-        llr = config.tf_rng.normal([batch_size, n], mean=1., stddev=1)
-        dec = LDPCBPDecoder(pcm, track_exit=False)
-        x = dec(llr)
-        self.assertTrue(np.shape(x)[1]==n)
-
-    def test_multi_dim(self):
-        """Test that 2+D Tensors are correctly handled."""
-
-        pcm, k, n, _ = load_parity_check_examples(2)
-        dec = LDPCBPDecoder(pcm)
-        shapes =[[10, 2, 3, n], [1, 4, n], [10, 2, 3, 3, n]]
-
-        for s in shapes:
-            llr = config.tf_rng.normal(s, mean=0, stddev=1)
-            llr_ref = tf.reshape(llr, [-1, n])
-
-            c = dec(llr)
-            c_ref = dec(llr_ref)
-            s[-1] = n
-            c_ref = tf.reshape(c_ref, s)
-            self.assertTrue(np.allclose(c.numpy(), c_ref.numpy(), atol=0.001))
-
-        # and verify that wrong last dimension raises an error
-        with self.assertRaises(tf.errors.InvalidArgumentError):
-            s = [10, 2, n-1]
-            llr = config.tf_rng.normal(s, mean=0, stddev=1)
-            c = dec(llr)
-
-    def test_all_zero(self):
-        """Test all-zero cw without noise yields all-zero info bits."""
-        batch_size = 100
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        cns = ['boxplus', 'boxplus-phi','minsum']
-        trainable = [True, False]
-        for cn in cns:
-            for t in trainable:
-                dec = LDPCBPDecoder(pcm, trainable=t, cn_type=cn, hard_out=True)
-                # init with all-zero and large LLRs/logits (=high SNR)
-                llr = -10.* tf.ones([batch_size, n])
-                x = np.zeros_like(llr)
-                x_hat = dec(llr)
-                self.assertTrue(np.array_equal(x, x_hat.numpy()))
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)"""
-        bs = 10
-        source = BinarySource()
-        pcm, k, n, _ = load_parity_check_examples(2)
-
-        inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
-        x = LDPCBPDecoder(pcm)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-        # test that output batch dim is none
-        self.assertTrue(model.output_shape[0] is None)
-        llr = tf.ones([bs, n])
-        model(llr)
-        # call twice to see that bs can change
-        llr2 = tf.ones([bs, n])
-        model(llr2)
-        model.summary()
-
-    def test_dtype2(self):
-        """Test that output dtype can be flexible"""
-        batch_size = 100
-        pcm, k, n, _ = load_parity_check_examples(2)
-        dec_32 = LDPCBPDecoder(pcm, output_dtype=tf.float32)
-        dec_64 = LDPCBPDecoder(pcm, output_dtype=tf.float64)
-        llr_32 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                    tf.cast(n, dtype=tf.int32)],
+    # raise error if input shape does not match PCM dim
+    pcm = config.np_rng.uniform(0,2,[n-k, n]).astype(int)
+    dec = LDPCBPDecoder(pcm)
+    llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
+                                    tf.cast(n+1, dtype=tf.int32)],
                                     dtype=tf.float32)
-        llr_64 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                    tf.cast(n, dtype=tf.int32)],
-                                    dtype=tf.float64)
-
-        # output for both inputs is tf.float32
-        u_32 = dec_32(llr_32)
-        u_64 = dec_32(llr_64)
-        self.assertTrue(u_32.dtype is tf.float32)
-        self.assertTrue(u_64.dtype is tf.float32)
-
-        # output for both inputs is tf.float64
-        u_32 = dec_64(llr_32)
-        u_64 = dec_64(llr_64)
-        self.assertTrue(u_32.dtype is tf.float64)
-        self.assertTrue(u_64.dtype is tf.float64)
-
-    def test_sparse(self):
-        """Test that parity-check matrix can be also scipy.sparse mat."""
-        batch_size = 10
-        Niter = 10
-        pcm, k, n, _ = load_parity_check_examples(3)
-        source = GaussianPriorSource()
-
-        # generate sparse parity-check matrices
-        pcm_csc = sp.sparse.csc_matrix(pcm)
-        pcm_csr = sp.sparse.csr_matrix(pcm)
-
-        # instantiate decoders with different pcm datatypes
-        dec = LDPCBPDecoder(pcm, num_iter=Niter)
-        dec_csc = LDPCBPDecoder(pcm_csc, num_iter=Niter)
-        dec_csr = LDPCBPDecoder(pcm_csr, num_iter=Niter)
-
-        llr = source([[batch_size, n], 0.9])
-
-        # and decode the same llrs with each decoder
-        res = dec(llr)
-        res_csc = dec_csc(llr)
-        res_csr = dec_csr(llr)
-
-        # results must be the same
-        self.assertTrue(np.allclose(res, res_csc))
-        self.assertTrue(np.allclose(res, res_csr))
-
-    def test_llrmax(self):
-        """Test that llr_max can be set."""
-        pcm, _, n, _ = load_parity_check_examples(0)
-        # no iteration: decoder returns clipped llrs
-        dec = LDPCBPDecoder(pcm, num_iter=0, hard_out=False)
-
-        # test default value
-        llr_max_def = dec.llr_max.numpy() # get default value
-        x = tf.ones((1,n))*100
-        y = dec(x).numpy() # run 0 iterations
-        np.max(y)==llr_max_def
-
-        # set new llr_max
-        llr_maxs = [17., 45.3, 78]
-        for l in llr_maxs:
-            dec.llr_max = l
-            y = dec(x).numpy() # run 0 iterations
-
-    def test_cn_minsum(self):
-        """Test min_sim implementation of CN update.
-        Test that double min is correctly processed, zeros are detected and
-        that signs are also correctly handled."""
-
-        # init dummy decoder
-        pcm, _, _, _ = load_parity_check_examples(0)
-        dec = LDPCBPDecoder(pcm, cn_type="minsum")
-
-        # test messages for CN function
-        m_in = tf.ragged.constant(([1,-2,3,-1],[2,.3,2],[0,1,-1,2.3]),
-                                  tf.float32)
-
-        # apply decoder
-        m_out = dec._cn_update_minsum(tf.expand_dims(m_in ,axis=-1)).numpy()
-
-        # reference decoder
-        m_ref = np.copy(m_in.numpy())
-        for i,m in enumerate(m_in.numpy()):
-            for j in range(len(m)):
-                x = np.abs(np.copy(m))
-                x[j] = 1000 # lareg value
-                s = np.sign(np.copy(m))
-                s[j] = 1
-                s = np.prod(s)
-                m_ref[i][j] = np.min(x) * s
-
-        # and compare both results
-        for i,(a,b) in enumerate(zip(m_ref, m_out)):
-            self.assertTrue(np.allclose(a, b[:,0]))
-
-class TestBPDecoding5G(unittest.TestCase):
-    """Checks LDPC5GDecoding layer.
-    Remark: As this layer inherits from BPDecoding many cases are covered by
-    previous tests."""
-
-    def test_encoding(self):
-        """Test that encoded info bits can be reconstructed after decoding
-        (assuming no/little noise)."""
-
-        batch_size = 100
-
-        # k, n
-        params =[[64, 128], [64, 180], [167, 201], [439, 800], [948, 1024],
-                 [3893, 7940], [6530, 10023], [8448, 23000], [955,1024],
-                 [1900, 2000]]
-
-        # generate random bits
-        for ret_info in [True, False]:
-            src = BinarySource()
-            for p in params:
-                k = p[0]
-                n = p[1]
-                enc = LDPC5GEncoder(k, n)
-                dec = LDPC5GDecoder(enc, hard_out=True, return_infobits=ret_info)
-                b = src([batch_size, k])
-                c = enc(b)
-                x = 2*c -1 # BPSK (neg. sign due to  sionna llr definition)
-                llr = 5 * x # scale as we have no noise -> larger LLRs
-                b_hat = dec(llr)
-                if ret_info:
-                    self.assertTrue(np.array_equal(b.numpy(), b_hat.numpy()))
-                else:
-                    self.assertTrue(np.array_equal(c.numpy(), b_hat.numpy()))
-
-    def test_dimensions(self):
-        """Test for dimension mismatched between input_shape and k, n."""
-
-        batch_size = 100
-        n = 128
-        k = 64
-        enc = LDPC5GEncoder(k, n)
-        dec = LDPC5GDecoder(enc)
-        llr = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                 tf.cast(n+1, dtype=tf.int32)],
-                                 dtype=tf.float32)
-
-        with self.assertRaises(AssertionError):
-            dec(llr)
-
-        # varying batch-sizes should be supported
-        llr = config.tf_rng.uniform([tf.cast(batch_size+1, dtype=tf.int32),
-                                 tf.cast(n, dtype=tf.int32)],
-                                 dtype=tf.float32)
+    with pytest.raises(BaseException):
         dec(llr)
 
-    def test_multi_dim(self):
-        """Test that 2+D Tensors are correctly handled."""
+@pytest.mark.parametrize("pcm_id", [0,1,2])
+@pytest.mark.parametrize("num_iter", [0,1,10,100])
+def test_message_passing(pcm_id, num_iter):
+    """Test that message passing works correctly; this tests uses no CN/VN functions (i.e. identity functions.)"""
 
-        k = 100
-        n = 200
-        shapes =[[10, 20, 30, n], [1, 40, n], [10, 2, 3, 4, 3, n]]
-        enc = LDPC5GEncoder(k, n)
-        dec = LDPC5GDecoder(enc, num_iter=10)
-        source = GaussianPriorSource()
+    pcm, k,n,r = load_parity_check_examples(pcm_id=pcm_id)
+    dec = LDPCBPDecoder(pcm,
+                        cn_update="identity",
+                        vn_update="identity",
+                        hard_out=False,
+                        num_iter=num_iter,
+                        llr_max=100000,
+                        return_state=True)# avoid clipping
 
-        for s in shapes:
-            llr = source([s, 1])
-            llr_ref = tf.reshape(llr, [-1, n])
+    # feed node indices as inputs (to test correct message passing)
+    llr_ch = tf.cast(np.arange(n), tf.float32)
+    # add batch dim
+    llr_ch = tf.expand_dims(llr_ch,axis=0)
 
-            c = dec(llr)
-            c_ref = dec(llr_ref)
-            s[-1] = k
-            c_ref = tf.reshape(c_ref, s)
-            self.assertTrue(np.allclose(c.numpy(), c_ref.numpy(), atol=0.01))
+    y, msg_v2c = dec(llr_ch) # invert sign due to different LLR definition
 
-        # and verify that wrong last dimension raises an error
-        with self.assertRaises(BaseException):
-            s = [10, 2, k-1]
-            llr = config.tf_rng.normal(s, mean=0, stddev=1)
-            c = dec(llr)
+    # normalize y by node degree (as VN nodes marginalize)
+    vn_degree = np.sum(pcm, axis=0)
+    if num_iter>0:
+        y_ = y/(vn_degree+1) # +1 as we also marginalize over llr_ch
+    else: # for 0 iterations the decoder directly returns llr_ch
+        y_ = y
+    assert np.array_equal(llr_ch.numpy(), (y_).numpy())
 
-    def test_gradient(self):
-        """Test that gradient is accessible and not None."""
+    # also test that msg_v2c has same values per VN node
+    msg_v2c = tf.RaggedTensor.from_value_rowids(values=msg_v2c,
+                                                value_rowids=dec._vn_idx)
+    # loop over ragged tensor
+    for i in range(n):
+        for j in range(msg_v2c[i,:].shape[0]):
+            assert msg_v2c[i,j]==i
 
-        batch_size = 100
-        n = 128
-        k = 64
-        enc = LDPC5GEncoder(k, n)
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("use_xla", [False, True])
+@pytest.mark.parametrize("num_iter", [0,1,10])
+def test_graph_mode(cn_update, use_xla, num_iter, pcm_id=0, batch_size=10):
+    """Test that decoder supports graph / XLA mode."""
 
-        cns = ['boxplus', 'boxplus-phi', 'minsum']
-        trainable = [True, False]
-        for cn in cns:
-            for t in trainable:
-                dec = LDPC5GDecoder(enc,
-                                    trainable=t,
-                                    cn_type=cn,
-                                    hard_out=False)
-                llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
+    # init decoder
+    pcm, k,n,r = load_parity_check_examples(pcm_id=pcm_id)
+    dec = LDPCBPDecoder(pcm,
+                        cn_update=cn_update,
+                        vn_update="sum",
+                        hard_out=False,
+                        num_iter=num_iter)
+    source = GaussianPriorSource()
 
-                with tf.GradientTape() as tape:
-                    x = dec(llr)
-                    grads = tape.gradient(x, dec.trainable_variables)
+    @tf.function(jit_compile=use_xla)
+    def run_graph(batch_size):
+        llr_ch = source([batch_size, n], 0.1)
+        return dec(llr_ch)
 
-                    # check that gradients exist
-                    self.assertIsNotNone(grads)
+    # run with batch_size as python integer
+    run_graph(batch_size)
+    # run again with increased batch_size
+    run_graph(batch_size+1)
 
-                    # check that gradients are provided
-                    if t: # if trainable we should get gradients
-                        self.assertTrue(len(grads)>0), "no gradient found"
+    # and test with tf.constant
+    batch_size = tf.constant(batch_size, tf.int32)
+    run_graph(batch_size)
+    # and run again
+    run_graph(batch_size+1)
 
-                        # and check that array is not None
-                        for g in grads:
-                            self.assertTrue(not g is None), "grad is None"
-                    else:
-                        self.assertTrue(len(grads)==0), \
-                                                "gradient should not exist"
+# XLA is currently not supported for layered decoding
+@pytest.mark.parametrize("mode", ["eager", "graph"])
+def test_scheduling(mode):
+    """Test different schedulings."""
 
-    def test_dtype(self):
-        """Test that output dtype can be flexible."""
-        batch_size = 100
-        n = 128
-        k = 64
-        enc = LDPC5GEncoder(k, n)
-        dec_32 = LDPC5GDecoder(enc, output_dtype=tf.float32)
-        dec_64 = LDPC5GDecoder(enc, output_dtype=tf.float64)
-        llr_32 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                 tf.cast(n, dtype=tf.int32)],
-                                 dtype=tf.float32)
-        llr_64 = config.tf_rng.uniform([tf.cast(batch_size, dtype=tf.int32),
-                                 tf.cast(n, dtype=tf.int32)],
-                                 dtype=tf.float64)
+    # checks are indpendent
+    pcm = np.array([[1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 1]])
+    n = pcm.shape[1]
 
-        # output for both inputs is tf.float32
-        u_32 = dec_32(llr_32)
-        u_64 = dec_32(llr_64)
-        self.assertTrue(u_32.dtype is tf.float32)
-        self.assertTrue(u_64.dtype is tf.float32)
+    cns1 = "flooding"
+    cns2 = np.stack([[0],[1]], axis=0) # layered
+    cns3 = np.stack([[0],[0]], axis=0) # update only CN0
 
-        # output for both inputs is tf.float64
-        u_32 = dec_64(llr_32)
-        u_64 = dec_64(llr_64)
-        self.assertTrue(u_32.dtype is tf.float64)
-        self.assertTrue(u_64.dtype is tf.float64)
+    y_out = []
+    for cns in [cns1, cns2, cns3]:
 
-    def test_full_cw_ratematching(self):
-        """Test that if return_infobit==False, the full codeword is returned.
+        dec = LDPCBPDecoder(pcm,
+                            num_iter=10,
+                            hard_out=False,
+                            vn_update="sum",
+                            cn_update="min",
+                            cn_schedule=cns,
+                            llr_max=100000,)
+        @tf.function(jit_compile=False)
+        def run_graph(x):
+            return dec(x)
 
-        We test this for zero iterations, to see if all internal reshapes are correctly recovered before returning the estimate.
-        """
-        batch_size = 100
-        params =[[64,128], [64, 180], [167, 201], [439, 800], [948, 1024],
-                 [3893, 7940], [6530, 10023], [8448, 23000]]
+        x = tf.cast(tf.range(n), tf.float32)
+        if mode=="graph":
+            y = run_graph(x)
+        else:
+            y = dec(x)
+        y_out.append(y)
 
-        for p in params:
-            k = p[0]
-            n = p[1]
-            enc = LDPC5GEncoder(k, n)
-            dec = LDPC5GDecoder(enc,
-                                hard_out=False,
+    # layered and flooding should be the same output (nodes are independent)
+    assert np.array_equal(y_out[0].numpy(), y_out[1].numpy())
+
+    # output shuold be different if only first CN is updated
+    # check that the 2nd node is not updated
+    assert not np.array_equal(y_out[0].numpy(), y_out[2].numpy())
+
+@pytest.mark.parametrize("shape", [[], [2,3], [2,3,4,5]])
+@pytest.mark.parametrize("pcm_id", [0,1])
+def test_batch_and_multidimension(shape, pcm_id, num_iter=100):
+    """Test that batches are properly handled.
+    Further, test multi-dimensional shapes."""
+
+    # init decoder
+    pcm, k,n,r = load_parity_check_examples(pcm_id=pcm_id)
+    dec = LDPCBPDecoder(pcm,
+                        num_iter=num_iter,
+                        hard_out=False)
+    source = GaussianPriorSource()
+    shape.append(n)
+    llr_ch = source(shape, 0.1)
+    y = dec(llr_ch)
+
+    #reshape before decoding
+    y_ref_ = dec(tf.reshape(llr_ch, (-1,n)))
+    # restore shape after decoding
+    y_ref = tf.reshape(y_ref_, shape)
+
+    assert np.allclose(y.numpy(), y_ref.numpy(), rtol=0.001, atol=0.001)
+
+@pytest.mark.parametrize("dt_in", [tf.float32, tf.float64])
+@pytest.mark.parametrize("prec", ["single", "double"])
+def test_dtypes(prec, dt_in, pcm_id=0, batch_size=10):
+    """Test different precisions."""
+        # init decoder
+    pcm, k,n,r = load_parity_check_examples(pcm_id=pcm_id)
+    dec = LDPCBPDecoder(pcm,
+                        hard_out=False,
+                        precision=prec,
+                        return_state=True)
+
+    # test that input yields no error
+    llr_ch = tf.zeros([batch_size, n], dt_in)
+    y, v2c_msg = dec(llr_ch)
+
+    # test that output has correct format
+    if prec=="single":
+        assert y.dtype==tf.float32
+        assert v2c_msg.dtype==tf.float32
+    else:
+        assert y.dtype==tf.float64
+        assert v2c_msg.dtype==tf.float64
+
+@pytest.mark.parametrize("pcm_id", [0,1])
+@pytest.mark.parametrize("num_iter", [1,10,100])
+def test_internal_state(pcm_id, num_iter, batch_size=10):
+    """test that internal state is correctly returned.
+    For this test, we run the decoder 1 x num_iter and num_iter x 1
+    and compare both results.
+    """
+
+    pcm, k,n,r = load_parity_check_examples(pcm_id=pcm_id)
+    source = GaussianPriorSource()
+    dec_ref = LDPCBPDecoder(pcm,
+                            hard_out=False,
+                            num_iter=num_iter)
+    dec = LDPCBPDecoder(pcm,
+                        hard_out=False,
+                        return_state=True,
+                        num_iter=1)
+
+    # test that input yields no error
+    llr_ch = source([batch_size, n], 0.1)
+
+    # run reference decoder with num_iter iterations
+    y_ref = dec_ref(llr_ch)
+
+    # run decoder num_iter times with 1 iteration
+    # always feed state of last iteration
+    msg_v2c = None
+    for i in range(num_iter):
+        y, msg_v2c = dec(llr_ch, msg_v2c=msg_v2c)
+
+    assert np.allclose(y.numpy(), y_ref.numpy())
+
+    # also test that number iter can be feed during call
+    y, _ = dec(llr_ch, num_iter=num_iter)
+
+    assert np.allclose(y.numpy(), y_ref.numpy())
+
+# XLA currently not supported for training
+@pytest.mark.parametrize("mode", ["eager", "graph"])
+def test_gradient(mode, pcm_id=1, batch_size=10):
+    """Test that gradients are accessible and not None."""
+    pcm, k,n,r = load_parity_check_examples(pcm_id)
+
+    dec = LDPCBPDecoder(pcm, num_iter=2, hard_out=False)
+    # calculate gradients w.r.t x
+    x = tf.Variable(tf.ones((batch_size, n)), tf.float32)
+
+    @tf.function(jit_compile=True)
+    def run_graph_xla(x):
+        with tf.GradientTape() as tape:
+            y = dec(x)
+        return tape.gradient(y, x)
+
+    @tf.function(jit_compile=False)
+    def run_graph(x):
+        with tf.GradientTape() as tape:
+            y = dec(x)
+        return tape.gradient(y, x)
+
+    if mode=="eager":
+        with tf.GradientTape() as tape:
+            y = dec(x)
+        grads = tape.gradient(y, x)
+    elif mode=="graph":
+        grads = run_graph(x)
+    else:
+        grads = run_graph_xla(x)
+    assert grads is not None
+
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("num_iter", [0, 1, 10])
+def test_all_erasure(cn_update, num_iter, pcm_id=2, batch_size=10):
+    """test that an all-erasure (llr_ch=0) yields exact 0 outputs.
+    This tests against biases in the decoder."""
+    pcm, k, n, _ = load_parity_check_examples(2)
+    dec = LDPCBPDecoder(pcm,
+                        cn_update=cn_update,
+                        hard_out=False,
+                        num_iter=num_iter)
+    llr_ch = tf.zeros((batch_size, n), tf.float32)
+
+    y = dec(llr_ch)
+    assert np.array_equal(llr_ch.numpy(), y.numpy())
+
+@pytest.mark.parametrize("num_iter", [0, 10])
+def test_hard_output(num_iter, pcm_id=2, batch_size=10):
+    """Test hard-out flag yields hard-decided output."""
+    pcm, k, n, _ = load_parity_check_examples(2)
+    source = GaussianPriorSource()
+    dec = LDPCBPDecoder(pcm,
+                        hard_out=True,
+                        num_iter=num_iter)
+    llr_ch = source([batch_size, n], 0.1)
+    y = dec(llr_ch)
+    y_np = y.numpy()
+    # only binary values are allowed
+    assert np.array_equal(y_np, y_np.astype(bool))
+
+def test_sparse(num_iter=10, batch_size=10, pcm_id=2):
+    """Test that parity-check matrix can be also scipy.sparse mat."""
+
+    pcm, k, n, _ = load_parity_check_examples(pcm_id)
+    source = GaussianPriorSource()
+
+    # generate sparse parity-check matrices
+    pcm_csc = sp.sparse.csc_matrix(pcm)
+    pcm_csr = sp.sparse.csr_matrix(pcm)
+
+    # instantiate decoders with different pcm datatypes
+    dec = LDPCBPDecoder(pcm, num_iter=num_iter)
+    dec_csc = LDPCBPDecoder(pcm_csc, num_iter=num_iter)
+    dec_csr = LDPCBPDecoder(pcm_csr, num_iter=num_iter)
+
+    llr = source([batch_size, n], 0.9)
+
+    # and decode the same llrs with each decoder
+    res = dec(llr)
+    res_csc = dec_csc(llr)
+    res_csr = dec_csr(llr)
+
+    # results must be the same
+    assert np.allclose(res, res_csc)
+    assert np.allclose(res, res_csr)
+
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("pcm_id", [1,2,3])
+def test_e2e_ldpc(pcm_id, cn_update, no=0.3, num_iter=10, batch_size=10):
+    """End-to-end test of LDPC coding scheme using a linear encoder."""
+
+    pcm, k, n, _ = load_parity_check_examples(pcm_id)
+    source = BinarySource()
+    channel = AWGN()
+
+    encoder = LinearEncoder(pcm, is_pcm=True)
+    dec = LDPCBPDecoder(pcm, num_iter=num_iter, cn_update=cn_update)
+
+    bits = source([batch_size, k])
+    c = encoder(bits)
+    x_bpsk = 2*c-1 # logit definition!
+    x_bpsk = tf.cast(x_bpsk, tf.complex64)
+    y = channel(x_bpsk, no)
+    # real-valued domain is fine
+    llr_ch = tf.math.real(2/no**2 * y)
+    c_hat = dec(llr_ch)
+
+    # test that transmitted codeword could is correctly recovered
+    assert np.array_equal(c.numpy(), c_hat.numpy())
+
+    # check that there was at least one transmission error
+    # otherwise the test is useless
+    c_hat_no_coding = hard_decisions(llr_ch)
+    assert not np.array_equal(c.numpy(), c_hat_no_coding.numpy())
+
+@pytest.mark.parametrize("num_iter", [0,1,10])
+@pytest.mark.parametrize("llr_max", [0, 5, 100])
+def test_llr_max(llr_max, num_iter, pcm_id=1, batch_size=10):
+    """Test that llr_max is correctly set and can be None."""
+
+    pcm, k, n, _ = load_parity_check_examples(pcm_id)
+    dec = LDPCBPDecoder(pcm, num_iter=num_iter, hard_out=False,
+                        llr_max=llr_max, return_state=True)
+
+    # generate large random inputs
+    llr_ch = 2*llr_max * config.tf_rng.normal((batch_size, n))
+    y, msg = dec(llr_ch)
+
+    #check that no larger value than llr_max exists
+    assert np.max(np.abs(y))<=llr_max
+    assert np.max(np.abs(msg))<=llr_max
+
+#####################################
+# Testcases for node update functions
+#####################################
+
+def utils_gen_ragged_tensor(node_degrees, batch_size):
+    """Generate a ragged tensor for testing of the node update functions."""
+
+    row_ids = []
+    for c,i in enumerate(node_degrees):
+        for j in range(i):
+            row_ids.append(c)
+
+    row_ids = tf.constant(row_ids, tf.int32)
+    # last dim used as batch dim
+    v = config.tf_rng.normal((row_ids.shape[0], batch_size))
+    msg = tf.RaggedTensor.from_value_rowids(values=v, value_rowids=row_ids)
+    msg = tf.cast(msg, tf.float32)
+    return msg
+
+@pytest.mark.parametrize("mode", ["eager", "graph", "xla"])
+@pytest.mark.parametrize("no", [0, 0.1, 1.])
+@pytest.mark.parametrize("llr_clipping", [5, 20, 100, None])
+def test_vn_update_sum(no, llr_clipping, mode, batch_size=100, node_degrees=[3,4,5,6,7]):
+    """Test VN update against reference implementation."""
+
+    @tf.function(jit_compile=True)
+    def run_graph_xla(msg_c2v, llr_ch):
+        return vn_update_sum(msg_c2v, llr_ch, llr_clipping)
+
+    @tf.function(jit_compile=False)
+    def run_graph(msg_c2v, llr_ch):
+        return vn_update_sum(msg_c2v, llr_ch, llr_clipping)
+
+    # test with random input
+    msg_c2v = utils_gen_ragged_tensor(node_degrees, batch_size)
+    num_nodes = len(node_degrees)
+    llr_ch = no * config.tf_rng.normal((num_nodes, batch_size))
+
+    if mode=="eager":
+        msg_v2c, x_tot = vn_update_sum(msg_c2v, llr_ch, llr_clipping)
+    elif mode=="graph":
+        msg_v2c, x_tot = run_graph(msg_c2v, llr_ch)
+    else: # xla
+        msg_v2c, x_tot = run_graph_xla(msg_c2v, llr_ch)
+
+    # numpy reference implementation
+    msg_np = msg_c2v.numpy()
+    x_e_ref = [] # use list to mimic ragged array
+    x_tot_ref = np.zeros((num_nodes, batch_size))
+    # loop over each node
+    for node_idx in range(msg_np.shape[0]):
+        x_in = msg_np[node_idx]
+        # marginalize
+        x_tot_ref[node_idx,:] = np.sum(x_in, axis=0, keepdims=True) \
+                                + llr_ch.numpy()[node_idx]
+        # extrinsic node output
+        x_e_ref.append(x_tot_ref[node_idx,:] - x_in)
+
+    # check results per node
+    for idx,v in enumerate(x_e_ref):
+        # apply clipping if required
+        if llr_clipping is not None:
+            v = np.minimum(v, llr_clipping)
+            v = np.maximum(v, -llr_clipping)
+        assert np.allclose(msg_v2c[idx,:], v, rtol=0.001, atol=0.001)
+
+    for idx,v in enumerate(x_tot_ref):
+         # apply clipping if required
+        if llr_clipping is not None:
+            v = np.minimum(v, llr_clipping)
+            v = np.maximum(v, -llr_clipping)
+        assert np.allclose(x_tot[idx,:], v, rtol=0.001, atol=0.001)
+
+@pytest.mark.parametrize("mode", ["eager", "graph", "xla"])
+@pytest.mark.parametrize("llr_clipping", [5, 20, 100, None])
+def test_cn_update_minsum(llr_clipping, mode, batch_size=100, node_degrees=[3,4,5,6,7]):
+    """Test minsum CN update against reference implementation."""
+
+    @tf.function(jit_compile=True)
+    def run_graph_xla(msg_v2c):
+        return cn_update_minsum(msg_v2c, llr_clipping)
+
+    @tf.function(jit_compile=False)
+    def run_graph(msg_v2c):
+        return cn_update_minsum(msg_v2c, llr_clipping)
+
+    msg_v2c = utils_gen_ragged_tensor(node_degrees, batch_size)
+    if mode=="eager":
+        msg_c2v = cn_update_minsum(msg_v2c, llr_clipping)
+    elif mode=="graph":
+        msg_c2v = run_graph(msg_v2c)
+    else: # xla
+        msg_c2v = run_graph_xla(msg_v2c)
+
+    # numpy reference implementation
+    msg_np = msg_v2c.numpy()
+
+    # loop over each node
+    msg_c2v_ref = [] # use list to mimic ragged array
+    # find extrinsic min for each node individually
+    for node_idx in range(msg_np.shape[0]):
+        # all incoming message of specific CN
+        sign_out = np.prod(np.sign(msg_np[node_idx]),axis=0, keepdims=True) \
+            * np.sign(msg_np[node_idx])
+        x_in = np.abs(msg_np[node_idx])
+        # init array of outgoing message for this node
+        x_out = np.zeros((x_in.shape))
+        for i in range(x_in.shape[0]):
+            # loop over batch
+            for bs_idx in range(x_in.shape[1]):
+                cur_min = np.inf
+                for j in range(x_in.shape[0]):
+                    if i!=j:
+                        cur_min = np.minimum(cur_min, x_in[j,bs_idx])
+                x_out[i,bs_idx] = cur_min * sign_out[i,bs_idx]
+        msg_c2v_ref.append(x_out)
+
+    # check results per node
+    for idx,v in enumerate(msg_c2v_ref):
+        # apply clipping if required
+        if llr_clipping is not None:
+            v = np.minimum(v, llr_clipping)
+            v = np.maximum(v, -llr_clipping)
+        assert np.allclose(msg_c2v[idx,:].numpy(), v,rtol=0.001, atol=0.001)
+
+    # Test also for the corner case of a double minimum
+    # this results in the same messages to all nodes
+    v = [2.1, 2.1, 3, 4]
+    msg_c2v_ref = np.array([2.1, 2.1, 2.1, 2.1])
+    row_ids = [0,0,0,0]
+    msg = tf.RaggedTensor.from_value_rowids(values=v, value_rowids=row_ids)
+    msg_c2v = cn_update_minsum(msg, llr_clipping=None)
+    assert np.allclose(msg_c2v.flat_values.numpy(), msg_c2v_ref)
+
+@pytest.mark.parametrize("mode", ["eager", "graph", "xla"])
+@pytest.mark.parametrize("llr_clipping", [5, 20, 100, None])
+@pytest.mark.parametrize("offset", [0, 0.5, 1.])
+def test_cn_update_offset_minsum(llr_clipping, mode, offset, batch_size=100, node_degrees=[3,4,5,6,7]):
+    """Test offset minsum CN update against reference implementation."""
+    @tf.function(jit_compile=True)
+    def run_graph_xla(msg_v2c):
+        return cn_update_offset_minsum(msg_v2c, llr_clipping, offset=offset)
+
+    @tf.function(jit_compile=False)
+    def run_graph(msg_v2c):
+        return cn_update_offset_minsum(msg_v2c, llr_clipping, offset=offset)
+
+    msg_v2c = utils_gen_ragged_tensor(node_degrees, batch_size)
+    if mode=="eager":
+        msg_c2v = cn_update_offset_minsum(msg_v2c, llr_clipping, offset=offset)
+    elif mode=="graph":
+        msg_c2v = run_graph(msg_v2c)
+    else: # xla
+        msg_c2v = run_graph_xla(msg_v2c)
+
+    # numpy reference implementation
+    msg_np = msg_v2c.numpy()
+
+    # loop over each node
+    msg_c2v_ref = [] # use list to mimic ragged array
+    # find extrinsic min for each node individually
+    for node_idx in range(msg_np.shape[0]):
+        # all incoming message of specific CN
+        sign_out = np.prod(np.sign(msg_np[node_idx]),axis=0, keepdims=True) \
+            * np.sign(msg_np[node_idx])
+        x_in = np.abs(msg_np[node_idx])
+        # init array of outgoing message for this node
+        x_out = np.zeros((x_in.shape))
+        for i in range(x_in.shape[0]):
+            # loop over batch
+            for bs_idx in range(x_in.shape[1]):
+                cur_min = np.inf
+                for j in range(x_in.shape[0]):
+                    if i!=j:
+                        cur_min = np.minimum(cur_min, x_in[j,bs_idx])
+
+                # offset correction
+                x_out[i,bs_idx] = np.maximum(cur_min - offset,0)
+                # and apply sign
+                x_out[i,bs_idx] *= sign_out[i,bs_idx]
+        msg_c2v_ref.append(x_out)
+
+    # check results per node
+    for idx,v in enumerate(msg_c2v_ref):
+        # apply clipping if required
+        if llr_clipping is not None:
+            v = np.minimum(v, llr_clipping)
+            v = np.maximum(v, -llr_clipping)
+        assert np.allclose(msg_c2v[idx,:].numpy(), v,rtol=0.001, atol=0.001)
+
+@pytest.mark.parametrize("mode", ["eager", "graph", "xla"])
+@pytest.mark.parametrize("llr_clipping", [5, 20, 100, None])
+def test_cn_update_boxplus(llr_clipping, mode, batch_size=100, node_degrees=[3,4,5,6,7]):
+    """Test boxplus CN update against reference implementation."""
+
+    @tf.function(jit_compile=True)
+    def run_graph_xla(msg_v2c):
+        return cn_update_tanh(msg_v2c, llr_clipping)
+
+    @tf.function(jit_compile=False)
+    def run_graph(msg_v2c):
+        return cn_update_tanh(msg_v2c, llr_clipping)
+
+    msg_v2c = utils_gen_ragged_tensor(node_degrees, batch_size)
+    if mode=="eager":
+        msg_c2v = cn_update_tanh(msg_v2c, llr_clipping)
+    elif mode=="graph":
+        msg_c2v = run_graph(msg_v2c)
+    else: # xla
+        msg_c2v = run_graph_xla(msg_v2c)
+
+    # numpy reference implementation
+    msg_v2c_np = msg_v2c.numpy()
+    msg_c2v_ref = []
+    for cn in msg_v2c_np:
+        d = len(cn)
+        msg_out = np.zeros((d,batch_size))
+        for i in range(d):
+            v = 1
+            for j in range(d):
+                if i!=j: # exclude extrinsic msg
+                    v *= np.tanh(cn[j]/2)
+            msg_out[i,:] = 2* np.arctanh(v)
+        msg_c2v_ref.append(msg_out)
+
+    # check results per node
+    for idx,v in enumerate(msg_c2v_ref):
+        # apply clipping if required
+        if llr_clipping is not None:
+            v = np.minimum(v, llr_clipping)
+            v = np.maximum(v, -llr_clipping)
+        assert np.allclose(msg_c2v[idx,:].numpy(), v, rtol=0.001, atol=0.001)
+
+@pytest.mark.parametrize("mode", ["eager", "graph", "xla"])
+@pytest.mark.parametrize("llr_clipping", [5, 20, 100, None])
+def test_cn_update_boxplus_phi(llr_clipping, mode, batch_size=100, node_degrees=[3,4,5,6,7]):
+    """Test boxplus-phi CN update against reference implementation."""
+
+    @tf.function(jit_compile=True)
+    def run_graph_xla(msg_v2c):
+        return cn_update_phi(msg_v2c, llr_clipping)
+
+    @tf.function(jit_compile=False)
+    def run_graph(msg_v2c):
+        return cn_update_phi(msg_v2c, llr_clipping)
+
+    msg_v2c = utils_gen_ragged_tensor(node_degrees, batch_size)
+    if mode=="eager":
+        msg_c2v = cn_update_phi(msg_v2c, llr_clipping)
+    elif mode=="graph":
+        msg_c2v = run_graph(msg_v2c)
+    else: # xla
+        msg_c2v = run_graph_xla(msg_v2c)
+
+    # numpy reference implementation
+    msg_v2c_np = msg_v2c.numpy()
+    msg_c2v_ref = []
+    for cn in msg_v2c_np:
+        d = len(cn)
+        msg_out = np.zeros((d,batch_size))
+        for i in range(d):
+            v = 0
+            s = 1
+            for j in range(d):
+                if i!=j: # exclude extrinsic msg
+                    s *= np.sign(cn[j])
+                    v += -np.log(np.tanh(np.abs(cn[j])/2))
+            msg_out[i,:] = s * (-1.*np.log(np.tanh(v/2)))
+        msg_c2v_ref.append(msg_out)
+
+    # check results per node
+    for idx,v in enumerate(msg_c2v_ref):
+        # apply clipping if required
+        if llr_clipping is not None:
+            v = np.minimum(v, llr_clipping)
+            v = np.maximum(v, -llr_clipping)
+        assert np.allclose(msg_c2v[idx,:].numpy(), v, rtol=0.001, atol=0.001)
+
+#############################
+# Testcases for LDPC5GDecoder
+#############################
+
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("use_xla", [False, True])
+@pytest.mark.parametrize("return_info_bits", [False, True])
+@pytest.mark.parametrize("num_iter", [0, 1, 10])
+def test_graph_mode_5g(cn_update, use_xla, num_iter, return_info_bits, k=34, n=89, batch_size=10):
+    """Test that decoder supports graph / XLA mode."""
+
+    # init decoder
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder, num_iter=num_iter,
+                            cn_update=cn_update,return_info_bits=return_info_bits)
+    source = GaussianPriorSource()
+
+    @tf.function(jit_compile=use_xla)
+    def run_graph(batch_size):
+        llr_ch = source([batch_size, n], 0.1)
+        return decoder(llr_ch)
+
+    # run with batch_size as python integer
+    run_graph(batch_size)
+    # run again with increased batch_size
+    run_graph(batch_size+1)
+
+    # and test with tf.constant
+    batch_size = tf.constant(batch_size, tf.int32)
+    run_graph(batch_size)
+    # and run again
+    run_graph(batch_size+1)
+
+def test_scheduling_5g():
+    """Test layered scheduling for 5G code.
+    We test against the rule of thumb that layered decoding requires approx 50%
+    of the iterations for similar results.
+    Note that correct scheduling was tested already in the BP decoder."""
+
+    ebno_db = np.arange(0, 3, 0.5) # sim SNR range
+    k = 200
+    n = 400
+    source = BinarySource()
+    enc = LDPC5GEncoder(k=k, n=n)
+    cn_update = "boxplus"
+
+    bler = []
+    for cns, num_iter in zip(["layered", "flooding"],[8, 16]):
+
+        dec = LDPC5GDecoder(enc,
+                            num_iter=num_iter,
+                            cn_update=cn_update,
+                            cn_schedule=cns)
+        # run decoding graph
+        @tf.function(jit_compile=False) # no XLA for layered
+        def run_graph(batch_size, ebno_db):
+            no = ebnodb2no(ebno_db, 2, k/n)
+            b = source((batch_size, k))
+            c = enc(b)
+            x = (2*c-1) # bpsk
+            y = x + tf.math.sqrt(no) * config.tf_rng.normal((batch_size, n))
+            llr_ch = 2 * y / no
+            return b, dec(llr_ch)
+
+        _, bler_ = sim_ber(run_graph,
+                            ebno_dbs=ebno_db,
+                            max_mc_iter=10,
+                            num_target_block_errors=100,
+                            target_bler=1e-3,
+                            batch_size=10000,
+                            soft_estimates=False,
+                            early_stop=True,
+                            verbose=False)
+        bler.append(bler_)
+
+    # verify that blers are similar; allow rtol as this is only a rule of thumb
+    # and blers are in the log-domain, i.e. a factor 2x is still ok
+    assert np.allclose(bler[0].numpy(), bler[1].numpy(), rtol=0.7)
+
+@pytest.mark.parametrize("parameters", [[12, 25],[20, 65], [45, 63], [12, 59], [500,1000]]) # k,n
+def test_scheduling_pruning_5g(parameters):
+    """Test layered scheduling for 5G code.
+    Test that pruning of the pcm does not mess up the CN update schedule.
+    This needs to be tested for various code configurations..
+    """
+    k, n = parameters
+    enc = LDPC5GEncoder(k, n)
+
+    retval=[]
+    for p in [False, True]:
+
+        dec = LDPC5GDecoder(enc, cn_schedule="layered", num_iter=5,
+                            return_infobits=False, hard_out=False, llr_max=10000,cn_update="minsum", prune_pcm=p)
+
+        x = tf.cast(tf.range(n), tf.float32)
+        y = -dec(-x)
+        retval.append(y)
+
+    assert np.allclose(retval[0].numpy(), retval[1].numpy())
+
+@pytest.mark.parametrize("k", [100, 400, 800, 2000, 4000, 8000])
+@pytest.mark.parametrize("r", [0.34, 0.5, 0.75, 0.9])
+def test_pruning_5g(k, r, batch_size=100):
+    """Test degree-1 VN pruning"""
+
+    source = GaussianPriorSource()
+    n = int(k/r)
+
+    enc = LDPC5GEncoder(k, n)
+    dec = LDPC5GDecoder(enc,
+                        prune_pcm=True,
+                        hard_out=False,
+                        num_iter=10)
+
+    dec_ref = LDPC5GDecoder(enc,
+                            prune_pcm=False,
+                            hard_out=False,
+                            num_iter=10)
+
+    llr = source([batch_size, n], 0.5)
+    x = dec(llr)
+    x_ref = dec_ref(llr)
+
+    # allow small difference as iterative error can accumulate after
+    # multiple iterations
+    diff = tf.reduce_mean(tf.math.abs(x-x_ref)).numpy()
+    assert diff < 5e-2
+
+@pytest.mark.parametrize("parameters", [[12, 20, 1], [200, 250, 2], [345, 544, 4], [231, 808, 8]])
+def test_output_interleaver_5g(parameters, batch_size=10):
+    """Test output interleaver. Parameters are k,n,m
+    """
+    k, n, m =  parameters
+
+    source = BinarySource()
+    enc_ref = LDPC5GEncoder(k, n) # no mapper
+    enc = LDPC5GEncoder(k, n, m)
+    dec_ref = LDPC5GDecoder(enc_ref, cn_update="minsum")
+    dec = LDPC5GDecoder(enc, cn_update="minsum")
+    dec_cw = LDPC5GDecoder(enc, cn_update="minsum", return_infobits=False)
+
+    u = source([batch_size, k])
+    c = enc(u)
+    c_ref = enc_ref(u)
+    # emulate tx (no noise/scaling due to minsum required)
+    y = 2*c-1
+    y_ref = 2*c_ref-1
+
+    u_hat = dec(y)
+    c_hat = dec_cw(y)
+    u_hat_ref = dec_ref(y_ref)
+
+    assert np.array_equal(u_hat.numpy(), u_hat_ref.numpy())
+
+    # also verify that codeword is correctly returned
+    assert np.array_equal(c_hat.numpy(), c.numpy())
+
+    # and verify that c and c_ref are different for m>1
+    if m>1:
+        assert not np.array_equal(c.numpy(), c_ref.numpy())
+
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("n", [100, 1234, 9000])
+@pytest.mark.parametrize("r", [0.3, 0.5, 0.9])
+def test_e2e_ldpc_5g(r, n, cn_update, no=0.3, num_iter=20, batch_size=10):
+    """Test end-to-end LDPC coding scheme with 5G NR Encoder."""
+
+    # number of info bits
+    k = int(r*n)
+
+    source = BinarySource()
+    channel = AWGN()
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder, num_iter=num_iter, cn_update=cn_update)
+
+    bits = source([batch_size, k])
+    c = encoder(bits)
+    x_bpsk = 2*c-1 # logit definition!
+    x_bpsk = tf.cast(x_bpsk, tf.complex64)
+    y = channel(x_bpsk, no)
+    # real-valued domain is fine
+    llr_ch = tf.math.real(2/no**2 * y)
+    b_hat = decoder(llr_ch)
+
+    # test that transmitted codeword could is correctly recovered
+    assert np.array_equal(bits.numpy(), b_hat.numpy())
+
+    # check that there was at least one transmission error
+    # otherwise the test is useless
+    c_hat_no_coding = hard_decisions(llr_ch)
+    assert not np.array_equal(c.numpy(), c_hat_no_coding.numpy())
+
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("dt_in", [tf.float32, tf.float64])
+@pytest.mark.parametrize("prec", ["single", "double"])
+@pytest.mark.parametrize("return_infobits", [False, True])
+def test_dtypes_5g(dt_in, prec, cn_update, return_infobits, k=50, n=100, batch_size=10):
+    """Test different precisions."""
+        # init decoder
+
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder,
+                            cn_update=cn_update,
+                            precision=prec,
+                            return_infobits=return_infobits,
+                            return_state=True)
+
+    # test that input yields no error
+    llr_ch = tf.zeros([batch_size, n], dt_in)
+    y, v2c_msg = decoder(llr_ch)
+
+    # test that output has correct format
+    if prec=="single":
+        assert y.dtype==tf.float32
+        assert v2c_msg.dtype==tf.float32
+    else:
+        assert y.dtype==tf.float64
+        assert v2c_msg.dtype==tf.float64
+
+@pytest.mark.parametrize("num_iter", [1,10,100])
+def test_internal_state_5g(num_iter, k=50, n=100, batch_size=10):
+    """test that internal state is correctly returned.
+    For this test, we run the decoder 1 x num_iter and num_iter x 1
+    and compare both results.
+    """
+    source = GaussianPriorSource()
+    encoder = LDPC5GEncoder(k, n)
+    decoder_ref = LDPC5GDecoder(encoder,
                                 return_infobits=False,
-                                num_iter=0)
-            llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-            # check if return after 0 iterations equals input
-            c_hat = dec(llr)
-            self.assertTrue(np.array_equal(c_hat.numpy(), llr.numpy()))
+                                hard_out=False,
+                                return_state=False,
+                                num_iter=num_iter)
+    decoder = LDPC5GDecoder(encoder,
+                            return_infobits=False,
+                            hard_out=False,
+                            return_state=True,
+                            num_iter=1)
 
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)."""
-        bs = 10
-        n = 200
-        k = 100
-        enc = LDPC5GEncoder(k, n)
-        for return_info in [True, False]:
-            inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
-            x = LDPC5GDecoder(enc, return_infobits=return_info)(inputs)
-            model = tf.keras.Model(inputs=inputs, outputs=x)
-            # test that output batch dim is none
-            self.assertTrue(model.output_shape[0] is None)
+    # test that input yields no error
+    llr_ch = source([batch_size, n], 0.1)
 
-            llr = -10.* tf.ones([bs, n])
-            model(llr)
-            # call twice to see that bs can change
-            llr2 = -10.* tf.ones([bs, n])
-            model(llr2)
-            model.summary()
+    # run reference decoder with num_iter iterations
+    y_ref = decoder_ref(llr_ch)
 
-    def test_tf_fun(self):
-        """Test graph mode and support for XLA."""
+    # run decoder num_iter times with 1 iteration
+    # always feed state of last iteration
+    msg_v2c = None
+    for i in range(num_iter):
+        y, msg_v2c = decoder(llr_ch, msg_v2c=msg_v2c)
 
-        @tf.function
-        def run_graph(llr):
-            return dec(llr)
+    assert np.array_equal(y.numpy(), y_ref. numpy())
 
-        @tf.function(jit_compile=True)
-        def run_graph_xla(llr):
-            return dec(llr)
+    # also test that number iter can be feed during call
+    y, _ = decoder(llr_ch, num_iter=num_iter)
 
-        batch_size = 100
-        n = 100
-        k = 50
-        enc = LDPC5GEncoder(k, n)
+    assert np.array_equal(y.numpy(), y_ref. numpy())
 
-        for cn_type in ["minsum", "boxplus", "boxplus-phi"]:
-            for return_info_bits in [True, False]:
-                for hard_out in [True, False]:
-                    dec = LDPC5GDecoder(enc,
-                                    hard_out=hard_out,
-                                    cn_type=cn_type,
-                                    return_infobits=return_info_bits)
+# XLA currently not supported for training
+@pytest.mark.parametrize("mode", ["eager", "graph"])
+def test_gradient_5g(mode, k=20, n=50, batch_size=10):
+    """Test that gradients are accessible and not None."""
 
-                    # test that all zero CW yields hard-decided all-zero cw
-                    llr = -10.*tf.ones([batch_size, n]) # all-zero input
-                    x = dec(llr).numpy()
-                    if hard_out:
-                        self.assertTrue(np.array_equal(x, np.zeros_like(x)))
+    enc = LDPC5GEncoder(k,n)
+    dec = LDPC5GDecoder(enc, num_iter=2, hard_out=False)
+    x = tf.Variable(tf.ones((batch_size, n)), tf.float32)
 
-                    # test that for arbitrary input only 0,1 values are returned
-                    llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-                    x = run_graph(llr).numpy()
+    @tf.function(jit_compile=True)
+    def run_graph_xla(x):
+        with tf.GradientTape() as tape:
+            y = dec(x)
+        return tape.gradient(y, x)
 
-                    # execute the graph twice
-                    x = run_graph(llr).numpy()
+    @tf.function(jit_compile=False)
+    def run_graph(x):
+        with tf.GradientTape() as tape:
+            y = dec(x)
+        return tape.gradient(y, x)
 
-                    # and change batch_size
-                    llr = -10.*tf.ones([2*batch_size, n]) # all-zero input
-                    x = run_graph(llr).numpy()
+    if mode=="eager":
+        with tf.GradientTape() as tape:
+            y = dec(x)
+        grads = tape.gradient(y, x)
+    elif mode=="graph":
+        grads = run_graph(x)
+    else:
+        grads = run_graph_xla(x)
+    assert grads is not None
 
-                    # and again with jit_compile=True
-                    x = run_graph_xla(llr).numpy()
+@pytest.mark.parametrize("cn_update", CN_UPDATES)
+@pytest.mark.parametrize("num_iter", [0, 1, 10])
+def test_all_erasure_5g(cn_update, num_iter, k=75, n=150, batch_size=10):
+    """test that an all-erasure (llr_ch=0) yields exact 0 outputs.
+    This tests against biases in the decoder."""
 
-                    # execute the graph twice
-                    x = run_graph_xla(llr).numpy()
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder,
+                            cn_update=cn_update,
+                            return_infobits=False,
+                            hard_out=False,
+                            num_iter=num_iter)
+    llr_ch = tf.zeros((batch_size, n), tf.float32)
 
-                    # and change batch_size
-                    llr = -10.*tf.ones([2*batch_size, n]) # all-zero input
-                    x = run_graph_xla(llr).numpy()
+    y = decoder(llr_ch)
+    assert np.array_equal(llr_ch.numpy(), y.numpy())
 
-    def test_dtype_flexible(self):
-        """Test that output_dtype can be flexible and
-        only floats are supported."""
-        batch_size = 100
-        k = 100
-        n = 200
-        source = GaussianPriorSource()
+@pytest.mark.parametrize("num_iter", [0, 10])
+def test_hard_output_5g(num_iter, k=75, n=150, batch_size=10):
+    """Test hard-out flag yields hard-decided output."""
 
-        enc = LDPC5GEncoder(k,n)
+    source = GaussianPriorSource()
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder,
+                            hard_out=True,
+                            num_iter=num_iter,
+                            return_infobits=False)
 
-        dtypes_supported = (tf.float16, tf.float32, tf.float64)
+    llr_ch = source([batch_size, n], 0.1)
+    y = decoder(llr_ch)
+    y_np = y.numpy()
+    # only binary values are allowed
+    assert np.array_equal(y_np, y_np.astype(bool))
 
-        for dt_in in dtypes_supported:
-            for dt_out in dtypes_supported:
-                llr = source([[batch_size, n], 0.5])
-                llr = tf.cast(llr, dt_in)
+@pytest.mark.parametrize("num_iter", [0,1,10])
+@pytest.mark.parametrize("llr_max", [0, 5, 100])
+def test_llr_max_5g(llr_max, num_iter, k=12, n=20, batch_size=10):
+    """Test that llr_max is correctly set and can be None."""
 
-                dec = LDPC5GDecoder(enc, output_dtype=dt_out)
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder,
+                            hard_out=False,
+                            num_iter=num_iter,
+                            return_infobits=False,
+                            return_state=True,
+                            llr_max=llr_max)
 
-                x = dec(llr)
+    # generate large random inputs
+    llr_ch = 2*llr_max * config.tf_rng.normal((batch_size, n))
+    y, msg = decoder(llr_ch)
 
-                self.assertTrue(x.dtype==dt_out)
+    #check that no larger value than llr_max exists
+    assert np.max(np.abs(y))<=llr_max
+    assert np.max(np.abs(msg))<=llr_max
 
-        # test that complex inputs raise error
-        llr = source([[batch_size, n], 0.5])
-        llr_c = tf.complex(llr, tf.zeros_like(llr))
-        dec = LDPC5GDecoder(enc, output_dtype=tf.float32)
+@pytest.mark.parametrize("shape", [[], [2,3], [2,3,4,5]])
+def test_batch_and_multidimension_5g(shape, k=200, n=300, num_iter=10):
+    """Test that batches are properly handled.
+    Further, test multi-dimensional shapes."""
 
-        with self.assertRaises(TypeError):
-            x = dec(llr_c)
+    # init decoder
+    encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder,
+                            hard_out=False,
+                            num_iter=num_iter,
+                            return_infobits=False)
 
-    def test_pruning(self):
-        """Test degree-1 VN pruning"""
+    source = GaussianPriorSource()
+    shape.append(n)
+    llr_ch = source(shape, 0.1)
+    y = decoder(llr_ch)
 
-        batch_size = 100
-        ks = [100, 400, 800, 2000, 4000, 8000]
-        rs = [ 0.34, 0.5, 0.75, 0.9]
-        source = GaussianPriorSource()
+    #reshape before decoding
+    y_ref_ = decoder(tf.reshape(llr_ch, (-1,n)))
+    # restore shape after decoding
+    y_ref = tf.reshape(y_ref_, shape)
 
-        for k in ks:
-            for r in rs:
+    assert np.allclose(y.numpy(), y_ref.numpy(), rtol=0.001, atol=0.001)
 
-                n = int(k/r)
+@pytest.mark.parametrize("parameters", [[64,128], [64, 180], [167, 201], [439, 800], [948, 1024],[3893, 7940], [6530, 10023], [8448, 23000]])
+def test_rate_matching_5g(parameters, batch_size=100):
+    """Test that if return_infobit==False, the full codeword is returned.
 
-                enc = LDPC5GEncoder(k, n)
-                dec = LDPC5GDecoder(enc,
-                                    prune_pcm=True,
-                                    hard_out=False,
-                                    num_iter=10)
+    We test this for zero iterations, to see if all internal reshapes are correctly recovered before returning the estimate.
+    """
 
-                dec_ref = LDPC5GDecoder(enc,
-                                        prune_pcm=False,
-                                        hard_out=False,
-                                        num_iter=10)
-
-                llr = source([[batch_size, n], 0.5])
-                x = dec(llr)
-                x_ref = dec_ref(llr)
-
-                # allow small difference as iterative error can accumulate after
-                # multiple iterations
-                diff = tf.reduce_mean(tf.math.abs(x-x_ref)).numpy()
-                self.assertTrue(diff < 5e-2)
-
-    def test_pruning(self):
-        """Test output interleaver."""
-
-        bs = 10
-        source = BinarySource()
-
-        # k, n, m
-        params = [[12, 20, 1], [200, 250, 2], [345, 544, 4], [231, 808, 8]]
-
-        for (k,n,m) in params:
-            enc_ref = LDPC5GEncoder(k, n) # no mapper
-            enc = LDPC5GEncoder(k, n, m)
-            dec_ref = LDPC5GDecoder(enc_ref, cn_type="minsum")
-            dec = LDPC5GDecoder(enc, cn_type="minsum")
-            dec_cw = LDPC5GDecoder(enc, cn_type="minsum", return_infobits=False)
-
-            u = source([bs, k])
-            c = enc(u)
-            c_ref = enc_ref(u)
-            # emulate tx (no noise/scaling due to minsum required)
-            y = 2*c-1
-            y_ref = 2*c_ref-1
-
-            u_hat = dec(y)
-            c_hat = dec_cw(y)
-            u_hat_ref = dec_ref(y_ref)
-
-            self.assertTrue(np.array_equal(u_hat.numpy(),
-                                           u_hat_ref.numpy()))
-
-            # also verify that codeword is correctly returned
-            self.assertTrue(np.array_equal(c_hat.numpy(),
-                                           c.numpy()))
-
-            # and verify that c and c_ref are different for m>1
-            if m>1:
-                self.assertFalse(np.array_equal(c.numpy(),
-                                                c_ref.numpy()))
-
-    def test_int_state(self):
-        """Test internal state functionality of decoder.
-        This implies that Nx1 iterations yields exact same result as N
-        iterations."""
-        batch_size = 1
-        Niter = 5
-        k = 100
-        n = 200
-
-        enc = LDPC5GEncoder(k,n)
-        dec = LDPC5GDecoder(enc, num_iter=Niter)
-        dec2 = LDPC5GDecoder(enc, num_iter=1, stateful=True)
-
-        llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
-
-        res1 = dec(llr)
-
-        res2, msg_vn = dec2([llr, None]) # iter 0 to init msg_vn
-
-        for i in range(Niter-1): # remaining iterations
-            res2, msg_vn = dec2([llr, msg_vn])
-
-        # results must be the same, otherwise the internal state is not
-        # correctly recovered
-        self.assertTrue(np.allclose(res1,res2))
-
-    def test_llrmax(self):
-        """Test that llr_max can be set."""
-        k = 12
-        n = 20
-        enc = LDPC5GEncoder(k,n)
-        dec = LDPC5GDecoder(enc, hard_out=False, num_iter=0)
-
-        # test default value
-        llr_max_def = dec.llr_max.numpy() # get default value
-        x = tf.ones((1,n))*100
-        y = dec(x).numpy() # run 0 iterations
-        np.max(y)==llr_max_def
-
-        # set new llr_max
-        llr_maxs = [17., 45.3, 78]
-        for l in llr_maxs:
-            dec.llr_max = l
-            y = dec(x).numpy() # run 0 iterations
+    k = parameters[0]
+    n = parameters[1]
+    enc = LDPC5GEncoder(k, n)
+    dec = LDPC5GDecoder(enc,
+                        hard_out=False,
+                        return_infobits=False,
+                        num_iter=0)
+    llr = config.tf_rng.normal([batch_size, n], mean=4.2, stddev=1)
+    # check if return after 0 iterations equals input
+    c_hat = dec(llr)
+    assert np.array_equal(c_hat.numpy(), llr.numpy())

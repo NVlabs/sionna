@@ -1,7 +1,6 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 """Script to generate config files for the PUSCHTransmitter tests
 """
 import json
@@ -12,7 +11,7 @@ except ImportError as e:
     import sys
     sys.path.append("../../../../")
 import sionna
-from sionna import config
+from sionna.phy import config
 
 def gen_config_file(filename,
                     n_cell_id,
@@ -61,10 +60,10 @@ def gen_config_file(filename,
     }
     }
     
-    num_bits_per_symbol, target_code_rate = sionna.nr.utils.select_mcs(config["pusch"]["tb"]["mcs_index"],
+    num_bits_per_symbol, target_code_rate = sionna.phy.nr.utils.decode_mcs_index(config["pusch"]["tb"]["mcs_index"],
                                                                    config["pusch"]["tb"]["mcs_table"])
-    config["pusch"]["tb"]["num_bits_per_symbol"] = num_bits_per_symbol
-    config["pusch"]["tb"]["target_code_rate"] = target_code_rate
+    config["pusch"]["tb"]["num_bits_per_symbol"] = num_bits_per_symbol.numpy()
+    config["pusch"]["tb"]["target_code_rate"] = target_code_rate.numpy()
 
     json_object = json.dumps(config, indent=4)
     with open(filename + ".json", "w") as outfile:

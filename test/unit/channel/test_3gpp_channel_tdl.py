@@ -1,15 +1,14 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import pytest
 import unittest
 import numpy as np
 from scipy.stats import kstest, rayleigh, rice
 from scipy.special import jv
-import sionna
-from sionna.channel.tr38901 import TDL
-from sionna.channel import exp_corr_mat
+from sionna.phy import PI, SPEED_OF_LIGHT
+from sionna.phy.channel.tr38901 import TDL
+from sionna.phy.channel import exp_corr_mat
 from channel_test_utils import *
 
 @pytest.mark.usefixtures("only_gpu")
@@ -37,7 +36,7 @@ class TestTDL(unittest.TestCase):
 
     # Speed
     SPEED = 150 # m/s
-    MAX_DOPPLER = 2.*sionna.PI*SPEED/sionna.SPEED_OF_LIGHT*CARRIER_FREQUENCY
+    MAX_DOPPLER = 2.*PI*SPEED/SPEED_OF_LIGHT*CARRIER_FREQUENCY
 
     # AoA
     LoS_AoA = np.pi/4

@@ -1,15 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import pytest
 import os
-import unittest
 import numpy as np
 import tensorflow as tf
 import json
 import numpy as np
-from sionna.nr import PUSCHConfig, PUSCHTransmitter
+from sionna.phy.nr import PUSCHConfig, PUSCHTransmitter
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -54,11 +52,8 @@ def run_test(test_name):
     return np.allclose(tf.squeeze(x_grid), grid)
 
 @pytest.mark.usefixtures("only_gpu")
-class TestPUSCHTransmitter(unittest.TestCase):
-    """Tests for PUSCHTransmitter"""
-
-    def tests_against_reference(self):
-        """Test PUSCHTransmitter output against reference"""
-        for i in range(0,83):
-            test_name = script_dir+f"/pusch_test_configs/test_{i}"
-            self.assertTrue(run_test(test_name))
+@pytest.mark.parametrize("test_id", list(range(0,83)))
+def tests_against_reference(test_id):
+    """Test PUSCHTransmitter output against reference"""
+    test_name = script_dir+f"/pusch_test_configs/test_{test_id}"
+    assert run_test(test_name)

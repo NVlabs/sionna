@@ -1,25 +1,24 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 """Integration tests for 5G Channel Coding and Rate-Matching: Polar vs. LDPC
 Codes"""
 
 import unittest
 import numpy as np
 import tensorflow as tf
-import sionna
-from sionna.mapping import Constellation, Mapper, Demapper
-from sionna.fec.polar import PolarEncoder, Polar5GEncoder, PolarSCLDecoder, Polar5GDecoder
-from sionna.fec.ldpc import LDPC5GEncoder, LDPC5GDecoder
-from sionna.fec.polar.utils import generate_5g_ranking, generate_rm_code
-from sionna.fec.conv import ConvEncoder, ViterbiDecoder
-from sionna.utils import BinarySource, ebnodb2no
-from sionna.utils.metrics import  count_block_errors
-from sionna.channel import AWGN
-from sionna.utils.plotting import PlotBER
+from sionna.phy import Block
+from sionna.phy.mapping import Constellation, Mapper, Demapper, BinarySource
+from sionna.phy.fec.polar import PolarEncoder, Polar5GEncoder, PolarSCLDecoder, Polar5GDecoder
+from sionna.phy.fec.ldpc import LDPC5GEncoder, LDPC5GDecoder
+from sionna.phy.fec.polar.utils import generate_5g_ranking, generate_rm_code
+from sionna.phy.fec.conv import ConvEncoder, ViterbiDecoder
+from sionna.phy.utils import ebnodb2no
+from sionna.phy.utils.metrics import  count_block_errors
+from sionna.phy.channel import AWGN
+from sionna.phy.utils.plotting import PlotBER
 
-class System_Model(tf.keras.Model):
+class System_Model(Block):
     """System model for channel coding BER simulations.
 
     This model allows to simulate BERs over an AWGN channel with
@@ -110,8 +109,8 @@ class System_Model(tf.keras.Model):
         u = self.source([batch_size, self.k]) # generate random data
         c = self.encoder(u) # explicitly encode
         x = self.mapper(c) # map c to symbols x
-        y = self.channel([x, no]) # transmit over AWGN channel
-        llr_ch = self.demapper([y, no]) # demap y to LLRs
+        y = self.channel(x, no) # transmit over AWGN channel
+        llr_ch = self.demapper(y, no) # demap y to LLRs
         u_hat = self.decoder(llr_ch) # run FEC decoder (incl. rate-recovery)
 
         return u, u_hat
@@ -330,4 +329,3 @@ class TestFEC(unittest.TestCase):
                                         sim_esno=True) # no rate adjustment
                     # and find threshold via bisection search
                     esno[j, i] = find_threshold(model)
-

@@ -1,15 +1,15 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.ofdm import OFDMModulator, OFDMDemodulator, ResourceGrid, ResourceGridMapper, ResourceGridDemapper
-from sionna.mimo import StreamManagement
-from sionna.utils import QAMSource
-from tensorflow.keras import Model
+from sionna.phy import Block
+from sionna.phy.ofdm import OFDMModulator, OFDMDemodulator, ResourceGrid, \
+                            ResourceGridMapper, ResourceGridDemapper
+from sionna.phy.mimo import StreamManagement
+from sionna.phy.mapping import QAMSource
 
 class TestOFDMModulator(unittest.TestCase):
     def test_cyclic_prefixes(self):
@@ -125,7 +125,7 @@ class TestOFDMDemodulator(unittest.TestCase):
 class TestOFDMModDemod(unittest.TestCase):
     def test_end_to_end(self):
         """E2E test verying that all shapes can be properly inferred (see Issue #7)"""
-        class E2ESystem(Model):
+        class E2ESystem(Block):
             def __init__(self, cp_length, padding):
                 super().__init__()
                 self.cp_length = cp_length
@@ -145,16 +145,17 @@ class TestOFDMModDemod(unittest.TestCase):
                 x_f = self.demod(x_time)
                 return x_f
 
+        bs = tf.cast(128, tf.int32)
         for cp_length in [0,1,5,12]:
             for padding in [0,1,5,71]:
                 e2e = E2ESystem(cp_length, padding)
-                self.assertEqual(e2e(128).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
+                self.assertEqual(e2e(bs).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
 
         cp_lengths = np.arange(72)
         for padding in [0,1,5,71]:
                 e2e = E2ESystem(cp_lengths, padding)
                 e2e.num_ofdm_symbols = 72
-                self.assertEqual(e2e(128).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
+                self.assertEqual(e2e(bs).shape, [128,1,1,e2e.num_ofdm_symbols,e2e.fft_size])
 
 class TestResourceGridDemapper(unittest.TestCase):
 

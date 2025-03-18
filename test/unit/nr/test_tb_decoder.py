@@ -1,14 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 """Test NR receiver components."""
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.nr import TBEncoder, TBDecoder
-from sionna.utils import BinarySource
+from sionna.phy.nr import TBEncoder, TBDecoder
+from sionna.phy.mapping import BinarySource
 
 @pytest.mark.usefixtures("only_gpu")
 class TestTBDecoder(unittest.TestCase):
@@ -54,7 +53,7 @@ class TestTBDecoder(unittest.TestCase):
 
             decoder = TBDecoder(encoder=encoder,
                                 num_bp_iter=10,
-                                cn_type="minsum")
+                                cn_update="minsum")
 
             u = source(bs[i] + [encoder.k])
             c = encoder(u)
@@ -94,8 +93,8 @@ class TestTBDecoder(unittest.TestCase):
 
             if init: # init decoder only once
                 decoder = TBDecoder(encoder=encoder,
-                                      num_bp_iter=20,
-                                      cn_type="minsum")
+                                    num_bp_iter=20,
+                                    cn_update="minsum")
 
             # as scrambling IDs do not match, all TBs must be wrong
             if not init:
@@ -127,7 +126,7 @@ class TestTBDecoder(unittest.TestCase):
 
         decoder = TBDecoder(encoder=encoder,
                             num_bp_iter=20,
-                            cn_type="minsum")
+                            cn_update="minsum")
 
 
         u = source([bs, encoder.k])
@@ -178,8 +177,8 @@ class TestTBDecoder(unittest.TestCase):
                     use_scrambler=True)
 
         decoder = TBDecoder(encoder=encoder,
-                              num_bp_iter=20,
-                              cn_type="minsum")
+                            num_bp_iter=20,
+                            cn_update="minsum")
 
         x = run_graph(bs)
         self.assertTrue(x[0].shape[0]==bs) # verify correct size

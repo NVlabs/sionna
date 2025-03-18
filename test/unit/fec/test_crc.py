@@ -1,14 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import os
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.fec.crc import CRCEncoder, CRCDecoder
-from sionna.utils import BinarySource
-from sionna import config
+from sionna.phy import config
+from sionna.phy.fec.crc import CRCEncoder, CRCDecoder
+from sionna.phy.mapping import BinarySource
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
@@ -48,7 +47,7 @@ class TestCRC(unittest.TestCase):
         """Test that output dims are correct (=k+crc_len)."""
 
         # test against random shapes
-        shapes = [[1, 10],[10, 3, 3],[1, 2, 3, 4, 1000]]
+        shapes = [[10],[1, 10],[10, 3, 3],[1, 2, 3, 4, 100]]
 
         for pol in VALID_POLS:
             crc_enc = CRCEncoder(pol)
@@ -70,17 +69,6 @@ class TestCRC(unittest.TestCase):
                 self.assertTrue(crc_indicator.shape[-1]==1)
                 # check that decoder removes parity bits (=original shape)
                 self.assertTrue(np.array_equal(u_hat.shape, s))
-
-    def test_rank1(self):
-        """Test that rank 1 input raises error."""
-
-        shapes = [[1],[10]]
-        for pol in VALID_POLS:
-            crc_enc = CRCEncoder(pol)
-            for s in shapes:
-                with self.assertRaises(tf.errors.InvalidArgumentError):
-                    u = tf.zeros(s)
-                    crc_enc(u)
 
     def test_tf_fun(self):
         """Test that tf.function works and XLA is supported."""
@@ -105,7 +93,7 @@ class TestCRC(unittest.TestCase):
             y, z = crc_dec(x)
             return y
 
-        shapes = [[1, 10], [10, 3, 3], [1 ,2, 3, 4, 1000]]
+        shapes = [[10], [2, 10], [1 ,2, 3, 4, 100]]
         # test for different shapes
         for pol in VALID_POLS:
             for s in shapes:
@@ -118,7 +106,7 @@ class TestCRC(unittest.TestCase):
         re-encoding always yields a valid CRC.
         """
 
-        shapes = [[100, 10], [50, 3, 3], [100, 2, 3, 4, 100], [1,int(1e6)]]
+        shapes = [[100,], [100, 10], [4, 2, 100], [1, int(1e6)]]
         source = BinarySource()
 
         for pol in VALID_POLS:
@@ -134,7 +122,7 @@ class TestCRC(unittest.TestCase):
 
     def test_error_patters(self):
         """"Test that CRC detects random error patterns."""
-        shapes = [100, 100]
+        shapes = [10, 100]
         source = BinarySource()
 
         for pol in VALID_POLS:
@@ -144,13 +132,13 @@ class TestCRC(unittest.TestCase):
             x = crc_enc(u) # add CRC
 
             # add error patters with 3 random errors per CW
-            e = tf.concat([tf.ones([100, 3]),
-                          tf.zeros([100, (97+crc_enc.crc_length)])], axis=1)
+            e = tf.concat([tf.ones([10, 3]),
+                          tf.zeros([10, (97+crc_enc.crc_length)])], axis=1)
             # shuffling permutes first dim, but we need the second dim
             e = tf.transpose(e, (1,0))
             random_indices = config.tf_rng.uniform(shape=[tf.shape(e)[0]],
                                                    maxval=tf.shape(e)[0],
-                                                dtype=tf.int32)
+                                                   dtype=tf.int32)
             e = tf.gather(e, random_indices)
             e = tf.transpose(e, (1,0))
             # add error vector
@@ -209,46 +197,25 @@ class TestCRC(unittest.TestCase):
             self.assertTrue(crc_enc.k==u.shape[-1])
             self.assertTrue(crc_enc.n==x.shape[-1])
 
-    def test_keras(self):
-        """Test that Keras model can be compiled (=supports dynamic shapes)."""
-
-        bs = 10
-        k = 100
-        source = BinarySource()
-
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = CRCEncoder("CRC24A")(inputs)
-        y, _ = CRCDecoder(CRCEncoder("CRC24A"))(x)
-        model = tf.keras.Model(inputs=inputs, outputs=y)
-        # test that output batch dim is none
-        self.assertTrue(model.output_shape[0] is None)
-
-        b = source([bs, k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1, k])
-        model(b2)
-
-        model.summary()
-
     def test_dtype(self):
         """Test support for variable dtypes."""
 
-        dt = [tf.float16, tf.float32, tf.float64]
+        prec = ["single", "double"]
+        dtype = [tf.float32, tf.float64]
         pol = "CRC24A"
-        shape = [100, 10]
+        shape = [2, 10]
         source = BinarySource()
 
-        for d_in in dt:
-            for d_enc in dt:
-                for d_dec in dt:
-                    crc_enc = CRCEncoder(pol, dtype=d_enc)
-                    crc_dec = CRCDecoder(crc_enc, dtype=d_dec)
+        for p_in, dt_in in zip(prec, dtype):
+            for p_enc, dt_enc in zip(prec, dtype):
+                for p_dec, dt_dec in zip(prec, dtype):
+                    crc_enc = CRCEncoder(pol, precision=p_enc)
+                    crc_dec = CRCDecoder(crc_enc, precision=p_dec)
 
-                    u = tf.cast(source(shape), d_in)
+                    u = tf.cast(source(shape), dtype=dt_in)
                     x = crc_enc(u) # add CRC parity bits
                     y, _ = crc_dec(x) # perform CRC check
 
-                    self.assertTrue(u.dtype==d_in)
-                    self.assertTrue(x.dtype==d_enc)
-                    self.assertTrue(y.dtype==d_dec)
+                    self.assertTrue(u.dtype==dt_in)
+                    self.assertTrue(x.dtype==dt_enc)
+                    self.assertTrue(y.dtype==dt_dec)

@@ -1,53 +1,50 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
 import numpy as np
-import sionna
-from sionna.utils import compute_ber
-from sionna.channel import OFDMChannel, RayleighBlockFading, TimeChannel
-from sionna.nr import PUSCHConfig, PUSCHTransmitter, PUSCHReceiver
-from sionna.mimo import StreamManagement
+from sionna.phy.utils import compute_ber
+from sionna.phy.channel import OFDMChannel, RayleighBlockFading, TimeChannel
+from sionna.phy.nr import PUSCHConfig, PUSCHTransmitter, PUSCHReceiver
+from sionna.phy.mimo import StreamManagement
+from sionna.phy import dtypes
 
-def run_test(pusch_configs, channel_estimator="perfect", domain="freq", num_rx=1, num_rx_ant=8, graph_mode=False, jit_compile=False, batch_size=128, dtype=tf.complex64):
+def run_test(pusch_configs, channel_estimator="perfect", domain="freq", num_rx=1, num_rx_ant=8, graph_mode=False, jit_compile=False, batch_size=128, precision="single"):
     """Configurable function for various test cases"""
-    sionna.config.xla_compat = jit_compile
     num_tx = len(pusch_configs)
     num_tx_ant = pusch_configs[0].num_antenna_ports
     l_min, l_max = -1, 3
 
-    pusch_transmitter = PUSCHTransmitter(pusch_configs, output_domain=domain, dtype=dtype)
+    pusch_transmitter = PUSCHTransmitter(pusch_configs, output_domain=domain, precision=precision)
 
     stream_management = None
     if num_rx==2:
         rx_tx_association = np.eye(2, dtype=bool)
-        stream_management = StreamManagement(rx_tx_association, pusch_config.num_layers)
+        stream_management = StreamManagement(rx_tx_association, pusch_configs[0].num_layers)
 
     pusch_receiver = PUSCHReceiver(pusch_transmitter,
                                    stream_management=stream_management,
                                    input_domain=domain,
                                    l_min=l_min,
                                    channel_estimator=channel_estimator,
-                                   dtype=dtype)
+                                   precision=precision)
 
     rayleigh = RayleighBlockFading(num_rx=num_rx,
                                    num_rx_ant=num_rx_ant,
                                    num_tx=num_tx,
                                    num_tx_ant=num_tx_ant,
-                                   dtype=dtype)
+                                   precision=precision)
 
     if domain=="freq":
         channel = OFDMChannel(
                     rayleigh,
                     pusch_transmitter.resource_grid,
-                    add_awgn=False,
                     normalize_channel=True,
                     return_channel=True,
-                    dtype=dtype)
+                    precision=precision)
     else:
         channel = TimeChannel(
                     rayleigh,
@@ -55,18 +52,17 @@ def run_test(pusch_configs, channel_estimator="perfect", domain="freq", num_rx=1
                     pusch_transmitter.resource_grid.num_time_samples,
                     l_min=l_min,
                     l_max=l_max,
-                    add_awgn=False,
                     normalize_channel=True,
                     return_channel=True,
-                    dtype=dtype)
+                    precision=precision)
 
     def run():
         x, b = pusch_transmitter(batch_size)
         y, h = channel(x)
         if channel_estimator=="perfect":
-            b_hat = pusch_receiver([y, h, tf.cast(0.001, dtype.real_dtype)])
+            b_hat = pusch_receiver(y, tf.cast(0.001, dtypes[precision]["tf"]["rdtype"]), h)
         else:
-            b_hat = pusch_receiver([y, tf.cast(0.001, dtype.real_dtype)])
+            b_hat = pusch_receiver(y, tf.cast(0.001, dtypes[precision]["tf"]["rdtype"]))
         return compute_ber(b, b_hat)
 
     @tf.function(jit_compile=jit_compile)
@@ -77,7 +73,6 @@ def run_test(pusch_configs, channel_estimator="perfect", domain="freq", num_rx=1
         res = run_graph()
     else:
         res = run()
-    sionna.config.xla_compat=False
     return res
 
 @pytest.mark.usefixtures("only_gpu")
@@ -255,12 +250,12 @@ class TestPUSCHReceiver(unittest.TestCase):
         pusch_config.dmrs.dmrs_port_set = [2,3]
 
         pusch_configs = [pusch_config, pusch_config2]
-        
-        ber = run_test(pusch_configs, channel_estimator="perfect", domain="freq", dtype=tf.complex128)
+
+        ber = run_test(pusch_configs, channel_estimator="perfect", domain="freq", precision="double")
         self.assertEqual(ber, 0.0)
-        ber = run_test(pusch_configs, channel_estimator=None, domain="freq", dtype=tf.complex128)
+        ber = run_test(pusch_configs, channel_estimator=None, domain="freq", precision="double")
         self.assertEqual(ber, 0.0)
-        ber = run_test(pusch_configs, channel_estimator="perfect", domain="time", dtype=tf.complex128)
+        ber = run_test(pusch_configs, channel_estimator="perfect", domain="time", precision="double")
         self.assertEqual(ber, 0.0)
-        ber = run_test(pusch_configs, channel_estimator=None, domain="time", dtype=tf.complex128)
+        ber = run_test(pusch_configs, channel_estimator=None, domain="time", precision="double")
         self.assertEqual(ber, 0.0)

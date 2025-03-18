@@ -1,18 +1,16 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import os
 from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna import config
-from sionna.utils.misc import ebnodb2no
-from sionna.fec.conv import ConvEncoder, ViterbiDecoder, BCJRDecoder
-from sionna.fec.utils import GaussianPriorSource
-from sionna.utils import BinarySource
-from sionna.channel import AWGN
+from sionna.phy import config
+from sionna.phy.utils.misc import ebnodb2no
+from sionna.phy.fec.conv import ConvEncoder, ViterbiDecoder, BCJRDecoder
+from sionna.phy.fec.utils import GaussianPriorSource
+from sionna.phy.mapping import BinarySource
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
@@ -31,14 +29,15 @@ class TestViterbiDecoding(unittest.TestCase):
             for dec in (
                 ViterbiDecoder(rate=rate, constraint_length=5),
                 ViterbiDecoder(rate=rate, constraint_length=3, rsc=True),
-                ViterbiDecoder(rate=rate, constraint_length=muterm+1, terminate=True)):
+                ViterbiDecoder(rate=rate, constraint_length=muterm+1,
+                               terminate=True)):
 
                 n = int(k/rate)
                 if dec.terminate:
                     n += int((muterm)/rate)
 
                 # all-zero with BPSK (no noise);logits
-                c = -10. * np.ones([bs, n])
+                c = -10. * tf.ones([bs, n])
                 u = dec(c).numpy()
                 # also check that all-zero input yields all-zero output
                 self.assertTrue(u.shape[-1]==k)
@@ -47,7 +46,7 @@ class TestViterbiDecoding(unittest.TestCase):
                 self.assertTrue(np.array_equal(u, u_hat))
 
     def test_numerical_stab(self):
-        """Test for numerical stability (no nan or infty as output)"""
+        """Test for numerical stability (no nan or infinity as output)"""
         bs = 10
         # (k,n)
         source = GaussianPriorSource()
@@ -60,7 +59,7 @@ class TestViterbiDecoding(unittest.TestCase):
             dec = ViterbiDecoder(rate=rate, constraint_length=5)
 
             # case 1: extremely large inputs
-            c = source([[bs, n], 0.0001])
+            c = source([bs, n], 0.0001)
             # llrs
             u1 = dec(c).numpy()
             # no nan
@@ -100,7 +99,7 @@ class TestViterbiDecoding(unittest.TestCase):
             # method 2: provide rate and constraint length
             dec2 = ViterbiDecoder(rate=r, constraint_length=cs)
 
-            llr = source([[bs, n], no])
+            llr = source([bs, n], no)
 
             x_hat1 = dec1(llr)
             x_hat2 = dec2(llr)
@@ -163,65 +162,40 @@ class TestViterbiDecoding(unittest.TestCase):
             enc = ConvEncoder(gen_poly=gp)
             test_identity_(enc, u)
 
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)"""
-        bs = 10
-        n1 = 64
-
-        muterm = 3
-        rterm = 1/3
-        n2 = 96 + int(muterm/rterm)
-
-        source = BinarySource()
-
-        inputs = tf.keras.Input(shape=(n1), dtype=tf.float32)
-        x = ViterbiDecoder(rate=1/2, constraint_length=3)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        # Keras Model using termination
-        inputs = tf.keras.Input(shape=(n2), dtype=tf.float32)
-        xterm = ViterbiDecoder(
-            rate=rterm, constraint_length=muterm+1, terminate=True)(inputs)
-        modelterm = tf.keras.Model(inputs=inputs, outputs=xterm)
-
-        for n, mod in zip((n1,n2),(model, modelterm)):
-            b = source([bs, n])
-            mod(b)
-            # call twice to see that bs can change
-            b2 = source([bs+1,n])
-            mod(b2)
-            mod.summary()
-
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
         k = 100
         rate = 1/2
         mu = 3
-
+        shapes  =[[4, 5, 5,], []]
         source = BinarySource()
         for term in (True, False):
-            dec = ViterbiDecoder(rate=rate, constraint_length=mu+1, terminate=term)
+            for s_ in shapes:
+                s = s_.copy()
+                dec = ViterbiDecoder(rate=rate, constraint_length=mu+1, terminate=term)
 
-            n = int(k/rate)
-            if dec.terminate:
-                n += int(mu/rate)
+                n = int(k/rate)
+                if dec.terminate:
+                    n += int(mu/rate)
 
-            b = source([100, n])
-            b_res = tf.reshape(b, [4, 5, 5, n])
+                bs = int(np.prod(s))
+                b = source([bs, n])
+                s.append(n)
+                b_res = tf.reshape(b, s)
 
-            # encode 2D Tensor
-            c = dec(b).numpy()
-            # encode 4D Tensor
-            c_res = dec(b_res).numpy()
+                # encode 2D Tensor
+                c = dec(b).numpy()
+                # encode 4D Tensor
+                c_res = dec(b_res).numpy()
 
-            # test that shape was preserved
-            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+                # test that shape was preserved
+                self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
 
-            # and reshape to 2D shape
-            c_res = tf.reshape(c_res, [100, k])
-            # both version should yield same result
-            self.assertTrue(np.array_equal(c, c_res))
+                # and reshape to 2D shape
+                c_res = tf.reshape(c_res, [bs, k])
+                # both version should yield same result
+                self.assertTrue(np.array_equal(c, c_res))
 
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
@@ -232,7 +206,7 @@ class TestViterbiDecoding(unittest.TestCase):
         source = GaussianPriorSource()
         dec = ViterbiDecoder(rate=1/2, constraint_length=3)
 
-        b = source([[1, n], 1])
+        b = source([1, n], 1)
         b_rep = tf.tile(b, [bs, 1])
 
         # and run tf version (to be tested)
@@ -264,7 +238,7 @@ class TestViterbiDecoding(unittest.TestCase):
             yref = np.load(ref_path + gen_str + 'ref_y.npy')
             uhat_ref = np.load(ref_path + gen_str + 'ref_uhat.npy')
             no = ebnodb2no(4.95, num_bits_per_symbol=2, coderate=1.)
-            yref_soft = 2*(yref) / no
+            yref_soft = tf.constant(2*(yref) / no, tf.float32)
             uhat = dec(yref_soft)
             self.assertTrue(np.array_equal(uhat_ref, uhat))
 
@@ -275,30 +249,21 @@ class TestViterbiDecoding(unittest.TestCase):
         n = 64
         source = GaussianPriorSource()
 
-        dtypes_supported = (tf.float16, tf.float32, tf.float64)
+        precisions = ["single", "double"]
+        dtypes_supported = (tf.float32, tf.float64)
 
-        for dt_in in dtypes_supported:
-            for dt_out in dtypes_supported:
-                llr = source([[batch_size, n], 0.5])
+        for p, dt_out in zip(precisions, dtypes_supported):
+            for dt_in in dtypes_supported:
+                llr = source([batch_size, n], 0.5)
                 llr = tf.cast(llr, dt_in)
 
                 dec = ViterbiDecoder(rate=1/2,
                                      constraint_length=3,
-                                     output_dtype=dt_out)
+                                     precision=p)
 
                 x = dec(llr)
 
                 self.assertTrue(x.dtype==dt_out)
-
-        # test that complex inputs raise error
-        llr = source([[batch_size, n], 0.5])
-        llr_c = tf.complex(llr, tf.zeros_like(llr))
-        dec = ViterbiDecoder(rate=1/2,
-                            constraint_length=3,
-                            output_dtype=tf.float32)
-
-        with self.assertRaises(TypeError):
-            x = dec(llr_c)
 
     def test_tf_fun(self):
         """Test that tf.function decorator works
@@ -359,7 +324,7 @@ class TestBCJRDecoding(unittest.TestCase):
                     n += int((muterm)/rate)
 
                 # all-zero with BPSK (no noise);logits
-                c = -10. * np.ones([bs, n])
+                c = -10. * tf.ones([bs, n])
                 u1 = dec(c).numpy()
                 self.assertTrue(u1.shape[-1]==k)
                 # also check that all-zero input yields all-zero output
@@ -380,7 +345,7 @@ class TestBCJRDecoding(unittest.TestCase):
             dec = BCJRDecoder(rate=rate, constraint_length=5)
 
             # case 1: extremely large inputs
-            c = source([[bs, n], 0.0001])
+            c = source([bs, n], 0.0001)
             # llrs
             u1 = dec(c).numpy()
             # no nan
@@ -420,7 +385,7 @@ class TestBCJRDecoding(unittest.TestCase):
             # method 2: provide rate and constraint length
             dec2 = BCJRDecoder(rate=r, constraint_length=cs)
 
-            llr = source([[bs, n], no])
+            llr = source([bs, n], no)
 
             x_hat1 = dec1(llr)
             x_hat2 = dec2(llr)
@@ -477,65 +442,40 @@ class TestBCJRDecoding(unittest.TestCase):
             enc = ConvEncoder(gen_poly=gp)
             test_identity_(enc, u)
 
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)"""
-        bs = 10
-        n1 = 64
-
-        muterm = 3
-        rterm = 1/3
-        n2 = 96 + int(muterm/rterm)
-
-        source = BinarySource()
-
-        inputs = tf.keras.Input(shape=(n1), dtype=tf.float32)
-        x = BCJRDecoder(rate=1/2, constraint_length=3)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        # Keras Model using termination
-        inputs = tf.keras.Input(shape=(n2), dtype=tf.float32)
-        xterm = BCJRDecoder(
-            rate=rterm, constraint_length=muterm+1, terminate=True)(inputs)
-        modelterm = tf.keras.Model(inputs=inputs, outputs=xterm)
-
-        for n, mod in zip((n1,n2),(model, modelterm)):
-            b = source([bs,n])
-            mod(b)
-            # call twice to see that bs can change
-            b2 = source([bs+1,n])
-            mod(b2)
-            mod.summary()
-
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
         k = 40
         rate = 1/2
         mu = 3
+        shapes  =[[4, 5, 5,], []] # includes non-batch dimension test
 
         source = BinarySource()
         for term in (True, False):
             dec = BCJRDecoder(rate=rate, constraint_length=mu+1, terminate=term)
+            for s_ in shapes:
+                s = s_.copy()
+                n = int(k/rate)
+                if dec.terminate:
+                    n += int(mu/rate)
 
-            n = int(k/rate)
-            if dec.terminate:
-                n += int(mu/rate)
+                bs = int(np.prod(s))
+                b = source([bs, n])
+                s.append(n)
+                b_res = tf.reshape(b, s)
 
-            b = source([100, n])
-            b_res = tf.reshape(b, [4, 5, 5, n])
+                # encode 2D Tensor
+                c = dec(b).numpy()
+                # encode 4D Tensor
+                c_res = dec(b_res).numpy()
 
-            # encode 2D Tensor
-            c = dec(b).numpy()
-            # encode 4D Tensor
-            c_res = dec(b_res).numpy()
+                # test that shape was preserved
+                self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
 
-            # test that shape was preserved
-            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
-
-            # and reshape to 2D shape
-            c_res = tf.reshape(c_res, [100, k])
-            # both version should yield same result
-            self.assertTrue(np.array_equal(c, c_res))
+                # and reshape to 2D shape
+                c_res = tf.reshape(c_res, [bs, k])
+                # both version should yield same result
+                self.assertTrue(np.array_equal(c, c_res))
 
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
@@ -546,7 +486,7 @@ class TestBCJRDecoding(unittest.TestCase):
         source = GaussianPriorSource()
         dec = BCJRDecoder(rate=1/2, constraint_length=3)
 
-        b = source([[1, n], 1])
+        b = source([1, n], 1)
         b_rep = tf.tile(b, [bs, 1])
 
         # and run tf version (to be tested)
@@ -579,7 +519,7 @@ class TestBCJRDecoding(unittest.TestCase):
             yref = np.load(ref_path + gen_str + 'ref_y.npy')
             uhat_ref = np.load(ref_path + gen_str + 'ref_uhat.npy')
 
-            yref_soft = 0.5 * (yref+1)
+            yref_soft = tf.constant(0.5 * (yref+1), tf.float32)
             uhat = dec(yref_soft)
             self.assertTrue(np.array_equal(uhat_ref, uhat))
 
@@ -590,28 +530,20 @@ class TestBCJRDecoding(unittest.TestCase):
         n = 64
         source = GaussianPriorSource()
 
-        dtypes_supported = (tf.float16, tf.float32, tf.float64)
+        precisions = ["single", "double"]
+        dtypes_supported = (tf.float32, tf.float64)
 
-        for dt_in in dtypes_supported:
-            for dt_out in dtypes_supported:
-                llr = source([[batch_size, n], 0.5])
+        for p, dt_out in zip(precisions, dtypes_supported):
+            for dt_in in dtypes_supported:
+
+                llr = source([batch_size, n], 0.5)
                 llr = tf.cast(llr, dt_in)
 
                 dec = BCJRDecoder(rate=1/2,
                                   constraint_length=3,
-                                  output_dtype=dt_out)
+                                  precision=p)
                 x = dec(llr)
                 self.assertTrue(x.dtype==dt_out)
-
-        # test that complex inputs raise error
-        llr = source([[batch_size, n], 0.5])
-        llr_c = tf.complex(llr, tf.zeros_like(llr))
-        dec = BCJRDecoder(rate=1/2,
-                          constraint_length=3,
-                          output_dtype=tf.float32)
-
-        with self.assertRaises(TypeError):
-            x = dec(llr_c)
 
     def test_tf_fun(self):
         """Test that tf.function decorator works
@@ -662,3 +594,5 @@ class TestBCJRDecoding(unittest.TestCase):
             return u_hat
 
         run_graph(tf.constant(1))
+        # and change batch size
+        run_graph(tf.constant(2))

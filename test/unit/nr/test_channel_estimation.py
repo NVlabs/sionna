@@ -1,14 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import pytest
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.nr import PUSCHConfig, PUSCHTransmitter, PUSCHLSChannelEstimator
-from sionna.channel import RayleighBlockFading, OFDMChannel
-from sionna.utils import insert_dims
+from sionna.phy.nr import PUSCHConfig, PUSCHTransmitter, PUSCHLSChannelEstimator
+from sionna.phy.channel import RayleighBlockFading, OFDMChannel
+from sionna.phy.utils import insert_dims
 
 
 def check_channel_estimation(pusch_configs, add_awgn=False):
@@ -19,7 +18,7 @@ def check_channel_estimation(pusch_configs, add_awgn=False):
                                    num_tx_ant=pusch_configs[0].num_antenna_ports)
     channel = OFDMChannel(rayleigh,
                           pusch_transmitter._resource_grid,
-                          return_channel=True, add_awgn=add_awgn)
+                          return_channel=True)
 
     channel_estimator = PUSCHLSChannelEstimator(
                             pusch_transmitter._resource_grid,
@@ -30,8 +29,10 @@ def check_channel_estimation(pusch_configs, add_awgn=False):
 
     no = 0.01
     x, b = pusch_transmitter(128)
-    inputs = x if not add_awgn else [x, no]
-    y, h = channel(inputs)
+    if not add_awgn:
+        y, h = channel(x)
+    else:
+        y, h = channel(x, no)
 
     if pusch_configs[0].precoding == "codebook":
         # Compute precoded channel
@@ -51,7 +52,7 @@ def check_channel_estimation(pusch_configs, add_awgn=False):
         # [batch size, num_rx, num_rx_ant, num_tx, num_streams, num_ofdm_symbols, fft_size]
         h = tf.transpose(h, perm=[0,1,5,2,6,3,4])
 
-    h_hat, err_var_hat = channel_estimator([y, no])
+    h_hat, err_var_hat = channel_estimator(y, no)
 
     # Compute empirical error variance
     err_var = np.var(h-h_hat)

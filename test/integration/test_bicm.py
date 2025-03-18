@@ -1,22 +1,22 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 """Integration tests for Bit-Interleaved Coded Modulation"""
 
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.mapping import Constellation, Mapper, Demapper
-from sionna.fec.ldpc import LDPC5GEncoder, LDPC5GDecoder, LDPCBPDecoder
-from sionna.fec.interleaving import RandomInterleaver, Deinterleaver
-from sionna.fec.scrambling import Scrambler, Descrambler
-from sionna.fec.utils import GaussianPriorSource, load_parity_check_examples, get_exit_analytic, plot_exit_chart, plot_trajectory
-from sionna.utils import BinarySource, ebnodb2no, hard_decisions
-from sionna.utils.plotting import PlotBER
-from sionna.channel import AWGN
 
-class LDPC_QAM_AWGN(tf.keras.Model):
+from sionna.phy import Block
+from sionna.phy.mapping import Constellation, Mapper, Demapper, BinarySource
+from sionna.phy.fec.ldpc import LDPC5GEncoder, LDPC5GDecoder
+from sionna.phy.fec.interleaving import RandomInterleaver, Deinterleaver
+from sionna.phy.fec.scrambling import Scrambler, Descrambler
+from sionna.phy.utils import ebnodb2no, hard_decisions
+from sionna.phy.utils.plotting import PlotBER
+from sionna.phy.channel import AWGN
+
+class LDPC_QAM_AWGN(Block):
     """System model for channel coding BER simulations.
 
     This model allows to simulate BERs over an AWGN channel with
@@ -142,10 +142,10 @@ class LDPC_QAM_AWGN(tf.keras.Model):
 
         x = self.mapper(c) # map c to symbols
 
-        y = self.channel([x, no]) # transmit over AWGN channel
+        y = self.channel(x, no) # transmit over AWGN channel
 
         no_est = no * self.no_est_mismatch
-        llr_ch = self.demapper([y, no_est]) # demap
+        llr_ch = self.demapper(y, no_est) # demap
 
         if self.use_scrambler:
             llr_ch = self.descrambler(llr_ch)
@@ -181,8 +181,8 @@ class TestBICM(unittest.TestCase):
 
         b = source([batch_size, num_bits_per_symbol])
         x = mapper(b)
-        y = channel([x, no])
-        llr = demapper([y, no])
+        y = channel(x, no)
+        llr = demapper(y, no)
         llr_b = tf.multiply(llr, (2.*b-1.))
         llr_dist = []
         for i in range(num_bits_per_symbol):
@@ -232,8 +232,8 @@ class TestBICM(unittest.TestCase):
             c = encoder(u)
             c_int = interleaver(c)
             x = mapper(c_int) # map to symbol (QPSK)
-            y = channel([x, no]) # transmit over AWGN channel
-            llr_ch = demapper([y, no]) # demapp
+            y = channel(x, no) # transmit over AWGN channel
+            llr_ch = demapper(y, no) # demapp
             llr_deint = deinterleaver(llr_ch)
             u_hat = decoder(llr_deint)
 
@@ -294,40 +294,3 @@ class TestBICM(unittest.TestCase):
         # check results for consistency
         for ber in ber_plot.ber:
             self.assertFalse(np.isnan(ber).any())
-
-    def test_exit_charts(self):
-        # parameters
-        ebno_db = 2.3
-        batch_size = 10000
-        num_bits_per_symbol = 2
-
-        pcm_id = 4
-        pcm, k_exit, n_exit, coderate = load_parity_check_examples(pcm_id)
-
-        # init components
-        decoder_exit = LDPCBPDecoder(pcm,
-                                     hard_out=False,
-                                     cn_type="boxplus",
-                                     trainable=False,
-                                     track_exit=True,
-                                     num_iter=20)
-
-        llr_source = GaussianPriorSource()
-        noise_var = ebnodb2no(ebno_db=ebno_db,
-                            num_bits_per_symbol=num_bits_per_symbol,
-                            coderate=coderate)
-
-        llr = llr_source([[batch_size, n_exit], noise_var])
-        decoder_exit(llr)
-        Ia, Iev, Iec = get_exit_analytic(pcm, ebno_db)
-        plt = plot_exit_chart(Ia, Iev, Iec)
-        plot_trajectory(plt, decoder_exit.ie_v, decoder_exit.ie_c, ebno_db)
-
-        # check results for consistency
-        for mi in decoder_exit.ie_v:
-            self.assertGreater(mi, -0.001)
-            self.assertLess(mi, 1.001)
-
-        for mi in decoder_exit.ie_c:
-            self.assertGreater(mi, -0.001)
-            self.assertLess(mi, 1.001)

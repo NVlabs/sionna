@@ -1,13 +1,12 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.channel import ApplyTimeChannel, ApplyOFDMChannel
-from sionna import config
+from sionna.phy import config
+from sionna.phy.channel import ApplyTimeChannel, ApplyOFDMChannel
 
 class TestApplyTimeChannel(unittest.TestCase):
 
@@ -21,7 +20,7 @@ class TestApplyTimeChannel(unittest.TestCase):
         L_TOT = [1, 3, 8, 16]
         for num_time_samples in NUM_TIME_SAMPLES:
             for l_tot in L_TOT:
-                apply = ApplyTimeChannel(num_time_samples, l_tot, False)
+                apply = ApplyTimeChannel(num_time_samples, l_tot)
                 x = config.tf_rng.normal([batch_size,
                                       num_tx,
                                       num_tx_ant,
@@ -33,7 +32,7 @@ class TestApplyTimeChannel(unittest.TestCase):
                                            num_tx_ant,
                                            num_time_samples+l_tot-1,
                                            l_tot])
-                y = apply((x, h_time)).numpy()
+                y = apply(x, h_time).numpy()
                 self.assertEqual(y.shape, (batch_size,
                                            num_rx,
                                            num_rx_ant,
@@ -68,7 +67,7 @@ class TestApplyOFDMChannel(unittest.TestCase):
         num_tx_ant = 2
         NUM_OFDM_SYMBOLS = [1, 14, 28, 64]
         FFT_SIZE = [1, 12, 32, 64]
-        apply = ApplyOFDMChannel(False)
+        apply = ApplyOFDMChannel()
         for num_ofdm_symbols in NUM_OFDM_SYMBOLS:
             for fft_size in FFT_SIZE:
                 x = config.tf_rng.normal([batch_size,
@@ -83,7 +82,7 @@ class TestApplyOFDMChannel(unittest.TestCase):
                                            num_tx_ant,
                                            num_ofdm_symbols,
                                            fft_size])
-                y = apply((x, h_freq)).numpy()
+                y = apply(x, h_freq).numpy()
                 self.assertEqual(y.shape, (batch_size,
                                            num_rx,
                                            num_rx_ant,

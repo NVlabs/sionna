@@ -1,15 +1,14 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 
 import os
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.fec.polar.encoding import PolarEncoder, Polar5GEncoder
-from sionna.utils import BinarySource
-from sionna.fec.polar.utils import generate_5g_ranking, generate_polar_transform_mat
+from sionna.phy.fec.polar.encoding import PolarEncoder, Polar5GEncoder
+from sionna.phy.mapping import BinarySource
+from sionna.phy.fec.polar.utils import generate_5g_ranking, generate_polar_transform_mat
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
@@ -27,13 +26,8 @@ class TestPolarEncoding(unittest.TestCase):
 
         for p in param_invalid:
             frozen_pos,_ = generate_5g_ranking(p[2], p[3])
-            with self.assertRaises(AssertionError):
+            with self.assertRaises(BaseException):
                 PolarEncoder(frozen_pos, p[1])
-
-        # no complex-valued input allowed
-        with self.assertRaises(ValueError):
-            frozen_pos,_ = generate_5g_ranking(32, 64)
-            PolarEncoder(frozen_pos, 64, dtype=tf.complex64)
 
         # test also valid shapes
         # (k, n)
@@ -57,32 +51,13 @@ class TestPolarEncoding(unittest.TestCase):
         for p in param_valid:
             frozen_pos, _ = generate_5g_ranking(p[0], p[1])
             enc = PolarEncoder(frozen_pos, p[1])
-            u = np.zeros([bs, p[0]])
+            u = tf.zeros([bs, p[0]])
             c = enc(u).numpy()
             self.assertTrue(c.shape[-1]==p[1])
 
             # also check that all-zero input yields all-zero output
             c_hat = np.zeros([bs, p[1]])
             self.assertTrue(np.array_equal(c, c_hat))
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)."""
-
-        bs = 10
-        k = 100
-        n = 128
-        source = BinarySource()
-        frozen_pos, _ = generate_5g_ranking(k, n)
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = PolarEncoder(frozen_pos, n)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        b = source([bs,k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1,k])
-        model(b2)
-        model.summary()
 
     def test_multi_dimensional(self):
         """Test against multi-dimensional shapes."""
@@ -154,9 +129,9 @@ class TestPolarEncoding(unittest.TestCase):
         source = BinarySource()
         enc = PolarEncoder(frozen_pos, n)
 
-        b = source([bs, k]).numpy() # perform array ops in numpy
+        b = source([bs, k]) # perform array ops in numpy
         u = np.zeros([bs, n])
-        u[:, info_pos] = b
+        u[:, info_pos] = b.numpy()
 
         # call reference implementation
         c_ref = np.zeros([bs, n])
@@ -241,12 +216,8 @@ class TestPolarEncoding5G(unittest.TestCase):
                          [100, 110]] # k+k_crc>n
 
         for p in param_invalid:
-            with self.assertRaises((AssertionError, ValueError)):
+            with self.assertRaises((BaseException, ValueError)):
                 Polar5GEncoder(p[0], p[1])
-
-        # no complex-valued input allowed
-        with self.assertRaises(ValueError):
-            Polar5GEncoder(32, 64, dtype=tf.complex64)
 
     def test_output_dim(self):
         """Test that output dims are correct (=n) and output is all-zero
@@ -259,30 +230,12 @@ class TestPolarEncoding5G(unittest.TestCase):
 
         for p in param_valid:
             enc = Polar5GEncoder(p[0], p[1])
-            u = np.zeros([bs, p[0]])
+            u = tf.zeros([bs, p[0]])
             c = enc(u).numpy()
             self.assertTrue(c.shape[-1]==p[1])
             # also check that all-zero input yields all-zero output
             c_hat = np.zeros_like(c)
             self.assertTrue(np.array_equal(c, c_hat))
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)."""
-
-        bs = 10
-        k = 45
-        n = 67
-        source = BinarySource()
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = Polar5GEncoder(k, n)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        b = source([bs, k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1, k])
-        model(b2)
-        model.summary()
 
     def test_multi_dimensional(self):
         """Test against arbitrary shapes."""
@@ -374,6 +327,7 @@ class TestPolarEncoding5G(unittest.TestCase):
         for f in filename:
             # load random info bits
             u = np.load(ref_path + f + "_u.npy")
+            u = tf.constant(u, tf.float32)
             # load reference codewords
             c_ref = np.load(ref_path + f + "_c.npy")
 

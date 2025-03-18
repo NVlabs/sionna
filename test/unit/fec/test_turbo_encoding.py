@@ -1,13 +1,12 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import os
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.fec.turbo import TurboEncoder
-from sionna.utils import BinarySource
+from sionna.phy.fec.turbo import TurboEncoder
+from sionna.phy.mapping import BinarySource
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
@@ -15,7 +14,7 @@ test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 class TestTurboEncoding(unittest.TestCase):
 
     def test_output_dim(self):
-        r"""Test with allzero codeword that output dims are correct (=n) and output also equals all-zero."""
+        r"""Test with all-zero codeword that output dims are correct (=n) and output also equals all-zero."""
 
         bs = 10
         coderates = [1/2, 1/3]
@@ -33,7 +32,7 @@ class TestTurboEncoding(unittest.TestCase):
                     enc = TurboEncoder(rate=rate,
                                        constraint_length=cl,
                                        terminate=t)
-                    u = np.zeros([bs, k])
+                    u = tf.zeros([bs, k], tf.float32)
                     c = enc(u).numpy()
 
                     # if no termination is used, the output must be k/r
@@ -51,7 +50,7 @@ class TestTurboEncoding(unittest.TestCase):
                     # test that output dim can change (in eager mode)
                     k += 1 # increase length
                     n = int(k/rate) # calculate coderate
-                    u = np.zeros([bs, k])
+                    u = tf.zeros([bs, k])
                     c = enc(u).numpy()
 
                     # if no termination is used, the output must be k/r
@@ -78,16 +77,16 @@ class TestTurboEncoding(unittest.TestCase):
         constraint_length_valid = [3, 4, 5, 6]
         for rate in rate_valid:
             for mu in constraint_length_invalid:
-                with self.assertRaises(AssertionError):
+                with self.assertRaises(BaseException):
                     enc = TurboEncoder(rate=rate, constraint_length=mu)
 
         for rate in rate_invalid:
             for mu in constraint_length_valid:
-                with self.assertRaises(AssertionError):
+                with self.assertRaises(BaseException):
                     enc = TurboEncoder(rate=rate, constraint_length= mu)
 
         gmat = [['101', '111', '000'], ['000', '010', '011']]
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(BaseException):
             enc = TurboEncoder(gen_poly=gmat)
 
     def test_polynomial_input(self):
@@ -97,7 +96,7 @@ class TestTurboEncoding(unittest.TestCase):
         k = 100
         rate = 1/2
         n = int(k/rate) # calculate coderate
-        u = np.zeros([bs, k])
+        u = tf.zeros([bs, k])
 
         g1 = ['101', '111']
         g2 = np.array(g1)
@@ -112,7 +111,7 @@ class TestTurboEncoding(unittest.TestCase):
             self.assertTrue(np.array_equal(c, c_hat))
 
         def util_check_assertion_err(gen_poly_, msg_):
-            with self.assertRaises(AssertionError) as exception_context:
+            with self.assertRaises(BaseException) as exception_context:
                 enc = TurboEncoder(gen_poly=gen_poly_)
                 self.assertEqual(str(exception_context.exception), msg_)
 
@@ -128,54 +127,35 @@ class TestTurboEncoding(unittest.TestCase):
         for idx, g in enumerate(gs):
             util_check_assertion_err(g,msg_s[idx])
 
-    def test_keras(self):
-        """Test that Keras model can be compiled (+supports dynamic shapes)."""
-        bs = 10
-        k = 100
-
-        source = BinarySource()
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = TurboEncoder(rate=0.5, constraint_length=4)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        b = source([bs, k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1, k])
-        model(b2)
-
-        model.summary()
-
-        source = BinarySource()
-        enc = TurboEncoder(rate=0.5, constraint_length=5)
-        u = source([1, 32])
-        x = enc(u)
-        u = source([2, 30])
-        x = enc(u)
 
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
         k = 120
         n = 240 # rate must be 1/2 or 1/3
+        shapes  =[[4, 5, 5,], []] # includes non-batch dimension test
 
         source = BinarySource()
         enc = TurboEncoder(rate=k/n, constraint_length=5, terminate=False)
 
-        b = source([100, k])
-        b_res = tf.reshape(b, [4, 5, 5, k])
+        for s_ in shapes:
+            s = s_.copy()
+            bs = int(np.prod(s))
+            b = source([bs, k])
+            s.append(k)
+            b_res = tf.reshape(b, s)
 
-        # encode 2D Tensor
-        c = enc(b).numpy()
-        # encode 4D Tensor
-        c_res = enc(b_res).numpy()
-        # test that shape was preserved
-        self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
+            # encode 2D Tensor
+            c = enc(b).numpy()
+            # encode 4D Tensor
+            c_res = enc(b_res).numpy()
+            # test that shape was preserved
+            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
 
-        # and reshape to 2D shape
-        c_res = tf.reshape(c_res, [100,n])
-        # both version should yield same result
-        self.assertTrue(np.array_equal(c, c_res))
+            # and reshape to 2D shape
+            c_res = tf.reshape(c_res, [bs, n])
+            # both version should yield same result
+            self.assertTrue(np.array_equal(c, c_res))
 
     def test_batch(self):
         """Test that all samples in batch yield same output (for same input).
@@ -256,10 +236,16 @@ class TestTurboEncoding(unittest.TestCase):
             u = source([bs+1, k])
             x = run_graph(u).numpy()
 
-            #check XLA
+            # check XLA
             x = run_graph_xla(u).numpy()
             u = source([bs, k])
             x = run_graph_xla(u).numpy()
+
+            # test no batch dim
+            u = source([k,])
+            x = run_graph(u).numpy()
+            x = run_graph_xla(u).numpy()
+
 
     def test_ref_implementation(self):
         r"""Test against pre-encoded codewords from reference implementation.
@@ -271,5 +257,5 @@ class TestTurboEncoding(unittest.TestCase):
         for k in ks:
             uref = np.load(ref_path + 'ref_k{}_u.npy'.format(k))
             cref = np.load(ref_path + 'ref_k{}_x.npy'.format(k))
-            c = enc(uref).numpy()
+            c = enc(tf.constant(uref, tf.float32)).numpy()
             self.assertTrue(np.array_equal(c, cref))

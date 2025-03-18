@@ -1,15 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import sys
 import os
 import unittest
 import numpy as np
 import tensorflow as tf
-import sionna
-from sionna.nr import PUSCHConfig
-from sionna import config
+from sionna.phy.nr import PUSCHConfig
+from sionna.phy import config
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 

@@ -1,12 +1,11 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import tensorflow as tf
 import unittest
 import numpy as np
-import sionna
-from sionna import config
+from sionna.phy import channel
+from sionna.phy import config
 from channel_test_utils import *
 
 class TestChannelCoefficientsGenerator(unittest.TestCase):
@@ -21,10 +20,10 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
     # Maximum allowed deviation for calculation (relative error)
     MAX_ERR = 1e-2
 
-    # # Heigh of UTs
+    # # Height of UTs
     H_UT = 1.5
 
-    # # Heigh of BSs
+    # # Height of BSs
     H_BS = 10.0
 
     # # Number of BS
@@ -45,27 +44,27 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
 
         # UT and BS arrays have no impact on LSP
         # However, these are needed to instantiate the model
-        self.tx_array = sionna.channel.tr38901.PanelArray(num_rows_per_panel=2,
-                                                    num_cols_per_panel=2,
-                                                    polarization='dual',
-                                                    polarization_type='VH',
-                                                    antenna_pattern='38.901',
-                                                    carrier_frequency=fc,
-                                                    dtype=tf.complex128)
-        self.rx_array = sionna.channel.tr38901.PanelArray(num_rows_per_panel=1,
-                                                    num_cols_per_panel=1,
-                                                    polarization='dual',
-                                                    polarization_type='VH',
-                                                    antenna_pattern='38.901',
-                                                    carrier_frequency=fc,
-                                                    dtype=tf.complex128)
+        self.tx_array = channel.tr38901.PanelArray(num_rows_per_panel=2,
+                                                   num_cols_per_panel=2,
+                                                   polarization='dual',
+                                                   polarization_type='VH',
+                                                   antenna_pattern='38.901',
+                                                   carrier_frequency=fc,
+                                                   precision="double")
+        self.rx_array = channel.tr38901.PanelArray(num_rows_per_panel=1,
+                                                   num_cols_per_panel=1,
+                                                   polarization='dual',
+                                                   polarization_type='VH',
+                                                   antenna_pattern='38.901',
+                                                   carrier_frequency=fc,
+                                                   precision="double")
 
-        self.ccg = sionna.channel.tr38901.ChannelCoefficientsGenerator(
+        self.ccg = channel.tr38901.ChannelCoefficientsGenerator(
             fc,
             tx_array=self.tx_array,
             rx_array=self.rx_array,
             subclustering=True,
-            dtype=tf.complex128)
+            precision="double")
 
         batch_size = TestChannelCoefficientsGenerator.BATCH_SIZE
         nb_ut = TestChannelCoefficientsGenerator.NB_UT
@@ -80,10 +79,10 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
         ut_velocities = config.tf_rng.uniform([batch_size, nb_ut, 3], 0.0, 5.0,
                                                 dtype=tf.float64)
 
-        scenario = sionna.channel.tr38901.RMaScenario(fc, self.rx_array,
-                                                           self.tx_array,
-                                                           "downlink",
-                                                           dtype=tf.complex128)
+        scenario = channel.tr38901.RMaScenario(fc, self.rx_array,
+                                               self.tx_array,
+                                               "downlink",
+                                               precision="double")
 
         ut_loc = generate_random_loc(batch_size, nb_ut, (100,2000),
                                      (100,2000), (h_ut, h_ut), dtype=tf.float64)
@@ -96,7 +95,7 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
                                 tx_orientations, ut_velocities, in_state)
         self.scenario = scenario
 
-        topology = sionna.channel.tr38901.Topology(
+        topology = channel.tr38901.Topology(
             velocities=ut_velocities,
             moving_end='rx',
             los_aoa=scenario.los_aoa,
@@ -109,8 +108,8 @@ class TestChannelCoefficientsGenerator(unittest.TestCase):
             rx_orientations=rx_orientations)
         self.topology = topology
 
-        lsp_sampler = sionna.channel.tr38901.LSPGenerator(scenario)
-        ray_sampler = sionna.channel.tr38901.RaysGenerator(scenario)
+        lsp_sampler = channel.tr38901.LSPGenerator(scenario)
+        ray_sampler = channel.tr38901.RaysGenerator(scenario)
         lsp_sampler.topology_updated_callback()
         ray_sampler.topology_updated_callback()
         lsp = lsp_sampler()

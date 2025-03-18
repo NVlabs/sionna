@@ -1,13 +1,12 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 from re import L
 import tensorflow as tf
 import numpy as np
 from functools import wraps
-from sionna.channel.utils import sample_bernoulli
-from sionna import config
+from sionna.phy.utils import sample_bernoulli
+from sionna.phy import config, dtypes
 
 ####################################################################
 # Utility functions
@@ -90,10 +89,10 @@ def generate_random_bool(bs, n, p, share_state=False):
     """
 
     if share_state:
-        bool_tensor = sample_bernoulli([1, n], p, tf.float32)
+        bool_tensor = sample_bernoulli([1, n], p, precision="single")
         bool_tensor = tf.tile(bool_tensor, [bs, 1])
     else:
-        bool_tensor = sample_bernoulli([bs, n], p, tf.float32)
+        bool_tensor = sample_bernoulli([bs, n], p, precision="single")
     bool_tensor = tf.cast(bool_tensor, tf.bool)
     return bool_tensor
 
@@ -2568,3 +2567,29 @@ def cdl_zoa(model):
     zoa = zoa + c*alpha_m
     zoa = zoa*np.pi/180.
     return zoa
+
+
+def exp_corr_mat_numpy(a, n, precision="single"):
+    tf_dtype = dtypes[precision]["tf"]["cdtype"]
+    np_dtype = dtypes[precision]["np"]["cdtype"]
+    R = np.eye(n, dtype=np_dtype)
+    for i in range(1, n):
+        for j in range(i+1):
+            R[i,j] = a**(i-j)
+            R[j,i] = np.conj(a)**(i-j)
+    return tf.cast(R, tf_dtype)
+
+
+def one_ring_corr_numpy(phi_deg, n, d_h=0.5, sigma_phi_deg=15):
+    R = np.zeros([n, n], dtype=np.complex128)
+    c = 2*np.pi*d_h
+    phi = phi_deg/180*np.pi
+    sigma_phi = sigma_phi_deg/180*np.pi    
+    for l in range(n):
+        for m in range(n):
+            tmp = c*(l-m) 
+            a = np.exp(1j * tmp*np.sin(phi) )
+            b = np.exp(-0.5 * (sigma_phi*tmp*np.cos(phi))**2 )
+            R[l, m] = a*b
+    return R
+

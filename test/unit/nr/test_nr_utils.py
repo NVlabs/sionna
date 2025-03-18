@@ -1,12 +1,14 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.nr.utils import select_mcs, generate_prng_seq, calculate_tb_size
+from sionna.phy.nr.utils import decode_mcs_index, generate_prng_seq, \
+    calculate_tb_size
+from utils import calculate_tb_size_numpy, decode_mcs_index_numpy
+from sionna.phy.utils.tensors import random_tensor_from_values, enumerate_indices
 
 
 class TestNRUtils(unittest.TestCase):
@@ -22,19 +24,19 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
-                                  table_index=1,
-                                  channel_type="PDSCH",
-                                  pi2bpsk=bpsk)
+                m, r = decode_mcs_index(mcs_index=idx,
+                                        table_index=1,
+                                        is_pusch=False,
+                                        pi2bpsk=bpsk)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
-                       table_index=1,
-                       channel_type="PDSCH",
-                       pi2bpsk=False)
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
+                             table_index=1,
+                             is_pusch=False,
+                             pi2bpsk=False)
 
         # Tab. 5.1.3.1-2
         qs = [2,2,2,2,2,4,4,4,4,4,4,6,6,6,6,6,6,6,6,6,8,8,8,8,8,8,8,8]
@@ -43,18 +45,18 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
+                m, r = decode_mcs_index(mcs_index=idx,
                                   table_index=2,
-                                  channel_type="PDSCH",
+                                  is_pusch=False,
                                   pi2bpsk=bpsk)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=2,
-                       channel_type="PDSCH",
+                       is_pusch=False,
                        pi2bpsk=False)
 
         # Tab. 5.1.3.1-3
@@ -64,18 +66,18 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
+                m, r = decode_mcs_index(mcs_index=idx,
                                   table_index=3,
-                                  channel_type="PDSCH",
+                                  is_pusch=False,
                                   pi2bpsk=bpsk)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=3,
-                       channel_type="PDSCH",
+                       is_pusch=False,
                        pi2bpsk=False)
                        
         # Tab. 5.1.3.1-4
@@ -84,18 +86,18 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
+                m, r = decode_mcs_index(mcs_index=idx,
                                   table_index=4,
-                                  channel_type="PDSCH",
+                                  is_pusch=False,
                                   pi2bpsk=bpsk)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=4,
-                       channel_type="PDSCH",
+                       is_pusch=False,
                        pi2bpsk=False)
 
 
@@ -110,19 +112,19 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
+                m, r = decode_mcs_index(mcs_index=idx,
                                   table_index=1,
-                                  channel_type="PUSCH",
+                                  is_pusch=True,
                                   pi2bpsk=bpsk,
                                   transform_precoding=False)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=1,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=False,
                        transform_precoding=False)
 
@@ -133,19 +135,19 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
+                m, r = decode_mcs_index(mcs_index=idx,
                                   table_index=2,
-                                  channel_type="PUSCH",
+                                  is_pusch=True,
                                   pi2bpsk=bpsk,
                                   transform_precoding=False)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=2,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=False,
                        transform_precoding=False)
 
@@ -156,19 +158,19 @@ class TestNRUtils(unittest.TestCase):
 
         for bpsk in (True, False): # no impact
             for idx, q in enumerate(qs):
-                m, r = select_mcs(mcs_index=idx,
+                m, r = decode_mcs_index(mcs_index=idx,
                                   table_index=3,
-                                  channel_type="PUSCH",
+                                  is_pusch=True,
                                   pi2bpsk=bpsk,
                                   transform_precoding=False)
                 self.assertTrue(m==q)
-                self.assertTrue(rs[idx]/1024==r)
+                self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=3,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=False,
                        transform_precoding=False)
 
@@ -180,19 +182,19 @@ class TestNRUtils(unittest.TestCase):
               658,466,517,567,616,666,719,772,822,873,910,948]
 
         for idx, q in enumerate(qs):
-            m, r = select_mcs(mcs_index=idx,
+            m, r = decode_mcs_index(mcs_index=idx,
                               table_index=1,
                               transform_precoding=True,
-                              channel_type="PUSCH",
+                              is_pusch=True,
                               pi2bpsk=pi2bpsk)
             self.assertTrue(m==q)
-            self.assertTrue(rs[idx]/1024==r)
+            self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=1,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=pi2bpsk,
                        transform_precoding=True)
 
@@ -203,19 +205,19 @@ class TestNRUtils(unittest.TestCase):
               658,466,517,567,616,666,719,772,822,873,910,948]
 
         for idx, q in enumerate(qs):
-            m, r = select_mcs(mcs_index=idx,
+            m, r = decode_mcs_index(mcs_index=idx,
                               table_index=1,
-                              channel_type="PUSCH",
+                              is_pusch=True,
                               transform_precoding=True,
                               pi2bpsk=pi2bpsk)
             self.assertTrue(m==q)
-            self.assertTrue(rs[idx]/1024==r)
+            self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=1,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=pi2bpsk,
                        transform_precoding=True)
 
@@ -226,19 +228,19 @@ class TestNRUtils(unittest.TestCase):
               490,553,616,658,699,772,567,616,666,772]
 
         for idx, q in enumerate(qs):
-            m, r = select_mcs(mcs_index=idx,
+            m, r = decode_mcs_index(mcs_index=idx,
                               table_index=2,
-                              channel_type="PUSCH",
+                              is_pusch=True,
                               pi2bpsk=pi2bpsk,
                               transform_precoding=True)
             self.assertTrue(m==q)
-            self.assertTrue(rs[idx]/1024==r)
+            self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=2,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=pi2bpsk,
                        transform_precoding=True)
 
@@ -249,19 +251,19 @@ class TestNRUtils(unittest.TestCase):
               434,490,553,616,658,699,772,567,616,666,772]
 
         for idx, q in enumerate(qs):
-            m, r = select_mcs(mcs_index=idx,
+            m, r = decode_mcs_index(mcs_index=idx,
                               table_index=2,
-                              channel_type="PUSCH",
+                              is_pusch=True,
                               pi2bpsk=pi2bpsk,
                               transform_precoding=True)
             self.assertTrue(m==q)
-            self.assertTrue(rs[idx]/1024==r)
+            self.assertTrue(rs[idx]/1024==r.numpy())
 
         # test that next index raises error
-        with self.assertRaises(AssertionError):
-            select_mcs(mcs_index=idx+1,
+        with self.assertRaises(tf.errors.InvalidArgumentError):
+            decode_mcs_index(mcs_index=idx+1,
                        table_index=2,
-                       channel_type="PUSCH",
+                       is_pusch=True,
                        pi2bpsk=pi2bpsk,
                        transform_precoding=True)
 
@@ -301,12 +303,12 @@ class TestNRUtils(unittest.TestCase):
         def verify_results(retval, target_rate, n_res):
             """Run consistency tests"""
 
-            tb_size = retval[0]
-            cb_size = retval[1]
-            num_cbs = retval[2]
-            cw_length = retval[3]
-            tb_crc_length = retval[4]
-            cb_crc_length = retval[5]
+            tb_size = retval[0].numpy()
+            cb_size = retval[1].numpy()
+            num_cbs = retval[2].numpy()
+            tb_crc_length = retval[3].numpy()
+            cb_crc_length = retval[4].numpy()
+            cw_length = retval[5].numpy()
 
             # tb_size must equal number of CB bits (+CRC overhead)
             self.assertTrue(
@@ -352,7 +354,8 @@ class TestNRUtils(unittest.TestCase):
                 for num_prbs in (1, 20, 200, 275):
                     for num_ofdm_symbols in (8, 10, 14):
                         for num_dmrs_per_prb in (0, 10, 20):
-                            q, r = select_mcs(mcs_index, 2)
+                            q, r = decode_mcs_index(mcs_index, 2)
+                            q, r = q.numpy(), r.numpy()
 
                             retval = calculate_tb_size(
                                             target_coderate=r,
@@ -369,3 +372,235 @@ class TestNRUtils(unittest.TestCase):
 
                             #### verify results #####
                             verify_results(retval, r, n_res)
+
+    def test_tb_size_vs_numpy(self):
+        """
+        Validate calculate_tb_size_tf, accepting Tensor inputs, 
+        against the Numpy version "calculate_tb_size". Test in Eager, Graph and
+        XLA modes
+        """
+        @tf.function
+        def calculate_tb_size_graph(modulation_order,
+                      target_coderate,
+                      target_tb_size=None,
+                      num_coded_bits=None,
+                      num_prbs=None,
+                      num_ofdm_symbols=None,
+                      num_dmrs_per_prb=None,
+                      num_layers=None,
+                      num_ov=None,
+                      tb_scaling=None,
+                      return_cw_length=True,
+                      verbose=False):
+            return calculate_tb_size(modulation_order,
+                      target_coderate,
+                      target_tb_size=target_tb_size,
+                      num_coded_bits=num_coded_bits,
+                      num_prbs=num_prbs,
+                      num_ofdm_symbols=num_ofdm_symbols,
+                      num_dmrs_per_prb=num_dmrs_per_prb,
+                      num_layers=num_layers,
+                      num_ov=num_ov,
+                      tb_scaling=tb_scaling,
+                      return_cw_length=return_cw_length,
+                      verbose=verbose)
+
+        @tf.function(jit_compile=True)
+        def calculate_tb_size_xla(modulation_order,
+                      target_coderate,
+                      target_tb_size=None,
+                      num_coded_bits=None,
+                      num_prbs=None,
+                      num_ofdm_symbols=None,
+                      num_dmrs_per_prb=None,
+                      num_layers=None,
+                      num_ov=None,
+                      tb_scaling=None,
+                      return_cw_length=True,
+                      verbose=False):
+            return calculate_tb_size(modulation_order,
+                      target_coderate,
+                      target_tb_size=target_tb_size,
+                      num_coded_bits=num_coded_bits,
+                      num_prbs=num_prbs,
+                      num_ofdm_symbols=num_ofdm_symbols,
+                      num_dmrs_per_prb=num_dmrs_per_prb,
+                      num_layers=num_layers,
+                      num_ov=num_ov,
+                      tb_scaling=tb_scaling,
+                      return_cw_length=return_cw_length,
+                      verbose=verbose)
+
+        fun_dict = {'eager': calculate_tb_size,
+                    'graph': calculate_tb_size_graph,
+                    'xla': calculate_tb_size_xla}
+
+        def validate_against_np(tb_size, cb_size, num_cb, cw_length, tb_crc_length, cb_crc_length):
+            # Validate against the Numpy version "calculate_tb_size"
+            for idx in enumerate_indices(shape).numpy():
+
+                tb_size_orig, cb_size_orig, num_cbs_orig, \
+                    tb_crc_length_orig, cb_crc_length_orig, cw_length_orig = \
+                    calculate_tb_size_numpy(tf.gather_nd(modulation_order, idx).numpy(),
+                                    tf.gather_nd(target_coderate, idx).numpy(),
+                                    num_prbs=tf.gather_nd(num_prbs, idx).numpy(),
+                                    num_ofdm_symbols=tf.gather_nd(num_ofdm_symbols, idx).numpy(),
+                                    num_dmrs_per_prb=tf.gather_nd(num_dmrs_per_prb, idx).numpy(),
+                                    num_layers=tf.gather_nd(num_layers, idx).numpy(),
+                                    num_ov=tf.gather_nd(num_ov, idx).numpy(),
+                                    tb_scaling=tf.gather_nd(tb_scaling, idx).numpy(),
+                                    verbose=False)
+                self.assertTrue(tb_size_orig==tf.gather_nd(tb_size, idx).numpy())
+                self.assertTrue(cb_size_orig==tf.gather_nd(cb_size, idx).numpy())
+                self.assertTrue(num_cbs_orig==tf.gather_nd(num_cb, idx).numpy())
+                if not np.all(cw_length_orig==tf.gather_nd(cw_length, idx).numpy()[:len(cw_length_orig)]):
+                    print(f'{cw_length_orig=}')
+                    print(f'TF version = {tf.gather_nd(cw_length, idx).numpy()}')
+                self.assertTrue(np.all(cw_length_orig==tf.gather_nd(cw_length, idx).numpy()[:len(cw_length_orig)]))
+                self.assertTrue(tb_crc_length_orig==tf.gather_nd(tb_crc_length, idx).numpy())
+                self.assertTrue(cb_crc_length_orig==tf.gather_nd(cb_crc_length, idx).numpy())
+                self.assertTrue(num_cbs_orig==tf.gather_nd(num_cb, idx).numpy())
+            return None
+        
+
+        shape = [10, 12, 15]
+        int_dtype = tf.int32
+        float_dtype = tf.float32
+
+        modulation_order = random_tensor_from_values(
+            values=[2, 4, 6], shape=shape, dtype=int_dtype)
+        target_coderate = random_tensor_from_values(
+            values=np.linspace(.5, .95, 30), shape=shape, dtype=float_dtype)
+        num_ofdm_symbols = random_tensor_from_values(
+            values=[8, 9, 10, 11, 12], shape=shape, dtype=int_dtype)
+        num_dmrs_per_prb = random_tensor_from_values(values=[12, 24, 36],
+                                                     shape=shape, dtype=int_dtype)
+        num_prbs = random_tensor_from_values(values=list(
+            range(1, 100)), shape=shape, dtype=int_dtype)
+        num_layers = random_tensor_from_values(values=[1, 2, 3],
+                                               shape=shape, dtype=int_dtype)
+        num_ov = random_tensor_from_values(values=[0, 1, 2, 3],
+                                           shape=shape, dtype=int_dtype)
+        tb_scaling = random_tensor_from_values(
+            values=[1.0], shape=shape, dtype=float_dtype)
+
+        for mode, fun in fun_dict.items():
+            # mode a): compute target_tb_size and num_coded bits
+            tb_size, cb_size, num_cb, tb_crc_length, cb_crc_length, cw_length = \
+                fun(modulation_order,
+                    target_coderate,
+                    num_prbs=num_prbs,
+                    num_ofdm_symbols=num_ofdm_symbols,
+                    num_dmrs_per_prb=num_dmrs_per_prb,
+                    num_layers=num_layers,
+                    num_ov=num_ov,
+                    tb_scaling=tb_scaling)
+            
+            # validate against the Numpy version
+            validate_against_np(tb_size, cb_size, num_cb, cw_length,
+                                tb_crc_length, cb_crc_length)
+            
+            # mode b): provide already target_tb_size, num_coded_bits
+            # Compute data symbols per PRB
+            n_re_per_prb = 12 * num_ofdm_symbols - num_dmrs_per_prb - num_ov
+            # number of coded bits that fit into the given slot configuration
+            num_coded_bits = tb_scaling * \
+                tf.cast(n_re_per_prb * modulation_order *
+                        num_layers * num_prbs, float_dtype)
+            num_coded_bits = tf.cast(num_coded_bits, int_dtype)
+
+            # Number of allocated REs
+            # The max. number of REs per PRB is limited to 156 in 38.214
+            n_re = tf.minimum(156, n_re_per_prb) * num_prbs
+
+            # Compute coded bits and info bits
+            target_tb_size = target_coderate * tb_scaling * \
+                tf.cast(n_re * modulation_order * num_layers, float_dtype)
+            
+            tb_size1, cb_size1, num_cb1, tb_crc_length1, cb_crc_length1, cw_length1 = \
+                fun(modulation_order,
+                    target_coderate,
+                    target_tb_size=target_tb_size,
+                    num_coded_bits=num_coded_bits,
+                    num_layers=num_layers,
+                    num_ov=num_ov,
+                    tb_scaling=tb_scaling)
+            
+            # validate against the mode a) version
+            self.assertTrue(tf.reduce_all(tb_size==tb_size1))
+            self.assertTrue(tf.reduce_all(cb_size==cb_size1))
+            self.assertTrue(tf.reduce_all(num_cb==num_cb1))
+            self.assertTrue(tf.reduce_all(cw_length==cw_length1))
+            self.assertTrue(tf.reduce_all(tb_crc_length==tb_crc_length1))
+            self.assertTrue(tf.reduce_all(cb_crc_length==cb_crc_length1))
+
+            # The sum of codeword lengths must equal the n. coded bits
+            self.assertTrue(
+                tf.reduce_all(tf.reduce_sum(cw_length1, axis=-1) == num_coded_bits))
+        
+    def test_decode_mcs_index_tf(self):
+        """Unittest for decode_mcs_index_tf. Compares against its Numpy version.
+        Test in Eager, Graph and XLA modes""" 
+
+        @tf.function
+        def decode_mcs_index_graph(mcs_index,
+                                   table_index=None,
+                                   is_pusch=None,
+                                   transform_precoding=None,
+                                   pi2bpsk=None):
+            return decode_mcs_index(mcs_index,
+                                    table_index=table_index,
+                                    is_pusch=is_pusch,
+                                    transform_precoding=transform_precoding,
+                                    pi2bpsk=pi2bpsk)
+
+        @tf.function(jit_compile=True)
+        def decode_mcs_index_xla(mcs_index,
+                                 table_index=None,
+                                 is_pusch=None,
+                                 transform_precoding=None,
+                                 pi2bpsk=None):
+            return decode_mcs_index(mcs_index,
+                                    table_index=table_index,
+                                    is_pusch=is_pusch,
+                                    transform_precoding=transform_precoding,
+                                    pi2bpsk=pi2bpsk)
+        fun_dict = {'eager': decode_mcs_index,
+                    'graph': decode_mcs_index_graph,
+                    'xla': decode_mcs_index_xla}
+
+        shape = [10, 10, 10]
+        mcs_index = random_tensor_from_values(values=list(range(27)), shape=shape)
+        table_index = random_tensor_from_values(values=[1, 2], shape=shape)
+        is_pusch = random_tensor_from_values(
+            values=[True, False], shape=shape)
+        transform_precoding = random_tensor_from_values(
+            values=[True, False], shape=shape)
+        pi2bpsk = random_tensor_from_values(values=[True, False], shape=shape)
+
+        for mod, fun in fun_dict.items():
+            mod_orders_tf, target_rates_tf = fun(
+                mcs_index,
+                table_index=table_index,
+                is_pusch=is_pusch,
+                transform_precoding=transform_precoding,
+                pi2bpsk=pi2bpsk)
+
+            # compare against Numpy
+            target_rates_np = np.zeros(shape)
+            mod_orders_np = np.zeros(shape)
+
+            for s in enumerate_indices(shape):
+                channel_type = 'PUSCH' if tf.gather_nd(
+                    is_pusch, s).numpy() else 'PDSCH'
+                mod_orders_np[tuple(s)], target_rates_np[tuple(s)] = \
+                    decode_mcs_index_numpy(
+                        int(tf.gather_nd(mcs_index, s).numpy()),
+                    table_index=int(tf.gather_nd(table_index, s).numpy()),
+                    channel_type=channel_type,
+                    transform_precoding=bool(tf.gather_nd(
+                        transform_precoding, s).numpy()),
+                    pi2bpsk=bool(tf.gather_nd(pi2bpsk, s).numpy()),
+                    verbose=False)
+            self.assertTrue(tf.reduce_sum(tf.abs(mod_orders_np - mod_orders_tf.numpy()))==0)
+            self.assertTrue(tf.reduce_sum(tf.abs(target_rates_np - target_rates_tf.numpy()))==0)

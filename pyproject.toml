@@ -1,6 +1,85 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["sionna*"]
+exclude = ["sionna.rt*"]
+
+[tool.setuptools.package-data]
+"sionna" = ["**/*.csv", "**/*.npy", "**/*.json"]
+
+[tool.setuptools.exclude-package-data]
+"sionna.rt" = ["*"]
+
+[project]
+name = "sionna"
+version = "1.0.1"
+description = "Sionna - A hardware-accelerated differentiable open-source library for research on communication systems"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [
+    { name = "The Sionna contributors", email = "sionna@nvidia.com" }
+]
+keywords = [
+    "communication systems",
+    "ray tracing",
+    "physical layer",
+    "link-level simulation",
+    "system-level simulation",
+    "5G",
+    "6G",
+    "radio propagation",
+    "channel model",
+    "wireless communication",
+    "optical communication",
+    "wireless networks",
+    "deep learning",
+    "differentiable simulation",
+    "differentiable ray tracing",
+    "gradient-based optimization",
+    "automatic differentiation",
+    "neural networks",
+    "machine learning",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Telecommunications Industry",
+    "Operating System :: OS Independent"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "sionna-rt==1.0.1",
+    "tensorflow(>=2.14, !=2.16, !=2.17)",
+    "numpy(>=1.26, <2.0)",
+    "scipy>=1.14.1",
+    "matplotlib>=3.10",
+    "importlib_resources>=6.4.5"
+]
+
+[project.urls]
+source = "https://github.com/nvlabs/sionna-rt/"
+documentation = "https://nvlabs.github.io/sionna/"
+issues = "https://github.com/nvlabs/sionna/issues"
+
+[project.optional-dependencies]
+    doc = [
+        "docutils==0.21.2",
+        "markupsafe==3.0.2",
+        "nbconvert==7.13.1",
+        "nbsphinx==0.9.6",
+        "sphinx==8.1.3",
+        "sphinx-autodoc-typehints==2.5.0",
+        "sphinx-copybutton==0.5.2",
+        "sphinx-rtd-theme==3.0.2",
+    ]
+
+    test = [
+        "pytest>=8.3.4"
+    ]
+
+    dev = [
+        "pylint>=3.3.2"
+    ]

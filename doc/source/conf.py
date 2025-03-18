@@ -1,75 +1,58 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
-
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# SPDX-License-Identifier: Apache-2.0#
 
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
+
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../..'))
-
-import sphinx_rtd_theme
+sys.path.insert(0, os.path.abspath('../../src'))
+sys.path.insert(0, os.path.abspath('./rt'))
 
 # -- Project information -----------------------------------------------------
 
 project = "Sionna"
-copyright = "2021-2024 NVIDIA CORPORATION"
+copyright = "2021-2025 NVIDIA CORPORATION"
 
 # Read version number from sionna.__init__
 from importlib.machinery import SourceFileLoader
 release = SourceFileLoader("version",
-                         "../../sionna/__init__.py").load_module().__version__
+                           "../../src/sionna/__init__.py").load_module().__version__
+
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
+# Load custom extensions
+sys.path.append(os.path.abspath("./_ext"))
 
-sys.path.append(os.path.abspath("./_ext")) # load custom extensions
-
-extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "nbsphinx",
-    "sphinx.ext.mathjax",
-    "sphinx_rtd_theme",
-    "sphinx.ext.viewcode",
-    "sphinx_copybutton",
-    "made_with_sionna",
-]
-
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
-
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
-
+#import sphinx_rtd_theme
+extensions = ["sphinx_rtd_theme",
+              "sphinx.ext.napoleon",
+              "sphinx_autodoc_typehints",
+              "sphinx.ext.viewcode",
+              "sphinx.ext.mathjax",
+              "sphinx_copybutton",
+              "nbsphinx",
+              "roles",
+              "made_with_sionna",
+             ]
+autodoc_typehints = "description"
+typehints_fully_qualified = True
+simplify_optional_unions = True
+nbsphinx_execute = 'never'
+suppress_warnings = ['nbsphinx.localfile']
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
 html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
-    'collapse_navigation': False,
-    'sticky_navigation': False,
-    'display_version': True,
-     'navigation_depth': 4,
+    "collapse_navigation": False,
+    "sticky_navigation": False,
+    "navigation_depth": 5,
     }
 html_show_sourcelink = False
 pygments_style = "default"
@@ -80,21 +63,16 @@ pygments_style = "default"
 html_static_path = ["_static"]
 html_css_files = ['css/sionna.css']
 
-autodoc_default_options = {
-    "exclude-members": "build"
-    }
-
-autodoc_docstring_signature = True
-
 napoleon_custom_sections = [("Input shape", "params_style"),
                             ("Output shape", "params_style"),
                             ("Attributes", "params_style"),
                             ("Input", "params_style"),
-                            ("Output", "params_style")
+                            ("Output", "params_style"),
+                            ("Keyword Arguments", "params_style"),
                             ]
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
-
+napoleon_use_keyword = True
 numfig = True
 
 # do not re-execute jupyter notebooks when building the docs
@@ -112,7 +90,7 @@ nbsphinx_prolog = r"""
         <table>
             <td style="padding: 0px 0px;">
                 <a href=" https://colab.research.google.com/github/NVlabs/sionna/blob/main/{{ docname|e }}" style="vertical-align:text-bottom">
-                    <img alt="Colab logo" src="../_static/colab_logo.svg" style="width: 40px; min-width: 40px">
+                    <img alt="Colab logo" src="../../_static/colab_logo.svg" style="width: 40px; min-width: 40px">
                 </a>
             </td>
             <td style="padding: 4px 0px;">

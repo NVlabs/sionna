@@ -1,23 +1,18 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
-
+# SPDX-License-Identifier: Apache-2.0#
 import unittest
 import numpy as np
 import tensorflow as tf
 import itertools
-import sionna
-from sionna.mimo import StreamManagement
-from sionna.ofdm import ResourceGrid, ResourceGridMapper, LSChannelEstimator, PilotPattern, KroneckerPilotPattern, LMMSEInterpolator, tdl_freq_cov_mat, tdl_time_cov_mat
-from sionna.channel.tr38901 import Antenna, AntennaArray, UMi
-from sionna.channel import gen_single_sector_topology as gen_topology
-from sionna.channel import subcarrier_frequencies, cir_to_ofdm_channel
-from sionna.channel import ApplyOFDMChannel, exp_corr_mat
-from sionna.utils import QAMSource,ebnodb2no
-from sionna.mapping import Mapper
-from sionna.channel.tr38901 import TDL
-
+from sionna.phy.mimo import StreamManagement
+from sionna.phy.ofdm import ResourceGrid, ResourceGridMapper, LSChannelEstimator, PilotPattern, KroneckerPilotPattern, LMMSEInterpolator, tdl_freq_cov_mat, tdl_time_cov_mat
+from sionna.phy.channel.tr38901 import Antenna, AntennaArray, UMi, TDL
+from sionna.phy.channel import gen_single_sector_topology as gen_topology
+from sionna.phy.channel import subcarrier_frequencies, cir_to_ofdm_channel
+from sionna.phy.channel import ApplyOFDMChannel, exp_corr_mat
+from sionna.phy.utils import ebnodb2no
+from sionna.phy.mapping import QAMSource
 
 def freq_int(h, i, j):
     """Linear interpolation along the second axis on a 2D resource grid
@@ -139,7 +134,7 @@ def check_linear_interpolation(self, pilot_pattern, time_avg=False, mode="eager"
                   pilot_pattern=pilot_pattern)
 
     frequencies = subcarrier_frequencies(rg.fft_size, rg.subcarrier_spacing)
-    channel_freq = ApplyOFDMChannel(add_awgn=False)
+    channel_freq = ApplyOFDMChannel()
     rg_mapper = ResourceGridMapper(rg)
     if time_avg:
         ls_est = LSChannelEstimator(rg, interpolation_type="lin_time_avg")
@@ -151,8 +146,8 @@ def check_linear_interpolation(self, pilot_pattern, time_avg=False, mode="eager"
         x_rg = rg_mapper(x)
         a, tau = channel_model(num_time_samples=rg.num_ofdm_symbols, sampling_frequency=1/rg.ofdm_symbol_duration)
         h_freq = cir_to_ofdm_channel(frequencies, a, tau, normalize=True)
-        y = channel_freq([x_rg, h_freq]) # noiseless channel
-        h_hat_lin, _n = ls_est([y, 0.])
+        y = channel_freq(x_rg, h_freq) # noiseless channel
+        h_hat_lin, _n = ls_est(y, 0.)
         return x_rg, h_freq, h_hat_lin
 
     @tf.function
@@ -669,7 +664,7 @@ class TestLMMSEInterpolator(unittest.TestCase):
     # the maximums error for both the estimate and error variance and both
     # time first and frequency first interpolation
     def run_e2e_link(self, batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx,
-        num_ofdm_symbols, fft_size, pilot_pattern, ebno_db, exec_mode, dtype):
+        num_ofdm_symbols, fft_size, pilot_pattern, ebno_db, exec_mode, precision):
 
         assert exec_mode in ('eager', 'graph', 'xla'), "Wrong execution mode"
 
@@ -688,34 +683,33 @@ class TestLMMSEInterpolator(unittest.TestCase):
                         num_streams_per_tx=num_streams_per_tx,
                         cyclic_prefix_length=0,
                         pilot_pattern=pilot_pattern,
-                        dtype=dtype)
+                        precision=precision)
 
         # Transmitter
-        qam_source = QAMSource(num_bits_per_symbol, dtype=dtype)
-        mapper = Mapper("qam", num_bits_per_symbol, dtype=dtype)
-        rg_mapper = ResourceGridMapper(rg, dtype=dtype)
+        qam_source = QAMSource(num_bits_per_symbol, precision=precision)
+        rg_mapper = ResourceGridMapper(rg, precision=precision)
 
         # OFDM CHannel
         los_angle_of_arrival=np.pi/4.
         channel_model = TDL(tdl_model, delay_spread, carrier_frequency, min_speed=speed, max_speed=speed,
-                            los_angle_of_arrival=los_angle_of_arrival, dtype=dtype)
-        channel_freq = ApplyOFDMChannel(add_awgn=True, dtype=dtype)
-        frequencies = subcarrier_frequencies(fft_size, subcarrier_spacing, dtype=dtype)
+                            los_angle_of_arrival=los_angle_of_arrival, precision=precision)
+        channel_freq = ApplyOFDMChannel(add_awgn=True, precision=precision)
+        frequencies = subcarrier_frequencies(fft_size, subcarrier_spacing, precision=precision)
 
         # The LS channel estimator will provide channel estimates and error variances
-        cov_mat_freq = tdl_freq_cov_mat(tdl_model, subcarrier_spacing, fft_size, delay_spread, dtype)
+        cov_mat_freq = tdl_freq_cov_mat(tdl_model, subcarrier_spacing, fft_size, delay_spread, precision)
         cov_mat_time = tdl_time_cov_mat(tdl_model, speed, carrier_frequency, rg.ofdm_symbol_duration,
-                                        num_ofdm_symbols, los_angle_of_arrival, dtype)
-        cov_mat_space = exp_corr_mat(0.9, num_rx_ant, dtype)
+                                        num_ofdm_symbols, los_angle_of_arrival, precision)
+        cov_mat_space = exp_corr_mat(0.9, num_rx_ant, precision=precision)
         lmmse_inter_ft = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, order="f-t")
-        ls_est_lmmse_ft = LSChannelEstimator(rg, interpolator=lmmse_inter_ft, dtype=dtype)
+        ls_est_lmmse_ft = LSChannelEstimator(rg, interpolator=lmmse_inter_ft, precision=precision)
         lmmse_inter_tf = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, order="t-f")
-        ls_est_lmmse_tf = LSChannelEstimator(rg, interpolator=lmmse_inter_tf, dtype=dtype)
+        ls_est_lmmse_tf = LSChannelEstimator(rg, interpolator=lmmse_inter_tf, precision=precision)
         lmmse_inter_tsf = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, cov_mat_space, order="t-s-f")
-        ls_est_lmmse_tsf = LSChannelEstimator(rg, interpolator=lmmse_inter_tsf, dtype=dtype)
+        ls_est_lmmse_tsf = LSChannelEstimator(rg, interpolator=lmmse_inter_tsf, precision=precision)
 
         # For computing the reference interpolation
-        ls_no_interp = LSChannelEstimator(rg, interpolation_type=None, dtype=dtype)
+        ls_no_interp = LSChannelEstimator(rg, interpolation_type=None, precision=precision)
 
         def _run():
             no = ebnodb2no(ebno_db, num_bits_per_symbol, coderate=1.0)
@@ -724,12 +718,12 @@ class TestLMMSEInterpolator(unittest.TestCase):
 
             a, tau = channel_model(batch_size, num_ofdm_symbols, sampling_frequency=1./rg.ofdm_symbol_duration)
             h_freq = cir_to_ofdm_channel(frequencies, a, tau, normalize=True)
-            y = channel_freq([x_rg, h_freq, no])
+            y = channel_freq(x_rg, h_freq, no)
 
-            h_hat_lmmse_ft,err_var_lmmse_ft = ls_est_lmmse_ft([y, no])
-            h_hat_lmmse_tf,err_var_lmmse_tf = ls_est_lmmse_tf([y, no])
-            h_hat_lmmse_tsf,err_var_lmmse_tsf = ls_est_lmmse_tsf([y, no])
-            h_hat_no_int, err_var_no_int = ls_no_interp([y, no])
+            h_hat_lmmse_ft,err_var_lmmse_ft = ls_est_lmmse_ft(y, no)
+            h_hat_lmmse_tf,err_var_lmmse_tf = ls_est_lmmse_tf(y, no)
+            h_hat_lmmse_tsf,err_var_lmmse_tsf = ls_est_lmmse_tsf(y, no)
+            h_hat_no_int, err_var_no_int = ls_no_interp(y, no)
 
             return h_hat_no_int, err_var_no_int, h_hat_lmmse_ft, err_var_lmmse_ft, h_hat_lmmse_tf, err_var_lmmse_tf, h_hat_lmmse_tsf, err_var_lmmse_tsf, h_freq
 
@@ -783,15 +777,11 @@ class TestLMMSEInterpolator(unittest.TestCase):
                     fft_size, mask, pilots):
 
         def _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
-                    fft_size, pilot_pattern, ebno_db, exec_mode, dtype):
-            if exec_mode == 'xla':
-                sionna.Config.xla_compat = True
+                    fft_size, pilot_pattern, ebno_db, exec_mode, precision):
             outputs = self.run_e2e_link(TestLMMSEInterpolator.BATCH_SIZE, num_rx, num_rx_ant, num_tx,
-                num_streams_per_tx, num_ofdm_symbols, fft_size, pilot_pattern, ebno_db, exec_mode, dtype)
-            if exec_mode == 'xla':
-                sionna.Config.xla_compat = False
+                num_streams_per_tx, num_ofdm_symbols, fft_size, pilot_pattern, ebno_db, exec_mode, precision)
 
-            if dtype == tf.complex64 or exec_mode == "xla":
+            if precision=="single" or exec_mode == "xla":
                 atol = TestLMMSEInterpolator.ATOL_LOW_PREC
             else:
                 atol = TestLMMSEInterpolator.ATOL_HIGH_PREC
@@ -816,22 +806,22 @@ class TestLMMSEInterpolator(unittest.TestCase):
 
         for ebno_db in TestLMMSEInterpolator.EBN0DBs:
             # 32bit precision
-            pilot_pattern = PilotPattern(mask, pilots, dtype=tf.complex64)
+            pilot_pattern = PilotPattern(mask, pilots, precision="single")
             ebno_db_sp = tf.cast(ebno_db, tf.float32)
             _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
-                    fft_size, pilot_pattern, ebno_db_sp, "eager", tf.complex64)
+                    fft_size, pilot_pattern, ebno_db_sp, "eager", "single")
             _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
-                    fft_size, pilot_pattern, ebno_db_sp, "graph", tf.complex64)
+                    fft_size, pilot_pattern, ebno_db_sp, "graph", "single")
             # XLA is not supported
             # _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
             #         fft_size, pilot_pattern, ebno_db_sp, "xla", tf.complex64)
             # 64bit precision
-            pilot_pattern = PilotPattern(mask, pilots, dtype=tf.complex128)
+            pilot_pattern = PilotPattern(mask, pilots, precision="double")
             ebno_db_dp = tf.cast(ebno_db, tf.float64)
             _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
-                    fft_size, pilot_pattern, ebno_db_dp, "eager", tf.complex128)
+                    fft_size, pilot_pattern, ebno_db_dp, "eager", "double")
             _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
-                    fft_size, pilot_pattern, ebno_db_dp, "graph", tf.complex128)
+                    fft_size, pilot_pattern, ebno_db_dp, "graph", "double")
             # XLA is not supported
             # _test(num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols,
             #         fft_size, pilot_pattern, ebno_db_dp, "xla", tf.complex128)
@@ -1022,141 +1012,3 @@ class TestLMMSEInterpolator(unittest.TestCase):
         # Test s but no spatial covariance matrix
         with self.assertRaises(AssertionError):
             lmmse_inter_ft = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, order="f-t-s")
-
-#######################################################
-# Test utilities
-#######################################################
-
-# class TestUtilities(unittest.TestCase):
-
-#     # Batch size for sampling channel models
-#     BATCH_SIZE = 1000
-
-#     # Num samples for every monte carlo estimate
-#     NUM_SAMPLES = 1000000
-
-#     # Tested subcarrier spacings
-#     SUBCARRIER_SPACING = (15e3, 30e3, 120e3) # Hz
-
-#     # Tested delay spreads
-#     DELAY_SPREAD = (100e-9, 300e-9, 1000e-9) # s
-
-#     # Tested FFT sizes
-#     FFT_SIZE = 1024
-
-#     # TDL models
-#     TDL_MODELS = ('A', 'B', 'C', 'D', 'E')
-
-#     # Tested speeds
-#     SPEEDS = (0.0, 10.0, 100.)
-
-#     # Tested number of OFDM symbols
-#     NUM_SYMBOLS = 140
-
-#     # Tested carrier frequencies
-#     CARRIER_FREQS = (0.450e6, 3.5e9, 6.0e9)
-
-#     # Absolute error tolerance
-#     ATOL = 1e-2
-
-#     def est_tdl_freq_cov_mat(self, num_samples, model, delay_spread, carrier_frequency,
-#         subcarrier_spacing, ofdm_symbol_duration, fft_size):
-
-
-#         channel_model = TDL(model, delay_spread, carrier_frequency)
-#         frequencies = subcarrier_frequencies(fft_size, subcarrier_spacing)
-
-#         batch_size = TestUtilities.BATCH_SIZE
-#         num_it = (num_samples//batch_size) + 1
-#         hs = []
-
-#         @tf.function(jit_compile=True)
-#         def _run():
-#             cov_mat = tf.zeros([fft_size, fft_size], tf.complex64)
-#             for _ in tf.range(num_it):
-#                 a, tau = channel_model(batch_size, 1,
-#                                         sampling_frequency=1./ofdm_symbol_duration)
-#                 h = cir_to_ofdm_channel(frequencies, a, tau)[:,0,0,0,0] # [batch size, 1, fft size]
-#                 h = tf.transpose(h, [0,2,1]) # [batch size, fft size, 1]
-#                 cov_mat_ = tf.matmul(h, h, adjoint_b=True)
-#                 cov_mat_ = tf.reduce_mean(cov_mat_, axis=0)
-#                 cov_mat += cov_mat_
-#             cov_mat = cov_mat / tf.cast(num_it,tf.complex64)
-#             return cov_mat
-
-#         cov_mat = _run().numpy()
-#         return cov_mat
-
-#     def test_tdl_freq_cov_mat(self):
-
-#         fft_size = TestUtilities.FFT_SIZE
-
-#         parameters =  itertools.product(TestUtilities.TDL_MODELS,
-#                                         TestUtilities.SUBCARRIER_SPACING,
-#                                         TestUtilities.DELAY_SPREAD)
-#         for p in parameters:
-#             model = p[0]        # Model
-#             scs = p[1]          # subcarrier spacing
-#             ds = p[2]           # delay spread
-#             # Empirical covariance
-#             cov_mat_emp = self.est_tdl_freq_cov_mat(TestUtilities.NUM_SAMPLES, model, ds, 3.5e9,
-#                                             scs, 1.0, fft_size)
-#             # Expected covariance
-#             cov_mat = tdl_freq_cov_mat(model, scs,fft_size, ds)
-#             cov_mat = cov_mat.numpy()
-#             # Error
-#             max_err = np.max(np.abs(cov_mat - cov_mat_emp))
-#             self.assertTrue(max_err < TestUtilities.ATOL)
-
-#     def est_tdl_time_cov_mat(self, num_samples, model, carrier_frequency,
-#         subcarrier_spacing, speed, num_ofdm_symbols, los_angle_of_arrival):
-
-
-#         channel_model = TDL(model, 300e-9, carrier_frequency, min_speed=speed, max_speed=speed,
-#                             los_angle_of_arrival=los_angle_of_arrival)
-#         frequencies = subcarrier_frequencies(1, subcarrier_spacing)
-
-#         batch_size = TestUtilities.BATCH_SIZE
-#         num_it = (num_samples//batch_size) + 1
-#         hs = []
-
-#         @tf.function(jit_compile=True)
-#         def _run():
-#             cov_mat = tf.zeros([num_ofdm_symbols, num_ofdm_symbols], tf.complex64)
-#             for _ in tf.range(num_it):
-#                 a, tau = channel_model(batch_size, num_ofdm_symbols,
-#                                         sampling_frequency=subcarrier_spacing)
-#                 h = cir_to_ofdm_channel(frequencies, a, tau)[:,0,0,0,0] # [batch size, num_ofdm_symbols, 1]
-#                 cov_mat_ = tf.matmul(h, h, adjoint_b=True)
-#                 cov_mat_ = tf.reduce_mean(cov_mat_, axis=0)
-#                 cov_mat += cov_mat_
-#             cov_mat = cov_mat / tf.cast(num_it,tf.complex64)
-#             return cov_mat
-
-#         cov_mat = _run().numpy()
-#         return cov_mat
-
-#     def test_tdl_time_cov_mat(self):
-
-#         num_ofdm_symbols = TestUtilities.NUM_SYMBOLS
-#         los_angle_of_arrival = np.pi/4.
-
-#         parameters =  itertools.product(TestUtilities.TDL_MODELS,
-#                                         TestUtilities.SPEEDS,
-#                                         TestUtilities.SUBCARRIER_SPACING,
-#                                         TestUtilities.CARRIER_FREQS)
-#         for p in parameters:
-#             model = p[0]                    # Model
-#             speed = p[1]                    # Speed
-#             subcarrier_spacing = p[2]       # Subcarrier spacing
-#             carr_freq = p[3]                # Carrier frequency
-#             # Empirical covariance
-#             cov_mat_emp = self.est_tdl_time_cov_mat(TestUtilities.NUM_SAMPLES, model, carr_freq,
-#                 subcarrier_spacing, speed, num_ofdm_symbols, los_angle_of_arrival)
-#             # Expected covariance
-#             cov_mat = tdl_time_cov_mat(model, speed, carr_freq, 1./subcarrier_spacing,
-#                                         num_ofdm_symbols, los_angle_of_arrival)
-#             cov_mat = cov_mat.numpy()
-#             # # Error
-#             max_err = np.max(np.abs(cov_mat - cov_mat_emp))
-#             self.assertTrue(max_err < TestUtilities.ATOL)

@@ -1,19 +1,18 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.channel import BinarySymmetricChannel, BinaryZChannel, BinaryMemorylessChannel, BinaryErasureChannel
-from sionna.utils import BinarySource
+from sionna.phy.channel import BinarySymmetricChannel, BinaryZChannel, BinaryMemorylessChannel, BinaryErasureChannel
+from sionna.phy.mapping import BinarySource
 
 class TestDMCs(unittest.TestCase):
     """General tests for all discrete channels."""
 
     def test_dtypes(self):
         """Test that different input dtypes are supported"""
-        dtypes = (tf.float16, tf.float32, tf.float64,
+        dtypes = (tf.float32, tf.float64,
                   tf.uint8, tf.uint16, tf.uint32, tf.uint64,
                   tf.int8, tf.int16, tf.int32, tf.int64)
 
@@ -28,37 +27,36 @@ class TestDMCs(unittest.TestCase):
                     # select valid dtypes for each mode
                     if is_binary:
                         if return_llrs:
-                            dt_valid = (tf.float16, tf.float32, tf.float64)
+                            dt_valid = (tf.float32, tf.float64)
                         else:
                             if channel is BinaryErasureChannel:
                                 # no unints for BEC
-                                dt_valid = (tf.float16, tf.float32, tf.float64,
+                                dt_valid = (tf.float32, tf.float64,
                                             tf.int8, tf.int16, tf.int32, tf.
                                             int64)
                             else:
-                                dt_valid = (tf.float16, tf.float32, tf.float64,
+                                dt_valid = (tf.float32, tf.float64,
                                             tf.uint8, tf.uint16, tf.uint32,
                                             tf.uint64, tf.int8, tf.int16,
                                             tf.int32, tf.int64, tf.bool)
                     else:
                         if return_llrs:
-                            dt_valid = (tf.float16, tf.float32, tf.float64)
+                            dt_valid = (tf.float32, tf.float64)
                         else:
                             # no unsigned dtype
-                            dt_valid = (tf.float16, tf.float32, tf.float64,
+                            dt_valid = (tf.float32, tf.float64,
                                         tf.int8, tf.int16, tf.int32, tf.int64)
                     for dt in dtypes:
                         if dt in dt_valid:
+                            if dt == tf.float32:
+                                precision = "single"
+                            elif dt == tf.float64:
+                                precision = "double"
+                            else:
+                                precision = "single"
                             ch = channel(bipolar_input=(not is_binary),
-                                         return_llrs=return_llrs,
-                                         dtype=dt)
-                        else:
-                            # most throw an error
-                            with self.assertRaises(AssertionError):
-                               ch = channel(bipolar_input=(not is_binary),
                                             return_llrs=return_llrs,
-                                            dtype=dt)
-                            continue # next dtype
+                                            precision=precision)
 
                         if channel is BinaryMemorylessChannel:
                             pb = (0.1, 0.1)
@@ -69,16 +67,20 @@ class TestDMCs(unittest.TestCase):
                             x = 2 * x - 1
                         x = tf.cast(x, dtype=dt)
                         pb = tf.cast(pb, dtype=dt)
-                        y = ch((x, pb))
+                        if dt in dt_valid:
+                            y = ch(x, pb)
+                        else:
+                            with self.assertRaises(tf.errors.InvalidArgumentError):
+                                y = ch(x, pb)
+                            continue
                         self.assertTrue(y.dtype==dt)
 
                         # also test graph / XLA mode
                         for jc in (False, True):
                             @tf.function(jit_compile=jc)
                             def run_graph(x, pb):
-                                return ch((x, pb))
+                                return ch(x, pb)
                             y = run_graph(x, pb)
-
 
     def test_llrs(self):
         """Test llr output against Monte Carlo based estimation."""
@@ -98,8 +100,8 @@ class TestDMCs(unittest.TestCase):
         for pb in pbs:
 
             x_tf = source((num_samples,))
-            y_tf = channel((x_tf, pb))
-            y_ref = channel_ref((x_tf, pb))
+            y_tf = channel(x_tf, pb)
+            y_ref = channel_ref(x_tf, pb)
             x = x_tf.numpy()
             y = y_tf.numpy()
 
@@ -149,7 +151,7 @@ class TestDMCs(unittest.TestCase):
 
         for _ in range(100):
             with tf.GradientTape() as tape:
-                y = channel((x, pb))
+                y = channel(x, pb)
                 loss = tf.reduce_mean((tf.reduce_mean(y)-target_ber)**2)
             weights = [pb]
             grads = tape.gradient(loss, weights)
@@ -180,7 +182,7 @@ class TestDMCs(unittest.TestCase):
                 x = source((int(bs), 2, 4))
                 if not is_binary:
                     x = 2*x-1
-                y = channel((x, pb))
+                y = channel(x, pb)
 
                 # count errors
                 e = tf.where(x!=y, 1., 0.)
@@ -202,7 +204,6 @@ class TestDMCs(unittest.TestCase):
                 # allow certain mismatch due to Monte-Carlo sampling
                 self.assertTrue(np.all((ber0 - pb[0]) < 0.01))
                 self.assertTrue(np.all((ber1 - pb[1]) < 0.01))
-
 
 class TestBEC(unittest.TestCase):
     """Tests for Binary Erasure Channel."""
@@ -228,7 +229,7 @@ class TestBEC(unittest.TestCase):
                 x = source((int(bs), 2, 4))
                 if not is_binary:
                     x = 2*x-1
-                y = channel((x, pb))
+                y = channel(x, pb)
 
                 if is_binary:
                     erased_element = -1.

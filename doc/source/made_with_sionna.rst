@@ -4,7 +4,14 @@
 
 We love to see how Sionna is used by other researchers! For this reason, you find below links to papers/projects whose authors have published Sionna-based simulation code.
 
-If you want your paper/project and code be listed here, please send an email to `sionna@nvidia.com <mailto:sionna@nvidia.com>`_ with links to the paper (e.g., `arXiv <https://arxiv.org>`_) and code repository (e.g., `GitHub <https://github.com>`_).
+.. made-with-sionna::
+    :title: End-to-End Human Pose Reconstruction from Wearable Sensors for 6G Extended Reality Systems
+    :authors: Nguyen Quang Hieu, Dinh Thai Hoang, Diep N. Nguyen, Mohammad Abu Alsheikh, Carlos C. N. Kuhn, Yibeltal F. Alem, and Ibrahim Radwan
+    :year: 2025
+    :version: 0.19
+    :link_arxiv: https://arxiv.org/abs/2503.04860
+    :link_github: https://github.com/TheOpenSI/imu2pose-sionna 
+    :abstract: Full 3D human pose reconstruction is a critical enabler for extended reality (XR) applications in future sixth generation (6G) networks, supporting immersive interactions in gaming, virtual meetings, and remote collaboration. However, achieving accurate pose reconstruction over wireless networks remains challenging due to channel impairments, bit errors, and quantization effects. Existing approaches often assume error-free transmission in indoor settings, limiting their applicability to real-world scenarios. To address these challenges, we propose a novel deep learning-based framework for human pose reconstruction over orthogonal frequency-division multiplexing (OFDM) systems. The framework introduces a two-stage deep learning receiver: the first stage jointly estimates the wireless channel and decodes OFDM symbols, and the second stage maps the received sensor signals to full 3D body poses. Simulation results demonstrate that the proposed neural receiver reduces bit error rate (BER), thus gaining a 5 dB gap at 10−4 BER, compared to the baseline method that employs separate signal detection steps, i.e., least squares channel estimation and linear minimum mean square error equalization. Additionally, our empirical findings show that 8-bit quantization is sufficient for accurate pose reconstruction, achieving a mean squared error of 5×10−4 for reconstructed sensor signals, and reducing joint angular error by 37\% for the reconstructed human poses compared to the baseline.
 
 .. made-with-sionna::
     :title: CISSIR: Beam Codebooks with Self-Interference Reduction Guarantees for Integrated Sensing and Communication Beyond 5G
@@ -15,6 +22,7 @@ If you want your paper/project and code be listed here, please send an email to 
     :link_github: https://github.com/rodrihgh/cissir
     :abstract: We propose a beam codebook design to reduce self-interference (SI) in integrated sensing and communication (ISAC) systems. Our optimization methods, which can be applied to both tapered beamforming and phased arrays, adapt the codebooks to the SI channel such that a certain SI level is achieved. Furthermore, we derive an upper bound on the quantization noise in terms of the achieved SI level, which provides guidelines to pose the optimization problem in order to obtain performance guarantees for sensing. By selecting standard reference codebooks in our simulations, we show substantially improved sensing quality with little impact on 5G-NR communication. Our proposed method is not only less dependent on hyperparameters than other approaches in the literature, but it can also reduce SI further, and thus deliver better sensing and communication performance.
 
+
 .. made-with-sionna::
     :title: Safehaul: Risk-Averse Learning for Reliable mmWave Self-Backhauling in 6G Networks
     :authors: Amir Ashtari Gargari, Andrea Ortiz, Matteo Pagin, Anja Klein, Matthias Hollick, Michele Zorzi, Arash Asadi
@@ -23,6 +31,7 @@ If you want your paper/project and code be listed here, please send an email to 
     :link_arxiv: https://arxiv.org/abs/2301.03201
     :link_github: https://github.com/TUDA-wise/safehaul_infocom2023
     :abstract: Wireless backhauling at millimeter-wave frequencies (mmWave) in static scenarios is a well-established practice in cellular networks. However, highly directional and adaptive beamforming in today’s mmWave systems have opened new possibilities for self-backhauling. Tapping into this potential, 3GPP has standardized Integrated Access and Backhaul (IAB) allowing the same base station to serve both access and backhaul traffic. Although much more cost-effective and flexible, resource allocation and path selection in IAB mmWave networks is a formidable task. To date, prior works have addressed this challenge through a plethora of classic optimization and learning methods, generally optimizing a Key Performance Indicator (KPI) such as throughput, latency, and fairness, and little attention has been paid to the reliability of the KPI. We propose Safehaul, a risk-averse learning-based solution for IAB mmWave networks. In addition to optimizing average performance, Safehaul ensures reliability by minimizing the losses in the tail of the performance distribution. We develop a novel simulator and show via extensive simulations that Safehaul not only reduces the latency by up to 43.2% compared to the benchmarks, but also exhibits significantly more reliable performance, e.g., 71.4% less variance in achieved latency.
+
 
 .. made-with-sionna::
     :title: Advancing Spectrum Anomaly Detection through Digital Twins

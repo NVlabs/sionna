@@ -1,14 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import tensorflow as tf
 import unittest
 import numpy as np
-import sionna
-from sionna import config
-from channel_test_utils import *
 from scipy.stats import kstest, norm
+from sionna.phy import channel
+from sionna.phy import config
+from channel_test_utils import *
 
 
 class TestLSP(unittest.TestCase):
@@ -19,10 +18,10 @@ class TestLSP(unittest.TestCase):
     # Carrier frequency
     CARRIER_FREQUENCY = 3.5e9 # Hz
 
-    # Heigh of UTs
+    # Height of UTs
     H_UT = 1.5
 
-    # Heigh of BSs
+    # Height of BSs
     H_BS = 35.0
 
     # Batch size for generating samples of LSPs and pathlosses
@@ -82,20 +81,20 @@ class TestLSP(unittest.TestCase):
 
         # UT and BS arrays have no impact on LSP
         # However, these are needed to instantiate the model
-        bs_array = sionna.channel.tr38901.PanelArray(num_rows_per_panel=2,
-                                                    num_cols_per_panel=2,
-                                                    polarization='dual',
-                                                    polarization_type='VH',
-                                                    antenna_pattern='38.901',
-                                                    carrier_frequency=fc,
-                                                    dtype=tf.complex128)
-        ut_array = sionna.channel.tr38901.PanelArray(num_rows_per_panel=1,
-                                                    num_cols_per_panel=1,
-                                                    polarization='dual',
-                                                    polarization_type='VH',
-                                                    antenna_pattern='38.901',
-                                                    carrier_frequency=fc,
-                                                    dtype=tf.complex128)
+        bs_array = channel.tr38901.PanelArray(num_rows_per_panel=2,
+                                              num_cols_per_panel=2,
+                                              polarization='dual',
+                                              polarization_type='VH',
+                                              antenna_pattern='38.901',
+                                              carrier_frequency=fc,
+                                              precision="double")
+        ut_array = channel.tr38901.PanelArray(num_rows_per_panel=1,
+                                              num_cols_per_panel=1,
+                                              polarization='dual',
+                                              polarization_type='VH',
+                                              antenna_pattern='38.901',
+                                              carrier_frequency=fc,
+                                              precision="double")
 
         # The following quantities have no impact on LSP
         # However,these are needed to instantiate the model
@@ -120,12 +119,12 @@ class TestLSP(unittest.TestCase):
         TestLSP.lsp_samples['rma'] = {}
         TestLSP.zod_offset['rma'] = {}
         TestLSP.pathlosses['rma'] = {}
-        scenario = sionna.channel.tr38901.RMaScenario(  fc,
-                                                        ut_array,
-                                                        bs_array,
-                                                        "uplink",
-                                                        dtype=tf.complex128)
-        lsp_sampler = sionna.channel.tr38901.LSPGenerator(scenario)
+        scenario = channel.tr38901.RMaScenario(fc,
+                                               ut_array,
+                                               bs_array,
+                                               "uplink",
+                                               precision="double")
+        lsp_sampler = channel.tr38901.LSPGenerator(scenario)
 
         # LoS
         in_state = generate_random_bool(batch_size, nb_ut, 0.0)
@@ -163,13 +162,13 @@ class TestLSP(unittest.TestCase):
         TestLSP.lsp_samples['umi'] = {}
         TestLSP.zod_offset['umi'] = {}
         TestLSP.pathlosses['umi'] = {}
-        scenario = sionna.channel.tr38901.UMiScenario(  fc,
-                                                        'low',
-                                                        ut_array,
-                                                        bs_array,
-                                                        "uplink",
-                                                        dtype=tf.complex128)
-        lsp_sampler = sionna.channel.tr38901.LSPGenerator(scenario)
+        scenario = channel.tr38901.UMiScenario(fc,
+                                               "low",
+                                               ut_array,
+                                               bs_array,
+                                               "uplink",
+                                               precision="double")
+        lsp_sampler = channel.tr38901.LSPGenerator(scenario)
 
         # LoS
         in_state = generate_random_bool(batch_size, nb_ut, 0.0)
@@ -204,13 +203,13 @@ class TestLSP(unittest.TestCase):
         TestLSP.lsp_samples['uma'] = {}
         TestLSP.zod_offset['uma'] = {}
         TestLSP.pathlosses['uma'] = {}
-        scenario = sionna.channel.tr38901.UMaScenario(  fc,
-                                                        'low',
-                                                        ut_array,
-                                                        bs_array,
-                                                        "uplink",
-                                                        dtype=tf.complex128)
-        lsp_sampler = sionna.channel.tr38901.LSPGenerator(scenario)
+        scenario = channel.tr38901.UMaScenario(fc,
+                                               "low",
+                                               ut_array,
+                                               bs_array,
+                                               "uplink",
+                                               precision="double")
+        lsp_sampler = channel.tr38901.LSPGenerator(scenario)
 
         # LoS
         in_state = generate_random_bool(batch_size, nb_ut, 0.0)
@@ -243,13 +242,13 @@ class TestLSP(unittest.TestCase):
 
         # Sample pathlosses with high O2I loss model. Only with UMi and UMa
         ####### UMi-High
-        scenario = sionna.channel.tr38901.UMiScenario(  fc,
-                                                        'high',
-                                                        ut_array,
-                                                        bs_array,
-                                                        "uplink",
-                                                        dtype=tf.complex128)
-        lsp_sampler = sionna.channel.tr38901.LSPGenerator(scenario)
+        scenario = channel.tr38901.UMiScenario(fc,
+                                               "high",
+                                               ut_array,
+                                               bs_array,
+                                               "uplink",
+                                               precision="double")
+        lsp_sampler = channel.tr38901.LSPGenerator(scenario)
         in_state = generate_random_bool(batch_size, nb_ut, 1.0)
         scenario.set_topology(ut_loc, bs_loc, ut_orientations, bs_orientations,
                               ut_velocities, in_state)
@@ -257,13 +256,13 @@ class TestLSP(unittest.TestCase):
         TestLSP.pathlosses['umi']['o2i-high'] = lsp_sampler.sample_pathloss()[:,0,:]
 
         ####### UMa-high
-        scenario = sionna.channel.tr38901.UMaScenario(  fc,
-                                                        'high',
-                                                        ut_array,
-                                                        bs_array,
-                                                        "uplink",
-                                                        dtype=tf.complex128)
-        lsp_sampler = sionna.channel.tr38901.LSPGenerator(scenario)
+        scenario = channel.tr38901.UMaScenario(fc,
+                                               "high",
+                                               ut_array,
+                                               bs_array,
+                                               "uplink",
+                                               precision="double")
+        lsp_sampler = channel.tr38901.LSPGenerator(scenario)
         in_state = generate_random_bool(batch_size, nb_ut, 1.0)
         scenario.set_topology(ut_loc, bs_loc, ut_orientations, bs_orientations,
                               ut_velocities, in_state)

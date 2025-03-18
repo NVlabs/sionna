@@ -1,14 +1,12 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
-from sionna import config
+# SPDX-License-Identifier: Apache-2.0#
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.fec.interleaving import RandomInterleaver, RowColumnInterleaver, Deinterleaver, Turbo3GPPInterleaver
-from sionna.utils import BinarySource
-from sionna.fec.scrambling import Scrambler
+from sionna.phy import config
+from sionna.phy.fec.interleaving import RandomInterleaver, RowColumnInterleaver, Deinterleaver, Turbo3GPPInterleaver
+from sionna.phy.fec.scrambling import Scrambler
 
 class TestRandomInterleaver(unittest.TestCase):
     """Test random interleaver for consistency."""
@@ -45,11 +43,24 @@ class TestRandomInterleaver(unittest.TestCase):
                 self.assertTrue(np.array_equal(z[i,:], np.arange(seq_length)))
 
             # also test explicit seed
-            y = inter([x, 12345])
-            z = inter2([y, 12345])
+            y = inter(x, seed=12345)
+            z = inter2(y, seed=12345)
             for i in range(batch_size):
                 # result must be sorted integers
                 self.assertTrue(np.array_equal(z[i,:], np.arange(seq_length)))
+
+            ###################
+            # test without batch dim
+            # test RowColumnInterleaver
+            inter = RandomInterleaver(row_depth=3, keep_batch_constant=m)
+            # inherits precision from inter
+            deinter = Deinterleaver(inter)
+
+            x = np.arange(seq_length)
+            y = inter(x)
+            z = deinter(y)
+            self.assertFalse(np.array_equal(x,y))
+            self.assertTrue(np.array_equal(x,z))
 
     def test_sequence_batch(self):
         """Test that interleaver sequence is random per batch sample.
@@ -119,7 +130,7 @@ class TestRandomInterleaver(unittest.TestCase):
 
         # note: test can fail for small dimension_sizes as it may
         # randomly result in the identity interleaver pattern
-        shapes=[[10,20,30],[10,22,33,44],[20,10,10,10,6]]
+        shapes=[[1000],[10,20,30], [10,22,33,44], [20,10,10,10,6]]
 
         for s in shapes:
             #check soft-value scrambling (flipp sign)
@@ -146,58 +157,26 @@ class TestRandomInterleaver(unittest.TestCase):
                                                keep_state=True,
                                                inverse=True)
 
-                    x = i([llr, 1234])
+                    x = i(llr, seed=1234)
                     # after interleaving arrays must be different
                     self.assertTrue(np.any(np.not_equal(x.numpy(),llr.numpy())))
 
                     # after deinterleaving arrays should be equal again
-                    x = i2([x, 1234])
+                    x = i2(x, seed=1234)
                     self.assertIsNone(np.testing.assert_array_equal(x.numpy(), llr.numpy()))
 
     def test_invalid_shapes(self):
         """Test that invalid shapes/axis parameter raise error.
         """
-        # axis 0 not allowed
-        with self.assertRaises(AssertionError):
-            RandomInterleaver(axis=0)
 
-        shapes=[[10,20,30],[10,22,33,44],[20,10,10,10,6]]
+        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,6]]
 
         for s in shapes:
-            with self.assertRaises(AssertionError):
+            with self.assertRaises(ValueError):
                 # axis out bounds...must raise error
                 i = RandomInterleaver(axis=len(s))
                 llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
                 i(llr)
-
-        # cannot permute batch_dim only
-        with self.assertRaises(AssertionError):
-            i = RandomInterleaver(axis=1)
-            llr = config.tf_rng.uniform(tf.constant([10], dtype=tf.int32),
-                                    minval=-10,
-                                    maxval=10)
-            i(llr)
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)."""
-        bs = 10
-        k = 100
-        source = BinarySource()
-        modes = [True, False]
-        for m in modes:
-            inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-            x = RandomInterleaver(keep_batch_constant=m)(inputs)
-            model = tf.keras.Model(inputs=inputs, outputs=x)
-            # test that output batch dim is none
-            self.assertTrue(model.output_shape[0] is None)
-
-            # test that model can be called
-            b = source([bs, k])
-            model(b)
-            # call twice to see that bs can change
-            b2 = source([bs+1, k])
-            model(b2)
-            model.summary()
 
     def test_tf_fun(self):
         """Test that tf.function works as expected and XLA work as expected.
@@ -265,8 +244,8 @@ class TestRandomInterleaver(unittest.TestCase):
             self.assertFalse(np.array_equal(x1, x4))
 
             i11 = RandomInterleaver(keep_batch_constant=m,
-                                   seed=seed,
-                                   keep_state=False)
+                                    seed=seed,
+                                    keep_state=False)
             i31 = RandomInterleaver(keep_batch_constant=m,
                                     seed=seed,
                                     keep_state=True)
@@ -278,21 +257,21 @@ class TestRandomInterleaver(unittest.TestCase):
 
             # test that seed can be also provided to call
             seed = 987654
-            x7 = i11([x, seed]).numpy()
-            x8 = i11([x, seed+1]).numpy()
-            x9 = i11([x, seed]).numpy()
-            x10 = i1([x, seed]).numpy()
+            x7 = i11(x, seed=seed).numpy()
+            x8 = i11(x, seed=seed+1).numpy()
+            x9 = i11(x, seed=seed).numpy()
+            x10 = i1(x, seed=seed).numpy()
             self.assertFalse(np.array_equal(x7, x8)) # different seed
             self.assertTrue(np.array_equal(x7, x9)) # same seed
             self.assertTrue(np.array_equal(x7, x10)) # same seed (keep_state=f)
 
             # test that random seed allows inverse
-            x11 = i11([x, seed])
+            x11 = i11(x, seed=seed)
             i21 = RandomInterleaver(keep_batch_constant=m,
                                     keep_state=False,
                                     inverse=True)
             # use different interleaver with same seed to de-interleave
-            x12 = i21([x11, seed]).numpy()
+            x12 = i21(x11, seed=seed).numpy()
             self.assertTrue(np.array_equal(x, x12)) # identity
 
     def test_s_param(self):
@@ -304,7 +283,7 @@ class TestRandomInterleaver(unittest.TestCase):
         for s in range(N_tests):
             x = np.arange(k)
             x = np.expand_dims(x, axis=0)
-            x_int = inter([x, s]).numpy()
+            x_int = inter(x, seed=s).numpy()
             x_int = np.squeeze(x_int, axis=0)
 
             s_inter = inter.find_s_min(seed=s, seq_length=k)
@@ -334,11 +313,12 @@ class TestRandomInterleaver(unittest.TestCase):
         seq_length = int(1e1)
         batch_size = int(1e2)
 
-        dt_supported = [tf.float16, tf.float32, tf.float64]
-        for dt in dt_supported:
+        precisions = ["single", "double"]
+        dt_supported = [tf.float32, tf.float64]
+        for p, dt in zip(precisions, dt_supported):
             for dt_in in dt_supported:
                 b = tf.zeros([batch_size, seq_length], dtype=dt_in)
-                inter = RandomInterleaver(dtype=dt)
+                inter = RandomInterleaver(precision=p)
                 x = inter(b)
                 assert (x.dtype==dt)
 
@@ -405,6 +385,18 @@ class TestInterleaverRC(unittest.TestCase):
             self.assertIsNone(np.testing.assert_array_equal(y.numpy(),
                                                             llr.numpy()))
 
+        # test non batch dim
+        # test RowColumnInterleaver
+        inter = RowColumnInterleaver(row_depth=3)
+        # inherits precision from inter
+        deinter = Deinterleaver(inter)
+
+        x = np.arange(100)
+        y = inter(x)
+        z = deinter(y)
+        self.assertFalse(np.array_equal(x,y))
+        self.assertTrue(np.array_equal(x,z))
+
     def test_multi_dim(self):
         """Test that 2+D Tensors permutation can be inverted/removed.
         inherently tests that the output dimensions match.
@@ -412,7 +404,7 @@ class TestInterleaverRC(unittest.TestCase):
         Also tests that arrays are different.
         """
 
-        shapes=[[10,20,30],[10,22,33,44],[20,10,10,10,9]]
+        shapes=[[1000],[10,20,30],[10,22,33,44],[20,10,10,10,9]]
 
         for s in shapes:
             #check soft-value scrambling (flip sign)
@@ -465,45 +457,26 @@ class TestInterleaverRC(unittest.TestCase):
         """Test that 2+D Tensors and invalid axis raise error
         """
 
-        shapes=[[10,20,30],[10,22,33,44],[20,10,10,10,6]]
+        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,6]]
 
         for s in shapes:
-            with self.assertRaises(AssertionError):
+            with self.assertRaises(ValueError):
                 i = RowColumnInterleaver(row_depth=4, axis=len(s))
                 # axis is out bounds; must raise an error
                 llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
                 i(llr)
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)"""
-        bs = 10
-        k = 100
-        source = BinarySource()
-
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = RowColumnInterleaver(row_depth=4)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-        # test that output batch dim is none
-        self.assertTrue(model.output_shape[0] is None)
-
-        # test that model can be called
-        b = source([bs,k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1,k])
-        model(b2)
-        model.summary()
 
     def test_dtype(self):
         """Test that variable dtypes are supported."""
         seq_length = int(1e1)
         batch_size = int(1e2)
 
-        dt_supported = [tf.float16, tf.float32, tf.float64]
-        for dt in dt_supported:
+        precisions = ["single", "double"]
+        dt_supported = [tf.float32, tf.float64]
+        for p, dt in zip(precisions, dt_supported):
             for dt_in in dt_supported:
                 b = tf.zeros([batch_size, seq_length], dtype=dt_in)
-                inter = RowColumnInterleaver(row_depth=4, dtype=dt)
+                inter = RowColumnInterleaver(row_depth=4, precision=p)
                 x = inter(b)
                 assert (x.dtype==dt)
 
@@ -603,54 +576,57 @@ class TestDeinterleaver(unittest.TestCase):
     def test_dtype(self):
         """test that arbitrary dtypes are supported."""
 
-        dtypes_supported = (tf.float16, tf.float32, tf.float64, tf.int32,
+        dtypes_supported = (tf.float32, tf.float64, tf.int32,
                             tf.int64, tf.complex128, tf.complex64)
 
-        for dt_in in dtypes_supported:
+        precisions = ["single", "double"]
+        dt_precision = [tf.float32, tf.float64]
 
-            # tf.uniform does not support complex dtypes
-            if dt_in is (tf.complex64):
-                x = config.tf_rng.uniform([10, 20], maxval=10, dtype=tf.float32)
-                x = tf.complex(x, tf.zeros_like(x))
-            elif dt_in is (tf.complex128):
-                x = config.tf_rng.uniform([10, 20], maxval=10, dtype=tf.float64)
-                x = tf.complex(x, tf.zeros_like(x))
-            else:
-                x = config.tf_rng.uniform([10, 20], maxval=10, dtype=dt_in)
+        for p, dt in zip(precisions, dt_precision):
+            for dt_in in dtypes_supported:
 
-            # test RowColumnInterleaver
-            inter_rc = RowColumnInterleaver(row_depth=3,
-                                            dtype=dt_in)
+                # tf.uniform does not support complex dtypes
+                if dt_in is (tf.complex64):
+                    x = config.tf_rng.uniform([10, 20], maxval=10, dtype=tf.float32)
+                    x = tf.complex(x, tf.zeros_like(x))
+                elif dt_in is (tf.complex128):
+                    x = config.tf_rng.uniform([10, 20], maxval=10, dtype=tf.float64)
+                    x = tf.complex(x, tf.zeros_like(x))
+                else:
+                    x = config.tf_rng.uniform([10, 20], maxval=10, dtype=dt_in)
 
-            # inherits dtype from inter
-            deinter_rc1 = Deinterleaver(inter_rc)
-            # custom dtype
-            deinter_rc2 = Deinterleaver(inter_rc, dtype=dt_in)
+                # test RowColumnInterleaver
+                inter_rc = RowColumnInterleaver(row_depth=3,
+                                                precision=p)
 
-            y = inter_rc(x)
-            z1 = deinter_rc1(y)
-            z2 = deinter_rc2(y)
+                # inherits precision from inter
+                deinter_rc1 = Deinterleaver(inter_rc)
 
-            self.assertTrue(y.dtype==dt_in)
-            self.assertTrue(z1.dtype==dt_in)
-            self.assertTrue(z2.dtype==dt_in)
+                # custom precision
+                deinter_rc2 = Deinterleaver(inter_rc, precision=p)
 
-            # test RandomInterleaver
-            inter_rand = RandomInterleaver(dtype=dt_in)
+                y = inter_rc(x)
+                z1 = deinter_rc1(y)
+                z2 = deinter_rc2(y)
 
-            # inherits dtype from inter
-            deinter_rand1 = Deinterleaver(inter_rand)
-            # custom dtype
-            deinter_rand2 = Deinterleaver(inter_rand,
-                                            dtype=dt_in)
+                self.assertTrue(z1.dtype==y.dtype)
+                self.assertTrue(z2.dtype==y.dtype)
 
-            y = inter_rand(x)
-            z1 = deinter_rand1(y)
-            z2 = deinter_rand2(y)
+                # test RandomInterleaver
+                inter_rand = RandomInterleaver(precision=p)
 
-            self.assertTrue(y.dtype==dt_in)
-            self.assertTrue(z1.dtype==dt_in)
-            self.assertTrue(z2.dtype==dt_in)
+                # inherits precision from inter
+                deinter_rand1 = Deinterleaver(inter_rand)
+                # custom precision
+                deinter_rand2 = Deinterleaver(inter_rand,
+                                              precision=p)
+
+                y = inter_rand(x)
+                z1 = deinter_rand1(y)
+                z2 = deinter_rand2(y)
+
+                self.assertTrue(z1.dtype==y.dtype)
+                self.assertTrue(z2.dtype==y.dtype)
 
     def test_invalid_input(self):
         """test against invalid parameters."""
@@ -700,6 +676,19 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
             # result must be sorted integers
             self.assertTrue(np.array_equal(z[i,:], np.arange(seq_length)))
             self.assertTrue(np.array_equal(z2[i,:], np.arange(seq_length)))
+
+        ###################
+        # test without batch dim
+        # test RowColumnInterleaver
+        inter = Turbo3GPPInterleaver()
+        # inherits precision from inter
+        deinter = Deinterleaver(inter)
+
+        x = np.arange(seq_length)
+        y = inter(x)
+        z = deinter(y)
+        self.assertFalse(np.array_equal(x,y))
+        self.assertTrue(np.array_equal(x,z))
 
     def test_dimension(self):
         """Test that dimensions can be changed."""
@@ -753,53 +742,21 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
     def test_invalid_shapes(self):
         """Test that invalid shapes/axis parameter raise error.
         """
-        # axis 0 not allowed
-        with self.assertRaises(AssertionError):
-            Turbo3GPPInterleaver(axis=0)
 
         # k>6144
         i = Turbo3GPPInterleaver(axis=-1)
         s = [10, 6145]
         llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             i(llr)
 
-        shapes=[[10,20,30], [10,22,33,44], [20,10,10,10,6]]
+        s=[[10, 20, 30], [20, 10, 10, 10, 6]]
 
-        for s in shapes:
-            with self.assertRaises(AssertionError):
-                # axis out bounds...must raise error
-                i = Turbo3GPPInterleaver(axis=len(s))
-                llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
-                i(llr)
-
-        # cannot permute batch_dim only
-        with self.assertRaises(AssertionError):
-            i = Turbo3GPPInterleaver(axis=1)
-            llr = config.tf_rng.uniform(tf.constant([10], dtype=tf.int32),
-                                    minval=-10,
-                                    maxval=10)
+        with self.assertRaises(ValueError):
+            # axis out bounds...must raise error
+            i = Turbo3GPPInterleaver(axis=len(s))
+            llr = config.tf_rng.uniform(tf.constant(s, dtype=tf.int32))
             i(llr)
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (supports dynamic shapes)."""
-        bs = 10
-        k = 100
-        source = BinarySource()
-
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-        x = Turbo3GPPInterleaver()(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-        # test that output batch dim is none
-        self.assertTrue(model.output_shape[0] is None)
-
-        # test that model can be called
-        b = source([bs, k])
-        model(b)
-        # call twice to see that bs can change
-        b2 = source([bs+1, k])
-        model(b2)
-        model.summary()
 
     def test_tf_fun(self):
         """Test that tf.function works as expected and XLA work as expected.
@@ -842,10 +799,11 @@ class TestTurbo3GPPInterleaver(unittest.TestCase):
         seq_length = int(1e1)
         batch_size = int(1e2)
 
-        dt_supported = [tf.float16, tf.float32, tf.float64]
-        for dt in dt_supported:
+        precisions = ["single", "double"]
+        dt_supported = [tf.float32, tf.float64]
+        for p, dt in zip(precisions, dt_supported):
             for dt_in in dt_supported:
                 b = tf.zeros([batch_size, seq_length], dtype=dt_in)
-                inter = Turbo3GPPInterleaver(dtype=dt)
+                inter = Turbo3GPPInterleaver(precision=p)
                 x = inter(b)
                 assert (x.dtype==dt)

@@ -1,19 +1,18 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import pytest
 import os
 from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna import config
-from sionna.fec.turbo import TurboEncoder, TurboDecoder
-from sionna.fec.utils import GaussianPriorSource
-from sionna.utils import BinarySource, sim_ber, ebnodb2no
-from sionna.channel import AWGN
-from sionna.mapping import Mapper, Demapper, Constellation
+from sionna.phy import config
+from sionna.phy.fec.turbo import TurboEncoder, TurboDecoder
+from sionna.phy.fec.utils import GaussianPriorSource
+from sionna.phy.utils import sim_ber, ebnodb2no
+from sionna.phy.channel import AWGN
+from sionna.phy.mapping import Mapper, Demapper, Constellation, BinarySource
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
@@ -42,7 +41,7 @@ class TestTurboDecoding(unittest.TestCase):
 
                 # --- test output dimensions ---
                 # all-zero with BPSK (no noise);logits
-                c = -10. * np.ones([bs, n])
+                c = -10. * tf.ones([bs, n])
                 u = dec(c).numpy()
                 self.assertTrue(u.shape[-1]==k)
                 # also check that all-zero input yields all-zero output
@@ -51,7 +50,7 @@ class TestTurboDecoding(unittest.TestCase):
 
                 # --- test numerical stability ---
                 # case 1: extremely large inputs
-                c = source([[bs, n], 0.0001])
+                c = source([bs, n], 0.0001)
                 # llrs
                 u1 = dec(c).numpy()
                 # no nan
@@ -101,22 +100,6 @@ class TestTurboDecoding(unittest.TestCase):
                 dec = TurboDecoder(enc, algorithm=alg, num_iter=2)
                 test_identity_(enc, dec, u)
 
-    def test_keras(self):
-        """Test that Keras model can be compiled (+ supports dynamic shapes)"""
-        bs = 10
-        n = 64
-        source = BinarySource()
-        inputs = tf.keras.Input(shape=(n), dtype=tf.float32)
-        x = TurboDecoder(rate=1/2, constraint_length=3, terminate=False, num_iter=3)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        b = source([bs, n])
-        model(b)
-        # call twice to see that bs can change in Eager mode
-        b2 = source([bs+1, n])
-        model(b2)
-        model.summary()
-
     def test_multi_dimensional(self):
         """Test against arbitrary multi-dim input shapes."""
         k = 100
@@ -149,9 +132,10 @@ class TestTurboDecoding(unittest.TestCase):
         n = 240
 
         source = GaussianPriorSource()
-        dec = TurboDecoder(rate=1/2, constraint_length=3, terminate=False, num_iter=2)
+        dec = TurboDecoder(rate=1/2, constraint_length=3,
+                           terminate=False, num_iter=2)
 
-        b = source([[1, n], 1.])
+        b = source([1, n], 1.)
         b_rep = tf.tile(b, [bs, 1])
 
         # and run the decoder
@@ -161,6 +145,11 @@ class TestTurboDecoding(unittest.TestCase):
         for i in range(bs):
             self.assertTrue(np.array_equal(c[0,:], c[i,:]))
 
+        # test no batch-dim
+        b = source([n,], 1.)
+        c = dec(b).numpy()
+
+
     @pytest.mark.usefixtures("only_gpu")
     def test_ber_match(self):
         """Test against results from reference implementation.
@@ -168,7 +157,8 @@ class TestTurboDecoding(unittest.TestCase):
         def simulation(k, num_iter, snrs):
             r = 1/3
             source = BinarySource()
-            enc = TurboEncoder(gen_poly=('1101', '1011'), rate=r, terminate=True)
+            enc = TurboEncoder(gen_poly=('1101', '1011'),
+                               rate=r, terminate=True)
             dec = TurboDecoder(enc, num_iter=num_iter)
             constellation = Constellation("qam", num_bits_per_symbol=2)
             mapper = Mapper(constellation=constellation)
@@ -181,8 +171,8 @@ class TestTurboDecoding(unittest.TestCase):
                 u = source([batch_size, k])
                 c = enc(u)
                 x = mapper(c)
-                y = channel([x, no])
-                llr_ch = demapper([y, no])
+                y = channel(x, no)
+                llr_ch = demapper(y, no)
                 u_hat = dec(llr_ch)
                 return u, u_hat
 
@@ -209,7 +199,8 @@ class TestTurboDecoding(unittest.TestCase):
             ber = simulation(k, num_iters, snrs)
             for idx in range(len(snrs)):
                 self.assertTrue(np.less_equal(ber[idx], ber_ub[num_iters][idx]))
-                self.assertTrue(np.greater_equal(ber[idx], ber_lb[num_iters][idx]))
+                self.assertTrue(np.greater_equal(ber[idx],
+                                                 ber_lb[num_iters][idx]))
 
     @pytest.mark.usefixtures("only_gpu")
     def test_ref_implementation(self):
@@ -227,6 +218,7 @@ class TestTurboDecoding(unittest.TestCase):
         for k in ks:
             uhatref = np.load(ref_path + 'ref_k{}_uhat.npy'.format(k))
             yref = np.load(ref_path + 'ref_k{}_y.npy'.format(k))
+            yref = tf.constant(yref, tf.float32)
             uhat = dec(-4.*yref/no).numpy()
             self.assertTrue(np.array_equal(uhat, uhatref))
 
@@ -236,31 +228,21 @@ class TestTurboDecoding(unittest.TestCase):
         n = 64
         source = GaussianPriorSource()
 
-        dtypes_supported = (tf.float16, tf.float32, tf.float64)
+        precisions = ["single", "double"]
+        dtypes_supported = (tf.float32, tf.float64)
 
-        for dt_in in dtypes_supported:
-            for dt_out in dtypes_supported:
-                llr = source([[batch_size, n], 0.5])
+        for p, dt_out in zip(precisions, dtypes_supported):
+            for dt_in in dtypes_supported:
+                llr = source([batch_size, n], 0.5)
                 llr = tf.cast(llr, dt_in)
 
                 dec = TurboDecoder(rate=1/2,
                                    constraint_length=3,
-                                   output_dtype=dt_out)
+                                   precision=p)
 
                 x = dec(llr)
 
                 self.assertTrue(x.dtype==dt_out)
-
-        # test that complex inputs raise error
-        llr = source([[batch_size, n], 0.5])
-        llr_c = tf.complex(llr, tf.zeros_like(llr))
-        dec = TurboDecoder(rate=1/2,
-                           constraint_length=3,
-                           num_iter=1,
-                           output_dtype=tf.float32)
-
-        with self.assertRaises(TypeError):
-            x = dec(llr_c)
 
     @pytest.mark.usefixtures("only_gpu")
     def test_tf_fun(self):
@@ -272,7 +254,8 @@ class TestTurboDecoding(unittest.TestCase):
 
         for t in [False, True]:
 
-            dec = TurboDecoder(rate=1/3, constraint_length=3, terminate=t, num_iter=3)
+            dec = TurboDecoder(rate=1/3, constraint_length=3,
+                               terminate=t, num_iter=3)
 
             @tf.function
             def run_graph(u):

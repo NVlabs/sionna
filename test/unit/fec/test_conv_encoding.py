@@ -1,14 +1,13 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import os
 from itertools import product
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.fec.conv import ConvEncoder
-from sionna.utils import BinarySource
+from sionna.phy.fec.conv import ConvEncoder
+from sionna.phy.mapping import BinarySource
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
@@ -63,19 +62,19 @@ class TestConvEncoding(unittest.TestCase):
         constraint_length_valid = [3, 4, 5, 6, 7, 8]
         for rate in rate_valid:
             for mu in constraint_length_invalid:
-                with self.assertRaises(AssertionError):
+                with self.assertRaises(ValueError):
                     enc = ConvEncoder(rate=rate, constraint_length=mu)
 
         for rate in rate_invalid:
             for mu in constraint_length_valid:
-                with self.assertRaises(AssertionError):
+                with self.assertRaises(ValueError):
                     enc = ConvEncoder(rate=rate, constraint_length= mu)
                     enc = ConvEncoder(rate=rate, rsc=True)
                     enc = ConvEncoder(rate=rate, terminate=True)
                     enc = ConvEncoder(rate=rate, rsc=True, terminate=True)
 
         gmat = [['101', '111', '000'], ['000', '010', '011']]
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(BaseException):
             enc = ConvEncoder(gen_poly=gmat)
             enc = ConvEncoder(gen_poly=gmat, rsc=True)
 
@@ -83,7 +82,7 @@ class TestConvEncoding(unittest.TestCase):
         r"""Test that different formats of input polynomials are accepted and raises exceptions when the generator polynomials fail assertions."""
 
         def util_check_assertion_err(gen_poly_, msg_):
-            with self.assertRaises(AssertionError) as exception_context:
+            with self.assertRaises(BaseException) as exception_context:
                 enc = ConvEncoder(gen_poly=gen_poly_)
                 self.assertEqual(str(exception_context.exception), msg_)
 
@@ -118,75 +117,43 @@ class TestConvEncoding(unittest.TestCase):
             "Each Polynomial must be a string of 0/1 s."
                  ]
         for idx, g in enumerate(gs):
-            util_check_assertion_err(g,msg_s[idx])
-
-    def test_keras(self):
-        """Test that Keras model can be compiled (+supports dynamic shapes)."""
-        bs = 10
-        k = 100
-
-        source = BinarySource()
-        inputs = tf.keras.Input(shape=(k), dtype=tf.float32)
-
-        x = ConvEncoder(rate=0.5, constraint_length=4)(inputs)
-        model = tf.keras.Model(inputs=inputs, outputs=x)
-
-        xterm = ConvEncoder(rate=1/3, constraint_length=3, terminate=True)(inputs)
-        modelterm = tf.keras.Model(inputs=inputs, outputs=xterm)
-
-        b = source([bs, k])
-        model(b)
-        modelterm(b)
-
-        # call twice to see that bs can change
-        b2 = source([bs+1, k])
-        model(b2)
-        modelterm(b2)
-
-        model.summary()
-        modelterm.summary()
-
-        source = BinarySource()
-        enc = ConvEncoder(rate=0.5, constraint_length=6)
-        u = source([1, 32])
-        x = enc(u)
-        self.assertTrue(x.shape == [1,64])
-
-        u = source([2, 30])
-        x = enc(u)
-        self.assertTrue(x.shape == [2,60])
+            util_check_assertion_err(g, msg_s[idx])
 
     def test_multi_dimensional(self):
         """Test against arbitrary shapes
         """
         k = 120
         rate = 1/2
-        n = int(k/rate)
         mu = 4
+        shapes  =[[4, 5, 5,], []] # includes non-batch dimension test
 
         source = BinarySource()
         for enc in (
             ConvEncoder(rate=rate, constraint_length=mu+1),
             ConvEncoder(rate=rate, constraint_length=mu+1, terminate=True)):
+            for s_ in shapes:
+                n = int(k/rate)
+                s = s_.copy()
+                if enc.terminate:
+                    n += int(mu/rate)
 
-            if enc.terminate:
-                n += int(mu/rate)
+                bs = int(np.prod(s))
+                b = source([bs, k])
+                s.append(k)
+                b_res = tf.reshape(b, s)
 
-            b = source([100, k])
-            b_res = tf.reshape(b, [4, 5, 5, k])
+                # encode 2D Tensor
+                c = enc(b).numpy()
+                # encode 4D Tensor
+                c_res = enc(b_res).numpy()
 
-            # encode 2D Tensor
-            c = enc(b).numpy()
-            # encode 4D Tensor
-            c_res = enc(b_res).numpy()
+                # test that shape was preserved
+                self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
 
-            # test that shape was preserved
-            self.assertTrue(c_res.shape[:-1]==b_res.shape[:-1])
-
-            # and reshape to 2D shape
-            c_res = tf.reshape(c_res, [100, n])
-            # both version should yield same result
-            self.assertTrue(np.array_equal(c, c_res))
+                # and reshape to 2D shape
+                c_res = tf.reshape(c_res, [bs, n])
+                # both version should yield same result
+                self.assertTrue(np.array_equal(c, c_res))
 
     def test_ref_implementation(self):
         r"""Test against pre-encoded codewords from reference implementation.

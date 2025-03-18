@@ -2,103 +2,114 @@
 SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: Apache-2.0
 -->
-# Sionna: An Open-Source Library for Next-Generation Physical Layer Research
+# Sionna: An Open-Source Library for Research on Communication Systems
 
-Sionna&trade; is an open-source Python library for link-level simulations of digital communication systems built on top of the open-source software library [TensorFlow](https://www.tensorflow.org) for machine learning.
+Sionna&trade; is an open-source Python-based library for research on
+communication systems.
 
-The official documentation can be found [here](https://nvlabs.github.io/sionna/).
+The official documentation can be found
+[here](https://nvlabs.github.io/sionna/).
 
-## Installation
+It is composed of the following packages:
 
-Sionna requires [Python](https://www.python.org/) and [Tensorflow](https://www.tensorflow.org/).
-In order to run the tutorial notebooks on your machine, you also need [JupyterLab](https://jupyter.org/).
-You can alternatively test them on [Google Colab](https://colab.research.google.com/).
-Although not necessary, we recommend running Sionna in a [Docker container](https://www.docker.com).
+- [Sionna RT](https://nvlabs.github.io/sionna/rt/index.html) -
+    A lightning-fast stand-alone ray tracer for radio propagation modeling
 
-Sionna requires [TensorFlow 2.13-2.15](https://www.tensorflow.org/install) and Python 3.8-3.11. We recommend Ubuntu 22.04. Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
+- [Sionna PHY](https://nvlabs.github.io/sionna/phy/index.html) -
+    A link-level simulator for wireless and optical communication systems
 
-To run the ray tracer on CPU, [LLVM](https://llvm.org) is required by DrJit.  Please check the [installation instructions for the LLVM backend](https://drjit.readthedocs.io/en/latest/what.html#backends).
+- [Sionna SYS](https://nvlabs.github.io/sionna/sys/index.html) -
+    A system-level simulator based on physical-layer abstraction
 
-We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/install/gpu) for GPU support and the required driver setup.
+# Installation
+Sionna PHY and Sionna SYS require [Python 3.8-3.12](https://www.python.org/) and [TensorFlow 2.14-2.19](https://www.tensorflow.org/install). We recommend Ubuntu 24.04. Earlier versions of TensorFlow may still work but are not recommended. We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/install/gpu) for GPU support and the required driver setup.
 
-### Installation using pip
+Sionna RT has the same requirements as [Mitsuba
+3](https://github.com/mitsuba-renderer/mitsuba3) and we refer to its
+[installation guide](https://mitsuba.readthedocs.io/en/stable/) for further
+information. To run Sionna RT on CPU, [LLVM](https://llvm.org) is required by
+[Dr.Jit](https://drjit.readthedocs.io/en/stable/). Please check the
+[installation instructions for the LLVM
+backend](https://drjit.readthedocs.io/en/latest/what.html#backends). The source
+code of Sionna RT is located in a separate [GitHub repository](https://github.com/NVlabs/sionna-rt).
 
-We recommend to do this within a [virtual environment](https://docs.python.org/3/tutorial/venv.html), e.g., using [conda](https://docs.conda.io).
-On macOS, you need to install [tensorflow-macos](https://github.com/apple/tensorflow_macos) first.
+If you want to run the tutorial notebooks on your machine, you also need
+[JupyterLab](https://jupyter.org/). You can alternatively test them on [Google
+Colab](https://colab.research.google.com/). Although not necessary, we recommend
+running Sionna in a [Docker container](https://www.docker.com) and/or [Python virtual
+enviroment](https://docs.python.org/3/library/venv.html).
 
-1.) Install the package
+## Installation via pip
+The recommended way to install Sionna is via pip:
 ```
-    pip install sionna
-```
-
-2.) Test the installation in Python
-```
-    python
-```
-```
-    >>> import sionna
-    >>> print(sionna.__version__)
-    0.19.2
-```
-
-3.) Once Sionna is installed, you can run the [Sionna "Hello, World!" example](https://nvlabs.github.io/sionna/examples/Hello_World.html), have a look at the [quick start guide](https://nvlabs.github.io/sionna/quickstart.html), or at the [tutorials](https://nvlabs.github.io/sionna/tutorials.html).
-
-The example notebooks can be opened and executed with [Jupyter](https://jupyter.org/).
-
-For a local installation, the [JupyterLab Desktop](https://github.com/jupyterlab/jupyterlab-desktop) application can be used which also includes the Python installation.
-
-### Docker-based installation
-
-1.) Make sure that you have [Docker](<https://docs.docker.com/engine/install/ubuntu/>) installed on your system. On Ubuntu 22.04, you can run for example
-
-```
-    sudo apt install docker.io
+pip install sionna
 ```
 
-Ensure that your user belongs to the `docker` group (see [Docker post-installation](<https://docs.docker.com/engine/install/linux-postinstall/>))
-
+If you want to install only Sionna RT, run:
 ```
-    sudo usermod -aG docker $USER
-```
-Log out and re-login to load updated group memberships.
-
-For GPU support on Linux, you need to install the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker).
-
-
-2.) Build the Sionna Docker image. From within the Sionna directory, run
-
-```
-    make docker
+pip install sionna-rt
 ```
 
-3.) Run the Docker image with GPU support
-
+You can install Sionna without the RT package via
 ```
-    make run-docker gpus=all
-```
-or without GPU:
-```
-    make run-docker
+pip install sionna-no-rt
 ```
 
-This will immediately launch a Docker image with Sionna installed, running JupyterLab on port 8888.
+## Installation from source
+1. Clone the repository with all submodules:
+    ```
+    git clone --recursive https://github.com/NVlabs/sionna
+    ```
+    If you have already cloned the repository but forgot to set the `--recursive`
+    flag, you can correct this via:
+    ```
+    git submodule update --init --recursive --remote
+    ```
+2. Install Sionna (including Sionna RT) by running the following command from within the repository's
+   root folder:
+    ```
+    pip install ext/sionna-rt/ .
+    pip install .
+    ```
 
-4.) Browse through the example notebooks by connecting to [http://127.0.0.1:8888](http://127.0.0.1:8888) in your browser.
+## Testing
+First, you need to install the test requirements by executing the
+following command from the repository's root directory:
 
-### Installation from source
+```
+pip install '.[test]'
+```
 
-We recommend to do this within a [virtual environment](https://docs.python.org/3/tutorial/venv.html), e.g., using [conda](https://docs.conda.io).
+The unit tests can then be executed by running ``pytest`` from within the
+``test`` folder.
 
-1.) Clone this repository and execute from within its root folder
+## Building the Documentation
+Install the requirements for building the documentation by running the following
+command from the repository's root directory:
+
 ```
-    make install
+pip install '.[doc]'
 ```
-2.) Test the installation in Python
+
+You might need to install [pandoc](https://pandoc.org) manually.
+
+You can then build the documentation by executing ``make html`` from within the ``doc`` folder.
+
+The documentation can then be served by any web server, e.g.,
+
 ```
-    >>> import sionna
-    >>> print(sionna.__version__)
-    0.19.2
+python -m http.server --dir build/html
 ```
+
+## For Developers
+
+Development requirements can be installed by executing from the repository's root directory:
+
+```
+pip install '.[dev]'
+```
+
+Linting of the code can be achieved by running ```pylint src/``` from the repository's root directory.
 
 ## License and Citation
 
@@ -106,12 +117,11 @@ Sionna is Apache-2.0 licensed, as found in the [LICENSE](https://github.com/nvla
 
 If you use this software, please cite it as:
 ```bibtex
-@article{sionna,
-    title = {Sionna: An Open-Source Library for Next-Generation Physical Layer Research},
-    author = {Hoydis, Jakob and Cammerer, Sebastian and {Ait Aoudia}, Fayçal and Vem, Avinash and Binder, Nikolaus and Marcus, Guillermo and Keller, Alexander},
-    year = {2022},
-    month = {Mar.},
-    journal = {arXiv preprint},
-    online = {https://arxiv.org/abs/2203.11854}
+@software{sionna,
+ title = {Sionna},
+ author = {Hoydis, Jakob and Cammerer, Sebastian and {Ait Aoudia}, Fayçal and Nimier-David, Merlin and Maggi, Lorenzo and Marcus, Guillermo and Vem, Avinash and Keller, Alexander},
+ note = {https://nvlabs.github.io/sionna/},
+ year = {2022},
+ version = {1.0.1}
 }
 ```

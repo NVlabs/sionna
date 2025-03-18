@@ -1,11 +1,10 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 import tensorflow as tf
 import unittest
 import numpy as np
-from sionna.channel.tr38901 import CDL, PanelArray
+from sionna.phy.channel.tr38901 import CDL, PanelArray
 from channel_test_utils import *
 
 class TestCDL(unittest.TestCase):
@@ -49,14 +48,14 @@ class TestCDL(unittest.TestCase):
                                 polarization_type='V',
                                 antenna_pattern='omni',
                                 carrier_frequency=TestCDL.CARRIER_FREQUENCY,
-                                dtype=tf.complex128)
+                                precision="double")
         rx_array = PanelArray(  num_rows_per_panel=1,
                                 num_cols_per_panel=1,
                                 polarization='single',
                                 polarization_type='V',
                                 antenna_pattern='omni',
                                 carrier_frequency=TestCDL.CARRIER_FREQUENCY,
-                                dtype=tf.complex128)
+                                precision="double")
 
         ########## CDL-A
         cdl = CDL(  "A",
@@ -65,7 +64,7 @@ class TestCDL(unittest.TestCase):
                     ut_array=rx_array,
                     bs_array=tx_array,
                     direction='downlink',
-                    dtype=tf.complex128)
+                    precision="double")
         a,tau = cdl(100000, 1, 100e6)
         a = a[:,0,0,0,0,:,0].numpy()
         tau = tau.numpy()[0,0,0]
@@ -85,7 +84,7 @@ class TestCDL(unittest.TestCase):
                     ut_array=rx_array,
                     bs_array=tx_array,
                     direction='downlink',
-                    dtype=tf.complex128)
+                    precision="double")
         a,tau = cdl(100000, 1, 100e6)
         a = a[:,0,0,0,0,:,0].numpy()
         tau = tau.numpy()[0,0,0]
@@ -105,7 +104,7 @@ class TestCDL(unittest.TestCase):
                     ut_array=rx_array,
                     bs_array=tx_array,
                     direction='downlink',
-                    dtype=tf.complex128)
+                    precision="double")
         a,tau = cdl(100000, 1, 100e6)
         a = a[:,0,0,0,0,:,0].numpy()
         tau = tau.numpy()[0,0,0]
@@ -125,7 +124,7 @@ class TestCDL(unittest.TestCase):
                     ut_array=rx_array,
                     bs_array=tx_array,
                     direction='downlink',
-                    dtype=tf.complex128)
+                    precision="double")
         a,tau = cdl(100000, 1, 100e6)
         a = a[:,0,0,0,0,:,0].numpy()
         tau = tau.numpy()[0,0,0]
@@ -145,7 +144,7 @@ class TestCDL(unittest.TestCase):
                     ut_array=rx_array,
                     bs_array=tx_array,
                     direction='downlink',
-                    dtype=tf.complex128)
+                    precision="double")
         a,tau = cdl(100000, 1, 100e6)
         a = a[:,0,0,0,0,:,0].numpy()
         tau = tau.numpy()[0,0,0]

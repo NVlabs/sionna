@@ -1,18 +1,16 @@
 #
 # SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: Apache-2.0
-#
+# SPDX-License-Identifier: Apache-2.0#
 
 import unittest
 import numpy as np
 import tensorflow as tf
-from sionna.utils.metrics import BitErrorRate, BitwiseMutualInformation, compute_ber, compute_bler, count_block_errors, count_errors
-from sionna.fec.interleaving import RandomInterleaver
-from sionna.utils import sim_ber, complex_normal, SymbolSource, BinarySource, QAMSource, PAMSource
-from sionna.fec.utils import GaussianPriorSource
-from sionna.mapping import SymbolDemapper, Demapper, Constellation
-from sionna.channel import AWGN
-
+from sionna.phy.utils.metrics import compute_ber, compute_bler, count_block_errors, count_errors
+from sionna.phy.fec.interleaving import RandomInterleaver
+from sionna.phy.utils import sim_ber, complex_normal, DeepUpdateDict, dict_keys_to_int, to_list
+from sionna.phy.mapping import SymbolDemapper, Demapper, Constellation, SymbolSource, BinarySource, QAMSource, PAMSource
+from sionna.phy.channel import AWGN
+from sionna.phy import dtypes, config
 
 class ber_tester():
     """Utility class to emulate monte-carlo simulation with predefined
@@ -88,7 +86,7 @@ class TestUtils(unittest.TestCase):
         def _run_sim(batch_size, ebno_db):
             no = 10**(-ebno_db/10)
             b = tf.ones((batch_size, 1),tf.complex64)
-            return tf.math.real(b), tf.math.real(channel([b, no]))
+            return tf.math.real(b), tf.math.real(channel(b, no))
 
         ber_ref, _ = sim_ber(_run_sim,
                              ebno_dbs,
@@ -196,59 +194,6 @@ class TestUtils(unittest.TestCase):
             bler /= shape[0]
             self.assertTrue(np.allclose(bler, bler_hat))
 
-    def test_bit_error_metric(self):
-        """Test that BitErrorRate metric returns the correct value."""
-
-        shape = [500, 20, 40]
-        errors = [1000, 400, 200, 100, 1, 0, 10]
-        bers_true = errors / np.prod(shape)
-
-        tester = ber_tester(errors, shape)
-
-        ber_metric = BitErrorRate()
-
-        for idx,_ in enumerate(bers_true):
-            b, b_hat = tester.get_samples(0, 0)
-            ber_metric(b, b_hat)
-            ber_hat = ber_metric.result()
-            self.assertTrue(np.allclose(np.mean(bers_true[:idx+1]),
-                                        ber_hat.numpy()))
-
-        # check that reset state also works
-        ber_metric.reset_states()
-        self.assertTrue(ber_metric.result().numpy()==0.)
-        # test that internal counter is 0
-        self.assertTrue(ber_metric.counter.numpy()==0.)
-
-    def test_bmi_metric(self):
-        """Test that BitwiseMutualInformation metric returns the correct value.
-
-        This test uses GaussianPriorSource to generate fake LLRS with a given
-        BMI.
-        """
-
-        shape = [50000, 20, 40]
-        bmis = np.arange(0.1, 0.9, 0.1)
-
-        bmi_metric = BitwiseMutualInformation()
-        source = GaussianPriorSource(specified_by_mi=True)
-
-        for idx, bmi in enumerate(bmis):
-            # generate fake llrs with given bmi
-            llr = source([shape, bmi])
-            b = tf.zeros_like(llr)
-            # update metric
-            bmi_metric(b, llr)
-
-            self.assertTrue(np.allclose(np.mean(bmis[:idx+1]),
-                                        bmi_metric.result().numpy(),
-                                        rtol=0.01))
-
-        # check that reset state also works
-        bmi_metric.reset_states()
-        self.assertTrue(bmi_metric.result().numpy()==0.)
-        # test that internal counter is 0
-        self.assertTrue(bmi_metric.counter.numpy()==0.)
 
 class TestComplexNormal(unittest.TestCase):
     """Test cases for the complex_normal function"""
@@ -264,10 +209,10 @@ class TestComplexNormal(unittest.TestCase):
         var_hat = np.var(complex_normal(shape))
         self.assertTrue(np.allclose(1.0, var_hat, rtol=1e-3))
 
-    def test_dtype(self):
-        for dtype in [tf.complex64, tf.complex128]:
-            x = complex_normal([100], dtype=dtype)
-            self.assertEqual(dtype, x.dtype)
+    def test_precision(self):
+        for precision in ["single", "double"]:
+            x = complex_normal([100], precision=precision)
+            self.assertEqual(dtypes[precision]['tf']['cdtype'], x.dtype)
 
     def test_dims(self):
         dims = [
@@ -282,7 +227,7 @@ class TestComplexNormal(unittest.TestCase):
     def test_xla(self):
         @tf.function(jit_compile=True)
         def func(batch_size, var):
-            return complex_normal([batch_size, 1000], var, tf.complex128)
+            return complex_normal([batch_size, 1000], var, precision="double")
         var = 0.3
         var_hat = np.var(func(100000, var))
         self.assertTrue(np.allclose(var, var_hat, rtol=1e-3))
@@ -295,22 +240,21 @@ class TestComplexNormal(unittest.TestCase):
         var_hat = np.var(func(100000, var))
         self.assertTrue(np.allclose(var, var_hat, rtol=1e-3))
 
-
 class TestSources(unittest.TestCase):
 
     def test_binary_source(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
-        dtypes = [tf.int16, tf.float64, tf.complex64]
+        precisions = ["single", "double"]
         seeds = [None, 1, 2]
-        for dtype in dtypes:
+        for precision in precisions:
             for seed in seeds:
-                binary_source = BinarySource(dtype=dtype, seed=seed)
-                binary_source2 = BinarySource(dtype=dtype, seed=seed)
-                binary_source3 = BinarySource(dtype=dtype, seed=3)
+                binary_source = BinarySource(precision=precision, seed=seed)
+                binary_source2 = BinarySource(precision=precision, seed=seed)
+                binary_source3 = BinarySource(precision=precision, seed=3)
                 for shape in shapes:
                     b = binary_source(shape)
                     self.assertTrue(np.array_equal(b.shape, shape))
-                    self.assertTrue(b.dtype==dtype)
+                    self.assertTrue(b.dtype==dtypes[precision]['tf']['rdtype'])
                     if seed is not None:
                         b2 = binary_source2(shape)
                         b3 = binary_source3(shape)
@@ -319,19 +263,19 @@ class TestSources(unittest.TestCase):
 
     def test_symbol_source_pam(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
-        dtypes = [tf.complex64, tf.complex128]
+        precisions = ["single", "double"]
         seeds = [None, 1, 2]
         bits_per_symbol = [1, 2, 3, 4]
-        for dtype in dtypes:
+        for precision in precisions:
             for seed in seeds:
                 for num_bits_per_symbol in bits_per_symbol:
-                    symbol_source = SymbolSource("pam", num_bits_per_symbol, dtype=dtype, seed=seed)
-                    symbol_source2 = PAMSource(num_bits_per_symbol, dtype=dtype, seed=seed)
-                    symbol_source3 = SymbolSource("pam", num_bits_per_symbol, dtype=dtype, seed=3)
+                    symbol_source = SymbolSource("pam", num_bits_per_symbol, precision=precision, seed=seed)
+                    symbol_source2 = PAMSource(num_bits_per_symbol, precision=precision, seed=seed)
+                    symbol_source3 = SymbolSource("pam", num_bits_per_symbol,precision=precision, seed=3)
                     for shape in shapes:
                         x = symbol_source(shape)
                         self.assertTrue(np.array_equal(x.shape, shape))
-                        self.assertTrue(x.dtype==dtype)
+                        self.assertTrue(x.dtype==dtypes[precision]['tf']['cdtype'])
                         if seed is not None:
                             x2 = symbol_source2(shape)
                             x3 = symbol_source3(shape)
@@ -342,19 +286,19 @@ class TestSources(unittest.TestCase):
 
     def test_symbol_source_qam(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
-        dtypes = [tf.complex64, tf.complex128]
+        precisions = ["single", "double"]
         seeds = [None, 1, 2]
         bits_per_symbol = [2, 4, 6]
-        for dtype in dtypes:
+        for precision in precisions:
             for seed in seeds:
                 for num_bits_per_symbol in bits_per_symbol:
-                    symbol_source = SymbolSource("qam", num_bits_per_symbol, dtype=dtype, seed=seed)
-                    symbol_source2 = QAMSource(num_bits_per_symbol, dtype=dtype, seed=seed)
-                    symbol_source3 = SymbolSource("qam", num_bits_per_symbol, dtype=dtype, seed=3)
+                    symbol_source = SymbolSource("qam", num_bits_per_symbol, precision=precision, seed=seed)
+                    symbol_source2 = QAMSource(num_bits_per_symbol, precision=precision, seed=seed)
+                    symbol_source3 = SymbolSource("qam", num_bits_per_symbol, precision=precision, seed=3)
                     for shape in shapes:
                         x = symbol_source(shape)
                         self.assertTrue(np.array_equal(x.shape, shape))
-                        self.assertTrue(x.dtype==dtype)
+                        self.assertTrue(x.dtype==dtypes[precision]['tf']['cdtype'])
                         if seed is not None:
                             x2 = symbol_source2(shape)
                             x3 = symbol_source3(shape)
@@ -365,20 +309,21 @@ class TestSources(unittest.TestCase):
 
     def test_symbol_source_custom(self):
         shapes = [[10], [10, 20], [10, 20, 30], [10,20,30,40]]
-        dtypes = [tf.complex64, tf.complex128]
+        precisions = ["single", "double"]
         seeds = [None, 1, 2]
         bits_per_symbol = [2, 4, 6]
-        for dtype in dtypes:
+        for precision in precisions:
             for seed in seeds:
                 for num_bits_per_symbol in bits_per_symbol:
-                    constellation = Constellation("custom", num_bits_per_symbol, dtype=dtype)
-                    symbol_source = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, dtype=dtype, seed=seed)
-                    symbol_source2 = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, dtype=dtype, seed=seed)
-                    symbol_source3 = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, dtype=dtype, seed=3)
+                    points = config.tf_rng.normal([2**num_bits_per_symbol])
+                    constellation = Constellation("custom", num_bits_per_symbol, points=points, precision=precision)
+                    symbol_source = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, precision=precision, seed=seed)
+                    symbol_source2 = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, precision=precision, seed=seed)
+                    symbol_source3 = SymbolSource("custom", num_bits_per_symbol, constellation=constellation, precision=precision, seed=3)
                     for shape in shapes:
                         x = symbol_source(shape)
                         self.assertTrue(np.array_equal(x.shape, shape))
-                        self.assertTrue(x.dtype==dtype)
+                        self.assertTrue(x.dtype==dtypes[precision]['tf']['cdtype'])
                         if seed is not None:
                             x2 = symbol_source2(shape)
                             x3 = symbol_source3(shape)
@@ -407,13 +352,13 @@ class TestSources(unittest.TestCase):
                             x, ind = symbol_source(shape)
                             self.assertTrue(np.array_equal(x.shape, shape))
                             self.assertTrue(np.array_equal(ind.shape, shape))
-                            ind2 = symbol_demapper([x, 0.01])
+                            ind2 = symbol_demapper(x, tf.cast(0.01, tf.float32))
                             self.assertTrue(np.array_equal(ind, ind2))
                         if not ri and rb:
                             x, b = symbol_source(shape)
                             self.assertTrue(np.array_equal(x.shape, shape))
                             self.assertTrue(np.array_equal(b.shape, shape+[num_bits_per_symbol]))
-                            b2 = demapper([x, 0.01])
+                            b2 = demapper(x, tf.cast(0.01, tf.float32))
                             b2 = tf.reshape(b2, b.shape)
                             self.assertTrue(np.array_equal(b, b2))
 
@@ -422,8 +367,85 @@ class TestSources(unittest.TestCase):
                             self.assertTrue(np.array_equal(x.shape, shape))
                             self.assertTrue(np.array_equal(ind.shape, shape))
                             self.assertTrue(np.array_equal(b.shape, shape+[num_bits_per_symbol]))
-                            ind2 = symbol_demapper([x, 0.01])
+                            ind2 = symbol_demapper(x, tf.cast(0.01, tf.float32))
                             self.assertTrue(np.array_equal(ind, ind2))
-                            b2 = demapper([x, 0.01])
+                            b2 = demapper(x, tf.cast(0.01, tf.float32))
                             b2 = tf.reshape(b2, b.shape)
                             self.assertTrue(np.array_equal(b, b2))
+
+
+class TestMisc(unittest.TestCase):
+    """Test cases for miscellaneous utility functions"""
+    
+    def test_to_list(self):
+        """Test sionna.phy.utils.to_list"""
+
+        self.assertEqual(to_list(None), None)
+        self.assertEqual(to_list(1), [1])
+        self.assertEqual(to_list([1, 2]), [1, 2])
+        self.assertEqual(to_list('abc'), ['abc'])
+        self.assertEqual(to_list(np.array([1, 2])), [1, 2])
+
+    def test_dict_keys_to_int(self):
+        """Test sionna.phy.utils.dict_keys_to_int"""
+
+        dict1 = {'1': {'2.3': [45, '3']}, 4: 6, 'ciao': [5, '87']}
+        dict_out = dict_keys_to_int(dict1)
+        self.assertDictEqual(dict_out, 
+                             {1: {'2.3': [45, '3']}, 4: 6, 'ciao': [5, '87']})
+        
+    def test_deep_merge_dict(self):
+        """Test sionna.phy.utils.deep_merge_dict"""
+        
+        # Merge without conflicts
+        dict1 = DeepUpdateDict(
+            {'a': 1,
+            'b':
+            {'b1': 10,
+            'b2': 20}})
+        dict_delta1 = {'c': -2,
+                    'b':
+                    {'b3': 30}}
+        dict1.deep_update(dict_delta1)
+        self.assertDictEqual(
+            dict1,
+            {'a': 1, 'b': {'b1': 10, 'b2': 20, 'b3': 30}, 'c': -2})
+
+        # Handle key conflicts
+        dict2 = DeepUpdateDict(
+            {'a': 1,
+            'b':
+            {'b1': 10,
+            'b2': 20}})
+        dict_delta2 = {'a': -2,
+                    'b':
+                    {'b1': {'f': 3, 'g': 4}}}
+        dict2.deep_update(dict_delta2)
+        self.assertDictEqual(
+            dict2,
+            {'a': -2, 'b': {'b1': {'f': 3, 'g': 4}, 'b2': 20}}
+        )
+
+        # Merge with conflicts (1)
+        dict3 = DeepUpdateDict({'a': {3: 50},
+                'b':
+                {'b1': 10,
+                'b2': 20}})
+        dict4 = {'a': -2,
+                'b':
+                {'b1': {'f': 3, 'g': 4}}}
+        dict3.deep_update(dict4)
+        self.assertDictEqual(dict3,
+                             {'a': -2, 'b': {'b1': {'f': 3, 'g': 4}, 'b2': 20}})
+
+        # Merge at intermediate keys
+        dict2 = DeepUpdateDict(
+            {'a': 1,
+            'b':
+            {'b1': 10,
+            'b2': 20}})
+        dict2.deep_update(dict_delta2, stop_at_keys='b')
+        self.assertDictEqual(
+            dict2,
+            {'a': -2, 'b': {'b1': {'f': 3, 'g': 4}}}
+        )
