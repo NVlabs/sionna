@@ -1,114 +1,115 @@
 Installation
-############
+============
 
-Sionna requires `Python <https://www.python.org/>`_ and `Tensorflow <https://www.tensorflow.org/>`_.
-In order to run the tutorial notebooks on your machine, you also need `JupyterLab <https://jupyter.org/>`_.
-You can alternatively test them on `Google Colab <https://colab.research.google.com/github/nvlabs/sionna/blob/main/examples/Discover_Sionna.ipynb>`_.
-Although not necessary, we recommend running Sionna in a `Docker container <https://www.docker.com>`_.
+Sionna is composed of three Python modules, namely `Sionna RT <rt/index.html>`_, `Sionna
+PHY <phy/index.html>`_, and `Sionna SYS <sys/index.html>`_.
 
-.. note::
-    Sionna requires `TensorFlow 2.13-2.15 <https://www.tensorflow.org/install>`_ and Python 3.8-3.11.
-    We recommend Ubuntu 22.04.
-    Earlier versions of TensorFlow may still work but are not recommended because of known, unpatched CVEs.
+Sionna PHY and Sionna SYS require `Python 3.8-3.12 <https://www.python.org/>`_
+and `TensorFlow 2.14-2.19 <https://www.tensorflow.org/install>`_. We recommend
+Ubuntu 24.04. Earlier versions of TensorFlow may still work but are not
+recommended. We refer to the `TensorFlow GPU support
+tutorial <https://www.tensorflow.org/install/gpu>`_ for GPU support and the
+required driver setup.
 
-    To run the ray tracer on CPU, `LLVM <https://llvm.org>`_ is required by DrJit. Please check the `installation instructions for the LLVM backend <https://drjit.readthedocs.io/en/latest/what.html#backends>`_.
-    The ray tracing preview requires a recent version of `JupyterLab`. You can upgrade to the latest version via ``pip install --upgrade ipykernel jupyterlab`` (requires restart of `JupyterLab`).
+`Sionna RT <rt/index.html>`_ has the same requirements as `Mitsuba 3 <https://github.com/mitsuba-renderer/mitsuba3>`_ and we refer to its
+`installation guide <https://mitsuba.readthedocs.io/en/stable/>`_ for further
+information. To run Sionna RT on CPU, `LLVM <https://llvm.org>`_ is required by
+`Dr.Jit <https://drjit.readthedocs.io/en/stable/>`_. Please check the
+`installation instructions for the LLVM
+backend <https://drjit.readthedocs.io/en/latest/what.html#backends>`_.
 
-    We refer to the `TensorFlow GPU support tutorial <https://www.tensorflow.org/install/gpu>`_ for GPU support and the required driver setup.
+If you want to run the tutorial notebooks on your machine, you also need
+`JupyterLab <https://jupyter.org/>`_. You can alternatively test them on `Google
+Colab <https://colab.research.google.com/>`_. Although not necessary, we recommend
+running Sionna in a `Docker container <https://www.docker.com>`_ and/or `Python virtual
+enviroment <https://docs.python.org/3/library/venv.html>`_.
 
-Installation using pip
-----------------------
-We recommend to do this within a `virtual environment <https://docs.python.org/3/tutorial/venv.html>`_,
-e.g., using `conda <https://docs.conda.io>`_. On macOS, you need to install `tensorflow-macos <https://github.com/apple/tensorflow_macos>`_ first.
+Using pip
+---------
 
-
-1.) Install the package
+The recommended way to install Sionna is via pip:
 
 .. code-block:: bash
 
     pip install sionna
 
 
-2.) Test the installation in Python
+If you want to install only Sionna RT, run:
 
 .. code-block:: bash
 
-    python
-
-.. code-block:: python
-
-    >>> import sionna
-    >>> print(sionna.__version__)
-    0.19.2
-
-3.) Once Sionna is installed, you can run the `Sionna "Hello, World!" example <https://nvlabs.github.io/sionna/examples/Hello_World.html>`_, have a look at the `quick start guide <https://nvlabs.github.io/sionna/quickstart.html>`_, or at the `tutorials <https://nvlabs.github.io/sionna/tutorials.html>`_.
-
-For a local installation, the `JupyterLab Desktop <https://github.com/jupyterlab/jupyterlab-desktop>`_ application can be used. This directly includes the Python installation and configuration.
+    pip install sionna-rt
 
 
-Docker-based Installation
--------------------------
-
-1.) Make sure that you have Docker `installed <https://docs.docker.com/engine/install/ubuntu/>`_ on your system. On Ubuntu 22.04, you can run for example
+If you want to install Sionna without the RT package, run:
 
 .. code-block:: bash
 
-    sudo apt install docker.io
+    pip install sionna-no-rt
 
-Ensure that your user belongs to the `docker` group (see `Docker post-installation <https://docs.docker.com/engine/install/linux-postinstall/>`_).
+From source
+-----------
+1. Clone the repository with all submodules:
 
-.. code-block:: bash
+    .. code-block:: bash
 
-    sudo usermod -aG docker $USER
+        git clone --recursive https://github.com/NVlabs/sionna
 
-Log out and re-login to load updated group memberships.
+    If you have already cloned the repository but forgot to set the `--recursive`
+    flag, you can correct this via:
 
-For GPU support on Linux, you need to install the `NVIDIA Container Toolkit <https://github.com/NVIDIA/nvidia-docker>`_.
+    .. code-block:: bash
 
-2.) Build the Sionna Docker image. From within the Sionna directory, run:
+        git submodule update --init --recursive --remote
 
-.. code-block:: bash
+2. Install Sionna (including Sionna RT) by running the following command from within the repository's
+   root folder:
 
-    make docker
+    .. code-block:: bash
 
-3.) Run the Docker image with GPU support
+        pip install ext/sionna-rt/ .
+        pip install .
 
-.. code-block:: bash
-
-    make run-docker gpus=all
-
-or without GPU:
-
-.. code-block:: bash
-
-    make run-docker
-
-This will immediately launch a Docker image with Sionna installed, running JupyterLab on port 8888.
-
-4.) Browse through the example notebook by connecting to `http://127.0.0.1:8888 <http://127.0.0.1:8888>`_ in your browser.
-
-
-Installation from source
-------------------------
-
-We recommend to do this within a `virtual environment <https://docs.python.org/3/tutorial/venv.html>`_,
-e.g., using `conda <https://docs.conda.io>`_.
-
-1.) Clone this repository and execute from within its root folder:
+Testing
+-------
+First, you need to install the test requirements by executing the
+following command from the repository's root directory:
 
 .. code-block:: bash
 
-    make install
+    pip install '.[test]'
 
+The unit tests can then be executed by running ``pytest`` from within the
+``test`` folder.
 
-2.) Test the installation in Python
+Documentation
+-------------
+Install the requirements for building the documentation by running the following
+command from the repository's root directory:
 
 .. code-block:: bash
 
-    python
+    pip install '.[doc]'
 
-.. code-block:: python
 
-    >>> import sionna
-    >>> print(sionna.__version__)
-    0.19.2
+You might need to install `pandoc <https://pandoc.org>`_ manually.
+
+You can then build the documentation by executing ``make html`` from within the ``doc`` folder.
+
+The documentation can finally be served by any web server, e.g.,
+
+.. code-block:: bash
+
+    python -m http.server --dir build/html
+
+
+Developing
+----------
+
+Development requirements can be installed by executing from the repository's root directory:
+
+.. code-block:: bash
+
+    pip install '.[dev]'
+
+Linting of the code can be achieved by running ``pylint src/`` from the repository's root directory.
