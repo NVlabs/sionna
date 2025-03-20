@@ -1352,6 +1352,10 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna/pulls">Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citation</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Older Versions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://jhoydis.github.io/sionna-0.19.2-doc">v0.19.2</a></li>
+</ul>
 
         </div>
       </div>
@@ -1544,27 +1548,27 @@ LLR-values of the received noisy codeword observation.</p>
 <ol class="arabic">
 <li><p><cite>boxplus</cite></p>
 <div class="math notranslate nohighlight">
-\[y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)\]</div>
+\[y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)\]</div>
 </li>
 <li><p><cite>boxplus-phi</cite></p>
 <div class="math notranslate nohighlight">
-\[y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}_(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)\]</div>
+\[y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)\]</div>
 <p>with <span class="math notranslate nohighlight">\(\phi(x)=-\operatorname{log}(\operatorname{tanh} \left(\frac{x}{2}) \right)\)</span></p>
 </li>
 <li><p><cite>minsum</cite></p>
 <div class="math notranslate nohighlight">
-\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}|\right)\]</div>
+\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}|\right)\]</div>
 </li>
 <li><p><cite>offset-minsum</cite></p></li>
 </ol>
 <div class="math notranslate nohighlight">
-\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)\]</div>
+\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(\beta=0.5\)</span> and and <span class="math notranslate nohighlight">\(y_{j \to i}\)</span> denotes the message
 from check node (CN) <em>j</em> to variable node (VN) <em>i</em> and <span class="math notranslate nohighlight">\(x_{i \to j}\)</span>
-from VN <em>i</em> to CN <em>j</em>, respectively.  Further, <span class="math notranslate nohighlight">\(\mathcal{N}_(j)\)</span>
+from VN <em>i</em> to CN <em>j</em>, respectively.  Further, <span class="math notranslate nohighlight">\(\mathcal{N}(j)\)</span>
 denotes all indices of connected VNs to CN <em>j</em> and</p>
 <div class="math notranslate nohighlight">
-\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
+\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
 <p>is the sign of the outgoing message. For further details we refer to
 <a class="reference internal" href="#ryan" id="id7"><span>[Ryan]</span></a> and <a class="reference internal" href="#chen" id="id8"><span>[Chen]</span></a> for offset corrected minsum.</p>
 <p>Note that for full 5G 3GPP NR compatibility, the correct puncturing and
@@ -1869,13 +1873,13 @@ clipping is applied.</p></li>
 <dd><p>Check node update function implementing the <cite>minsum</cite> update.</p>
 <p>The function implements</p>
 <div class="math notranslate nohighlight">
-\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}|\right)\]</div>
+\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}|\right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(y_{j \to i}\)</span> denotes the message from check node (CN) <em>j</em> to
 variable node (VN) <em>i</em> and <span class="math notranslate nohighlight">\(x_{i \to j}\)</span> from VN <em>i</em> to CN <em>j</em>,
-respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}_(j)\)</span> denotes all indices of
+respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}(j)\)</span> denotes all indices of
 connected VNs to CN <em>j</em> and</p>
 <div class="math notranslate nohighlight">
-\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
+\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
 <p>is the sign of the outgoing message. For further details we refer to
 <a class="reference internal" href="#ryan" id="id16"><span>[Ryan]</span></a> and <a class="reference internal" href="#chen" id="id17"><span>[Chen]</span></a>.</p>
 <dl class="field-list simple">
@@ -1904,13 +1908,13 @@ messages.</p>
 <dd><p>Check node update function implementing the offset corrected minsum.</p>
 <p>The function implements</p>
 <div class="math notranslate nohighlight">
-\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)\]</div>
+\[\qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(\beta=0.5\)</span> and <span class="math notranslate nohighlight">\(y_{j \to i}\)</span> denotes the message from
 check node (CN) <em>j</em> to variable node (VN) <em>i</em> and <span class="math notranslate nohighlight">\(x_{i \to j}\)</span> from
-VN <em>i</em> to CN <em>j</em>, respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}_(j)\)</span> denotes
+VN <em>i</em> to CN <em>j</em>, respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}(j)\)</span> denotes
 all indices of connected VNs to CN <em>j</em> and</p>
 <div class="math notranslate nohighlight">
-\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
+\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
 <p>is the sign of the outgoing message. For further details we refer to
 <a class="reference internal" href="#chen" id="id18"><span>[Chen]</span></a>.</p>
 <dl class="field-list simple">
@@ -1946,14 +1950,14 @@ The exact boxplus function is implemented by using the <cite>“_phi”</cite> f
 as in <a class="reference internal" href="#ryan" id="id20"><span>[Ryan]</span></a>.</p>
 <p>The function implements</p>
 <div class="math notranslate nohighlight">
-\[y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}_(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)\]</div>
+\[y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(\phi(x)=-\operatorname{log}(\operatorname{tanh} \left(\frac{x} {2}) \right)\)</span>
 and <span class="math notranslate nohighlight">\(y_{j \to i}\)</span> denotes the message from check node
 (CN) <em>j</em> to variable node (VN) <em>i</em> and <span class="math notranslate nohighlight">\(x_{i \to j}\)</span> from VN <em>i</em> to
-CN <em>j</em>, respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}_(j)\)</span> denotes all indices
+CN <em>j</em>, respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}(j)\)</span> denotes all indices
 of connected VNs to CN <em>j</em> and</p>
 <div class="math notranslate nohighlight">
-\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
+\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
 <p>is the sign of the outgoing message. For further details we refer to
 <a class="reference internal" href="#ryan" id="id21"><span>[Ryan]</span></a>.</p>
 <p>Note that for numerical stability clipping can be applied.</p>
@@ -1987,13 +1991,13 @@ function. It calculates the boxplus function over all incoming messages
 The exact boxplus function is implemented by using the tanh function.</p>
 <p>The function implements</p>
 <div class="math notranslate nohighlight">
-\[y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)\]</div>
+\[y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(y_{j \to i}\)</span> denotes the message from check node (CN) <em>j</em> to
 variable node (VN) <em>i</em> and <span class="math notranslate nohighlight">\(x_{i \to j}\)</span> from VN <em>i</em> to CN <em>j</em>,
-respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}_(j)\)</span> denotes all indices of
+respectively. Further, <span class="math notranslate nohighlight">\(\mathcal{N}(j)\)</span> denotes all indices of
 connected VNs to CN <em>j</em> and</p>
 <div class="math notranslate nohighlight">
-\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
+\[\alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})\]</div>
 <p>is the sign of the outgoing message. For further details we refer to
 <a class="reference internal" href="#ryan" id="id22"><span>[Ryan]</span></a>.</p>
 <p>Note that for numerical stability clipping can be applied.</p>
@@ -2116,7 +2120,7 @@ converges to the wrong codeword.</p>
 by following the concept of <cite>weighted BP</cite> <a class="reference internal" href="#nachmani" id="id25"><span>[Nachmani]</span></a> as shown in Fig. 1
 leading to</p>
 <div class="math notranslate nohighlight">
-\[y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{\textcolor{red}{w_{i' \to j}} \cdot x_{i' \to j}}{2} \right) \right)\]</div>
+\[y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{\textcolor{red}{w_{i' \to j}} \cdot x_{i' \to j}}{2} \right) \right)\]</div>
 <p>where <span class="math notranslate nohighlight">\(w_{i \to j}\)</span> denotes the trainable weight of message
 <span class="math notranslate nohighlight">\(x_{i \to j}\)</span>.
 Please note that the training of some check node types may be not supported.</p>

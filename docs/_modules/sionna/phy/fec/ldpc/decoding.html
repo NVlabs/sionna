@@ -1347,6 +1347,10 @@
 <li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna/pulls">Contribute</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../citation.html">Citation</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Older Versions</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://jhoydis.github.io/sionna-0.19.2-doc">v0.19.2</a></li>
+</ul>
 
         </div>
       </div>
@@ -1403,32 +1407,32 @@
 <span class="sd">    (1) `boxplus`</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i&#39; \to j}}{2} \right) \right)</span>
+<span class="sd">            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i&#39; \to j}}{2} \right) \right)</span>
 
 <span class="sd">    (2) `boxplus-phi`</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i&#39; \in \mathcal{N}_(j) \setminus i} \phi \left( |x_{i&#39; \to j}|\right) \right)</span>
+<span class="sd">            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i&#39; \in \mathcal{N}(j) \setminus i} \phi \left( |x_{i&#39; \to j}|\right) \right)</span>
 
 <span class="sd">        with :math:`\phi(x)=-\operatorname{log}(\operatorname{tanh} \left(\frac{x}{2}) \right)`</span>
 
 <span class="sd">    (3) `minsum`</span>
 
 <span class="sd">        .. math::</span>
-<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i&#39; \in \mathcal{N}_(j) \setminus i} \left(|x_{i&#39; \to j}|\right)</span>
+<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i&#39; \in \mathcal{N}(j) \setminus i} \left(|x_{i&#39; \to j}|\right)</span>
 
 <span class="sd">    (4) `offset-minsum`</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i&#39; \in \mathcal{N}_(j) \setminus i} \left(|x_{i&#39; \to j}| \right)-\beta , 0\right)</span>
+<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i&#39; \in \mathcal{N}(j) \setminus i} \left(|x_{i&#39; \to j}| \right)-\beta , 0\right)</span>
 
 <span class="sd">    where :math:`\beta=0.5` and and :math:`y_{j \to i}` denotes the message</span>
 <span class="sd">    from check node (CN) *j* to variable node (VN) *i* and :math:`x_{i \to j}`</span>
-<span class="sd">    from VN *i* to CN *j*, respectively.  Further, :math:`\mathcal{N}_(j)`</span>
+<span class="sd">    from VN *i* to CN *j*, respectively.  Further, :math:`\mathcal{N}(j)`</span>
 <span class="sd">    denotes all indices of connected VNs to CN *j* and</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
+<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
 
 <span class="sd">    is the sign of the outgoing message. For further details we refer to</span>
 <span class="sd">    [Ryan]_ and [Chen]_ for offset corrected minsum.</span>
@@ -2138,15 +2142,15 @@
 <span class="sd">    The function implements</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i&#39; \in \mathcal{N}_(j) \setminus i} \left(|x_{i&#39; \to j}| \right)-\beta , 0\right)</span>
+<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i&#39; \in \mathcal{N}(j) \setminus i} \left(|x_{i&#39; \to j}| \right)-\beta , 0\right)</span>
 
 <span class="sd">    where :math:`\beta=0.5` and :math:`y_{j \to i}` denotes the message from</span>
 <span class="sd">    check node (CN) *j* to variable node (VN) *i* and :math:`x_{i \to j}` from</span>
-<span class="sd">    VN *i* to CN *j*, respectively. Further, :math:`\mathcal{N}_(j)` denotes</span>
+<span class="sd">    VN *i* to CN *j*, respectively. Further, :math:`\mathcal{N}(j)` denotes</span>
 <span class="sd">    all indices of connected VNs to CN *j* and</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
+<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
 
 <span class="sd">    is the sign of the outgoing message. For further details we refer to</span>
 <span class="sd">    [Chen]_.</span>
@@ -2297,15 +2301,15 @@
 <span class="sd">    The function implements</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i&#39; \in \mathcal{N}_(j) \setminus i} \left(|x_{i&#39; \to j}|\right)</span>
+<span class="sd">            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i&#39; \in \mathcal{N}(j) \setminus i} \left(|x_{i&#39; \to j}|\right)</span>
 
 <span class="sd">    where :math:`y_{j \to i}` denotes the message from check node (CN) *j* to</span>
 <span class="sd">    variable node (VN) *i* and :math:`x_{i \to j}` from VN *i* to CN *j*,</span>
-<span class="sd">    respectively. Further, :math:`\mathcal{N}_(j)` denotes all indices of</span>
+<span class="sd">    respectively. Further, :math:`\mathcal{N}(j)` denotes all indices of</span>
 <span class="sd">    connected VNs to CN *j* and</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
+<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
 
 <span class="sd">    is the sign of the outgoing message. For further details we refer to</span>
 <span class="sd">    [Ryan]_ and [Chen]_.</span>
@@ -2349,15 +2353,15 @@
 <span class="sd">    The function implements</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i&#39; \to j}}{2} \right) \right)</span>
+<span class="sd">            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i&#39; \to j}}{2} \right) \right)</span>
 
 <span class="sd">    where :math:`y_{j \to i}` denotes the message from check node (CN) *j* to</span>
 <span class="sd">    variable node (VN) *i* and :math:`x_{i \to j}` from VN *i* to CN *j*,</span>
-<span class="sd">    respectively. Further, :math:`\mathcal{N}_(j)` denotes all indices of</span>
+<span class="sd">    respectively. Further, :math:`\mathcal{N}(j)` denotes all indices of</span>
 <span class="sd">    connected VNs to CN *j* and</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
+<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
 
 <span class="sd">    is the sign of the outgoing message. For further details we refer to</span>
 <span class="sd">    [Ryan]_.</span>
@@ -2444,16 +2448,16 @@
 <span class="sd">    The function implements</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i&#39; \in \mathcal{N}_(j) \setminus i} \phi \left( |x_{i&#39; \to j}|\right) \right)</span>
+<span class="sd">            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i&#39; \in \mathcal{N}(j) \setminus i} \phi \left( |x_{i&#39; \to j}|\right) \right)</span>
 
 <span class="sd">    where :math:`\phi(x)=-\operatorname{log}(\operatorname{tanh} \left(\frac{x} {2}) \right)`</span>
 <span class="sd">    and :math:`y_{j \to i}` denotes the message from check node</span>
 <span class="sd">    (CN) *j* to variable node (VN) *i* and :math:`x_{i \to j}` from VN *i* to</span>
-<span class="sd">    CN *j*, respectively. Further, :math:`\mathcal{N}_(j)` denotes all indices</span>
+<span class="sd">    CN *j*, respectively. Further, :math:`\mathcal{N}(j)` denotes all indices</span>
 <span class="sd">    of connected VNs to CN *j* and</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
+<span class="sd">        \alpha_{j \to i} = \prod_{i&#39; \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i&#39; \to j})</span>
 
 <span class="sd">    is the sign of the outgoing message. For further details we refer to</span>
 <span class="sd">    [Ryan]_.</span>
