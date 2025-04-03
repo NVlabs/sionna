@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.phy.fec.ldpc.decoding &mdash; Sionna 1.0.1 documentation</title>
+  <title>sionna.phy.fec.ldpc.decoding &mdash; Sionna 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../../../_static/documentation_options.js?v=1ed6394b"></script>
       <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../../rt/tutorials.html">Tutorials</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html">Introduction to Sionna RT</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html#Imports">Imports</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html#Loading-and-Visualizing-of-Scenes">Loading and Visualizing of Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html#Loading-and-Visualizing-Scenes">Loading and Visualizing Scenes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html#Inspecting-SceneObjects-and-Editing-of-Scenes">Inspecting SceneObjects and Editing of Scenes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html#Ray-tracing-of-Propagation-Paths">Ray tracing of Propagation Paths</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
@@ -1591,6 +1591,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Unsupported dtype of pcm.&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Deprecation warning for cn_type</span>
+        <span class="k">if</span> <span class="s1">&#39;cn_type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;cn_type&#39; is deprecated; use &#39;cn_update&#39; instead.&quot;</span><span class="p">)</span>
+
         <span class="c1"># init decoder parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pcm</span> <span class="o">=</span> <span class="n">pcm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hard_out</span> <span class="o">=</span> <span class="n">hard_out</span>
@@ -2724,6 +2728,10 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">return_state</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;return_state must be bool.&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_return_state</span> <span class="o">=</span> <span class="n">return_state</span>
+
+        <span class="c1"># Deprecation warning for cn_type</span>
+        <span class="k">if</span> <span class="s1">&#39;cn_type&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;cn_type&#39; is deprecated; use &#39;cn_update&#39; instead.&quot;</span><span class="p">)</span>
 
         <span class="c1"># prune punctured degree-1 VNs and connected CNs. A punctured</span>
         <span class="c1"># VN-1 node will always &quot;send&quot; llr=0 to the connected CN. Thus, this</span>

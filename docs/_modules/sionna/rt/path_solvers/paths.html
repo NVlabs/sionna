@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.path_solvers.paths &mdash; Sionna 1.0.1 documentation</title>
+  <title>sionna.rt.path_solvers.paths &mdash; Sionna 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../../_static/documentation_options.js?v=1ed6394b"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -57,7 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../rt/tutorials.html">Tutorials</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html">Introduction to Sionna RT</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Imports">Imports</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Loading-and-Visualizing-of-Scenes">Loading and Visualizing of Scenes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Loading-and-Visualizing-Scenes">Loading and Visualizing Scenes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Inspecting-SceneObjects-and-Editing-of-Scenes">Inspecting SceneObjects and Editing of Scenes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Ray-tracing-of-Propagation-Paths">Ray tracing of Propagation Paths</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
@@ -1481,9 +1481,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_eff_tx_array_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tx_array</span><span class="o">.</span><span class="n">array_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_eff_rx_array_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rx_array</span><span class="o">.</span><span class="n">array_size</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_eff_tx_array_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_num_tgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_eff_rx_array_size</span>
-
         <span class="n">src_ind</span> <span class="o">=</span> <span class="n">paths_buffer</span><span class="o">.</span><span class="n">source_indices</span>
         <span class="n">tgt_ind</span> <span class="o">=</span> <span class="n">paths_buffer</span><span class="o">.</span><span class="n">target_indices</span>
 
@@ -1495,11 +1492,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_tx_ant_ind</span> <span class="o">=</span> <span class="n">src_ind</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eff_tx_array_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rx_ant_ind</span> <span class="o">=</span> <span class="n">tgt_ind</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eff_rx_array_size</span>
 
+        <span class="c1"># The following uses `dr.scatter_inc` to jointly:</span>
+        <span class="c1"># - Compute the maximum number of paths over all (source, target)</span>
+        <span class="c1"># couples, which is then used to allocate the memory for the tensors.</span>
+        <span class="c1"># - Compute a path index such that paths sharing the same</span>
+        <span class="c1"># (source, target) couple do not share the same index. This is later</span>
+        <span class="c1"># used to scatter data in the allocated tensors.</span>
+        <span class="c1">#</span>
         <span class="c1"># We must ensure that the path index used for scattering the path data</span>
         <span class="c1"># in the allocated tensors are unique for every (source, target) couple.</span>
         <span class="c1"># Map (src_ind, tgt_ind) to a unique integer identifying the path source</span>
         <span class="c1"># and target</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_src_tgt_id</span> <span class="o">=</span> <span class="n">tgt_ind</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_src</span> <span class="o">+</span> <span class="n">src_ind</span>
+        <span class="n">num_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_eff_tx_array_size</span>
+        <span class="n">num_tgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_eff_rx_array_size</span>
+        <span class="n">src_tgt_id</span> <span class="o">=</span> <span class="n">tgt_ind</span><span class="o">*</span><span class="n">num_src</span> <span class="o">+</span> <span class="n">src_ind</span>
+        <span class="c1">#</span>
+        <span class="n">num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_src</span><span class="o">*</span><span class="n">num_tgt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path_ind</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">scatter_inc</span><span class="p">(</span><span class="n">num_paths</span><span class="p">,</span> <span class="n">src_tgt_id</span><span class="p">)</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path_ind</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_paths</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c1"># Build the tensors</span>
 
@@ -2171,33 +2182,21 @@
         <span class="n">paths_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_buffer</span>
         <span class="n">num_tx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span>
         <span class="n">num_rx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx</span>
-        <span class="n">num_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_src</span>
-        <span class="n">num_tgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tgt</span>
         <span class="n">tx_array_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eff_tx_array_size</span>
         <span class="n">rx_array_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eff_rx_array_size</span>
         <span class="n">tx_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tx_ind</span>
         <span class="n">rx_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rx_ind</span>
         <span class="n">tx_ant_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tx_ant_ind</span>
         <span class="n">rx_ant_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rx_ant_ind</span>
-        <span class="n">src_tgt_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_src_tgt_id</span>
         <span class="n">num_rx_patterns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rx_array</span><span class="o">.</span><span class="n">antenna_pattern</span><span class="o">.</span><span class="n">patterns</span><span class="p">)</span>
         <span class="n">num_tx_patterns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tx_array</span><span class="o">.</span><span class="n">antenna_pattern</span><span class="o">.</span><span class="n">patterns</span><span class="p">)</span>
-
-        <span class="c1"># The following uses `dr.scatter_inc` to jointly:</span>
-        <span class="c1"># - Compute the maximum number of paths over all (source, target)</span>
-        <span class="c1"># couples, which is then used to allocate the memory for the tensors.</span>
-        <span class="c1"># - Compute a path index such that paths sharing the same</span>
-        <span class="c1"># (source, target) couple do not share the same index. This is later</span>
-        <span class="c1"># used to scatter data in the allocated tensors.</span>
-        <span class="n">num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_src</span><span class="o">*</span><span class="n">num_tgt</span><span class="p">)</span>
-        <span class="n">path_ind</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">scatter_inc</span><span class="p">(</span><span class="n">num_paths</span><span class="p">,</span> <span class="n">src_tgt_id</span><span class="p">)</span>
-        <span class="c1"># Required to ensure `path_ind` is available after the max op (reduces)</span>
-        <span class="n">dr</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">path_ind</span><span class="p">)</span>
-        <span class="c1"># Maximum number of paths</span>
-        <span class="n">max_num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_paths</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Path index such that paths sharing the same (source, target) couple</span>
+        <span class="c1"># do not share the same index.</span>
+        <span class="n">path_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path_ind</span>
+        <span class="c1"># Maximum number of paths over all (source, target) couples</span>
+        <span class="n">max_num_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_paths</span>
 
         <span class="c1"># Allocate the tensors and fill them</span>
-
         <span class="c1"># `a`</span>
         <span class="n">a_real</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">TensorXf</span><span class="p">,</span> <span class="p">[</span><span class="n">num_rx</span><span class="p">,</span> <span class="n">num_rx_patterns</span><span class="p">,</span> <span class="n">rx_array_size</span><span class="p">,</span>
                                         <span class="n">num_tx</span><span class="p">,</span> <span class="n">num_tx_patterns</span><span class="p">,</span> <span class="n">tx_array_size</span><span class="p">,</span>
@@ -2496,30 +2495,19 @@
         <span class="n">total_paths_count</span> <span class="o">=</span> <span class="n">paths_buffer</span><span class="o">.</span><span class="n">buffer_size</span>
         <span class="n">num_tx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tx</span>
         <span class="n">num_rx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_rx</span>
-        <span class="n">num_src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_src</span>
-        <span class="n">num_tgt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_tgt</span>
         <span class="n">tx_array_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eff_tx_array_size</span>
         <span class="n">rx_array_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eff_rx_array_size</span>
         <span class="n">tx_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tx_ind</span>
         <span class="n">rx_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rx_ind</span>
         <span class="n">tx_ant_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tx_ant_ind</span>
         <span class="n">rx_ant_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rx_ant_ind</span>
-        <span class="n">src_tgt_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_src_tgt_id</span>
         <span class="n">num_rx_patterns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rx_array</span><span class="o">.</span><span class="n">antenna_pattern</span><span class="o">.</span><span class="n">patterns</span><span class="p">)</span>
         <span class="n">num_tx_patterns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tx_array</span><span class="o">.</span><span class="n">antenna_pattern</span><span class="o">.</span><span class="n">patterns</span><span class="p">)</span>
-
-        <span class="c1"># The following uses `dr.scatter_inc` to jointly:</span>
-        <span class="c1"># - Compute the maximum number of paths over all (source, target)</span>
-        <span class="c1"># couples, which is then used to allocate the memory for the tensors.</span>
-        <span class="c1"># - Compute a path index such that paths sharing the same</span>
-        <span class="c1"># (source, target) couple do not share the same index. This is later</span>
-        <span class="c1"># used to scatter data in the allocated tensors.</span>
-        <span class="n">num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_src</span><span class="o">*</span><span class="n">num_tgt</span><span class="p">)</span>
-        <span class="n">path_ind</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">scatter_inc</span><span class="p">(</span><span class="n">num_paths</span><span class="p">,</span> <span class="n">src_tgt_id</span><span class="p">)</span>
-        <span class="c1"># Required to ensure `path_ind` is available after the max op (reduces)</span>
-        <span class="n">dr</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">path_ind</span><span class="p">)</span>
-        <span class="c1"># Maximum number of paths</span>
-        <span class="n">max_num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_paths</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Path index such that paths sharing the same (source, target) couple</span>
+        <span class="c1"># do not share the same index.</span>
+        <span class="n">path_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path_ind</span>
+        <span class="c1"># Maximum number of paths over all (source, target) couples</span>
+        <span class="n">max_num_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_paths</span>
 
         <span class="c1"># Shape of the tensors</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_synthetic_array</span><span class="p">:</span>
