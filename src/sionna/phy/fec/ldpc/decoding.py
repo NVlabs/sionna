@@ -26,32 +26,32 @@ class LDPCBPDecoder(Block):
     (1) `boxplus`
 
         .. math::
-            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)
+            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)
 
     (2) `boxplus-phi`
 
         .. math::
-            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}_(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)
+            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)
 
         with :math:`\phi(x)=-\operatorname{log}(\operatorname{tanh} \left(\frac{x}{2}) \right)`
 
     (3) `minsum`
 
         .. math::
-            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}|\right)
+            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}|\right)
 
     (4) `offset-minsum`
 
     .. math::
-            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)
+            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)
 
     where :math:`\beta=0.5` and and :math:`y_{j \to i}` denotes the message
     from check node (CN) *j* to variable node (VN) *i* and :math:`x_{i \to j}`
-    from VN *i* to CN *j*, respectively.  Further, :math:`\mathcal{N}_(j)`
+    from VN *i* to CN *j*, respectively.  Further, :math:`\mathcal{N}(j)`
     denotes all indices of connected VNs to CN *j* and
 
     .. math::
-        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})
+        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})
 
     is the sign of the outgoing message. For further details we refer to
     [Ryan]_ and [Chen]_ for offset corrected minsum.
@@ -209,6 +209,10 @@ class LDPCBPDecoder(Block):
                 raise ValueError('PC matrix must be binary.')
         else:
             raise TypeError("Unsupported dtype of pcm.")
+
+        # Deprecation warning for cn_type
+        if 'cn_type' in kwargs:
+            raise TypeError("'cn_type' is deprecated; use 'cn_update' instead.")
 
         # init decoder parameters
         self._pcm = pcm
@@ -755,15 +759,15 @@ def cn_update_offset_minsum(msg_v2c_rag, llr_clipping=None, offset=0.5):
     The function implements
 
     .. math::
-            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)
+            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {max} \left( {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}| \right)-\beta , 0\right)
 
     where :math:`\beta=0.5` and :math:`y_{j \to i}` denotes the message from
     check node (CN) *j* to variable node (VN) *i* and :math:`x_{i \to j}` from
-    VN *i* to CN *j*, respectively. Further, :math:`\mathcal{N}_(j)` denotes
+    VN *i* to CN *j*, respectively. Further, :math:`\mathcal{N}(j)` denotes
     all indices of connected VNs to CN *j* and
 
     .. math::
-        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})
+        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})
 
     is the sign of the outgoing message. For further details we refer to
     [Chen]_.
@@ -911,15 +915,15 @@ def cn_update_minsum(msg_v2c_rag, llr_clipping=None):
     The function implements
 
     .. math::
-            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}_(j) \setminus i} \left(|x_{i' \to j}|\right)
+            \qquad y_{j \to i} = \alpha_{j \to i} \cdot {min}_{i' \in \mathcal{N}(j) \setminus i} \left(|x_{i' \to j}|\right)
 
     where :math:`y_{j \to i}` denotes the message from check node (CN) *j* to
     variable node (VN) *i* and :math:`x_{i \to j}` from VN *i* to CN *j*,
-    respectively. Further, :math:`\mathcal{N}_(j)` denotes all indices of
+    respectively. Further, :math:`\mathcal{N}(j)` denotes all indices of
     connected VNs to CN *j* and
 
     .. math::
-        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})
+        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})
 
     is the sign of the outgoing message. For further details we refer to
     [Ryan]_ and [Chen]_.
@@ -960,15 +964,15 @@ def cn_update_tanh(msg, llr_clipping=None):
     The function implements
 
     .. math::
-            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)
+            y_{j \to i} = 2 \operatorname{tanh}^{-1} \left( \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{tanh} \left( \frac{x_{i' \to j}}{2} \right) \right)
 
     where :math:`y_{j \to i}` denotes the message from check node (CN) *j* to
     variable node (VN) *i* and :math:`x_{i \to j}` from VN *i* to CN *j*,
-    respectively. Further, :math:`\mathcal{N}_(j)` denotes all indices of
+    respectively. Further, :math:`\mathcal{N}(j)` denotes all indices of
     connected VNs to CN *j* and
 
     .. math::
-        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})
+        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})
 
     is the sign of the outgoing message. For further details we refer to
     [Ryan]_.
@@ -1052,16 +1056,16 @@ def cn_update_phi(msg, llr_clipping=None):
     The function implements
 
     .. math::
-            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}_(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)
+            y_{j \to i} = \alpha_{j \to i} \cdot \phi \left( \sum_{i' \in \mathcal{N}(j) \setminus i} \phi \left( |x_{i' \to j}|\right) \right)
 
     where :math:`\phi(x)=-\operatorname{log}(\operatorname{tanh} \left(\frac{x} {2}) \right)`
     and :math:`y_{j \to i}` denotes the message from check node
     (CN) *j* to variable node (VN) *i* and :math:`x_{i \to j}` from VN *i* to
-    CN *j*, respectively. Further, :math:`\mathcal{N}_(j)` denotes all indices
+    CN *j*, respectively. Further, :math:`\mathcal{N}(j)` denotes all indices
     of connected VNs to CN *j* and
 
     .. math::
-        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}_(j) \setminus i} \operatorname{sign}(x_{i' \to j})
+        \alpha_{j \to i} = \prod_{i' \in \mathcal{N}(j) \setminus i} \operatorname{sign}(x_{i' \to j})
 
     is the sign of the outgoing message. For further details we refer to
     [Ryan]_.
@@ -1325,6 +1329,10 @@ class LDPC5GDecoder(LDPCBPDecoder):
         if not isinstance(return_state, bool):
             raise TypeError('return_state must be bool.')
         self._return_state = return_state
+
+        # Deprecation warning for cn_type
+        if 'cn_type' in kwargs:
+            raise TypeError("'cn_type' is deprecated; use 'cn_update' instead.")
 
         # prune punctured degree-1 VNs and connected CNs. A punctured
         # VN-1 node will always "send" llr=0 to the connected CN. Thus, this

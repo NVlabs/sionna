@@ -41,6 +41,15 @@ Sionna is developed, continuously extended, and used by NVIDIA to drive 5G and 6
    Contribute <https://github.com/NVlabs/sionna/pulls>
    citation
 
+.. toctree::
+   :name: old-docs
+   :caption: Older Versions
+   :maxdepth: 1
+   :hidden:
+   
+   v0.19.2 <https://jhoydis.github.io/sionna-0.19.2-doc>
+
+
 License
 *******
 Sionna is Apache-2.0 licensed, as found in the `LICENSE <https://github.com/nvlabs/sionna/blob/main/LICENSE>`_ file.

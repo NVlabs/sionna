@@ -82,6 +82,29 @@ exclude_patterns = ['_build', '**.ipynb_checkpoints']
 # Add a custom prolog to each notebook to automatically add github/colab/download links
 nbsphinx_prolog = r"""
 {% set docname = env.doc2path(env.docname, base=None) %}
+{% set fullpath = env.doc2path(env.docname, base='source') %}
+{% set path_parts = fullpath.split('/') %}
+{% set module_name = path_parts[-3] if path_parts|length > 2 else '' %}
+{% set notebook_name = path_parts[-1] if path_parts|length > 1 else '' %}
+
+{# Set the appropriate links based on module name #}
+{% if module_name == 'phy' %}
+    {% set github_link = 'https://github.com/nvlabs/sionna/blob/main/tutorials/phy/' + notebook_name|string|e %}
+    {% set download_link = notebook_name|string|e %}
+    {% set colab_link = 'https://colab.research.google.com/github/nvlabs/sionna/blob/main/tutorials/phy/' + notebook_name|string|e %}
+{% elif module_name == 'sys' %}
+    {% set github_link = 'https://github.com/nvlabs/sionna/blob/main/tutorials/sys/' + notebook_name|string|e %}
+ {% set download_link = notebook_name|string|e %}
+    {% set colab_link = 'https://colab.research.google.com/github/nvlabs/sionna/blob/main/tutorials/sys/' + notebook_name|string|e %}
+{% elif module_name == 'rt' %}
+    {% set github_link = 'https://github.com/nvlabs/sionna-rt/blob/main/tutorials/' + notebook_name|string|e %}
+    {% set download_link = notebook_name|string|e %}
+    {% set colab_link = 'https://colab.research.google.com/github/nvlabs/sionna-rt/blob/main/tutorials/' + notebook_name|string|e %}
+{% else %}
+    {% set github_link = notebook_name|string|e %}
+    {% set download_link = notebook_name|string|e %}
+    {% set colab_link = notebook_name|string|e %}
+{% endif %}
 
 .. raw:: html
 
@@ -89,12 +112,12 @@ nbsphinx_prolog = r"""
     <div style="margin-bottom:15px;">
         <table>
             <td style="padding: 0px 0px;">
-                <a href=" https://colab.research.google.com/github/NVlabs/sionna/blob/main/{{ docname|e }}" style="vertical-align:text-bottom">
+                <a href="{{ colab_link }}" style="vertical-align:text-bottom">
                     <img alt="Colab logo" src="../../_static/colab_logo.svg" style="width: 40px; min-width: 40px">
                 </a>
             </td>
             <td style="padding: 4px 0px;">
-                <a href=" https://colab.research.google.com/github/nvlabs/sionna/blob/main/{{ docname|e }}" style="vertical-align:text-bottom">
+                <a href="{{ colab_link }}" style="vertical-align:text-bottom">
                     Run in Google Colab
                 </a>
             </td>
@@ -103,14 +126,14 @@ nbsphinx_prolog = r"""
             </td>
 
             <td class="wy-breadcrumbs-aside" style="padding: 0 30px;">
-                <a href="https://github.com/nvlabs/sionna/blob/main/{{ docname|e }}" style="vertical-align:text-bottom">
+                <a href="{{ github_link }}" style="vertical-align:text-bottom">
                     <i class="fa fa-github" style="font-size:24px;"></i>
                     View on GitHub
                 </a>
             </td>
 
             <td class="wy-breadcrumbs-aside" style="padding: 0 35px;">
-                <a href="../{{ docname|e }}" download target="_blank" style="vertical-align:text-bottom">
+                <a href="{{ download_link|e }}" download target="_blank" style="vertical-align:text-bottom">
                     <i class="fa fa-download" style="font-size:24px;"></i>
                     Download notebook
                 </a>
