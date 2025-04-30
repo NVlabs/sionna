@@ -490,6 +490,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1432,30 +1433,48 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mi_shape</span><span class="o">.</span><span class="n">bsdf</span><span class="p">(),</span> <span class="n">HolderMaterial</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The BSDF of `mi_shape` must be a&quot;</span>
                                  <span class="s2">&quot; HolderMaterial object&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">radio_material</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mi_shape</span><span class="o">.</span><span class="n">bsdf</span><span class="p">()</span><span class="o">.</span><span class="n">radio_material</span> <span class="o">=</span> <span class="n">radio_material</span>
+
         <span class="k">elif</span> <span class="n">fname</span><span class="p">:</span>
             <span class="c1"># Mesh type</span>
             <span class="n">mesh_type</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
             <span class="k">if</span> <span class="n">mesh_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ply&#39;</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid mesh type.&quot;</span>
                                  <span class="s2">&quot; Supported types: `ply` and `obj`&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The `name` of the object to instantiate must&quot;</span>
-                                 <span class="s2">&quot; be an str&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">radio_material</span><span class="p">,</span> <span class="n">RadioMaterialBase</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The `radio_material` for the object to&quot;</span>
                                  <span class="s2">&quot; instantiate must be a RadioMaterialBase&quot;</span><span class="p">)</span>
 
             <span class="n">mi_shape</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_dict</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mesh_type</span><span class="p">,</span>
-                                     <span class="s1">&#39;id&#39;</span> <span class="p">:</span> <span class="n">name</span><span class="p">,</span>
                                      <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">fname</span><span class="p">,</span>
                                      <span class="s1">&#39;flip_normals&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-                                     <span class="s1">&#39;bsdf&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;holder-material&#39;</span><span class="p">,</span>
-                                               <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;mat-holder-</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">}</span>
+                                     <span class="s1">&#39;bsdf&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;holder-material&#39;</span><span class="p">}</span>
                                      <span class="p">})</span>
             <span class="n">mi_shape</span><span class="o">.</span><span class="n">bsdf</span><span class="p">()</span><span class="o">.</span><span class="n">radio_material</span> <span class="o">=</span> <span class="n">radio_material</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either a Mitsuba Shape (mi_shape) or a filename&quot;</span>
                              <span class="s2">&quot; (fname) must be provided&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Object naming.</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If a `name` parameter is provided, adopt it regardless of the current</span>
+            <span class="c1"># Mitsuba shape&#39;s ID.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The `name` of the object to instantiate must&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot; be a `str`, found `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s2">` instead.&quot;</span><span class="p">)</span>
+            <span class="n">mi_shape</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">mi_shape</span><span class="o">.</span><span class="n">bsdf</span><span class="p">()</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="s2">&quot;mat-holder-&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">id</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;__root__&quot;</span><span class="p">):</span>
+            <span class="c1"># Default name.</span>
+            <span class="n">SceneObject</span><span class="o">.</span><span class="n">NO_NAME_COUNTER</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;no-name-</span><span class="si">{</span><span class="n">SceneObject</span><span class="o">.</span><span class="n">NO_NAME_COUNTER</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">mi_shape</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">mi_shape</span><span class="o">.</span><span class="n">bsdf</span><span class="p">()</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="s2">&quot;mat-holder-&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Otherwise, keep the current Mitsuba shape&#39;s ID.</span>
+            <span class="k">pass</span>
+        <span class="k">del</span> <span class="n">name</span>
 
         <span class="c1"># Set the Mitsuba shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mi_shape</span> <span class="o">=</span> <span class="n">mi_shape</span>
@@ -1463,16 +1482,12 @@
         <span class="c1"># Scene object to which the object belongs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># Read the ID from the Mitsuba Shape</span>
+        <span class="c1"># Read the ID from the Mitsuba Shape.</span>
         <span class="c1"># The object ID is the corresponding Mitsuba shape pointer</span>
-        <span class="c1"># reinterpreted as an UInt32</span>
+        <span class="c1"># reinterpreted as an UInt32 (not the object&#39;s name).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_object_id</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">reinterpret_array</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt32</span><span class="p">,</span>
                                                <span class="n">mi</span><span class="o">.</span><span class="n">ShapePtr</span><span class="p">(</span><span class="n">mi_shape</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">mi_shape</span><span class="o">.</span><span class="n">id</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">SceneObject</span><span class="o">.</span><span class="n">NO_NAME_COUNTER</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;no-name-</span><span class="si">{</span><span class="n">SceneObject</span><span class="o">.</span><span class="n">NO_NAME_COUNTER</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">mi_shape</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
         <span class="c1"># Increment the material counter of objects</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radio_material</span><span class="o">.</span><span class="n">add_object</span><span class="p">()</span>
@@ -1497,9 +1512,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">scene_module</span><span class="o">.</span><span class="n">Scene</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`scene` must be an instance of Scene&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">scene</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Radio material (&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;) already used by another &quot;</span>\
-                <span class="s2">&quot;scene&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radio material (&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;) is already used&quot;</span>
+                             <span class="s2">&quot; by another scene.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
 
     <span class="nd">@staticmethod</span>
@@ -1557,13 +1571,11 @@
             <span class="n">mat_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
             <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">mat_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
                  <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mat_obj</span><span class="p">,</span> <span class="n">RadioMaterialBase</span><span class="p">))</span> <span class="p">):</span>
-                <span class="n">err_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unknown radio material &#39;</span><span class="si">{</span><span class="n">mat</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown radio material &#39;</span><span class="si">{</span><span class="n">mat</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">RadioMaterialBase</span><span class="p">):</span>
-            <span class="n">err_msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The material must be a material name (str) or an &quot;</span>
-                        <span class="s2">&quot;instance of RadioMaterialBase&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">err_msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The material must be a material name (str) or an &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;instance of RadioMaterialBase, found </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">mat_obj</span> <span class="o">=</span> <span class="n">mat</span>
@@ -1576,8 +1588,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mat_obj</span><span class="p">)</span>
             <span class="c1"># Ensure that the object and the material belong to the same scene</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">!=</span> <span class="n">mat_obj</span><span class="o">.</span><span class="n">scene</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Radio material and object are not part of the same scene&quot;</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Radio material and object are not part of the&quot;</span>
+                                 <span class="s2">&quot; same scene&quot;</span><span class="p">)</span>
 
         <span class="c1"># Increment the material counter of objects</span>
         <span class="n">mat_obj</span><span class="o">.</span><span class="n">add_object</span><span class="p">()</span>
@@ -1618,6 +1630,10 @@
     <span class="nd">@position</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_position</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">):</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scene is not set: Object must be added to a&quot;</span>
+                             <span class="s2">&quot; scene before setting its position&quot;</span><span class="p">)</span>
+
         <span class="c1"># Scene parameters</span>
         <span class="n">scene_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">mi_scene_params</span>
 
@@ -1645,6 +1661,10 @@
 
     <span class="nd">@orientation</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_orientation</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scene is not set: Object must be added to a&quot;</span>
+                             <span class="s2">&quot; scene before setting its orientation&quot;</span><span class="p">)</span>
 
         <span class="n">new_orientation</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="n">new_orientation</span><span class="p">)</span>
 
@@ -1689,6 +1709,10 @@
 
     <span class="nd">@scaling</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">scaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_scaling</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scene is not set: Object must be added to a&quot;</span>
+                             <span class="s2">&quot; scene before setting its scaling&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">new_scaling</span> <span class="o">&lt;=</span> <span class="mf">0.</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scaling must be positive&quot;</span><span class="p">)</span>

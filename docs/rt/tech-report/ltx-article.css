@@ -1,0 +1,75 @@
+
+.ltx_title_document      { font-size:170%; text-align:center; margin:0.5em 0 0.5em 0; }
+.ltx_dates,
+.ltx_authors,
+.ltx_role_author         { text-align:center; margin:0.5em 0 0.5em 0; }
+.ltx_role_author .ltx_personname  { font-size: 120%; }
+.ltx_date        { text-align:center; font-size: 120%; margin:0.5em 0 0.5em 0; }
+.ltx_subtitle    { text-align:center; font-size: 120%; padding-left:0.2em; margin-left:-0.5em; }
+
+.ltx_title_abstract      { text-align:center; font-size: 100%; font-weight:bold; }
+.ltx_abstract {
+   margin-left:clamp(1em, 6%, 4em);
+   margin-right:clamp(1em, 6%, 4em); }
+.ltx_title_acknowledgements,
+.ltx_title_keywords,
+.ltx_title_classification {
+   text-align:left; font-size: 100%; font-weight:bold; margin:0.5em 0 0 0; }
+
+.ltx_appendix,
+.ltx_part,
+.ltx_section,
+.ltx_subsection,
+.ltx_subsubsection { margin-top:1.5em; }
+.ltx_paragraph,
+.ltx_subparagraph   { margin-top:1.0em; }
+
+.ltx_title_part          { font-size:250%; font-weight:bold; margin-bottom:1em; }
+.ltx_title_appendix,
+.ltx_title_section,
+.ltx_title_index,
+.ltx_title_glossary,
+.ltx_title_bibliography  { font-size:140%; font-weight:bold; margin-bottom:1em; }
+.ltx_title_subsection    { font-size:120%; font-weight:bold; margin-bottom:1em; }
+.ltx_title_subsubsection { font-size:100%; font-weight:bold; margin-bottom:1em; }
+
+/* Paragraph & Subparagraph titles should be runin! */
+.ltx_title_paragraph   { font-size:100%; font-weight:bold; display:inline; 
+                         margin-right:1em; }
+.ltx_paragraph .ltx_title,
+.ltx_paragraph .ltx_title + .ltx_para,
+.ltx_paragraph .ltx_title + .ltx_para > .ltx_p { display:inline; }
+
+.ltx_title_subparagraph  { font-size:100%; font-weight:bold; display:inline; 
+                           margin-left:2em; margin-right:1em; }
+.ltx_subparagraph .ltx_title,
+.ltx_subparagraph .ltx_title + .ltx_para,
+.ltx_subparagraph .ltx_title + .ltx_para > .ltx_p { display:inline; }
+
+.ltx_figure  { text-align:center; margin:auto; margin:0.5em; }
+.ltx_table   { text-align:center; margin:auto; margin:0.5em; }
+
+/* experimental: flex model, to center short captions, justify long ones */
+.ltx_table,
+.ltx_figure { display:flex; flex-direction:column; align-items:center; }
+.ltx_table .ltx_caption,
+.ltx_figure .ltx_caption { text-align:justify; }
+
+/* first p in para gets indented; , even 1st in section if marked "no" first child */
+.ltx_para > .ltx_p:first-child,
+section.ltx_pruned_first > .ltx_title + .ltx_para > .ltx_p,
+section.ltx_indent_first > .ltx_title + .ltx_para > .ltx_p { text-indent:2em; }
+/* except the initial in a section */
+section > .ltx_title +.ltx_para > .ltx_p,
+section > .ltx_title +.ltx_date +.ltx_para > .ltx_p {text-indent:0em; }
+
+.ltx_title_abstract + .ltx_p {text-indent:2em; }
+
+.ltx_itemize,
+.ltx_enumerate { margin-left:1em; }
+
+.ltx_theorem { margin-top:0.5em; margin-bottom:0.5em; }
+.ltx_theorem .ltx_title { margin-bottom:0.1em; }
+.ltx_theorem .ltx_title + .ltx_para,
+.ltx_theorem .ltx_title + .ltx_para .ltx_p,
+.ltx_theorem .ltx_title + .ltx_p  { margin-top:0em; }

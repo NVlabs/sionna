@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<title>1 Introduction ‣ Sionna RT: Technical Report</title>
+<!--Generated on Wed Apr 30 18:10:24 2025 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<link href="LaTeXML.css" rel="stylesheet" type="text/css"/>
+<link href="ltx-article.css" rel="stylesheet" type="text/css"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+<link href="./" rel="up" title="Sionna RT: Technical Report"/>
+<link href="./" rel="start" title="Sionna RT: Technical Report"/>
+</head>
+<body><div class="nav-panel"><div class="nav-panel-header"><h1 class="nav-panel-header-title">NVIDIA Sionna RT</h1><p class="nav-panel-header-subtitle">Technical Report</p></div><div class="nav-panel-content"><nav class="ltx_TOC"><h2 class="nav-panel-toc-title">Contents</h2><ul class="ltx_toclist"><li class="ltx_tocentry"><a class="ltx_tocentry" href="S1.html">Introduction</a></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S2.html">Essential Concepts and Terminology</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS1">Scene Objects and Meshes</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS2">Rays and Paths</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS3">Interactions with Scene Objects</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS4">Ray Tubes</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S3.html">Path Solver</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS1">Generating Candidates by Shooting and Bouncing of Rays (SBR)</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS2">Image Method-based Candidate Processing</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS3">Channel Coefficients, Delays, and Doppler Shifts Computation</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S4.html">Radio Map Solver</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS1">Definition of a Radio Map</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS2">SBR-based Radio Map Solver</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="A1.html">Appendix: Primer on Electromagnetism</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS1">Coordinate System, Rotations, and Vector Fields</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS2">Planar Time-Harmonic Waves</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS3">Far Field of a Transmitting Antenna</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS4">Modeling of a Receiving Antenna</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS5">General Propagation Path</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS6">Frequency and Impulse Response</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS7">Specular Reflection and Refraction</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS8">Diffuse Reflection</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="bib.html">References</a></li></ul></nav></div></div>
+<div class="ltx_page_main">
+<header class="ltx_page_header">
+<div class="ltx_align_center">
+<a class="ltx_ref" href="./" rel="up" title=""><span class="ltx_text ltx_ref_title">Sionna RT: Technical Report</span></a>
+</div></header>
+<div class="ltx_page_content">
+<section class="ltx_section ltx_authors_1line" lang="en">
+<h1 class="ltx_title ltx_title_section">
+<span class="ltx_tag ltx_tag_section">1 </span>Introduction</h1>
+<div class="ltx_para" id="p1">
+<p class="ltx_p">Ray tracing for simulating radio wave propagation has received renewed attention in the recent years, fueled by the growing interest in creating digital twins for wireless communication systems and research topics that require simulating spatially consistent <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">channel impulse responses (CIRs)</span></a>.
+In 2023, we released Sionna RT <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib1" title="">1</a>]</cite>, the world’s first fully differentiable ray tracer for radio propagation modeling, as part of version 0.14 of the Sionna open-source library for research in communication systems <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib2" title="">2</a>]</cite>.
+Over the following years, we have expanded the capabilities of Sionna RT with additional features, including support for diffraction and diffuse reflection (version 0.15), mobility (version 0.17), and <a href="#glo.acronym.RIS"><span class="ltx_glossaryref" href="#glo.acronym.RIS" title="reflective intelligent surface">reflective intelligent surfaces (RISs)</span></a> (version 0.18).</p>
+</div>
+<div class="ltx_para" id="p2">
+<p class="ltx_p">Sionna RT is built on top of the <a href="#glo.acronym.JIT"><span class="ltx_glossaryref" href="#glo.acronym.JIT" title="just-in-time">just-in-time (JIT)</span></a> compiler Dr.Jit <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib3" title="">3</a>]</cite> and the differentiable physically-based renderer Mitsuba <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib4" title="">4</a>]</cite>.
+Sionna RT implements ray tracing-based algorithms to model the propagation of <a href="#glo.acronym.EM"><span class="ltx_glossaryref" href="#glo.acronym.EM" title="electromagnetic">electromagnetic (EM)</span></a> radio waves, enabling the computation of <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIRs</span></a> and radio maps (also known as <em class="ltx_emph ltx_font_italic">coverage maps</em> or <em class="ltx_emph ltx_font_italic">power maps</em>).
+Additionally, it includes radio material models to simulate the interaction of radio waves with scatterers in a radio propagation environment.
+The release of Sionna 1.0 marks a significant milestone as it features a complete revision of the ray tracing module.<span class="ltx_note ltx_role_footnote" id="footnote1"><sup class="ltx_note_mark">1</sup><span class="ltx_note_outer"><span class="ltx_note_content"><sup class="ltx_note_mark">1</sup>
+<span class="ltx_tag ltx_tag_note">1</span>
+            
+            
+            
+          
+As of version 1.0.2, Sionna RT does not currently support diffraction and <a href="#glo.acronym.RIS"><span class="ltx_glossaryref" href="#glo.acronym.RIS" title="reflective intelligent surface">RISs</span></a>. These features are planned for future updates.
+In the meantime, they remain available as part of Sionna version 0.19.2.
+</span></span></span>
+The ray tracer is now interoperable with major deep learning frameworks, including TensorFlow <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib5" title="">5</a>]</cite> and PyTorch <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib6" title="">6</a>]</cite>.
+Moreover, the computation of <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIRs</span></a> and radio maps has been substantially accelerated while maintaining full differentiability of the ray tracing process by leveraging the automatic differentiation capabilities of Dr.Jit.
+The ray tracer has also been made easier to extend to facilitate research on various aspects of radio propagation and digital twins.</p>
+</div>
+<figure class="ltx_figure" id="F1"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="128" id="F1.g1" src="x1.png" width="420"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 1</span>: </span><span class="ltx_text" style="font-size:90%;">A propagation path, shown in 2D for clarity.</span></figcaption>
+</figure>
+<div class="ltx_para" id="p3">
+<p class="ltx_p">The primary objective of Sionna RT is to identify the <em class="ltx_emph ltx_font_italic">propagation paths</em> that link radio devices within a given propagation environment.
+As depicted in Figure <a class="ltx_ref" href="#F1" title="Figure 1 ‣ 1 Introduction ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">1</span></a>, a propagation environment is defined by a collection of scatterers. A radio device functions as either a <em class="ltx_emph ltx_font_italic">transmitter</em>, which emits radio waves, or a <em class="ltx_emph ltx_font_italic">receiver</em>, which captures them, and is equipped with one or more antennas. The <em class="ltx_emph ltx_font_italic">channel frequency response</em> <math alttext="H(f)" class="ltx_Math" display="inline" id="p3.m1"><mrow><mi>H</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow></math> characterizes the propagation of radio waves from a transmitting antenna to a receiving antenna for the frequency <math alttext="f" class="ltx_Math" display="inline" id="p3.m2"><mi>f</mi></math>, and is expressed as the ratio of the received voltage to the voltage at the input of the transmitting antenna:</p>
+<table class="ltx_equation ltx_eqn_table" id="E1">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="H(f)=\frac{V_{\text{R}}}{V_{\text{T}}}." class="ltx_Math" display="block" id="E1.m1"><mrow><mrow><mrow><mi>H</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo>=</mo><mfrac><msub><mi>V</mi><mtext>R</mtext></msub><msub><mi>V</mi><mtext>T</mtext></msub></mfrac></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(1)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">As explained in Appendix <a class="ltx_ref" href="A1.html" title="Appendix A Primer on Electromagnetism ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">A</span></a>, the channel frequency response is the Fourier transform of the <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIR</span></a>, which is defined as:</p>
+<table class="ltx_equation ltx_eqn_table" id="E2">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="h(\tau)=\sum_{n=1}^{N}a_{n}\delta(\tau-\tau_{n})." class="ltx_Math" display="block" id="E2.m1"><mrow><mrow><mrow><mi>h</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow></mrow><mo rspace="0.111em">=</mo><mrow><munderover><mo movablelimits="false">∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>⁢</mo><mi>δ</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mrow><mi>τ</mi><mo>−</mo><msub><mi>τ</mi><mi>n</mi></msub></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(2)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">Here, <math alttext="N" class="ltx_Math" display="inline" id="p3.m3"><mi>N</mi></math> represents the number of <em class="ltx_emph ltx_font_italic">propagation paths</em> connecting the transmit antenna to the receive antenna. The term <math alttext="a_{n}" class="ltx_Math" display="inline" id="p3.m4"><msub><mi>a</mi><mi>n</mi></msub></math> is the <em class="ltx_emph ltx_font_italic">complex-valued path coefficient</em> for the <math alttext="n" class="ltx_Math" display="inline" id="p3.m5"><mi>n</mi></math>-th path, and <math alttext="\tau_{n}=\nicefrac{{r_{n}}}{{c}}" class="ltx_Math" display="inline" id="p3.m6"><mrow><msub><mi>τ</mi><mi>n</mi></msub><mo>=</mo><mrow><mpadded voffset="0.3em"><msub><mi mathsize="70%">r</mi><mi mathsize="71%">n</mi></msub></mpadded><mpadded lspace="-0.1em" width="-0.15em"><mo stretchy="true" symmetric="true">/</mo></mpadded><mi mathsize="70%">c</mi></mrow></mrow></math> is the <em class="ltx_emph ltx_font_italic">propagation delay</em>, where <math alttext="r_{n}" class="ltx_Math" display="inline" id="p3.m7"><msub><mi>r</mi><mi>n</mi></msub></math> is the distance the radio wave travels, and <math alttext="c" class="ltx_Math" display="inline" id="p3.m8"><mi>c</mi></math> is the speed of light. This leads to:</p>
+<table class="ltx_equation ltx_eqn_table" id="E3">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="H(f)=\int_{-\infty}^{\infty}h(\tau)e^{-j2\pi f\tau}\,d\tau=\sum_{n=1}^{N}a_{n}%
+e^{-j2\pi f\tau_{n}}." class="ltx_Math" display="block" id="E3.m1"><mrow><mrow><mrow><mi>H</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>f</mi><mo stretchy="false">)</mo></mrow></mrow><mo rspace="0.111em">=</mo><mrow><msubsup><mo>∫</mo><mrow><mo>−</mo><mi mathvariant="normal">∞</mi></mrow><mi mathvariant="normal">∞</mi></msubsup><mrow><mi>h</mi><mo>⁢</mo><mrow><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo></mrow><mo>⁢</mo><msup><mi>e</mi><mrow><mo>−</mo><mrow><mi>j</mi><mo>⁢</mo><mn>2</mn><mo>⁢</mo><mi>π</mi><mo>⁢</mo><mi>f</mi><mo>⁢</mo><mi>τ</mi></mrow></mrow></msup><mo lspace="0em">⁢</mo><mrow><mo rspace="0em">𝑑</mo><mi>τ</mi></mrow></mrow></mrow><mo rspace="0.111em">=</mo><mrow><munderover><mo movablelimits="false">∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>⁢</mo><msup><mi>e</mi><mrow><mo>−</mo><mrow><mi>j</mi><mo>⁢</mo><mn>2</mn><mo>⁢</mo><mi>π</mi><mo>⁢</mo><mi>f</mi><mo>⁢</mo><msub><mi>τ</mi><mi>n</mi></msub></mrow></mrow></msup></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(3)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">Notably, the path coefficient <math alttext="a_{n}" class="ltx_Math" display="inline" id="p3.m9"><msub><mi>a</mi><mi>n</mi></msub></math> is calculated by considering the sequence of matrices that model the transformations caused by interactions with scatterers along the <math alttext="n" class="ltx_Math" display="inline" id="p3.m10"><mi>n</mi></math>-th propagation path, as well as the characteristics of the transmit and receive antennas:</p>
+<table class="ltx_equation ltx_eqn_table" id="E4">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="a_{n}=\frac{\lambda}{4\pi}\mathbf{C}_{\text{R}}(\theta_{\text{R},n},\varphi_{%
+\text{R},n})^{\mathsf{H}}\left(\prod_{\ell^{\prime}=1}^{\ell}\mathbf{T}_{n}^{(%
+\ell^{\prime})}\right)\mathbf{C}_{\text{T}}(\theta_{\text{T},n},\varphi_{\text%
+{T},n})." class="ltx_Math" display="block" id="E4.m1"><mrow><mrow><msub><mi>a</mi><mi>n</mi></msub><mo>=</mo><mrow><mfrac><mi>λ</mi><mrow><mn>4</mn><mo>⁢</mo><mi>π</mi></mrow></mfrac><mo>⁢</mo><msub><mi>𝐂</mi><mtext>R</mtext></msub><mo>⁢</mo><msup><mrow><mo stretchy="false">(</mo><msub><mi>θ</mi><mrow><mtext>R</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo>,</mo><msub><mi>φ</mi><mrow><mtext>R</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow><mi>𝖧</mi></msup><mo>⁢</mo><mrow><mo>(</mo><mrow><munderover><mo lspace="0em" movablelimits="false">∏</mo><mrow><msup><mi mathvariant="normal">ℓ</mi><mo>′</mo></msup><mo>=</mo><mn>1</mn></mrow><mi mathvariant="normal">ℓ</mi></munderover><msubsup><mi>𝐓</mi><mi>n</mi><mrow><mo stretchy="false">(</mo><msup><mi mathvariant="normal">ℓ</mi><mo>′</mo></msup><mo stretchy="false">)</mo></mrow></msubsup></mrow><mo>)</mo></mrow><mo>⁢</mo><msub><mi>𝐂</mi><mtext>T</mtext></msub><mo>⁢</mo><mrow><mo stretchy="false">(</mo><msub><mi>θ</mi><mrow><mtext>T</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo>,</mo><msub><mi>φ</mi><mrow><mtext>T</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(4)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">Here, <math alttext="\lambda" class="ltx_Math" display="inline" id="p3.m11"><mi>λ</mi></math> is the wavelength, <math alttext="\ell" class="ltx_Math" display="inline" id="p3.m12"><mi mathvariant="normal">ℓ</mi></math> is the number of scatterers along the <math alttext="n" class="ltx_Math" display="inline" id="p3.m13"><mi>n</mi></math>-th path, <math alttext="\mathbf{C}_{\text{T}}" class="ltx_Math" display="inline" id="p3.m14"><msub><mi>𝐂</mi><mtext>T</mtext></msub></math> is the complex-valued vector of dimension 2 representing the <em class="ltx_emph ltx_font_italic">transmit antenna pattern</em> evaluated for the angles of departure of the path <math alttext="(\theta_{\text{T},n},\varphi_{\text{T},n})" class="ltx_Math" display="inline" id="p3.m15"><mrow><mo stretchy="false">(</mo><msub><mi>θ</mi><mrow><mtext>T</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo>,</mo><msub><mi>φ</mi><mrow><mtext>T</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></math>, <math alttext="\mathbf{C}_{\text{R}}" class="ltx_Math" display="inline" id="p3.m16"><msub><mi>𝐂</mi><mtext>R</mtext></msub></math> is the complex-valued vector of dimension 2 representing the <em class="ltx_emph ltx_font_italic">receive antenna pattern</em> evaluated for the angles of arrival of the path <math alttext="(\theta_{\text{R},n},\varphi_{\text{R},n})" class="ltx_Math" display="inline" id="p3.m17"><mrow><mo stretchy="false">(</mo><msub><mi>θ</mi><mrow><mtext>R</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo>,</mo><msub><mi>φ</mi><mrow><mtext>R</mtext><mo>,</mo><mi>n</mi></mrow></msub><mo stretchy="false">)</mo></mrow></math>, and <math alttext="\mathbf{T}_{n}^{(\ell^{\prime})}" class="ltx_Math" display="inline" id="p3.m18"><msubsup><mi>𝐓</mi><mi>n</mi><mrow><mo stretchy="false">(</mo><msup><mi mathvariant="normal">ℓ</mi><mo>′</mo></msup><mo stretchy="false">)</mo></mrow></msubsup></math> is the <math alttext="2\times 2" class="ltx_Math" display="inline" id="p3.m19"><mrow><mn>2</mn><mo lspace="0.222em" rspace="0.222em">×</mo><mn>2</mn></mrow></math> complex-valued matrix modeling the interaction with the <math alttext="\ell^{\prime}" class="ltx_Math" display="inline" id="p3.m20"><msup><mi mathvariant="normal">ℓ</mi><mo>′</mo></msup></math>-th scatterer. Further details on the computation of the path coefficient are provided in Section <a class="ltx_ref" href="S3.html" title="3 Path Solver ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">3</span></a>.
+The corresponding <em class="ltx_emph ltx_font_italic">channel gain</em> is</p>
+<table class="ltx_equation ltx_eqn_table" id="E5">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="g=\sum_{n=1}^{N}\left|a_{n}\right|^{2}." class="ltx_Math" display="block" id="E5.m1"><mrow><mrow><mi>g</mi><mo rspace="0.111em">=</mo><mrow><munderover><mo movablelimits="false" rspace="0em">∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo>|</mo><msub><mi>a</mi><mi>n</mi></msub><mo>|</mo></mrow><mn>2</mn></msup></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(5)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">It is crucial to understand that calculating the path coefficients and delays necessitates first determining the intersection points of the paths with the scene geometry, referred to as the <em class="ltx_emph ltx_font_italic">path vertices</em>. This is because computing the path coefficients (<a class="ltx_ref" href="#E4" title="In 1 Introduction ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">4</span></a>) requires the knowledge of the geometrical features of the paths. Specifically, the antenna patterns are evaluated at the angles of departure and arrival of the paths, and computing the matrices <math alttext="\mathbf{T}_{n}^{(\ell^{\prime})}" class="ltx_Math" display="inline" id="p3.m21"><msubsup><mi>𝐓</mi><mi>n</mi><mrow><mo stretchy="false">(</mo><msup><mi mathvariant="normal">ℓ</mi><mo>′</mo></msup><mo stretchy="false">)</mo></mrow></msubsup></math> requires the angles of incidence and scattering of waves at the scatterers as well as the traveled distances. Once the path vertices have been determined, the path coefficients and delays are computed, considering the characteristics of the antennas and scatterers’ materials.</p>
+</div>
+<div class="ltx_para" id="p4">
+<p class="ltx_p">Paths are determined between two endpoints: a <em class="ltx_emph ltx_font_italic">source</em> and a <em class="ltx_emph ltx_font_italic">target</em>. Ideally, paths would be traced between every pair of transmitter and receiver antennas, designating the sources and targets as the set of transmit and receive antennas, respectively. However, when radio devices are equipped with a large number of antennas, computing paths for all antenna pairs becomes computationally demanding. To mitigate this issue, Sionna RT introduces a <em class="ltx_emph ltx_font_italic">synthetic array</em> feature, which calculates paths only between radio devices instead of each antenna pair. Phase shifts due to the array geometry are then applied synthetically, as detailed in Section <a class="ltx_ref" href="S3.html" title="3 Path Solver ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">3</span></a>. Note that the use of synthetic arrays can be disabled. Throughout this document, the endpoints of a path will be referred to as sources and targets, which can be either radio devices or antennas. Although the use of synthetic arrays does not change the pathfinding process, it does affect the computation of the path coefficient and delays.</p>
+</div>
+<figure class="ltx_figure" id="F2"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_landscape" height="162" id="F2.g1" src="x2.png" width="563"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 2</span>: </span><span class="ltx_text" style="font-size:90%;">Sionna RT architecture overview.</span></figcaption>
+</figure>
+<div class="ltx_para" id="p5">
+<p class="ltx_p">Figure <a class="ltx_ref" href="#F2" title="Figure 2 ‣ 1 Introduction ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">2</span></a> illustrates the overall architecture of Sionna RT.
+A <em class="ltx_emph ltx_font_italic">scene</em> represents a radio propagation environment, comprising a set of <em class="ltx_emph ltx_font_italic">objects</em>, <em class="ltx_emph ltx_font_italic">radio materials</em>, and <em class="ltx_emph ltx_font_italic">radio devices</em>.
+Each object acting as a scatterer is associated with a radio material that determines its interaction with incident radio waves.
+Multiple objects can share the same radio material. Radio materials are akin to <a href="#glo.acronym.BSDF"><span class="ltx_glossaryref" href="#glo.acronym.BSDF" title="bidirectional scattering distribution function">bidirectional scattering distribution function (BSDF)</span></a> in the field of computer graphics, see e.g. <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib7" title="">7</a>, Ch. 4.3.1]</cite>.
+Note that an <em class="ltx_emph ltx_font_italic">object</em> alone defines only the geometry of a scatterer and does not contain any information about the radio material.
+Radio devices are either transmitters or receivers.
+A <em class="ltx_emph ltx_font_italic">solver</em> implements an algorithm for simulating radio wave propagation within a scene.
+Given the distinct algorithmic requirements for <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIRs</span></a> and radio maps, Sionna RT provides two types of solvers:</p>
+<ul class="ltx_itemize" id="I1">
+<li class="ltx_item" id="I1.i1" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="I1.i1.p1">
+<p class="ltx_p">The <em class="ltx_emph ltx_font_italic">path solver</em> computes a set of paths connecting a source to a target, which can then be used to compute a <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIR</span></a>.</p>
+</div>
+</li>
+<li class="ltx_item" id="I1.i2" style="list-style-type:none;">
+<span class="ltx_tag ltx_tag_item">•</span>
+<div class="ltx_para" id="I1.i2.p1">
+<p class="ltx_p">The <em class="ltx_emph ltx_font_italic">radio map solver</em> computes a radio map, a 2D grid of values that approximate the channel gain (<a class="ltx_ref" href="#E5" title="In 1 Introduction ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">5</span></a>) that a receiver located on the grid would observe.</p>
+</div>
+</li>
+</ul>
+<p class="ltx_p">While Sionna RT provides built-in solvers and radio material models, it is designed to facilitate the implementation of custom alternatives.</p>
+</div>
+<section class="ltx_paragraph" id="SS0.SSS0.Px1">
+<h2 class="ltx_title ltx_title_paragraph">Contributions of the Technical Report</h2>
+<div class="ltx_para" id="SS0.SSS0.Px1.p1">
+<p class="ltx_p">Beyond serving as a technical reference, this technical report provides theoretical contributions by detailing the key methods implemented in Sionna RT for simulating radio wave propagation by ray tracing.
+For computing paths, a method that combines <a href="#glo.acronym.SBR"><span class="ltx_glossaryref" href="#glo.acronym.SBR" title="shooting and bouncing of rays">shooting and bouncing of rays (SBR)</span></a> with the image method is presented. Although this approach existed in earlier versions of Sionna RT, it has been significantly refined in Sionna 1.0, notably by incorporating a hashing-based mechanism to efficiently remove duplicate paths.
+The technical report also introduces a formal definition of radio maps, which forms the foundation for the radio map solver implemented in Sionna RT, as it enables efficient computation through <a href="#glo.acronym.SBR"><span class="ltx_glossaryref" href="#glo.acronym.SBR" title="shooting and bouncing of rays">SBR</span></a> alone. It is worth noting that <a href="#glo.acronym.SBR"><span class="ltx_glossaryref" href="#glo.acronym.SBR" title="shooting and bouncing of rays">SBR</span></a> is already extensively used in the graphics community (see e.g. <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib7" title="">7</a>]</cite>).
+Moreover, we include discussions on the limitations of the current algorithms and offer perspectives for future improvements.</p>
+</div>
+</section>
+<section class="ltx_paragraph" id="SS0.SSS0.Px2">
+<h2 class="ltx_title ltx_title_paragraph">Structure of the Technical Report</h2>
+<div class="ltx_para" id="SS0.SSS0.Px2.p1">
+<p class="ltx_p">Section <a class="ltx_ref" href="S2.html" title="2 Essential Concepts and Terminology ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">2</span></a> introduces the essential concepts and terminology.
+Sections <a class="ltx_ref" href="S3.html" title="3 Path Solver ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">3</span></a> and <a class="ltx_ref" href="S4.html" title="4 Radio Map Solver ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">4</span></a> provide an in-depth look at the built-in path solver and radio map solver of Sionna RT, respectively.
+These sections primarily focus on path tracing algorithms, specifically the methods used to determine the intersection points of paths with scene geometry.
+Appendix <a class="ltx_ref" href="A1.html" title="Appendix A Primer on Electromagnetism ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">A</span></a> provides a primer on <a href="#glo.acronym.EM"><span class="ltx_glossaryref" href="#glo.acronym.EM" title="electromagnetic">EM</span></a> theory and explains the computation of the electric field along a path.</p>
+</div>
+</section>
+</section>
+</div>
+<footer class="ltx_page_footer">
+<div class="ltx_align_center">
+</div>
+<div class="ltx_page_logo">Generated  on Wed Apr 30 18:10:24 2025 by <a class="ltx_LaTeXML_logo" href="http://dlmf.nist.gov/LaTeXML/"><span style="letter-spacing:-0.2em; margin-right:0.1em;">L<span class="ltx_font_smallcaps" style="position:relative; bottom:2.2pt;">a</span>T<span class="ltx_font_smallcaps" style="font-size:120%;position:relative; bottom:-0.2ex;">e</span></span><span style="font-size:90%; position:relative; bottom:-0.2ex;">XML</span><img alt="Mascot Sammy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg=="/></a>
+</div></footer>
+</div>
+</body>
+</html>

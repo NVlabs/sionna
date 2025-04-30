@@ -490,6 +490,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1673,9 +1674,8 @@
         <span class="n">s_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already used by another item of the&quot;</span>\
-                       <span class="s2">&quot; scene&quot;</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already used by another item&quot;</span>
+                                 <span class="s2">&quot; of the scene&quot;</span><span class="p">)</span>
 
             <span class="c1"># This exact item was already added, skip it.</span>
             <span class="k">return</span>
@@ -1714,18 +1714,17 @@
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">RadioMaterialBase</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">is_used</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The radio material &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is used by at least one&quot;</span>\
-                        <span class="s2">&quot; object&quot;</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot remove the radio material &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                                  <span class="s2">&quot; because it is still used by at least one&quot;</span>
+                                  <span class="s2">&quot; object&quot;</span><span class="p">)</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radio_materials</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Transmitter</span><span class="p">):</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transmitters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">):</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Only Transmitters, Receivers, or&quot;</span>\
-                  <span class="s2">&quot; RadioMaterials can be removed&quot;</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Only Transmitters, Receivers, or RadioMaterials&quot;</span>
+                            <span class="s2">&quot; can be removed&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Scene.edit">
@@ -2308,9 +2307,8 @@
         <span class="n">s_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span>  <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">scene_object</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already used by another item of the&quot;</span>\
-                       <span class="s2">&quot; scene&quot;</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already used by another item&quot;</span>
+                                 <span class="s2">&quot; of the scene&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># This item was already added.</span>
                 <span class="k">return</span>
@@ -2318,7 +2316,7 @@
         <span class="c1"># Add the scene object and its material</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">scene_object</span><span class="o">.</span><span class="n">radio_material</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object </span><span class="si">{</span><span class="n">scene_object</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> has no radio&quot;</span>
-                                <span class="s2">&quot; material assigned to it&quot;</span><span class="p">)</span>
+                             <span class="s2">&quot; material assigned to it&quot;</span><span class="p">)</span>
         <span class="n">scene_object</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span><span class="p">[</span><span class="n">scene_object</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">scene_object</span>
         <span class="c1"># Add the scene object radio material as well</span>

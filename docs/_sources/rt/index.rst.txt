@@ -16,6 +16,8 @@ extended according to one's needs.
 
 Sionna RT is available as a standalone package whose source code is located in a
 separate `GitHub repository <https://github.com/NVlabs/sionna-rt>`_.
+A technical report describing the algorithms implemented in Sionna RT is available
+`here <https://nvlabs.github.io/sionna/rt/tech-report/index.html>`_.
 
 .. toctree::
    :hidden: 
@@ -25,3 +27,4 @@ separate `GitHub repository <https://github.com/NVlabs/sionna-rt>`_.
    em_primer
    api/rt.rst
    developer/developer.rst
+   Technical Report <https://nvlabs.github.io/sionna/rt/tech-report/index.html>

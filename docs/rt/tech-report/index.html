@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="en" prefix="dcterms: http://purl.org/dc/terms/">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<title>Sionna RT: Technical Report</title>
+<!--Generated on Wed Apr 30 18:10:24 2025 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<link href="LaTeXML.css" rel="stylesheet" type="text/css"/>
+<link href="ltx-article.css" rel="stylesheet" type="text/css"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+</head>
+<body><div class="nav-panel"><div class="nav-panel-header"><h1 class="nav-panel-header-title">NVIDIA Sionna RT</h1><p class="nav-panel-header-subtitle">Technical Report</p></div><div class="nav-panel-content"><nav class="ltx_TOC"><h2 class="nav-panel-toc-title">Contents</h2><ul class="ltx_toclist"><li class="ltx_tocentry"><a class="ltx_tocentry" href="S1.html">Introduction</a></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S2.html">Essential Concepts and Terminology</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS1">Scene Objects and Meshes</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS2">Rays and Paths</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS3">Interactions with Scene Objects</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS4">Ray Tubes</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S3.html">Path Solver</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS1">Generating Candidates by Shooting and Bouncing of Rays (SBR)</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS2">Image Method-based Candidate Processing</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS3">Channel Coefficients, Delays, and Doppler Shifts Computation</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S4.html">Radio Map Solver</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS1">Definition of a Radio Map</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS2">SBR-based Radio Map Solver</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="A1.html">Appendix: Primer on Electromagnetism</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS1">Coordinate System, Rotations, and Vector Fields</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS2">Planar Time-Harmonic Waves</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS3">Far Field of a Transmitting Antenna</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS4">Modeling of a Receiving Antenna</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS5">General Propagation Path</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS6">Frequency and Impulse Response</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS7">Specular Reflection and Refraction</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS8">Diffuse Reflection</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="bib.html">References</a></li></ul></nav></div></div>
+<div class="ltx_page_main">
+<div class="ltx_page_content">
+<article class="ltx_document ltx_authors_1line">
+
+<h1 class="ltx_title ltx_title_document" lang="en">Sionna RT: Technical Report</h1>
+<div class="ltx_authors">
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname" lang="en">Fayçal Aït Aoudia
+</span><span class="ltx_author_notes">
+<span class="ltx_contact ltx_role_affiliation">
+</span></span></span>
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname" lang="en"> Jakob Hoydis
+</span><span class="ltx_author_notes">
+<span class="ltx_contact ltx_role_affiliation">
+</span></span></span>
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname" lang="en"> Merlin Nimier-David
+</span><span class="ltx_author_notes">
+<span class="ltx_contact ltx_role_affiliation">
+</span></span></span>
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname" lang="en"> Sebastian Cammerer
+</span><span class="ltx_author_notes">
+<span class="ltx_contact ltx_role_affiliation">
+</span></span></span>
+<span class="ltx_creator ltx_role_author">
+<span class="ltx_personname" lang="en"> and Alexander Keller
+</span><span class="ltx_author_notes">
+<span class="ltx_contact ltx_role_affiliation">
+</span></span></span>
+</div>
+<div class="ltx_abstract">
+<h6 class="ltx_title ltx_title_abstract">Abstract</h6>
+<p class="ltx_p"><span class="ltx_text" lang="en">Sionna™ is an open-source, GPU-accelerated library that, as of version 0.14, incorporates a ray tracer for simulating radio wave propagation.
+A unique feature of Sionna RT is differentiability, enabling the calculation of gradients for the <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">channel impulse responses (CIRs)</span></a>, radio maps, and other related metrics with respect to system and environmental parameters, such as material properties, antenna patterns, and array geometries.
+The release of Sionna 1.0 provides a complete overhaul of the ray tracer, significantly improving its speed, memory efficiency, and extensibility.
+This document details the algorithms employed by Sionna RT to simulate radio wave propagation efficiently, while also addressing their current limitations.
+Given that the computation of <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIRs</span></a> and radio maps requires distinct algorithms, these are detailed in separate sections.
+For <a href="#glo.acronym.CIR"><span class="ltx_glossaryref" href="#glo.acronym.CIR" title="channel impulse response">CIRs</span></a>, Sionna RT integrates <a href="#glo.acronym.SBR"><span class="ltx_glossaryref" href="#glo.acronym.SBR" title="shooting and bouncing of rays">shooting and bouncing of rays (SBR)</span></a> with the image method and uses a hashing-based mechanism to efficiently eliminate duplicate paths. Radio maps are computed using a purely <a href="#glo.acronym.SBR"><span class="ltx_glossaryref" href="#glo.acronym.SBR" title="shooting and bouncing of rays">SBR</span></a>-based approach.</span></p>
+</div><a class="pdf-download-link" href="https://drive.google.com/file/d/1S-T_MyWUbeNacy5YpSRKztQfXvOfnerR">PDF version</a><div class="ltx_para"><h6 class="ltx_title ltx_title_section">Citation</h6><div class="ltx_verbatim"><button class="copy-button">Copy</button><pre>@article{sionna-rt-tech-report,
+title={Sionna RT: Technical Report},
+author={{Aït Aoudia}, Fayçal and Hoydis, Jakob and Nimier-David, Merlin and Cammerer, Sebastian and Keller, Alexander},
+year = {2025},
+month = {Apr},
+online = {https://drive.google.com/file/d/1S-T_MyWUbeNacy5YpSRKztQfXvOfnerR}
+}</pre></div></div>
+
+
+
+
+
+
+
+</article>
+</div>
+<footer class="ltx_page_footer">
+<div class="ltx_page_logo">Generated  on Wed Apr 30 18:10:24 2025 by <a class="ltx_LaTeXML_logo" href="http://dlmf.nist.gov/LaTeXML/"><span style="letter-spacing:-0.2em; margin-right:0.1em;">L<span class="ltx_font_smallcaps" style="position:relative; bottom:2.2pt;">a</span>T<span class="ltx_font_smallcaps" style="font-size:120%;position:relative; bottom:-0.2ex;">e</span></span><span style="font-size:90%; position:relative; bottom:-0.2ex;">XML</span><img alt="Mascot Sammy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg=="/></a>
+</div></footer>
+</div>
+<script>
+    document.querySelector('.copy-button').addEventListener('click', function() {
+        const bibtex = this.parentElement.querySelector('pre').textContent;
+        navigator.clipboard.writeText(bibtex).then(() => {
+            this.textContent = 'Copied!';
+            this.classList.add('copied');
+            setTimeout(() => {
+                this.textContent = 'Copy';
+                this.classList.remove('copied');
+            }, 2000);
+        });
+    });
+    </script></body>
+</html>

@@ -496,6 +496,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Physical Layer (PHY)</a><ul class="current">
@@ -1415,7 +1416,6 @@
 
         </td>
     </table>
-
 </div><section id="Introduction-to-Iterative-Detection-and-Decoding">
 <h1>Introduction to Iterative Detection and Decoding<a class="headerlink" href="#Introduction-to-Iterative-Detection-and-Decoding" title="Link to this heading"></a></h1>
 <p>In this notebook, you will learn how to set-up an iterative detection and decoding (IDD) scheme (first presented in [1]) by combining multiple available components in Sionna.</p>
@@ -1446,7 +1446,7 @@
 <section id="GPU-Configuration-and-Imports">
 <h2>GPU Configuration and Imports<a class="headerlink" href="#GPU-Configuration-and-Imports" title="Link to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -1504,7 +1504,7 @@
 <p>The standard configuration implements a coded 5G inspired MU-MIMO OFDM uplink transmission over 3GPP UMa channels, with 4 single-antenna UEs, 16-QAM modulation, and a 16 element dual-polarized uniform planar antenna array (UPA) at the gNB. We implement least squares channel estimation with linear interpolation. Alternatively, we implement iid Rayleigh fading channels and perfect channel state information (CSI), which can be controlled by the model parameter <code class="docutils literal notranslate"><span class="pre">perfect_csi_rayleigh</span></code>. As channel
 code, we apply a rate-matched 5G LDPC code at rate 1/2.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">SIMPLE_SIM</span> <span class="o">=</span> <span class="kc">False</span>   <span class="c1"># reduced simulation time for simple simulation if set to True</span>
@@ -1597,7 +1597,7 @@ code, we apply a rate-matched 5G LDPC code at rate 1/2.</p>
 <h2>Setting-up an End-to-end Block<a class="headerlink" href="#Setting-up-an-End-to-end-Block" title="Link to this heading"></a></h2>
 <p>Now, we define the baseline models for benchmarking. Let us start with the non-IDD models.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">NonIddModel</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
@@ -1698,7 +1698,7 @@ code, we apply a rate-matched 5G LDPC code at rate 1/2.</p>
 </div>
 <p>Next, we implement the IDD model with a non-resetting LDPC decoder, as in [3], i.e., we forward the LLRs and decoder state from one IDD iteration to the following.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">IddModel</span><span class="p">(</span><span class="n">NonIddModel</span><span class="p">):</span>  <span class="c1"># inherited from NonIddModel</span>
@@ -1712,7 +1712,7 @@ code, we apply a rate-matched 5G LDPC code at rate 1/2.</p>
                                               <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_siso_decoder</span> <span class="o">=</span> <span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="p">,</span> <span class="n">return_infobits</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                            <span class="n">num_iter</span><span class="o">=</span><span class="n">num_bp_iter_per_idd_iter</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cn_update</span><span class="o">=</span><span class="s1">&#39;minsum&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span> <span class="o">=</span> <span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="p">,</span> <span class="n">return_infobits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hard_out</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="n">num_bp_iter_per_idd_iter</span><span class="p">,</span> <span class="n">cn_type</span><span class="o">=</span><span class="s1">&#39;minsum&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decoder</span> <span class="o">=</span> <span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="p">,</span> <span class="n">return_infobits</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">hard_out</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="n">num_bp_iter_per_idd_iter</span><span class="p">,</span> <span class="n">cn_update</span><span class="o">=</span><span class="s1">&#39;minsum&#39;</span><span class="p">)</span>
         <span class="c1"># last decoder must also be statefull</span>
 
     <span class="nd">@tf</span><span class="o">.</span><span class="n">function</span>  <span class="c1"># We don&#39;t use jit_compile=True to ensure better numerical stability</span>
@@ -1786,7 +1786,7 @@ code, we apply a rate-matched 5G LDPC code at rate 1/2.</p>
 <section id="Non-IDD-versus-IDD-Benchmarks">
 <h2>Non-IDD versus IDD Benchmarks<a class="headerlink" href="#Non-IDD-versus-IDD-Benchmarks" title="Link to this heading"></a></h2>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Range of SNR (dB)</span>
@@ -1987,7 +1987,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 </div>
 <p>Finally, we plot the simulation results and observe that IDD outperforms the non-iterative methods by about 1 dB in the scenario with iid Rayleigh fading channels and perfect CSI. In the scenario with 3GPP UMa channels and estimated CSI, IDD performs slightly better than K-best, at considerably lower runtime.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>

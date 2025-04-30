@@ -490,6 +490,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1562,9 +1563,8 @@
     <span class="nd">@relative_permittivity</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">relative_permittivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eta_r</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">eta_r</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Real part of the relative permittivity must greater &quot;</span>\
-                <span class="s2">&quot;or equal to 1&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Real part of the relative permittivity must be&quot;</span>
+                             <span class="s2">&quot; greater or equal to 1&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eta_r</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">eta_r</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -1578,8 +1578,7 @@
     <span class="nd">@conductivity</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">conductivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">sigma</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;The conductivity must be greater or equal to 0&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The conductivity must be greater or equal to 0&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -1608,8 +1607,7 @@
     <span class="nd">@scattering_coefficient</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">scattering_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Scattering coefficient must be in range (0,1)&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scattering coefficient must be in range (0,1)&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -1624,8 +1622,7 @@
     <span class="nd">@xpd_coefficient</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">xpd_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kx</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">kx</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">kx</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;XPD coefficient must be in the range (0,1)&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;XPD coefficient must be in the range (0,1)&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_kx</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">kx</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_xpd_jones_mat</span><span class="p">()</span>
 

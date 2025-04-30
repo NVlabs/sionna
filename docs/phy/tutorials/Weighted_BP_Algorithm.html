@@ -496,6 +496,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Physical Layer (PHY)</a><ul class="current">
@@ -1415,7 +1416,6 @@
 
         </td>
     </table>
-
 </div><section id="Weighted-Belief-Propagation-Decoding">
 <h1>Weighted Belief Propagation Decoding<a class="headerlink" href="#Weighted-Belief-Propagation-Decoding" title="Link to this heading"></a></h1>
 <p>This notebooks implements the <em>Weighted Belief Propagation</em> (BP) algorithm as proposed by Nachmani <em>et al.</em> in [1]. The main idea is to leverage BP decoding by additional trainable weights that scale each outgoing variable node (VN) and check node (CN) message. These weights provide additional degrees of freedom and can be trained by stochastic gradient descent (SGD) to improve the BP performance for the given code. If all weights are initialized with <em>1</em>, the algorithm equals the <em>classical</em> BP
@@ -1529,7 +1529,7 @@ algorithm and, thus, the concept can be seen as a generalized BP decoder.</p>
 </ul>
 <p>The BP decoder itself does not have any trainable weights. However, the LDPCBPDecoder API allows to register custom callback functions after each VN/CN node update step. In this tutorial, we use the <code class="docutils literal notranslate"><span class="pre">WeightedBPCallback</span></code> to apply trainable weights to each exchanged internal decoder message. Similarly, offset-corrected BP can be made trainable.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">WeightedBP</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
@@ -1580,7 +1580,7 @@ algorithm and, thus, the concept can be seen as a generalized BP decoder.</p>
                                      <span class="n">num_iter</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># iterations are done via outer loop (to access intermediate results for multi-loss)</span>
                                      <span class="n">return_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># decoder stores internal messages after call</span>
                                      <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># we need to access soft-information</span>
-                                     <span class="n">cn_type</span><span class="o">=</span><span class="s2">&quot;boxplus&quot;</span><span class="p">,</span>
+                                     <span class="n">cn_update</span><span class="o">=</span><span class="s2">&quot;boxplus&quot;</span><span class="p">,</span>
                                      <span class="n">v2c_callbacks</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_weights</span><span class="p">])</span><span class="c1"># register callback to make the decoder trainable</span>
 
         <span class="c1"># used to generate llrs during training (see example notebook on all-zero codeword trick)</span>
@@ -1943,7 +1943,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
 <p>In this Section, you will experience what happens if we apply the same concept to the 5G LDPC code (including rate matching).</p>
 <p>For this, we need to define a new model.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">WeightedBP5G</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
@@ -2000,7 +2000,7 @@ EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |
                                      <span class="n">return_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                      <span class="n">hard_out</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                      <span class="n">prune_pcm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                     <span class="n">cn_type</span><span class="o">=</span><span class="s2">&quot;boxplus&quot;</span><span class="p">,</span>
+                                     <span class="n">cn_update</span><span class="o">=</span><span class="s2">&quot;boxplus&quot;</span><span class="p">,</span>
                                      <span class="n">v2c_callbacks</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_weights</span><span class="p">,])</span> <span class="c1"># register callback</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">llr_source</span> <span class="o">=</span> <span class="n">GaussianPriorSource</span><span class="p">()</span>

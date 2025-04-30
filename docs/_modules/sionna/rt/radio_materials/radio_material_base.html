@@ -490,6 +490,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1442,9 +1443,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">scene_module</span><span class="o">.</span><span class="n">Scene</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`scene` must be an instance of Scene&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">scene</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Radio material (&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;) already used by another &quot;</span>\
-                <span class="s2">&quot;scene&quot;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Radio material (&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;) already used by&quot;</span>
+                             <span class="s2">&quot; another scene.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
 
     <span class="nd">@property</span>
@@ -1476,8 +1476,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_color</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">new_color</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="n">new_color</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Color components must be in the range (0,1)&quot;</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Color components must be in the range (0,1)&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_color</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_color</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new_color</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">new_color</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 
     <span class="nd">@property</span>

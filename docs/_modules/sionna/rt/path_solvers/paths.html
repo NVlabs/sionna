@@ -490,6 +490,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -2110,8 +2111,6 @@
 
         <span class="n">frequencies</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
 
-        <span class="n">frequencies</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">frequencies</span><span class="p">)</span>
-
         <span class="c1"># Get complex baseband equivalent CIR</span>
         <span class="n">a</span><span class="p">,</span> <span class="n">tau_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">sampling_frequency</span><span class="o">=</span><span class="n">sampling_frequency</span><span class="p">,</span>
                            <span class="n">num_time_steps</span><span class="o">=</span><span class="n">num_time_steps</span><span class="p">,</span>
@@ -2130,7 +2129,7 @@
 
         <span class="c1"># Add dummy dimensions to account for synthetic arrays</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">synthetic_array</span><span class="p">:</span>
-            <span class="n">num_rx</span><span class="p">,</span> <span class="n">num_tx</span><span class="p">,</span> <span class="n">num_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">num_rx</span><span class="p">,</span> <span class="n">num_tx</span><span class="p">,</span> <span class="n">num_paths</span> <span class="o">=</span> <span class="n">tau_</span><span class="o">.</span><span class="n">shape</span>
             <span class="n">tau_</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">TensorXf</span><span class="p">,</span> <span class="n">tau_</span><span class="p">,</span>
                              <span class="p">[</span><span class="n">num_rx</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_tx</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_paths</span><span class="p">])</span>
 
