@@ -1,0 +1,93 @@
+Performance Tweaks
+==================
+
+This guide covers key performance optimizations for the Jetson platform, including power settings, CPU governors, and real-time priority settings.
+
+Power Management
+----------------
+
+Per default the Jetson platform is configured to use the "balanced" power mode.
+For best performance, we recommend to use the "max-performance" power mode as described below.
+
+You can view the current settings with:
+
+.. code-block:: bash
+
+   # Check current power mode
+   sudo nvpmodel -q
+
+   # View detailed configuration
+   sudo nvpmodel -q --verbose
+
+To optimize the power settings, run:
+
+.. code-block:: bash
+
+   # Set maximum performance mode (50W)
+   sudo nvpmodel -m 0
+
+   # Verify changes
+   sudo nvpmodel -q
+
+The CPU governor controls how the processor scales frequency based on load. Setting it to "performance" ensures maximum processing speed.
+
+.. code-block:: bash
+
+   # Set governor for cores 1-4
+   sudo cpufreq-set -c 0 -g performance
+
+   # Set governor for cores 5-8
+   sudo cpufreq-set -c 4 -g performance
+
+   # Set governor for cores 9-12
+   sudo cpufreq-set -c 8 -g performance
+
+
+Real-Time Scheduling
+--------------------
+
+The signal processing latency is critical for the 5G stack.
+We recommend to use the following configuration to further reduce the latency induced by the scheduler.
+
+Create USRP group and add user:
+
+   .. code-block:: bash
+
+      sudo groupadd usrp
+      sudo usermod -aG usrp $USER
+
+Add real-time priority limits by creating/editing ``/etc/security/limits.conf``:
+
+   .. code-block:: text
+
+      @usrp - rtprio 99
+
+
+Configure kernel real-time scheduling:
+
+.. code-block:: bash
+
+   # Check current setting
+   cat /proc/sys/kernel/sched_rt_runtime_us
+
+   # Remove runtime limit
+   sudo su -
+   echo -1 > /proc/sys/kernel/sched_rt_runtime_us
+
+.. note::
+   Log out and back in for group changes to take effect. A system reboot may be required for some changes.
+
+Verifying Settings
+------------------
+
+.. code-block:: bash
+
+   # Check CPU frequencies
+   cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+
+   # Check CPU governors
+   cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+
+   # Check real-time limits
+   ulimit -r
+
