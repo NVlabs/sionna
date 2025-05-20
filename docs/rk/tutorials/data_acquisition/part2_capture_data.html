@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3 current"><a class="reference internal" href="index.html">Plugins &amp; Data Acquisition</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Part 2: Capture Data</a><ul>
@@ -1643,17 +1653,16 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="n">config</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">.</span><span class="n">override</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">template</span> <span class="n">config</span><span class="o">/</span><span class="n">b200_arm64</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">.</span><span class="n">override</span><span class="o">.</span><span class="n">yaml</span>
 </pre></div>
 </div>
-<p>And edit the file accordingly:
-.. code-block:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">:</span><span class="n">caption</span><span class="p">:</span> <span class="n">Mount</span> <span class="n">capture</span> <span class="n">files</span>
-<span class="p">:</span><span class="n">name</span><span class="p">:</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">.</span><span class="n">override</span><span class="o">.</span><span class="n">yaml</span>
-
-<span class="n">services</span><span class="p">:</span>
+<p>And edit the file accordingly:</p>
+<div class="literal-block-wrapper docutils container" id="docker-compose-override-yaml">
+<div class="code-block-caption"><span class="caption-number">Listing 12 </span><span class="caption-text">Mount capture files</span><a class="headerlink" href="#docker-compose-override-yaml" title="Link to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="p">:</span>
 <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="p">:</span>
     <span class="n">volumes</span><span class="p">:</span>
     <span class="o">-</span> <span class="o">../../</span><span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
     <span class="o">-</span> <span class="o">../../</span><span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
+</div>
 </div>
 <p>Create the files before running the container:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the logs directory</span>
@@ -1675,7 +1684,7 @@
 <p>The captured data is stored in two text files: one containing the input symbols to the demapper and another containing the corresponding demapped output values. This simple text-based format allows for easy inspection and post-processing of the captured data.</p>
 <p>The input file format is as follows:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-number">Listing 11 </span><span class="caption-text">input file format</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 13 </span><span class="caption-text">input file format</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cm">/*</span>
 <span class="linenos"> 2</span><span class="cm"> * Input file format (f_in):</span>
 <span class="linenos"> 3</span><span class="cm"> * time source resolution (sec.nanosec) - only first line</span>
@@ -1690,7 +1699,7 @@
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="demapper-input-txt">
-<div class="code-block-caption"><span class="caption-number">Listing 12 </span><span class="caption-text">Sample input format / demapper_in.txt</span><a class="headerlink" href="#demapper-input-txt" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 14 </span><span class="caption-text">Sample input format / demapper_in.txt</span><a class="headerlink" href="#demapper-input-txt" title="Link to this code"></a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.000000001</span>         <span class="c1"># Time source resolution (sec.nanosec)</span>
 <span class="mf">1373853.185968662</span>   <span class="c1"># Timestamp (sec.nanosec)</span>
 <span class="n">QPSK</span>                <span class="c1"># Modulation scheme (QPSK or QAM16)</span>
@@ -1706,7 +1715,7 @@
 </div>
 <p>And the output file format is as follows:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-number">Listing 13 </span><span class="caption-text">output file format</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 15 </span><span class="caption-text">output file format</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cm">/*</span>
 <span class="linenos"> 2</span><span class="cm"> * Output file format (f_out):</span>
 <span class="linenos"> 3</span><span class="cm"> * time source resolution (sec.nanosec) - only first line</span>
@@ -1722,7 +1731,7 @@
 </div>
 <p>With the following sample output format:</p>
 <div class="literal-block-wrapper docutils container" id="demapper-output-txt">
-<div class="code-block-caption"><span class="caption-number">Listing 14 </span><span class="caption-text">Sample output format / demapper_out.txt</span><a class="headerlink" href="#demapper-output-txt" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 16 </span><span class="caption-text">Sample output format / demapper_out.txt</span><a class="headerlink" href="#demapper-output-txt" title="Link to this code"></a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.000000001</span>         <span class="c1"># Time source resolution (sec.nanosec)</span>
 <span class="mf">1373853.185968662</span>   <span class="c1"># Timestamp (sec.nanosec)</span>
 <span class="n">QPSK</span>                <span class="c1"># Modulation scheme (QPSK or QAM16)</span>
@@ -1749,7 +1758,7 @@
 <h2>Account for Multi-Threading<a class="headerlink" href="#account-for-multi-threading" title="Link to this heading"></a></h2>
 <p>Since this is a multi-threaded application, we need to handle concurrent file writes carefully. Multiple threads will attempt to write data simultaneously, which could lead to corrupted output. Although the data processing is complete by the time we write to files, we still need to synchronize the actual file operations. The solution is straightforward - we use a mutex to ensure only one thread can write at a time. We initialize the mutex in our initialization functions and protect all file write operations with mutex locks:</p>
 <div class="literal-block-wrapper docutils container" id="capture-mutex-wrapper">
-<div class="code-block-caption"><span class="caption-number">Listing 15 </span><span class="caption-text">Mutex for file data writes</span><a class="headerlink" href="#capture-mutex-wrapper" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 17 </span><span class="caption-text">Mutex for file data writes</span><a class="headerlink" href="#capture-mutex-wrapper" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="n">pthread_mutex_t</span><span class="w"> </span><span class="n">capture_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
 
 <span class="c1">// ...</span>
@@ -1770,7 +1779,7 @@
 <h2>Final Source Code<a class="headerlink" href="#final-source-code" title="Link to this heading"></a></h2>
 <p>The original demapping function remains active while the capture function runs in parallel, allowing data collection without impacting the normal operation of the connection. The complete implementation of the capture plugin is shown below.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-number">Listing 16 </span><span class="caption-text">nr_demapper_capture.c</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 18 </span><span class="caption-text">nr_demapper_capture.c</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">filename_in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;demapper_in.txt&quot;</span><span class="p">;</span>
 <span class="linenos">  2</span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">filename_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;demapper_out.txt&quot;</span><span class="p">;</span>
 <span class="linenos">  3</span><span class="k">static</span><span class="w"> </span><span class="kt">FILE</span><span class="w"> </span><span class="o">*</span><span class="n">f_in</span><span class="p">;</span>

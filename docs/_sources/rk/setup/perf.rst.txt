@@ -42,6 +42,37 @@ The CPU governor controls how the processor scales frequency based on load. Sett
    # Set governor for cores 9-12
    sudo cpufreq-set -c 8 -g performance
 
+To make these changes persistent across reboots, modify ``/etc/nvpmodel.conf`` to set the default power mode, and create ``/etc/default/cpufrequtils`` to set the CPU governor. This can also be done as follows:
+
+.. code-block:: bash
+
+   sudo sed -i 's|< PM_CONFIG DEFAULT=2 >|< PM_CONFIG DEFAULT=0 >|' /etc/nvpmodel.conf
+   echo 'GOVERNOR="performance"' | tee /etc/default/cpufrequtils
+
+Default System Mode
+-------------------
+
+The Ubuntu system in the Jetson ships with booting on graphical mode by default. This consumes resources that can be better used elsewhere. You can switch the default to be multi user command line in order to free these resources.
+
+.. code-block:: bash
+
+   # check current system runlevel target
+   systemctl get-default
+
+   # change default to multi-user (non-GUI)
+   sudo systemctl set-default multi-user.target
+
+   # change current running system to multi-user
+   sudo systemctl isolate multi-user.target
+
+   ### If you want to go back to graphical mode:
+
+   # change current running system back to GUI
+   sudo systemctl isolate graphical.target
+
+   # change default back to GUI
+   sudo systemctl set-default graphical.target
+
 
 Real-Time Scheduling
 --------------------

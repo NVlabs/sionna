@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3 current"><a class="reference internal" href="../setup.html#software-configuration">Software Configuration</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1644,8 +1654,8 @@
 </ul>
 </section>
 </section>
-<section id="tl-dr">
-<span id="quickstart"></span><h2>TL,DR<a class="headerlink" href="#tl-dr" title="Link to this heading"></a></h2>
+<section id="tldr">
+<h2>TLDR<a class="headerlink" href="#tldr" title="Link to this heading"></a></h2>
 <p>The whole process of getting the source code, patching, creating the configuration files and building the docker images is automated with two scripts: <code class="docutils literal notranslate"><span class="pre">quickstart-oai.sh</span></code> for OAI images and <code class="docutils literal notranslate"><span class="pre">quickstart-cn5g.sh</span></code> for the 5G Core Network images. The rest of the document goes over the different steps performed by these scripts in detail.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scripts/quickstart-oai.sh
 scripts/quickstart-cn5g.sh
@@ -1755,20 +1765,6 @@ docker<span class="w"> </span>build<span class="w"> </span>--target<span class="
 
 docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-gnb-cuda<span class="w"> </span>--tag<span class="w"> </span>oai-gnb-cuda:latest<span class="w"> </span>--file<span class="w"> </span>docker/Dockerfile.gNB.cuda.aarch64<span class="w"> </span>.
 docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-nr-ue-cuda<span class="w"> </span>--tag<span class="w"> </span>oai-nr-ue-cuda:latest<span class="w"> </span>--file<span class="w"> </span>docker/Dockerfile.nrUE.cuda.aarch64<span class="w"> </span>.
-</pre></div>
-</div>
-</section>
-<section id="building-for-x86">
-<h3>Building for x86<a class="headerlink" href="#building-for-x86" title="Link to this heading"></a></h3>
-<p>The following build the RAN components for x86 and with CUDA support.
-No patches are required for x86. You can use the following command to build the Docker images:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ext/openairinterface5g
-
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>ran-base<span class="w"> </span>--tag<span class="w"> </span>ran-base:latest<span class="w"> </span>--file<span class="w"> </span>docker/Dockerfile.base.ubuntu22<span class="w"> </span>.
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>ran-build<span class="w"> </span>--tag<span class="w"> </span>ran-build:latest<span class="w"> </span>--file<span class="w"> </span>docker/Dockerfile.build.ubuntu22<span class="w"> </span>.
-
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-gnb<span class="w"> </span>--tag<span class="w"> </span>oai-gnb:latest<span class="w"> </span>--file<span class="w"> </span>docker/Dockerfile.gNB.ubuntu22<span class="w"> </span>.
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-nr-ue<span class="w"> </span>--tag<span class="w"> </span>oai-nr-ue:latest<span class="w"> </span>--file<span class="w"> </span>docker/Dockerfile.nrUE.ubuntu22<span class="w"> </span>.
 </pre></div>
 </div>
 </section>

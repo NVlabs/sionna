@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="setup/perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="setup/perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="setup/OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1609,6 +1619,33 @@
 <p class="admonition-title">Warning</p>
 <p>Ensure compliance with local RF spectrum regulations before conducting over-the-air experiments.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have already configured your Jetson system with Jetpack R36.3 and if you are experienced with OAI, the shortest path to get started is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Checkout the Github repository</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NVlabs/sionna-rk.git
+<span class="nb">cd</span><span class="w"> </span>sionna-rk
+
+<span class="c1"># Prepare system</span>
+make<span class="w"> </span>prepare-system
+
+<span class="c1"># Reboot</span>
+sudo<span class="w"> </span>reboot
+
+<span class="c1"># Build Sionna RK images and configs</span>
+make<span class="w"> </span>sionna-rk
+
+<span class="c1"># You can now start the end-to-end system in the rf-simulator mode</span>
+./scripts/start_system<span class="w"> </span>rfsim_arm64
+
+<span class="c1"># Or connect your USRP and run real transmissions.</span>
+<span class="c1"># Note that you need to modify the .env file in the</span>
+<span class="c1"># config/b200_arm64/ directory to set your USRP serial number</span>
+./scripts/start_system<span class="w"> </span>b200_arm64
+</pre></div>
+</div>
+</div>
+<p>What follows is a more detailed sequence of steps, including configuration details.</p>
 <section id="hardware-requirements">
 <h2>Hardware Requirements<a class="headerlink" href="#hardware-requirements" title="Link to this heading"></a></h2>
 <figure class="align-center" id="system-overview">
@@ -1629,33 +1666,6 @@
 </ul>
 <p>Connect the components as shown in <a class="reference internal" href="#figure-system-setup"><span class="std std-numref">Fig. 16</span></a>.
 This means that the Jetson board is connected to the USRP and the Quectel modem is connected to the host machine. Connect the UE and the USRP via RF cables and corresponding splitters/combiners. Note that an attenuator in-between the USRP and the UE is strongly recommended to protect the USRP from high power levels.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you have already configured your Jetson system with Jetpack R36.3 and if you are experienced with OAI, the shortest path to get started is:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Checkout the repo via</span>
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NVlabs/sionna-rk.git
-<span class="nb">cd</span><span class="w"> </span>sionna-rk
-
-<span class="c1"># Build and install custom kernel via</span>
-./scripts/configure-system.sh
-./scripts/build-custom-kernel.sh
-./scripts/install-custom-kernel.sh
-
-<span class="c1"># Reboot the system via</span>
-sudo<span class="w"> </span>reboot
-
-<span class="c1"># Build OAI and core network containers via</span>
-./scripts/quickstart-cn5g.sh
-./scripts/quickstart-oai.sh
-
-<span class="c1"># You can now start the system</span>
-<span class="c1"># Note that you may need to modify the .env file</span>
-<span class="c1"># In the config/b200_arm64/ directory</span>
-<span class="c1"># To set your USRP serial number</span>
-./scripts/start_system<span class="w"> </span>b200_arm64
-</pre></div>
-</div>
-</div>
 </section>
 <section id="step-1-jetson-setup">
 <h2>Step 1: Jetson Setup<a class="headerlink" href="#step-1-jetson-setup" title="Link to this heading"></a></h2>
@@ -1709,6 +1719,13 @@ sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> <
 <span class="nb">cd</span><span class="w"> </span>sionna-rk
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following steps can also be invoked with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>prepare-system
+</pre></div>
+</div>
+</div>
 <p>Configure the system:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/configure-system.sh
 </pre></div>
@@ -1721,10 +1738,10 @@ sudo<span class="w"> </span>reboot
 </div>
 <p>Install Sionna and TensorFlow with GPU support:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># You can install the TF GPU package via</span>
-python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--extra-index-url<span class="w"> </span>https://developer.download.nvidia.com/compute/redist/jp/v60<span class="w"> </span><span class="nv">tensorflow</span><span class="o">==</span><span class="m">2</span>.15.0+nv24.05
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--extra-index-url<span class="w"> </span>https://developer.download.nvidia.com/compute/redist/jp/v60<span class="w"> </span><span class="nv">tensorflow</span><span class="o">==</span><span class="m">2</span>.15.0+nv24.05
 
 <span class="c1"># Install sionna (without ray tracing dependencies)</span>
-pip<span class="w"> </span>install<span class="w"> </span>sionna-no-rt
+python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>sionna-no-rt
 </pre></div>
 </div>
 </section>
@@ -1742,6 +1759,10 @@ uhd_usrp_probe
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Make note of your USRP’s serial number - you’ll need it later for configuration.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Sometimes OAI get confused if the USRP firmware is not loaded. In that case, run one of the uhd utilities to load the default firmware in the device, and retry.</p>
 </div>
 </section>
 <section id="step-3-ue-setup">
@@ -1769,6 +1790,13 @@ sudo<span class="w"> </span>nmcli<span class="w"> </span>c<span class="w"> </spa
 </figcaption>
 </figure>
 <p><a class="reference internal" href="#figure-5g-stack"><span class="std std-numref">Fig. 17</span></a> shows the block diagram of the complete system (see <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers">OpenAirInterface5G guide</a> for more details). The 5G stack is deployed as a set of Docker containers. The following steps build and deploy the core network components as well as the RAN components:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The following steps can also be invoked with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>sionna-rk
+</pre></div>
+</div>
+</div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull and patch OAI Core 5G network, build containers</span>
 ./scripts/quickstart-cn5g.sh
 
@@ -1776,7 +1804,10 @@ sudo<span class="w"> </span>nmcli<span class="w"> </span>c<span class="w"> </spa
 ./scripts/quickstart-oai.sh
 
 <span class="c1"># Generate config files</span>
-./scripts/generate_configs.sh
+./scripts/generate-configs.sh
+
+<span class="c1"># Update TensorRT plans for current platform</span>
+./tutorials/neural_demapper/build-trt-plans.sh
 </pre></div>
 </div>
 <p>You need to configure the environment using your individual configuration:</p>
@@ -1823,6 +1854,7 @@ ip<span class="w"> </span>addr<span class="w"> </span>show<span class="w"> </spa
 ping<span class="w"> </span>-I<span class="w"> </span>wwan0<span class="w"> </span>google.com
 </pre></div>
 </div>
+<p>This has been successfully tested on Raspberry Pi OS, for other distributions the Quectel QConnectManager might need to be installed manually.</p>
 <p>Monitor system load on the Jetson:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jtop
 </pre></div>
@@ -1842,13 +1874,14 @@ iperf3<span class="w"> </span>-u<span class="w"> </span>-t<span class="w"> </spa
 </pre></div>
 </div>
 <p>You can now have your first call over your private 5G network!</p>
-<p>We hope that you have enjoyed this quickstart guide! For inspiration and as blueprint for your own experiments, you can now try the following tutorials:</p>
+<p>We hope that you have enjoyed this quickstart guide! For inspiration and as blueprint for your own experiments, you can now try the following precompiled tutorials:</p>
 <ul class="simple">
 <li><p>Explore the <a class="reference internal" href="tutorials/ldpc_cuda/index.html#accelerated-ldpc"><span class="std std-ref">GPU-Accelerated LDPC Decoding</span></a> tutorial and learn about accelerated RAN</p></li>
 <li><p>Learn about <a class="reference internal" href="tutorials/data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a> to generate training data for your own AI models</p></li>
 <li><p>Discover the toolchain from training in Sionna to the <a class="reference internal" href="tutorials/neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> in a real 5G network</p></li>
 <li><p>Run a <a class="reference internal" href="tutorials/ue_emulator.html#ue-emulator"><span class="std std-ref">Software-defined End-to-End 5G Network</span></a></p></li>
 </ul>
+<p>Check the <a class="reference internal" href="tutorials.html#tutorials"><span class="std std-ref">Tutorials</span></a> page for more info.</p>
 <p>For a detailed configuration and troubleshooting, see the <a class="reference internal" href="setup.html#setup"><span class="std std-ref">Setup</span></a> guide or visit the <a class="reference external" href="https://github.com/NVLabs/sionna/discussions">Github Discussions</a>.</p>
 </section>
 </section>

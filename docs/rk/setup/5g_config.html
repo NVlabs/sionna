@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3 current"><a class="reference internal" href="../setup.html#software-configuration">Software Configuration</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1607,6 +1617,10 @@
 <h1>5G System Configuration<a class="headerlink" href="#g-system-configuration" title="Link to this heading"></a></h1>
 <p>This section explains how to configure the bandwidth, carrier frequency, and other key parameters of your 5G network.</p>
 <p>The main configuration is done through the <code class="docutils literal notranslate"><span class="pre">gnb.XXX.conf</span></code> files. We provide several pre-configured files for common setups, but you can customize them for your needs.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For performance reasons, we recommend using either the configuration file with 24 or 51 PRBs.</p>
+</div>
 <p>The configuration files are located in the <code class="docutils literal notranslate"><span class="pre">sionna-rk/config</span></code> directory.
 Most configurations are shared between different setups, these can be found in the <code class="docutils literal notranslate"><span class="pre">sionna-rk/config/common</span></code> directory:</p>
 <ul class="simple">
@@ -1617,6 +1631,10 @@ Most configurations are shared between different setups, these can be found in t
 <li><p><code class="docutils literal notranslate"><span class="pre">docker-compose.override.yml.template</span></code>: Custom overrides for the docker-compose file</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">oai_db.sql</span></code>: database with all registered UEs</p></li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For testing purposes, we provide x86 configuration files. However, some tutorials will only work on the Jetson platform.</p>
+</div>
 <p>See <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/tree/develop/doc">OpenAirInterface5G documentation</a> for further details about the configuration files.</p>
 <p>A detailed explanation of the MAC parameters can be found in the <a class="reference external" href="https://github.com/OPENAIRINTERFACE/openairinterface5g/blob/develop/doc/MAC/mac-usage.md">OAI MAC documentation</a>.</p>
 <section id="environment-variables">

@@ -8,6 +8,34 @@ By following this guide, you can set-up your private software-defined 5G network
 .. warning::
     Ensure compliance with local RF spectrum regulations before conducting over-the-air experiments.
 
+.. note::
+   If you have already configured your Jetson system with Jetpack R36.3 and if you are experienced with OAI, the shortest path to get started is:
+
+   .. code-block:: bash
+
+      # Checkout the Github repository
+      git clone https://github.com/NVlabs/sionna-rk.git
+      cd sionna-rk
+
+      # Prepare system
+      make prepare-system
+
+      # Reboot
+      sudo reboot
+
+      # Build Sionna RK images and configs
+      make sionna-rk
+
+      # You can now start the end-to-end system in the rf-simulator mode
+      ./scripts/start_system rfsim_arm64
+
+      # Or connect your USRP and run real transmissions.
+      # Note that you need to modify the .env file in the
+      # config/b200_arm64/ directory to set your USRP serial number
+      ./scripts/start_system b200_arm64
+
+What follows is a more detailed sequence of steps, including configuration details.
+
 Hardware Requirements
 ---------------------
 
@@ -33,32 +61,6 @@ Hardware Requirements
 Connect the components as shown in :numref:`figure_system_setup`.
 This means that the Jetson board is connected to the USRP and the Quectel modem is connected to the host machine. Connect the UE and the USRP via RF cables and corresponding splitters/combiners. Note that an attenuator in-between the USRP and the UE is strongly recommended to protect the USRP from high power levels.
 
-.. note::
-   If you have already configured your Jetson system with Jetpack R36.3 and if you are experienced with OAI, the shortest path to get started is:
-
-   .. code-block:: bash
-
-      # Checkout the repo via
-      git clone https://github.com/NVlabs/sionna-rk.git
-      cd sionna-rk
-
-      # Build and install custom kernel via
-      ./scripts/configure-system.sh
-      ./scripts/build-custom-kernel.sh
-      ./scripts/install-custom-kernel.sh
-
-      # Reboot the system via
-      sudo reboot
-
-      # Build OAI and core network containers via
-      ./scripts/quickstart-cn5g.sh
-      ./scripts/quickstart-oai.sh
-
-      # You can now start the system
-      # Note that you may need to modify the .env file
-      # In the config/b200_arm64/ directory
-      # To set your USRP serial number
-      ./scripts/start_system b200_arm64
 
 Step 1: Jetson Setup
 --------------------
@@ -124,6 +126,14 @@ Clone the repository:
    git clone https://github.com/NVlabs/sionna-rk.git
    cd sionna-rk
 
+.. note::
+   The following steps can also be invoked with:
+
+   .. code-block:: bash
+
+      make prepare-system
+
+
 Configure the system:
 
 .. code-block:: bash
@@ -143,10 +153,10 @@ Install Sionna and TensorFlow with GPU support:
 .. code-block:: bash
 
    # You can install the TF GPU package via
-   python3 -m pip install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v60 tensorflow==2.15.0+nv24.05
+   python3 -m pip install --user --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v60 tensorflow==2.15.0+nv24.05
 
    # Install sionna (without ray tracing dependencies)
-   pip install sionna-no-rt
+   python3 -m pip install --user sionna-no-rt
 
 
 Step 2: USRP Setup
@@ -166,6 +176,9 @@ Install UHD drivers and verify the USRP connection:
 
 .. note::
     Make note of your USRP's serial number - you'll need it later for configuration.
+
+.. note::
+   Sometimes OAI get confused if the USRP firmware is not loaded. In that case, run one of the uhd utilities to load the default firmware in the device, and retry.
 
 Step 3: UE Setup
 ----------------
@@ -200,6 +213,13 @@ Step 4: Deploy 5G Stack
 
 :numref:`figure_5g_stack` shows the block diagram of the complete system (see `OpenAirInterface5G guide <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers>`_ for more details). The 5G stack is deployed as a set of Docker containers. The following steps build and deploy the core network components as well as the RAN components:
 
+.. note::
+   The following steps can also be invoked with:
+
+   .. code-block:: bash
+
+      make sionna-rk
+
 .. code-block:: bash
 
    # Pull and patch OAI Core 5G network, build containers
@@ -209,7 +229,10 @@ Step 4: Deploy 5G Stack
    ./scripts/quickstart-oai.sh
 
    # Generate config files
-   ./scripts/generate_configs.sh
+   ./scripts/generate-configs.sh
+
+   # Update TensorRT plans for current platform
+   ./tutorials/neural_demapper/build-trt-plans.sh
 
 You need to configure the environment using your individual configuration:
 
@@ -264,6 +287,8 @@ Verify connectivity on the host machine (using the Quectel modem):
    # Test internet connectivity through the 5G tunnel
    ping -I wwan0 google.com
 
+This has been successfully tested on Raspberry Pi OS, for other distributions the Quectel QConnectManager might need to be installed manually.
+
 Monitor system load on the Jetson:
 
 .. code-block:: bash
@@ -289,11 +314,13 @@ And run performance tests:
 
 You can now have your first call over your private 5G network!
 
-We hope that you have enjoyed this quickstart guide! For inspiration and as blueprint for your own experiments, you can now try the following tutorials:
+We hope that you have enjoyed this quickstart guide! For inspiration and as blueprint for your own experiments, you can now try the following precompiled tutorials:
 
 * Explore the :ref:`accelerated_ldpc` tutorial and learn about accelerated RAN
 * Learn about :ref:`data_acquisition` to generate training data for your own AI models
 * Discover the toolchain from training in Sionna to the :ref:`neural_demapper` in a real 5G network
 * Run a :ref:`ue_emulator`
+
+Check the :ref:`tutorials` page for more info.
 
 For a detailed configuration and troubleshooting, see the :ref:`setup` guide or visit the `Github Discussions <https://github.com/NVLabs/sionna/discussions>`_.

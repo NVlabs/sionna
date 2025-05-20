@@ -253,7 +253,7 @@ Finally, we integrate the TensorRT demapper implementation into the OAI stack. A
 This automatically patches the OAI stack and adds the CUDA flag to the build pipeline. Note that this is already done if you followed the :ref:`quickstart` tutorial.
 
 After patching, the demapper implementation is located in `tutorials/neural_demapper/... <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/>`_.
-You can now modify the `runtime/demapper_trt.cpp <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/demapper_trt.cpp>`_ file and implement your own demapper variants.
+You can now modify the `runtime/trt_demapper.cpp <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/trt_demapper.cpp>`_ file and implement your own demapper variants.
 
 In order to mount the TensorRT models and config files, you can extend the `oai-gnb` config in `docker-compose.override.yaml`:
 
@@ -266,7 +266,7 @@ In order to mount the TensorRT models and config files, you can extend the `oai-
           - ./models/:/opt/oai-gnb/models
           - ./demapper_trt.config:/opt/oai-gnb/demapper_trt.config
 
-Pre-trained models are available in `tutorials/neural_demapper/tests/model <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/tests/model>`_.
+Pre-trained models are available in `tutorials/neural_demapper/models <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/models>`_.
 
 The TRT config file format has the following schema:
 
@@ -275,7 +275,7 @@ The TRT config file format has the following schema:
    <trt_engine_file:string> # file name of the TensorRT engine
    <trt_normalized_inputs:int> # flag to indicate if the inputs are normalized
 
-For example, the following config file will use the TensorRT engine `model/neural_demapper.2xfloat16.plan <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/tests/model/neural_demapper.2xfloat16.plan>`_ and normalize the inputs:
+For example, the following config file will use the TensorRT engine `models/neural_demapper.2xfloat16.plan <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/models/neural_demapper.2xfloat16.onnx>`_ and normalize the inputs:
 
 .. code-block::
 

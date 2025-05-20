@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../setup/perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../setup/perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../setup/perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../setup/OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../setup/OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../setup/OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../setup/OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../setup/OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1607,16 +1617,16 @@
 <span id="ue-emulator"></span><h1>Software-defined End-to-End 5G Network<a class="headerlink" href="#software-defined-end-to-end-5g-network" title="Link to this heading"></a></h1>
 <p>In this tutorial, we will show how the entire end-to-end 5G network can be simulated using software defined user equipment (UE). This allows for the evaluation of novel — non-standard compliant — algorithms and protocols.
 This enables you to test and prototype two-sided network functions such as AI/ML-based CSI feedback compression or even custom constellations for <a class="reference external" href="https://arxiv.org/pdf/2009.05261">pilotless communications</a>.</p>
+<p>Ensure that you have already build the nrUE container <cite>oai-nr-ue</cite> (see <a class="reference internal" href="../setup/OAI.html#oai"><span class="std std-ref">OpenAirInterface Setup</span></a>).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial currently only works in the <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md">rfsimulator mode</a>.
-In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware. This allows for the simulation of a fully software defined end-to-end 5G network.</p>
+In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware. This allows for the simulation of a fully software defined network.</p>
 </div>
-<p>Ensure that you have already build the nrUE container <cite>oai-nr-ue</cite> (see <a class="reference internal" href="../setup/OAI.html#oai"><span class="std std-ref">OpenAirInterface Setup</span></a>).</p>
 <section id="run-the-gnb">
 <h2>Run the gNB<a class="headerlink" href="#run-the-gnb" title="Link to this heading"></a></h2>
 <p>Before connecting the UE, the gNB needs to be ready to connect.
-As we are using the <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md">rfsimulator mode</a>, we need to start the gNB using a different configuration file.</p>
+As we are using the <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md">rfsimulator mode</a>, we need to start the gNB using a slightly different configuration file.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">start_system</span><span class="o">.</span><span class="n">sh</span> <span class="n">rfsim_arm64</span>
 </pre></div>
 </div>
@@ -1629,16 +1639,17 @@ As we are using the <a class="reference external" href="https://gitlab.eurecom.f
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">136387.122571</span> <span class="p">[</span><span class="n">PHY</span><span class="p">]</span> <span class="n">A</span> <span class="p">(</span><span class="n">nr_common_signal_proced</span><span class="p">:</span><span class="mi">92</span><span class="p">)</span> <span class="n">Command</span> <span class="n">line</span> <span class="n">parameters</span> <span class="k">for</span> <span class="n">OAI</span> <span class="n">UE</span><span class="p">:</span> <span class="o">-</span><span class="n">C</span> <span class="mi">3319680000</span> <span class="o">-</span><span class="n">r</span> <span class="mi">106</span> <span class="o">--</span><span class="n">numerology</span> <span class="mi">1</span> <span class="o">--</span><span class="n">ssb</span> <span class="mi">516</span>
 </pre></div>
 </div>
-<p>Ensure this is properly set as <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> in the <cite>.env</cite> file.
-This depends on the choice of the configuration file of the gNB.</p>
+<p>Ensure this is properly set as <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> in the <cite>.env</cite> file in the <cite>configs/rfsim_arm64</cite> directory.
+These parameters depend on the choice of the configuration file of the gNB.</p>
+<p>As the rfsimulator does not run in real-time mode, one can simulate a larger number of PRBs than in the case of the USRP.</p>
 </section>
 <section id="run-the-ue">
 <h2>Run the UE<a class="headerlink" href="#run-the-ue" title="Link to this heading"></a></h2>
 <p>We are now ready to connect the UE to the gNB.</p>
 <p>Instead of using a real sim-card the UE can be configured via the
-<a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/configs/rfsim_arm64/nrue.uicc.conf">configs/rfsim_arm64/nrue.uicc.conf</a> file. In case you modify the IMSI, ensure it is registered in the the <cite>oai_db.sql</cite>. Otherwise, the UE will not be recognized by the 5G core network.</p>
+<cite>configs/common/nrue.uicc.conf file. In case you modify the IMSI, ensure it is registered in the the `oai_db.sql</cite>. Otherwise, the UE will not be recognized by the 5G core network.</p>
 <p>Ensure that the UE configuration in the <cite>docker-compose.yaml</cite> file is correctly configured. In particular, the additional <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> parameters in the <cite>.env</cite> file must be correctly aligned with gNB config.
-For the above example, the <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> should be</p>
+For the above example with 106 PRBs, the <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> should be</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UE_EXTRA_OPTIONS</span><span class="o">=-</span><span class="n">r</span> <span class="mi">106</span> <span class="o">--</span><span class="n">numerology</span> <span class="mi">1</span> <span class="o">-</span><span class="n">C</span> <span class="mi">3319680000</span>
 </pre></div>
 </div>

@@ -41,13 +41,20 @@ Export environment variables:
 
    # Prepare files
    mkdir jetson-flash && cd jetson-flash
-   tar xf ${L4T_RELEASE_PACKAGE}
-   sudo tar xpf ${SAMPLE_FS_PACKAGE} -C Linux_for_Tegra/rootfs/
+   tar xf ../${L4T_RELEASE_PACKAGE}
+   sudo tar xpf ../${SAMPLE_FS_PACKAGE} -C Linux_for_Tegra/rootfs/
    cd Linux_for_Tegra/
    sudo ./tools/l4t_flash_prerequisites.sh
    sudo ./apply_binaries.sh
 
-    # Connect Jetson to host machine via USB-C cable
+   # Set Jetson in recovery mode. 
+   # For the AGX:
+   # 1. Ensure that the developer kit is powered off.
+   # 2. Press and hold down the Force Recovery button.
+   # 3. Press, then release the Power button.
+   # 4. Release the Force Recovery button.
+
+   # Connect Jetson to host machine via USB-C cable
 
    # Flash to eMMC
    sudo ./flash.sh jetson-agx-orin-devkit internal
@@ -140,6 +147,13 @@ Switch to different power modes:
    sudo nvpmodel -m 1 # 15W
    sudo nvpmodel -m 2 # 30W
    sudo nvpmodel -m 3 # 50W
+
+To make these changes persistent across reboots, modify ``/etc/nvpmodel.conf`` to set the default power mode, and create ``/etc/default/cpufrequtils`` to set the CPU governor. This can also be done as follows:
+
+.. code-block:: bash
+
+   sudo sed -i 's|< PM_CONFIG DEFAULT=2 >|< PM_CONFIG DEFAULT=0 >|' /etc/nvpmodel.conf
+   echo 'GOVERNOR="performance"' | tee /etc/default/cpufrequtils
 
 
 Version Information

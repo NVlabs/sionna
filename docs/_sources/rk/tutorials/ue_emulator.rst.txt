@@ -6,16 +6,17 @@ Software-defined End-to-End 5G Network
 In this tutorial, we will show how the entire end-to-end 5G network can be simulated using software defined user equipment (UE). This allows for the evaluation of novel --- non-standard compliant --- algorithms and protocols.
 This enables you to test and prototype two-sided network functions such as AI/ML-based CSI feedback compression or even custom constellations for `pilotless communications <https://arxiv.org/pdf/2009.05261>`_.
 
-.. note:: This tutorial currently only works in the `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md>`_.
-    In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware. This allows for the simulation of a fully software defined end-to-end 5G network.
-
 Ensure that you have already build the nrUE container `oai-nr-ue` (see :ref:`OAI`).
+
+.. note:: This tutorial currently only works in the `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md>`_.
+    In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware. This allows for the simulation of a fully software defined network.
+
 
 Run the gNB
 -----------
 
 Before connecting the UE, the gNB needs to be ready to connect.
-As we are using the `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md>`_, we need to start the gNB using a different configuration file.
+As we are using the `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md>`_, we need to start the gNB using a slightly different configuration file.
 
 .. code-block::
 
@@ -35,8 +36,10 @@ During the initialization procedure, the gNB provides the required UE parameters
 
     136387.122571 [PHY] A (nr_common_signal_proced:92) Command line parameters for OAI UE: -C 3319680000 -r 106 --numerology 1 --ssb 516
 
-Ensure this is properly set as ``UE_EXTRA_OPTIONS`` in the `.env` file.
-This depends on the choice of the configuration file of the gNB.
+Ensure this is properly set as ``UE_EXTRA_OPTIONS`` in the `.env` file in the `configs/rfsim_arm64` directory.
+These parameters depend on the choice of the configuration file of the gNB.
+
+As the rfsimulator does not run in real-time mode, one can simulate a larger number of PRBs than in the case of the USRP.
 
 Run the UE
 -----------
@@ -44,10 +47,10 @@ Run the UE
 We are now ready to connect the UE to the gNB.
 
 Instead of using a real sim-card the UE can be configured via the
-`configs/rfsim_arm64/nrue.uicc.conf <https://github.com/NVlabs/sionna-rk/blob/main/configs/rfsim_arm64/nrue.uicc.conf>`_ file. In case you modify the IMSI, ensure it is registered in the the `oai_db.sql`. Otherwise, the UE will not be recognized by the 5G core network.
+`configs/common/nrue.uicc.conf file. In case you modify the IMSI, ensure it is registered in the the `oai_db.sql`. Otherwise, the UE will not be recognized by the 5G core network.
 
 Ensure that the UE configuration in the `docker-compose.yaml` file is correctly configured. In particular, the additional ``UE_EXTRA_OPTIONS`` parameters in the `.env` file must be correctly aligned with gNB config.
-For the above example, the ``UE_EXTRA_OPTIONS`` should be
+For the above example with 106 PRBs, the ``UE_EXTRA_OPTIONS`` should be
 
 .. code-block::
 

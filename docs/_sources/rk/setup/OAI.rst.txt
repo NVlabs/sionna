@@ -43,12 +43,11 @@ RAN Components
 * ``oai-nr-ue`` - 5G NR UE implementation
 * ``trf-gen-cn5g`` - Traffic generator (only for testing)
 
-.. _quickstart:
 
-TL,DR
------
+TLDR
+----
 
-The whole process of getting the source code, patching, creating the configuration files and building the docker images is automated with two scripts: ``quickstart-oai.sh`` for OAI images and ``quickstart-cn5g.sh`` for the 5G Core Network images. The rest of the document goes over the different steps performed by these scripts in detail. 
+The whole process of getting the source code, patching, creating the configuration files and building the docker images is automated with two scripts: ``quickstart-oai.sh`` for OAI images and ``quickstart-cn5g.sh`` for the 5G Core Network images. The rest of the document goes over the different steps performed by these scripts in detail.
 
 .. code-block:: bash
 
@@ -181,22 +180,6 @@ Building for aarch64 with CUDA support
 
    docker build --target oai-gnb-cuda --tag oai-gnb-cuda:latest --file docker/Dockerfile.gNB.cuda.aarch64 .
    docker build --target oai-nr-ue-cuda --tag oai-nr-ue-cuda:latest --file docker/Dockerfile.nrUE.cuda.aarch64 .
-
-Building for x86
-^^^^^^^^^^^^^^^^
-
-The following build the RAN components for x86 and with CUDA support.
-No patches are required for x86. You can use the following command to build the Docker images:
-
-.. code-block:: bash
-
-   cd ext/openairinterface5g
-
-   docker build --target ran-base --tag ran-base:latest --file docker/Dockerfile.base.ubuntu22 .
-   docker build --target ran-build --tag ran-build:latest --file docker/Dockerfile.build.ubuntu22 .
-
-   docker build --target oai-gnb --tag oai-gnb:latest --file docker/Dockerfile.gNB.ubuntu22 .
-   docker build --target oai-nr-ue --tag oai-nr-ue:latest --file docker/Dockerfile.nrUE.ubuntu22 .
 
 
 Building OAI 5G Core Images

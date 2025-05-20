@@ -1,10 +1,49 @@
 Part 1: Create a Plugin
 =======================
 
-To keep the implementation of new functions flexible, we use OpenAirInterface's dynamic module loader [OAILib]_ which allows to load different implementations at runtime. This requires creating a plugin, but also adding the required hooks or entry points in the original code base to initialize, make them available and use the plugin. Further, modifications to the build system and the container images created are needed. We will cover these tasks in the following sections.
+A plugin mechanism in OpenAirInterface will allow us to isolate functionality originally implemented in the main source code and modularize it, so that multiple implementations and extensions to the functionality can be done. Using dynamic libraries, we will be able to select across multiple modules implementing the functionality based on the use case needs.
 
-For this tutorial, we will show how the QAM demapper can be modularized. We implement a new plugin that provides data capturing functionality.
-Further, the :ref:`neural_demapper` in the next tutorial will be implemented as a plugin and can be used as a drop-in replacement for the existing OAI demapper.
+To keep the implementation of new functions flexible, we use OpenAirInterface's dynamic module loader [OAILib]_ which allows to load different implementations at runtime. This requires creating a plugin, but also adding the required hooks or entry points in the original code base to initialize, make them available and use the plugin. Further, modifications to the build system and the container images created are needed. 
+
+The global modifications are already integrated in the patched OpenAirInterface code base. We will focus on the tasks required to add a plugin in this added infrastructure.
+
+For this tutorial, we will show the procedure how the QAM demapper is modularized. The first part will describe the different parts of the plugin, and the second part will extend it with a second version that captures data from the selected function. Further, the :ref:`neural_demapper` in the next tutorial will be implemented as a plugin and can be used as a drop-in replacement for the existing OAI demapper.
+
+.. note::
+    The current plugin mechanism works with L1 code. Other parts of the OAI code, like L2, require some modifications and are still work in progress.
+
+Architecture Overview
+---------------------
+
+There is a set of global changes to the OpenAirInterface needed to compile and expose the plugins in the code base. These changes involve exposing the plugin headers to the codebase, connecting the initialization functions, as well as changes to the build system. These changes are not covered by the tutorial.
+
+The global files `plugins.h`, `plugins.c` and `CMakeLists.txt` represent the entry points of this infrastructure that are modified when adding a new plugin.
+
+Plugin specific files cover the following parts:
+
+* **Type definitions**. Data types and function signatures exposed by the plugin to OAI.
+* **Public interface**. Set of functions exposed by the dynamic library, as well as the global entry point of the interface.
+* **Init functions**. Functions called during the initialization of OAI that loads the dynamic library and populates the global entry point with the corresponding function pointers. Additional functions for proper deinitialization as well as additional setups.
+* **Plugin entry point**. A globally accessible structure (a singleton) that contains the function pointers to the functions of the plugin to be used inside the OAI codebase.
+* **Plugin code**. The code that implements the plugin functionality.
+
+==============  ====================================================================
+File            Description
+==============  ====================================================================
+plugins.h       Header entry point, all plugins headers added here
+--------------  --------------------------------------------------------------------
+plugins.c       Plugin entry point, wires loading, unloading and init of all plugins
+--------------  --------------------------------------------------------------------
+_defs.h         Types definitions and function signatures
+--------------  --------------------------------------------------------------------
+_extern.h       Public interface of the plugin
+--------------  --------------------------------------------------------------------
+_load.c         Load / Unload / Init functions
+--------------  --------------------------------------------------------------------
+.c              Plugin compilation units
+--------------  --------------------------------------------------------------------
+CMakeLists.txt  CMake build files
+==============  ====================================================================
 
 Select Functions
 ----------------
@@ -103,12 +142,12 @@ The unload function handles the graceful shutdown of the module according to the
    :start-after: START marker-plugin-load
    :end-before: END marker-plugin-load
 
-To integrate these functions into the executables, we need to make the module interface visible and initialize it when the application starts. We accomplish this by adding two files:
+To integrate these functions into the executables, we need to make the module interface visible and initialize it when the application starts. We accomplish this by adding them to the two global entry points:
 
 - ``tutorials/plugins.h``: Contains the required module interface headers
 - ``tutorials/plugins.c``: Implements the initialization calls
 
-These files provide a single, clean entry point for module integration. They are incorporated into both the gNB and UE executables of OpenAirInterface, as well as the build system.
+These files provide a single, clean entry point for module integration. They are incorporated into both the gNB and UE executables of OpenAirInterface, as well as the build system. Additional plugins only need to added to these two files to be exposed to OAI.
 
 .. literalinclude:: plugins.h
    :caption: plugins.h
@@ -134,6 +173,9 @@ At this point, the module is loaded and its interface is available in the OpenAi
     :caption: Wrapper / nr_ulsch_llr_computation.c
     :name: nr_ulsch_llr_wrapper
     :linenos:
+
+    // will include the definition for demapper_interface singleton
+    #include <tutorials/plugins.h>
 
     void nr_ulsch_compute_llr(int32_t *rxdataF_comp,
                             int32_t *ul_ch_mag,
@@ -180,7 +222,7 @@ Now we can implement the actual functionality of the module. The implementation 
 Compiling
 ---------
 
-Finally, we need to compile our new plugin. This is done by creating a new ``CMakeLists.txt`` file in our module directory and including it from the main ``tutorials/CMakeLists.txt`` file. This setup allows CMake to properly build and link our plugin as a shared library.
+Finally, we need to compile our new plugin. This is done by creating a new ``CMakeLists.txt`` file in our module directory and including it from the main ``tutorials/CMakeLists.txt`` file. This setup allows CMake to properly build and link our plugin as a shared library. A minimal version looks as follows:
 
 .. literalinclude:: CMakeLists.txt
    :language: CMake
@@ -189,10 +231,37 @@ Finally, we need to compile our new plugin. This is done by creating a new ``CMa
    :end-before: END marker-plugin-cmake
 
 
+Incremental Builds
+------------------
+
+Rebuilding the full ``ran-build-cuda`` OAI image every time to rebuild only the module is too time consuming. You can however use the image to rebuild it quickly.
+
+.. code-block:: bash
+
+    # Create temp directory
+    mkdir /tmp/demapper
+
+    # Launch a container, mounting the tutorials directory with the newer code.
+    # If you made changes to openairinterface5g code, you also need to mount those.
+    # for example, for openair1, add -v ext/openairinterface5g/openair1:/oai-ran/openair1
+    docker run -v /tmp/demapper:/mnt -v ./tutorials:/oai-ran/tutorials --rm -it ran-build-cuda:latest bash
+
+    # Inside the container
+    cmake -S . -B cmake_targets/ran_build/build/ -GNinja
+    cmake --build cmake_targets/ran_build/build/ --target demapper
+    cmake --build cmake_targets/ran_build/build/ --target demapper_orig
+
+    # Check updated libraries
+    ls -lh cmake_targets/ran_build/build/libdemapper*
+
+    # Copy resulting libraries to host
+    cp cmake_targets/ran_build/build/libdemapper* /mnt/
+
+
 Container Changes
 -----------------
 
-As a final step, you need to modify the gNB and UE Dockerfiles to include the newly created libraries in your containers. Here is an example:
+As a final step, you need to modify the gNB and UE Dockerfiles to include the newly created libraries in your containers. Here are the corresponding lines for the demapper:
 
 .. code-block::
     :caption: gNB Docker file
@@ -232,30 +301,6 @@ When the library is loaded, you will see a message like this in the gNB logs:
 
     [LOADER] library libdemapper_orig.so successfully loaded
 
-
-Note: Incremental Builds
-------------------------
-
-Rebuilding the full ``ran-build`` OAI image every time to rebuild only the module is too time consuming. You can however use the image to rebuild it quickly.
-
-.. code-block:: bash
-
-    # Create temp directory
-    mkdir /tmp/demapper
-
-    # Launch a container
-    docker run -v /tmp/demapper:/mnt --rm -it ran-build:latest bash
-
-    # Inside the container
-    cmake -S . -B cmake_targets/ran_build/build/ -GNinja
-    cmake --build cmake_targets/ran_build/build/ --target demapper
-    cmake --build cmake_targets/ran_build/build/ --target demapper_orig
-
-    # Check updated libraries
-    ls -lh cmake_targets/ran_build/build/libdemapper*
-
-    # Copy resulting libraries to host
-    cp cmake_targets/ran_build/build/libdemapper* /mnt/
 
 
 

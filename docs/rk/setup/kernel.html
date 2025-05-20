@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1616,6 +1626,10 @@
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
+<p>These steps are summarized in the scripts <code class="docutils literal notranslate"><span class="pre">scripts/build-custom-kernel.sh</span></code> and <code class="docutils literal notranslate"><span class="pre">scripts/install-custom-kernel.sh</span></code>. Realtime kernels are not supported by the scripts at the moment.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>It is highly recommended NOT to perform these steps as root. Use sudo or root only when necessary for specific steps.</p>
 </div>
 <section id="prerequisites">
@@ -1685,6 +1699,7 @@ cp<span class="w"> </span>sionna-rk/l4t/kernel/defconfig<span class="w"> </span>
 <h2>Building the Kernel<a class="headerlink" href="#building-the-kernel" title="Link to this heading"></a></h2>
 <p>We now need to re-build the kernel and install the modules.
 To further reduce the latency induced by the scheduler, we also build a real-time kernel that can be used optionally.</p>
+<p>If you want to build both regular and realtime kernels, compile, install and test the non-realtime version first, then compile, install and test the realtime version. Or use separate directories for the realtime and non-realtime kernel compilation.</p>
 <section id="standard-build">
 <h3>Standard Build<a class="headerlink" href="#standard-build" title="Link to this heading"></a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Navigate to kernel source directory</span>
@@ -1763,10 +1778,9 @@ sudo<span class="w"> </span>-E<span class="w"> </span>make<span class="w"> </spa
 <p class="admonition-title">Warning</p>
 <p>Back up your existing kernel before proceeding. Package updates may overwrite custom kernels.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The realtime kernel will have the -rt-tegra postfix instead.</p>
-</div>
+<p>The goal is to have <code class="docutils literal notranslate"><span class="pre">Image</span></code>, <code class="docutils literal notranslate"><span class="pre">initrd</span></code> and kernel modules in two or three different versions installed: original, custom with SCTP, and optionally custom realtime with SCTP. We use in the following builds the postfixes <code class="docutils literal notranslate"><span class="pre">.original</span></code>, <code class="docutils literal notranslate"><span class="pre">.new</span></code> and <code class="docutils literal notranslate"><span class="pre">.rt</span></code>.</p>
+<section id="id1">
+<h3>Standard Build<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Backup existing setup (kernel, initrd, and modules)</span>
 <span class="nb">cd</span><span class="w"> </span>/boot
 sudo<span class="w"> </span>cp<span class="w"> </span>Image<span class="w"> </span>Image.original
@@ -1792,11 +1806,42 @@ sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>
 <span class="c1"># Build new initrd</span>
 <span class="nb">cd</span><span class="w"> </span>/boot
 sudo<span class="w"> </span>nv-update-initrd
-sudo<span class="w"> </span>mv<span class="w"> </span>/boot/initrd.img-5.15.136-tegra<span class="w"> </span>/boot/initrd.img-5.15.136-tegra.new
 sudo<span class="w"> </span>mv<span class="w"> </span>/boot/initrd<span class="w"> </span>initrd.new
 sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>initrd.new<span class="w"> </span>initrd
+<span class="c1"># this is a backup of the created initrd you just updated</span>
+sudo<span class="w"> </span>cp<span class="w"> </span>/boot/initrd<span class="w"> </span>/boot/initrd.img-5.15.136-tegra.new
 </pre></div>
 </div>
+</section>
+<section id="id2">
+<h3>Real-time Build (Optional)<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<p>Note that because the stock realtime kernel is not installed by default, the backups are from the original kernel, and the modules do not override the stock modules.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Backup existing setup (kernel, initrd, and modules)</span>
+<span class="nb">cd</span><span class="w"> </span>/boot
+sudo<span class="w"> </span>cp<span class="w"> </span>Image<span class="w"> </span>Image.rt.original
+sudo<span class="w"> </span>cp<span class="w"> </span>initrd<span class="w"> </span>initrd.rt.original
+
+<span class="c1"># Copy new kernel</span>
+sudo<span class="w"> </span>cp<span class="w"> </span>~/l4t/Linux_for_Tegra/rootfs/boot/Image<span class="w"> </span>/boot/Image.rt
+
+<span class="c1"># Copy new modules</span>
+sudo<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>~/l4t/Linux_for_Tegra/rootfs/lib/modules/5.15.136-rt-tegra<span class="w"> </span>/lib/modules/5.15.136-rt-tegra
+
+<span class="c1"># Create symlinks</span>
+<span class="nb">cd</span><span class="w"> </span>/boot
+sudo<span class="w"> </span>rm<span class="w"> </span>Image
+sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>Image.rt<span class="w"> </span>Image
+
+<span class="c1"># Build new initrd</span>
+<span class="nb">cd</span><span class="w"> </span>/boot
+sudo<span class="w"> </span>nv-update-initrd
+sudo<span class="w"> </span>mv<span class="w"> </span>/boot/initrd<span class="w"> </span>initrd.rt
+sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>initrd.rt<span class="w"> </span>initrd
+<span class="c1"># this is a backup of the created initrd you just updated</span>
+sudo<span class="w"> </span>cp<span class="w"> </span>/boot/initrd.rt<span class="w"> </span>/boot/initrd.img-5.15.136-rt-tegra
+</pre></div>
+</div>
+</section>
 </section>
 <section id="configure-boot-sequence">
 <h2>Configure Boot Sequence<a class="headerlink" href="#configure-boot-sequence" title="Link to this heading"></a></h2>
@@ -1811,7 +1856,7 @@ sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>
 cp<span class="w"> </span>extlinux.conf<span class="w"> </span>extlinux.conf.original
 </pre></div>
 </div>
-<p>Edit the original <cite>extlinux.conf</cite> to add another entry. Here is an example configuration:</p>
+<p>Edit the original <cite>extlinux.conf</cite> to add another entry. Here is an example configuration. Change the <code class="docutils literal notranslate"><span class="pre">DEFAULT</span></code> entry to th  e label you want to use and reboot:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>TIMEOUT<span class="w"> </span><span class="m">30</span>
 DEFAULT<span class="w"> </span>primary
 

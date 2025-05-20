@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1899,9 +1909,9 @@ After inference, the conversion back to quantized LLRs follows the same pattern,
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/patch_oai-tutorials.sh
 </pre></div>
 </div>
-<p>This automatically patches the OAI stack and adds the CUDA flag to the build pipeline. Note that this is already done if you followed the <a class="reference internal" href="../../setup/OAI.html#quickstart"><span class="std std-ref">TL,DR</span></a> tutorial.</p>
+<p>This automatically patches the OAI stack and adds the CUDA flag to the build pipeline. Note that this is already done if you followed the <a class="reference internal" href="../../quickstart.html#quickstart"><span class="std std-ref">Quickstart</span></a> tutorial.</p>
 <p>After patching, the demapper implementation is located in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/">tutorials/neural_demapper/…</a>.
-You can now modify the <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/demapper_trt.cpp">runtime/demapper_trt.cpp</a> file and implement your own demapper variants.</p>
+You can now modify the <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/trt_demapper.cpp">runtime/trt_demapper.cpp</a> file and implement your own demapper variants.</p>
 <p>In order to mount the TensorRT models and config files, you can extend the <cite>oai-gnb</cite> config in <cite>docker-compose.override.yaml</cite>:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">services</span><span class="p">:</span>
 <span class="linenos">2</span><span class="w">   </span><span class="nt">oai-gnb</span><span class="p">:</span>
@@ -1910,13 +1920,13 @@ You can now modify the <a class="reference external" href="https://github.com/NV
 <span class="linenos">5</span><span class="w">       </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./demapper_trt.config:/opt/oai-gnb/demapper_trt.config</span>
 </pre></div>
 </div>
-<p>Pre-trained models are available in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/tests/model">tutorials/neural_demapper/tests/model</a>.</p>
+<p>Pre-trained models are available in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/models">tutorials/neural_demapper/models</a>.</p>
 <p>The TRT config file format has the following schema:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">trt_engine_file</span><span class="p">:</span><span class="n">string</span><span class="o">&gt;</span> <span class="c1"># file name of the TensorRT engine</span>
 <span class="o">&lt;</span><span class="n">trt_normalized_inputs</span><span class="p">:</span><span class="nb">int</span><span class="o">&gt;</span> <span class="c1"># flag to indicate if the inputs are normalized</span>
 </pre></div>
 </div>
-<p>For example, the following config file will use the TensorRT engine <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/tests/model/neural_demapper.2xfloat16.plan">model/neural_demapper.2xfloat16.plan</a> and normalize the inputs:</p>
+<p>For example, the following config file will use the TensorRT engine <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/models/neural_demapper.2xfloat16.onnx">models/neural_demapper.2xfloat16.plan</a> and normalize the inputs:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">/</span><span class="n">neural_demapper</span><span class="mf">.2</span><span class="n">xfloat16</span><span class="o">.</span><span class="n">plan</span>
 <span class="mi">1</span>
 </pre></div>

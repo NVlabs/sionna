@@ -14,6 +14,9 @@ This guide is based on the `Jetson Linux Kernel Configuration Guide <https://doc
 * We backup the original installation; we do not override it
 
 .. note::
+   These steps are summarized in the scripts ``scripts/build-custom-kernel.sh`` and ``scripts/install-custom-kernel.sh``. Realtime kernels are not supported by the scripts at the moment.
+
+.. note::
    It is highly recommended NOT to perform these steps as root. Use sudo or root only when necessary for specific steps.
 
 Prerequisites
@@ -92,6 +95,8 @@ Building the Kernel
 
 We now need to re-build the kernel and install the modules.
 To further reduce the latency induced by the scheduler, we also build a real-time kernel that can be used optionally.
+
+If you want to build both regular and realtime kernels, compile, install and test the non-realtime version first, then compile, install and test the realtime version. Or use separate directories for the realtime and non-realtime kernel compilation.
 
 Standard Build
 ^^^^^^^^^^^^^^
@@ -173,9 +178,10 @@ Installing Kernel Image and Modules
 .. warning::
    Back up your existing kernel before proceeding. Package updates may overwrite custom kernels.
 
-.. note::
-   The realtime kernel will have the -rt-tegra postfix instead.
+The goal is to have ``Image``, ``initrd`` and kernel modules in two or three different versions installed: original, custom with SCTP, and optionally custom realtime with SCTP. We use in the following builds the postfixes ``.original``, ``.new`` and ``.rt``.
 
+Standard Build
+^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -204,9 +210,41 @@ Installing Kernel Image and Modules
    # Build new initrd
    cd /boot
    sudo nv-update-initrd
-   sudo mv /boot/initrd.img-5.15.136-tegra /boot/initrd.img-5.15.136-tegra.new
    sudo mv /boot/initrd initrd.new
    sudo ln -s initrd.new initrd
+   # this is a backup of the created initrd you just updated
+   sudo cp /boot/initrd /boot/initrd.img-5.15.136-tegra.new
+
+Real-time Build (Optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Note that because the stock realtime kernel is not installed by default, the backups are from the original kernel, and the modules do not override the stock modules.
+
+.. code-block:: bash
+
+   # Backup existing setup (kernel, initrd, and modules)
+   cd /boot
+   sudo cp Image Image.rt.original
+   sudo cp initrd initrd.rt.original
+
+   # Copy new kernel
+   sudo cp ~/l4t/Linux_for_Tegra/rootfs/boot/Image /boot/Image.rt
+
+   # Copy new modules
+   sudo cp -r ~/l4t/Linux_for_Tegra/rootfs/lib/modules/5.15.136-rt-tegra /lib/modules/5.15.136-rt-tegra
+
+   # Create symlinks
+   cd /boot
+   sudo rm Image
+   sudo ln -s Image.rt Image
+
+   # Build new initrd
+   cd /boot
+   sudo nv-update-initrd
+   sudo mv /boot/initrd initrd.rt
+   sudo ln -s initrd.rt initrd
+   # this is a backup of the created initrd you just updated
+   sudo cp /boot/initrd.rt /boot/initrd.img-5.15.136-rt-tegra
 
 Configure Boot Sequence
 -----------------------
@@ -223,7 +261,7 @@ This is equivalent to editing *grub.conf* on a standard system and allows you to
    # Backup current configuration
    cp extlinux.conf extlinux.conf.original
 
-Edit the original `extlinux.conf` to add another entry. Here is an example configuration:
+Edit the original `extlinux.conf` to add another entry. Here is an example configuration. Change the ``DEFAULT`` entry to th  e label you want to use and reboot:
 
 .. code-block:: bash
 

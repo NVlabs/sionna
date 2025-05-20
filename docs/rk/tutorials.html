@@ -26,7 +26,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="GPU-Accelerated LDPC Decoding" href="tutorials/ldpc_cuda/index.html" />
+    <link rel="next" title="Running the Tutorials" href="tutorials/run_tutorials.html" />
     <link rel="prev" title="get-oai-cn5g-commit-versions.sh" href="scripts/get-oai-cn5g-commit-versions.html" /> 
 </head>
 
@@ -1383,6 +1383,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="setup/perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="setup/perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1413,7 +1414,7 @@
 <li class="toctree-l3"><a class="reference internal" href="setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="setup/OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="setup/OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1476,6 +1477,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1501,14 +1510,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tutorials/data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1614,11 +1624,13 @@
 <p>In a first step, we show how the physical layer can be accelerated using <a class="reference internal" href="tutorials/ldpc_cuda/index.html#accelerated-ldpc"><span class="std std-ref">GPU-Accelerated LDPC Decoding</span></a>. The tutorial on <a class="reference internal" href="tutorials/data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a> explains how to capture and record real-world 5G signals using the Sionna Research Kit.
 As next step, the <a class="reference internal" href="tutorials/neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> tutorial explains how to train a neural network-based demapper and integrate it in the 5G stack using NVIDIA TensorRT for real-time inference.
 Finally, the <a class="reference internal" href="tutorials/ue_emulator.html#ue-emulator"><span class="std std-ref">Software-defined End-to-End 5G Network</span></a> tutorial allows to simulate the entire end-to-end system using software defined user equipment (UE). This allows for the evaluation of novel — non-standard compliant — algorithms and protocols.</p>
+<p>All tutorials are precompiled during the quickstart setup of the system, and integrated in the compiled images. Check <a class="reference internal" href="tutorials/run_tutorials.html#run-tutorials"><span class="std std-ref">Running the Tutorials</span></a> if you want to give them a try before going into the details.</p>
 <p>Additionally, we provide a tutorial on <a class="reference internal" href="tutorials/debugging.html#debugging"><span class="std std-ref">Debugging &amp; Troubleshooting</span></a> to help you resolve issues that may arise when working with the Sionna Research Kit.</p>
 <p>Besides <em>AI for RAN</em>, the AI-RAN alliance also envisions the coexistence of <em>AI and RAN</em> on the same platform. Many examples of LLM deployment on the Jetson platform can be found in the <a class="reference external" href="https://www.jetson-ai-lab.com">NVIDIA Jetson AI Lab</a>.</p>
 <p>You can find all tutorials below:</p>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/run_tutorials.html">Running the Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/neural_demapper/index.html">Integration of a Neural Demapper</a></li>
@@ -1626,6 +1638,7 @@ Finally, the <a class="reference internal" href="tutorials/ue_emulator.html#ue-e
 <li class="toctree-l1"><a class="reference internal" href="tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
 </div>
+<p>The best way to get started is to have a look at the <a class="reference internal" href="tutorials/run_tutorials.html#run-tutorials"><span class="std std-ref">Running the Tutorials</span></a> section.</p>
 </section>
 
 
@@ -1633,7 +1646,7 @@ Finally, the <a class="reference internal" href="tutorials/ue_emulator.html#ue-e
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="scripts/get-oai-cn5g-commit-versions.html" class="btn btn-neutral float-left" title="get-oai-cn5g-commit-versions.sh" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="tutorials/ldpc_cuda/index.html" class="btn btn-neutral float-right" title="GPU-Accelerated LDPC Decoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tutorials/run_tutorials.html" class="btn btn-neutral float-right" title="Running the Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

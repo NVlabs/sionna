@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/perf.html">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3 current"><a class="reference internal" href="index.html">Plugins &amp; Data Acquisition</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1606,14 +1616,62 @@
              
   <section id="part-1-create-a-plugin">
 <h1>Part 1: Create a Plugin<a class="headerlink" href="#part-1-create-a-plugin" title="Link to this heading"></a></h1>
-<p>To keep the implementation of new functions flexible, we use OpenAirInterface’s dynamic module loader <a class="reference internal" href="index.html#oailib" id="id1"><span>[OAILib]</span></a> which allows to load different implementations at runtime. This requires creating a plugin, but also adding the required hooks or entry points in the original code base to initialize, make them available and use the plugin. Further, modifications to the build system and the container images created are needed. We will cover these tasks in the following sections.</p>
-<p>For this tutorial, we will show how the QAM demapper can be modularized. We implement a new plugin that provides data capturing functionality.
-Further, the <a class="reference internal" href="../neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> in the next tutorial will be implemented as a plugin and can be used as a drop-in replacement for the existing OAI demapper.</p>
+<p>A plugin mechanism in OpenAirInterface will allow us to isolate functionality originally implemented in the main source code and modularize it, so that multiple implementations and extensions to the functionality can be done. Using dynamic libraries, we will be able to select across multiple modules implementing the functionality based on the use case needs.</p>
+<p>To keep the implementation of new functions flexible, we use OpenAirInterface’s dynamic module loader <a class="reference internal" href="index.html#oailib" id="id1"><span>[OAILib]</span></a> which allows to load different implementations at runtime. This requires creating a plugin, but also adding the required hooks or entry points in the original code base to initialize, make them available and use the plugin. Further, modifications to the build system and the container images created are needed.</p>
+<p>The global modifications are already integrated in the patched OpenAirInterface code base. We will focus on the tasks required to add a plugin in this added infrastructure.</p>
+<p>For this tutorial, we will show the procedure how the QAM demapper is modularized. The first part will describe the different parts of the plugin, and the second part will extend it with a second version that captures data from the selected function. Further, the <a class="reference internal" href="../neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> in the next tutorial will be implemented as a plugin and can be used as a drop-in replacement for the existing OAI demapper.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The current plugin mechanism works with L1 code. Other parts of the OAI code, like L2, require some modifications and are still work in progress.</p>
+</div>
+<section id="architecture-overview">
+<h2>Architecture Overview<a class="headerlink" href="#architecture-overview" title="Link to this heading"></a></h2>
+<p>There is a set of global changes to the OpenAirInterface needed to compile and expose the plugins in the code base. These changes involve exposing the plugin headers to the codebase, connecting the initialization functions, as well as changes to the build system. These changes are not covered by the tutorial.</p>
+<p>The global files <cite>plugins.h</cite>, <cite>plugins.c</cite> and <cite>CMakeLists.txt</cite> represent the entry points of this infrastructure that are modified when adding a new plugin.</p>
+<p>Plugin specific files cover the following parts:</p>
+<ul class="simple">
+<li><p><strong>Type definitions</strong>. Data types and function signatures exposed by the plugin to OAI.</p></li>
+<li><p><strong>Public interface</strong>. Set of functions exposed by the dynamic library, as well as the global entry point of the interface.</p></li>
+<li><p><strong>Init functions</strong>. Functions called during the initialization of OAI that loads the dynamic library and populates the global entry point with the corresponding function pointers. Additional functions for proper deinitialization as well as additional setups.</p></li>
+<li><p><strong>Plugin entry point</strong>. A globally accessible structure (a singleton) that contains the function pointers to the functions of the plugin to be used inside the OAI codebase.</p></li>
+<li><p><strong>Plugin code</strong>. The code that implements the plugin functionality.</p></li>
+</ul>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>plugins.h</p></td>
+<td><p>Header entry point, all plugins headers added here</p></td>
+</tr>
+<tr class="row-odd"><td><p>plugins.c</p></td>
+<td><p>Plugin entry point, wires loading, unloading and init of all plugins</p></td>
+</tr>
+<tr class="row-even"><td><p>_defs.h</p></td>
+<td><p>Types definitions and function signatures</p></td>
+</tr>
+<tr class="row-odd"><td><p>_extern.h</p></td>
+<td><p>Public interface of the plugin</p></td>
+</tr>
+<tr class="row-even"><td><p>_load.c</p></td>
+<td><p>Load / Unload / Init functions</p></td>
+</tr>
+<tr class="row-odd"><td><p>.c</p></td>
+<td><p>Plugin compilation units</p></td>
+</tr>
+<tr class="row-even"><td><p>CMakeLists.txt</p></td>
+<td><p>CMake build files</p></td>
+</tr>
+</tbody>
+</table>
+</section>
 <section id="select-functions">
 <h2>Select Functions<a class="headerlink" href="#select-functions" title="Link to this heading"></a></h2>
 <p>We focus on modularizing the demapper function <code class="docutils literal notranslate"><span class="pre">nr_ulsch_compute_llr</span></code> into a separate module. This function, found in <code class="docutils literal notranslate"><span class="pre">openair1/PHY/NR_TRANSPORT/nr_ulsch_llr_computation.c</span></code>, handles the demapping of received QAM symbols to log-likelihood ratios (LLRs) based on the modulation scheme used. It has a clear and well-defined interface, making it an ideal candidate for modularization. The function’s signature will serve as the basis for our plugin’s interface requirements.</p>
 <div class="literal-block-wrapper docutils container" id="nr-ulsch-llr-computation-c">
-<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">Functions to extract / nr_ulsch_llr_computation.c</span><a class="headerlink" href="#nr-ulsch-llr-computation-c" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">Functions to extract / nr_ulsch_llr_computation.c</span><a class="headerlink" href="#nr-ulsch-llr-computation-c" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kt">void</span><span class="w"> </span><span class="nf">nr_ulsch_compute_llr</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
 <span class="linenos"> 2</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag</span><span class="p">,</span>
 <span class="linenos"> 3</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magb</span><span class="p">,</span>
@@ -1667,7 +1725,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 <h2>Define Module Interface<a class="headerlink" href="#define-module-interface" title="Link to this heading"></a></h2>
 <p>Next, we define the module interface that specifies the function we want to extend, along with additional functions for module initialization and cleanup during loading and unloading.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">nr_demapper_extern.h</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">nr_demapper_extern.h</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;nr_demapper_defs.h&quot;</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">demapper_interface_s</span><span class="w"> </span><span class="p">{</span>
@@ -1692,7 +1750,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 <p>The structure <code class="docutils literal notranslate"><span class="pre">demapper_interface_t</span></code> defines the functions that each dynamically loaded library will export, making them available for dynamic linking at runtime. The global instance <code class="docutils literal notranslate"><span class="pre">demapper_interface</span></code> is the actual mapping loaded and active in the system - this serves as the entry point that makes the module available throughout the codebase. The functions <code class="docutils literal notranslate"><span class="pre">load_demapper_lib</span></code> and <code class="docutils literal notranslate"><span class="pre">free_demapper_lib</span></code> are called during initialization to select and load the library, utilizing the module loader functionality.</p>
 <p>The actual function signatures are defined in a separate file <code class="docutils literal notranslate"><span class="pre">nr_demapper_defs.h</span></code> given as:</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">nr_demapper_defs.h</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">nr_demapper_defs.h</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">typedef</span><span class="w"> </span><span class="kt">int32_t</span><span class="p">(</span><span class="n">demapper_initfunc_t</span><span class="p">)(</span><span class="kt">void</span><span class="p">);</span>
 <span class="linenos"> 2</span><span class="k">typedef</span><span class="w"> </span><span class="kt">int32_t</span><span class="p">(</span><span class="n">demapper_shutdownfunc_t</span><span class="p">)(</span><span class="kt">void</span><span class="p">);</span>
 <span class="linenos"> 3</span>
@@ -1714,7 +1772,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 <p>The load function performs dynamic linking of the selected module and retrieves the function pointers that the module exports. These function pointers are then mapped to the corresponding elements of the global entry point interface, making them available throughout the application.</p>
 <p>The unload function handles the graceful shutdown of the module according to the module’s own cleanup specifications.</p>
 <div class="literal-block-wrapper docutils container" id="id4">
-<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">nr_demapper_load.c</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 5 </span><span class="caption-text">nr_demapper_load.c</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">static</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="nf">demapper_no_thread_init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 <span class="linenos"> 2</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 <span class="linenos"> 3</span><span class="p">}</span>
@@ -1757,14 +1815,14 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 </pre></div>
 </div>
 </div>
-<p>To integrate these functions into the executables, we need to make the module interface visible and initialize it when the application starts. We accomplish this by adding two files:</p>
+<p>To integrate these functions into the executables, we need to make the module interface visible and initialize it when the application starts. We accomplish this by adding them to the two global entry points:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">tutorials/plugins.h</span></code>: Contains the required module interface headers</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">tutorials/plugins.c</span></code>: Implements the initialization calls</p></li>
 </ul>
-<p>These files provide a single, clean entry point for module integration. They are incorporated into both the gNB and UE executables of OpenAirInterface, as well as the build system.</p>
+<p>These files provide a single, clean entry point for module integration. They are incorporated into both the gNB and UE executables of OpenAirInterface, as well as the build system. Additional plugins only need to added to these two files to be exposed to OAI.</p>
 <div class="literal-block-wrapper docutils container" id="id5">
-<div class="code-block-caption"><span class="caption-number">Listing 5 </span><span class="caption-text">plugins.h</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 6 </span><span class="caption-text">plugins.h</span><a class="headerlink" href="#id5" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;neural_demapper/nr_demapper_extern.h&quot;</span>
 <span class="linenos">2</span>
 <span class="linenos">3</span><span class="kt">void</span><span class="w"> </span><span class="nf">init_plugins</span><span class="p">();</span>
@@ -1775,7 +1833,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="id6">
-<div class="code-block-caption"><span class="caption-number">Listing 6 </span><span class="caption-text">plugins.c</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 7 </span><span class="caption-text">plugins.c</span><a class="headerlink" href="#id6" title="Link to this code"></a></div>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1">// global entry points for the tutorial plugins</span>
 <span class="linenos"> 2</span><span class="c1">// any global structures defined here.</span>
 <span class="linenos"> 3</span>
@@ -1811,34 +1869,37 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 <h2>Use Module Functions<a class="headerlink" href="#use-module-functions" title="Link to this heading"></a></h2>
 <p>At this point, the module is loaded and its interface is available in the OpenAirInterface code. The next step is to use this interface. The demapper function selects between several modulation schemes and calls the corresponding implementation. Since we only want to accelerate specific modulation schemes, we will rename the original function <code class="docutils literal notranslate"><span class="pre">nr_ulsch_compute_llr</span></code> to <code class="docutils literal notranslate"><span class="pre">nr_ulsch_compute_llr_default</span></code> and implement a wrapper that falls back to this default implementation when the module does not handle a particular case.</p>
 <div class="literal-block-wrapper docutils container" id="nr-ulsch-llr-wrapper">
-<div class="code-block-caption"><span class="caption-number">Listing 7 </span><span class="caption-text">Wrapper / nr_ulsch_llr_computation.c</span><a class="headerlink" href="#nr-ulsch-llr-wrapper" title="Link to this code"></a></div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kt">void</span><span class="w"> </span><span class="nf">nr_ulsch_compute_llr</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos"> 2</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag</span><span class="p">,</span>
-<span class="linenos"> 3</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magb</span><span class="p">,</span>
-<span class="linenos"> 4</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magc</span><span class="p">,</span>
-<span class="linenos"> 5</span><span class="w">                        </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos"> 6</span><span class="w">                        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos"> 7</span><span class="w">                        </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">symbol</span><span class="p">,</span>
-<span class="linenos"> 8</span><span class="w">                        </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">mod_order</span><span class="p">)</span>
-<span class="linenos"> 9</span><span class="p">{</span>
-<span class="linenos">10</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">handled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">demapper_interface</span><span class="p">.</span><span class="n">compute_llr</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos">11</span><span class="w">                                                </span><span class="n">ul_ch_mag</span><span class="p">,</span>
-<span class="linenos">12</span><span class="w">                                                </span><span class="n">ul_ch_magb</span><span class="p">,</span>
-<span class="linenos">13</span><span class="w">                                                </span><span class="n">ul_ch_magc</span><span class="p">,</span>
-<span class="linenos">14</span><span class="w">                                                </span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos">15</span><span class="w">                                                </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos">16</span><span class="w">                                                </span><span class="n">symbol</span><span class="p">,</span>
-<span class="linenos">17</span><span class="w">                                                </span><span class="n">mod_order</span><span class="p">);</span>
-<span class="linenos">18</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">handled</span><span class="p">)</span>
-<span class="linenos">19</span><span class="w">        </span><span class="n">nr_ulsch_compute_llr_default</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos">20</span><span class="w">                                    </span><span class="n">ul_ch_mag</span><span class="p">,</span>
-<span class="linenos">21</span><span class="w">                                    </span><span class="n">ul_ch_magb</span><span class="p">,</span>
-<span class="linenos">22</span><span class="w">                                    </span><span class="n">ul_ch_magc</span><span class="p">,</span>
-<span class="linenos">23</span><span class="w">                                    </span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos">24</span><span class="w">                                    </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos">25</span><span class="w">                                    </span><span class="n">symbol</span><span class="p">,</span>
-<span class="linenos">26</span><span class="w">                                    </span><span class="n">mod_order</span><span class="p">);</span>
-<span class="linenos">27</span><span class="p">}</span>
+<div class="code-block-caption"><span class="caption-number">Listing 8 </span><span class="caption-text">Wrapper / nr_ulsch_llr_computation.c</span><a class="headerlink" href="#nr-ulsch-llr-wrapper" title="Link to this code"></a></div>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1">// will include the definition for demapper_interface singleton</span>
+<span class="linenos"> 2</span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;tutorials/plugins.h&gt;</span>
+<span class="linenos"> 3</span>
+<span class="linenos"> 4</span><span class="kt">void</span><span class="w"> </span><span class="nf">nr_ulsch_compute_llr</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
+<span class="linenos"> 5</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag</span><span class="p">,</span>
+<span class="linenos"> 6</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magb</span><span class="p">,</span>
+<span class="linenos"> 7</span><span class="w">                        </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magc</span><span class="p">,</span>
+<span class="linenos"> 8</span><span class="w">                        </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span>
+<span class="linenos"> 9</span><span class="w">                        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span>
+<span class="linenos">10</span><span class="w">                        </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">symbol</span><span class="p">,</span>
+<span class="linenos">11</span><span class="w">                        </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">mod_order</span><span class="p">)</span>
+<span class="linenos">12</span><span class="p">{</span>
+<span class="linenos">13</span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">handled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">demapper_interface</span><span class="p">.</span><span class="n">compute_llr</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span>
+<span class="linenos">14</span><span class="w">                                                </span><span class="n">ul_ch_mag</span><span class="p">,</span>
+<span class="linenos">15</span><span class="w">                                                </span><span class="n">ul_ch_magb</span><span class="p">,</span>
+<span class="linenos">16</span><span class="w">                                                </span><span class="n">ul_ch_magc</span><span class="p">,</span>
+<span class="linenos">17</span><span class="w">                                                </span><span class="n">ulsch_llr</span><span class="p">,</span>
+<span class="linenos">18</span><span class="w">                                                </span><span class="n">nb_re</span><span class="p">,</span>
+<span class="linenos">19</span><span class="w">                                                </span><span class="n">symbol</span><span class="p">,</span>
+<span class="linenos">20</span><span class="w">                                                </span><span class="n">mod_order</span><span class="p">);</span>
+<span class="linenos">21</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">handled</span><span class="p">)</span>
+<span class="linenos">22</span><span class="w">        </span><span class="n">nr_ulsch_compute_llr_default</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span>
+<span class="linenos">23</span><span class="w">                                    </span><span class="n">ul_ch_mag</span><span class="p">,</span>
+<span class="linenos">24</span><span class="w">                                    </span><span class="n">ul_ch_magb</span><span class="p">,</span>
+<span class="linenos">25</span><span class="w">                                    </span><span class="n">ul_ch_magc</span><span class="p">,</span>
+<span class="linenos">26</span><span class="w">                                    </span><span class="n">ulsch_llr</span><span class="p">,</span>
+<span class="linenos">27</span><span class="w">                                    </span><span class="n">nb_re</span><span class="p">,</span>
+<span class="linenos">28</span><span class="w">                                    </span><span class="n">symbol</span><span class="p">,</span>
+<span class="linenos">29</span><span class="w">                                    </span><span class="n">mod_order</span><span class="p">);</span>
+<span class="linenos">30</span><span class="p">}</span>
 </pre></div>
 </div>
 </div>
@@ -1847,7 +1908,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 <h2>Module Implementation<a class="headerlink" href="#module-implementation" title="Link to this heading"></a></h2>
 <p>Now we can implement the actual functionality of the module. The implementation consists of two parts: a header file defining the interface and a source file containing its actual implementation. In this example, we take a minimal approach where the module simply returns zero, indicating that it does not handle any cases itself. Instead, it relies on the wrapper function to call the default behavior. This design pattern helps reduce code duplication while allowing the plugin to gradually take over specific cases as needed, with unhandled cases automatically falling back to the original implementation.</p>
 <div class="literal-block-wrapper docutils container" id="id7">
-<div class="code-block-caption"><span class="caption-number">Listing 8 </span><span class="caption-text">nr_demapper_orig.c</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 9 </span><span class="caption-text">nr_demapper_orig.c</span><a class="headerlink" href="#id7" title="Link to this code"></a></div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="kt">int32_t</span><span class="w"> </span><span class="nf">demapper_init</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span>
 <span class="linenos"> 2</span><span class="p">{</span>
 <span class="linenos"> 3</span><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Original/pass-through demapping initialized</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
@@ -1880,7 +1941,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 </section>
 <section id="compiling">
 <h2>Compiling<a class="headerlink" href="#compiling" title="Link to this heading"></a></h2>
-<p>Finally, we need to compile our new plugin. This is done by creating a new <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file in our module directory and including it from the main <code class="docutils literal notranslate"><span class="pre">tutorials/CMakeLists.txt</span></code> file. This setup allows CMake to properly build and link our plugin as a shared library.</p>
+<p>Finally, we need to compile our new plugin. This is done by creating a new <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file in our module directory and including it from the main <code class="docutils literal notranslate"><span class="pre">tutorials/CMakeLists.txt</span></code> file. This setup allows CMake to properly build and link our plugin as a shared library. A minimal version looks as follows:</p>
 <div class="highlight-CMake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_LIBRARY_OUTPUT_DIRECTORY</span><span class="w"> </span><span class="o">${</span><span class="nv">PROJECT_BINARY_DIR</span><span class="o">}</span><span class="p">)</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="c"># demapper libraries</span>
@@ -1900,11 +1961,35 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 </pre></div>
 </div>
 </section>
+<section id="incremental-builds">
+<h2>Incremental Builds<a class="headerlink" href="#incremental-builds" title="Link to this heading"></a></h2>
+<p>Rebuilding the full <code class="docutils literal notranslate"><span class="pre">ran-build-cuda</span></code> OAI image every time to rebuild only the module is too time consuming. You can however use the image to rebuild it quickly.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create temp directory</span>
+mkdir<span class="w"> </span>/tmp/demapper
+
+<span class="c1"># Launch a container, mounting the tutorials directory with the newer code.</span>
+<span class="c1"># If you made changes to openairinterface5g code, you also need to mount those.</span>
+<span class="c1"># for example, for openair1, add -v ext/openairinterface5g/openair1:/oai-ran/openair1</span>
+docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>/tmp/demapper:/mnt<span class="w"> </span>-v<span class="w"> </span>./tutorials:/oai-ran/tutorials<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>ran-build-cuda:latest<span class="w"> </span>bash
+
+<span class="c1"># Inside the container</span>
+cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>cmake_targets/ran_build/build/<span class="w"> </span>-GNinja
+cmake<span class="w"> </span>--build<span class="w"> </span>cmake_targets/ran_build/build/<span class="w"> </span>--target<span class="w"> </span>demapper
+cmake<span class="w"> </span>--build<span class="w"> </span>cmake_targets/ran_build/build/<span class="w"> </span>--target<span class="w"> </span>demapper_orig
+
+<span class="c1"># Check updated libraries</span>
+ls<span class="w"> </span>-lh<span class="w"> </span>cmake_targets/ran_build/build/libdemapper*
+
+<span class="c1"># Copy resulting libraries to host</span>
+cp<span class="w"> </span>cmake_targets/ran_build/build/libdemapper*<span class="w"> </span>/mnt/
+</pre></div>
+</div>
+</section>
 <section id="container-changes">
 <h2>Container Changes<a class="headerlink" href="#container-changes" title="Link to this heading"></a></h2>
-<p>As a final step, you need to modify the gNB and UE Dockerfiles to include the newly created libraries in your containers. Here is an example:</p>
+<p>As a final step, you need to modify the gNB and UE Dockerfiles to include the newly created libraries in your containers. Here are the corresponding lines for the demapper:</p>
 <div class="literal-block-wrapper docutils container" id="dockerfile-gnb-ubuntu22">
-<div class="code-block-caption"><span class="caption-number">Listing 9 </span><span class="caption-text">gNB Docker file</span><a class="headerlink" href="#dockerfile-gnb-ubuntu22" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 10 </span><span class="caption-text">gNB Docker file</span><a class="headerlink" href="#dockerfile-gnb-ubuntu22" title="Link to this code"></a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
 <span class="n">COPY</span> <span class="o">--</span><span class="n">from</span><span class="o">=</span><span class="n">gnb</span><span class="o">-</span><span class="n">build</span> \
     <span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">ran</span><span class="o">/</span><span class="n">cmake_targets</span><span class="o">/</span><span class="n">ran_build</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">libdemapper</span><span class="o">*.</span><span class="n">so</span> \
@@ -1916,7 +2001,7 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 </div>
 </div>
 <div class="literal-block-wrapper docutils container" id="dockerfile-nrue-ubuntu22">
-<div class="code-block-caption"><span class="caption-number">Listing 10 </span><span class="caption-text">NR-UE Docker file</span><a class="headerlink" href="#dockerfile-nrue-ubuntu22" title="Link to this code"></a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 11 </span><span class="caption-text">NR-UE Docker file</span><a class="headerlink" href="#dockerfile-nrue-ubuntu22" title="Link to this code"></a></div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
 <span class="n">COPY</span> <span class="o">--</span><span class="n">from</span><span class="o">=</span><span class="n">nr</span><span class="o">-</span><span class="n">ue</span><span class="o">-</span><span class="n">build</span> \
     <span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">ran</span><span class="o">/</span><span class="n">cmake_targets</span><span class="o">/</span><span class="n">ran_build</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">libdemapper</span><span class="o">*.</span><span class="n">so</span> \
@@ -1933,28 +2018,6 @@ Further, the <a class="reference internal" href="../neural_demapper/index.html#n
 </div>
 <p>When the library is loaded, you will see a message like this in the gNB logs:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">LOADER</span><span class="p">]</span> <span class="n">library</span> <span class="n">libdemapper_orig</span><span class="o">.</span><span class="n">so</span> <span class="n">successfully</span> <span class="n">loaded</span>
-</pre></div>
-</div>
-</section>
-<section id="note-incremental-builds">
-<h2>Note: Incremental Builds<a class="headerlink" href="#note-incremental-builds" title="Link to this heading"></a></h2>
-<p>Rebuilding the full <code class="docutils literal notranslate"><span class="pre">ran-build</span></code> OAI image every time to rebuild only the module is too time consuming. You can however use the image to rebuild it quickly.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create temp directory</span>
-mkdir<span class="w"> </span>/tmp/demapper
-
-<span class="c1"># Launch a container</span>
-docker<span class="w"> </span>run<span class="w"> </span>-v<span class="w"> </span>/tmp/demapper:/mnt<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>ran-build:latest<span class="w"> </span>bash
-
-<span class="c1"># Inside the container</span>
-cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>cmake_targets/ran_build/build/<span class="w"> </span>-GNinja
-cmake<span class="w"> </span>--build<span class="w"> </span>cmake_targets/ran_build/build/<span class="w"> </span>--target<span class="w"> </span>demapper
-cmake<span class="w"> </span>--build<span class="w"> </span>cmake_targets/ran_build/build/<span class="w"> </span>--target<span class="w"> </span>demapper_orig
-
-<span class="c1"># Check updated libraries</span>
-ls<span class="w"> </span>-lh<span class="w"> </span>cmake_targets/ran_build/build/libdemapper*
-
-<span class="c1"># Copy resulting libraries to host</span>
-cp<span class="w"> </span>cmake_targets/ran_build/build/libdemapper*<span class="w"> </span>/mnt/
 </pre></div>
 </div>
 </section>

@@ -1381,6 +1381,7 @@
 </li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#power-management">Power Management</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#real-time-scheduling">Real-Time Scheduling</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#verifying-settings">Verifying Settings</a></li>
 </ul>
@@ -1411,7 +1412,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="OAI.html">OpenAirInterface Setup</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="OAI.html#tl-dr">TL,DR</a></li>
+<li class="toctree-l5"><a class="reference internal" href="OAI.html#tldr">TLDR</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#getting-the-source-code">Getting the Source Code</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#patching">Patching</a></li>
 <li class="toctree-l5"><a class="reference internal" href="OAI.html#create-configuration-files">Create configuration files</a></li>
@@ -1474,6 +1475,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/run_tutorials.html">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/ldpc_cuda/LDPC_background.html#Background:-Channel-Coding-in-5G">Background: Channel Coding in 5G</a></li>
@@ -1499,14 +1508,15 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#select-functions">Select Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#module-implementation">Module Implementation</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#compiling">Compiling</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#container-changes">Container Changes</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../tutorials/data_acquisition/part1_create_plugin.html#note-incremental-builds">Note: Incremental Builds</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/data_acquisition/part2_capture_data.html">Part 2: Capture Data</a><ul>
@@ -1635,6 +1645,33 @@ sudo<span class="w"> </span>cpufreq-set<span class="w"> </span>-c<span class="w"
 
 <span class="c1"># Set governor for cores 9-12</span>
 sudo<span class="w"> </span>cpufreq-set<span class="w"> </span>-c<span class="w"> </span><span class="m">8</span><span class="w"> </span>-g<span class="w"> </span>performance
+</pre></div>
+</div>
+<p>To make these changes persistent across reboots, modify <code class="docutils literal notranslate"><span class="pre">/etc/nvpmodel.conf</span></code> to set the default power mode, and create <code class="docutils literal notranslate"><span class="pre">/etc/default/cpufrequtils</span></code> to set the CPU governor. This can also be done as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s|&lt; PM_CONFIG DEFAULT=2 &gt;|&lt; PM_CONFIG DEFAULT=0 &gt;|&#39;</span><span class="w"> </span>/etc/nvpmodel.conf
+<span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;GOVERNOR=&quot;performance&quot;&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>/etc/default/cpufrequtils
+</pre></div>
+</div>
+</section>
+<section id="default-system-mode">
+<h2>Default System Mode<a class="headerlink" href="#default-system-mode" title="Link to this heading"></a></h2>
+<p>The Ubuntu system in the Jetson ships with booting on graphical mode by default. This consumes resources that can be better used elsewhere. You can switch the default to be multi user command line in order to free these resources.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># check current system runlevel target</span>
+systemctl<span class="w"> </span>get-default
+
+<span class="c1"># change default to multi-user (non-GUI)</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>set-default<span class="w"> </span>multi-user.target
+
+<span class="c1"># change current running system to multi-user</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>isolate<span class="w"> </span>multi-user.target
+
+<span class="c1">### If you want to go back to graphical mode:</span>
+
+<span class="c1"># change current running system back to GUI</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>isolate<span class="w"> </span>graphical.target
+
+<span class="c1"># change default back to GUI</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>set-default<span class="w"> </span>graphical.target
 </pre></div>
 </div>
 </section>

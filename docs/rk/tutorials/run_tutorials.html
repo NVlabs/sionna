@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Debugging &amp; Troubleshooting &mdash; Sionna 1.0.2 documentation</title>
+  <title>Running the Tutorials &mdash; Sionna 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -24,8 +24,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="“Made with Sionna”" href="../../made_with_sionna.html" />
-    <link rel="prev" title="Software-defined End-to-End 5G Network" href="ue_emulator.html" /> 
+    <link rel="next" title="GPU-Accelerated LDPC Decoding" href="ldpc_cuda/index.html" />
+    <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -1475,12 +1475,12 @@
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="run_tutorials.html">Running the Tutorials</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Running the Tutorials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#command-cheat-sheet">Command Cheat-sheet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#demapper-plugin">Demapper Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
@@ -1564,12 +1564,12 @@
 <li class="toctree-l4"><a class="reference internal" href="ue_emulator.html#test-performance">Test performance</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Debugging &amp; Troubleshooting</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#running-memcheck-within-an-interactive-docker-compose-session">Running memcheck within an interactive Docker compose session</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#profiling-with-nvidia-nsight-systems">Profiling with NVIDIA Nsight Systems</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#fixing-missing-linker-error-messages-in-docker-build-ran-build">Fixing missing linker error messages in <cite>docker build ran-build</cite></a></li>
+<li class="toctree-l3"><a class="reference internal" href="debugging.html">Debugging &amp; Troubleshooting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="debugging.html#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="debugging.html#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
+<li class="toctree-l4"><a class="reference internal" href="debugging.html#running-memcheck-within-an-interactive-docker-compose-session">Running memcheck within an interactive Docker compose session</a></li>
+<li class="toctree-l4"><a class="reference internal" href="debugging.html#profiling-with-nvidia-nsight-systems">Profiling with NVIDIA Nsight Systems</a></li>
+<li class="toctree-l4"><a class="reference internal" href="debugging.html#fixing-missing-linker-error-messages-in-docker-build-ran-build">Fixing missing linker error messages in <cite>docker build ran-build</cite></a></li>
 </ul>
 </li>
 </ul>
@@ -1604,7 +1604,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Research Kit (RK)</a></li>
           <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
-      <li class="breadcrumb-item active">Debugging &amp; Troubleshooting</li>
+      <li class="breadcrumb-item active">Running the Tutorials</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -1613,146 +1613,206 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="debugging-troubleshooting">
-<span id="debugging"></span><h1>Debugging &amp; Troubleshooting<a class="headerlink" href="#debugging-troubleshooting" title="Link to this heading"></a></h1>
-<p>This guide provides a collection of tips and tricks for debugging and troubleshooting the Sionna Research Kit.</p>
-<section id="attaching-a-debugger-gdb-and-vs-code">
-<h2>Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)<a class="headerlink" href="#attaching-a-debugger-gdb-and-vs-code" title="Link to this heading"></a></h2>
-<p>To run a <cite>gdbserver</cite> inside the <cite>gNB</cite> container to which we can attach debuggers to, we override the <cite>docker compose</cite> command line as follows.
-You can find the <cite>docker-compose.override.yaml</cite> file in the <cite>config/&lt;CONFIG_NAME&gt;/docker-compose.override.yaml</cite> directory of the Sionna Research Kit.</p>
+  <section id="running-the-tutorials">
+<span id="run-tutorials"></span><h1>Running the Tutorials<a class="headerlink" href="#running-the-tutorials" title="Link to this heading"></a></h1>
+<p>This page serves as a quick reference guide for testing the precompiled tutorials. For each tutorial, it provides a concise list of useful commands, summarizes the required configuration changes, and shows the expected gNB log output. For more detailed explanations, we refer to each individual <a class="reference internal" href="../tutorials.html#tutorials"><span class="std std-ref">Tutorials</span></a> description.</p>
+<section id="command-cheat-sheet">
+<h2>Command Cheat-sheet<a class="headerlink" href="#command-cheat-sheet" title="Link to this heading"></a></h2>
+<p>Try the tutorials in the rfsimulator mode via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># start a configuration</span>
+<span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">start_system</span><span class="o">.</span><span class="n">sh</span> <span class="n">rfsim_arm64</span>   <span class="c1"># or any other config in configs/</span>
+
+<span class="c1"># stop a configuration</span>
+<span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">stop_system</span><span class="o">.</span><span class="n">sh</span> <span class="n">rfsim_arm64</span>
+
+<span class="c1"># list of containers running</span>
+<span class="n">cd</span> <span class="n">config</span><span class="o">/</span><span class="n">rfsim_arm64</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">ps</span>
+
+<span class="c1"># check gnb logs</span>
+<span class="n">docker</span> <span class="n">compose</span> <span class="n">logs</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>     <span class="c1"># add -f to keep log open</span>
+
+<span class="c1"># watch CPU core load</span>
+<span class="n">jtop</span> <span class="o">-</span><span class="n">p</span> <span class="mi">3</span>
+
+<span class="c1"># watch GPU load</span>
+<span class="n">jtop</span> <span class="o">-</span><span class="n">p</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</section>
+<section id="gpu-accelerated-ldpc">
+<h2>GPU-Accelerated LDPC<a class="headerlink" href="#gpu-accelerated-ldpc" title="Link to this heading"></a></h2>
+<p>In the <cite>.env</cite> file, add the following line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GNB_EXTRA_OPTIONS</span><span class="o">=--</span><span class="n">loader</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">shlibversion</span> <span class="n">_cuda</span> <span class="o">--</span><span class="n">thread</span><span class="o">-</span><span class="n">pool</span> <span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span>
+</pre></div>
+</div>
+<p>And run the configuration:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./scripts/start_system.sh rfsim_arm64
+
+Starting 5G Core network
+[+] Running 7/7
+✔ Network oai-traffic-net  Created                                                                                 0.0s
+✔ Network oai-public-net   Created                                                                                 0.1s
+✔ Container oai-mysql      Started                                                                                 0.3s
+✔ Container oai-amf        Started                                                                                 0.4s
+✔ Container oai-smf        Started                                                                                 0.6s
+✔ Container oai-upf        Started                                                                                 0.9s
+✔ Container oai-ext-dn     Started                                                                                 1.2s
+Waiting for oai-mysql to be healthy (Timeout: 60s)...
+oai-mysql is ready!
+Waiting for oai-amf to be healthy (Timeout: 60s)...
+oai-amf is ready!
+Waiting for oai-smf to be healthy (Timeout: 60s)...
+oai-smf is ready!
+Waiting for oai-upf to be healthy (Timeout: 60s)...
+oai-upf is ready!
+Waiting for oai-ext-dn to be healthy (Timeout: 60s)...
+oai-ext-dn is ready!
+All services are up and healthy!
+Starting gNB
+[+] Running 6/6
+✔ Container oai-mysql   Running                                                                                    0.0s
+✔ Container oai-amf     Running                                                                                    0.0s
+✔ Container oai-smf     Running                                                                                    0.0s
+✔ Container oai-upf     Running                                                                                    0.0s
+✔ Container oai-ext-dn  Running                                                                                    0.0s
+✔ Container oai-gnb     Started                                                                                    0.5s
+Waiting for oai-gnb to be healthy (Timeout: 60s)...
+oai-gnb is ready!
+gNB ready to connect
+Starting nr-ue
+[+] Running 7/7
+✔ Container oai-mysql   Running                                                                                    0.0s
+✔ Container oai-amf     Running                                                                                    0.0s
+✔ Container oai-smf     Running                                                                                    0.0s
+✔ Container oai-upf     Running                                                                                    0.0s
+✔ Container oai-ext-dn  Running                                                                                    0.0s
+✔ Container oai-gnb     Running                                                                                    0.0s
+✔ Container oai-nr-ue   Started                                                                                    0.5s
+Waiting for oai-nr-ue to be healthy (Timeout: 60s)...
+oai-nr-ue is ready!
+5G network is ready to connect!
+</pre></div>
+</div>
+<p>Inspect oai-gnb output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">logs</span> <span class="o">-</span><span class="n">f</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>
+
+<span class="o">&gt;</span> <span class="o">...</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="p">[</span><span class="n">LOADER</span><span class="p">]</span> <span class="n">library</span> <span class="n">libldpc_cuda</span><span class="o">.</span><span class="n">so</span> <span class="n">successfully</span> <span class="n">loaded</span>
+<span class="o">&gt;</span> <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="demapper-plugin">
+<h2>Demapper Plugin<a class="headerlink" href="#demapper-plugin" title="Link to this heading"></a></h2>
+<p>In the <cite>.env</cite> file, add the following line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GNB_EXTRA_OPTIONS</span><span class="o">=--</span><span class="n">loader</span><span class="o">.</span><span class="n">demapper</span><span class="o">.</span><span class="n">shlibversion</span> <span class="n">_orig</span>
+</pre></div>
+</div>
+<p>Inspect oai-gnb output via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">logs</span> <span class="o">-</span><span class="n">f</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>
+
+<span class="o">&gt;</span> <span class="o">...</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="p">[</span><span class="n">LOADER</span><span class="p">]</span> <span class="n">library</span> <span class="n">libdemapper_orig</span><span class="o">.</span><span class="n">so</span> <span class="n">successfully</span> <span class="n">loaded</span>
+<span class="o">&gt;</span> <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="data-capture-plugin">
+<h2>Data Capture Plugin<a class="headerlink" href="#data-capture-plugin" title="Link to this heading"></a></h2>
+<p>In the <cite>.env</cite> file, add the following line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GNB_EXTRA_OPTIONS</span><span class="o">=--</span><span class="n">loader</span><span class="o">.</span><span class="n">demapper</span><span class="o">.</span><span class="n">shlibversion</span> <span class="n">_capture</span> <span class="o">--</span><span class="n">thread</span><span class="o">-</span><span class="n">pool</span> <span class="mi">6</span>
+</pre></div>
+</div>
+<p>In the <cite>docker-compose.override.yaml</cite> file, add the following:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-number">Listing 19 </span><span class="caption-text">docker-compose.override.yaml</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">services</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">oai-gnb</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;gdbserver&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;:7777&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;/opt/oai-gnb/bin/nr-softmodem&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;-O&quot;</span><span class="p p-Indicator">,</span><span class="s">&quot;/opt/oai-gnb/etc/gnb.conf&quot;</span><span class="p p-Indicator">]</span>
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">docker-compose.override.yaml</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="n">services</span><span class="p">:</span>
+<span class="linenos">2</span>    <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="p">:</span>
+<span class="linenos">3</span>        <span class="n">volumes</span><span class="p">:</span>
+<span class="linenos">4</span>        <span class="c1">##### Data capture tutorial; ensure that .txt files exist and have the right permissions (666)</span>
+<span class="linenos">5</span>        <span class="o">-</span> <span class="o">../../</span><span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
+<span class="linenos">6</span>        <span class="o">-</span> <span class="o">../../</span><span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
 </div>
-<p>Note that we simply prepended <cite>gdbserver :7777</cite> to the pre-existing command line of the <cite>oai-gnb</cite> container, which can be obtained as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>inspect<span class="w"> </span>--format<span class="o">=</span><span class="s1">&#39;{{json .Config.Cmd}}&#39;</span><span class="w"> </span>oai-gnb
-<span class="o">[</span><span class="s2">&quot;/opt/oai-gnb/bin/nr-softmodem&quot;</span>,<span class="s2">&quot;-O&quot;</span>,<span class="s2">&quot;/opt/oai-gnb/etc/gnb.conf&quot;</span><span class="o">]</span>
+<p>Create the files before starting the containers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the logs directory</span>
+<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">logs</span>
+
+<span class="c1"># Create the files</span>
+<span class="n">touch</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">touch</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
+
+<span class="c1"># Make the files writable by the container</span>
+<span class="n">chmod</span> <span class="mi">666</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">chmod</span> <span class="mi">666</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
-<p>We can then attach using <cite>gdb</cite> as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>gdb
-&gt;<span class="w"> </span>target<span class="w"> </span>remote<span class="w"> </span>&lt;CONTAINER_IP&gt;:7777
+<p>Inspect oai-gnb output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">logs</span> <span class="o">-</span><span class="n">f</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>
+
+<span class="o">&gt;</span> <span class="o">...</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="p">[</span><span class="n">LOADER</span><span class="p">]</span> <span class="n">library</span> <span class="n">libdemapper_capture</span><span class="o">.</span><span class="n">so</span> <span class="n">successfully</span> <span class="n">loaded</span>
+<span class="o">&gt;</span> <span class="o">...</span>
 </pre></div>
 </div>
-<p>To get the local IP of a running container, run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>inspect<span class="w"> </span>-f<span class="w"> </span><span class="s1">&#39;{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}&#39;</span><span class="w"> </span>&lt;CONTAINER_NAME,<span class="w"> </span>e.g.<span class="w"> </span>oai-gnb&gt;
+<p>You can access the data captured after running the system:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
+
+<span class="mf">0.000000001</span>     <span class="c1"># time resolution of system</span>
+<span class="mf">19412.279803840</span> <span class="c1"># timestamp</span>
+<span class="n">QPSK</span>            <span class="c1"># modulation format</span>
+<span class="mi">96</span>              <span class="c1"># number of I/Q symbols to follow</span>
+<span class="o">-</span><span class="mi">21</span> <span class="o">-</span><span class="mi">6</span>          <span class="c1"># I/Q values</span>
+<span class="mi">48</span> <span class="mi">7</span>            <span class="c1"># number of RE in the PDCCH</span>
+<span class="mi">0</span> <span class="o">-</span><span class="mi">29</span>           <span class="c1"># I/Q values</span>
+<span class="o">-</span><span class="mi">36</span> <span class="mi">116</span>
+<span class="o">-</span><span class="mi">17</span> <span class="mi">37</span>
+<span class="o">-</span><span class="mi">30</span> <span class="mi">34</span>
 </pre></div>
 </div>
-<p>To attach using the <cite>VS code</cite> debugger, the following example <cite>launch.json</cite> configuration can be used:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;0.2.0&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;configurations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">      </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C++ Remote Debug&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cppdbg&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;program&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/opt/oai-gnb/bin/nr-softmodem&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;customLaunchSetupCommands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;target remote &lt;CONTAINER_IP&gt;:7777&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;attach to target&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;ignoreFailures&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"> </span><span class="p">}</span>
-<span class="w">        </span><span class="p">],</span>
-<span class="w">        </span><span class="nt">&quot;launchCompleteCommand&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;None&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;stopAtEntry&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;environment&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
-<span class="w">        </span><span class="nt">&quot;externalConsole&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;pipeTransport&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// needed if you are working on a different maching than the container host</span>
-<span class="w">            </span><span class="nt">&quot;pipeCwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${workspaceRoot}&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;pipeProgram&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssh&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="nt">&quot;pipeArgs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                </span><span class="s2">&quot;user@&lt;remote ip ?.?.?.?&gt;&quot;</span>
-<span class="w">            </span><span class="p">],</span>
-<span class="w">            </span><span class="nt">&quot;debuggerPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/usr/bin/gdb&quot;</span>
-<span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;sourceFileMap&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="nt">&quot;/oai-ran&quot;</span><span class="p">:</span><span class="s2">&quot;${workspaceRoot}&quot;</span>
-<span class="w">        </span><span class="p">},</span>
-<span class="w">        </span><span class="nt">&quot;targetArchitecture&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;arm&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;linux&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">          </span><span class="nt">&quot;MIMode&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;miDebuggerServerAddress&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;CONTAINER_IP&gt;:7777&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="nt">&quot;setupCommands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Enable pretty-printing for gdb&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;text&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;-enable-pretty-printing&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;ignoreFailures&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">          </span><span class="p">]</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">      </span><span class="p">}</span>
-<span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cat</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
+
+<span class="mf">0.000000001</span>     <span class="c1"># time resolution of system</span>
+<span class="mf">19412.279803840</span> <span class="c1"># timestamp</span>
+<span class="n">QPSK</span>            <span class="c1"># modulation format</span>
+<span class="mi">96</span>              <span class="c1"># number of LLRs to follow</span>
+<span class="o">-</span><span class="mi">3</span> <span class="o">-</span><span class="mi">1</span>           <span class="c1"># LLRs (demapper&#39;s output)</span>
+<span class="mi">6</span> <span class="mi">0</span>
+<span class="mi">0</span> <span class="o">-</span><span class="mi">4</span>
+<span class="o">-</span><span class="mi">5</span> <span class="mi">14</span>
+<span class="o">-</span><span class="mi">3</span> <span class="mi">4</span>
+<span class="o">-</span><span class="mi">4</span> <span class="mi">4</span>
 </pre></div>
 </div>
 </section>
-<section id="inspecting-and-debugging-inside-a-container-interactively">
-<h2>Inspecting and debugging inside a container interactively<a class="headerlink" href="#inspecting-and-debugging-inside-a-container-interactively" title="Link to this heading"></a></h2>
-<p>First, find out the commands that are usually run inside the container of interest, e.g., for the <cite>oai-gnb</cite> container</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>inspect<span class="w"> </span>--format<span class="o">=</span><span class="s1">&#39;{{json .Config.Entrypoint}} {{json .Config.Cmd}}&#39;</span><span class="w"> </span>oai-gnb
-<span class="o">[</span><span class="s2">&quot;/tini&quot;</span>,<span class="s2">&quot;-v&quot;</span>,<span class="s2">&quot;--&quot;</span>,<span class="s2">&quot;/opt/oai-gnb/bin/entrypoint.sh&quot;</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="s2">&quot;/opt/oai-gnb/bin/nr-softmodem&quot;</span>,<span class="s2">&quot;-O&quot;</span>,<span class="s2">&quot;/opt/oai-gnb/etc/gnb.conf&quot;</span><span class="o">]</span>
+<section id="tensorrt-neural-demapper">
+<h2>TensorRT Neural Demapper<a class="headerlink" href="#tensorrt-neural-demapper" title="Link to this heading"></a></h2>
+<p>In the <cite>.env</cite> file, add the following line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GNB_EXTRA_OPTIONS</span><span class="o">=--</span><span class="n">loader</span><span class="o">.</span><span class="n">demapper</span><span class="o">.</span><span class="n">shlibversion</span> <span class="n">_trt</span> <span class="o">--</span><span class="n">MACRLCs</span><span class="o">.</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dl_max_mcs</span> <span class="mi">10</span> <span class="o">--</span><span class="n">MACRLCs</span><span class="o">.</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ul_max_mcs</span> <span class="mi">10</span> <span class="o">--</span><span class="n">thread</span><span class="o">-</span><span class="n">pool</span> <span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span>
 </pre></div>
 </div>
-<p>We can then override the entrypoint to run an interactive session instead of the default launch procedure. This can be done by adding the following to the <cite>docker-compose.override.yaml</cite> file</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-number">Listing 20 </span><span class="caption-text">docker-compose.override.yaml</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">oai-gnb</span><span class="p">:</span>
-<span class="w">     </span><span class="nt">stdin_open</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"> </span><span class="c1"># docker run -i</span>
-<span class="w">     </span><span class="nt">tty</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">        </span><span class="c1"># docker run -t</span>
-<span class="w">     </span><span class="nt">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/bin/bash</span>
+<p>In the <cite>docker-compose.override.yaml</cite> file, add the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="p">:</span>
+    <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="p">:</span>
+        <span class="n">volumes</span><span class="p">:</span>
+        <span class="c1">##### neural demapper tutorial; mount weights and trtengine config</span>
+        <span class="o">-</span> <span class="o">../../</span><span class="n">tutorials</span><span class="o">/</span><span class="n">neural_demapper</span><span class="o">/</span><span class="n">models</span><span class="o">/</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">models</span>
+        <span class="o">-</span> <span class="o">./</span><span class="n">demapper_trt</span><span class="o">.</span><span class="n">config</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_trt</span><span class="o">.</span><span class="n">config</span>
 </pre></div>
 </div>
-</div>
-<p>To attach to a running session after running <cite>./start_system.sh</cite> or <cite>docker compose up -d oai-gnb</cite>, and for example start a debug session, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>attach<span class="w"> </span>oai-gnb
-$<span class="w"> </span>gdb<span class="w"> </span>--args<span class="w"> </span>/tini<span class="w"> </span>-v<span class="w"> </span>--<span class="w"> </span>/opt/oai-gnb/bin/entrypoint.sh<span class="w">  </span>./bin/nr-softmodem<span class="w"> </span>-O<span class="w"> </span>/opt/oai-gnb/etc/gnb.conf
+<p>Inspect oai-gnb output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">logs</span> <span class="o">-</span><span class="n">f</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>
+
+<span class="o">&gt;</span> <span class="o">...</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="p">[</span><span class="n">LOADER</span><span class="p">]</span> <span class="n">library</span> <span class="n">libdemapper_trt</span><span class="o">.</span><span class="n">so</span> <span class="n">successfully</span> <span class="n">loaded</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="n">Initializing</span> <span class="n">TRT</span> <span class="n">demapper</span> <span class="p">(</span><span class="n">TID</span> <span class="mi">20</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="n">Initializing</span> <span class="n">TRT</span> <span class="n">runtime</span> <span class="mi">20</span>
+<span class="o">&gt;</span> <span class="n">oai</span><span class="o">-</span><span class="n">gnb</span>  <span class="o">|</span> <span class="n">Loading</span> <span class="n">TRT</span> <span class="n">engine</span> <span class="n">models</span><span class="o">/</span><span class="n">neural_demapper</span><span class="mf">.2</span><span class="n">xfloat16</span><span class="o">.</span><span class="n">plan</span> <span class="p">(</span><span class="n">normalized</span> <span class="n">inputs</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="o">...</span>
 </pre></div>
 </div>
-</section>
-<section id="running-memcheck-within-an-interactive-docker-compose-session">
-<h2>Running memcheck within an interactive Docker compose session<a class="headerlink" href="#running-memcheck-within-an-interactive-docker-compose-session" title="Link to this heading"></a></h2>
-<p>We can use the <cite>compute-sanitizer</cite> tool from the NVIDIA Cuda Toolkit to run a GPU memcheck inside an interactive container session launched as above with the following commands:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>attach<span class="w"> </span>oai-gnb
-$<span class="w"> </span>/tini<span class="w"> </span>-v<span class="w"> </span>--<span class="w"> </span>/opt/oai-gnb/bin/entrypoint.sh<span class="w"> </span>compute-sanitizer<span class="w"> </span>--require-cuda-init<span class="o">=</span>no<span class="w"> </span>--tool<span class="w"> </span>memcheck<span class="w"> </span>./bin/nr-softmodem<span class="w"> </span>-O<span class="w"> </span>/opt/oai-gnb/etc/gnb.conf
-</pre></div>
-</div>
-</section>
-<section id="profiling-with-nvidia-nsight-systems">
-<h2>Profiling with NVIDIA Nsight Systems<a class="headerlink" href="#profiling-with-nvidia-nsight-systems" title="Link to this heading"></a></h2>
-<p>To enable interactive profiling inside a container, we can mount the <a class="reference external" href="https://docs.nvidia.com/nsight-systems/UserGuide/index.html">Nsight Systems CLI tools</a> installed on the host. This can be done by adding the following to the <cite>docker-compose.override.yaml</cite> file</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-number">Listing 21 </span><span class="caption-text">docker-compose.override.yaml</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">services</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">oai-gnb</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">stdin_open</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"> </span><span class="c1"># docker run -i</span>
-<span class="w">    </span><span class="nt">tty</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">        </span><span class="c1"># docker run -t</span>
-<span class="w">    </span><span class="nt">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/bin/bash</span>
-<span class="w">    </span><span class="nt">cap_add</span><span class="p">:</span>
-<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SYS_ADMIN</span>
-<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
-<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/opt/nvidia/nsight-systems/:/opt/nvidia/nsight-systems</span>
-</pre></div>
-</div>
-</div>
-<p>To collect system usage statistics using NVIDIA Nsight Systems, <cite>nsys</cite> can be run inside the gNB container as follows:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>docker<span class="w"> </span>container<span class="w"> </span>attach<span class="w"> </span>oai-gnb
-$<span class="w"> </span>/tini<span class="w"> </span>-v<span class="w"> </span>--<span class="w"> </span>/opt/oai-gnb/bin/entrypoint.sh<span class="w"> </span>/opt/nvidia/nsight-systems/2024.2.2/bin/nsys<span class="w"> </span>profile<span class="w"> </span>-t<span class="w"> </span>cuda,nvtx,osrt,cudnn,tegra-accelerators<span class="w"> </span>-o<span class="w"> </span>./sysprofile<span class="w"> </span>./bin/nr-softmodem<span class="w"> </span>-O<span class="w"> </span>/opt/oai-gnb/etc/gnb.conf
-</pre></div>
-</div>
-<p>You can afterwards download the profile data from the Jetson and inspect it locally on your host machine.</p>
-</section>
-<section id="fixing-missing-linker-error-messages-in-docker-build-ran-build">
-<h2>Fixing missing linker error messages in <cite>docker build ran-build</cite><a class="headerlink" href="#fixing-missing-linker-error-messages-in-docker-build-ran-build" title="Link to this heading"></a></h2>
-<p>In <cite>./cmake_targets/tools/build_helper</cite>, change the reprinted error context in the <cite>compilations()</cite> function from</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>egrep<span class="w"> </span>-A3<span class="w"> </span><span class="s2">&quot;warning:|error:&quot;</span><span class="w"> </span><span class="nv">$dlog</span>/<span class="nv">$logfile</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-</pre></div>
-</div>
-<p>to</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>egrep<span class="w"> </span>-C6<span class="w"> </span><span class="s2">&quot;warning:|error:&quot;</span><span class="w"> </span><span class="nv">$dlog</span>/<span class="nv">$logfile</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
-</pre></div>
-</div>
-<p>This modification shows additional context before and after lines containing ‘error’, which is particularly helpful for linker (<cite>ld</cite>) errors where the actual error message often appears before the ‘error’ line in the output.</p>
 </section>
 </section>
 
@@ -1760,8 +1820,8 @@ $<span class="w"> </span>/tini<span class="w"> </span>-v<span class="w"> </span>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ue_emulator.html" class="btn btn-neutral float-left" title="Software-defined End-to-End 5G Network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../../made_with_sionna.html" class="btn btn-neutral float-right" title="“Made with Sionna”" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ldpc_cuda/index.html" class="btn btn-neutral float-right" title="GPU-Accelerated LDPC Decoding" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
