@@ -13,6 +13,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../../src'))
 sys.path.insert(0, os.path.abspath('./rt'))
 
+
 # -- Project information -----------------------------------------------------
 
 project = "Sionna"
@@ -89,23 +90,29 @@ nbsphinx_prolog = r"""
 
 {# Set the appropriate links based on module name #}
 {% if module_name == 'phy' %}
+    {% set add_navigation_bar = True %}
     {% set github_link = 'https://github.com/nvlabs/sionna/blob/main/tutorials/phy/' + notebook_name|string|e %}
     {% set download_link = notebook_name|string|e %}
     {% set colab_link = 'https://colab.research.google.com/github/nvlabs/sionna/blob/main/tutorials/phy/' + notebook_name|string|e %}
 {% elif module_name == 'sys' %}
+    {% set add_navigation_bar = True %}
     {% set github_link = 'https://github.com/nvlabs/sionna/blob/main/tutorials/sys/' + notebook_name|string|e %}
- {% set download_link = notebook_name|string|e %}
+    {% set download_link = notebook_name|string|e %}
     {% set colab_link = 'https://colab.research.google.com/github/nvlabs/sionna/blob/main/tutorials/sys/' + notebook_name|string|e %}
 {% elif module_name == 'rt' %}
+    {% set add_navigation_bar = True %}
     {% set github_link = 'https://github.com/nvlabs/sionna-rt/blob/main/tutorials/' + notebook_name|string|e %}
     {% set download_link = notebook_name|string|e %}
     {% set colab_link = 'https://colab.research.google.com/github/nvlabs/sionna-rt/blob/main/tutorials/' + notebook_name|string|e %}
+{% elif module_name == 'rk' %}
+    {% set add_navigation_bar = False %}
 {% else %}
     {% set github_link = notebook_name|string|e %}
     {% set download_link = notebook_name|string|e %}
     {% set colab_link = notebook_name|string|e %}
 {% endif %}
 
+{% if add_navigation_bar %}
 .. raw:: html
 
     <style>h3 {display: block !important}</style>
@@ -140,8 +147,9 @@ nbsphinx_prolog = r"""
 
             </td>
         </table>
-
     </div>
+{% endif %}
+
 """
 
 # Make sure that nbsphinx picks the HTML output rather
@@ -153,3 +161,4 @@ nbsphinx.DISPLAY_DATA_PRIORITY_HTML = tuple(
 )
 # Avoid duplicate display of widgets, see: https://github.com/spatialaudio/nbsphinx/issues/378#issuecomment-573599835
 nbsphinx_widgets_path = ''
+

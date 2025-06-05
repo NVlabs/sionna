@@ -5,6 +5,24 @@
 We love to see how Sionna is used by other researchers! For this reason, you find below links to papers/projects whose authors have published Sionna-based simulation code.
 
 .. made-with-sionna::
+    :title: Geo2SigMap: High-Fidelity RF Signal Mapping Using Geographic Databases
+    :authors: Yiming Li, Zeyu Li, Zhihui Gao, Tingjun Chen
+    :year: 2025
+    :version: 1.0
+    :link_arxiv: https://arxiv.org/abs/2312.14303
+    :link_github: https://github.com/functions-lab/geo2sigmap
+    :abstract: Radio frequency (RF) signal mapping, which is the process of analyzing and predicting the RF signal strength and distribution across specific areas, is crucial for cellular network planning and deployment. Traditional approaches to RF signal mapping rely on statistical models constructed based on measurement data, which offer low complexity but often lack accuracy, or ray tracing tools, which provide enhanced precision for the target area but suffer from increased computational complexity. Recently, machine learning (ML) has emerged as a data-driven method for modeling RF signal propagation, which leverages models trained on synthetic datasets to perform RF signal mapping in "unseen" areas. In this paper, we present Geo2SigMap, an ML-based framework for efficient and high-fidelity RF signal mapping using geographic databases. First, we develop an automated framework that seamlessly integrates three open-source tools: OpenStreetMap (geographic databases), Blender (computer graphics), and Sionna (ray tracing), enabling the efficient generation of large-scale 3D building maps and ray tracing models. Second, we propose a cascaded U-Net model, which is pre-trained on synthetic datasets and employed to generate detailed RF signal maps, leveraging environmental information and sparse measurement data. Finally, we evaluate the performance of Geo2SigMap via a real-world measurement campaign, where three types of user equipment (UE) collect over 45,000 data points related to cellular information from six LTE cells operating in the citizens broadband radio service (CBRS) band. Our results show that Geo2SigMap achieves an average root-mean-square-error (RMSE) of 6.04 dB for predicting the reference signal received power (RSRP) at the UE, representing an average RMSE improvement of 3.59 dB compared to existing methods.
+
+.. made-with-sionna::
+    :title: Multi-cell Outdoor Channel State Information Dataset (MOCSID)
+    :authors: Mohamed El Mehdi Makhlouf, Maxime Guillaud, Yamil Vindas Yassine
+    :year: 2025
+    :version: 0.19
+    :link_arxiv: https://hal.science/hal-05037063/
+    :link_github: https://gitlab.inria.fr/channelcharting/outdoor_dataset
+    :abstract: We introduce MOCSID, a multi-cell outdoor channel state information dataset of synthetic channel state information (CSI) samples mimicking an outdoor campus scenario, including multiple base stations with partially overlapping coverage  areas and pedestrian user mobility. The scenario is characterized by a high density of base stations (10 base stations within a 625m x 535 m area) and includes a mixture of non-line-of-sight and line-of-sight propagation. MOCSID includes user locations, timestamps, velocities, and multipath component information (delays and path coefficients). The pedestrian mobility follows realistic movement patterns generated via the probabilistic roadmap algorithm. The dataset captures key propagation characteristics, including path loss, shadowing, and multipath effects. Since MOCSID is intended as a reference for the development and validation of channel charting algorithms, we put particular emphasis on the spatial consistency of the synthetic data. With this dataset, we aim to foster progress in channel charting research by facilitating entry into the field and encouraging reproducibility, collaboration, and benchmarking within the community. MOCSID was generated using the NVIDIA Sionna ray tracing tool. MOCSID is publicly released on Zenodo.
+
+.. made-with-sionna::
     :title: End-to-End Human Pose Reconstruction from Wearable Sensors for 6G Extended Reality Systems
     :authors: Nguyen Quang Hieu, Dinh Thai Hoang, Diep N. Nguyen, Mohammad Abu Alsheikh, Carlos C. N. Kuhn, Yibeltal F. Alem, and Ibrahim Radwan
     :year: 2025
@@ -21,7 +39,6 @@ We love to see how Sionna is used by other researchers! For this reason, you fin
     :link_arxiv: https://arxiv.org/abs/2502.10371
     :link_github: https://github.com/rodrihgh/cissir
     :abstract: We propose a beam codebook design to reduce self-interference (SI) in integrated sensing and communication (ISAC) systems. Our optimization methods, which can be applied to both tapered beamforming and phased arrays, adapt the codebooks to the SI channel such that a certain SI level is achieved. Furthermore, we derive an upper bound on the quantization noise in terms of the achieved SI level, which provides guidelines to pose the optimization problem in order to obtain performance guarantees for sensing. By selecting standard reference codebooks in our simulations, we show substantially improved sensing quality with little impact on 5G-NR communication. Our proposed method is not only less dependent on hyperparameters than other approaches in the literature, but it can also reduce SI further, and thus deliver better sensing and communication performance.
-
 
 .. made-with-sionna::
     :title: Safehaul: Risk-Averse Learning for Reliable mmWave Self-Backhauling in 6G Networks
