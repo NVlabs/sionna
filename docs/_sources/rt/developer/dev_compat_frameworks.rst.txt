@@ -63,7 +63,7 @@ The inverse direction is even simpler:
 .. code-block:: python
 
     import torch
-    a = torch.ones([3, 6], dtype=torch.float32) 
+    a = torch.ones([3, 6], dtype=torch.float32)
     a_dr = mi.TensorXf(a)
     print(a_dr)
 
@@ -101,7 +101,7 @@ The following code snippet shows how a function written in Dr.Jit can be exposed
 Similarly, one can use a function written in PyTorch in the context of a larger
 program implemented in Dr.Jit, as shown below:
 
-.. code-block:: 
+.. code-block:: python
 
     a = dr.ones(mi.TensorXf, [3, 6])
     dr.enable_grad(a)
@@ -153,7 +153,7 @@ should be made as small as possible to increase the energy of the refracted fiel
     # Load scene and place TX/RX
     scene = load_scene(sionna.rt.scene.simple_reflector, merge_shapes=False)
     scene.tx_array = PlanarArray(num_cols=1, num_rows=1,
-                                pattern="iso", polarization="V")
+                                 pattern="iso", polarization="V")
     scene.rx_array = scene.tx_array
     scene.add(Transmitter("tx", position=[0,0,3]))
     scene.add(Receiver("rx", position=[0,0,-3]))

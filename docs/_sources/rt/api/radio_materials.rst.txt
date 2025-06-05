@@ -3,7 +3,7 @@ Radio Materials
 
 A radio material defines how an object scatters incident radio waves.
 It implements all necessary components to simulate the interaction between
-radio waves and objects composed of specific materials. 
+radio waves and objects composed of specific materials.
 
 The base class :class:`~sionna.rt.RadioMaterialBase` provides an interface
 for implementing arbitrary radio materials and can be used to implemented
@@ -18,7 +18,7 @@ materials are uniquely identified by their name.
 For example, specifying that a scene object named `"wall"` is made of the
 material named `"itu-brick"` is done as follows:
 
-.. code-block:: Python
+.. code-block:: python
 
    obj = scene.get("wall") # obj is a SceneObject
    obj.radio_material = "itu-brick" # "wall" is made of "itu-brick"
@@ -29,7 +29,7 @@ The class :class:`~sionna.rt.RadioMaterial` implements the model described in th
 `Primer on Electromagnetics <../em_primer.html>`_. Following this model, a radio material consists of the
 real-valued relative permittivity :math:`\varepsilon_r`, the conductivity :math:`\sigma`,
 and the relative  permeability :math:`\mu_r`.
-For more details, see :eq:`epsilon`, :eq:`mu`, :eq:`eta`. 
+For more details, see :eq:`epsilon`, :eq:`mu`, :eq:`eta`.
 These quantities can possibly depend on the frequency of the incident radio
 wave. Note that this model only allows non-magnetic materials with :math:`\mu_r=1`.
 

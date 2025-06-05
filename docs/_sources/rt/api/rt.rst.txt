@@ -10,7 +10,7 @@ API Documentation
     paths
     paths_solvers
     radio_devices
-    radio_map
+    radio_maps
     radio_map_solvers
     radio_materials
     scene

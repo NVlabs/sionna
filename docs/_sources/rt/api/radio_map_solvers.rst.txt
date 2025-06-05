@@ -1,7 +1,7 @@
 Radio Map Solvers
 ====================
 
-A radio map solver computes a radio map for a given :class:`~sionna.rt.Scene` and
+A radio map solver computes a :doc:`radio map <radio_maps>` for a given :class:`~sionna.rt.Scene` and
 for every :class:`~sionna.rt.Transmitter`.
 Sionna provides a radio map solver (:class:`~sionna.rt.RadioMapSolver`) which currently
 supports specular reflection (including specular chains), diffuse reflection,

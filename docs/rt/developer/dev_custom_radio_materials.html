@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Understanding Radio Materials &mdash; Sionna 1.0.2 documentation</title>
+  <title>Understanding Radio Materials &mdash; Sionna 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -96,6 +96,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/Radio-Maps.html#Channel-impulse-responses-for-random-user-locations">Channel impulse responses for random user locations</a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Radio-Maps.html#Radio-maps-on-meshes">Radio maps on meshes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Radio-Maps.html#Conclusions">Conclusions</a></li>
 </ul>
 </li>
@@ -264,26 +265,46 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../api/radio_map.html">Radio Map</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_size</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.center"><code class="docutils literal notranslate"><span class="pre">RadioMap.center</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.num_cells"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_cells</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.num_rx"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_rx</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.num_tx"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_tx</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.orientation"><code class="docutils literal notranslate"><span class="pre">RadioMap.orientation</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">RadioMap.path_gain</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.rss"><code class="docutils literal notranslate"><span class="pre">RadioMap.rss</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.rx_cell_indices"><code class="docutils literal notranslate"><span class="pre">RadioMap.rx_cell_indices</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.sample_positions"><code class="docutils literal notranslate"><span class="pre">RadioMap.sample_positions()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.show"><code class="docutils literal notranslate"><span class="pre">RadioMap.show()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.show_association"><code class="docutils literal notranslate"><span class="pre">RadioMap.show_association()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.sinr"><code class="docutils literal notranslate"><span class="pre">RadioMap.sinr</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.size"><code class="docutils literal notranslate"><span class="pre">RadioMap.size</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.tx_association"><code class="docutils literal notranslate"><span class="pre">RadioMap.tx_association()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_map.html#sionna.rt.RadioMap.tx_cell_indices"><code class="docutils literal notranslate"><span class="pre">RadioMap.tx_cell_indices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../api/radio_maps.html">Radio Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_per_dim"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_per_dim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.center"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.center</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.measurement_surface</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.orientation"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.orientation</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.path_gain</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.rx_cell_indices"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.rx_cell_indices</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.sample_positions"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.sample_positions()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.show"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.show()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.show_association"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.show_association()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.size</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.tx_association"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.tx_association()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.tx_cell_indices"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.tx_cell_indices</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.path_gain</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.sample_positions"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.sample_positions()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">RadioMap.measurement_surface</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.num_rx"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_rx</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.num_tx"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_tx</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">RadioMap.path_gain</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.rss"><code class="docutils literal notranslate"><span class="pre">RadioMap.rss</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.sample_cells"><code class="docutils literal notranslate"><span class="pre">RadioMap.sample_cells()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.sinr"><code class="docutils literal notranslate"><span class="pre">RadioMap.sinr</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.transmitter_radio_map"><code class="docutils literal notranslate"><span class="pre">RadioMap.transmitter_radio_map()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.tx_association"><code class="docutils literal notranslate"><span class="pre">RadioMap.tx_association()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -370,7 +391,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../api/scene.html#examples">Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../api/scene.html#built-in-scenes">Built-in scenes</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.box"><code class="docutils literal notranslate"><span class="pre">box</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.box_one_screen"><code class="docutils literal notranslate"><span class="pre">box_one_screen</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.box_two_screens"><code class="docutils literal notranslate"><span class="pre">box_two_screens</span></code></a></li>
@@ -379,6 +400,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.floor_wall"><code class="docutils literal notranslate"><span class="pre">floor_wall</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.florence"><code class="docutils literal notranslate"><span class="pre">florence</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.munich"><code class="docutils literal notranslate"><span class="pre">munich</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.san_francisco"><code class="docutils literal notranslate"><span class="pre">san_francisco</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.simple_reflector"><code class="docutils literal notranslate"><span class="pre">simple_reflector</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.simple_street_canyon"><code class="docutils literal notranslate"><span class="pre">simple_street_canyon</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.simple_street_canyon_with_cars"><code class="docutils literal notranslate"><span class="pre">simple_street_canyon_with_cars</span></code></a></li>
@@ -386,12 +408,18 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.triple_reflector"><code class="docutils literal notranslate"><span class="pre">triple_reflector</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="../api/scene.html#built-in-meshes">Built-in meshes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.low_poly_car"><code class="docutils literal notranslate"><span class="pre">low_poly_car</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.scene.sphere"><code class="docutils literal notranslate"><span class="pre">sphere</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/scene_object.html">Scene Objects</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject"><code class="docutils literal notranslate"><span class="pre">SceneObject</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.clone"><code class="docutils literal notranslate"><span class="pre">SceneObject.clone()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.look_at"><code class="docutils literal notranslate"><span class="pre">SceneObject.look_at()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.mi_shape"><code class="docutils literal notranslate"><span class="pre">SceneObject.mi_shape</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.mi_mesh"><code class="docutils literal notranslate"><span class="pre">SceneObject.mi_mesh</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.name"><code class="docutils literal notranslate"><span class="pre">SceneObject.name</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.object_id"><code class="docutils literal notranslate"><span class="pre">SceneObject.object_id</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene_object.html#sionna.rt.SceneObject.orientation"><code class="docutils literal notranslate"><span class="pre">SceneObject.orientation</span></code></a></li>
@@ -438,6 +466,11 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.to_world_jones_rotator"><code class="docutils literal notranslate"><span class="pre">to_world_jones_rotator()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.jones_matrix_to_world_implicit"><code class="docutils literal notranslate"><span class="pre">jones_matrix_to_world_implicit()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.jones_vec_dot"><code class="docutils literal notranslate"><span class="pre">jones_vec_dot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../api/utils.html#meshes">Meshes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.load_mesh"><code class="docutils literal notranslate"><span class="pre">load_mesh()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.transform_mesh"><code class="docutils literal notranslate"><span class="pre">transform_mesh()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils.html#miscellaneous">Miscellaneous</a><ul>
@@ -1618,15 +1651,15 @@
   <section id="understanding-radio-materials">
 <span id="dev-custom-radio-materials"></span><h1>Understanding Radio Materials<a class="headerlink" href="#understanding-radio-materials" title="Link to this heading"></a></h1>
 <p>Radio materials define how objects scatter incident radio waves.
-They implements all necessary components to simulate the interaction
+They implement all necessary components to simulate the interaction
 between radio waves and objects composed of specific materials.</p>
 <section id="modifying-parameters-of-radio-materials">
 <h2>Modifying Parameters of Radio Materials<a class="headerlink" href="#modifying-parameters-of-radio-materials" title="Link to this heading"></a></h2>
 <p>To show how to modify the parameters of radio materials, we start by loading
-a since that consists only of a single reflector.
+a scene that consists only of a single reflector.
 We also instantiate a transmitter and a receiver, each equipped with a single
 antenna.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">&quot;tx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
@@ -1637,7 +1670,7 @@ antenna.</p>
 </div>
 <p>We then change the radio material of the reflector to a <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterial" title="sionna.rt.RadioMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadioMaterial</span></code></a> instance.
 We set the relative permittivity and conductivity of the material to specific values.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the radio material</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the radio material</span>
 <span class="n">my_mat</span> <span class="o">=</span> <span class="n">RadioMaterial</span><span class="p">(</span><span class="s2">&quot;my-mat&quot;</span><span class="p">,</span>
                        <span class="n">thickness</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
                        <span class="n">relative_permittivity</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span>
@@ -1659,7 +1692,7 @@ We set the relative permittivity and conductivity of the material to specific va
 </pre></div>
 </div>
 <p>We can now compute paths and print their gains for different values of the conductivity.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the path solver</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Instantiate the path solver</span>
 <span class="n">solver</span> <span class="o">=</span> <span class="n">PathSolver</span><span class="p">()</span>
 
 <span class="n">conductivities</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">100.</span><span class="p">,</span> <span class="mf">10000.</span><span class="p">,</span> <span class="mf">1000000.</span><span class="p">]</span>
@@ -1707,7 +1740,7 @@ conductivity is initialized to an arbitrary value and is trainable.
 We will then retrieve the value of the conductivity through gradient descent on
 the normalized absolute error between the path gain computed for the previously
 defined scene (reference scene) and the trainable one.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">trainable_scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trainable_scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">trainable_scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">&quot;tx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
 <span class="n">trainable_scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
@@ -1719,7 +1752,7 @@ defined scene (reference scene) and the trainable one.</p>
 <p>In order to assign trainable variables to the reflector material properties, we
 need to first instantiate an optimizer.
 The optimizer is used to instantiate trainable variables.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adam optimizer</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Adam optimizer</span>
 <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">4e-2</span>
 <span class="n">opt</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">ad</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
 </pre></div>
@@ -1729,7 +1762,7 @@ trainable conductivity property.
 To ensure that the conductivity remains non-negative, the trainable variable is
 defined as its logarithm (logit), and the actual conductivity is computed from
 the logit using a numerically stable <a class="reference internal" href="../api/utils.html#sionna.rt.utils.sigmoid" title="sionna.rt.utils.sigmoid"><code class="xref py py-func docutils literal notranslate"><span class="pre">sigmoid()</span></code></a> function.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">logit_2_conductivity</span><span class="p">(</span><span class="n">logit</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">logit_2_conductivity</span><span class="p">(</span><span class="n">logit</span><span class="p">):</span>
     <span class="n">max_conductivity</span> <span class="o">=</span> <span class="mf">100.</span>
     <span class="k">return</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">logit</span><span class="p">)</span><span class="o">*</span><span class="n">max_conductivity</span>
 
@@ -1739,10 +1772,10 @@ the logit using a numerically stable <a class="reference internal" href="../api/
 
 <span class="c1"># Instantiate the radio material</span>
 <span class="c1"># The conductivity is initialized using the trainable variable</span>
-<span class="n">trainable_mat</span> <span class="o">=</span> <span class="n">RadioMaterial</span><span class="p">(</span><span class="s2">&quot;my-trinable-mat&quot;</span><span class="p">,</span>
-                            <span class="n">thickness</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                            <span class="n">relative_permittivity</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span>
-                            <span class="n">conductivity</span><span class="o">=</span><span class="n">logit_2_conductivity</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;logit_conductivity&quot;</span><span class="p">]))</span> <span class="c1"># Use the trainable variable</span>
+<span class="n">trainable_mat</span> <span class="o">=</span> <span class="n">RadioMaterial</span><span class="p">(</span><span class="s2">&quot;my-trainable-mat&quot;</span><span class="p">,</span>
+                              <span class="n">thickness</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                              <span class="n">relative_permittivity</span><span class="o">=</span><span class="mf">5.</span><span class="p">,</span>
+                              <span class="n">conductivity</span><span class="o">=</span><span class="n">logit_2_conductivity</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;logit_conductivity&quot;</span><span class="p">]))</span> <span class="c1"># Use the trainable variable</span>
 <span class="c1"># Assign the radio material to the reflector</span>
 <span class="n">trainable_scene</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="s2">&quot;reflector&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">radio_material</span> <span class="o">=</span> <span class="n">trainable_mat</span>
 <span class="c1"># To avoid confusion, discard the radio material initially loaded with the scene</span>
@@ -1752,7 +1785,7 @@ the logit using a numerically stable <a class="reference internal" href="../api/
 <span class="nb">print</span><span class="p">(</span><span class="n">trainable_scene</span><span class="o">.</span><span class="n">radio_materials</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;my-trinable-mat&#39;</span><span class="p">:</span> <span class="n">RadioMaterial</span> <span class="n">eta_r</span><span class="o">=</span><span class="mf">5.000</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s1">&#39;my-trainable-mat&#39;</span><span class="p">:</span> <span class="n">RadioMaterial</span> <span class="n">eta_r</span><span class="o">=</span><span class="mf">5.000</span>
             <span class="n">sigma</span><span class="o">=</span><span class="mf">0.669</span>
             <span class="n">thickness</span><span class="o">=</span><span class="mf">0.100</span>
             <span class="n">scattering_coefficient</span><span class="o">=</span><span class="mf">0.000</span>
@@ -1760,8 +1793,8 @@ the logit using a numerically stable <a class="reference internal" href="../api/
 </pre></div>
 </div>
 <p>Backpropagation through a <code class="docutils literal notranslate"><span class="pre">drjit</span></code> loop can currently only be done when the
-<cite>evaluated</cite> mode is used for the computation of the electic field by the solver.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">solver</span> <span class="o">=</span> <span class="n">PathSolver</span><span class="p">()</span>
+<cite>evaluated</cite> mode is used for the computation of the electric field by the solver.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">solver</span> <span class="o">=</span> <span class="n">PathSolver</span><span class="p">()</span>
 
 <span class="c1"># Switch the computation of field loop to &quot;evaluated&quot; mode to</span>
 <span class="c1"># enable gradient backpropagation through the loop</span>
@@ -1771,7 +1804,7 @@ the logit using a numerically stable <a class="reference internal" href="../api/
 <p>We can now run the optimization that performs gradient descent on the normalized
 absolute error between the gain obtained using the trainable scene and the one
 obtained using the reference scene instantiated at the beginning of this guide.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">total_gain</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">total_gain</span><span class="p">(</span><span class="n">paths</span><span class="p">):</span>
     <span class="n">a_real</span><span class="p">,</span> <span class="n">a_imag</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">a</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a_real</span><span class="p">)</span> <span class="o">+</span> <span class="n">dr</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">a_imag</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">g</span>
@@ -1832,13 +1865,13 @@ scattering model by defining a new class that inherits from the
 define how a material scatters an incident wave.</p>
 <p>We will start by detailing how Jones vectors and matrices are represented in
 Sionna RT. It is highly recommended to first read the
-<a class="reference external" href="em_primer.html">Primer on Electromagnetics</a> to understand the basics of
+<a class="reference external" href="../em_primer.html">Primer on Electromagnetics</a> to understand the basics of
 radio wave propagation.</p>
 <section id="representation-of-jones-vector-and-matrices">
 <h3>Representation of Jones vector and Matrices<a class="headerlink" href="#representation-of-jones-vector-and-matrices" title="Link to this heading"></a></h3>
-<p>As detailed in the <a class="reference external" href="em_primer.html">Primer on Electromagnetics</a>, a wave phasor
+<p>As detailed in the <a class="reference external" href="../em_primer.html">Primer on Electromagnetics</a>, a wave phasor
 is typically represented by a Jones vector <span class="math notranslate nohighlight">\(\mathbf{E} \in \mathbb{C}^2\)</span>.
-However, as <code class="docutils literal notranslate"><span class="pre">drjit</span></code> does not current supports complex-valued vectors and
+However, as <code class="docutils literal notranslate"><span class="pre">drjit</span></code> does not currently support complex-valued vectors and
 matrices, Sionna RT uses the equivalent real-valued representation of two-dimensional
 complex-valued vectors, which represents a Jones vector as a real-valued vector
 with 4 dimensions:</p>
@@ -1852,8 +1885,8 @@ of size <span class="math notranslate nohighlight">\(2 \times 2\)</span> that mo
 represented by the equivalent <span class="math notranslate nohighlight">\(4 \times 4\)</span> real-valued matrix</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\begin{bmatrix}
-    \Re{\{\mathbf{E}\}} &amp; -\Im{\{\mathbf{E}\}}\\
-    \Im{\{\mathbf{E}\}} &amp; \Re{\{\mathbf{E}\}}
+    \Re{\{\mathbf{M}\}} &amp; -\Im{\{\mathbf{M}\}}\\
+    \Im{\{\mathbf{M}\}} &amp; \Re{\{\mathbf{M}\}}
 \end{bmatrix}\end{split}\]</div>
 <p>In the rest of this guide, we will interchangeably use both representations to
 write equations.
@@ -1894,7 +1927,7 @@ resulting from an interaction is facilitated in Sionna RT by defining a local
 coordinate system specific to this interaction.</p>
 <p>This local interaction coordinate system is defined such that the local Z axis
 corresponds to the normal to the scatterer surface at the interaction point, and
-the X and Y axes are tangant to the scatterer surface at the interaction point.</p>
+the X and Y axes are tangent to the scatterer surface at the interaction point.</p>
 <p>Using the prime (<span class="math notranslate nohighlight">\('\)</span>) notation to indicate that a vector is represented
 in the local coordinate system, we therefore have
 <span class="math notranslate nohighlight">\(\mathbf{n'} = \begin{bmatrix}0\\0\\1\end{bmatrix}\)</span>.</p>
@@ -1949,7 +1982,7 @@ in a humanly readable way.</p>
 <section id="implementation-of-a-simple-radio-material-model">
 <h3>Implementation of a Simple Radio Material Model<a class="headerlink" href="#implementation-of-a-simple-radio-material-model" title="Link to this heading"></a></h3>
 <p>For simplicity, we will start by implementing a scattering model that only
-reflect incident radio waves specularly, and such that the energy of the reflected
+reflects incident radio waves specularly, and such that the energy of the reflected
 wave equals the one of the incident wave scaled by a parameter <span class="math notranslate nohighlight">\(g \in (0,1)\)</span>.</p>
 <p>Formally, this simple material model implements the following transfer equation.
 The direction of propagation of the reflected ray <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_\text{r}\)</span>
@@ -1980,8 +2013,8 @@ In these equations, <span class="math notranslate nohighlight">\((\hat{\mathbf{e
 and <span class="math notranslate nohighlight">\((\hat{\mathbf{e}}_{\text{r},s}, \hat{\mathbf{e}}_{\text{r},p})\)</span> are
 the implicit basis for the incident and scattered wave, respectively,
 and <span class="math notranslate nohighlight">\(\mathbf{W}\left(\hat{\mathbf{x}}_{2}, \hat{\mathbf{y}}_{2}, \hat{\mathbf{x}}_{1}, \hat{\mathbf{y}}_{1}\right)\)</span>
-is change-of-basis matrix from basis <span class="math notranslate nohighlight">\((\hat{\mathbf{x}}_{1}, \hat{\mathbf{y}}_{1})\)</span> to
-basis <span class="math notranslate nohighlight">\((\hat{\mathbf{x}}_{2}, \hat{\mathbf{y}}_{2})\)</span> defined in the <a class="reference external" href="em_primer.html">Primer on Electromagnetics</a> .</p>
+is the change-of-basis matrix from basis <span class="math notranslate nohighlight">\((\hat{\mathbf{x}}_{1}, \hat{\mathbf{y}}_{1})\)</span> to
+basis <span class="math notranslate nohighlight">\((\hat{\mathbf{x}}_{2}, \hat{\mathbf{y}}_{2})\)</span> defined in the <a class="reference external" href="../em_primer.html">Primer on Electromagnetics</a> .</p>
 <p>Let’s now implement this radio material model.
 Note that only the <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase.sample" title="sionna.rt.RadioMaterialBase.sample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample()</span></code></a>, <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase.eval" title="sionna.rt.RadioMaterialBase.eval"><code class="xref py py-meth docutils literal notranslate"><span class="pre">eval()</span></code></a>,
 and <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase.pdf" title="sionna.rt.RadioMaterialBase.pdf"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pdf()</span></code></a> methods are required to actually
@@ -1991,7 +2024,7 @@ the radio material represented in the local coordinate system.
 The direction of reflection <a class="reference internal" href="#equation-eq-kr">(55)</a> can then be computed by leveraging the fact that
 <span class="math notranslate nohighlight">\(\hat{\mathbf{n}} = \hat{\mathbf{z}}\)</span> as shown in the following code snippet, where
 an arbitrary direction of incidence is defined.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Arbitrary direction of incidence used in this example.</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Arbitrary direction of incidence used in this example.</span>
 <span class="c1"># The z component of the incident direction of propagation can only be negative</span>
 <span class="n">ki_prime</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ki_prime&quot;</span><span class="p">,</span> <span class="n">ki_prime</span><span class="p">)</span>
@@ -2012,7 +2045,7 @@ an arbitrary direction of incidence is defined.</p>
 Note that this utility uses the rendering convention for representing direction
 of propagation, in which the input vector points <em>away</em> from the interaction
 point:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Expects an input vector that points away from the interaction point</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Expects an input vector that points away from the interaction point</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;kr_prime&quot;</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">reflect</span><span class="p">(</span><span class="o">-</span><span class="n">ki_prime</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -2053,7 +2086,7 @@ for a detailed understanding of this code.
 It is also recommended to consult the
 <a class="reference external" href="https://mitsuba.readthedocs.io/en/stable/src/api_reference.html#mitsuba.BSDF">API documentation of the mi.BSDF class</a>,
 as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase" title="sionna.rt.RadioMaterialBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadioMaterialBase</span></code></a> inherits from it.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CustomRadioMaterial</span><span class="p">(</span><span class="n">RadioMaterialBase</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CustomRadioMaterial</span><span class="p">(</span><span class="n">RadioMaterialBase</span><span class="p">):</span>
 
     <span class="c1"># The __init__ method builds the radio material from:</span>
     <span class="c1"># - A unique `name` to identify the material instance in the scene</span>
@@ -2067,10 +2100,10 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
     <span class="c1"># read from the XML scene file. Therefore, when a `props` object is provided,</span>
     <span class="c1"># the other parameters are ignored and should not be given.</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">g</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">color</span> <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">props</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Properties</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+                 <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">g</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">color</span> <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">props</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Properties</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
         <span class="c1"># If `props` is `None`, then one is built from the</span>
         <span class="c1"># other parameters</span>
@@ -2120,10 +2153,10 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="c1"># structure we need.</span>
         <span class="n">sqrt_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">jones_matrix_to_world_implicit</span><span class="p">(</span><span class="n">c1</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
-                                                <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
-                                                <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
+                                                   <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
+                                                   <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
+                                                   <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
+                                                   <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
 
         <span class="c1">## We now only need to prepare the outputs</span>
 
@@ -2175,10 +2208,10 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="c1"># structure we need.</span>
         <span class="n">sqrt_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">jones_matrix_to_world_implicit</span><span class="p">(</span><span class="n">c1</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
-                                                <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
-                                                <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
+                                                   <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
+                                                   <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
+                                                   <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
+                                                   <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
 
         <span class="c1"># This model only scatters energy in the direction of the specular reflection.</span>
         <span class="c1"># Any other direction provided by the user `wo` should therefore lead to no energy.</span>
@@ -2215,7 +2248,7 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="c1"># Registers the `g` parameter as a differentiable</span>
         <span class="c1"># parameter of the scene</span>
         <span class="n">callback</span><span class="o">.</span><span class="n">put_parameter</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span>
-                            <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
+                               <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># Returns a humanly readable description of the material</span>
@@ -2232,13 +2265,17 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
     <span class="nd">@g</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="c1"># Register the custom radio material as a Mitsuba plugin</span>
+<span class="n">mi</span><span class="o">.</span><span class="n">register_bsdf</span><span class="p">(</span><span class="s2">&quot;custom-radio-material&quot;</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">props</span><span class="p">:</span> <span class="n">CustomRadioMaterial</span><span class="p">(</span><span class="n">props</span><span class="o">=</span><span class="n">props</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Let’s now use this custom radio material in a Sionna RT scene!
 We start by loading a new scene, then instantiate the newly created radio
 material and use it for the reflector. We set <span class="math notranslate nohighlight">\(g\)</span> to a very low value to
 clearly see the impact on the reflected path gain.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene_custom_mat</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scene_custom_mat</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">scene_custom_mat</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">&quot;tx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
 <span class="n">scene_custom_mat</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">&quot;rx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
@@ -2263,7 +2300,7 @@ clearly see the impact on the reflected path gain.</p>
 <p>We can see that the <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase.to_string" title="sionna.rt.RadioMaterialBase.to_string"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_string()</span></code></a> function we
 have defined is used to describe the material.</p>
 <p>We are now ready to trace paths.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">scene_custom_mat</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">paths</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">scene_custom_mat</span><span class="p">)</span>
 <span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">paths</span><span class="o">.</span><span class="n">tau</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
@@ -2281,7 +2318,7 @@ have defined is used to describe the material.</p>
 <p>We can see that the gain of the reflected path is low because of the low value of
 <span class="math notranslate nohighlight">\(g\)</span>.
 Let’s now set the value of <span class="math notranslate nohighlight">\(g\)</span> to a higher value:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">my_mat</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="mf">0.9</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">my_mat</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="mf">0.9</span>
 
 <span class="c1"># Paths coefficient</span>
 <span class="n">paths</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">scene_custom_mat</span><span class="p">)</span>
@@ -2308,7 +2345,7 @@ All we need to to next is to use
 <a class="reference external" href="https://drjit.readthedocs.io/en/latest/reference.html#drjit.backward">dr.backward()</a>
 to compute gradients.
 For this toy example, we use the total gain as objective function.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dr</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">(</span><span class="n">my_mat</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dr</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">(</span><span class="n">my_mat</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
 
 <span class="c1"># Switch the computation of field loop to &quot;evaluated&quot; mode to</span>
 <span class="c1"># enable gradient backpropagation through the loop</span>
@@ -2375,7 +2412,7 @@ for a detailed understanding of this code.
 It is also recommended to consult the
 <a class="reference external" href="https://mitsuba.readthedocs.io/en/stable/src/api_reference.html#mitsuba.BSDF">API documentation of the mi.BSDF class</a>,
 as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase" title="sionna.rt.RadioMaterialBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadioMaterialBase</span></code></a> inherits from it.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EnhancedCustomRadioMaterial</span><span class="p">(</span><span class="n">RadioMaterialBase</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EnhancedCustomRadioMaterial</span><span class="p">(</span><span class="n">RadioMaterialBase</span><span class="p">):</span>
 
     <span class="c1"># Note: The __init__ method is identical to the one of `CustomRadioMaterial`.</span>
     <span class="c1"># The __init__ method builds the radio material from:</span>
@@ -2390,10 +2427,10 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
     <span class="c1"># read from the XML scene file. Therefore, when a `props` object is provided,</span>
     <span class="c1"># the other parameters are ignored and should not be given.</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">g</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">color</span> <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">props</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Properties</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+                 <span class="n">name</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">g</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">color</span> <span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">props</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Properties</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
         <span class="c1"># If `props` is `None`, then one is built from the</span>
         <span class="c1"># other parameters</span>
@@ -2449,16 +2486,16 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="c1"># structure we need.</span>
         <span class="n">sqrt_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">jones_mat_ref</span> <span class="o">=</span> <span class="n">jones_matrix_to_world_implicit</span><span class="p">(</span><span class="n">c1</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                    <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                    <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
-                                                    <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
-                                                    <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
+                                                       <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
+                                                       <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
+                                                       <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
+                                                       <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
         <span class="n">sqrt_1mg</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">g</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">jones_mat_tra</span> <span class="o">=</span> <span class="n">jones_matrix_to_world_implicit</span><span class="p">(</span><span class="n">c1</span><span class="o">=</span><span class="n">sqrt_1mg</span><span class="p">,</span>
-                                                    <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_1mg</span><span class="p">,</span>
-                                                    <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
-                                                    <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
-                                                    <span class="n">k_out_local</span><span class="o">=</span><span class="n">kt_prime</span><span class="p">)</span>
+                                                       <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_1mg</span><span class="p">,</span>
+                                                       <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
+                                                       <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
+                                                       <span class="n">k_out_local</span><span class="o">=</span><span class="n">kt_prime</span><span class="p">)</span>
 
         <span class="c1"># Sample the interaction type.</span>
         <span class="c1"># We use the `sample1` parameter, which is assumed to be a float uniformly sampled</span>
@@ -2482,8 +2519,8 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="n">bs</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">BSDFSample3f</span><span class="p">()</span>
         <span class="c1"># Specifies the type of interaction that was sampled</span>
         <span class="n">bs</span><span class="o">.</span><span class="n">sampled_component</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">reflection</span><span class="p">,</span>
-                                        <span class="n">InteractionType</span><span class="o">.</span><span class="n">SPECULAR</span><span class="p">,</span>
-                                        <span class="n">InteractionType</span><span class="o">.</span><span class="n">REFRACTION</span><span class="p">)</span>
+                                         <span class="n">InteractionType</span><span class="o">.</span><span class="n">SPECULAR</span><span class="p">,</span>
+                                         <span class="n">InteractionType</span><span class="o">.</span><span class="n">REFRACTION</span><span class="p">)</span>
         <span class="c1"># Direction of the scattered wave in the world frame</span>
         <span class="n">bs</span><span class="o">.</span><span class="n">wo</span> <span class="o">=</span> <span class="n">to_world</span><span class="nd">@ko_prime</span>
         <span class="c1"># The next field of `bs` stores the probability that the sampled</span>
@@ -2533,16 +2570,16 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="c1"># structure we need.</span>
         <span class="n">sqrt_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">jones_mat_ref</span> <span class="o">=</span> <span class="n">jones_matrix_to_world_implicit</span><span class="p">(</span><span class="n">c1</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                    <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
-                                                    <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
-                                                    <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
-                                                    <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
+                                                       <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_g</span><span class="p">,</span>
+                                                       <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
+                                                       <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
+                                                       <span class="n">k_out_local</span><span class="o">=</span><span class="n">kr_prime</span><span class="p">)</span>
         <span class="n">sqrt_1mg</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">g</span><span class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">jones_mat_tra</span> <span class="o">=</span> <span class="n">jones_matrix_to_world_implicit</span><span class="p">(</span><span class="n">c1</span><span class="o">=</span><span class="n">sqrt_1mg</span><span class="p">,</span>
-                                                    <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_1mg</span><span class="p">,</span>
-                                                    <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
-                                                    <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
-                                                    <span class="n">k_out_local</span><span class="o">=</span><span class="n">kt_prime</span><span class="p">)</span>
+                                                       <span class="n">c2</span><span class="o">=</span><span class="n">sqrt_1mg</span><span class="p">,</span>
+                                                       <span class="n">to_world</span><span class="o">=</span><span class="n">to_world</span><span class="p">,</span>
+                                                       <span class="n">k_in_local</span><span class="o">=</span><span class="n">ki_prime</span><span class="p">,</span>
+                                                       <span class="n">k_out_local</span><span class="o">=</span><span class="n">kt_prime</span><span class="p">)</span>
 
         <span class="c1"># Select the Jones matrix and direction of the scattered wave according to the sampled</span>
         <span class="c1"># interaction type</span>
@@ -2599,7 +2636,7 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
         <span class="c1"># Registers the `g` parameter as a differentiable</span>
         <span class="c1"># parameter of the scene</span>
         <span class="n">callback</span><span class="o">.</span><span class="n">put_parameter</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span>
-                            <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
+                               <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># Returns a humanly readable description of the material</span>
@@ -2616,6 +2653,10 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
     <span class="nd">@g</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="c1"># Register the custom radio material as a Mitsuba plugin</span>
+<span class="n">mi</span><span class="o">.</span><span class="n">register_bsdf</span><span class="p">(</span><span class="s2">&quot;enhanced-custom-radio-material&quot;</span><span class="p">,</span>
+                <span class="k">lambda</span> <span class="n">props</span><span class="p">:</span> <span class="n">EnhancedCustomRadioMaterial</span><span class="p">(</span><span class="n">props</span><span class="o">=</span><span class="n">props</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Note that we use the <code class="docutils literal notranslate"><span class="pre">sample1</span></code> parameter of <a class="reference internal" href="../api/radio_materials.html#sionna.rt.RadioMaterialBase.sample" title="sionna.rt.RadioMaterialBase.sample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample()</span></code></a>
@@ -2628,7 +2669,7 @@ when modeling diffuse reflections).</p>
 We start by loading the <code class="docutils literal notranslate"><span class="pre">simple_reflector</span></code> scene, but this time with we
 instantiate two receivers: one on each side of the reflector to capture both a
 reflected and a transmitted path.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene_custom_mat</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scene_custom_mat</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_reflector</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="n">scene_custom_mat</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">&quot;tx&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
 <span class="n">scene_custom_mat</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">&quot;rx-1&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">2.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>

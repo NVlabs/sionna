@@ -24,7 +24,7 @@ a factory method for it together with a name, using the function
 Once this is done, the new scattering pattern can be used everywhere by providing
 its name. An example is shown below:
 
-.. code-block:: Python
+.. code-block:: python
 
     import mitsuba as mi
     import drjit as dr
@@ -48,9 +48,11 @@ its name. An example is shown below:
     register_scattering_pattern("my_pattern", MyPattern)
 
     # Pattern can be referenced by its name
-    my_mat = RadioMaterial(name="my_material",
-                        scattering_pattern="my_pattern", # Name of registered pattern
-                        n=3) # Keyword argument passed to the class constructor
+    my_mat = RadioMaterial(
+        name="my_material",
+        scattering_pattern="my_pattern",  # Name of registered pattern
+        n=3  # Keyword argument passed to the class constructor
+    )
 
     # Visualize the scattering pattern
     my_mat.scattering_pattern.show()
@@ -73,7 +75,7 @@ snippet. Please note that this example is only meant for illustration purposes.
 
     import mitsuba as mi
     import drjit as dr
-    import sionna 
+    import sionna
     from sionna.rt import RadioMaterial, ScatteringPattern, register_scattering_pattern,\
                           load_scene, Transmitter, Receiver, PlanarArray,\
                           PathSolver
@@ -86,7 +88,7 @@ snippet. Please note that this example is only meant for illustration purposes.
         cos(theta_o)^n.
         """
         def __init__(self, n: int):
-            self.n = n 
+            self.n = n
             self.normalization = dr.sqrt((n+1)/(2*dr.pi))
             self.v = mi.Vector3f([0,0,1])
             dr.enable_grad(self.v) # Enable gradient computation for v
@@ -108,11 +110,11 @@ snippet. Please note that this example is only meant for illustration purposes.
     # Create new radio material with custom scattering pattern
     # and assign it to the reflector (only object in the scene)
     my_mat = RadioMaterial(name="my_material",
-                        conductivity=10,
-                        relative_permittivity=5,
-                        scattering_coefficient=0.8,
-                        scattering_pattern="my_pattern",
-                        n=3)
+                           conductivity=10,
+                           relative_permittivity=5,
+                           scattering_coefficient=0.8,
+                           scattering_pattern="my_pattern",
+                           n=3)
 
     scene.get("merged-shapes").radio_material = my_mat
 

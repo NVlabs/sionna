@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Radio Map &mdash; Sionna 1.0.2 documentation</title>
+  <title>Radio Maps &mdash; Sionna 1.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -96,6 +96,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../tutorials/Radio-Maps.html#Channel-impulse-responses-for-random-user-locations">Channel impulse responses for random user locations</a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Radio-Maps.html#Radio-maps-on-meshes">Radio maps on meshes</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Radio-Maps.html#Conclusions">Conclusions</a></li>
 </ul>
 </li>
@@ -264,26 +265,46 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Radio Map</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Radio Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cells_per_dim"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_per_dim</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.center"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.center</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.measurement_surface</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.orientation"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.orientation</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.path_gain</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.rx_cell_indices"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.rx_cell_indices</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.sample_positions"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.sample_positions()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.show"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.show()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.show_association"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.show_association()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.size</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.tx_association"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.tx_association()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.tx_cell_indices"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.tx_cell_indices</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.path_gain</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.sample_positions"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.sample_positions()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_size</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.center"><code class="docutils literal notranslate"><span class="pre">RadioMap.center</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.num_cells"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_cells</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">RadioMap.measurement_surface</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.num_rx"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_rx</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.num_tx"><code class="docutils literal notranslate"><span class="pre">RadioMap.num_tx</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.orientation"><code class="docutils literal notranslate"><span class="pre">RadioMap.orientation</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.path_gain"><code class="docutils literal notranslate"><span class="pre">RadioMap.path_gain</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.rss"><code class="docutils literal notranslate"><span class="pre">RadioMap.rss</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.rx_cell_indices"><code class="docutils literal notranslate"><span class="pre">RadioMap.rx_cell_indices</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.sample_positions"><code class="docutils literal notranslate"><span class="pre">RadioMap.sample_positions()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.show"><code class="docutils literal notranslate"><span class="pre">RadioMap.show()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.show_association"><code class="docutils literal notranslate"><span class="pre">RadioMap.show_association()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.sample_cells"><code class="docutils literal notranslate"><span class="pre">RadioMap.sample_cells()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.sinr"><code class="docutils literal notranslate"><span class="pre">RadioMap.sinr</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.size"><code class="docutils literal notranslate"><span class="pre">RadioMap.size</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.transmitter_radio_map"><code class="docutils literal notranslate"><span class="pre">RadioMap.transmitter_radio_map()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.tx_association"><code class="docutils literal notranslate"><span class="pre">RadioMap.tx_association()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.tx_cell_indices"><code class="docutils literal notranslate"><span class="pre">RadioMap.tx_cell_indices</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -370,7 +391,7 @@
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="scene.html#examples">Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="scene.html#built-in-scenes">Built-in scenes</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.box"><code class="docutils literal notranslate"><span class="pre">box</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.box_one_screen"><code class="docutils literal notranslate"><span class="pre">box_one_screen</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.box_two_screens"><code class="docutils literal notranslate"><span class="pre">box_two_screens</span></code></a></li>
@@ -379,6 +400,7 @@
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.floor_wall"><code class="docutils literal notranslate"><span class="pre">floor_wall</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.florence"><code class="docutils literal notranslate"><span class="pre">florence</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.munich"><code class="docutils literal notranslate"><span class="pre">munich</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.san_francisco"><code class="docutils literal notranslate"><span class="pre">san_francisco</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.simple_reflector"><code class="docutils literal notranslate"><span class="pre">simple_reflector</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.simple_street_canyon"><code class="docutils literal notranslate"><span class="pre">simple_street_canyon</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.simple_street_canyon_with_cars"><code class="docutils literal notranslate"><span class="pre">simple_street_canyon_with_cars</span></code></a></li>
@@ -386,12 +408,18 @@
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.triple_reflector"><code class="docutils literal notranslate"><span class="pre">triple_reflector</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="scene.html#built-in-meshes">Built-in meshes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.low_poly_car"><code class="docutils literal notranslate"><span class="pre">low_poly_car</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.scene.sphere"><code class="docutils literal notranslate"><span class="pre">sphere</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="scene_object.html">Scene Objects</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject"><code class="docutils literal notranslate"><span class="pre">SceneObject</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.clone"><code class="docutils literal notranslate"><span class="pre">SceneObject.clone()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.look_at"><code class="docutils literal notranslate"><span class="pre">SceneObject.look_at()</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.mi_shape"><code class="docutils literal notranslate"><span class="pre">SceneObject.mi_shape</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.mi_mesh"><code class="docutils literal notranslate"><span class="pre">SceneObject.mi_mesh</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.name"><code class="docutils literal notranslate"><span class="pre">SceneObject.name</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.object_id"><code class="docutils literal notranslate"><span class="pre">SceneObject.object_id</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene_object.html#sionna.rt.SceneObject.orientation"><code class="docutils literal notranslate"><span class="pre">SceneObject.orientation</span></code></a></li>
@@ -438,6 +466,11 @@
 <li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.to_world_jones_rotator"><code class="docutils literal notranslate"><span class="pre">to_world_jones_rotator()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.jones_matrix_to_world_implicit"><code class="docutils literal notranslate"><span class="pre">jones_matrix_to_world_implicit()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.jones_vec_dot"><code class="docutils literal notranslate"><span class="pre">jones_vec_dot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="utils.html#meshes">Meshes</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.load_mesh"><code class="docutils literal notranslate"><span class="pre">load_mesh()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.transform_mesh"><code class="docutils literal notranslate"><span class="pre">transform_mesh()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#miscellaneous">Miscellaneous</a><ul>
@@ -1606,7 +1639,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Ray Tracing (RT)</a></li>
           <li class="breadcrumb-item"><a href="rt.html">API Documentation</a></li>
-      <li class="breadcrumb-item active">Radio Map</li>
+      <li class="breadcrumb-item active">Radio Maps</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -1615,87 +1648,58 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="radio-map">
-<h1>Radio Map<a class="headerlink" href="#radio-map" title="Link to this heading"></a></h1>
+  <section id="radio-maps">
+<h1>Radio Maps<a class="headerlink" href="#radio-maps" title="Link to this heading"></a></h1>
 <p>A radio map describes a metric, such as path gain, received signal strength
-(RSS), or signal-to-interference-plus-noise ratio (SINR) for a specific transmitter at every point on a plane.
-In other words, for a given transmitter, it associates every point on a surface
-with the channel gain, RSS, or SINR, that a receiver with
-a specific orientation would observe at this point. A radio map is not uniquely defined as it depends on
-the transmit and receive arrays and their respective antenna patterns, the transmitter and receiver orientations,
-as well as transmit precoding and receive combining vectors. Moreover, a radio map is not continuous but discrete
-because the plane is quantized into small rectangular bins.</p>
-<p>In Sionna, radio maps are computed using a <a class="reference internal" href="radio_map_solvers.html"><span class="doc">radio map solver</span></a> which returns an instance of
-<a class="reference internal" href="#sionna.rt.RadioMap" title="sionna.rt.RadioMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadioMap</span></code></a>. They can be visualized by providing them either as arguments to the functions
-<a class="reference internal" href="scene.html#sionna.rt.Scene.render" title="sionna.rt.Scene.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code></a>, <a class="reference internal" href="scene.html#sionna.rt.Scene.render_to_file" title="sionna.rt.Scene.render_to_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render_to_file()</span></code></a>, and <a class="reference internal" href="scene.html#sionna.rt.Scene.preview" title="sionna.rt.Scene.preview"><code class="xref py py-meth docutils literal notranslate"><span class="pre">preview()</span></code></a>,
-or by using the class method <a class="reference internal" href="#sionna.rt.RadioMap.show" title="sionna.rt.RadioMap.show"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show()</span></code></a>.</p>
-<p>A very useful feature is <a class="reference internal" href="#sionna.rt.RadioMap.sample_positions" title="sionna.rt.RadioMap.sample_positions"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sample_positions()</span></code></a> which allows sampling
+(RSS), or signal-to-interference-plus-noise ratio (SINR) for a specific transmitter at every point on a measurement surface.
+In other words, for a given transmitter, it associates every point on a measurement surface
+with the channel gain, RSS, or SINR, that a receiver equipped with a dual-polarized isotropic antenna would observe at this point.
+A radio map is not uniquely defined as it depends on the transmit array and antenna pattern, the transmitter orientation,
+as well as the transmit precoding vector. Moreover, a radio map is not continuous but discrete because the measurement surface is quantized into small planar bins.</p>
+<p>In Sionna, radio maps are generated using a <a class="reference internal" href="radio_map_solvers.html"><span class="doc">radio map solver</span></a>, which returns an instance of a specialized class derived from the abstract base class <a class="reference internal" href="#sionna.rt.RadioMap" title="sionna.rt.RadioMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">RadioMap</span></code></a>. The built-in radio map solver can compute a radio map for either of the following:</p>
+<ul class="simple">
+<li><p>A rectangular measurement plane grid, subdivided into equal-sized rectangular cells. In this case, an instance of <a class="reference internal" href="#sionna.rt.PlanarRadioMap" title="sionna.rt.PlanarRadioMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a> is returned.</p></li>
+<li><p>A mesh, where each triangle of the mesh serves as a bin of the radio map. Here, an instance of <a class="reference internal" href="#sionna.rt.MeshRadioMap" title="sionna.rt.MeshRadioMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a> is returned.</p></li>
+</ul>
+<p>Radio maps can be visualized by passing them as arguments to the functions <a class="reference internal" href="scene.html#sionna.rt.Scene.render" title="sionna.rt.Scene.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render()</span></code></a>, <a class="reference internal" href="scene.html#sionna.rt.Scene.render_to_file" title="sionna.rt.Scene.render_to_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render_to_file()</span></code></a>, or <a class="reference internal" href="scene.html#sionna.rt.Scene.preview" title="sionna.rt.Scene.preview"><code class="xref py py-meth docutils literal notranslate"><span class="pre">preview()</span></code></a>. Additionally, <a class="reference internal" href="#sionna.rt.PlanarRadioMap" title="sionna.rt.PlanarRadioMap"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a> features a class method <a class="reference internal" href="#sionna.rt.PlanarRadioMap.show" title="sionna.rt.PlanarRadioMap.show"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show()</span></code></a>.</p>
+<p>A very useful feature is <code class="xref py py-meth docutils literal notranslate"><span class="pre">sample_positions()</span></code> which allows sampling
 of random positions within the scene that have sufficient path gain, RSS, or SINR from a specific transmitter.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">RadioMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap" title="Link to this definition"></a></dt>
-<dd><p>Radio Map</p>
-<p>A radio map is generated for the loaded scene for all transmitters using
-a <a class="reference internal" href="radio_map_solvers.html"><span class="doc">radio map solver</span></a>.
-Please refer to the documentation of this module for further details.</p>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">PlanarRadioMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orientation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/planar_radio_map.html#PlanarRadioMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.PlanarRadioMap" title="Link to this definition"></a></dt>
+<dd><p>Planar Radio Map</p>
+<p>A planar radio map is defined by a measurement grid, i.e., a rectangular
+grid of cells. It is computed by
+a <a class="reference internal" href="radio_map_solvers.html"><span class="doc">radio map solver</span></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="scene.html#sionna.rt.Scene" title="sionna.rt.scene.Scene"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.scene.Scene</span></code></a></span>) – Scene for which the radio map is computed</p></li>
-<li><p><strong>center</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code></span>) – Center of the radio map <span class="math notranslate nohighlight">\((x,y,z)\)</span> [m] as
+<li><p><strong>center</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Center of the radio map <span class="math notranslate nohighlight">\((x,y,z)\)</span> [m] as
 three-dimensional vector</p></li>
-<li><p><strong>orientation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code></span>) – Orientation of the radio map
+<li><p><strong>orientation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Orientation of the radio map
 <span class="math notranslate nohighlight">\((\alpha, \beta, \gamma)\)</span> specified through three angles
 corresponding to a 3D rotation as defined in <a class="reference internal" href="../em_primer.html#equation-rotation">(3)</a></p></li>
-<li><p><strong>size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point2f</span></code></span>) – Size of the radio map [m]</p></li>
+<li><p><strong>size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point2f</span></code>]</span>) – Size of the radio map [m]</p></li>
 <li><p><strong>cell_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point2f</span></code></span>) – Size of a cell of the radio map [m]</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.cdf">
-<span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.cdf" title="Link to this definition"></a></dt>
-<dd><p>Computes and visualizes the CDF of a metric of the radio map</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>metric</strong> (<em>&quot;path_gain&quot;</em><em> | </em><em>&quot;rss&quot;</em><em> | </em><em>&quot;sinr&quot;</em>) – Metric to be shown</p></li>
-<li><p><strong>tx</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>) – Index or name of the transmitter for which to show the radio
-map. If <cite>None</cite>, the maximum value over all transmitters for each
-cell is shown.</p></li>
-<li><p><strong>bins</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of bins used to compute the CDF</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.figure.Figure</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXf</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span></p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Figure showing the CDF</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Data points for the chosen metric</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Cummulative probabilities for the data points</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.cell_centers">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_centers</span></span><a class="headerlink" href="#sionna.rt.RadioMap.cell_centers" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.cell_centers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_centers</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.cell_centers" title="Link to this definition"></a></dt>
 <dd><p>Positions of the centers of the cells in the global coordinate
 system</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_cells_y,</span> <span class="pre">num_cells_x,</span> <span class="pre">3]</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[cells_per_dim_y,</span> <span class="pre">cells_per_dim_x,</span> <span class="pre">3]</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.cell_size">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_size</span></span><a class="headerlink" href="#sionna.rt.RadioMap.cell_size" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.cell_size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_size</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.cell_size" title="Link to this definition"></a></dt>
 <dd><p>Size of a cell of the radio map [m]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1705,8 +1709,30 @@ system</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.center">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#sionna.rt.RadioMap.center" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.cells_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_count</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.cells_count" title="Link to this definition"></a></dt>
+<dd><p>Total number of cells</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.cells_per_dim">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_per_dim</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.cells_per_dim" title="Link to this definition"></a></dt>
+<dd><p>Number of cells per dimension</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Point2u</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.center">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">center</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.center" title="Link to this definition"></a></dt>
 <dd><p>Center of the radio map in the global coordinate system</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1716,41 +1742,20 @@ system</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.num_cells">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_cells</span></span><a class="headerlink" href="#sionna.rt.RadioMap.num_cells" title="Link to this definition"></a></dt>
-<dd><p>Number of cells along the local X and Y axes</p>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.measurement_surface">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_surface</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.measurement_surface" title="Link to this definition"></a></dt>
+<dd><p>Mitsuba rectangle corresponding to the
+radio map measurement surface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Point2u</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Rectangle</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.num_rx">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_rx</span></span><a class="headerlink" href="#sionna.rt.RadioMap.num_rx" title="Link to this definition"></a></dt>
-<dd><p>Number of receivers</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.num_tx">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_tx</span></span><a class="headerlink" href="#sionna.rt.RadioMap.num_tx" title="Link to this definition"></a></dt>
-<dd><p>Number of transmitters</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.orientation">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">orientation</span></span><a class="headerlink" href="#sionna.rt.RadioMap.orientation" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.orientation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">orientation</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.orientation" title="Link to this definition"></a></dt>
 <dd><p>Orientation of the radio map <span class="math notranslate nohighlight">\((\alpha, \beta, \gamma)\)</span>
 specified through three angles corresponding to a 3D rotation as defined
 in <a class="reference internal" href="../em_primer.html#equation-rotation">(3)</a>. An orientation of <span class="math notranslate nohighlight">\((0,0,0)\)</span> corresponds to a
@@ -1763,31 +1768,19 @@ radio map that is parallel to the XY plane.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.path_gain">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.RadioMap.path_gain" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.path_gain">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.path_gain" title="Link to this definition"></a></dt>
 <dd><p>Path gains across the radio map from all transmitters</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">num_cells_y,</span> <span class="pre">num_cells_x]</span></code></p>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">cells_per_dim_y,</span> <span class="pre">cells_per_dim_x]</span></code></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.rss">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rss</span></span><a class="headerlink" href="#sionna.rt.RadioMap.rss" title="Link to this definition"></a></dt>
-<dd><p>Received signal strength (RSS) across the radio map from all
-transmitters</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">num_cells_y,</span> <span class="pre">num_cells_x]</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.rx_cell_indices">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rx_cell_indices</span></span><a class="headerlink" href="#sionna.rt.RadioMap.rx_cell_indices" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.rx_cell_indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rx_cell_indices</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.rx_cell_indices" title="Link to this definition"></a></dt>
 <dd><p>Computes and returns the cell index positions corresponding to
 receivers in the format <cite>(column, row)</cite></p>
 <dl class="field-list simple">
@@ -1798,8 +1791,8 @@ receivers in the format <cite>(column, row)</cite></p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.sample_positions">
-<span class="sig-name descname"><span class="pre">sample_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_association</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.sample_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.sample_positions" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.sample_positions">
+<span class="sig-name descname"><span class="pre">sample_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_association</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/planar_radio_map.html#PlanarRadioMap.sample_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.PlanarRadioMap.sample_positions" title="Link to this definition"></a></dt>
 <dd><p>Samples random user positions in a scene based on a radio map</p>
 <p>For a given radio map, <code class="docutils literal notranslate"><span class="pre">num_pos</span></code> random positions are sampled
 around each transmitter, such that the selected metric, e.g., SINR, is
@@ -1822,7 +1815,7 @@ positions from the cell centers.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sionna</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_scene</span><span class="p">,</span> <span class="n">PlanarArray</span><span class="p">,</span> <span class="n">Transmitter</span><span class="p">,</span>\
-                      <span class="n">RadioMapSolver</span><span class="p">,</span> <span class="n">Receiver</span>
+                    <span class="n">RadioMapSolver</span><span class="p">,</span> <span class="n">Receiver</span>
 
 <span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">munich</span><span class="p">)</span>
 
@@ -1843,7 +1836,7 @@ positions from the cell centers.</p>
 <span class="n">rm</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">cell_size</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span> <span class="n">samples_per_tx</span><span class="o">=</span><span class="mi">100000000</span><span class="p">)</span>
 
 <span class="n">positions</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">sample_positions</span><span class="p">(</span><span class="n">num_pos</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">min_val_db</span><span class="o">=-</span><span class="mf">100.</span><span class="p">,</span>
-                                  <span class="n">min_dist</span><span class="o">=</span><span class="mf">50.</span><span class="p">,</span> <span class="n">max_dist</span><span class="o">=</span><span class="mf">80.</span><span class="p">)</span>
+                                <span class="n">min_dist</span><span class="o">=</span><span class="mf">50.</span><span class="p">,</span> <span class="n">max_dist</span><span class="o">=</span><span class="mf">80.</span><span class="p">)</span>
 <span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
@@ -1911,8 +1904,8 @@ corresponding to the random positions in the format <cite>(column, row)</cite></
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.show">
-<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_rx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.show" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_rx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/planar_radio_map.html#PlanarRadioMap.show"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.PlanarRadioMap.show" title="Link to this definition"></a></dt>
 <dd><p>Visualizes a radio map</p>
 <p>The position of the transmitters is indicated by “+” markers.
 The positions of the receivers are indicated by “x” markers.</p>
@@ -1943,8 +1936,8 @@ shown.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.show_association">
-<span class="sig-name descname"><span class="pre">show_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_rx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.show_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.show_association" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.show_association">
+<span class="sig-name descname"><span class="pre">show_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_rx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/planar_radio_map.html#PlanarRadioMap.show_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.PlanarRadioMap.show_association" title="Link to this definition"></a></dt>
 <dd><p>Visualizes cell-to-tx association for a given metric</p>
 <p>The positions of the transmitters and receivers are indicated
 by “+” and “x” markers, respectively.</p>
@@ -1956,6 +1949,10 @@ by “+” and “x” markers, respectively.</p>
 are shown.</p></li>
 <li><p><strong>show_rx</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If set to <cite>True</cite>, then the position of the receivers are
 shown.</p></li>
+<li><p><strong>color_map</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]</span>) – Either the name of a Matplotlib colormap or a NumPy
+array of shape (num_tx, 3) containing the RGB values for the colors
+of the transmitters. If None, a default color map with the right
+number of colors is generated.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1968,19 +1965,8 @@ shown.</p></li>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.sinr">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sinr</span></span><a class="headerlink" href="#sionna.rt.RadioMap.sinr" title="Link to this definition"></a></dt>
-<dd><p>SINR across the radio map from all transmitters</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">num_cells_y,</span> <span class="pre">num_cells_x]</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.size">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#sionna.rt.RadioMap.size" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.size" title="Link to this definition"></a></dt>
 <dd><p>Size of the radio map [m]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -1990,8 +1976,8 @@ shown.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.tx_association">
-<span class="sig-name descname"><span class="pre">tx_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.tx_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.tx_association" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.tx_association">
+<span class="sig-name descname"><span class="pre">tx_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/planar_radio_map.html#PlanarRadioMap.tx_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.PlanarRadioMap.tx_association" title="Link to this definition"></a></dt>
 <dd><p>Computes cell-to-transmitter association</p>
 <p>Each cell is associated with the transmitter providing the highest
 metric, such as path gain, received signal strength (RSS), or
@@ -2010,13 +1996,427 @@ SINR.</p>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="sionna.rt.RadioMap.tx_cell_indices">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tx_cell_indices</span></span><a class="headerlink" href="#sionna.rt.RadioMap.tx_cell_indices" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.tx_cell_indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tx_cell_indices</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.tx_cell_indices" title="Link to this definition"></a></dt>
 <dd><p>Cell index position of each transmitter in the format
 <cite>(column, row)</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Point2u</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">MeshRadioMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meas_surface</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/mesh_radio_map.html#MeshRadioMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.MeshRadioMap" title="Link to this definition"></a></dt>
+<dd><p>Mesh Radio Map</p>
+<p>A mesh-based radio map is computed by
+a <a class="reference internal" href="radio_map_solvers.html"><span class="doc">radio map solver</span></a> for a measurement surface
+defined by a mesh. Each triangle of the mesh serves as a bin of the radio
+map.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="scene.html#sionna.rt.Scene" title="sionna.rt.scene.Scene"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.scene.Scene</span></code></a></span>) – Scene for which the radio map is computed</p></li>
+<li><p><strong>meas_surface</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Mesh</span></code></span>) – Mesh to be used as the measurement surface</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.cell_centers">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_centers</span></span><a class="headerlink" href="#sionna.rt.MeshRadioMap.cell_centers" title="Link to this definition"></a></dt>
+<dd><p>Positions of the centers of the cells in the global coordinate
+system</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Point3f</span> <span class="pre">[cells_count,</span> <span class="pre">3]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.cells_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_count</span></span><a class="headerlink" href="#sionna.rt.MeshRadioMap.cells_count" title="Link to this definition"></a></dt>
+<dd><p>Total number of cells in the radio map</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.measurement_surface">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_surface</span></span><a class="headerlink" href="#sionna.rt.MeshRadioMap.measurement_surface" title="Link to this definition"></a></dt>
+<dd><p>Mitsuba shape corresponding to the
+radio map measurement surface</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Mesh</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.path_gain">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.MeshRadioMap.path_gain" title="Link to this definition"></a></dt>
+<dd><p>Path gains across the radio map from all transmitters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">num_primitives]</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.sample_positions">
+<span class="sig-name descname"><span class="pre">sample_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_association</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/mesh_radio_map.html#MeshRadioMap.sample_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.MeshRadioMap.sample_positions" title="Link to this definition"></a></dt>
+<dd><p>Samples random user positions in a scene based on a radio map</p>
+<p>For a given radio map, <code class="docutils literal notranslate"><span class="pre">num_pos</span></code> random positions are sampled
+around each transmitter, such that the selected metric, e.g., SINR, is
+larger than <code class="docutils literal notranslate"><span class="pre">min_val_db</span></code> and/or smaller than <code class="docutils literal notranslate"><span class="pre">max_val_db</span></code>.
+Similarly, <code class="docutils literal notranslate"><span class="pre">min_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">max_dist</span></code> define the minimum and maximum
+distance of the random positions to the transmitter under consideration.
+By activating the flag <code class="docutils literal notranslate"><span class="pre">tx_association</span></code>, only positions are sampled
+for which the selected metric is the highest across all transmitters.
+This is useful if one wants to ensure, e.g., that the sampled positions
+for each transmitter provide the highest SINR or RSS.</p>
+<p>Note that due to the quantization of the radio map into cells it is
+not guaranteed that all above parameters are exactly fulfilled for a
+returned position. This stems from the fact that every
+individual cell of the radio map describes the expected <em>average</em>
+behavior of the surface within this cell. For instance, it may happen
+that half of the selected cell is shadowed and, thus, no path to the
+transmitter exists but the average path gain is still larger than the
+given threshold. Please enable the flag <code class="docutils literal notranslate"><span class="pre">center_pos</span></code> to sample only
+positions from the cell centers.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sionna</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_scene</span><span class="p">,</span> <span class="n">PlanarArray</span><span class="p">,</span> <span class="n">Transmitter</span><span class="p">,</span> \
+                      <span class="n">RadioMapSolver</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">transform_mesh</span>
+
+<span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">san_francisco</span><span class="p">)</span>
+
+<span class="c1"># Configure antenna array for all transmitters</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">vertical_spacing</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                        <span class="n">horizontal_spacing</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                        <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;iso&quot;</span><span class="p">,</span>
+                        <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;V&quot;</span><span class="p">)</span>
+<span class="c1"># Add a transmitters</span>
+<span class="n">tx</span> <span class="o">=</span> <span class="n">Transmitter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;tx&quot;</span><span class="p">,</span>
+            <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mf">15.9</span><span class="p">,</span><span class="mf">121.2</span><span class="p">,</span><span class="mi">25</span><span class="p">],</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">display_radius</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
+
+<span class="c1"># Create a measurement surface by cloning the terrain</span>
+<span class="c1"># and elevating it by 1.5 meters</span>
+<span class="n">measurement_surface</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="s2">&quot;Terrain&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">as_mesh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">transform_mesh</span><span class="p">(</span><span class="n">measurement_surface</span><span class="p">,</span>
+            <span class="n">translation</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.5</span><span class="p">])</span>
+
+<span class="n">solver</span> <span class="o">=</span> <span class="n">RadioMapSolver</span><span class="p">()</span>
+<span class="n">rm</span> <span class="o">=</span> <span class="n">solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+            <span class="n">cell_size</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
+            <span class="n">measurement_surface</span><span class="o">=</span><span class="n">measurement_surface</span><span class="p">,</span>
+            <span class="n">samples_per_tx</span><span class="o">=</span><span class="mi">100000000</span><span class="p">)</span>
+
+<span class="n">positions</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">rm</span><span class="o">.</span><span class="n">sample_positions</span><span class="p">(</span><span class="n">num_pos</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">min_val_db</span><span class="o">=-</span><span class="mf">100.</span><span class="p">,</span>
+                                <span class="n">min_dist</span><span class="o">=</span><span class="mf">50.</span><span class="p">,</span> <span class="n">max_dist</span><span class="o">=</span><span class="mf">80.</span><span class="p">)</span>
+<span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">positions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">positions</span><span class="p">):</span>
+    <span class="n">rx</span> <span class="o">=</span> <span class="n">Receiver</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rx-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
+                <span class="n">orientation</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">display_radius</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rx</span><span class="p">)</span>
+
+<span class="n">scene</span><span class="o">.</span><span class="n">preview</span><span class="p">();</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<img alt="../../_images/rm_mesh_user_sample.png" src="../../_images/rm_mesh_user_sample.png" />
+</figure>
+<p>The above example shows an example for random positions between 50m and
+80m from the transmitter and a minimum path gain of -100 dB.
+Keep in mind that the transmitter can have a different height than the
+radio map which also contributes to this distance.
+For example if the transmitter is located 20m above the surface of the
+radio map and a <code class="docutils literal notranslate"><span class="pre">min_dist</span></code> of 20m is selected, also positions
+directly below the transmitter are sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_pos</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of returned random positions for each transmitter</p></li>
+<li><p><strong>metric</strong> (<em>&quot;path_gain&quot;</em><em> | </em><em>&quot;rss&quot;</em><em> | </em><em>&quot;sinr&quot;</em>) – Metric to be considered for sampling positions</p></li>
+<li><p><strong>min_val_db</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Minimum value for the selected metric ([dB] for path
+gain and SINR; [dBm] for RSS).
+Positions are only sampled from cells where the selected metric is
+larger than or equal to this value. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>max_val_db</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Maximum value for the selected metric ([dB] for path
+gain and SINR; [dBm] for RSS).
+Positions are only sampled from cells where the selected metric is
+smaller than or equal to this value.
+Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>min_dist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Minimum distance [m] from transmitter for all random
+positions. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>max_dist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Maximum distance [m] from transmitter for all random
+positions. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>tx_association</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If <cite>True</cite>, only positions associated with a
+transmitter are chosen, i.e., positions where the chosen metric is
+the highest among all all transmitters. Else, a user located in a
+sampled position for a specific transmitter may perceive a higher
+metric from another TX.</p></li>
+<li><p><strong>center_pos</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If <cite>True</cite>, all returned positions are sampled from
+the cell center (i.e., the grid of the radio map). Otherwise, the
+positions are randomly drawn from the surface of the cell.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXf</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXu</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Random positions <span class="math notranslate nohighlight">\((x,y,z)\)</span> [m]
+(shape : <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_pos,</span> <span class="pre">3]</span></code>) that are in cells
+fulfilling the configured constraints</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Cell indices (shape <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_pos]</span></code>)
+corresponding to the random positions</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sionna.rt.</span></span><span class="sig-name descname"><span class="pre">RadioMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap" title="Link to this definition"></a></dt>
+<dd><p>Abstract base class for radio maps</p>
+<p>A radio map is generated for the loaded scene for all transmitters using
+a <a class="reference internal" href="radio_map_solvers.html"><span class="doc">radio map solver</span></a>.
+Please refer to the documentation of this module for further details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="scene.html#sionna.rt.Scene" title="sionna.rt.scene.Scene"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.scene.Scene</span></code></a></span>) – Scene for which the radio map is computed</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.cdf">
+<span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.cdf" title="Link to this definition"></a></dt>
+<dd><p>Computes and visualizes the CDF of a metric of the radio map</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> (<em>&quot;path_gain&quot;</em><em> | </em><em>&quot;rss&quot;</em><em> | </em><em>&quot;sinr&quot;</em>) – Metric to be shown</p></li>
+<li><p><strong>tx</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span>) – Index or name of the transmitter for which to show the radio
+map. If <cite>None</cite>, the maximum value over all transmitters for each
+cell is shown.</p></li>
+<li><p><strong>bins</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of bins used to compute the CDF</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.figure.Figure</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXf</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure showing the CDF</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data points for the chosen metric</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cummulative probabilities for the data points</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.cell_centers">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_centers</span></span><a class="headerlink" href="#sionna.rt.RadioMap.cell_centers" title="Link to this definition"></a></dt>
+<dd><p>Positions of the centers of the cells in the global coordinate
+system.</p>
+<p>The type of this property depends on the subclass.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.cells_count">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_count</span></span><a class="headerlink" href="#sionna.rt.RadioMap.cells_count" title="Link to this definition"></a></dt>
+<dd><p>Total number of cells in the radio map</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.measurement_surface">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_surface</span></span><a class="headerlink" href="#sionna.rt.RadioMap.measurement_surface" title="Link to this definition"></a></dt>
+<dd><p>Mitsuba rectangle corresponding to the
+radio map measurement plane</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Shape</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.num_rx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_rx</span></span><a class="headerlink" href="#sionna.rt.RadioMap.num_rx" title="Link to this definition"></a></dt>
+<dd><p>Number of receivers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.num_tx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_tx</span></span><a class="headerlink" href="#sionna.rt.RadioMap.num_tx" title="Link to this definition"></a></dt>
+<dd><p>Number of transmitters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.path_gain">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.RadioMap.path_gain" title="Link to this definition"></a></dt>
+<dd><p>Path gains across the radio map from all transmitters</p>
+<p>The shape of the tensor depends on the subclass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span></code> with shape <cite>[num_tx, …]</cite>,
+where the specific dimensions are defined by the subclass.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.rss">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rss</span></span><a class="headerlink" href="#sionna.rt.RadioMap.rss" title="Link to this definition"></a></dt>
+<dd><p>Received signal strength (RSS) across the radio map from all
+transmitters</p>
+<p>The shape of the tensor depends on the subclass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span></code> with shape <cite>[num_tx, …]</cite>,
+where the specific dimensions are defined by the subclass.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.sample_cells">
+<span class="sig-name descname"><span class="pre">sample_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_cells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_association</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.sample_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.sample_cells" title="Link to this definition"></a></dt>
+<dd><p>Samples random cells in a radio map</p>
+<p>For a given radio map, <code class="docutils literal notranslate"><span class="pre">num_cells</span></code> random cells are sampled
+such that the selected metric, e.g., SINR, is
+larger than <code class="docutils literal notranslate"><span class="pre">min_val_db</span></code> and/or smaller than <code class="docutils literal notranslate"><span class="pre">max_val_db</span></code>.
+Similarly, <code class="docutils literal notranslate"><span class="pre">min_dist</span></code> and <code class="docutils literal notranslate"><span class="pre">max_dist</span></code> define the minimum and maximum
+distance of the random cells centers to the transmitter under
+consideration.
+By activating the flag <code class="docutils literal notranslate"><span class="pre">tx_association</span></code>, only cells for which the
+selected metric is the highest across all transmitters are sampled.
+This is useful if one wants to ensure, e.g., that the sampled cells
+for each transmitter provide the highest SINR or RSS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_cells</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of returned random cells for each transmitter</p></li>
+<li><p><strong>metric</strong> (<em>&quot;path_gain&quot;</em><em> | </em><em>&quot;rss&quot;</em><em> | </em><em>&quot;sinr&quot;</em>) – Metric to be considered for sampling cells</p></li>
+<li><p><strong>min_val_db</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Minimum value for the selected metric ([dB] for path
+gain and SINR; [dBm] for RSS).
+Only cells for which the selected metric is larger than or equal to
+this value are sampled. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>max_val_db</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Maximum value for the selected metric ([dB] for path
+gain and SINR; [dBm] for RSS).
+Only cells for which the selected metric is smaller than or equal to
+this value are sampled. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>min_dist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Minimum distance [m] from transmitter for all random
+cells. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>max_dist</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – Maximum distance [m] from transmitter for all random
+cells. Ignored if <cite>None</cite>.</p></li>
+<li><p><strong>tx_association</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If <cite>True</cite>, only cells associated with a
+transmitter are chosen, i.e., cells where the chosen metric is
+the highest among all all transmitters. Else, a user located in a
+sampled cell for a specific transmitter may perceive a higher
+metric from another TX.</p></li>
+<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Seed for the random number generator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXu</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cell indices (shape <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_cells]</span></code>)
+corresponding to the random cells</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.sinr">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sinr</span></span><a class="headerlink" href="#sionna.rt.RadioMap.sinr" title="Link to this definition"></a></dt>
+<dd><p>SINR across the radio map from all transmitters</p>
+<p>The shape of the tensor depends on the subclass.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span></code> with shape <cite>[num_tx, …]</cite>,
+where the specific dimensions are defined by the subclass.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.transmitter_radio_map">
+<span class="sig-name descname"><span class="pre">transmitter_radio_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.transmitter_radio_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.transmitter_radio_map" title="Link to this definition"></a></dt>
+<dd><p>Returns the radio map values corresponding to transmitter <code class="docutils literal notranslate"><span class="pre">tx</span></code>
+and a specific <code class="docutils literal notranslate"><span class="pre">metric</span></code></p>
+<p>If <code class="docutils literal notranslate"><span class="pre">tx</span></code> is <cite>None</cite>, then returns for each cell the maximum value
+accross the transmitters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> (<em>&quot;path_gain&quot;</em><em> | </em><em>&quot;rss&quot;</em><em> | </em><em>&quot;sinr&quot;</em>) – Metric for which to return the radio map</p></li>
+<li><p><strong>tx</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXf</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.tx_association">
+<span class="sig-name descname"><span class="pre">tx_association</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.tx_association"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.tx_association" title="Link to this definition"></a></dt>
+<dd><p>Computes cell-to-transmitter association.</p>
+<p>Each cell is associated with the transmitter providing the highest
+metric, such as path gain, received signal strength (RSS), or
+SINR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>metric</strong> (<em>&quot;path_gain&quot;</em><em> | </em><em>&quot;rss&quot;</em><em> | </em><em>&quot;sinr&quot;</em>) – Metric to be used</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.TensorXi</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cell-to-transmitter association. The value -1 indicates that
+there is no coverage for the cell.</p>
 </dd>
 </dl>
 </dd></dl>

@@ -8,7 +8,7 @@ with an :class:`~sionna.rt.AntennaArray` as specified by the :class:`~sionna.rt.
 The following code snippet shows how to instantiate a :class:`~sionna.rt.Transmitter`
 equipped with a :math:`4 \times 2` :class:`~sionna.rt.PlanarArray` with cross-polarized isotropic antennas:
 
-.. code-block:: Python
+.. code-block:: python
 
     from sionna.rt import load_scene, PlanarArray, Transmitter
     scene = load_scene()
@@ -25,7 +25,7 @@ The position :math:`(x,y,z)` and orientation :math:`(\alpha, \beta, \gamma)` of 
 can be freely configured. The latter is specified through three angles corresponding to a 3D
 rotation as defined in :eq:`rotation`.
 
-.. code-block:: Python
+.. code-block:: python
 
    from sionna.rt import load_scene, Transmitter
    scene = load_scene()
@@ -37,7 +37,7 @@ rotation as defined in :eq:`rotation`.
 Radio devices need to be explicitly added to the scene using the scene's method :meth:`~sionna.rt.Scene.add`
 and can be removed from it using :meth:`~sionna.rt.Scene.remove`:
 
-.. code-block:: Python
+.. code-block:: python
 
    from sionna.rt import load_scene, Transmitter
    scene = load_scene()

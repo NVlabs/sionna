@@ -37,6 +37,11 @@ Jones calculus
 .. autofunction:: sionna.rt.utils.jones_matrix_to_world_implicit
 .. autofunction:: sionna.rt.utils.jones_vec_dot
 
+Meshes
+-------
+.. autofunction:: sionna.rt.utils.load_mesh
+.. autofunction:: sionna.rt.utils.transform_mesh
+
 Miscellaneous
 -------------
 .. autofunction:: sionna.rt.utils.complex_sqrt
@@ -56,6 +61,7 @@ Ray tracing
 .. autofunction:: sionna.rt.utils.offset_p
 .. autofunction:: sionna.rt.utils.spawn_ray_towards
 .. autofunction:: sionna.rt.utils.spawn_ray_to
+
 
 References:
    .. [ITU_R_2040_3] Recommendation ITU-R P.2040-3, "`Effects of building materials

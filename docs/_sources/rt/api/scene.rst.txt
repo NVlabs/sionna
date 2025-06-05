@@ -7,12 +7,12 @@ Scenes
    :members:
    :inherited-members:
 
-Examples
---------
+Built-in scenes
+---------------
 Sionna has several integrated scenes that are listed below.
 They can be loaded and used as follows:
 
-.. code-block:: Python
+.. code-block:: python
 
    scene = load_scene(sionna.rt.scene.etoile)
    scene.preview()
@@ -57,6 +57,11 @@ They can be loaded and used as follows:
 
 (`Blender file <https://drive.google.com/file/d/15WrvMGrPWsoVKYvDG6Ab7btq-ktTCGR1/view?usp=share_link>`__)
 
+.. autodata:: sionna.rt.scene.san_francisco
+   :annotation:
+
+(`Blender file <https://drive.google.com/file/d/1XxrHUoOxueB_zI5zZyn--RpnbNWaYhhS>`__)
+
 .. autodata:: sionna.rt.scene.simple_reflector
    :annotation:
 
@@ -82,3 +87,15 @@ They can be loaded and used as follows:
 
 (`Blender file <https://drive.google.com/file/d/1l95_0U2b3cEVtz3G8mQxuLxy8xiPsVID/view?usp=share_link>`__)
 
+Built-in meshes
+---------------
+
+.. autodata:: sionna.rt.scene.low_poly_car
+   :annotation:
+
+(`Blender file <https://drive.google.com/file/d/1w13Pcr4kltCaMyb9j-0pM5kIBIf4XGe6>`__)
+
+.. autodata:: sionna.rt.scene.sphere
+   :annotation:
+
+(`Blender file <https://drive.google.com/file/d/12mbejAc18BPpk6gvcmVlmhrorSQHp9tM>`__)

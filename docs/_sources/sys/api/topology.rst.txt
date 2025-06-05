@@ -32,6 +32,3 @@ Sionna, refer to the `Hexagonal Grid Topology notebook <../tutorials/HexagonalGr
 .. autofunction:: sionna.sys.topology.get_num_hex_in_grid
 
 .. autofunction:: sionna.sys.topology.convert_hex_coord
-
-References:
-   .. [HexGrid] Amit Patel's blog, `Hexagonal Grids <https://www.redblobgames.com/grids/hexagons/>`_

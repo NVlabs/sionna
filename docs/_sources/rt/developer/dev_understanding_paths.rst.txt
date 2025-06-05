@@ -11,7 +11,7 @@ transmitters and receivers in a scene. The goal of this developer guide is to
 explain the properties of the ``Paths`` object in detail. Let's start with a
 short code snippet that computes propagation paths between a transmitter and receiver:
 
-.. code-block:: Python
+.. code-block:: python
 
     # Imports
     import sionna.rt
@@ -23,9 +23,9 @@ short code snippet that computes propagation paths between a transmitter and rec
 
     # Configure TX/RX antenna array
     scene.tx_array = PlanarArray(num_rows=2,
-                                num_cols=1,
-                                pattern="iso",
-                                polarization="V")
+                                 num_cols=1,
+                                 pattern="iso",
+                                 polarization="V")
     scene.rx_array = scene.tx_array
 
     # Create TX/RX
@@ -48,7 +48,7 @@ and targets (one for each antenna of the array) if ``synthetic_array`` is
 `False`. There is a single source and target (one for each radio device) if ``synthetic_array`` is
 `True`. This can be seen from the properties of the paths objects as shown below:
 
-.. code-block:: Python
+.. code-block:: python
 
     # Show sources/targets
     print("Source coordinates: \n", paths.sources)
@@ -60,15 +60,15 @@ and targets (one for each antenna of the array) if ``synthetic_array`` is
 
 ::
 
-    Source coordinates: 
+    Source coordinates:
     [[8.5, 21, 27.0214],
     [8.5, 21, 26.9786]]
-    Target coordinates: 
+    Target coordinates:
     [[44, 95, 1.52141],
     [44, 95, 1.47859]]
-    Source coordinates (synthetic array): 
+    Source coordinates (synthetic array):
     [[8.5, 21, 27]]
-    Target coordinates (synthetic array): 
+    Target coordinates (synthetic array):
     [[44, 95, 1.5]]
 
 Apart from the paths coefficients ``paths.a`` and delays ``paths.tau``, the paths instance stores a lot of
@@ -76,9 +76,9 @@ side information about the propagation paths, such as angles of arrival and
 departure, Doppler shifts, interaction types, ids of intersected objects, and
 coordinates of intersection points (i.e., vertices).
 
-.. code-block:: Python
+.. code-block:: python
 
-    # Let us inspect a specific path in detail 
+    # Let us inspect a specific path in detail
     path_idx = 4 # Try out other values in the range [0, 14]
 
     # For a detailed overview of the dimensions of all properties, have a look at the API documentation
@@ -102,7 +102,7 @@ coordinates of intersection points (i.e., vertices).
     Azimuth angle of arrival: -0.9712 rad
     Doppler shift: 0.0000 Hz
 
-.. code-block:: Python
+.. code-block:: python
 
     # Show the interactions undergone by all paths:
     # 0 - No interaction, 1 - Specular reflection, 2 - Diffuse reflection, 4 - Refraction
@@ -114,7 +114,7 @@ coordinates of intersection points (i.e., vertices).
 
 ::
 
-    Interactions: 
+    Interactions:
     [[4 1 0 1 1 1 1 1 4 4 1 1 1 1 1]
     [1 0 0 1 0 1 1 0 1 1 0 1 1 0 1]
     [4 0 0 1 0 0 0 0 4 4 0 0 1 0 0]]
@@ -135,9 +135,9 @@ can be extracted in the following way:
 
 ::
 
-    Object IDs: 
+    Object IDs:
     [      2364 4294967295 4294967295]
-    Vertices: 
+    Vertices:
     [[42.107708 91.055534  0.      ]
     [ 0.        0.        0.      ]
     [ 0.        0.        0.      ]
@@ -226,4 +226,3 @@ The path instance can be used to compute the channel frequency response
 `Paths.cfr() <https://nvlabs.github.io/sionna/rt/api/paths.html#sionna.rt.Paths.cfr>`_, the baseband equivalent response `Paths.cir() <https://nvlabs.github.io/sionna/rt/api/paths.html#sionna.rt.Paths.cir>`_, or the discrete complex-baseband
 equivalent response `Paths.taps() <https://nvlabs.github.io/sionna/rt/api/paths.html#sionna.rt.Paths.taps>`_. How these functions are used is described
 in detail in the tutorial `Introduction to Sionna RT <https://nvlabs.github.io/sionna/rt/tutorials/introduction.html>`_.
-

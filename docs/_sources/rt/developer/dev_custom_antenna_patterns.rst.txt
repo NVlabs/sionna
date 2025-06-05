@@ -4,7 +4,7 @@ Custom Antenna Patterns
 =======================
 
 As explained in greater detail in ":ref:`far_field`", an antenna pattern maps a
-zenith and azimuth angle to two complex numbers, the zenith and azimuth patterns, respectively. 
+zenith and azimuth angle to two complex numbers, the zenith and azimuth patterns, respectively.
 Mathematically, it is defined as a function :math:`f:(\theta,\varphi)\mapsto (C_\theta(\theta, \varphi), C_\varphi(\theta, \varphi))`.
 
 If you want to add a new :class:`~sionna.rt.AntennaPattern` to Sionna RT, you must register
@@ -13,7 +13,7 @@ a factory method for it together with a name, using the function
 Once this is done, the new antenna pattern can be used everywhere by providing
 its name. An example is shown below:
 
-.. code-block:: Python
+.. code-block:: python
 
     import mitsuba as mi
     import drjit as dr
@@ -57,7 +57,7 @@ Rather than specifying an antenna pattern from scratch, you can also register a
 factory method for a new :class:`~sionna.rt.PolarizedAntennaPattern` which uses
 a vertically polarized antenna pattern function:
 
-.. code-block:: Python
+.. code-block:: python
 
     import mitsuba as mi
     import drjit as dr
@@ -70,12 +70,13 @@ a vertically polarized antenna pattern function:
 
     def my_pattern_factory(*, n, polarization, polarization_model):
         """Factory method returning an instance of a PolarizedAntennaPattern
-        with the newly created pattern function 
+        with the newly created pattern function
         """
         return PolarizedAntennaPattern(
-                    v_pattern=lambda theta, phi: v_sin_pow_pattern(theta, phi, n),
-                    polarization=polarization,
-                    polarization_model=polarization_model)
+            v_pattern=lambda theta, phi: v_sin_pow_pattern(theta, phi, n),
+            polarization=polarization,
+            polarization_model=polarization_model
+        )
 
     register_antenna_pattern("my_pattern", my_pattern_factory)
 
@@ -109,7 +110,7 @@ define antenna patterns with parameters that can be optimized via gradient desce
 In the following example, we will create a new antenna pattern that consists of
 a single spherical Gaussian with trainable mean direction and sharpness.
 
-.. code-block:: Python
+.. code-block:: python
 
     import mitsuba as mi
     import drjit as dr
@@ -144,9 +145,10 @@ a single spherical Gaussian with trainable mean direction and sharpness.
     # a Mitsuba optimizer
     def trainable_pattern_factory(*, opt, polarization, polarization_model="tr38901_2"):
         return PolarizedAntennaPattern(
-                    v_pattern=Trainable_V_Pattern(opt),
-                    polarization=polarization,
-                    polarization_model=polarization_model)
+            v_pattern=Trainable_V_Pattern(opt),
+            polarization=polarization,
+            polarization_model=polarization_model
+        )
 
     register_antenna_pattern("trainable", trainable_pattern_factory)
 
@@ -154,7 +156,7 @@ Let us now load and empty scene in which we place a transmitter and a receiver.
 The transmitter has an antenna array using our newly defined trainable antenna
 pattern.
 
-.. code-block:: Python
+.. code-block:: python
 
     from sionna.rt import load_scene, PlanarArray, Transmitter, Receiver
 
@@ -166,9 +168,9 @@ pattern.
 
     # Define transmit array with trainable antenna pattern
     scene.tx_array = PlanarArray(num_rows=1, num_cols=1,
-                                pattern="trainable",
-                                opt=opt,
-                                polarization="V")
+                                 pattern="trainable",
+                                 opt=opt,
+                                 polarization="V")
 
     scene.rx_array = PlanarArray(num_rows=1, num_cols=1,
                                  pattern="iso",
@@ -182,7 +184,7 @@ Next, we will compute propagation paths and compute gradients of the
 total receiver power with respect to the trainable parameters of the
 antenna patterns.
 
-.. code-block:: Python
+.. code-block:: python
 
     solver = PathSolver()
 

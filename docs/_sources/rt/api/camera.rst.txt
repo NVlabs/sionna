@@ -9,9 +9,9 @@ for rendering the scene.
 
 A new camera can be instantiated as follows:
 
-.. code-block:: Python
+.. code-block:: python
 
-    scene = load_scene(rt.scene.munich)
+   scene = load_scene(rt.scene.munich)
    cam = Camera(position=(200., 0.0, 50.))
    cam.look_at((0.0,0.0,0.0))
    scene.render(cam)

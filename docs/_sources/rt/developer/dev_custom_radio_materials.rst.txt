@@ -5,18 +5,18 @@ Understanding Radio Materials
 ###############################
 
 Radio materials define how objects scatter incident radio waves.
-They implements all necessary components to simulate the interaction
+They implement all necessary components to simulate the interaction
 between radio waves and objects composed of specific materials.
 
 Modifying Parameters of Radio Materials
 ******************************************
 
 To show how to modify the parameters of radio materials, we start by loading
-a since that consists only of a single reflector.
+a scene that consists only of a single reflector.
 We also instantiate a transmitter and a receiver, each equipped with a single
 antenna.
 
-.. code-block:: Python
+.. code-block:: python
 
     scene = load_scene(rt.scene.simple_reflector, merge_shapes=False)
 
@@ -29,7 +29,7 @@ antenna.
 We then change the radio material of the reflector to a :class:`~sionna.rt.RadioMaterial` instance.
 We set the relative permittivity and conductivity of the material to specific values.
 
-.. code-block:: Python
+.. code-block:: python
 
     # Instantiate the radio material
     my_mat = RadioMaterial("my-mat",
@@ -54,7 +54,7 @@ We set the relative permittivity and conductivity of the material to specific va
 
 We can now compute paths and print their gains for different values of the conductivity.
 
-.. code-block:: Python
+.. code-block:: python
 
     # Instantiate the path solver
     solver = PathSolver()
@@ -107,7 +107,7 @@ We will then retrieve the value of the conductivity through gradient descent on
 the normalized absolute error between the path gain computed for the previously
 defined scene (reference scene) and the trainable one.
 
-.. code-block:: Python
+.. code-block:: python
 
     trainable_scene = load_scene(rt.scene.simple_reflector, merge_shapes=False)
 
@@ -121,7 +121,7 @@ In order to assign trainable variables to the reflector material properties, we
 need to first instantiate an optimizer.
 The optimizer is used to instantiate trainable variables.
 
-.. code-block:: Python
+.. code-block:: python
 
     # Adam optimizer
     learning_rate = 4e-2
@@ -133,7 +133,7 @@ To ensure that the conductivity remains non-negative, the trainable variable is
 defined as its logarithm (logit), and the actual conductivity is computed from
 the logit using a numerically stable :func:`~sionna.rt.utils.sigmoid` function.
 
-.. code-block:: Python
+.. code-block:: python
 
     def logit_2_conductivity(logit):
         max_conductivity = 100.
@@ -145,10 +145,10 @@ the logit using a numerically stable :func:`~sionna.rt.utils.sigmoid` function.
 
     # Instantiate the radio material
     # The conductivity is initialized using the trainable variable
-    trainable_mat = RadioMaterial("my-trinable-mat",
-                                thickness=0.1,
-                                relative_permittivity=5.,
-                                conductivity=logit_2_conductivity(opt["logit_conductivity"])) # Use the trainable variable
+    trainable_mat = RadioMaterial("my-trainable-mat",
+                                  thickness=0.1,
+                                  relative_permittivity=5.,
+                                  conductivity=logit_2_conductivity(opt["logit_conductivity"])) # Use the trainable variable
     # Assign the radio material to the reflector
     trainable_scene.objects["reflector"].radio_material = trainable_mat
     # To avoid confusion, discard the radio material initially loaded with the scene
@@ -159,16 +159,16 @@ the logit using a numerically stable :func:`~sionna.rt.utils.sigmoid` function.
 
 ::
 
-    {'my-trinable-mat': RadioMaterial eta_r=5.000
+    {'my-trainable-mat': RadioMaterial eta_r=5.000
                 sigma=0.669
                 thickness=0.100
                 scattering_coefficient=0.000
                 xpd_coefficient=0.000}
 
 Backpropagation through a ``drjit`` loop can currently only be done when the
-`evaluated` mode is used for the computation of the electic field by the solver.
+`evaluated` mode is used for the computation of the electric field by the solver.
 
-.. code-block:: Python
+.. code-block:: python
 
     solver = PathSolver()
 
@@ -180,7 +180,7 @@ We can now run the optimization that performs gradient descent on the normalized
 absolute error between the gain obtained using the trainable scene and the one
 obtained using the reference scene instantiated at the beginning of this guide.
 
-.. code-block:: Python
+.. code-block:: python
 
     def total_gain(paths):
         a_real, a_imag = paths.a
@@ -243,15 +243,15 @@ define how a material scatters an incident wave.
 
 We will start by detailing how Jones vectors and matrices are represented in
 Sionna RT. It is highly recommended to first read the
-`Primer on Electromagnetics <em_primer.html>`_ to understand the basics of
+`Primer on Electromagnetics <../em_primer.html>`_ to understand the basics of
 radio wave propagation.
 
 Representation of Jones vector and Matrices
 =============================================
 
-As detailed in the `Primer on Electromagnetics <em_primer.html>`_, a wave phasor
+As detailed in the `Primer on Electromagnetics <../em_primer.html>`_, a wave phasor
 is typically represented by a Jones vector :math:`\mathbf{E} \in \mathbb{C}^2`.
-However, as ``drjit`` does not current supports complex-valued vectors and
+However, as ``drjit`` does not currently support complex-valued vectors and
 matrices, Sionna RT uses the equivalent real-valued representation of two-dimensional
 complex-valued vectors, which represents a Jones vector as a real-valued vector
 with 4 dimensions:
@@ -270,8 +270,8 @@ represented by the equivalent :math:`4 \times 4` real-valued matrix
 .. math::
 
     \begin{bmatrix}
-        \Re{\{\mathbf{E}\}} & -\Im{\{\mathbf{E}\}}\\
-        \Im{\{\mathbf{E}\}} & \Re{\{\mathbf{E}\}}
+        \Re{\{\mathbf{M}\}} & -\Im{\{\mathbf{M}\}}\\
+        \Im{\{\mathbf{M}\}} & \Re{\{\mathbf{M}\}}
     \end{bmatrix}
 
 In the rest of this guide, we will interchangeably use both representations to
@@ -321,7 +321,7 @@ coordinate system specific to this interaction.
 
 This local interaction coordinate system is defined such that the local Z axis
 corresponds to the normal to the scatterer surface at the interaction point, and
-the X and Y axes are tangant to the scatterer surface at the interaction point.
+the X and Y axes are tangent to the scatterer surface at the interaction point.
 
 Using the prime (:math:`'`) notation to indicate that a vector is represented
 in the local coordinate system, we therefore have
@@ -380,7 +380,7 @@ Implementation of a Simple Radio Material Model
 =================================================
 
 For simplicity, we will start by implementing a scattering model that only
-reflect incident radio waves specularly, and such that the energy of the reflected
+reflects incident radio waves specularly, and such that the energy of the reflected
 wave equals the one of the incident wave scaled by a parameter :math:`g \in (0,1)`.
 
 Formally, this simple material model implements the following transfer equation.
@@ -427,8 +427,8 @@ In these equations, :math:`(\hat{\mathbf{e}}_{\text{i},s}, \hat{\mathbf{e}}_{\te
 and :math:`(\hat{\mathbf{e}}_{\text{r},s}, \hat{\mathbf{e}}_{\text{r},p})` are
 the implicit basis for the incident and scattered wave, respectively,
 and :math:`\mathbf{W}\left(\hat{\mathbf{x}}_{2}, \hat{\mathbf{y}}_{2}, \hat{\mathbf{x}}_{1}, \hat{\mathbf{y}}_{1}\right)`
-is change-of-basis matrix from basis :math:`(\hat{\mathbf{x}}_{1}, \hat{\mathbf{y}}_{1})` to
-basis :math:`(\hat{\mathbf{x}}_{2}, \hat{\mathbf{y}}_{2})` defined in the `Primer on Electromagnetics <em_primer.html>`_ .
+is the change-of-basis matrix from basis :math:`(\hat{\mathbf{x}}_{1}, \hat{\mathbf{y}}_{1})` to
+basis :math:`(\hat{\mathbf{x}}_{2}, \hat{\mathbf{y}}_{2})` defined in the `Primer on Electromagnetics <../em_primer.html>`_ .
 
 Let's now implement this radio material model.
 Note that only the :meth:`~sionna.rt.RadioMaterialBase.sample`, :meth:`~sionna.rt.RadioMaterialBase.eval`,
@@ -441,7 +441,7 @@ The direction of reflection :eq:`eq_kr` can then be computed by leveraging the f
 :math:`\hat{\mathbf{n}} = \hat{\mathbf{z}}` as shown in the following code snippet, where
 an arbitrary direction of incidence is defined.
 
-.. code-block:: Python
+.. code-block:: python
 
     # Arbitrary direction of incidence used in this example.
     # The z component of the incident direction of propagation can only be negative
@@ -465,7 +465,7 @@ Note that this utility uses the rendering convention for representing direction
 of propagation, in which the input vector points *away* from the interaction
 point:
 
-.. code-block:: Python
+.. code-block:: python
 
     # Expects an input vector that points away from the interaction point
     print("kr_prime", mi.reflect(-ki_prime))
@@ -514,7 +514,7 @@ It is also recommended to consult the
 `API documentation of the mi.BSDF class <https://mitsuba.readthedocs.io/en/stable/src/api_reference.html#mitsuba.BSDF>`_,
 as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
 
-.. code-block:: Python
+.. code-block:: python
 
     class CustomRadioMaterial(RadioMaterialBase):
 
@@ -530,10 +530,10 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
         # read from the XML scene file. Therefore, when a `props` object is provided,
         # the other parameters are ignored and should not be given.
         def __init__(self,
-                    name : str | None = None,
-                    g : float | mi.Float | None = None,
-                    color : Tuple[float, float, float] | None = None,
-                    props : mi.Properties | None = None):
+                     name : str | None = None,
+                     g : float | mi.Float | None = None,
+                     color : Tuple[float, float, float] | None = None,
+                     props : mi.Properties | None = None):
 
             # If `props` is `None`, then one is built from the
             # other parameters
@@ -583,10 +583,10 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             # structure we need.
             sqrt_g = mi.Complex2f(dr.sqrt(self._g), 0.)
             jones_mat = jones_matrix_to_world_implicit(c1=sqrt_g,
-                                                    c2=sqrt_g,
-                                                    to_world=to_world,
-                                                    k_in_local=ki_prime,
-                                                    k_out_local=kr_prime)
+                                                       c2=sqrt_g,
+                                                       to_world=to_world,
+                                                       k_in_local=ki_prime,
+                                                       k_out_local=kr_prime)
 
             ## We now only need to prepare the outputs
 
@@ -638,10 +638,10 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             # structure we need.
             sqrt_g = mi.Complex2f(dr.sqrt(self._g), 0.)
             jones_mat = jones_matrix_to_world_implicit(c1=sqrt_g,
-                                                    c2=sqrt_g,
-                                                    to_world=to_world,
-                                                    k_in_local=ki_prime,
-                                                    k_out_local=kr_prime)
+                                                       c2=sqrt_g,
+                                                       to_world=to_world,
+                                                       k_in_local=ki_prime,
+                                                       k_out_local=kr_prime)
 
             # This model only scatters energy in the direction of the specular reflection.
             # Any other direction provided by the user `wo` should therefore lead to no energy.
@@ -678,7 +678,7 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             # Registers the `g` parameter as a differentiable
             # parameter of the scene
             callback.put_parameter('g', self._g,
-                                mi.ParamFlags.Differentiable)
+                                   mi.ParamFlags.Differentiable)
 
         def to_string(self) -> str:
             # Returns a humanly readable description of the material
@@ -696,12 +696,16 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
         def g(self, v):
             self._g = mi.Float(v)
 
+    # Register the custom radio material as a Mitsuba plugin
+    mi.register_bsdf("custom-radio-material",
+                    lambda props: CustomRadioMaterial(props=props))
+
 Let's now use this custom radio material in a Sionna RT scene!
 We start by loading a new scene, then instantiate the newly created radio
 material and use it for the reflector. We set :math:`g` to a very low value to
 clearly see the impact on the reflected path gain.
 
-.. code-block:: Python
+.. code-block:: python
 
     scene_custom_mat = load_scene(rt.scene.simple_reflector, merge_shapes=False)
 
@@ -730,7 +734,7 @@ have defined is used to describe the material.
 
 We are now ready to trace paths.
 
-.. code-block:: Python
+.. code-block:: python
 
     paths = solver(scene_custom_mat)
     a, tau = paths.a, paths.tau
@@ -751,7 +755,7 @@ We can see that the gain of the reflected path is low because of the low value o
 :math:`g`.
 Let's now set the value of :math:`g` to a higher value:
 
-.. code-block:: Python
+.. code-block:: python
 
     my_mat.g = 0.9
 
@@ -782,7 +786,7 @@ All we need to to next is to use
 to compute gradients.
 For this toy example, we use the total gain as objective function.
 
-.. code-block:: Python
+.. code-block:: python
 
     dr.enable_grad(my_mat.g)
 
@@ -871,7 +875,7 @@ It is also recommended to consult the
 `API documentation of the mi.BSDF class <https://mitsuba.readthedocs.io/en/stable/src/api_reference.html#mitsuba.BSDF>`_,
 as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
 
-.. code-block:: Python
+.. code-block:: python
 
     class EnhancedCustomRadioMaterial(RadioMaterialBase):
 
@@ -888,10 +892,10 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
         # read from the XML scene file. Therefore, when a `props` object is provided,
         # the other parameters are ignored and should not be given.
         def __init__(self,
-                    name : str | None = None,
-                    g : float | mi.Float | None = None,
-                    color : Tuple[float, float, float] | None = None,
-                    props : mi.Properties | None = None):
+                     name : str | None = None,
+                     g : float | mi.Float | None = None,
+                     color : Tuple[float, float, float] | None = None,
+                     props : mi.Properties | None = None):
 
             # If `props` is `None`, then one is built from the
             # other parameters
@@ -947,16 +951,16 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             # structure we need.
             sqrt_g = mi.Complex2f(dr.sqrt(g), 0.)
             jones_mat_ref = jones_matrix_to_world_implicit(c1=sqrt_g,
-                                                        c2=sqrt_g,
-                                                        to_world=to_world,
-                                                        k_in_local=ki_prime,
-                                                        k_out_local=kr_prime)
+                                                           c2=sqrt_g,
+                                                           to_world=to_world,
+                                                           k_in_local=ki_prime,
+                                                           k_out_local=kr_prime)
             sqrt_1mg = mi.Complex2f(dr.sqrt(1. - g), 0.)
             jones_mat_tra = jones_matrix_to_world_implicit(c1=sqrt_1mg,
-                                                        c2=sqrt_1mg,
-                                                        to_world=to_world,
-                                                        k_in_local=ki_prime,
-                                                        k_out_local=kt_prime)
+                                                           c2=sqrt_1mg,
+                                                           to_world=to_world,
+                                                           k_in_local=ki_prime,
+                                                           k_out_local=kt_prime)
 
             # Sample the interaction type.
             # We use the `sample1` parameter, which is assumed to be a float uniformly sampled
@@ -980,8 +984,8 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             bs = mi.BSDFSample3f()
             # Specifies the type of interaction that was sampled
             bs.sampled_component = dr.select(reflection,
-                                            InteractionType.SPECULAR,
-                                            InteractionType.REFRACTION)
+                                             InteractionType.SPECULAR,
+                                             InteractionType.REFRACTION)
             # Direction of the scattered wave in the world frame
             bs.wo = to_world@ko_prime
             # The next field of `bs` stores the probability that the sampled
@@ -1031,16 +1035,16 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             # structure we need.
             sqrt_g = mi.Complex2f(dr.sqrt(g), 0.)
             jones_mat_ref = jones_matrix_to_world_implicit(c1=sqrt_g,
-                                                        c2=sqrt_g,
-                                                        to_world=to_world,
-                                                        k_in_local=ki_prime,
-                                                        k_out_local=kr_prime)
+                                                           c2=sqrt_g,
+                                                           to_world=to_world,
+                                                           k_in_local=ki_prime,
+                                                           k_out_local=kr_prime)
             sqrt_1mg = mi.Complex2f(dr.sqrt(1. - g), 0.)
             jones_mat_tra = jones_matrix_to_world_implicit(c1=sqrt_1mg,
-                                                        c2=sqrt_1mg,
-                                                        to_world=to_world,
-                                                        k_in_local=ki_prime,
-                                                        k_out_local=kt_prime)
+                                                           c2=sqrt_1mg,
+                                                           to_world=to_world,
+                                                           k_in_local=ki_prime,
+                                                           k_out_local=kt_prime)
 
             # Select the Jones matrix and direction of the scattered wave according to the sampled
             # interaction type
@@ -1097,7 +1101,7 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
             # Registers the `g` parameter as a differentiable
             # parameter of the scene
             callback.put_parameter('g', self._g,
-                                mi.ParamFlags.Differentiable)
+                                   mi.ParamFlags.Differentiable)
 
         def to_string(self) -> str:
             # Returns a humanly readable description of the material
@@ -1115,6 +1119,10 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
         def g(self, v):
             self._g = mi.Float(v)
 
+    # Register the custom radio material as a Mitsuba plugin
+    mi.register_bsdf("enhanced-custom-radio-material",
+                    lambda props: EnhancedCustomRadioMaterial(props=props))
+
 Note that we use the ``sample1`` parameter of :meth:`~sionna.rt.RadioMaterialBase.sample`
 to select an interaction type.
 The ``sample2`` parameter is a 2-dimensional vector assumed to be uniformly sampled
@@ -1127,7 +1135,7 @@ We start by loading the ``simple_reflector`` scene, but this time with we
 instantiate two receivers: one on each side of the reflector to capture both a
 reflected and a transmitted path.
 
-.. code-block:: Python
+.. code-block:: python
 
     scene_custom_mat = load_scene(rt.scene.simple_reflector, merge_shapes=False)
 
