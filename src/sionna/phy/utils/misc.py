@@ -330,6 +330,7 @@ def sim_ber(mc_fun,
             ebno_dbs,
             batch_size,
             max_mc_iter,
+            is_ebno=True,
             soft_estimates=False,
             num_target_bit_errors=None,
             num_target_block_errors=None,
@@ -372,6 +373,11 @@ def sim_ber(mc_fun,
     soft_estimates: `bool`, (default `False`)
         If `True`, `b_hat` is interpreted as logit and an additional
         hard-decision is applied internally.
+
+    is_ebno: `bool`, (default `True`)
+        If `True`, the input ``ebno_dbs`` is interpreted as
+        `Eb/No` in dB. If `False`, the input ``ebno_dbs`` is
+        interpreted as `Es/No` in dB.
 
     num_target_bit_errors: `None` (default) | `tf.int32`
         Target number of bit errors per SNR point until
@@ -547,9 +553,13 @@ def sim_ber(mc_fun,
         b_hat = strategy.gather(outputs_rep[1], axis=0)
         return b, b_hat
 
-     # init table headers
+    # init table headers
+    if is_ebno:
+        snr_str = "EbNo [dB]"
+    else:
+        snr_str = "EsNo [dB]"
     header_text = [
-        "EbNo [dB]", "BER", "BLER", "bit errors", "num bits",
+        snr_str, "BER", "BLER", "bit errors", "num bits",
         "block errors", "num blocks", "runtime [s]", "status"
     ]
 
