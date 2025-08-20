@@ -40,13 +40,13 @@ class LDPC5GEncoder(Block):
         Precision used for internal calculations and outputs.
         If set to `None`, :py:attr:`~sionna.phy.config.precision` is used.
 
-    params_only: bool, default=False
+    params_only: bool, (default `False`)
         If set to `True`, the encoder will only initialize the parameters
         needed for the encoding, but will not load the basegraph or perform
         any further initialization. This is useful to obtain the parameters
-        of the encoder without loading the full model.
+        of the encoder without initializing the full block.
 
-    allow_low_rates: bool, default=False
+    allow_low_rates: bool, (default `False`)
         If set to `True`, the encoder will allow coding rates below 1/3 and 1/5,
         respectively for BG1 and BG2, consistent with 3GPP specifications.
 
@@ -55,12 +55,19 @@ class LDPC5GEncoder(Block):
     bits: [...,k], tf.float
         Binary tensor containing the information bits to be encoded.
 
+    rv: list of str | None (default)
+        List of redundancy version strings to generate. Can contain
+        any combination of ["rv0", "rv1", "rv2", "rv3"] in any order,
+        including repeats. If `None`, defaults to single `"rv0"` encoding without
+        adding an RV dimension to the output.
+
     Output
     ------
-    : [...,n], tf.float
+    : [...,n] or [...,len(rv),n], tf.float
         Binary tensor of same shape as inputs besides last dimension has
-        changed to `n` containing the encoded codeword bits.
-
+        changed to `n` containing the encoded codeword bits. If `rv` is not `None`, 
+        an additional dimension is adde to the output.
+        
     Note
     ----
     As specified in [3GPPTS38212_LDPC]_, the encoder also performs
@@ -226,6 +233,7 @@ class LDPC5GEncoder(Block):
     def out_int(self):
         """Output interleaver sequence as defined in 5.4.2.2"""
         return self._out_int
+    
     @property
     def out_int_inv(self):
         """Inverse output interleaver sequence as defined in 5.4.2.2"""
@@ -655,7 +663,7 @@ class LDPC5GEncoder(Block):
         c = tf.expand_dims(c, axis=-1) # returns nx1 vector
         return c
 
-    def validate_rv_list(self, rv_list):
+    def _validate_rv_list(self, rv_list):
         """Validate that all RV names in the list are valid.
 
         Args:
@@ -671,7 +679,7 @@ class LDPC5GEncoder(Block):
                     f"Invalid RV name '{rv_name}'. Valid RV names are: {sorted(valid_rvs)}"
                 )
 
-    def get_rv_starts(self) -> dict:
+    def _get_rv_starts(self) -> dict:
         """Get RV starting positions mapping as per 3GPP TS 38.212.
 
         Returns
@@ -718,7 +726,7 @@ class LDPC5GEncoder(Block):
             rv = ["rv0"]
 
         # Validate RV names
-        self.validate_rv_list(rv)
+        self._validate_rv_list(rv)
 
         # Reshape inputs to [...,k]
         input_shape = bits.get_shape().as_list()
@@ -760,21 +768,21 @@ class LDPC5GEncoder(Block):
         c_no_filler = tf.concat([c_no_filler1, c_no_filler2], 1)
 
         # get RV starting positions mapping
-        rv_starts = self.get_rv_starts()
+        rv_starts = self._get_rv_starts()
 
         c_short_list = []
-        n_cb = self.n_cb
+        
         for rv_name in rv:
             start = rv_starts[rv_name]
 
             # check if circular wrap occurs
-            if start + self.n <= n_cb:
+            if start + self.n <= self.n_cb:
                 # no wrap: simple slice from start to start+n
                 c_short_rv = tf.slice(c_no_filler, [0, start], [batch_size, self.n])
             else:
                 # wrap occurs: concatenate two slices
                 # first part: from start to end of buffer
-                first_part_size = n_cb - start
+                first_part_size = self.n_cb - start
                 first_part = tf.slice(c_no_filler, [0, start],
                                     [batch_size, first_part_size])
 
