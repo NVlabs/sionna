@@ -10,7 +10,7 @@ import numpy as np
 from sionna.phy.fec.ldpc.decoding import LDPC5GDecoder
 from sionna.phy.fec.ldpc.encoding import LDPC5GEncoder
 from sionna.phy.fec.utils import GaussianPriorSource
-from sionna.phy.utils import ebnodb2no
+from sionna.phy.utils import ebnodb2no, compute_ber
 from sionna.phy.mapping import BinarySource
 from sionna.phy.channel import AWGN
 from sionna.phy.mapping import Mapper, Demapper, Constellation
@@ -44,7 +44,7 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     batch_size = 2
     num_rv = len(rv_list)
 
-    ldpc_params = LDPC5GEncoder.get_params(k, n)
+    ldpc_params = LDPC5GEncoder(k, n)
     n_cb = ldpc_params.n_cb
 
     # Reference encoder assumes no rate matching
@@ -151,8 +151,7 @@ def test_harq_decoder(k_n_esno, use_graph_mode, use_xla):
         decoded_bits = decoder(llr, rv=rv_list)
 
     # Check decoding success
-    bit_errors = tf.reduce_sum(tf.cast(tf.not_equal(tf.cast(bits, tf.float32), tf.cast(decoded_bits > 0, tf.float32)), tf.float32))
-    ber = bit_errors / (batch_size * k)
+    ber = compute_ber(bits, decoded_bits)
 
     # Print BER for analysis
     mode_str = f"Graph={use_graph_mode}, XLA={use_xla}"
