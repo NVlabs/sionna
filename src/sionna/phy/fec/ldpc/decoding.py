@@ -1277,14 +1277,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
     -----
     llr_ch: [...,n] or [...,num_rv,n], tf.float
         Tensor containing the channel logits/llr values.
-        - If rv is None: shape [..., n] for single RV decoding
-        - If rv is provided: shape [..., num_rv, n] where num_rv = len(rv)
-
-    rv: `None` (default) | list of str
-        List of redundancy version strings to decode. Can contain
-        any combination of ["rv0", "rv1", "rv2", "rv3"] in any order,
-        including repeats. If None, defaults to single RV0 decoding.
-        When provided, the decoder accumulates LLRs from all RVs before decoding.
+        If ``rv`` is not `None`, the expected shape is shape [..., num_rv, n] where `num_rv = len(rv)`.
 
     num_iter: `None` | `int`, (default: None)
         Number of decoding iterations to be performed. When None is given,
@@ -1295,13 +1288,19 @@ class LDPC5GDecoder(LDPCBPDecoder):
         Required only if the decoder shall use its previous internal state, e.g.
         for iterative detection and decoding (IDD) schemes.
 
+    rv: `None` (default) | list of str
+        List of redundancy version strings to decode. Can contain
+        any combination of `["rv0", "rv1", "rv2", "rv3"]` in any order,
+        including repeats. If `None`, defaults to single RV0 decoding.
+        When provided, the decoder accumulates LLRs from all RVs before decoding.
+
     Output
     ------
     : [...,n] or [...,k], tf.float
-        Tensor containing bit-wise soft-estimates (or hard-decided bit-values).
-        - If return_infobits=True: shape [..., k] (information bits only)
-        - If return_infobits=False: shape [..., n] (all codeword bits)
-        Note: When rv is provided, the RV dimension is removed from output.
+        Tensor of same shape as ``llr_ch`` containing
+        bit-wise soft-estimates (or hard-decided bit-values) of all
+        `n` codeword bits or only the `k` information bits if
+        ``return_infobits`` is True.
 
     : [num_edges, batch_size], tf.float:
         Tensor of VN messages representing the internal decoder state.
@@ -1351,6 +1350,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
         self._encoder = encoder
         pcm = encoder.pcm
 
+        if not isinstance(harq_mode, bool):
+            raise TypeError('harq_mode must be bool.')
         self._harq_mode = harq_mode
         if self._harq_mode:
             prune_pcm = False
@@ -1428,7 +1429,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
         elif callable(accumulator):
             self._accumulator = accumulator
         else:
-            raise TypeError("accumulator must be callable or None")
+            raise TypeError("accumulator must be callable or None.")
 
         super().__init__(pcm,
                          cn_update=cn_update,
@@ -1442,6 +1443,19 @@ class LDPC5GDecoder(LDPCBPDecoder):
                          return_state=return_state,
                          precision=precision,
                          **kwargs)
+
+    ###############################
+    # Public methods and properties
+    ###############################
+
+    @property
+    def encoder(self):
+        """LDPC Encoder used for rate-matching/recovery"""
+        return self._encoder
+
+    ########################
+    # Sionna block functions
+    ########################
 
     def _default_accumulator(self, llr_accumulated, llr_new, transmission_idx):
         """Default LLR accumulator: simple addition.
@@ -1458,42 +1472,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
             return llr_new
         else:
             return llr_accumulated + llr_new
-
-    def _validate_rv_len(self, llr_ch, rv_list):
-        """Validate that tensor RV dimension matches RV list length.
-
-        Args:
-            llr_ch: Input tensor to validate.
-            rv_list (list): List of RV name strings.
-
-        Raises:
-            tf.errors.InvalidArgumentError: If tensor RV dimension doesn't match RV list length.
-        """
-        if len(llr_ch.shape) >= 2:
-            tensor_rv_dim = tf.shape(llr_ch)[-2]  # Second-to-last dimension
-            num_rv = len(rv_list)
-
-            tf.debugging.assert_equal(
-                tensor_rv_dim,
-                num_rv,
-                message=f"Input tensor RV dimension must match RV list length. "
-                        f"Expected {num_rv}, but tensor has mismatched "
-                        f"second-to-last dimension."
-            )
-
-    ###############################
-    # Public methods and properties
-    ###############################
-
-    @property
-    def encoder(self):
-        """LDPC Encoder used for rate-matching/recovery"""
-        return self._encoder
-
-    ########################
-    # Sionna block functions
-    ########################
-
+    
     def build(self, input_shape, **kwargs):
         """Build block"""
 
@@ -1503,7 +1482,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
 
         self._old_shape_5g = input_shape
 
-    def call(self, llr_ch, /, *, rv=None, num_iter=None, msg_v2c=None):
+    def call(self, llr_ch, /, *, num_iter=None, msg_v2c=None, rv=None):
         """Iterative BP decoding function and rate matching.
 
         Args:
@@ -1511,14 +1490,14 @@ class LDPC5GDecoder(LDPCBPDecoder):
                 Tensor containing the channel logits/llr values.
                 - If not self._harq_mode: shape [..., n]
                 - Else: shape [..., num_rv, n] where num_rv = len(rv)
-            rv: list, optional
-                List of redundancy version strings to decode. Can contain
-                any combination of ["rv0", "rv1", "rv2", "rv3"] in any order.
-                If None, assumes single RV0 decoding.
             num_iter: int, optional
                 Number of decoding iterations.
             msg_v2c: tf.Tensor, optional
                 VN messages for decoder state.
+            rv: list, optional
+                List of redundancy version strings to decode. Can contain
+                any combination of ["rv0", "rv1", "rv2", "rv3"] in any order.
+                If None, assumes single RV0 decoding.
         """
         llr_ch_shape = llr_ch.get_shape().as_list()
         llr_ch_shape[0] = -1  # it can be None
@@ -1527,8 +1506,11 @@ class LDPC5GDecoder(LDPCBPDecoder):
             rv = ["rv0"]
         else:
             self.encoder.validate_rv_list(rv)
-            self._validate_rv_len(llr_ch, rv)
-
+            if tf.shape(llr_ch)[-2]!=len(rv_list):
+                msg = "In HARQ mode, second last dimension of llr_ch"
+                msg += "must equal len(rv)."
+                raise ValueError(msg)
+    
         k = self.encoder.k
         n = tf.shape(llr_ch)[-1]  # or self.encoder.n
         n_cb = self.encoder.n_cb  # circular buffer length (n_ldpc - k_filler)
@@ -1549,6 +1531,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
             llr_rv = llr_ch_reshaped[:, rv_idx, :]
 
             # apply output interleaver inverse if needed
+            # see Sec. 5.4.2.2 in 38.212
             if self.encoder.num_bits_per_symbol is not None:
                 llr_rv = tf.gather(llr_rv, self.encoder.out_int_inv, axis=-1)
 
@@ -1558,6 +1541,7 @@ class LDPC5GDecoder(LDPCBPDecoder):
             llr_rv_padded = tf.pad(llr_rv, [[0, 0], [0, n_cb - n - nb_pruned_nodes]])
 
             # apply circular shift to reconstruct original position
+            # Implicit undoing of shortening of first two 2*Z positions
             llr_rv_unrolled = tf.roll(llr_rv_padded, shift=start_pos[rv_idx], axis=1)
 
             # accumulate using the configured accumulator function
