@@ -13,7 +13,7 @@ def plot_ber(snr_db,
              legend="",
              ylabel="BER",
              title="Bit Error Rate",
-             is_ebno=True,
+             ebno=True,
              is_bler=None,
              xlim=None,
              ylim=None,
@@ -38,7 +38,7 @@ def plot_ber(snr_db,
     title: `str`, (default "Bit Error Rate")
         Figure title
 
-    is_ebno: `bool`, (default `True`)
+    ebno: `bool`, (default `True`)
         If `True`, the x-label is set to
         "EbNo [dB]" instead of "EsNo [dB]".
 
@@ -121,7 +121,7 @@ def plot_ber(snr_db,
         plt.semilogy(snr_db, ber, line_style, linewidth=2)
 
     plt.grid(which="both")
-    if is_ebno:
+    if ebno:
         plt.xlabel(r"$E_b/N_0$ (dB)", fontsize=25)
     else:
         plt.xlabel(r"$E_s/N_0$ (dB)", fontsize=25)
@@ -147,11 +147,6 @@ class PlotBER():
     -----
     snr_db: `numpy.ndarray` or `list` of `numpy.ndarray`, `float`
         SNR values
-
-    is_ebno: `bool`, (default `True`)
-        Interpret SNR as EbNo or EsNo.
-        If `True`, the x-label is set to
-        "EbNo [dB]" instead of "EsNo [dB]".
 
     ber: `numpy.ndarray` or `list` of `numpy.ndarray`, `float`
         BER values corresponding to ``snr_db``
@@ -195,7 +190,6 @@ class PlotBER():
     # pylint: disable=W0102
     def __call__(self,
                  snr_db=[],
-                 is_ebno=True,
                  ber=[],
                  legend=[],
                  is_bler=[],
@@ -261,7 +255,6 @@ class PlotBER():
                  legend=legends,
                  is_bler=is_bler,
                  title=self._title,
-                 is_ebno=is_ebno,
                  ylabel=ylabel,
                  xlim=xlim,
                  ylim=ylim,
@@ -314,7 +307,6 @@ class PlotBER():
                  ebno_dbs,
                  batch_size,
                  max_mc_iter,
-                 is_ebno=True,
                  legend="",
                  add_ber=True,
                  add_bler=False,
@@ -438,7 +430,6 @@ class PlotBER():
                         batch_size,
                         soft_estimates=soft_estimates,
                         max_mc_iter=max_mc_iter,
-                        is_ebno=is_ebno,
                         num_target_bit_errors=num_target_bit_errors,
                         num_target_block_errors=num_target_block_errors,
                         target_ber=target_ber,
