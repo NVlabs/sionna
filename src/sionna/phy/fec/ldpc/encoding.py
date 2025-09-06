@@ -40,12 +40,6 @@ class LDPC5GEncoder(Block):
         Precision used for internal calculations and outputs.
         If set to `None`, :py:attr:`~sionna.phy.config.precision` is used.
 
-    params_only: bool, (default `False`)
-        If set to `True`, the encoder will only initialize the parameters
-        needed for the encoding, but will not load the basegraph or perform
-        any further initialization. This is useful to obtain the parameters
-        of the encoder without initializing the full block.
-
     allow_low_rates: bool, (default `False`)
         If set to `True`, the encoder will allow coding rates below 1/3 and 1/5,
         respectively for BG1 and BG2, consistent with 3GPP specifications.
@@ -85,7 +79,6 @@ class LDPC5GEncoder(Block):
                  num_bits_per_symbol=None,
                  bg=None,
                  precision=None,
-                 params_only=False,
                  allow_low_rates=False,
                  **kwargs):
 
@@ -132,23 +125,13 @@ class LDPC5GEncoder(Block):
 
         self._z, self._i_ls, self._k_b = self._sel_lifting(self._k, self._bg)
 
-        if not params_only:
-            self._bm = self._load_basegraph(self._i_ls, self._bg)
-            bm_num_cols = self._bm.shape[1]
-        else:
-            # If params_only is True, we do not load the basegraph,
-            # but we still need to set bm_num_cols for the n_ldpc calculation.
-            bm_num_cols = 68 if self._bg == "bg1" else 52
+        self._bm = self._load_basegraph(self._i_ls, self._bg)
+        bm_num_cols = self._bm.shape[1]
 
         # total number of codeword bits
         self._n_ldpc = bm_num_cols * self._z
         # if K_real < K _target puncturing must be applied earlier
         self._k_ldpc = self._k_b * self._z
-
-        if params_only:
-            # If params_only is True, we only initialize the parameters
-            # and do not load the basegraph or construct the parity-check matrix.
-            return
 
         # construct explicit graph via lifting
         pcm = self._lift_basegraph(self._bm, self._z)
@@ -242,29 +225,6 @@ class LDPC5GEncoder(Block):
     #################
     # Utility methods
     #################
-
-    @staticmethod
-    def get_params(k: int, n: int, bg: Optional[str]=None) -> "LDPC5GEncoder":
-        """Get the parameters of the LDPC encoder without loading the basegraph
-        and constructing the parity-check matrix. Assume HARQ mode is enabled.
-
-        Parameters
-        ----------
-        k: int
-            Number of information bits.
-        n: int
-            Number of codeword bits.
-        bg: `None` (default) | "bg1" | "bg2"
-            Basegraph to be used for the code construction.
-            If `None` is provided, the encoder will automatically select
-            the basegraph according to [3GPPTS38212_LDPC]_.
-
-        Returns
-        -------
-        LDPC5GEncoder instance with the specified parameters but without
-        loading the basegraph or constructing the parity-check matrix.
-        """
-        return LDPC5GEncoder(k=k, n=n, bg=bg, params_only=True, allow_low_rates=True)
 
     def generate_out_int(self, n, num_bits_per_symbol):
         """Generates LDPC output interleaver sequence as defined in
