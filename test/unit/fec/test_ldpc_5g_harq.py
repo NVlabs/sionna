@@ -21,8 +21,11 @@ from sionna.phy.mapping import Mapper, Demapper, Constellation
 
 @pytest.mark.parametrize("k_n", [(400, 900), (5000, 12000)])
 @pytest.mark.parametrize("rv_list", [["rv0", "rv2", "rv3", "rv1"]])
-@pytest.mark.parametrize("use_graph_mode", [True, False])
-@pytest.mark.parametrize("use_xla", [True, False])
+@pytest.mark.parametrize("use_graph_mode,use_xla", [
+    (True, True),   # Graph mode with XLA
+    (True, False),  # Graph mode without XLA
+    (False, False)  # Eager mode (XLA not applicable)
+])
 def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     """Test HARQ encoder functionality with different RV combinations.
 
@@ -68,6 +71,7 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     if use_graph_mode:
         bits, x_ref, x = encode_harq()
     else:
+        # In eager mode, XLA is not applicable
         bits = source([batch_size, k])
         x_ref = encoder_ref(bits)  # Shape: [batch_size, n_cb]
         x_ref = tf.roll(x_ref, shift=starts["rv0"], axis=-1)  # Undo shift of RV0
@@ -292,7 +296,8 @@ def test_harq_with_decoder_state(use_state):
         result = decoder(llr_ch, rv=rv_list)
         assert result.shape == [batch_size, k]
 
-def test_harq_error_conditions():
+@pytest.mark.parametrize("k_n", [(100, 200), (4000, 7000)])
+def test_harq_error_conditions(k_n):
     """Test error handling in HARQ mode.
 
     This test verifies that the HARQ decoder properly handles invalid inputs
@@ -304,7 +309,7 @@ def test_harq_error_conditions():
     - Graceful handling of dimension mismatches (implementation-dependent)
     - Validates that encoder and decoder both validate RV names properly
     """
-    k, n = 100, 200
+    k, n = k_n
     encoder = LDPC5GEncoder(k, n)
     decoder = LDPC5GDecoder(encoder, harq_mode=True)
 
