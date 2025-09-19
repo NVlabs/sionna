@@ -239,7 +239,7 @@ def calculate_tb_size_numpy(modulation_order,
 
     Returns
     -------
-    
+
     tb_size : int
         Transport block size, i.e., how many information bits can be encoded
         into a slot for the given slot configuration.
@@ -292,6 +292,7 @@ def calculate_tb_size_numpy(modulation_order,
 
         assert target_tb_size%1==0, "target_tb_size must be int."
         n_info = int(target_tb_size)
+        n_info_q = n_info # not quantized for user specified target_tb_size
 
         assert target_tb_size<num_coded_bits, \
             "Invalid transport block parameters. target_tb_size must be less " \
@@ -325,11 +326,25 @@ def calculate_tb_size_numpy(modulation_order,
         # include tb_scaling as defined in Tab. 5.1.3.2-2 38.214
         n_info = target_coderate * num_coded_bits
 
-    if n_info <= 3824:
+        # apply quantization of info bit
+        if n_info <= 3824:
+            # step3 in 38.214 5.1.3.2
+            n = max(3, np.floor(np.log2(n_info)) - 6)
+            n_info_q = max(24, 2**n * np.floor(n_info/2**n))
+        else:
+            # step 4 in 38.212 5.3.1.2
+            n = np.floor(np.log2(n_info-24)) - 5
+            # "ties in the round function are broken towards next largest
+            # integer"
+            n_info_q = max(3840, 2**n * np.round((n_info-24)/2**n))
+
+    if n_info_q <= 3824:
         c=1
         # go to step 3 in 38.214 5.1.3.2
-        n = max(3, np.floor(np.log2(n_info)) - 6)
-        n_info_q = max(24, 2**n * np.floor(n_info/2**n))
+
+        # already applied in the previous step
+        # n = max(3, np.floor(np.log2(n_info)) - 6)
+        # n_info_q = max(24, 2**n * np.floor(n_info/2**n))
 
         # explicit lengths given in Tab 5.1.3.2-1
         tab51321 = [24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120, 128,
@@ -348,15 +363,17 @@ def calculate_tb_size_numpy(modulation_order,
                 break
     else:
         # go to step 4 in 38.212 5.3.1.2
-        n = np.floor(np.log2(n_info-24)) - 5
+
+        # already applied in the previous step
+        # n = np.floor(np.log2(n_info-24)) - 5
         # "ties in the round function are broken towards next largest integer"
-        n_info_q = max(3840, 2**n * np.round((n_info-24)/2**n))
+        # n_info_q = max(3840, 2**n * np.round((n_info-24)/2**n))
 
         if target_coderate<=1/4:
             c = np.ceil((n_info_q + 24) / 3816)
             tbs = 8 * c * np.ceil((n_info_q + 24) / (8 * c)) - 24
         else:
-            if n_info > 8424:
+            if n_info_q > 8424:
                 c = np.ceil((n_info_q + 24) / 8424)
                 tbs = 8 * c * np.ceil((n_info_q + 24) / (8*c)) - 24
             else:

@@ -115,7 +115,7 @@ class LDPC_QAM_AWGN(Block):
 
         # LDPC encoder / decoder
         self.encoder = LDPC5GEncoder(self.k, self.n)
-        self.decoder = LDPC5GDecoder(self.encoder, cn_type=decoder_type)
+        self.decoder = LDPC5GDecoder(self.encoder, cn_update=decoder_type)
 
         self.scrambler = Scrambler()
         # connect descrambler to scrambler
@@ -208,7 +208,7 @@ class TestBICM(unittest.TestCase):
 
         encoder = LDPC5GEncoder(k, n)
         decoder = LDPC5GDecoder(encoder,
-                                cn_type="boxplus-phi",
+                                cn_update="boxplus-phi",
                                 num_iter=num_bp_iter)
 
         # initialize a random interleaver and corresponding deinterleaver

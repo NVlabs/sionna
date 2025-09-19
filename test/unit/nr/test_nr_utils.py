@@ -79,7 +79,7 @@ class TestNRUtils(unittest.TestCase):
                        table_index=3,
                        is_pusch=False,
                        pi2bpsk=False)
-                       
+
         # Tab. 5.1.3.1-4
         qs = [2,2,2,4,4,4,6,6,6,6,6,6,6,6,6,8,8,8,8,8,8,8,8,10,10,10,10]
         rs = [120,193,449,378,490,616,466,517,567,616,666,719,772,822,873,682.5,711,754,797,841,885,916.5,948,805.5,853,900.5,948]
@@ -375,7 +375,7 @@ class TestNRUtils(unittest.TestCase):
 
     def test_tb_size_vs_numpy(self):
         """
-        Validate calculate_tb_size_tf, accepting Tensor inputs, 
+        Validate calculate_tb_size_tf, accepting Tensor inputs,
         against the Numpy version "calculate_tb_size". Test in Eager, Graph and
         XLA modes
         """
@@ -461,7 +461,7 @@ class TestNRUtils(unittest.TestCase):
                 self.assertTrue(cb_crc_length_orig==tf.gather_nd(cb_crc_length, idx).numpy())
                 self.assertTrue(num_cbs_orig==tf.gather_nd(num_cb, idx).numpy())
             return None
-        
+
 
         shape = [10, 12, 15]
         int_dtype = tf.int32
@@ -495,28 +495,28 @@ class TestNRUtils(unittest.TestCase):
                     num_layers=num_layers,
                     num_ov=num_ov,
                     tb_scaling=tb_scaling)
-            
+
             # validate against the Numpy version
             validate_against_np(tb_size, cb_size, num_cb, cw_length,
                                 tb_crc_length, cb_crc_length)
-            
+
             # mode b): provide already target_tb_size, num_coded_bits
-            # Compute data symbols per PRB
+            # Use the actual TB size computed in mode a) to ensure consistency
+            # This avoids the quantization issue where providing an unquantized
+            # target_tb_size bypasses the 3GPP quantization steps
+            target_tb_size = tf.cast(tb_size, float_dtype)
+
+            # Compute data symbols per PRB for num_coded_bits calculation
             n_re_per_prb = 12 * num_ofdm_symbols - num_dmrs_per_prb - num_ov
+            # The max. number of REs per PRB is limited to 156 in 38.214
+            n_re_per_prb = tf.minimum(156, n_re_per_prb)
+
             # number of coded bits that fit into the given slot configuration
             num_coded_bits = tb_scaling * \
                 tf.cast(n_re_per_prb * modulation_order *
                         num_layers * num_prbs, float_dtype)
             num_coded_bits = tf.cast(num_coded_bits, int_dtype)
 
-            # Number of allocated REs
-            # The max. number of REs per PRB is limited to 156 in 38.214
-            n_re = tf.minimum(156, n_re_per_prb) * num_prbs
-
-            # Compute coded bits and info bits
-            target_tb_size = target_coderate * tb_scaling * \
-                tf.cast(n_re * modulation_order * num_layers, float_dtype)
-            
             tb_size1, cb_size1, num_cb1, tb_crc_length1, cb_crc_length1, cw_length1 = \
                 fun(modulation_order,
                     target_coderate,
@@ -525,7 +525,7 @@ class TestNRUtils(unittest.TestCase):
                     num_layers=num_layers,
                     num_ov=num_ov,
                     tb_scaling=tb_scaling)
-            
+
             # validate against the mode a) version
             self.assertTrue(tf.reduce_all(tb_size==tb_size1))
             self.assertTrue(tf.reduce_all(cb_size==cb_size1))
@@ -537,10 +537,10 @@ class TestNRUtils(unittest.TestCase):
             # The sum of codeword lengths must equal the n. coded bits
             self.assertTrue(
                 tf.reduce_all(tf.reduce_sum(cw_length1, axis=-1) == num_coded_bits))
-        
+
     def test_decode_mcs_index_tf(self):
         """Unittest for decode_mcs_index_tf. Compares against its Numpy version.
-        Test in Eager, Graph and XLA modes""" 
+        Test in Eager, Graph and XLA modes"""
 
         @tf.function
         def decode_mcs_index_graph(mcs_index,

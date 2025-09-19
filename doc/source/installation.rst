@@ -4,7 +4,7 @@ Installation
 Sionna is composed of three Python modules, namely `Sionna RT <rt/index.html>`_, `Sionna
 PHY <phy/index.html>`_, and `Sionna SYS <sys/index.html>`_.
 
-Sionna PHY and Sionna SYS require `Python 3.8-3.12 <https://www.python.org/>`_
+Sionna PHY and Sionna SYS require `Python 3.10-3.12 <https://www.python.org/>`_
 and `TensorFlow 2.14-2.19 <https://www.tensorflow.org/install>`_. We recommend
 Ubuntu 24.04. Earlier versions of TensorFlow may still work but are not
 recommended. We refer to the `TensorFlow GPU support

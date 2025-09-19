@@ -76,7 +76,7 @@ def test_exit_callback(num_iter=20, node_degrees=[5,3,4]*100, batch_size=10000):
     # init components
     decoder = LDPCBPDecoder(pcm,
                             hard_out=False,
-                            cn_type="boxplus",
+                            cn_update="boxplus",
                             num_iter=num_iter,
                             v2c_callbacks=[cb_exit_vn,], # register callbacks
                             c2v_callbacks=[cb_exit_cn,],) # register callbacks
@@ -198,7 +198,7 @@ def test_wbp_callback(mode, pcm_id=1, num_iter=5, batch_size=100):
     # init components
     decoder = LDPCBPDecoder(pcm,
                             hard_out=False,
-                            cn_type="boxplus",
+                            cn_update="boxplus",
                             num_iter=num_iter,
                             v2c_callbacks=[wbp_cb_vn,], # register callbacks
                             c2v_callbacks=[wbp_cb_cn,],) # register callbacks

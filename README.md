@@ -22,7 +22,7 @@ It is composed of the following packages:
     A system-level simulator based on physical-layer abstraction
 
 # Installation
-Sionna PHY and Sionna SYS require [Python 3.8-3.12](https://www.python.org/) and [TensorFlow 2.14-2.19](https://www.tensorflow.org/install). We recommend Ubuntu 24.04. Earlier versions of TensorFlow may still work but are not recommended. We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/install/gpu) for GPU support and the required driver setup.
+Sionna PHY and Sionna SYS require [Python 3.10-3.12](https://www.python.org/) and [TensorFlow 2.14-2.19](https://www.tensorflow.org/install). We recommend Ubuntu 24.04. Earlier versions of TensorFlow may still work but are not recommended. We refer to the [TensorFlow GPU support tutorial](https://www.tensorflow.org/install/gpu) for GPU support and the required driver setup.
 
 Sionna RT has the same requirements as [Mitsuba
 3](https://github.com/mitsuba-renderer/mitsuba3) and we refer to its
@@ -122,6 +122,6 @@ If you use this software, please cite it as:
  author = {Hoydis, Jakob and Cammerer, Sebastian and {Ait Aoudia}, Fayçal and Nimier-David, Merlin and Maggi, Lorenzo and Marcus, Guillermo and Vem, Avinash and Keller, Alexander},
  note = {https://nvlabs.github.io/sionna/},
  year = {2022},
- version = {1.1.0}
+ version = {1.2.0}
 }
 ```

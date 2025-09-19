@@ -309,7 +309,7 @@ class MCSDecoderNR(MCSDecoder):
     Maps a Modulation and Coding Scheme (MCS) index to the
     corresponding modulation order, i.e., number of bits per symbol, and
     coderate for 5G-NR networks. Wraps
-    :func:`~sionna.phy.nr.utils.decode_mcs_index` and inherits 
+    :func:`~sionna.phy.nr.utils.decode_mcs_index` and inherits
     from :class:`~sionna.phy.utils.MCSDecoder`.
 
     Input
@@ -381,8 +381,8 @@ def calculate_num_coded_bits(modulation_order,
                              precision=None):
     r"""
     Computes the number of coded bits that fit in a slot for the given resource
-    grid structure 
-    
+    grid structure
+
     Input
     -----
 
@@ -402,7 +402,7 @@ def calculate_num_coded_bits(modulation_order,
         data transmission, across all ``num_ofdm_symbols`` OFDM symbols.
 
     num_layers: [...], `tf.int32`
-        Number of MIMO layers. 
+        Number of MIMO layers.
 
     num_ov : [...], `tf.int32`
         Number of unused resource elements due to additional
@@ -411,7 +411,7 @@ def calculate_num_coded_bits(modulation_order,
     tb_scaling: [...], `tf.float`
         TB scaling factor for PDSCH as defined in TS 38.214 Tab. 5.1.3.2-2. Must
         contain values in {0.25, 0.5, 1.0}.
-    
+
     precision : `None` (default) | "single" | "double"
         Precision used for internal calculations and outputs.
         If set to `None`, then :attr:`~sionna.phy.config.Config.precision`
@@ -422,7 +422,7 @@ def calculate_num_coded_bits(modulation_order,
 
     num_coded_bits: [...], `tf.int` | `int` | `None` (default)
         Number of coded bits can be fit into a given slot for the fiven
-        configuration. 
+        configuration.
 
     """
     # Cast inputs
@@ -520,7 +520,7 @@ def calculate_tb_size(modulation_order,
         transmission, across all ``num_ofdm_symbols`` OFDM symbols.
 
     num_layers: [...], `tf.int` | `int` (default: 1)
-        Number of MIMO layers. 
+        Number of MIMO layers.
 
     num_ov : [...], `tf.int` | `int` | `None` (default)
         Number of unused resource elements due to additional
@@ -539,7 +539,7 @@ def calculate_tb_size(modulation_order,
 
     precision : `None` (default) | "single" | "double"
         Precision used for internal calculations and outputs.
-        If set to `None`, then :attr:`~sionna.phy.config.Config.precision` is used 
+        If set to `None`, then :attr:`~sionna.phy.config.Config.precision` is used
 
     Output
     ------
@@ -631,35 +631,47 @@ def calculate_tb_size(modulation_order,
             target_tb_size, tf.cast(num_coded_bits, target_tb_size.dtype),
             message="target_tb_size must be less than num_coded_bits.")
 
+        # no quantization for user input
+        n_info_q = target_tb_size
+
     else:
         # Compute n info bits (Target TB size)
         target_tb_size = target_coderate * tf.cast(num_coded_bits, rdtype)
 
+        # quantize target_tb_size
+        def n_info_q_if_target_tbs_greater_3824():
+            # Compute quantized n. info bits if target TB size > 3824
+            # Step 4 of 38.214 5.3.1.2
+            log2_n_info_minus_24 = tf.math.log(
+                target_tb_size - tf.cast(24, target_tb_size.dtype)) \
+            / tf.math.log(tf.cast(2.0, target_tb_size.dtype))
+            n = tf.math.floor(log2_n_info_minus_24) - 5.
+            n_info_q = tf.math.maximum(
+                tf.cast(3840.0, rdtype),
+                tf.cast(2**n * tf.math.round((target_tb_size - 24) / 2**n), rdtype))
+            return n_info_q
+
+        def n_info_q_if_target_tbs_smaller_3824():
+            # Compute quantized n. info bits if target TB size <= 3824
+            log2_n_info = tf.math.log(target_tb_size) \
+                / tf.cast(tf.math.log(2.0), target_tb_size.dtype)
+            n = tf.math.maximum(tf.cast(3.0, rdtype),
+                                tf.cast(tf.math.floor(log2_n_info) - 6, rdtype))
+            n_info_q = tf.math.maximum(
+                tf.cast(24.0, rdtype),
+                tf.cast(2**n * tf.math.floor(target_tb_size / 2**n), rdtype))
+            return n_info_q
+
+        # ----------------------------- #
+        # Quantized n. information bits #
+        # ----------------------------- #
+        n_info_q = tf.where(target_tb_size <= 3824,
+                            n_info_q_if_target_tbs_smaller_3824(),
+                            n_info_q_if_target_tbs_greater_3824())
     # ------------------- #
     # Auxiliary functions #
     # ------------------- #
-    def n_info_q_if_target_tbs_greater_3824():
-        # Compute quantized n. info bits if target TB size > 3824
-        # Step 4 of 38.214 5.3.1.2
-        log2_n_info_minus_24 = tf.math.log(
-            target_tb_size - tf.cast(24, target_tb_size.dtype)) \
-          / tf.math.log(tf.cast(2.0, target_tb_size.dtype))
-        n = tf.math.floor(log2_n_info_minus_24) - 5.
-        n_info_q = tf.math.maximum(
-            tf.cast(3840.0, rdtype),
-            tf.cast(2**n * tf.math.round((target_tb_size - 24) / 2**n), rdtype))
-        return n_info_q
 
-    def n_info_q_if_target_tbs_smaller_3824():
-        # Compute quantized n. info bits if target TB size <= 3824
-        log2_n_info = tf.math.log(target_tb_size) \
-              / tf.cast(tf.math.log(2.0), target_tb_size.dtype)
-        n = tf.math.maximum(tf.cast(3.0, rdtype),
-                            tf.cast(tf.math.floor(log2_n_info) - 6, rdtype))
-        n_info_q = tf.math.maximum(
-            tf.cast(24.0, rdtype),
-            tf.cast(2**n * tf.math.floor(target_tb_size / 2**n), rdtype))
-        return n_info_q
 
     def tbs_if_target_tbs_higher_3824():
         # Compute TB size if target_tb_size>3824
@@ -692,18 +704,11 @@ def calculate_tb_size(modulation_order,
         tbs = tf.gather(tab51321, tbs_ind)
         return tf.cast(tbs, tf.int32)
 
-    # ----------------------------- #
-    # Quantized n. information bits #
-    # ----------------------------- #
-    n_info_q = tf.where(target_tb_size <= 3824,
-                        n_info_q_if_target_tbs_smaller_3824(),
-                        n_info_q_if_target_tbs_greater_3824())
-
     # ----------------- #
     # N. of code blocks #
     # ----------------- #
     num_cb = tf.where(
-        target_tb_size <= 3824,
+        n_info_q <= 3824,
             # if target_tb_size <= 3824
             tf.cast(tf.fill(shape, 1.0), rdtype),
             # else:
@@ -711,7 +716,7 @@ def calculate_tb_size(modulation_order,
                 # if target_coderate <= 1/4:
                     tf.cast(tf.math.ceil((n_info_q + 24) / 3816), rdtype),
                 # else:
-                    tf.where(target_tb_size > 8424,
+                    tf.where(n_info_q > 8424,
                     # if target_tb_size > 8424:
                         tf.cast(tf.math.ceil((n_info_q + 24) / 8424), rdtype),
                     # else:
@@ -720,7 +725,7 @@ def calculate_tb_size(modulation_order,
     # ---------------------- #
     # TB size (n. info bits) #
     # ---------------------- #
-    tb_size = tf.where(target_tb_size <= 3824,
+    tb_size = tf.where(n_info_q <= 3824,
                        tbs_if_target_tbs_smaller_3824(),
                        tbs_if_target_tbs_higher_3824())
 
@@ -816,9 +821,9 @@ class TransportBlockNR(TransportBlock):
     coderate and the total number of coded bits of a transport block.
     Used in :class:`~sionna.sys.PHYAbstraction`. Inherits from
     :class:`sionna.phy.utils.TransportBlock` and wraps
-    :func:`~sionna.phy.nr.utils.calculate_tb_size` 
-    
-    Input 
+    :func:`~sionna.phy.nr.utils.calculate_tb_size`
+
+    Input
     -----
 
     modulation_order : [...], `tf.int32`
@@ -882,7 +887,7 @@ class CodedAWGNChannelNR(SingleLinkChannel):
         Check node update rule. See
         :class:`~sionna.phy.fec.ldpc.decoding.LDPC5GDecoder` for more details.
 
-    kwargs : 
+    kwargs :
         Additional keyword arguments for
         :class:`~sionna.phy.fec.ldpc.decoding.LDPC5GDecoder`.
 

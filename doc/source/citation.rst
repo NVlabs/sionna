@@ -11,5 +11,5 @@ If you use this software, please cite it as:
     Alexander},
     note = {https://nvlabs.github.io/sionna/},
     year = {2022},
-    version = {1.1.0}
+    version = {1.2.0}
    }
