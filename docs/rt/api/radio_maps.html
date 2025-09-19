@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Radio Maps &mdash; Sionna 1.1.0 documentation</title>
+  <title>Radio Maps &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -68,6 +68,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -267,6 +279,7 @@
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -285,6 +298,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -293,6 +307,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -345,11 +360,6 @@
 <li class="toctree-l5"><a class="reference internal" href="radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -389,6 +399,7 @@
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -447,6 +458,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1685,6 +1698,38 @@ corresponding to a 3D rotation as defined in <a class="reference internal" href=
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.add_paths">
+<span class="sig-name descname"><span class="pre">add_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">si</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_world</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffracted_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wedges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wedges_samples_cnt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/planar_radio_map.html#PlanarRadioMap.add_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.PlanarRadioMap.add_paths" title="Link to this definition"></a></dt>
+<dd><p>Adds the contribution of the paths that hit the measurement surface
+to the radio maps</p>
+<p>The radio maps are updated in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>e_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Vector4f</span></code></span>) – Electric fields as real-valued vectors of dimension 4</p></li>
+<li><p><strong>array_w</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span>) – Weighting used to model the effect of the transmitter
+array</p></li>
+<li><p><strong>si</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.SurfaceInteraction3f</span></code></span>) – Informations about the interaction with the measurement
+surface</p></li>
+<li><p><strong>k_world</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Vector3f</span></code></span>) – Directions of propagation of the incident paths</p></li>
+<li><p><strong>tx_indices</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.UInt</span></code></span>) – Indices of the transmitters from which the rays originate</p></li>
+<li><p><strong>active</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Bool</span></code></span>) – Flags indicating if the paths should be added to the radio map</p></li>
+<li><p><strong>diffracted_paths</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Flags indicating if the paths are diffracted</p></li>
+<li><p><strong>solid_angle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span>) – Ray tubes solid angles [sr] for non-diffracted paths.
+Not required for diffracted paths.</p></li>
+<li><p><strong>tx_positions</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Positions of the transmitters</p></li>
+<li><p><strong>wedges</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.utils.wedges.WedgeGeometry</span></code>]</span>) – Properties of the intersected wedges.
+Not required for non-diffracted paths.</p></li>
+<li><p><strong>diff_point</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Position of the diffraction point on the wedge.
+Not required for non-diffracted paths.</p></li>
+<li><p><strong>wedges_samples_cnt</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.UInt</span></code>]</span>) – Number of samples on the wedge.
+Not required for non-diffracted paths.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.cell_centers">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_centers</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.cell_centers" title="Link to this definition"></a></dt>
@@ -1770,7 +1815,7 @@ radio map that is parallel to the XY plane.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.PlanarRadioMap.path_gain">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.PlanarRadioMap.path_gain" title="Link to this definition"></a></dt>
-<dd><p>Path gains across the radio map from all transmitters</p>
+<dd><p>Path gains across the radio map from all transmitters [unitless, linear scale]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">cells_per_dim_y,</span> <span class="pre">cells_per_dim_x]</span></code></p>
@@ -1893,7 +1938,7 @@ positions are randomly drawn from the surface of the cell.</p></li>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Random positions <span class="math notranslate nohighlight">\((x,y,z)\)</span> [m]
-(shape : <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_pos,</span> <span class="pre">3]</span></code>) that are in cells
+(shape: <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_pos,</span> <span class="pre">3]</span></code>) that are in cells
 fulfilling the configured constraints</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2025,6 +2070,38 @@ map.</p>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.add_paths">
+<span class="sig-name descname"><span class="pre">add_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">si</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_world</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffracted_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wedges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wedges_samples_cnt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/mesh_radio_map.html#MeshRadioMap.add_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.MeshRadioMap.add_paths" title="Link to this definition"></a></dt>
+<dd><p>Adds the contribution of the paths that hit the measurement surface
+to the radio maps</p>
+<p>The radio maps are updated in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>e_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Vector4f</span></code></span>) – Electric fields as real-valued vectors of dimension 4</p></li>
+<li><p><strong>array_w</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span>) – Weighting used to model the effect of the transmitter
+array</p></li>
+<li><p><strong>si</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.SurfaceInteraction3f</span></code></span>) – Informations about the interaction with the measurement
+surface</p></li>
+<li><p><strong>k_world</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Vector3f</span></code></span>) – Directions of propagation of the incident paths</p></li>
+<li><p><strong>tx_indices</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.UInt</span></code></span>) – Indices of the transmitters from which the rays originate</p></li>
+<li><p><strong>active</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Bool</span></code></span>) – Flags indicating if the paths should be added to the radio map</p></li>
+<li><p><strong>diffracted_paths</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Flags indicating if the paths are diffracted</p></li>
+<li><p><strong>solid_angle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span>) – Ray tubes solid angles [sr] for non-diffracted paths.
+Not required for diffracted paths.</p></li>
+<li><p><strong>tx_positions</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Positions of the transmitters</p></li>
+<li><p><strong>wedges</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.utils.wedges.WedgeGeometry</span></code>]</span>) – Properties of the intersected wedges.
+Not required for non-diffracted paths.</p></li>
+<li><p><strong>diff_point</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Position of the diffraction point on the wedge.
+Not required for non-diffracted paths.</p></li>
+<li><p><strong>wedges_samples_cnt</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.UInt</span></code>]</span>) – Number of samples on the wedge.
+Not required for non-diffracted paths.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.cell_centers">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_centers</span></span><a class="headerlink" href="#sionna.rt.MeshRadioMap.cell_centers" title="Link to this definition"></a></dt>
@@ -2063,7 +2140,7 @@ radio map measurement surface</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.MeshRadioMap.path_gain">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.MeshRadioMap.path_gain" title="Link to this definition"></a></dt>
-<dd><p>Path gains across the radio map from all transmitters</p>
+<dd><p>Path gains across the radio map from all transmitters [unitless, linear scale]</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.TensorXf</span> <span class="pre">[num_tx,</span> <span class="pre">num_primitives]</span></code></p>
@@ -2185,7 +2262,7 @@ positions are randomly drawn from the surface of the cell.</p></li>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Random positions <span class="math notranslate nohighlight">\((x,y,z)\)</span> [m]
-(shape : <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_pos,</span> <span class="pre">3]</span></code>) that are in cells
+(shape: <code class="xref py py-class docutils literal notranslate"><span class="pre">[num_tx,</span> <span class="pre">num_pos,</span> <span class="pre">3]</span></code>) that are in cells
 fulfilling the configured constraints</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -2209,6 +2286,38 @@ Please refer to the documentation of this module for further details.</p>
 <dd class="field-odd"><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="scene.html#sionna.rt.Scene" title="sionna.rt.scene.Scene"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.scene.Scene</span></code></a></span>) – Scene for which the radio map is computed</p>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.rt.RadioMap.add_paths">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">si</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_world</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffracted_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solid_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wedges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diff_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wedges_samples_cnt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.add_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.add_paths" title="Link to this definition"></a></dt>
+<dd><p>Adds the contribution of the paths that hit the measurement surface
+to the radio maps</p>
+<p>The radio maps are updated in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>e_fields</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Vector4f</span></code></span>) – Electric fields as real-valued vectors of dimension 4</p></li>
+<li><p><strong>array_w</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span>) – Weighting used to model the effect of the transmitter
+array</p></li>
+<li><p><strong>si</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.SurfaceInteraction3f</span></code></span>) – Informations about the interaction with the measurement
+surface</p></li>
+<li><p><strong>k_world</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Vector3f</span></code></span>) – Directions of propagation of the incident paths</p></li>
+<li><p><strong>tx_indices</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.UInt</span></code></span>) – Indices of the transmitters from which the rays originate</p></li>
+<li><p><strong>active</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Bool</span></code></span>) – Flags indicating if the paths should be added to the radio map</p></li>
+<li><p><strong>diffracted_paths</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Flags indicating if the paths are diffracted</p></li>
+<li><p><strong>solid_angle</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.Float</span></code>]</span>) – Ray tubes solid angles [sr] for non-diffracted paths.
+Not required for diffracted paths.</p></li>
+<li><p><strong>tx_positions</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Positions of the transmitters</p></li>
+<li><p><strong>wedges</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.rt.utils.wedges.WedgeGeometry</span></code>]</span>) – Properties of the intersected wedges.
+Not required for non-diffracted paths.</p></li>
+<li><p><strong>diff_point</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">mitsuba.Point3f</span></code>]</span>) – Position of the diffraction point on the wedge.
+Not required for non-diffracted paths.</p></li>
+<li><p><strong>wedges_samples_cnt</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">drjit.cuda.ad.UInt</span></code>]</span>) – Number of samples on the wedge.
+Not required for non-diffracted paths.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="sionna.rt.RadioMap.cdf">
 <span class="sig-name descname"><span class="pre">cdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'path_gain'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/rt/radio_map_solvers/radio_map.html#RadioMap.cdf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.rt.RadioMap.cdf" title="Link to this definition"></a></dt>
@@ -2260,8 +2369,8 @@ system.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.RadioMap.measurement_surface">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">measurement_surface</span></span><a class="headerlink" href="#sionna.rt.RadioMap.measurement_surface" title="Link to this definition"></a></dt>
-<dd><p>Mitsuba rectangle corresponding to the
-radio map measurement plane</p>
+<dd><p>Mitsuba shape corresponding to the
+radio map measurement surface</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">mi.Shape</span></code></p>
@@ -2294,7 +2403,7 @@ radio map measurement plane</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.RadioMap.path_gain">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">path_gain</span></span><a class="headerlink" href="#sionna.rt.RadioMap.path_gain" title="Link to this definition"></a></dt>
-<dd><p>Path gains across the radio map from all transmitters</p>
+<dd><p>Path gains across the radio map from all transmitters [unitless, linear scale]</p>
 <p>The shape of the tensor depends on the subclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -2308,7 +2417,7 @@ where the specific dimensions are defined by the subclass.</p>
 <dt class="sig sig-object py" id="sionna.rt.RadioMap.rss">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rss</span></span><a class="headerlink" href="#sionna.rt.RadioMap.rss" title="Link to this definition"></a></dt>
 <dd><p>Received signal strength (RSS) across the radio map from all
-transmitters</p>
+transmitters [W]</p>
 <p>The shape of the tensor depends on the subclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -2370,7 +2479,7 @@ corresponding to the random cells</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="sionna.rt.RadioMap.sinr">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sinr</span></span><a class="headerlink" href="#sionna.rt.RadioMap.sinr" title="Link to this definition"></a></dt>
-<dd><p>SINR across the radio map from all transmitters</p>
+<dd><p>SINR across the radio map from all transmitters [unitless, linear scale]</p>
 <p>The shape of the tensor depends on the subclass.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>

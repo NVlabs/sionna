@@ -547,9 +547,9 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
 
             # Read the gain from `props`
             g = 0.0
-            if props.has_property("g"):
+            if "g" in props:
                 g = props["g"]
-                props.remove_property('g')
+                del props["g"]
             self._g = mi.Float(g)
 
             # The other parameters (`name`, `color`) are given to the
@@ -677,8 +677,7 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
         def traverse(self, callback : mi.TraversalCallback):
             # Registers the `g` parameter as a differentiable
             # parameter of the scene
-            callback.put_parameter('g', self._g,
-                                   mi.ParamFlags.Differentiable)
+            callback.put('g', self._g, mi.ParamFlags.Differentiable)
 
         def to_string(self) -> str:
             # Returns a humanly readable description of the material
@@ -909,9 +908,9 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
 
             # Read the gain from `props`
             g = 0.0
-            if props.has_property("g"):
+            if "g" in props:
                 g = props["g"]
-                props.remove_property('g')
+                del props["g"]
             self._g = mi.Float(g)
 
             # The other parameters (`name`, `color`) are given to the
@@ -1100,8 +1099,7 @@ as :class:`~sionna.rt.RadioMaterialBase` inherits from it.
         def traverse(self, callback : mi.TraversalCallback):
             # Registers the `g` parameter as a differentiable
             # parameter of the scene
-            callback.put_parameter('g', self._g,
-                                   mi.ParamFlags.Differentiable)
+            callback.put('g', self._g, mi.ParamFlags.Differentiable)
 
         def to_string(self) -> str:
             # Returns a humanly readable description of the material

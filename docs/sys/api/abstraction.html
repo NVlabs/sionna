@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PHY Abstraction &mdash; Sionna 1.1.0 documentation</title>
+  <title>PHY Abstraction &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -68,6 +68,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../rt/tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../rt/tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../rt/tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -267,6 +279,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../rt/api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -285,6 +298,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -293,6 +307,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -345,11 +360,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../rt/api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -389,6 +399,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -447,6 +458,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../rt/api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../rt/api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../rt/api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1700,7 +1713,7 @@ quality is defined as:</div>
 \[I^{\mathrm{EESM}}(x) := \exp(-x/\beta).\]</div>
 <p>Thus, the corresponding effective SINR can be expressed as:</p>
 <div class="math notranslate nohighlight" id="equation-eesm">
-<span class="eqno">(60)<a class="headerlink" href="#equation-eesm" title="Link to this equation"></a></span>\[\mathrm{SINR}_{\mathrm{eff}}^{\mathrm{EESM}} = -\beta \log \left( \frac{1}{N} \sum_{i=1}^N e^{-\mathrm{SINR}_i/\beta} \right).\]</div>
+<span class="eqno">(61)<a class="headerlink" href="#equation-eesm" title="Link to this equation"></a></span>\[\mathrm{SINR}_{\mathrm{eff}}^{\mathrm{EESM}} = -\beta \log \left( \frac{1}{N} \sum_{i=1}^N e^{-\mathrm{SINR}_i/\beta} \right).\]</div>
 <div class="line-block">
 <div class="line">In the following we outline the derivation of this expression, assuming the
 transmission of BPSK (<span class="math notranslate nohighlight">\(\pm 1\)</span>) modulated codewords <span class="math notranslate nohighlight">\(u^A\)</span> and
@@ -1722,7 +1735,7 @@ Hence, the pairwise error probability <span class="math notranslate nohighlight"
 be expressed as:</div>
 </div>
 <div class="math notranslate nohighlight" id="equation-pairwise">
-<span class="eqno">(61)<a class="headerlink" href="#equation-pairwise" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(62)<a class="headerlink" href="#equation-pairwise" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
     P^{N=1}\left(u^A \rightarrow u^B\right) = &amp; \, \Pr\left( \xi \sqrt{N_0/2} &gt;
     \sqrt{d\rho} \right), \quad \xi\sim \mathcal{N}(0,1) \\
     = &amp; \, Q\left( \sqrt{2 d \, \mathrm{SINR}} \right) \\
@@ -1744,28 +1757,28 @@ channel link 1 or
 \ell_2 \rho_2}\)</span> and the conditioned pairwise error probability equals:</div>
 </div>
 <div class="math notranslate nohighlight" id="equation-conditioned">
-<span class="eqno">(62)<a class="headerlink" href="#equation-conditioned" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(63)<a class="headerlink" href="#equation-conditioned" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
     P^{N=2}\left(u^A \rightarrow u^B | \ell_1,\ell_2\right) = &amp; \, \Pr\left( \sqrt{N_0/2} \xi &gt; \sqrt{\ell_1 \rho_1 + \ell_2 \rho_2} \right) \\
     = &amp; \, Q\left( \sqrt{2\ell_1 \, \mathrm{SINR}_1 + 2\ell_2 \, \mathrm{SINR}_2 } \right).
 \end{align}\end{split}\]</div>
 <p>To obtain the pairwise
-codeword error probability, we average expression <a class="reference internal" href="#equation-conditioned">(62)</a> across all
+codeword error probability, we average expression <a class="reference internal" href="#equation-conditioned">(63)</a> across all
 <span class="math notranslate nohighlight">\((\ell_1, \ell_2)\)</span> events:</p>
 <div class="math notranslate nohighlight" id="equation-n2">
-<span class="eqno">(63)<a class="headerlink" href="#equation-n2" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(64)<a class="headerlink" href="#equation-n2" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
     P^{N=2}\left(u^A \rightarrow u^B\right) &amp; \, = \sum_{\ell=0}^d {d \choose \ell} p_1^{\ell} \, p_2^{d-\ell} \, P^{N=2}\left(u^A \rightarrow u^B | \ell_1=\ell,\ell_2=d-\ell\right) \\
     \le &amp; \, \sum_{\ell=0}^d {d \choose \ell} \left(p_1 e^{-\mathrm{SINR}_1}\right)^\ell \left( p_2 e^{-\mathrm{SINR}_2} \right)^{d-\ell} \\
     = &amp; \, \left( p_1 e^{-\mathrm{SINR}_1}  + p_2 e^{-\mathrm{SINR}_2}\right)^d
 \end{align}\end{split}\]</div>
 <p>where the inequality stems again from the Chernoff bound.</p>
-<p><strong>Multi-link channel.</strong> Expression <a class="reference internal" href="#equation-n2">(63)</a> extends to a multi-link channel
+<p><strong>Multi-link channel.</strong> Expression <a class="reference internal" href="#equation-n2">(64)</a> extends to a multi-link channel
 (<span class="math notranslate nohighlight">\(N\ge 2\)</span>) as follows:</p>
 <div class="math notranslate nohighlight" id="equation-pr-multistate">
-<span class="eqno">(64)<a class="headerlink" href="#equation-pr-multistate" title="Link to this equation"></a></span>\[\begin{align}
+<span class="eqno">(65)<a class="headerlink" href="#equation-pr-multistate" title="Link to this equation"></a></span>\[\begin{align}
     P^{N}\left(u^A \rightarrow u^B\right) \le \, \left( \sum_{i=1}^N p_i e^{-\mathrm{SINR}_i} \right)^d.
 \end{align}\]</div>
-<p><strong>EESM expression.</strong> By equating the multi-link pairwise error probability bound <a class="reference internal" href="#equation-pr-multistate">(64)</a> with
-the analogous single-link expression <a class="reference internal" href="#equation-pairwise">(61)</a>, we recognize that the
+<p><strong>EESM expression.</strong> By equating the multi-link pairwise error probability bound <a class="reference internal" href="#equation-pr-multistate">(65)</a> with
+the analogous single-link expression <a class="reference internal" href="#equation-pairwise">(62)</a>, we recognize that the
 multi-link channel is analogous to a single-link channel with SINR:</p>
 <div class="math notranslate nohighlight">
 \[\mathrm{SINR}_{\mathrm{eff}}^{\mathrm{EESM}} := -\log \left( \sum_{i=1}^N p_i e^{-\mathrm{SINR}_i} \right)\]</div>
@@ -1773,9 +1786,9 @@ multi-link channel is analogous to a single-link channel with SINR:</p>
 <div class="line">where <span class="math notranslate nohighlight">\(\mathrm{SINR}_{\mathrm{eff}}^{\mathrm{EESM}}\)</span> is the <em>effective</em> SINR for the
 multi-link channel under the EESM model.</div>
 <div class="line">If we further assume that all links are equiprobable, i.e., <span class="math notranslate nohighlight">\(p_i=1/N\)</span>
-for all <span class="math notranslate nohighlight">\(i\)</span>, then we obtain expression <a class="reference internal" href="#equation-eesm">(60)</a> with <span class="math notranslate nohighlight">\(\beta=1\)</span>.</div>
+for all <span class="math notranslate nohighlight">\(i\)</span>, then we obtain expression <a class="reference internal" href="#equation-eesm">(61)</a> with <span class="math notranslate nohighlight">\(\beta=1\)</span>.</div>
 </div>
-<p>Note that the introduction of parameter <span class="math notranslate nohighlight">\(\beta\)</span> in <a class="reference internal" href="#equation-eesm">(60)</a> is useful
+<p>Note that the introduction of parameter <span class="math notranslate nohighlight">\(\beta\)</span> in <a class="reference internal" href="#equation-eesm">(61)</a> is useful
 to adapt the EESM formula to different modulation and coding schemes (MCS),
 since the argument above holds for BPSK modulation only. Hence, <span class="math notranslate nohighlight">\(\beta\)</span> shall
 depend on the used MCS, as shown in <a class="reference internal" href="#glena" id="id1"><span>[5GLENA]</span></a>.</p>

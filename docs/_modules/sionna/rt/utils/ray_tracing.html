@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.utils.ray_tracing &mdash; Sionna 1.1.0 documentation</title>
+  <title>sionna.rt.utils.ray_tracing &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -262,6 +274,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -280,6 +293,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -288,6 +302,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -340,11 +355,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -384,6 +394,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -442,6 +453,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1654,11 +1667,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">EPSILON_FLOAT</span>
-
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">rotate_vector_around_axis</span><span class="p">,</span>\
+    <span class="n">theta_phi_from_unit_vec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils.wedges</span><span class="w"> </span><span class="kn">import</span> <span class="n">wedge_interior_angle</span>
 
 <div class="viewcode-block" id="fibonacci_lattice">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.fibonacci_lattice">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">fibonacci_lattice</span><span class="p">(</span><span class="n">num_points</span> <span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point2f</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fibonacci_lattice</span><span class="p">(</span><span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point2f</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates a Fibonacci lattice of size ``num_points`` on the unit square</span>
 <span class="sd">    :math:`[0, 1] \times [0, 1]`</span>
@@ -1679,9 +1694,9 @@
 <div class="viewcode-block" id="spawn_ray_from_sources">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.spawn_ray_from_sources">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">spawn_ray_from_sources</span><span class="p">(</span>
-    <span class="n">lattice</span> <span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point2f</span><span class="p">],</span>
-    <span class="n">samples_per_src</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">src_positions</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span>
+    <span class="n">lattice</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point2f</span><span class="p">],</span>
+    <span class="n">samples_per_src</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">src_positions</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Ray3f</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spawns ``samples_per_src`` rays for each source at the positions specified</span>
@@ -1719,7 +1734,7 @@
 
 <div class="viewcode-block" id="offset_p">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.offset_p">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">offset_p</span><span class="p">(</span><span class="n">p</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">d</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">n</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">offset_p</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">:</span>
     <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds a small offset to :math:`\mathbf{p}` along :math:`\mathbf{n}` such that</span>
@@ -1747,9 +1762,9 @@
 <div class="viewcode-block" id="spawn_ray_towards">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.spawn_ray_towards">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">spawn_ray_towards</span><span class="p">(</span>
-    <span class="n">p</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
-    <span class="n">t</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
-    <span class="n">n</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+    <span class="n">t</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+    <span class="n">n</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Ray3f</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spawns a ray with infinite length from :math:`\mathbf{p}` toward</span>
@@ -1773,15 +1788,18 @@
     <span class="n">d</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">po</span><span class="p">)</span>
     <span class="c1">#</span>
     <span class="n">ray</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Ray3f</span><span class="p">(</span><span class="n">po</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+    <span class="c1"># Small optimization to avoid loop retracing due to size mismatch.</span>
+    <span class="c1"># This is still a literal.</span>
+    <span class="n">ray</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">d</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">ray</span></div>
 
 
 <div class="viewcode-block" id="spawn_ray_to">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.spawn_ray_to">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">spawn_ray_to</span><span class="p">(</span>
-    <span class="n">p</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
-    <span class="n">t</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
-    <span class="n">n</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">p</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+    <span class="n">t</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+    <span class="n">n</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Ray3f</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spawns a finite ray from :math:`\mathbf{p}` to :math:`\mathbf{t}`</span>
@@ -1809,8 +1827,136 @@
     <span class="n">maxt</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">EPSILON_FLOAT</span><span class="p">)</span>
     <span class="c1">#</span>
     <span class="n">ray</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Ray3f</span><span class="p">(</span><span class="n">po</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span>  <span class="n">maxt</span><span class="o">=</span><span class="n">maxt</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">wavelengths</span><span class="o">=</span><span class="n">mi</span><span class="o">.</span><span class="n">Color0f</span><span class="p">())</span>
+    <span class="c1"># Small optimization to avoid loop retracing due to size mismatch.</span>
+    <span class="c1"># This is still a literal.</span>
+    <span class="n">ray</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">ray</span><span class="o">.</span><span class="n">d</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">ray</span></div>
 
+
+<span class="k">def</span><span class="w"> </span><span class="nf">first_order_diffraction_point</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                  <span class="n">t</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                  <span class="n">o</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                  <span class="n">zeta</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the scalar the diffraction point on an edge for a</span>
+<span class="sd">    single-order diffracted path connecting a source and a target</span>
+
+<span class="sd">    This function determines the parameter :math:`x` that defines the position</span>
+<span class="sd">    on an edge where diffraction occurs for a ray path from source</span>
+<span class="sd">    :math:`\mathbf{s}` to target :math:`\mathbf{t}`. The edge is parameterized</span>
+<span class="sd">    as :math:`\mathbf{o} + x \boldsymbol{\zeta}`, where :math:`\mathbf{o}` is</span>
+<span class="sd">    the edge origin and :math:`\boldsymbol{\zeta}` is the normalized direction</span>
+<span class="sd">    vector.</span>
+
+
+<span class="sd">    :param s: Source position :math:`\mathbf{s}`</span>
+<span class="sd">    :param t: Target position :math:`\mathbf{t}`</span>
+<span class="sd">    :param o: Origin point of the edge :math:`\mathbf{o}`</span>
+<span class="sd">    :param zeta: Normalized direction vector of the edge :math:`\boldsymbol{\zeta}`</span>
+
+<span class="sd">    :return: Parameter :math:`x` defining the diffraction point position</span>
+<span class="sd">        :math:`\mathbf{o} + x \boldsymbol{\zeta}` on the edge</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## Use edge origin as reference point</span>
+    <span class="n">to</span> <span class="o">=</span> <span class="n">t</span> <span class="o">-</span> <span class="n">o</span>
+    <span class="n">so</span> <span class="o">=</span> <span class="n">s</span> <span class="o">-</span> <span class="n">o</span>
+
+    <span class="c1">## Projection of the source and target on the edge</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">zeta</span><span class="p">)</span><span class="o">*</span><span class="n">zeta</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">zeta</span><span class="p">)</span><span class="o">*</span><span class="n">zeta</span>
+
+    <span class="c1">## Rotate the target around the edge to be coplanar</span>
+    <span class="c1">## with the source and the edge</span>
+
+    <span class="c1"># Angle of rotation</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">to</span> <span class="o">-</span> <span class="n">tp</span><span class="p">)</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">so</span> <span class="o">-</span> <span class="n">sp</span><span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">dr</span><span class="o">.</span><span class="n">safe_acos</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v1</span><span class="p">,</span> <span class="n">v2</span><span class="p">))</span>
+
+    <span class="c1"># Axis of rotation</span>
+    <span class="n">rot_axis</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">so</span> <span class="o">-</span> <span class="n">sp</span><span class="p">,</span> <span class="n">to</span> <span class="o">-</span> <span class="n">tp</span><span class="p">)</span>
+    <span class="n">rot_axis_norm</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rot_axis</span><span class="p">)</span>
+    <span class="n">rot_axis</span> <span class="o">*=</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">rot_axis_norm</span><span class="p">)</span>
+    <span class="n">rot_axis</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">rot_axis_norm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">rot_axis</span><span class="p">,</span> <span class="n">zeta</span><span class="p">)</span>
+
+    <span class="c1"># Apply the rotation</span>
+    <span class="n">tc</span> <span class="o">=</span> <span class="n">rotate_vector_around_axis</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">rot_axis</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="c1">## Compute the diffraction point</span>
+
+    <span class="n">u0</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">tc</span> <span class="o">-</span> <span class="n">so</span><span class="p">)</span>
+    <span class="n">u1</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">so</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">u2</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">zeta</span><span class="p">,</span> <span class="n">u0</span><span class="p">)</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u1</span><span class="p">,</span> <span class="n">u2</span><span class="p">))</span>
+
+    <span class="c1"># Position of the diffraction point on the edge</span>
+    <span class="c1"># relative to the edge origin</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">sign</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u1</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u2</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">x</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_keller_cone</span><span class="p">(</span><span class="n">e_hat</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                       <span class="n">n0</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                       <span class="n">nn</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                       <span class="n">sample</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
+                       <span class="n">ki</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                       <span class="n">lit_region</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Samples a direction on the Keller cone for diffraction</span>
+
+<span class="sd">    This function samples a diffracted ray direction on the Keller cone.</span>
+<span class="sd">    The Keller cone is such that the angle between the diffracted rays and</span>
+<span class="sd">    the edge direction is equal to the angle between the incident ray and</span>
+<span class="sd">    the edge direction.</span>
+
+<span class="sd">    :param e_hat: Normalized edge direction vector</span>
+<span class="sd">    :param n0: Normal to the 0-face</span>
+<span class="sd">    :param nn: Normal to the n-face</span>
+<span class="sd">    :param sample: Random sample in [0, 1) used for sampling the Keller cone</span>
+<span class="sd">    :param ki: Incident ray direction</span>
+<span class="sd">    :param lit_region: If set to `True`, then the lit region is sampled.</span>
+<span class="sd">        If set to `False`, then only the shadow region is sampled.</span>
+
+<span class="sd">    :return: Normalized direction vector of the diffracted ray in the</span>
+<span class="sd">        local coordinate system</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Local coordinate system (t0, n0, e_fwd), where</span>
+    <span class="c1"># e_fwd is the edge direction oriented in the direction</span>
+    <span class="c1"># of the incident ray</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">n0</span><span class="p">,</span> <span class="n">e_hat</span><span class="p">))</span>
+    <span class="n">e_fwd</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">e_hat</span><span class="p">,</span> <span class="n">ki</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+                      <span class="n">e_hat</span><span class="p">,</span> <span class="o">-</span><span class="n">e_hat</span><span class="p">)</span>
+
+    <span class="c1"># k_i in local coordinate system</span>
+    <span class="n">ki_local</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ki</span><span class="p">,</span> <span class="n">t0</span><span class="p">),</span>
+                           <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ki</span><span class="p">,</span> <span class="n">n0</span><span class="p">),</span>
+                           <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ki</span><span class="p">,</span> <span class="n">e_fwd</span><span class="p">))</span>
+
+    <span class="n">beta0</span><span class="p">,</span> <span class="n">phi_i</span> <span class="o">=</span> <span class="n">theta_phi_from_unit_vec</span><span class="p">(</span><span class="n">ki_local</span><span class="p">)</span>
+
+    <span class="c1"># Read the wedge opening angle</span>
+    <span class="n">wedge_angle</span> <span class="o">=</span> <span class="n">wedge_interior_angle</span><span class="p">(</span><span class="n">n0</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
+
+    <span class="c1"># Sample an angle on the Keller cone</span>
+    <span class="k">if</span> <span class="n">lit_region</span><span class="p">:</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">sample</span> <span class="o">*</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span> <span class="o">-</span> <span class="n">wedge_angle</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Ensures that phi_i is in [0, 2*pi]</span>
+        <span class="n">phi_i</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">phi_i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">phi_i</span> <span class="o">+</span> <span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span><span class="p">,</span> <span class="n">phi_i</span><span class="p">)</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">phi_i</span> <span class="o">+</span> <span class="n">sample</span> <span class="o">*</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span> <span class="o">-</span> <span class="n">wedge_angle</span> <span class="o">-</span> <span class="n">phi_i</span><span class="p">)</span>
+
+
+    <span class="c1"># Direction of propagation of diffracted ray</span>
+    <span class="n">sin_beta0</span><span class="p">,</span> <span class="n">cos_beta0</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sincos</span><span class="p">(</span><span class="n">beta0</span><span class="p">)</span>
+    <span class="n">sin_phi</span><span class="p">,</span> <span class="n">cos_phi</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sincos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">k_diffr</span> <span class="o">=</span> <span class="n">sin_phi</span><span class="o">*</span><span class="n">sin_beta0</span><span class="o">*</span><span class="n">n0</span> \
+        <span class="o">+</span> <span class="n">cos_phi</span><span class="o">*</span><span class="n">sin_beta0</span><span class="o">*</span><span class="n">t0</span> \
+        <span class="o">+</span> <span class="n">cos_beta0</span><span class="o">*</span><span class="n">e_fwd</span>
+
+    <span class="k">return</span> <span class="n">k_diffr</span>
 </pre></div>
 
            </div>

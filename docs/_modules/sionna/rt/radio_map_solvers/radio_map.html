@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.radio_map_solvers.radio_map &mdash; Sionna 1.1.0 documentation</title>
+  <title>sionna.rt.radio_map_solvers.radio_map &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -262,6 +274,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -280,6 +293,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -288,6 +302,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -340,11 +355,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -384,6 +394,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -442,6 +453,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1658,6 +1671,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">watt_to_dbm</span><span class="p">,</span> <span class="n">log10</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">WedgeGeometry</span><span class="p">,</span> <span class="n">theta_phi_from_unit_vec</span>
 
 
 <div class="viewcode-block" id="RadioMap">
@@ -1673,36 +1687,27 @@
 <span class="sd">    :param scene: Scene for which the radio map is computed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span> <span class="p">:</span> <span class="n">Scene</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_thermal_noise_power</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">thermal_noise_power</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span>
 
         <span class="c1"># Positions of the transmitters</span>
-        <span class="n">tx_positions_x</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-        <span class="n">tx_positions_y</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-        <span class="n">tx_positions_z</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tx_positions</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="n">tx_positions_x</span><span class="p">,</span>
-                                        <span class="n">tx_positions_y</span><span class="p">,</span>
-                                        <span class="n">tx_positions_z</span><span class="p">)</span>
+        <span class="n">transmitters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tx_positions</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">transmitters</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">transmitters</span><span class="p">],</span>
+            <span class="p">[</span><span class="n">tx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">transmitters</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># Powers of the transmitters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tx_powers</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                    <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">transmitters</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tx_powers</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">tx</span><span class="o">.</span><span class="n">power</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">tx</span> <span class="ow">in</span> <span class="n">transmitters</span><span class="p">])</span>
 
         <span class="c1"># Positions of the receivers</span>
-        <span class="n">rx_positions_x</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">for</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">receivers</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-        <span class="n">rx_positions_y</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">for</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">receivers</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-        <span class="n">rx_positions_z</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">([</span><span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                                <span class="k">for</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">receivers</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_rx_positions</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="n">rx_positions_x</span><span class="p">,</span>
-                                        <span class="n">rx_positions_y</span><span class="p">,</span>
-                                        <span class="n">rx_positions_z</span><span class="p">)</span>
+        <span class="n">receivers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">receivers</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rx_positions</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">([</span><span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">receivers</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">receivers</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="n">rx</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rx</span> <span class="ow">in</span> <span class="n">receivers</span><span class="p">])</span>
 
         <span class="c1"># Sampler used to randomly sample user positions using</span>
         <span class="c1"># sample_positions()</span>
@@ -1711,8 +1716,8 @@
     <span class="nd">@property</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">measurement_surface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mitsuba rectangle corresponding to the</span>
-<span class="sd">        radio map measurement plane</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Mitsuba shape corresponding to the</span>
+<span class="sd">        radio map measurement surface</span>
 
 <span class="sd">        :type: :py:class:`mi.Shape`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1756,7 +1761,8 @@
     <span class="nd">@property</span>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">path_gain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Path gains across the radio map from all transmitters</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Path gains across the radio map from all transmitters [unitless, linear scale]</span>
 
 <span class="sd">        The shape of the tensor depends on the subclass.</span>
 
@@ -1765,45 +1771,61 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;RadioMap is an abstract class&quot;</span><span class="p">)</span>
 
+<div class="viewcode-block" id="RadioMap.add_paths">
+<a class="viewcode-back" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.add_paths">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_paths</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">e_fields</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">,</span>
-        <span class="n">solid_angle</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
-        <span class="n">array_w</span> <span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">],</span>
-        <span class="n">si_mp</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">SurfaceInteraction3f</span><span class="p">,</span>
-        <span class="n">k_world</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
-        <span class="n">tx_indices</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
-        <span class="n">hit</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Bool</span>
-        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">e_fields</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">,</span>
+        <span class="n">array_w</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">],</span>
+        <span class="n">si</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">SurfaceInteraction3f</span><span class="p">,</span>
+        <span class="n">k_world</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+        <span class="n">tx_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+        <span class="n">active</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Bool</span><span class="p">,</span>
+        <span class="n">diffracted_paths</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">solid_angle</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tx_positions</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">wedges</span><span class="p">:</span> <span class="n">WedgeGeometry</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">diff_point</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">wedges_samples_cnt</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Adds the contribution of the rays that hit the measurement plane to the</span>
-<span class="sd">        radio maps</span>
+<span class="sd">        Adds the contribution of the paths that hit the measurement surface</span>
+<span class="sd">        to the radio maps</span>
 
 <span class="sd">        The radio maps are updated in place.</span>
 
 <span class="sd">        :param e_fields: Electric fields as real-valued vectors of dimension 4</span>
-<span class="sd">        :param solid_angle: Ray tubes solid angles [sr]</span>
 <span class="sd">        :param array_w: Weighting used to model the effect of the transmitter</span>
 <span class="sd">            array</span>
-<span class="sd">        :param si_mp: Informations about the interaction with the measurement</span>
-<span class="sd">            plane</span>
-<span class="sd">        :param k_world: Directions of propagation of the rays</span>
-<span class="sd">        :param tx_indices: Indices of the transmitters from which the rays</span>
-<span class="sd">            originate</span>
-<span class="sd">        :param hit: Flags indicating if the rays hit the measurement plane</span>
+<span class="sd">        :param si: Informations about the interaction with the measurement</span>
+<span class="sd">            surface</span>
+<span class="sd">        :param k_world: Directions of propagation of the incident paths</span>
+<span class="sd">        :param tx_indices: Indices of the transmitters from which the rays originate</span>
+<span class="sd">        :param active: Flags indicating if the paths should be added to the radio map</span>
+<span class="sd">        :param diffracted_paths: Flags indicating if the paths are diffracted</span>
+<span class="sd">        :param solid_angle: Ray tubes solid angles [sr] for non-diffracted paths.</span>
+<span class="sd">            Not required for diffracted paths.</span>
+<span class="sd">        :param tx_positions: Positions of the transmitters</span>
+<span class="sd">        :param wedges: Properties of the intersected wedges.</span>
+<span class="sd">            Not required for non-diffracted paths.</span>
+<span class="sd">        :param diff_point: Position of the diffraction point on the wedge.</span>
+<span class="sd">            Not required for non-diffracted paths.</span>
+<span class="sd">        :param wedges_samples_cnt: Number of samples on the wedge.</span>
+<span class="sd">            Not required for non-diffracted paths.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;RadioMap is an abstract class&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;RadioMap is an abstract class&quot;</span><span class="p">)</span></div>
+
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Finalizes the computation of the radio map&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;RadioMap is an abstract class&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Received signal strength (RSS) across the radio map from all</span>
-<span class="sd">        transmitters</span>
+<span class="sd">        transmitters [W]</span>
 
 <span class="sd">        The shape of the tensor depends on the subclass.</span>
 
@@ -1818,7 +1840,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sinr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;SINR across the radio map from all transmitters</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;SINR across the radio map from all transmitters [unitless, linear scale]</span>
 
 <span class="sd">        The shape of the tensor depends on the subclass.</span>
 
@@ -1846,7 +1869,7 @@
 
 <div class="viewcode-block" id="RadioMap.tx_association">
 <a class="viewcode-back" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.tx_association">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">tx_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">TensorXi</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tx_association</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">TensorXi</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes cell-to-transmitter association.</span>
 
 <span class="sd">        Each cell is associated with the transmitter providing the highest</span>
@@ -1889,14 +1912,14 @@
 <a class="viewcode-back" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.sample_cells">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_cells</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">num_cells</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
-        <span class="n">min_val_db</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">max_val_db</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">min_dist</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">max_dist</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">tx_association</span> <span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">seed</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">num_cells</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
+        <span class="n">min_val_db</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_val_db</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_dist</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_dist</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tx_association</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">TensorXu</span><span class="p">]:</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Samples random cells in a radio map</span>
@@ -2059,9 +2082,9 @@
 <a class="viewcode-back" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cdf">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cdf</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
-        <span class="n">tx</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">bins</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
+        <span class="n">tx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">TensorXf</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes and visualizes the CDF of a metric of the radio map</span>
 
@@ -2147,8 +2170,8 @@
 <a class="viewcode-back" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.transmitter_radio_map">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">transmitter_radio_map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
-        <span class="n">tx</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
+        <span class="n">tx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">TensorXf</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the radio map values corresponding to transmitter ``tx``</span>
 <span class="sd">        and a specific ``metric``</span>
@@ -2171,13 +2194,111 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">elif</span> <span class="p">(</span><span class="n">tx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_tx</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid transmitter index </span><span class="si">{</span><span class="n">tx</span><span class="si">}</span><span class="s2">, expected &quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot;index in range [0, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_tx</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+                               <span class="sa">f</span><span class="s2">&quot;index in range [0, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_tx</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
             <span class="n">tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">[</span><span class="n">tx</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tensor</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">tensor</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_diffraction_integration_weight</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">wedges</span><span class="p">:</span> <span class="n">WedgeGeometry</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+        <span class="n">k_world</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+        <span class="n">si</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">SurfaceInteraction3f</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">:</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the diffraction integration weight required for computing</span>
+<span class="sd">        the radio map contribution from diffracted rays</span>
+
+<span class="sd">        This weight is used to integrate the observed electric field over the</span>
+<span class="sd">        cell surface by performing a change of variables from the cell surface</span>
+<span class="sd">        coordinates to the position of the diffraction point on the edge and the</span>
+<span class="sd">        angle of the diffracted ray on the Keller cone. This transformation</span>
+<span class="sd">        enables efficient surface integration for diffracted field contributions.</span>
+
+<span class="sd">        :param wedges: Wedge geometry information containing edge and surface</span>
+<span class="sd">            properties</span>
+<span class="sd">        :param source: Position of the source point from which the ray originates</span>
+<span class="sd">        :param q: Position of the observation point on the measurement surface</span>
+<span class="sd">        :param k_world: Direction of propagation of the diffracted ray in world</span>
+<span class="sd">            coordinates</span>
+<span class="sd">        :param si: Surface interaction information at the measurement point</span>
+
+<span class="sd">        :return: Weight for the surface integral transformation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The edge local basis is defined as (t0, n0, e_hat)</span>
+        <span class="n">n0</span> <span class="o">=</span> <span class="n">wedges</span><span class="o">.</span><span class="n">n0</span>
+        <span class="n">e_hat</span> <span class="o">=</span> <span class="n">wedges</span><span class="o">.</span><span class="n">e_hat</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">n0</span><span class="p">,</span> <span class="n">e_hat</span><span class="p">))</span>
+        <span class="c1"># Wedge origin</span>
+        <span class="n">wedge_o</span> <span class="o">=</span> <span class="n">wedges</span><span class="o">.</span><span class="n">o</span>
+
+        <span class="c1"># Change-of-basis matrix from the local edge basis to the world basis</span>
+        <span class="n">rot_edge2world</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix3f</span><span class="p">(</span>
+            <span class="n">t0</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">n0</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">e_hat</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">t0</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">n0</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">e_hat</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">t0</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">n0</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">e_hat</span><span class="o">.</span><span class="n">z</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Angle of the diffracted ray on the Keller cone</span>
+        <span class="n">k_local</span> <span class="o">=</span> <span class="n">rot_edge2world</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">k_world</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">theta_phi_from_unit_vec</span><span class="p">(</span><span class="n">k_local</span><span class="p">)</span>
+        <span class="c1"># Enable gradient tracking for phi</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+
+        <span class="c1"># Position of the diffraction point on the edge</span>
+        <span class="n">ell</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="n">wedge_o</span><span class="p">)</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">(</span><span class="n">ell</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_compute_s</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ell</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">si</span><span class="p">):</span>
+
+            <span class="c1"># Project the source on the edge and computes</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">source</span> <span class="o">-</span> <span class="n">wedge_o</span><span class="p">,</span> <span class="n">e_hat</span><span class="p">)</span>
+            <span class="n">source_proj</span> <span class="o">=</span> <span class="n">wedge_o</span> <span class="o">+</span> <span class="n">w</span> <span class="o">*</span> <span class="n">e_hat</span>
+
+            <span class="c1"># Compute sin(theta) and cos(theta), where theta is the Keller cone angle</span>
+            <span class="c1"># To get the gradients with respect to `ell` and `phi`</span>
+            <span class="c1"># (angle of diffracted ray on the Keller cone),</span>
+            <span class="c1"># we need to express these sine and cosin as a function of these two parameters.</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">source</span> <span class="o">-</span> <span class="n">wedge_o</span>
+            <span class="n">nrm</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ell</span><span class="o">*</span><span class="n">e_hat</span> <span class="o">-</span> <span class="n">v</span><span class="p">)</span>
+            <span class="n">sin_theta</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">source</span> <span class="o">-</span> <span class="n">source_proj</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">nrm</span><span class="p">)</span>
+            <span class="n">cos_theta</span> <span class="o">=</span> <span class="p">(</span><span class="n">ell</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">nrm</span><span class="p">)</span>
+
+            <span class="c1"># Direction of departure of diffracted ray in the local edge basis</span>
+            <span class="n">d_local</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span>
+                <span class="n">sin_theta</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+                <span class="n">sin_theta</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+                <span class="n">cos_theta</span>
+            <span class="p">)</span>
+            <span class="c1"># Direction of departure of diffracted ray in the world basis</span>
+            <span class="n">d_world</span> <span class="o">=</span> <span class="n">rot_edge2world</span> <span class="o">@</span> <span class="n">d_local</span>
+
+            <span class="c1"># Positon of the intersection point</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">p</span> <span class="o">-</span> <span class="n">wedge_o</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="n">wedge_o</span> <span class="o">+</span> <span class="n">ell</span> <span class="o">*</span> <span class="n">e_hat</span> <span class="o">+</span>
+                 <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">u</span> <span class="o">-</span> <span class="n">ell</span><span class="o">*</span><span class="n">e_hat</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">d_world</span><span class="p">))</span><span class="o">*</span><span class="n">d_world</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">s</span>
+
+        <span class="k">with</span> <span class="n">dr</span><span class="o">.</span><span class="n">suspend_grad</span><span class="p">(</span><span class="n">phi</span><span class="p">):</span>
+            <span class="n">s_wrt_ell</span> <span class="o">=</span> <span class="n">_compute_s</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ell</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">si</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">dr</span><span class="o">.</span><span class="n">suspend_grad</span><span class="p">(</span><span class="n">ell</span><span class="p">):</span>
+            <span class="n">s_wrt_phi</span> <span class="o">=</span> <span class="n">_compute_s</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">ell</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">si</span><span class="p">)</span>
+
+        <span class="n">dr</span><span class="o">.</span><span class="n">set_grad</span><span class="p">(</span><span class="n">ell</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">set_grad</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">ADMode</span><span class="o">.</span><span class="n">Forward</span><span class="p">,</span> <span class="n">ell</span><span class="p">)</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">ADMode</span><span class="o">.</span><span class="n">Forward</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">ADMode</span><span class="o">.</span><span class="n">Forward</span><span class="p">)</span>
+
+        <span class="n">j_ell</span> <span class="o">=</span> <span class="n">s_wrt_ell</span><span class="o">.</span><span class="n">grad</span>
+        <span class="n">j_phi</span> <span class="o">=</span> <span class="n">s_wrt_phi</span><span class="o">.</span><span class="n">grad</span>
+        <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">j_phi</span><span class="p">,</span> <span class="n">j_ell</span><span class="p">))</span></div>
 
 </pre></div>
 

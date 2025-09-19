@@ -126,10 +126,6 @@ Moreover, by default, the scattering coefficient, :math:`S`, of these materials 
 .. autoclass:: sionna.rt.ITURadioMaterial
     :members:
 
-.. autoclass:: sionna.rt.HolderMaterial
-    :members:
-    :exclude-members: sample,eval,pdf,eval_pdf,eval_diffuse_reflectance,eval_null_transmission,has_attribute,eval_attribute,eval_attribute_1,eval_attribute_3,traverse,parameters_changed
-
 
 Scattering Patterns
 -------------------

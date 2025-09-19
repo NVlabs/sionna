@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.utils.electromagnetics &mdash; Sionna 1.1.0 documentation</title>
+  <title>sionna.rt.utils.electromagnetics &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rt/tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -262,6 +274,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rt/api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -280,6 +293,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -288,6 +302,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -340,11 +355,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -384,6 +394,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -442,6 +453,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rt/api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../rt/api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1655,14 +1668,15 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">epsilon_0</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.misc</span><span class="w"> </span><span class="kn">import</span> <span class="n">complex_sqrt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.complex</span><span class="w"> </span><span class="kn">import</span> <span class="n">cpx_mul</span>
 
 
 <div class="viewcode-block" id="complex_relative_permittivity">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.complex_relative_permittivity">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">complex_relative_permittivity</span><span class="p">(</span>
-    <span class="n">eta_r</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
-    <span class="n">sigma</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
-    <span class="n">omega</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span>
+    <span class="n">eta_r</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
+    <span class="n">sigma</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
+    <span class="n">omega</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the complex relative permittivity of a material</span>
@@ -1681,8 +1695,8 @@
 <div class="viewcode-block" id="fresnel_reflection_coefficients_simplified">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fresnel_reflection_coefficients_simplified</span><span class="p">(</span>
-    <span class="n">cos_theta</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
-    <span class="n">eta</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span>
+    <span class="n">cos_theta</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
+    <span class="n">eta</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">]:</span>
     <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -1710,10 +1724,10 @@
 <div class="viewcode-block" id="itu_coefficients_single_layer_slab">
 <a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">itu_coefficients_single_layer_slab</span><span class="p">(</span>
-    <span class="n">cos_theta</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
-    <span class="n">eta</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">,</span>
-    <span class="n">d</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
-    <span class="n">wavelength</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span>
+    <span class="n">cos_theta</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
+    <span class="n">eta</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">,</span>
+    <span class="n">d</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
+    <span class="n">wavelength</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">]:</span>
     <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -1762,6 +1776,250 @@
     <span class="n">t_tm</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">r_tm_p_sqr</span><span class="p">)</span><span class="o">*</span><span class="n">exp_j_q</span><span class="o">*</span><span class="n">inv_denom_tm</span>
 
     <span class="k">return</span> <span class="n">r_te</span><span class="p">,</span> <span class="n">r_tm</span><span class="p">,</span> <span class="n">t_te</span><span class="p">,</span> <span class="n">t_tm</span></div>
+
+
+<div class="viewcode-block" id="fresnel">
+<a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.fresnel">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fresnel</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the complex-valued Fresnel integral</span>
+
+<span class="sd">    The complex-valued Fresnel integral is defined as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        :label: fresnel_integral</span>
+
+<span class="sd">        F_c(x) = \int_0^{\sqrt{\frac{2x}{\pi}}} \exp\left(j\frac{\pi s^2}{2}\right)ds = C(x) + jS(x)</span>
+
+<span class="sd">    This function computes an approximation of this integral as described in</span>
+<span class="sd">    Section 2.7 of [ITU_R_P_526_15]_. It has sufficient accuracy for most</span>
+<span class="sd">    purposes. Note that we let the upper limit of the integral be</span>
+<span class="sd">    :math:`\sqrt{2x/\pi}` instead of :math:`x`, which is different from the definition</span>
+<span class="sd">    in [ITU_R_P_526_15]_. Thus, evaluating :math:`F_c(x)` corresponds to</span>
+<span class="sd">    :math:`F_c(\sqrt{2x/\pi})` in the classical definition.</span>
+
+<span class="sd">    :param x: Argument of the Fresnel integral</span>
+
+<span class="sd">    :return: Complex-valued Fresnel integral</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Define Boersma coefficients</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">+</span><span class="mf">1.595769140</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.000001702</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">6.808568854</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.000576361</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">6.920691902</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.016898657</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">3.050485660</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.075752419</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.850663781</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.025639041</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.150230960</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.034404779</span>
+    <span class="p">]</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">-</span><span class="mf">0.000000033</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">4.255387524</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.000092810</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">7.780020400</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.009520895</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">5.075161298</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.138341947</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">1.363729124</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.403349276</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.702222016</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.216195929</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.019547031</span>
+    <span class="p">]</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">+</span><span class="mf">0.000000000</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.024933975</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000003936</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.005770956</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000689892</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.009497136</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.011948809</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.006748873</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000246420</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.002102967</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.001217930</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000233939</span>
+    <span class="p">]</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="o">+</span><span class="mf">0.199471140</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000000023</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.009351341</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000023006</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.004851466</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.001903218</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.017122914</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.029064067</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.027928955</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.016497308</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.005598515</span><span class="p">,</span>
+        <span class="o">+</span><span class="mf">0.000838386</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Only consider positive arguments of nu due to symmetry</span>
+    <span class="c1"># See Eq. (10a,10b)</span>
+    <span class="n">x_pos</span> <span class="o">=</span> <span class="n">x</span><span class="o">&gt;</span><span class="mi">0</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Eq. (8a, 8b)</span>
+    <span class="c1"># We treat both cases simultaneously by using a single argument</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">4</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">x</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="c1"># Unrolling the loop evaluation of a polynomial speeds up the computation</span>
+    <span class="n">r_part</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i_part</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">arg_pow_n</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">9</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">9</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_pow_n</span> <span class="o">*=</span> <span class="n">arg</span>
+    <span class="n">r_part</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+    <span class="n">i_part</span> <span class="o">-=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">11</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="mi">11</span><span class="p">])</span> <span class="o">*</span> <span class="n">arg_pow_n</span>
+
+    <span class="n">arg_sqrt</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">r_part</span> <span class="o">*=</span> <span class="n">arg_sqrt</span>
+    <span class="n">i_part</span> <span class="o">*=</span> <span class="n">arg_sqrt</span>
+
+    <span class="n">sin_arg</span><span class="p">,</span> <span class="n">cos_arg</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sincos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">f_r</span><span class="p">,</span> <span class="n">f_i</span> <span class="o">=</span> <span class="n">cpx_mul</span><span class="p">([</span><span class="n">cos_arg</span><span class="p">,</span> <span class="n">sin_arg</span><span class="p">],</span> <span class="p">[</span><span class="n">r_part</span><span class="p">,</span> <span class="n">i_part</span><span class="p">])</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">f_r</span><span class="p">,</span> <span class="n">f_r</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">f_i</span><span class="p">,</span> <span class="n">f_i</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="c1"># Change sign if needed</span>
+    <span class="c1">#  Eq. (10a,10b)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="f_utd">
+<a class="viewcode-back" href="../../../../rt/api/utils.html#sionna.rt.utils.f_utd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">f_utd</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the UTD transition function</span>
+
+<span class="sd">    The UTD transition function is defined as:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        F(x) = \sqrt{\frac{\pi x}{2}} e^{jx}\left(1+j-2jF_c^*(x) \right)</span>
+
+<span class="sd">    where :math:`F_c^*(x)` is the complex conjugate of the Fresnel integral :eq:`fresnel_integral`.</span>
+
+<span class="sd">    :param x: Argument of the UTD transition function</span>
+
+<span class="sd">    :return: Real and imaginary parts of the UTD transition function</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    The following code snippet produces a visualization of the magnitude and phase of</span>
+<span class="sd">    the UTD transition function which matches that of Fig. 6 in [Kouyoumjian74]_.</span>
+
+<span class="sd">    .. code-block:: Python</span>
+
+<span class="sd">        import numpy as np</span>
+<span class="sd">        import matplotlib.pyplot as plt</span>
+<span class="sd">        import drjit as dr</span>
+<span class="sd">        import mitsuba as mi</span>
+<span class="sd">        mi.set_variant(&quot;cuda_ad_mono_polarized&quot;, &quot;llvm_ad_mono_polarized&quot;)</span>
+<span class="sd">        from sionna.rt.utils import f_utd, cpx_convert</span>
+
+<span class="sd">        x = np.logspace(-3, 1, 1000)</span>
+<span class="sd">        y = cpx_convert(f_utd(mi.Float(x)), &quot;numpy&quot;)</span>
+<span class="sd">        fig, ax1 = plt.subplots(figsize=(10, 6.5))</span>
+
+<span class="sd">        # Plot magnitude with label</span>
+<span class="sd">        mag_line, = ax1.semilogx(x, np.abs(y), &quot;k-&quot;, label=&quot;Magnitude&quot;)</span>
+<span class="sd">        ax1.set_ylabel(&quot;Magnitude&quot;)</span>
+
+<span class="sd">        # Create second y-axis</span>
+<span class="sd">        ax2 = plt.twinx()</span>
+
+<span class="sd">        # Plot phase with label</span>
+<span class="sd">        phase_line, = ax2.semilogx(x, np.angle(y, deg=True), &quot;r--&quot;, label=&quot;Phase&quot;)</span>
+<span class="sd">        ax2.set_ylabel(&quot;Phase (deg)&quot;)</span>
+
+<span class="sd">        # Combine lines from both axes for the legend</span>
+<span class="sd">        lines = [mag_line, phase_line]</span>
+<span class="sd">        labels = [line.get_label() for line in lines]</span>
+
+<span class="sd">        # Add legend with both lines</span>
+<span class="sd">        ax1.legend(lines, labels, loc=&#39;upper center&#39;, frameon=True, ncol=2)</span>
+
+<span class="sd">        # Set title and x label</span>
+<span class="sd">        plt.title(r&quot;UTD Transition Function $F(x)$&quot;)</span>
+<span class="sd">        ax1.set_xlabel(&quot;x&quot;)</span>
+
+<span class="sd">        # Adjust limits and ticks</span>
+<span class="sd">        ax1.set_xlim(x.min(), x.max())</span>
+<span class="sd">        ax1.set_ylim(np.abs(y).min(), np.abs(y).max())</span>
+<span class="sd">        ax2.set_ylim(np.angle(y, deg=True).min(), np.angle(y, deg=True).max())</span>
+<span class="sd">        ax1.set_yticks(np.linspace(0, 1, 6))</span>
+<span class="sd">        ax2.set_yticks(np.linspace(0, 50, 11))</span>
+
+<span class="sd">        plt.show()</span>
+
+<span class="sd">    .. figure:: ../figures/f_utd.png</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">-=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">fresnel</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="n">f</span> <span class="o">*=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">x</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">*=</span> <span class="n">dr</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
 
 </pre></div>
 

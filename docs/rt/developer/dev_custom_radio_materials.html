@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Understanding Radio Materials &mdash; Sionna 1.1.0 documentation</title>
+  <title>Understanding Radio Materials &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -68,6 +68,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -267,6 +279,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -285,6 +298,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -293,6 +307,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -345,11 +360,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -389,6 +399,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -447,6 +458,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1988,7 +2001,7 @@ wave equals the one of the incident wave scaled by a parameter <span class="math
 The direction of propagation of the reflected ray <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_\text{r}\)</span>
 is computed as:</p>
 <div class="math notranslate nohighlight" id="equation-eq-kr">
-<span class="eqno">(55)<a class="headerlink" href="#equation-eq-kr" title="Link to this equation"></a></span>\[\hat{\mathbf{k}}_\text{r} = \hat{\mathbf{k}}_\text{i} - 2\left( \hat{\mathbf{k}}_\text{i}^\mathsf{T}\hat{\mathbf{n}} \right)\hat{\mathbf{n}}\]</div>
+<span class="eqno">(56)<a class="headerlink" href="#equation-eq-kr" title="Link to this equation"></a></span>\[\hat{\mathbf{k}}_\text{r} = \hat{\mathbf{k}}_\text{i} - 2\left( \hat{\mathbf{k}}_\text{i}^\mathsf{T}\hat{\mathbf{n}} \right)\hat{\mathbf{n}}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_\text{i}\)</span> is the direction of propagation of the
 incident wave and <span class="math notranslate nohighlight">\(\hat{\mathbf{n}}\)</span> the normal to the scatterer at the
 interaction point.</p>
@@ -1997,7 +2010,7 @@ interaction point.</p>
 \[\mathbf{E}_\text{r} = E_{\text{r},s} \hat{\mathbf{e}}_{\text{r},s} + E_{\text{r},p} \hat{\mathbf{e}}_{\text{r},p}\]</div>
 <p>where</p>
 <div class="math notranslate nohighlight" id="equation-eq-er">
-<span class="eqno">(56)<a class="headerlink" href="#equation-eq-er" title="Link to this equation"></a></span>\[\begin{split}\begin{bmatrix}E_{\text{r},s} \\ E_{\text{r},p} \end{bmatrix} =
+<span class="eqno">(57)<a class="headerlink" href="#equation-eq-er" title="Link to this equation"></a></span>\[\begin{split}\begin{bmatrix}E_{\text{r},s} \\ E_{\text{r},p} \end{bmatrix} =
 \mathbf{W}\left(\hat{\mathbf{e}}_{\text{r},s}, \hat{\mathbf{e}}_{\text{r},p}, \hat{\mathbf{e}}_{\text{r},\perp}, \hat{\mathbf{e}}_{\text{r},\parallel}\right)
 \begin{bmatrix}
     \sqrt{g}  &amp; 0 \\
@@ -2021,7 +2034,7 @@ and <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Ra
 implement the previous equations.</p>
 <p>The direction of propagation of the incident wave is assumed to be provided to
 the radio material represented in the local coordinate system.
-The direction of reflection <a class="reference internal" href="#equation-eq-kr">(55)</a> can then be computed by leveraging the fact that
+The direction of reflection <a class="reference internal" href="#equation-eq-kr">(56)</a> can then be computed by leveraging the fact that
 <span class="math notranslate nohighlight">\(\hat{\mathbf{n}} = \hat{\mathbf{z}}\)</span> as shown in the following code snippet, where
 an arbitrary direction of incidence is defined.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Arbitrary direction of incidence used in this example.</span>
@@ -2052,11 +2065,11 @@ point:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kr_prime</span> <span class="p">[[</span><span class="mf">0.408248</span><span class="p">,</span> <span class="mf">0.816497</span><span class="p">,</span> <span class="mf">0.408248</span><span class="p">]]</span>
 </pre></div>
 </div>
-<p>To compute the scattered field <a class="reference internal" href="#equation-eq-er">(56)</a>, the Jones matrix needs to be
+<p>To compute the scattered field <a class="reference internal" href="#equation-eq-er">(57)</a>, the Jones matrix needs to be
 constructed such that both the incident field and the scattered field (resulting
 from applying the Jones matrix) are represented in their respective implicit
 <em>world</em> coordinate system.
-Therefore, the Jones matrix in <a class="reference internal" href="#equation-eq-er">(56)</a>, i.e.,</p>
+Therefore, the Jones matrix in <a class="reference internal" href="#equation-eq-er">(57)</a>, i.e.,</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}\mathbf{J} =
 \mathbf{W}\left(\hat{\mathbf{e}}_{\text{r},s}, \hat{\mathbf{e}}_{\text{r},p}, \hat{\mathbf{e}}_{\text{r},\perp}, \hat{\mathbf{e}}_{\text{r},\parallel}\right)
@@ -2117,9 +2130,9 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
 
         <span class="c1"># Read the gain from `props`</span>
         <span class="n">g</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">if</span> <span class="n">props</span><span class="o">.</span><span class="n">has_property</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;g&quot;</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
             <span class="n">g</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span>
-            <span class="n">props</span><span class="o">.</span><span class="n">remove_property</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">props</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 
         <span class="c1"># The other parameters (`name`, `color`) are given to the</span>
@@ -2247,8 +2260,7 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
     <span class="k">def</span><span class="w"> </span><span class="nf">traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">TraversalCallback</span><span class="p">):</span>
         <span class="c1"># Registers the `g` parameter as a differentiable</span>
         <span class="c1"># parameter of the scene</span>
-        <span class="n">callback</span><span class="o">.</span><span class="n">put_parameter</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span>
-                               <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
+        <span class="n">callback</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># Returns a humanly readable description of the material</span>
@@ -2372,12 +2384,12 @@ Note that this model will not account for the refraction of radio waves as they
 pass through both the first and second boundaries of the scatterer.
 Instead, we will directly model the electromagnetic field that emerges after
 passing through the entire reflector.</p>
-<p>In addition to the previous model for specular reflection described by <a class="reference internal" href="#equation-eq-kr">(55)</a>-<a class="reference internal" href="#equation-eq-er">(56)</a>,
+<p>In addition to the previous model for specular reflection described by <a class="reference internal" href="#equation-eq-kr">(56)</a>-<a class="reference internal" href="#equation-eq-er">(57)</a>,
 this enhanced model also supports refraction as follows.
 The transmitted wave <span class="math notranslate nohighlight">\(\mathbf{E}_\text{t}\)</span> propagates in the direction
 <span class="math notranslate nohighlight">\(\mathbf{k}_\text{t}\)</span> such that</p>
 <div class="math notranslate nohighlight" id="equation-eq-kt">
-<span class="eqno">(57)<a class="headerlink" href="#equation-eq-kt" title="Link to this equation"></a></span>\[\hat{\mathbf{k}}_\text{t} = \hat{\mathbf{k}}_\text{i}\]</div>
+<span class="eqno">(58)<a class="headerlink" href="#equation-eq-kt" title="Link to this equation"></a></span>\[\hat{\mathbf{k}}_\text{t} = \hat{\mathbf{k}}_\text{i}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\hat{\mathbf{k}}_\text{i}\)</span> is the direction of propagation of the
 incident wave.</p>
 <p>The transmitted wave phasor <span class="math notranslate nohighlight">\(\mathbf{E}_\text{t}\)</span> is represented as</p>
@@ -2385,7 +2397,7 @@ incident wave.</p>
 \[\mathbf{E}_\text{t} = E_{\text{t},s} \hat{\mathbf{e}}_{\text{t},s} + E_{\text{t},p} \hat{\mathbf{e}}_{\text{t},p}\]</div>
 <p>where</p>
 <div class="math notranslate nohighlight" id="equation-eq-et">
-<span class="eqno">(58)<a class="headerlink" href="#equation-eq-et" title="Link to this equation"></a></span>\[\begin{split}\begin{bmatrix}E_{\text{t},s} \\ E_{\text{t},p} \end{bmatrix} =
+<span class="eqno">(59)<a class="headerlink" href="#equation-eq-et" title="Link to this equation"></a></span>\[\begin{split}\begin{bmatrix}E_{\text{t},s} \\ E_{\text{t},p} \end{bmatrix} =
 \mathbf{W}\left(\hat{\mathbf{e}}_{\text{t},s}, \hat{\mathbf{e}}_{\text{t},p}, \hat{\mathbf{e}}_{\text{t},\perp}, \hat{\mathbf{e}}_{\text{t},\parallel}\right)
 \begin{bmatrix}
     \sqrt{1-g}  &amp; 0 \\
@@ -2444,9 +2456,9 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
 
         <span class="c1"># Read the gain from `props`</span>
         <span class="n">g</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">if</span> <span class="n">props</span><span class="o">.</span><span class="n">has_property</span><span class="p">(</span><span class="s2">&quot;g&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;g&quot;</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
             <span class="n">g</span> <span class="o">=</span> <span class="n">props</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span>
-            <span class="n">props</span><span class="o">.</span><span class="n">remove_property</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">props</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_g</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 
         <span class="c1"># The other parameters (`name`, `color`) are given to the</span>
@@ -2635,8 +2647,7 @@ as <a class="reference internal" href="../api/radio_materials.html#sionna.rt.Rad
     <span class="k">def</span><span class="w"> </span><span class="nf">traverse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span> <span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">TraversalCallback</span><span class="p">):</span>
         <span class="c1"># Registers the `g` parameter as a differentiable</span>
         <span class="c1"># parameter of the scene</span>
-        <span class="n">callback</span><span class="o">.</span><span class="n">put_parameter</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span>
-                               <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
+        <span class="n">callback</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">ParamFlags</span><span class="o">.</span><span class="n">Differentiable</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="c1"># Returns a humanly readable description of the material</span>

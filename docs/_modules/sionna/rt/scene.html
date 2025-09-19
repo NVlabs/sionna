@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.scene &mdash; Sionna 1.1.0 documentation</title>
+  <title>sionna.rt.scene &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,6 +63,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Introduction.html#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Introduction.html#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Introduction.html#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../rt/tutorials/Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rt/tutorials/Mobility.html">Tutorial on Mobility</a><ul>
@@ -262,6 +274,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../rt/api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -280,6 +293,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -288,6 +302,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -340,11 +355,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -384,6 +394,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -442,6 +453,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../rt/api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../rt/api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../rt/api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1656,9 +1669,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">importlib_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
 
@@ -1672,16 +1682,15 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">sionna</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_FREQUENCY</span><span class="p">,</span> <span class="n">DEFAULT_BANDWIDTH</span><span class="p">,</span> \
                        <span class="n">DEFAULT_TEMPERATURE</span><span class="p">,</span> \
-                       <span class="n">DEFAULT_PREVIEW_BACKGROUND_COLOR</span><span class="p">,</span> \
-                       <span class="n">DEFAULT_THICKNESS</span>
+                       <span class="n">DEFAULT_PREVIEW_BACKGROUND_COLOR</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.radio_materials</span><span class="w"> </span><span class="kn">import</span> <span class="n">RadioMaterialBase</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.scene_object</span><span class="w"> </span><span class="kn">import</span> <span class="n">SceneObject</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.antenna_array</span><span class="w"> </span><span class="kn">import</span> <span class="n">AntennaArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.camera</span><span class="w"> </span><span class="kn">import</span> <span class="n">Camera</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.preview</span><span class="w"> </span><span class="kn">import</span> <span class="n">Previewer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">radio_map_color_mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.radio_devices</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transmitter</span><span class="p">,</span> <span class="n">Receiver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.renderer</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.scene_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">edit_scene_shapes</span><span class="p">,</span> <span class="n">process_xml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">radio_map_color_mapping</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">scenes</span>
 
 
@@ -1715,7 +1724,8 @@
 <span class="sd">    :param mi_scene: A Mitsuba scene</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mi_scene</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Scene</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mi_scene</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Scene</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">remove_duplicate_vertices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 
         <span class="c1"># Transmitter antenna array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tx_array</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1757,12 +1767,12 @@
         <span class="c1"># instantiated when loading the Mitsuba scene.</span>
         <span class="c1"># Note that when the radio material is instantiated, it is added</span>
         <span class="c1"># to the this scene.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load_scene_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_scene_objects</span><span class="p">(</span><span class="n">remove_duplicate_vertices</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.Float` : Get/set the carrier frequency [Hz]</span>
+<span class="sd">        :py:class:`mi.Float`: Get/set the carrier frequency [Hz]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frequency</span>
 
@@ -1778,14 +1788,21 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">wavelength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">         :py:class:`mi.Float` :  Wavelength [m]</span>
+<span class="sd">         :py:class:`mi.Float`:  Wavelength [m]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">speed_of_light</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">frequency</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wavenumber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :py:class:`mi.Float` : Wavenumber [rad/m]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">wavelength</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.Float` : Get/set the environment temperature [K].</span>
+<span class="sd">        :py:class:`mi.Float`: Get/set the environment temperature [K].</span>
 <span class="sd">            Used for the computation of</span>
 <span class="sd">            :attr:`~sionna.rt.Scene.thermal_noise_power`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1800,7 +1817,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bandwidth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.Float` : Get/set the transmission bandwidth [Hz].</span>
+<span class="sd">        :py:class:`mi.Float`: Get/set the transmission bandwidth [Hz].</span>
 <span class="sd">            Used for the computation of</span>
 <span class="sd">            :attr:`~sionna.rt.Scene.thermal_noise_power`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1815,21 +1832,21 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">thermal_noise_power</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.Float` : Thermal noise power [W]</span>
+<span class="sd">        :py:class:`mi.Float`: Thermal noise power [W]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">*</span> <span class="n">Boltzmann</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bandwidth</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">angular_frequency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.Float` : Angular frequency [rad/s]</span>
+<span class="sd">        :py:class:`mi.Float`: Angular frequency [rad/s]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">frequency</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">tx_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :class:`~rt.AntennaArray` : Get/set the antenna array used by</span>
+<span class="sd">        :class:`~rt.AntennaArray`: Get/set the antenna array used by</span>
 <span class="sd">            all transmitters in the scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tx_array</span>
@@ -1843,7 +1860,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rx_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :class:`~rt.AntennaArray` : Get/set the antenna array used by</span>
+<span class="sd">        :class:`~rt.AntennaArray`: Get/set the antenna array used by</span>
 <span class="sd">            all receivers in the scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rx_array</span>
@@ -1865,7 +1882,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`dict`, { &quot;name&quot;, :class:`~rt.SceneObject`} : Dictionary</span>
+<span class="sd">        :py:class:`dict`, { &quot;name&quot;, :class:`~rt.SceneObject`}: Dictionary</span>
 <span class="sd">            of scene objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span><span class="p">)</span>
@@ -1873,7 +1890,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">transmitters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`dict`, { &quot;name&quot;, :class:`~rt.Transmitter`} : Dictionary</span>
+<span class="sd">        :py:class:`dict`, { &quot;name&quot;, :class:`~rt.Transmitter`}: Dictionary</span>
 <span class="sd">            of transmitters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transmitters</span><span class="p">)</span>
@@ -1881,7 +1898,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">receivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`dict`, { &quot;name&quot;, :class:`~rt.Receiver`} : Dictionary</span>
+<span class="sd">        :py:class:`dict`, { &quot;name&quot;, :class:`~rt.Receiver`}: Dictionary</span>
 <span class="sd">            of receivers</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_receivers</span><span class="p">)</span>
@@ -1889,7 +1906,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">paths_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :class:`rt.PathSolverBase` : Get/set the path solver</span>
+<span class="sd">        :class:`rt.PathSolverBase`: Get/set the path solver</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_paths_solver</span>
 
@@ -2021,17 +2038,19 @@
 
         <span class="c1"># Set the Mitsuba scene to the edited scene</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">edit_scene_shapes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add</span><span class="o">=</span><span class="n">add</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="n">remove</span><span class="p">)</span>
+
         <span class="c1"># Reset the scene params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene_params</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">)</span>
 
         <span class="c1"># Update the scene objects.</span>
-        <span class="c1"># Scene objects are not re-instantiated to keep the instances hold by</span>
-        <span class="c1"># the users valid</span>
-        <span class="n">scene_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span>
+        <span class="c1"># Scene objects are not re-instantiated to keep the instances held by</span>
+        <span class="c1"># the users valid.</span>
+        <span class="n">scene_objects</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">add</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">SceneObject</span><span class="p">):</span>
                 <span class="n">add</span> <span class="o">=</span> <span class="p">[</span><span class="n">add</span><span class="p">]</span>
-            <span class="n">scene_objects</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">o</span><span class="o">.</span><span class="n">name</span> <span class="p">:</span> <span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">add</span><span class="p">})</span>
+            <span class="n">scene_objects</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">add</span><span class="p">})</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene_objects</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">shapes</span><span class="p">():</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">SceneObject</span><span class="o">.</span><span class="n">shape_id_to_name</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">())</span>
@@ -2040,7 +2059,6 @@
             <span class="n">obj</span><span class="o">.</span><span class="n">mi_mesh</span> <span class="o">=</span> <span class="n">s</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_scene_object</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
 
-
         <span class="c1"># Reset the preview widget to ensure the preview is redraw</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scene_geometry_updated</span><span class="p">()</span></div>
 
@@ -2048,21 +2066,23 @@
 <div class="viewcode-block" id="Scene.preview">
 <a class="viewcode-back" href="../../../rt/api/scene.html#sionna.rt.Scene.preview">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">preview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
-        <span class="n">background</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="n">DEFAULT_PREVIEW_BACKGROUND_COLOR</span><span class="p">,</span>
-        <span class="n">clip_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">clip_plane_orientation</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
-        <span class="n">fov</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="mf">45.</span><span class="p">,</span>
-        <span class="n">paths</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">Paths</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">radio_map</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">PlanarRadioMap</span> <span class="o">|</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">MeshRadioMap</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">resolution</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">655</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
-        <span class="n">rm_db_scale</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">rm_metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
-        <span class="n">rm_tx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">rm_vmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">rm_vmin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">show_devices</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">show_orientations</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">preview</span><span class="o">.</span><span class="n">Previewer</span><span class="p">:</span>
+        <span class="n">background</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_PREVIEW_BACKGROUND_COLOR</span><span class="p">,</span>
+        <span class="n">clip_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">clip_plane_orientation</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">fov</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">45.</span><span class="p">,</span>
+        <span class="n">paths</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">Paths</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">radio_map</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">PlanarRadioMap</span> <span class="o">|</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">MeshRadioMap</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">resolution</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">655</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+        <span class="n">rm_db_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">rm_metric</span> <span class="p">:</span> <span class="nb">str</span>  <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
+        <span class="n">rm_tx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rm_vmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rm_vmin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rm_cmap</span><span class="p">:</span> <span class="nb">callable</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">show_devices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">show_orientations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">point_picker</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;In an interactive notebook environment, opens an interactive 3D viewer of the scene.</span>
 
@@ -2117,9 +2137,19 @@
 <span class="sd">            It should be provided in dB if ``rm_db_scale`` is</span>
 <span class="sd">            set to `True`, or in linear scale otherwise.</span>
 
+<span class="sd">        :param rm_cmap: For coverage map visualization, defines the colormap to use.</span>
+<span class="sd">            If set to None, then the default colormap is used.</span>
+<span class="sd">            If a string is given, it is interpreted as a Matplotlib colormap name.</span>
+<span class="sd">            If a callable is given, it is used as a custom colormap function with</span>
+<span class="sd">            the same interface as a Matplotlib colormap.</span>
+<span class="sd">            Defaults to `None`.</span>
+
 <span class="sd">        :param show_devices: Show radio devices</span>
 
 <span class="sd">        :param show_orientations: Show orientation of radio devices</span>
+
+<span class="sd">        :param point_picker: Enable picking a point in the scene with</span>
+<span class="sd">            alt + click in order to display its coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">resolution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolution</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
@@ -2130,45 +2160,49 @@
 
         <span class="c1"># Cache the render widget so that we don&#39;t need to re-create it</span>
         <span class="c1"># every time</span>
-        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span>
-        <span class="n">needs_reset</span> <span class="o">=</span> <span class="n">fig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span>
+        <span class="n">needs_reset</span> <span class="o">=</span> <span class="n">widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">show_paths</span> <span class="o">=</span> <span class="n">paths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">needs_reset</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">fig</span> <span class="o">=</span> <span class="n">Previewer</span><span class="p">(</span><span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-                            <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
-                            <span class="n">fov</span><span class="o">=</span><span class="n">fov</span><span class="p">,</span>
-                            <span class="n">background</span><span class="o">=</span><span class="n">background</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span> <span class="o">=</span> <span class="n">fig</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">Previewer</span><span class="p">(</span><span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">resolution</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span>
+                               <span class="n">fov</span><span class="o">=</span><span class="n">fov</span><span class="p">,</span>
+                               <span class="n">background</span><span class="o">=</span><span class="n">background</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_preview_widget</span> <span class="o">=</span> <span class="n">widget</span>
 
         <span class="c1"># Show paths and devices, if required</span>
         <span class="k">if</span> <span class="n">show_paths</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">plot_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">plot_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">show_devices</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">plot_radio_devices</span><span class="p">(</span><span class="n">show_orientations</span><span class="o">=</span><span class="n">show_orientations</span><span class="p">)</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">plot_radio_devices</span><span class="p">(</span><span class="n">show_orientations</span><span class="o">=</span><span class="n">show_orientations</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">radio_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">radio_map</span><span class="p">,</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">MeshRadioMap</span><span class="p">):</span>
-                <span class="n">fig</span><span class="o">.</span><span class="n">plot_mesh_radio_map</span><span class="p">(</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">plot_mesh_radio_map</span><span class="p">(</span>
                     <span class="n">radio_map</span><span class="p">,</span> <span class="n">tx</span><span class="o">=</span><span class="n">rm_tx</span><span class="p">,</span> <span class="n">db_scale</span><span class="o">=</span><span class="n">rm_db_scale</span><span class="p">,</span>
-                    <span class="n">vmin</span><span class="o">=</span><span class="n">rm_vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">rm_vmax</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">rm_metric</span><span class="p">)</span>
+                    <span class="n">vmin</span><span class="o">=</span><span class="n">rm_vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">rm_vmax</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">rm_metric</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">rm_cmap</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">fig</span><span class="o">.</span><span class="n">plot_planar_radio_map</span><span class="p">(</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">plot_planar_radio_map</span><span class="p">(</span>
                     <span class="n">radio_map</span><span class="p">,</span> <span class="n">tx</span><span class="o">=</span><span class="n">rm_tx</span><span class="p">,</span> <span class="n">db_scale</span><span class="o">=</span><span class="n">rm_db_scale</span><span class="p">,</span>
-                    <span class="n">vmin</span><span class="o">=</span><span class="n">rm_vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">rm_vmax</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">rm_metric</span><span class="p">)</span>
-        <span class="c1"># Show legend</span>
-        <span class="k">if</span> <span class="n">show_paths</span> <span class="ow">or</span> <span class="n">show_devices</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">show_legend</span><span class="p">(</span><span class="n">show_paths</span><span class="o">=</span><span class="n">show_paths</span><span class="p">,</span> <span class="n">show_devices</span><span class="o">=</span><span class="n">show_devices</span><span class="p">)</span>
+                    <span class="n">vmin</span><span class="o">=</span><span class="n">rm_vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">rm_vmax</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">rm_metric</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">rm_cmap</span><span class="p">)</span>
 
         <span class="c1"># Clipping</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">set_clipping_plane</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="n">clip_at</span><span class="p">,</span>
-                               <span class="n">orientation</span><span class="o">=</span><span class="n">clip_plane_orientation</span><span class="p">)</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">set_clipping_plane</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="n">clip_at</span><span class="p">,</span>
+                                  <span class="n">orientation</span><span class="o">=</span><span class="n">clip_plane_orientation</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">point_picker</span><span class="p">:</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">setup_point_picker</span><span class="p">()</span>
 
         <span class="c1"># Update the camera state</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">needs_reset</span><span class="p">:</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">center_view</span><span class="p">()</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">center_view</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">fig</span></div>
+        <span class="c1"># Display the previewer and its companion widgets</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
 
 
 <div class="viewcode-block" id="Scene.render">
@@ -2178,7 +2212,7 @@
         <span class="n">clip_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">clip_plane_orientation</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">envmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fov</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">fov</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">lighting_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">Paths</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2186,12 +2220,14 @@
         <span class="n">resolution</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">655</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
         <span class="n">return_bitmap</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">rm_db_scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">rm_metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
+        <span class="n">rm_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
         <span class="n">rm_show_color_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">rm_tx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rm_vmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rm_vmin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">show_devices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">rm_cmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">show_devices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">show_orientations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Bitmap</span><span class="p">:</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Renders the scene from the viewpoint of a camera or the interactive viewer</span>
@@ -2212,7 +2248,9 @@
 <span class="sd">        :param envmap: Path to an environment map image file</span>
 <span class="sd">            (e.g. in EXR format) to use for scene lighting</span>
 
-<span class="sd">        :param fov: Field of view [deg]</span>
+<span class="sd">        :param fov: Field of view [deg]. If `None`, the field of view will</span>
+<span class="sd">            default to 45 degrees, unless `camera` is set to `&quot;preview&quot;`, in</span>
+<span class="sd">            which case the field of view of the preview camera is used.</span>
 
 <span class="sd">        :param lighting_scale: Scale to apply to the lighting in the scene</span>
 <span class="sd">            (e.g., from a constant uniform emitter or a given environment map)</span>
@@ -2251,18 +2289,29 @@
 <span class="sd">            It should be provided in dB if ``rm_db_scale`` is</span>
 <span class="sd">            set to `True`, or in linear scale otherwise.</span>
 
+<span class="sd">        :param rm_cmap: For coverage map visualization, defines the colormap to use.</span>
+<span class="sd">            If set to None, then the default colormap is used.</span>
+<span class="sd">            If a string is given, it is interpreted as a Matplotlib colormap name.</span>
+<span class="sd">            If a callable is given, it is used as a custom colormap function with</span>
+<span class="sd">            the same interface as a Matplotlib colormap.</span>
+<span class="sd">            Defaults to `None`.</span>
+
 <span class="sd">        :param show_devices: Show radio devices</span>
+
+<span class="sd">        :param show_orientations: Show orientation of radio devices</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span>
             <span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">camera</span><span class="o">=</span><span class="n">camera</span><span class="p">,</span>
             <span class="n">paths</span><span class="o">=</span><span class="n">paths</span><span class="p">,</span>
             <span class="n">show_devices</span><span class="o">=</span><span class="n">show_devices</span><span class="p">,</span>
+            <span class="n">show_orientations</span><span class="o">=</span><span class="n">show_orientations</span><span class="p">,</span>
             <span class="n">clip_at</span><span class="o">=</span><span class="n">clip_at</span><span class="p">,</span>
             <span class="n">clip_plane_orientation</span><span class="o">=</span><span class="n">clip_plane_orientation</span><span class="p">,</span>
             <span class="n">radio_map</span><span class="o">=</span><span class="n">radio_map</span><span class="p">,</span>
             <span class="n">rm_tx</span><span class="o">=</span><span class="n">rm_tx</span><span class="p">,</span>
             <span class="n">rm_db_scale</span><span class="o">=</span><span class="n">rm_db_scale</span><span class="p">,</span>
+            <span class="n">rm_cmap</span><span class="o">=</span><span class="n">rm_cmap</span><span class="p">,</span>
             <span class="n">rm_vmin</span><span class="o">=</span><span class="n">rm_vmin</span><span class="p">,</span>
             <span class="n">rm_vmax</span><span class="o">=</span><span class="n">rm_vmax</span><span class="p">,</span>
             <span class="n">rm_metric</span><span class="o">=</span><span class="n">rm_metric</span><span class="p">,</span>
@@ -2329,18 +2378,19 @@
         <span class="n">clip_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">clip_plane_orientation</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">envmap</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">fov</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">45</span><span class="p">,</span>
+        <span class="n">fov</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">lighting_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
         <span class="n">paths</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">Paths</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">radio_map</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">RadioMap</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">resolution</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">655</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
         <span class="n">rm_db_scale</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">rm_metric</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
+        <span class="n">rm_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span><span class="s2">&quot;path_gain&quot;</span><span class="p">,</span>
         <span class="n">rm_tx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">rm_vmin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">rm_vmax</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">show_devices</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">show_devices</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">show_orientations</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Bitmap</span><span class="p">:</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Renders the scene from the viewpoint of a camera or the interactive</span>
@@ -2365,7 +2415,9 @@
 <span class="sd">        :param envmap: Path to an environment map image file</span>
 <span class="sd">            (e.g. in EXR format) to use for scene lighting</span>
 
-<span class="sd">        :param fov: Field of view [deg]</span>
+<span class="sd">        :param fov: Field of view [deg]. If `None`, the field of view will</span>
+<span class="sd">            default to 45 degrees, unless `camera` is set to `&quot;preview&quot;`, in</span>
+<span class="sd">            which case the field of view of the preview camera is used.</span>
 
 <span class="sd">        :param lighting_scale: Scale to apply to the lighting in the scene</span>
 <span class="sd">            (e.g., from a constant uniform emitter or a given environment map)</span>
@@ -2401,12 +2453,15 @@
 <span class="sd">            set to `True`, or in linear scale otherwise.</span>
 
 <span class="sd">        :param show_devices: Show radio devices</span>
+
+<span class="sd">        :param show_orientations: Show orientation of radio devices</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span>
             <span class="n">scene</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">camera</span><span class="o">=</span><span class="n">camera</span><span class="p">,</span>
             <span class="n">paths</span><span class="o">=</span><span class="n">paths</span><span class="p">,</span>
             <span class="n">show_devices</span><span class="o">=</span><span class="n">show_devices</span><span class="p">,</span>
+            <span class="n">show_orientations</span><span class="o">=</span><span class="n">show_orientations</span><span class="p">,</span>
             <span class="n">clip_at</span><span class="o">=</span><span class="n">clip_at</span><span class="p">,</span>
             <span class="n">clip_plane_orientation</span><span class="o">=</span><span class="n">clip_plane_orientation</span><span class="p">,</span>
             <span class="n">radio_map</span><span class="o">=</span><span class="n">radio_map</span><span class="p">,</span>
@@ -2437,14 +2492,14 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">mi_scene_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.SceneParameters` : Mitsuba scene parameters</span>
+<span class="sd">        :py:class:`mi.SceneParameters`: Mitsuba scene parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene_params</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">mi_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :py:class:`mi.Scene` : Mitsuba scene</span>
+<span class="sd">        :py:class:`mi.Scene`: Mitsuba scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span>
 
@@ -2453,7 +2508,7 @@
 <a class="viewcode-back" href="../../../rt/api/scene.html#sionna.rt.Scene.sources">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">synthetic_array</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                <span class="n">return_velocities</span> <span class="p">:</span> <span class="nb">bool</span>
+                <span class="n">return_velocities</span><span class="p">:</span> <span class="nb">bool</span>
                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Builds arrays containing the positions and orientations of the</span>
@@ -2482,7 +2537,7 @@
 <a class="viewcode-back" href="../../../rt/api/scene.html#sionna.rt.Scene.targets">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">targets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">synthetic_array</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                <span class="n">return_velocities</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                <span class="n">return_velocities</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
                 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Builds arrays containing the positions and orientations of the targets</span>
@@ -2518,7 +2573,7 @@
 
 <div class="viewcode-block" id="Scene.all_set">
 <a class="viewcode-back" href="../../../rt/api/scene.html#sionna.rt.Scene.all_set">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">all_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radio_map</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">all_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">radio_map</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Raises an exception if the scene is not all set for simulations</span>
@@ -2550,7 +2605,7 @@
         <span class="k">yield</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">old_scene</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_load_scene_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_scene_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remove_duplicate_vertices</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Builds Sionna SceneObject instances from the Mistuba scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2566,7 +2621,8 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Only triangle meshes are supported&#39;</span><span class="p">)</span>
 
             <span class="c1"># Instantiate the scene object</span>
-            <span class="n">scene_object</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">SceneObject</span><span class="p">(</span><span class="n">mi_mesh</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">scene_object</span> <span class="o">=</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">SceneObject</span><span class="p">(</span><span class="n">mi_mesh</span><span class="o">=</span><span class="n">s</span><span class="p">,</span>
+                                                 <span class="n">remove_duplicate_vertices</span><span class="o">=</span><span class="n">remove_duplicate_vertices</span><span class="p">)</span>
 
             <span class="c1"># Add a scene object to the scene</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_scene_object</span><span class="p">(</span><span class="n">scene_object</span><span class="p">)</span>
@@ -2585,7 +2641,7 @@
         <span class="n">name</span> <span class="o">=</span> <span class="n">scene_object</span><span class="o">.</span><span class="n">name</span>
         <span class="n">s_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span>  <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">scene_object</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">s_item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">scene_object</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is already used by another item&quot;</span>
                                  <span class="s2">&quot; of the scene&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -2617,10 +2673,10 @@
         <span class="k">return</span> <span class="n">used</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                   <span class="n">radio_devices</span> <span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Transmitter</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Receiver</span><span class="p">],</span>
-                   <span class="n">array</span> <span class="p">:</span> <span class="n">AntennaArray</span><span class="p">,</span>
+                   <span class="n">radio_devices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Transmitter</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Receiver</span><span class="p">],</span>
+                   <span class="n">array</span><span class="p">:</span> <span class="n">AntennaArray</span><span class="p">,</span>
                    <span class="n">synthetic_array</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-                   <span class="n">return_velocities</span> <span class="p">:</span> <span class="nb">bool</span>
+                   <span class="n">return_velocities</span><span class="p">:</span> <span class="nb">bool</span>
                   <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Builds arrays containing the positions and orientations of the</span>
@@ -2700,9 +2756,10 @@
 
 <div class="viewcode-block" id="load_scene">
 <a class="viewcode-back" href="../../../rt/api/scene.html#sionna.rt.load_scene">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_scene</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">merge_shapes</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-               <span class="n">merge_shapes_exclude_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_scene</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">merge_shapes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">merge_shapes_exclude_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">remove_duplicate_vertices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="p">:</span>
     <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads a scene from file</span>
@@ -2717,362 +2774,58 @@
 
 <span class="sd">    :param merge_shapes_exclude_regex: Optional regex to exclude shapes from</span>
 <span class="sd">        merging. Only used if ``merge_shapes`` is set to `True`.</span>
+
+<span class="sd">    :param remove_duplicate_vertices: If set to `True`, duplicate vertices are</span>
+<span class="sd">        removed from the scene objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Scene</span><span class="p">()</span>
 
-    <span class="n">processed</span> <span class="o">=</span> <span class="n">process_xml</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="n">merge_shapes</span><span class="p">,</span>
-                        <span class="n">merge_shapes_exclude_regex</span><span class="o">=</span><span class="n">merge_shapes_exclude_regex</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="c1"># pylint: disable=unspecified-encoding</span>
+        <span class="n">xml_string</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-    <span class="c1"># Since we will be loading directly from a string,</span>
-    <span class="c1"># we have to make sure the directory containing the scene</span>
-    <span class="c1"># is part of the search path for meshes, etc.</span>
-    <span class="n">thread</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">thread</span><span class="p">()</span>
-    <span class="n">fres_old</span> <span class="o">=</span> <span class="n">thread</span><span class="o">.</span><span class="n">file_resolver</span><span class="p">()</span>
+    <span class="c1"># Since we will be loading directly from a string, we have to make sure</span>
+    <span class="c1"># the directory containing the scene is part of the search path.</span>
+    <span class="n">fres_old</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">file_resolver</span><span class="p">()</span>
     <span class="n">fres</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">FileResolver</span><span class="p">(</span><span class="n">fres_old</span><span class="p">)</span>
     <span class="n">fres</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">thread</span><span class="o">.</span><span class="n">set_file_resolver</span><span class="p">(</span><span class="n">fres</span><span class="p">)</span>
-        <span class="n">mi_scene</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_string</span><span class="p">(</span><span class="n">processed</span><span class="p">)</span>
+        <span class="n">mi</span><span class="o">.</span><span class="n">set_file_resolver</span><span class="p">(</span><span class="n">fres</span><span class="p">)</span>
+        <span class="n">loaded</span> <span class="o">=</span> <span class="n">load_scene_from_string</span><span class="p">(</span>
+            <span class="n">xml_string</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="n">merge_shapes</span><span class="p">,</span>
+            <span class="n">merge_shapes_exclude_regex</span><span class="o">=</span><span class="n">merge_shapes_exclude_regex</span><span class="p">,</span>
+            <span class="n">remove_duplicate_vertices</span><span class="o">=</span><span class="n">remove_duplicate_vertices</span>
+        <span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
-        <span class="n">thread</span><span class="o">.</span><span class="n">set_file_resolver</span><span class="p">(</span><span class="n">fres_old</span><span class="p">)</span>
+        <span class="n">mi</span><span class="o">.</span><span class="n">set_file_resolver</span><span class="p">(</span><span class="n">fres_old</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Scene</span><span class="p">(</span><span class="n">mi_scene</span><span class="o">=</span><span class="n">mi_scene</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">loaded</span></div>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">process_xml</span><span class="p">(</span><span class="n">fname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-                <span class="n">merge_shapes</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">merge_shapes_exclude_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">default_thickness</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="n">DEFAULT_THICKNESS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Preprocess the XML string describing the scene</span>
 
-<span class="sd">    This function adds radio material holders to allow users to change the</span>
-<span class="sd">    material describing a scene, and add an instruction to merge shapes that</span>
-<span class="sd">    share the same radio material to speed-up ray tracing.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_scene_from_string</span><span class="p">(</span>
+    <span class="n">xml_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">merge_shapes_exclude_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">remove_duplicate_vertices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Scene</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads a scene from an XML string.</span>
 
-<span class="sd">    :param fname: Filename to load</span>
-
+<span class="sd">    :param scene_string: XML string containing the scene.</span>
 <span class="sd">    :param merge_shapes: If set to `True`, shapes that share</span>
 <span class="sd">        the same radio material are merged.</span>
-
 <span class="sd">    :param merge_shapes_exclude_regex: Optional regex to exclude shapes from</span>
 <span class="sd">        merging. Only used if ``merge_shapes`` is set to `True`.</span>
-
-<span class="sd">    :param default_thickness: Default thickness [m] of radio materials</span>
+<span class="sd">    :param remove_duplicate_vertices: If set to `True`, duplicate vertices are</span>
+<span class="sd">        removed from the scene objects.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">processed</span> <span class="o">=</span> <span class="n">process_xml</span><span class="p">(</span><span class="n">xml_string</span><span class="p">,</span> <span class="n">merge_shapes</span><span class="o">=</span><span class="n">merge_shapes</span><span class="p">,</span>
+                        <span class="n">merge_shapes_exclude_regex</span><span class="o">=</span><span class="n">merge_shapes_exclude_regex</span><span class="p">)</span>
+    <span class="n">mi_scene</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_string</span><span class="p">(</span><span class="n">processed</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="c1"># Compile the regex if not &#39;None&#39;</span>
-    <span class="k">if</span> <span class="n">merge_shapes_exclude_regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">merge_shapes_exclude_regex</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">regex</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-    <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
-
-    <span class="c1"># 1. Replace BSDFs with radio BSDFs</span>
-    <span class="c1"># If a BSDF node in the XML scene has a special name starting with</span>
-    <span class="c1"># `mat-itu_` or `itu_`, we automatically convert that BSDF to an</span>
-    <span class="c1"># `itu-radio-material` plugin.</span>
-    <span class="c1"># All other nodes are left untouched, assuming that they already are</span>
-    <span class="c1"># radio materials.</span>
-    <span class="c1">#</span>
-    <span class="c1"># Finally, all BSDF nodes that are not HolderMaterial are wrapped in a</span>
-    <span class="c1"># HolderMaterial node, in order to enable setting the BSDF after the scene</span>
-    <span class="c1"># has been loaded. Note this is a temporary measure until a</span>
-    <span class="c1"># `Shape::set_bsdf()` method is available.</span>
-    <span class="c1">#</span>
-    <span class="c1"># We don&#39;t need to process BSDFs nested in other BSDFs, e.g. a `diffuse`</span>
-    <span class="c1"># inside of a `twosided`. We just process the outermost BSDF element.</span>
-    <span class="k">for</span> <span class="n">bsdf</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;./bsdf&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;.//shape/bsdf&quot;</span><span class="p">):</span>
-        <span class="n">bsdf_type</span> <span class="o">=</span> <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
-        <span class="n">mat_id</span> <span class="o">=</span> <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Ensure compatibility with Sionna v0.x ITU radio materials</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">mat_id</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mat-&quot;</span><span class="p">):</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
-        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;itu_&quot;</span><span class="p">):</span>
-            <span class="n">bsdf_type</span> <span class="o">=</span> <span class="s2">&quot;itu-radio-material&quot;</span>
-            <span class="n">props</span> <span class="o">=</span> <span class="p">{}</span>
-
-            <span class="c1"># Preserve user-defined thickness, if any</span>
-            <span class="n">thickness</span> <span class="o">=</span> <span class="n">default_thickness</span>
-            <span class="c1"># Returns first match</span>
-            <span class="n">thickness_prop</span> <span class="o">=</span> <span class="n">bsdf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;float[@name=&#39;thickness&#39;]&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">thickness_prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">thickness_prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">thickness</span><span class="p">))</span>
-
-            <span class="c1"># Read user-defined material type, if any</span>
-            <span class="n">itu_type</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
-            <span class="n">type_prop</span> <span class="o">=</span> <span class="n">bsdf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;string[@name=&#39;type&#39;]&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">type_prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">itu_type</span> <span class="o">=</span> <span class="n">type_prop</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
-
-            <span class="n">props</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="n">itu_type</span><span class="p">)</span>
-            <span class="n">props</span><span class="p">[</span><span class="s2">&quot;thickness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
-
-            <span class="c1"># TODO: we could consider saving some information about the original</span>
-            <span class="c1"># &quot;visual&quot; BSDFs if that allows users to customize the look of their</span>
-            <span class="c1"># scenes easily from Blender.</span>
-            <span class="n">bsdf</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-            <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bsdf_type</span>
-            <span class="k">if</span> <span class="n">mat_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mat_id</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">bsdf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">k</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)}))</span>
-
-        <span class="c1"># All BSDFs must be wrapped into a `HolderMaterial` so that we can let</span>
-        <span class="c1"># the user easily swap BSDFs later on.</span>
-        <span class="k">if</span> <span class="n">bsdf_type</span> <span class="o">!=</span> <span class="s2">&quot;holder-material&quot;</span><span class="p">:</span>
-            <span class="n">inner</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">bsdf</span><span class="p">)</span>
-            <span class="n">bsdf</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-            <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;holder-material&quot;</span>
-            <span class="k">if</span> <span class="s2">&quot;id&quot;</span> <span class="ow">in</span> <span class="n">inner</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
-                <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;holder-&quot;</span> <span class="o">+</span> <span class="n">inner</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-            <span class="n">bsdf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
-
-    <span class="c1"># 2. Wrap shapes into a `merge` shape if requested. Shapes that are</span>
-    <span class="c1"># not merged are assigned individual material holder instances to allow</span>
-    <span class="c1"># setting their radio material individually.</span>
-    <span class="n">merge_node</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;merge&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;merged-shapes&quot;</span><span class="p">})</span>
-    <span class="n">merge_node_empty</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;shape&quot;</span><span class="p">):</span>
-        <span class="c1"># Shape id</span>
-        <span class="n">shape_id</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-
-        <span class="c1"># BSDF node</span>
-        <span class="n">rm_id</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">rm_node</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1"># Check for a BSDF nested directly under the shape</span>
-        <span class="k">for</span> <span class="n">bsdf</span> <span class="ow">in</span> <span class="n">shape</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;bsdf&#39;</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="n">rm_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> \
-                   <span class="s2">&quot;Only a single BSDF can be assigned to a shape&quot;</span>
-            <span class="k">assert</span> <span class="n">bsdf</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;holder-material&quot;</span>
-            <span class="n">rm_node</span> <span class="o">=</span> <span class="n">bsdf</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;bsdf&quot;</span><span class="p">)</span>
-            <span class="n">rm_id</span> <span class="o">=</span> <span class="n">rm_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
-        <span class="c1"># Check for reference to BSDF</span>
-        <span class="k">for</span> <span class="n">nested_ref</span> <span class="ow">in</span> <span class="n">shape</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;ref&#39;</span><span class="p">):</span>
-            <span class="c1"># The &#39;name&#39; property of the ID is somewhat arbitrary.</span>
-            <span class="c1"># Instead, look up the target at the top-level of the scene</span>
-            <span class="c1"># and check whether it is a BSDF.</span>
-            <span class="n">target_id</span> <span class="o">=</span> <span class="n">nested_ref</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-            <span class="n">target_is_bsdf</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//bsdf[@id=&#39;</span><span class="si">{</span><span class="n">target_id</span><span class="si">}</span><span class="s2">&#39;]&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="ow">or</span> <span class="p">(</span><span class="n">merge_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.//bsdf[@id=&#39;</span><span class="si">{</span><span class="n">target_id</span><span class="si">}</span><span class="s2">&#39;]&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="k">if</span> <span class="n">target_is_bsdf</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">rm_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> \
-                       <span class="s2">&quot;Only a single BSDF can be assigned to a shape&quot;</span>
-                <span class="n">rm_id</span> <span class="o">=</span> <span class="n">target_id</span>
-                <span class="n">rm_node</span> <span class="o">=</span> <span class="n">nested_ref</span>
-
-        <span class="c1"># Decide whether or not to merge this shape.</span>
-        <span class="n">should_merge</span> <span class="o">=</span> <span class="n">merge_shapes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">merge_shapes_exclude_regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="n">regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">shape</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">rm_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">should_merge</span><span class="p">:</span>
-                <span class="c1"># Use the generic radio material holder</span>
-                <span class="k">if</span> <span class="n">rm_node</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;ref&quot;</span><span class="p">:</span>
-                    <span class="c1"># Redirect the reference to the common holder material</span>
-                    <span class="c1"># for this radio material.</span>
-                    <span class="n">rm_node</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;holder-&quot;</span> <span class="o">+</span> <span class="n">rm_id</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># BSDF is already nested in the shape, let it be.</span>
-                    <span class="k">pass</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># User requested not to merge this shape,</span>
-                <span class="c1"># create an individual radio material holder for it.</span>
-                <span class="n">bsdf_holder</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="s1">&#39;bsdf&#39;</span><span class="p">,</span>
-                                            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;holder-material&#39;</span><span class="p">,</span>
-                                             <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;mat-holder-</span><span class="si">{</span><span class="n">shape_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">})</span>
-                <span class="n">bsdf_holder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rm_node</span><span class="p">)</span>
-                <span class="n">shape</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">rm_node</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">should_merge</span><span class="p">:</span>
-            <span class="c1"># Add the shape to the merge node</span>
-            <span class="n">root</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-            <span class="n">merge_node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-            <span class="c1">#</span>
-            <span class="n">merge_node_empty</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">merge_node_empty</span><span class="p">:</span>
-        <span class="n">root</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merge_node</span><span class="p">)</span>
-
-    <span class="n">ET</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="s2">&quot;    &quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">edit_scene_shapes</span><span class="p">(</span>
-    <span class="n">scene</span><span class="p">:</span> <span class="n">sionna</span><span class="o">.</span><span class="n">rt</span><span class="o">.</span><span class="n">Scene</span><span class="p">,</span>
-    <span class="n">add</span><span class="p">:</span> <span class="p">(</span><span class="n">SceneObject</span> <span class="o">|</span>
-                   <span class="nb">list</span><span class="p">[</span><span class="n">SceneObject</span><span class="p">]</span> <span class="o">|</span>
-                   <span class="nb">dict</span> <span class="o">|</span>
-                   <span class="kc">None</span><span class="p">)</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">remove</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span> <span class="o">|</span>
-             <span class="n">SceneObject</span> <span class="o">|</span>
-             <span class="nb">list</span><span class="p">[</span><span class="n">SceneObject</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span>
-             <span class="kc">None</span><span class="p">)</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">return_dict</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Scene</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Builds a *new* Mitsuba Scene object identicaly to `scene`, but which</span>
-<span class="sd">    includes the shapes listed in `add` but not the shapes listed in `remove`.</span>
-
-<span class="sd">    The shapes and other plugins that are left untouched carry over to the new</span>
-<span class="sd">    scene (same objects).</span>
-
-<span class="sd">    :param scene: Scene to edit</span>
-
-<span class="sd">    :param add: Object, or list /dictionary of objects to be added</span>
-
-<span class="sd">    :param remove: Name or object, or list/dictionary of objects or names</span>
-<span class="sd">            to be added</span>
-
-<span class="sd">    :param return_dict: If `True`, then the new scene is returned as a</span>
-<span class="sd">        dictionnary. Otherwise, it is returned as a Mitsuba scene.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">mi_scene</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span>
-
-    <span class="c1"># Result scene as a dict</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
-
-    <span class="c1"># Local utility to add an object to `result`</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">add_with_id</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">fallback_id</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">()</span> <span class="ow">or</span> <span class="n">fallback_id</span>
-        <span class="k">assert</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
-
-
-    <span class="c1"># Add to `result` the visual components of the scene: sensors, integrator,</span>
-    <span class="c1"># and environment map</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mi_scene</span><span class="o">.</span><span class="n">sensors</span><span class="p">()):</span>
-        <span class="n">add_with_id</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;sensor-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">add_with_id</span><span class="p">(</span><span class="n">mi_scene</span><span class="o">.</span><span class="n">environment</span><span class="p">(),</span> <span class="s2">&quot;envmap&quot;</span><span class="p">)</span>
-    <span class="n">add_with_id</span><span class="p">(</span><span class="n">mi_scene</span><span class="o">.</span><span class="n">integrator</span><span class="p">(),</span> <span class="s2">&quot;integrator&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Build the sets of object ids to remove</span>
-
-    <span class="c1"># Set of object ids to remove</span>
-    <span class="n">ids_to_remove</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="c1"># In case some given `Shape` objects don&#39;t have IDs, we keep a separate set</span>
-    <span class="n">other_to_remove</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">remove</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">remove</span><span class="p">,</span> <span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Shape</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">SceneObject</span><span class="p">)):</span>
-            <span class="n">remove</span> <span class="o">=</span> <span class="p">[</span><span class="n">remove</span><span class="p">]</span>
-
-        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">remove</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">SceneObject</span><span class="p">):</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">mi_mesh</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">o</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">o</span><span class="p">:</span>
-                    <span class="n">mi_id</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">mi_mesh</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
-                    <span class="n">ids_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mi_id</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
-                <span class="n">v_id</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">v_id</span><span class="p">:</span>
-                    <span class="n">ids_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v_id</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Shape doesn&#39;t have an ID, we still want to remove it</span>
-                    <span class="n">other_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot remove object of type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span>
-                                  <span class="s2">&quot; The `remove` argument should be a list&quot;</span>
-                                  <span class="s2">&quot; containing either shape instances or shape&quot;</span>
-                                  <span class="s2">&quot; IDs.&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Add to `result` all shapes of the current scene, except the ones we want</span>
-    <span class="c1"># to exclude</span>
-
-    <span class="n">n_shapes</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">mi_scene</span><span class="o">.</span><span class="n">shapes</span><span class="p">():</span>
-        <span class="n">shape_id</span> <span class="o">=</span> <span class="n">shape</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">shape_id</span> <span class="ow">in</span> <span class="n">ids_to_remove</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">shape</span> <span class="ow">in</span> <span class="n">other_to_remove</span><span class="p">):</span>
-            <span class="k">continue</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">shape_id</span><span class="p">:</span>
-            <span class="n">shape_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;shape-</span><span class="si">{</span><span class="n">n_shapes</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">assert</span> <span class="n">shape_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">shape_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape</span>
-        <span class="n">n_shapes</span> <span class="o">+=</span> <span class="mi">1</span>
-
-    <span class="c1"># Add the objects provided by the user though `add` to `result`</span>
-
-    <span class="k">if</span> <span class="n">add</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Object</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">SceneObject</span><span class="p">)):</span>
-            <span class="n">add</span> <span class="o">=</span> <span class="p">[</span><span class="n">add</span><span class="p">]</span>
-
-        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">add</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">SceneObject</span><span class="p">):</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">mi_mesh</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">new_id</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Object</span><span class="p">):</span>
-                <span class="n">new_id</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot add object of type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span>
-                                  <span class="s2">&quot; The `add` argument should be a list&quot;</span>
-                                  <span class="s2">&quot; containing either a dict to be loaded by&quot;</span>
-                                  <span class="s2">&quot; `mi.load_dict()` or an existing Mitsuba&quot;</span>
-                                  <span class="s2">&quot; object instance.&quot;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">new_id</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
-                    <span class="n">new_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;shape-</span><span class="si">{</span><span class="n">n_shapes</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="n">n_shapes</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">new_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;object-</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-
-            <span class="k">if</span> <span class="n">new_id</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot add object of type (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="si">}</span><span class="s2">) with&quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot; ID </span><span class="se">\&quot;</span><span class="si">{</span><span class="n">new_id</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> because this ID is already&quot;</span>
-                                 <span class="s2">&quot; used in the scene.&quot;</span><span class="p">)</span>
-
-            <span class="n">result</span><span class="p">[</span><span class="n">new_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
-
-    <span class="k">if</span> <span class="n">return_dict</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">result</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">extend_scene_with_mesh</span><span class="p">(</span><span class="n">scene</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Scene</span><span class="p">,</span> <span class="n">mesh</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Mesh</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add a mesh to a Mitsuba scene</span>
-
-<span class="sd">    This function takes a Mitsuba scene and a mesh, and adds the mesh</span>
-<span class="sd">    to the scene.</span>
-
-<span class="sd">    :param scene: The Mitsuba scene to which the mesh will be added.</span>
-<span class="sd">    :param mesh: The Mitsuba mesh to be added to the scene.</span>
-
-<span class="sd">    :return: New Mitsuba scene with the mesh added</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># Result scene as a dict</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene&quot;</span><span class="p">,</span>
-    <span class="p">}</span>
-
-    <span class="c1"># Add to `result` all shapes of the current shapes</span>
-    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">shapes</span><span class="p">():</span>
-        <span class="n">shape_id</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span><span class="p">()</span>
-        <span class="n">result</span><span class="p">[</span><span class="n">shape_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
-
-    <span class="c1"># Add the shape</span>
-    <span class="n">result</span><span class="p">[</span><span class="n">mesh</span><span class="o">.</span><span class="n">id</span><span class="p">()]</span> <span class="o">=</span> <span class="n">mesh</span>
-
-    <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Scene</span><span class="p">(</span><span class="n">mi_scene</span><span class="o">=</span><span class="n">mi_scene</span><span class="p">,</span>
+                 <span class="n">remove_duplicate_vertices</span><span class="o">=</span><span class="n">remove_duplicate_vertices</span><span class="p">)</span>
 
 
 <span class="c1">#</span>
@@ -3127,6 +2880,15 @@
 <span class="sd">visualization purposes. In the actual scene, the box is closed on all sides.</span>
 
 <span class="sd">.. figure:: ../figures/box_two_screens.png</span>
+<span class="sd">   :align: center</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">box_knife</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">files</span><span class="p">(</span><span class="n">scenes</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;box_knife/box_knife.xml&quot;</span><span class="p">))</span>
+<span class="c1"># pylint: disable=C0301</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Example scene containing a metallic box and a knife made of glass</span>
+
+<span class="sd">.. figure:: ../figures/box_knife.png</span>
 <span class="sd">   :align: center</span>
 <span class="sd">&quot;&quot;&quot;</span>
 

@@ -17,6 +17,8 @@ Complex-valued tensors
 Electromagnetics
 ----------------
 .. autofunction:: sionna.rt.utils.complex_relative_permittivity
+.. autofunction:: sionna.rt.utils.fresnel
+.. autofunction:: sionna.rt.utils.f_utd
 .. autofunction:: sionna.rt.utils.fresnel_reflection_coefficients_simplified
 .. autofunction:: sionna.rt.utils.itu_coefficients_single_layer_slab
 
@@ -65,6 +67,9 @@ Ray tracing
 
 References:
    .. [ITU_R_2040_3] Recommendation ITU-R P.2040-3, "`Effects of building materials
-        and structures on radiowave propagation above about 100 MHz <https://www.itu.int/rec/R-REC-P.2040-3-202308-I/en>`_"
+        and structures on radiowave propagation above about 100 MHz
+        <https://www.itu.int/rec/R-REC-P.2040-3-202308-I/en>`_"
+   .. [ITU_R_P_526_15] Recommendation ITU-R P.526-15, "`Propagation by
+    diffraction <https://www.itu.int/rec/R-REC-P.526-15-201910-I/en>`_"
    .. [TR38901] 3GPP TR 38.901, "`Study on channel model for frequencies from 0.5
     to 100 GHz <https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3173>`_", Release 18.0

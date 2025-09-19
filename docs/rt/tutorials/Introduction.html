@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction to Sionna RT &mdash; Sionna 1.1.0 documentation</title>
+  <title>Introduction to Sionna RT &mdash; Sionna 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -16,7 +16,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fc837d61"></script>
+      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -27,7 +27,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Tutorial on Mobility" href="Mobility.html" />
+    <link rel="next" title="Tutorial on Diffraction" href="Diffraction.html" />
     <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
 </head>
 
@@ -69,6 +69,18 @@
 <li class="toctree-l4"><a class="reference internal" href="#From-Paths-to-Channel-Impulse-and-Frequency-Responses">From Paths to Channel Impulse and Frequency Responses</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Radio-Maps">Radio Maps</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#Summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Diffraction.html">Tutorial on Diffraction</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="Diffraction.html#Table-of-Contents">Table of Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Diffraction.html#Background-Information">Background Information</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="Diffraction.html#Wedge-vs-Edge">Wedge vs Edge</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="Diffraction.html#GPU-Configuration-and-Imports">GPU Configuration and Imports</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Diffraction.html#Experiments-with-a-Simple-Wedge">Experiments with a Simple Wedge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Diffraction.html#Coverage-Maps-with-Diffraction">Coverage Maps with Diffraction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="Diffraction.html#References">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="Mobility.html">Tutorial on Mobility</a><ul>
@@ -268,6 +280,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../api/radio_maps.html">Radio Maps</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cell_size"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cell_size</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.PlanarRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">PlanarRadioMap.cells_count</span></code></a></li>
@@ -286,6 +299,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.cells_count</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.MeshRadioMap.measurement_surface"><code class="docutils literal notranslate"><span class="pre">MeshRadioMap.measurement_surface</span></code></a></li>
@@ -294,6 +308,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap"><code class="docutils literal notranslate"><span class="pre">RadioMap</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.add_paths"><code class="docutils literal notranslate"><span class="pre">RadioMap.add_paths()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cdf"><code class="docutils literal notranslate"><span class="pre">RadioMap.cdf()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cell_centers"><code class="docutils literal notranslate"><span class="pre">RadioMap.cell_centers</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_maps.html#sionna.rt.RadioMap.cells_count"><code class="docutils literal notranslate"><span class="pre">RadioMap.cells_count</span></code></a></li>
@@ -346,11 +361,6 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.ITURadioMaterial.to_string"><code class="docutils literal notranslate"><span class="pre">ITURadioMaterial.to_string()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.HolderMaterial"><code class="docutils literal notranslate"><span class="pre">HolderMaterial</span></code></a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.HolderMaterial.radio_material"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.radio_material</span></code></a></li>
-<li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.HolderMaterial.velocity"><code class="docutils literal notranslate"><span class="pre">HolderMaterial.velocity</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l4"><a class="reference internal" href="../api/radio_materials.html#scattering-patterns">Scattering Patterns</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.ScatteringPattern"><code class="docutils literal notranslate"><span class="pre">ScatteringPattern</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/radio_materials.html#sionna.rt.LambertianPattern"><code class="docutils literal notranslate"><span class="pre">LambertianPattern</span></code></a></li>
@@ -390,6 +400,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.transmitters"><code class="docutils literal notranslate"><span class="pre">Scene.transmitters</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.tx_array"><code class="docutils literal notranslate"><span class="pre">Scene.tx_array</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.wavelength"><code class="docutils literal notranslate"><span class="pre">Scene.wavelength</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/scene.html#sionna.rt.Scene.wavenumber"><code class="docutils literal notranslate"><span class="pre">Scene.wavenumber</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/scene.html#built-in-scenes">Built-in scenes</a><ul>
@@ -448,6 +459,8 @@
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../api/utils.html#electromagnetics">Electromagnetics</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.complex_relative_permittivity"><code class="docutils literal notranslate"><span class="pre">complex_relative_permittivity()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.fresnel"><code class="docutils literal notranslate"><span class="pre">fresnel()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.f_utd"><code class="docutils literal notranslate"><span class="pre">f_utd()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.fresnel_reflection_coefficients_simplified"><code class="docutils literal notranslate"><span class="pre">fresnel_reflection_coefficients_simplified()</span></code></a></li>
 <li class="toctree-l5"><a class="reference internal" href="../api/utils.html#sionna.rt.utils.itu_coefficients_single_layer_slab"><code class="docutils literal notranslate"><span class="pre">itu_coefficients_single_layer_slab()</span></code></a></li>
 </ul>
@@ -1692,7 +1705,7 @@ either rendered through the lens of configurable cameras via ray tracing or disp
 <section id="Imports">
 <h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading"></a></h2>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import or install Sionna</span>
@@ -1810,13 +1823,13 @@ either rendered through the lens of configurable cameras via ray tracing or disp
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;building_1&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbcce0&gt;,
- &#39;building_6&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbd400&gt;,
- &#39;building_5&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbc9e0&gt;,
- &#39;building_4&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbdc40&gt;,
- &#39;building_3&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbdbe0&gt;,
- &#39;building_2&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbddf0&gt;,
- &#39;floor&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x7f0fbadbde80&gt;}
+{&#39;building_1&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f2315670&gt;,
+ &#39;building_6&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f23161b0&gt;,
+ &#39;building_5&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f2316330&gt;,
+ &#39;building_4&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f2316390&gt;,
+ &#39;building_3&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f2316570&gt;,
+ &#39;building_2&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f2316660&gt;,
+ &#39;floor&#39;: &lt;sionna.rt.scene_object.SceneObject at 0x76b7f23167b0&gt;}
 </pre></div></div>
 </div>
 <div class="nbinput nblast docutils container">
@@ -1851,7 +1864,7 @@ either rendered through the lens of configurable cameras via ray tracing or disp
 <div class="highlight"><pre>
 Position (x,y,z) [m]:  [[-0.769669, 0.238537, -0.0307941]]
 Orientation (alpha, beta, gamma) [rad]:  [[0, 0, 0]]
-Scaling:  [1]
+Scaling:  [[1, 1, 1]]
 </pre></div></div>
 </div>
 <p>More details on these functionalities can be found in the <a class="reference external" href="https://nvlabs.github.io/sionna/rt/tutorials/Scene-Edit.html">Tutorial on Loading and Editing of Scenes</a>.</p>
@@ -2039,8 +2052,8 @@ These class methods can simulate time evolution of the channel based on the comp
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Shape of a:  (1, 2, 1, 1, 20, 1)
-Shape of tau:  (1, 2, 1, 1, 20)
+Shape of a:  (1, 2, 1, 1, 27, 1)
+Shape of tau:  (1, 2, 1, 1, 27)
 </pre></div></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">out_type</span></code> argument can be used to convert the CIR into tensors from different frameworks, such as <a class="reference external" href="https://drjit.readthedocs.io/en/latest/reference.html">Dr.Jit</a> (“drjit”), <a class="reference external" href="https://numpy.org">Numpy</a> (“numpy”), <a class="reference external" href="https://jax.readthedocs.io/en/latest/index.html">Jax</a> (“jax”), <a class="reference external" href="https://www.tensorflow.org">TensorFlow</a> (“tf”), and <a class="reference external" href="https://pytorch.org">PyTorch</a> (“torch”). Please see the developer guide <a class="reference external" href="https://nvlabs.github.io/sionna/rt/developer/dev_compat_frameworks.html">Compatibility with other
@@ -2247,7 +2260,7 @@ point.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="Mobility.html" class="btn btn-neutral float-right" title="Tutorial on Mobility" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="Diffraction.html" class="btn btn-neutral float-right" title="Tutorial on Diffraction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
