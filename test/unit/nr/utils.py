@@ -326,17 +326,17 @@ def calculate_tb_size_numpy(modulation_order,
         # include tb_scaling as defined in Tab. 5.1.3.2-2 38.214
         n_info = target_coderate * num_coded_bits
 
-        # apply quantization of info bit
-        if n_info <= 3824:
-            # step3 in 38.214 5.1.3.2
-            n = max(3, np.floor(np.log2(n_info)) - 6)
-            n_info_q = max(24, 2**n * np.floor(n_info/2**n))
-        else:
-            # step 4 in 38.212 5.3.1.2
-            n = np.floor(np.log2(n_info-24)) - 5
-            # "ties in the round function are broken towards next largest
-            # integer"
-            n_info_q = max(3840, 2**n * np.round((n_info-24)/2**n))
+    # apply quantization of info bit
+    if n_info <= 3824:
+        # step3 in 38.214 5.1.3.2
+        n = max(3, np.floor(np.log2(n_info)) - 6)
+        n_info_q = max(24, 2**n * np.floor(n_info/2**n))
+    else:
+        # step 4 in 38.212 5.3.1.2
+        n = np.floor(np.log2(n_info-24)) - 5
+        # "ties in the round function are broken towards next largest
+        # integer"
+        n_info_q = max(3840, 2**n * np.round((n_info-24)/2**n))
 
     if n_info_q <= 3824:
         c=1

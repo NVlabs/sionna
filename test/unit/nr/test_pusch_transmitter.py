@@ -51,7 +51,6 @@ def run_test(test_name):
     x_grid = tf.transpose(x_grid[0,0], perm=[2,1,0])
     return np.allclose(tf.squeeze(x_grid), grid)
 
-@pytest.mark.usefixtures("only_gpu")
 @pytest.mark.parametrize("test_id", list(range(0,83)))
 def tests_against_reference(test_id):
     """Test PUSCHTransmitter output against reference"""

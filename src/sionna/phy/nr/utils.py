@@ -631,47 +631,43 @@ def calculate_tb_size(modulation_order,
             target_tb_size, tf.cast(num_coded_bits, target_tb_size.dtype),
             message="target_tb_size must be less than num_coded_bits.")
 
-        # no quantization for user input
-        n_info_q = target_tb_size
-
     else:
         # Compute n info bits (Target TB size)
         target_tb_size = target_coderate * tf.cast(num_coded_bits, rdtype)
 
-        # quantize target_tb_size
-        def n_info_q_if_target_tbs_greater_3824():
-            # Compute quantized n. info bits if target TB size > 3824
-            # Step 4 of 38.214 5.3.1.2
-            log2_n_info_minus_24 = tf.math.log(
-                target_tb_size - tf.cast(24, target_tb_size.dtype)) \
-            / tf.math.log(tf.cast(2.0, target_tb_size.dtype))
-            n = tf.math.floor(log2_n_info_minus_24) - 5.
-            n_info_q = tf.math.maximum(
-                tf.cast(3840.0, rdtype),
-                tf.cast(2**n * tf.math.round((target_tb_size - 24) / 2**n), rdtype))
-            return n_info_q
+    # quantize target_tb_size
+    def n_info_q_if_target_tbs_greater_3824():
+        # Compute quantized n. info bits if target TB size > 3824
+        # Step 4 of 38.214 5.3.1.2
+        log2_n_info_minus_24 = tf.math.log(
+            target_tb_size - tf.cast(24, target_tb_size.dtype)) \
+        / tf.math.log(tf.cast(2.0, target_tb_size.dtype))
+        n = tf.math.floor(log2_n_info_minus_24) - 5.
+        n_info_q = tf.math.maximum(
+            tf.cast(3840.0, rdtype),
+            tf.cast(2**n * tf.math.round((target_tb_size - 24) / 2**n), rdtype))
+        return n_info_q
 
-        def n_info_q_if_target_tbs_smaller_3824():
-            # Compute quantized n. info bits if target TB size <= 3824
-            log2_n_info = tf.math.log(target_tb_size) \
-                / tf.cast(tf.math.log(2.0), target_tb_size.dtype)
-            n = tf.math.maximum(tf.cast(3.0, rdtype),
-                                tf.cast(tf.math.floor(log2_n_info) - 6, rdtype))
-            n_info_q = tf.math.maximum(
-                tf.cast(24.0, rdtype),
-                tf.cast(2**n * tf.math.floor(target_tb_size / 2**n), rdtype))
-            return n_info_q
+    def n_info_q_if_target_tbs_smaller_3824():
+        # Compute quantized n. info bits if target TB size <= 3824
+        log2_n_info = tf.math.log(target_tb_size) \
+            / tf.cast(tf.math.log(2.0), target_tb_size.dtype)
+        n = tf.math.maximum(tf.cast(3.0, rdtype),
+                            tf.cast(tf.math.floor(log2_n_info) - 6, rdtype))
+        n_info_q = tf.math.maximum(
+            tf.cast(24.0, rdtype),
+            tf.cast(2**n * tf.math.floor(target_tb_size / 2**n), rdtype))
+        return n_info_q
 
-        # ----------------------------- #
-        # Quantized n. information bits #
-        # ----------------------------- #
-        n_info_q = tf.where(target_tb_size <= 3824,
-                            n_info_q_if_target_tbs_smaller_3824(),
-                            n_info_q_if_target_tbs_greater_3824())
+    # ----------------------------- #
+    # Quantized n. information bits #
+    # ----------------------------- #
+    n_info_q = tf.where(target_tb_size <= 3824,
+                        n_info_q_if_target_tbs_smaller_3824(),
+                        n_info_q_if_target_tbs_greater_3824())
     # ------------------- #
     # Auxiliary functions #
     # ------------------- #
-
 
     def tbs_if_target_tbs_higher_3824():
         # Compute TB size if target_tb_size>3824

@@ -87,7 +87,6 @@ def get_pathloss(h_freq,
     batch_size = h_freq.shape[:-6]
     lbs = len(batch_size)
     num_ofdm_symbols = h_freq.shape[-2]
-    num_ut = tf.reduce_sum(rx_tx_association)
 
     # Compute RX power
     # [..., num_rx, num_rx_ant, num_tx, num_tx_ant, num_ofdm_symbols, num_subcarriers]
@@ -108,6 +107,9 @@ def get_pathloss(h_freq,
             tensor_values_are_in_set(rx_tx_association, [0, 1]),
             True,
             message="rx_tx_association must contain binary values")
+
+        # Number of UTs
+        num_ut = tf.reduce_sum(rx_tx_association)
 
         # Extract pathloss for serving TX only, for each RX
         rx_tx_association = rx_tx_association == 1

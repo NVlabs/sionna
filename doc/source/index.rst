@@ -25,7 +25,7 @@ rapidly prototyped by connecting the desired blocks.
 NVIDIA GPU acceleration provides orders-of-magnitude faster simulation, enabling
 the interactive exploration of such systems, for example, in `Jupyter notebooks <https://jupyter.org/>`_ that can be run on cloud services such as `Google Colab <https://colab.research.google.com>`_. If no GPU is available, Sionna will run on the CPU.
 
-The `Sionna Research Kit (SRK) <rk/index.html>`_ allows to deploy trained AI/ML components in a real software-defined 5G NR radio access network (RAN). It is based on the `OpenAirInterface <https://gitlab.eurecom.fr/oai/openairinterface5g>`_ project and is powered by the `NVIDIA Jetson AGX Orin platform <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/>`_.
+The `Sionna Research Kit (SRK) <rk/index.html>`_ allows to deploy trained AI/ML components in a real software-defined 5G NR radio access network (RAN). It is based on the `OpenAirInterface <https://gitlab.eurecom.fr/oai/openairinterface5g>`_ project and is powered by the `NVIDIA Jetson AGX Thor platform <https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-thor/>`_.
 
 Sionna is developed, continuously extended, and used by NVIDIA to drive 5G and 6G research.
 

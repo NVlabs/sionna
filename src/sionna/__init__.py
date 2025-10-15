@@ -5,7 +5,7 @@
 
 import importlib
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 
 # pylint: disable=invalid-name
 def __getattr__(name):
