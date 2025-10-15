@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.phy.nr.utils &mdash; Sionna 1.2.0 documentation</title>
+  <title>sionna.phy.nr.utils &mdash; Sionna 1.2.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../../../_static/documentation_options.js?v=ca842793"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -2303,47 +2303,43 @@
             <span class="n">target_tb_size</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">num_coded_bits</span><span class="p">,</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span>
             <span class="n">message</span><span class="o">=</span><span class="s2">&quot;target_tb_size must be less than num_coded_bits.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># no quantization for user input</span>
-        <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">target_tb_size</span>
-
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Compute n info bits (Target TB size)</span>
         <span class="n">target_tb_size</span> <span class="o">=</span> <span class="n">target_coderate</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">num_coded_bits</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">)</span>
 
-        <span class="c1"># quantize target_tb_size</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">n_info_q_if_target_tbs_greater_3824</span><span class="p">():</span>
-            <span class="c1"># Compute quantized n. info bits if target TB size &gt; 3824</span>
-            <span class="c1"># Step 4 of 38.214 5.3.1.2</span>
-            <span class="n">log2_n_info_minus_24</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                <span class="n">target_tb_size</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span> \
-            <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">log2_n_info_minus_24</span><span class="p">)</span> <span class="o">-</span> <span class="mf">5.</span>
-            <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
-                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">3840.0</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">),</span>
-                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">target_tb_size</span> <span class="o">-</span> <span class="mi">24</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">),</span> <span class="n">rdtype</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">n_info_q</span>
+    <span class="c1"># quantize target_tb_size</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_info_q_if_target_tbs_greater_3824</span><span class="p">():</span>
+        <span class="c1"># Compute quantized n. info bits if target TB size &gt; 3824</span>
+        <span class="c1"># Step 4 of 38.214 5.3.1.2</span>
+        <span class="n">log2_n_info_minus_24</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="n">target_tb_size</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span> \
+        <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">log2_n_info_minus_24</span><span class="p">)</span> <span class="o">-</span> <span class="mf">5.</span>
+        <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">3840.0</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">),</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">target_tb_size</span> <span class="o">-</span> <span class="mi">24</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">),</span> <span class="n">rdtype</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">n_info_q</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">n_info_q_if_target_tbs_smaller_3824</span><span class="p">():</span>
-            <span class="c1"># Compute quantized n. info bits if target TB size &lt;= 3824</span>
-            <span class="n">log2_n_info</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">target_tb_size</span><span class="p">)</span> \
-                <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">),</span>
-                                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">log2_n_info</span><span class="p">)</span> <span class="o">-</span> <span class="mi">6</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">))</span>
-            <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
-                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">),</span>
-                <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">target_tb_size</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">),</span> <span class="n">rdtype</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">n_info_q</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_info_q_if_target_tbs_smaller_3824</span><span class="p">():</span>
+        <span class="c1"># Compute quantized n. info bits if target TB size &lt;= 3824</span>
+        <span class="n">log2_n_info</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">target_tb_size</span><span class="p">)</span> \
+            <span class="o">/</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span><span class="p">),</span> <span class="n">target_tb_size</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">),</span>
+                            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">log2_n_info</span><span class="p">)</span> <span class="o">-</span> <span class="mi">6</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">))</span>
+        <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mf">24.0</span><span class="p">,</span> <span class="n">rdtype</span><span class="p">),</span>
+            <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">target_tb_size</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">),</span> <span class="n">rdtype</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">n_info_q</span>
 
-        <span class="c1"># ----------------------------- #</span>
-        <span class="c1"># Quantized n. information bits #</span>
-        <span class="c1"># ----------------------------- #</span>
-        <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">target_tb_size</span> <span class="o">&lt;=</span> <span class="mi">3824</span><span class="p">,</span>
-                            <span class="n">n_info_q_if_target_tbs_smaller_3824</span><span class="p">(),</span>
-                            <span class="n">n_info_q_if_target_tbs_greater_3824</span><span class="p">())</span>
+    <span class="c1"># ----------------------------- #</span>
+    <span class="c1"># Quantized n. information bits #</span>
+    <span class="c1"># ----------------------------- #</span>
+    <span class="n">n_info_q</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">target_tb_size</span> <span class="o">&lt;=</span> <span class="mi">3824</span><span class="p">,</span>
+                        <span class="n">n_info_q_if_target_tbs_smaller_3824</span><span class="p">(),</span>
+                        <span class="n">n_info_q_if_target_tbs_greater_3824</span><span class="p">())</span>
     <span class="c1"># ------------------- #</span>
     <span class="c1"># Auxiliary functions #</span>
     <span class="c1"># ------------------- #</span>
-
 
     <span class="k">def</span><span class="w"> </span><span class="nf">tbs_if_target_tbs_higher_3824</span><span class="p">():</span>
         <span class="c1"># Compute TB size if target_tb_size&gt;3824</span>

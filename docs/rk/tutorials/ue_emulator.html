@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Software-defined End-to-End 5G Network &mdash; Sionna 1.2.0 documentation</title>
+  <title>Software-defined End-to-End 5G Network &mdash; Sionna 1.2.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6efca38a"></script>
+      <script src="../../_static/documentation_options.js?v=ca842793"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1662,18 +1662,23 @@
   <section id="software-defined-end-to-end-5g-network">
 <span id="ue-emulator"></span><h1>Software-defined End-to-End 5G Network<a class="headerlink" href="#software-defined-end-to-end-5g-network" title="Link to this heading"></a></h1>
 <p>In this tutorial, we will show how the entire end-to-end 5G network can be simulated using software defined user equipment (UE). This allows for the evaluation of novel — non-standard compliant — algorithms and protocols.
-This enables you to test and prototype two-sided network functions such as AI/ML-based CSI feedback compression or even custom constellations for <a class="reference external" href="https://arxiv.org/pdf/2009.05261">pilotless communications</a>.</p>
-<p>Ensure that you have already built the nrUE container <cite>oai-nr-ue</cite> (see <a class="reference internal" href="../setup/OAI.html#oai"><span class="std std-ref">OpenAirInterface Setup</span></a>).</p>
+Such a setup enables you to test and prototype two-sided network functions such as AI/ML-based CSI feedback compression or even custom constellations for <a class="reference external" href="https://arxiv.org/pdf/2009.05261">pilotless communications</a>.</p>
+<p>Ensure that you have already built the UE container <cite>oai-nr-ue</cite> (see <a class="reference internal" href="../setup/OAI.html#oai"><span class="std std-ref">OpenAirInterface Setup</span></a>).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This tutorial currently only works in the <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md">rfsimulator mode</a>.
-In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware. This allows for the simulation of a fully software defined network.</p>
+<p>For end-to-end RF experiments, this tutorials requires a
+second Jetson device with another USRP connected to the second device (or two USRPs connected to the same Jetson). However, end-to-end simulations can be done by using OAI’s <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md">rfsimulator mode</a>.
+In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware.</p>
 </div>
 <section id="run-the-gnb">
 <h2>Run the gNB<a class="headerlink" href="#run-the-gnb" title="Link to this heading"></a></h2>
 <p>Before connecting the UE, the gNB needs to be ready to connect.
 As we are using the <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md">rfsimulator mode</a>, we need to start the gNB using a slightly different configuration file.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">start_system</span><span class="o">.</span><span class="n">sh</span> <span class="n">rfsim_arm64</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># start the gNB with USRP connected</span>
+<span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">start_system</span><span class="o">.</span><span class="n">sh</span> <span class="n">b200_arm64</span>
+
+<span class="c1"># or start the gNB in rfsimulator mode</span>
+<span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">start_system</span><span class="o">.</span><span class="n">sh</span> <span class="n">rfsim_arm64_rfsim</span>
 </pre></div>
 </div>
 <p>The main difference in the configuration files is that the USRP is replaced by the simulated channel interface.</p>
@@ -1685,9 +1690,13 @@ As we are using the <a class="reference external" href="https://gitlab.eurecom.f
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">136387.122571</span> <span class="p">[</span><span class="n">PHY</span><span class="p">]</span> <span class="n">A</span> <span class="p">(</span><span class="n">nr_common_signal_proced</span><span class="p">:</span><span class="mi">92</span><span class="p">)</span> <span class="n">Command</span> <span class="n">line</span> <span class="n">parameters</span> <span class="k">for</span> <span class="n">OAI</span> <span class="n">UE</span><span class="p">:</span> <span class="o">-</span><span class="n">C</span> <span class="mi">3319680000</span> <span class="o">-</span><span class="n">r</span> <span class="mi">106</span> <span class="o">--</span><span class="n">numerology</span> <span class="mi">1</span> <span class="o">--</span><span class="n">ssb</span> <span class="mi">516</span>
 </pre></div>
 </div>
-<p>Ensure this is properly set as <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> in the <cite>.env</cite> file in the <cite>configs/rfsim_arm64</cite> directory.
-These parameters depend on the choice of the configuration file of the gNB.</p>
+<p>These parameters depend on the choice of the configuration file of the gNB.
+Ensure this is properly set as <code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code> in the <cite>.env</cite> file in the corresponding <cite>configs</cite> directory.</p>
+<p>For RF experiments, please also set the <code class="docutils literal notranslate"><span class="pre">USRP_SERIAL_UE</span></code> to the serial number of the USRP connected to the UE. For cable-based experiments, the two USRPs must be connected as shown in <a class="reference internal" href="../setup.html#figure-system-setup2"><span class="std std-numref">Fig. 19</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>As the rfsimulator does not run in real-time mode, one can simulate a larger number of PRBs than in the case of the USRP.</p>
+</div>
 </section>
 <section id="run-the-ue">
 <h2>Run the UE<a class="headerlink" href="#run-the-ue" title="Link to this heading"></a></h2>
@@ -1699,6 +1708,7 @@ For the above example with 106 PRBs, the <code class="docutils literal notransla
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UE_EXTRA_OPTIONS</span><span class="o">=-</span><span class="n">r</span> <span class="mi">106</span> <span class="o">--</span><span class="n">numerology</span> <span class="mi">1</span> <span class="o">-</span><span class="n">C</span> <span class="mi">3319680000</span>
 </pre></div>
 </div>
+<p>For RF based experiments, we recommend to use the 24 or 51 PRB configurations.</p>
 <p>Note that the <cite>start_system.sh</cite> script will automatically start the UE when the gNB is running. Otherwise, you can start the UE with</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">configs</span><span class="o">/</span><span class="n">rfsim_arm64</span><span class="o">/</span>
 <span class="n">docker</span> <span class="n">compose</span> <span class="n">up</span> <span class="o">-</span><span class="n">d</span> <span class="n">oai</span><span class="o">-</span><span class="n">nr</span><span class="o">-</span><span class="n">ue</span>
@@ -1707,6 +1717,7 @@ For the above example with 106 PRBs, the <code class="docutils literal notransla
 <span class="n">docker</span> <span class="n">compose</span> <span class="n">stop</span> <span class="n">oai</span><span class="o">-</span><span class="n">nr</span><span class="o">-</span><span class="n">ue</span>
 </pre></div>
 </div>
+<p>For RF experiments, this needs to be done on the second Jetson device.</p>
 <p>Verify that the UE is running correctly</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">logs</span> <span class="o">-</span><span class="n">f</span> <span class="n">oai</span><span class="o">-</span><span class="n">nr</span><span class="o">-</span><span class="n">ue</span>
 </pre></div>
@@ -1738,8 +1749,7 @@ For the above example with 106 PRBs, the <code class="docutils literal notransla
 <span class="n">docker</span> <span class="n">exec</span> <span class="o">-</span><span class="n">ti</span> <span class="n">oai</span><span class="o">-</span><span class="n">nr</span><span class="o">-</span><span class="n">ue</span> <span class="n">iperf3</span> <span class="o">-</span><span class="n">u</span> <span class="o">-</span><span class="n">t</span> <span class="mi">10</span> <span class="o">-</span><span class="n">i</span> <span class="mi">1</span> <span class="o">-</span><span class="n">b</span> <span class="mi">5</span><span class="n">M</span> <span class="o">-</span><span class="n">B</span> <span class="mf">12.1.1.2</span> <span class="o">-</span><span class="n">c</span> <span class="mf">192.168.72.135</span> <span class="o">-</span><span class="n">R</span>
 </pre></div>
 </div>
-<p>You can now also run multiple UEs by adding more instances of <code class="docutils literal notranslate"><span class="pre">oai-nr-ue</span></code> in the <cite>docker-compose.yaml</cite> file to simulate a multi-user scenario.
-Further, the setup can be used to evaluate new algorithms that require a modified transmitter such as the idea of custom constellations for <a class="reference external" href="https://arxiv.org/pdf/2009.05261">pilotless communications</a>.</p>
+<p>You can now also run multiple UEs by adding more instances of <code class="docutils literal notranslate"><span class="pre">oai-nr-ue</span></code> in the <cite>docker-compose.yaml</cite> file to simulate a multi-user scenario.</p>
 </section>
 </section>
 

@@ -4,13 +4,13 @@ Software-defined End-to-End 5G Network
 ======================================
 
 In this tutorial, we will show how the entire end-to-end 5G network can be simulated using software defined user equipment (UE). This allows for the evaluation of novel --- non-standard compliant --- algorithms and protocols.
-This enables you to test and prototype two-sided network functions such as AI/ML-based CSI feedback compression or even custom constellations for `pilotless communications <https://arxiv.org/pdf/2009.05261>`_.
+Such a setup enables you to test and prototype two-sided network functions such as AI/ML-based CSI feedback compression or even custom constellations for `pilotless communications <https://arxiv.org/pdf/2009.05261>`_.
 
-Ensure that you have already built the nrUE container `oai-nr-ue` (see :ref:`OAI`).
+Ensure that you have already built the UE container `oai-nr-ue` (see :ref:`OAI`).
 
-.. note:: This tutorial currently only works in the `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md>`_.
-    In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware. This allows for the simulation of a fully software defined network.
-
+.. note:: For end-to-end RF experiments, this tutorials requires a
+    second Jetson device with another USRP connected to the second device (or two USRPs connected to the same Jetson). However, end-to-end simulations can be done by using OAI's `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/radio/rfsimulator/README.md>`_.
+    In this mode, the UE is connected to the gNB via a simulated radio interface without the need for actual RF hardware.
 
 Run the gNB
 -----------
@@ -20,7 +20,11 @@ As we are using the `rfsimulator mode <https://gitlab.eurecom.fr/oai/openairinte
 
 .. code-block::
 
-    ./scripts/start_system.sh rfsim_arm64
+    # start the gNB with USRP connected
+    ./scripts/start_system.sh b200_arm64
+
+    # or start the gNB in rfsimulator mode
+    ./scripts/start_system.sh rfsim_arm64_rfsim
 
 The main difference in the configuration files is that the USRP is replaced by the simulated channel interface.
 
@@ -36,10 +40,13 @@ During the initialization procedure, the gNB provides the required UE parameters
 
     136387.122571 [PHY] A (nr_common_signal_proced:92) Command line parameters for OAI UE: -C 3319680000 -r 106 --numerology 1 --ssb 516
 
-Ensure this is properly set as ``UE_EXTRA_OPTIONS`` in the `.env` file in the `configs/rfsim_arm64` directory.
 These parameters depend on the choice of the configuration file of the gNB.
+Ensure this is properly set as ``UE_EXTRA_OPTIONS`` in the `.env` file in the corresponding `configs` directory.
 
-As the rfsimulator does not run in real-time mode, one can simulate a larger number of PRBs than in the case of the USRP.
+For RF experiments, please also set the ``USRP_SERIAL_UE`` to the serial number of the USRP connected to the UE. For cable-based experiments, the two USRPs must be connected as shown in :numref:`figure_system_setup2`.
+
+.. note::
+    As the rfsimulator does not run in real-time mode, one can simulate a larger number of PRBs than in the case of the USRP.
 
 Run the UE
 -----------
@@ -56,6 +63,7 @@ For the above example with 106 PRBs, the ``UE_EXTRA_OPTIONS`` should be
 
     UE_EXTRA_OPTIONS=-r 106 --numerology 1 -C 3319680000
 
+For RF based experiments, we recommend to use the 24 or 51 PRB configurations.
 
 Note that the `start_system.sh` script will automatically start the UE when the gNB is running. Otherwise, you can start the UE with
 
@@ -66,6 +74,8 @@ Note that the `start_system.sh` script will automatically start the UE when the 
 
     # and shutdown the UE
     docker compose stop oai-nr-ue
+
+For RF experiments, this needs to be done on the second Jetson device.
 
 Verify that the UE is running correctly
 
@@ -112,5 +122,4 @@ Or run an end-to-end speed test via
     docker exec -ti oai-nr-ue iperf3 -u -t 10 -i 1 -b 5M -B 12.1.1.2 -c 192.168.72.135 -R
 
 You can now also run multiple UEs by adding more instances of ``oai-nr-ue`` in the `docker-compose.yaml` file to simulate a multi-user scenario.
-Further, the setup can be used to evaluate new algorithms that require a modified transmitter such as the idea of custom constellations for `pilotless communications <https://arxiv.org/pdf/2009.05261>`_.
 
