@@ -617,9 +617,7 @@ class LDPC5GEncoder(Block):
         valid_rvs = {"rv0", "rv1", "rv2", "rv3"}
         for rv_name in rv_list:
             if rv_name not in valid_rvs:
-                raise ValueError(
-                    f"Invalid RV name '{rv_name}'. Valid RV names are: {sorted(valid_rvs)}"
-                )
+                raise ValueError(f"Invalid RV name '{rv_name}'. Valid RV names are: {valid_rvs}")
 
     @property
     def rv_starts(self) -> dict:
@@ -653,10 +651,10 @@ class LDPC5GEncoder(Block):
         """
         # Validate the RV list
         self._validate_rv_list(rv_list)
-        
+
         # Get the RV starts mapping
         rv_starts = self.rv_starts
-        
+
         # Convert RV names to start positions
         return [rv_starts[rv_name] for rv_name in rv_list]
 
