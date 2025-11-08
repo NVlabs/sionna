@@ -1471,9 +1471,11 @@ class LDPC5GDecoder(LDPCBPDecoder):
         if rv is None or not self._harq_mode:
             rv = ["rv0"]
         else:
-            if tf.shape(llr_ch)[-2] != len(rv):
-                msg = "In HARQ mode, second last dimension of llr_ch"
-                msg += " must equal len(rv)."
+            # Use static shape for graph compatibility
+            static_shape = llr_ch.get_shape().as_list()
+            if static_shape[-2] is not None and static_shape[-2] != len(rv):
+                msg = (f"In HARQ mode, second last dimension of llr_ch "
+                       f"({static_shape[-2]}) must equal len(rv) ({len(rv)}).")
                 raise ValueError(msg)
     
         k = self.encoder.k
