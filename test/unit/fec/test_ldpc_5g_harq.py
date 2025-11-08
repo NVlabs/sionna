@@ -47,15 +47,16 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     batch_size = 2
     num_rv = len(rv_list)
 
-    ldpc_params = LDPC5GEncoder(k, n)
-    n_cb = ldpc_params.n_cb
-
-    # Reference encoder assumes no rate matching
-    encoder_ref = LDPC5GEncoder(k, n_cb)
-
     # HARQ encoder
     encoder = LDPC5GEncoder(k, n)
     starts = encoder.rv_starts
+    n_cb = encoder.n_cb
+
+    # Reference encoder assumes no rate matching. Unfortunately, the original LDPC5GEncoder
+    # does not allow for rate k / n_cb. So we shorten a little by ignoring the last few bits.
+    # (Ideally, n_ref = n_cb).
+    n_ref = 5 * k if 5 * k < n_cb else 3 * k  # BG1 or BG2
+    encoder_ref = LDPC5GEncoder(k, n_ref)
 
     # Generate encoded bits
     source = BinarySource()
@@ -63,9 +64,8 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     @tf.function(jit_compile=use_xla)
     def encode_harq():
         bits = source([batch_size, k])
-        x_ref = encoder_ref(bits)  # Shape: [batch_size, n_cb]
-        x_ref = tf.roll(x_ref, shift=starts["rv0"], axis=-1)  # Undo shift of RV0
-        x = encoder(bits, rv=rv_list)  # Shape: [batch_size, num_rv, n]
+        x_ref = encoder_ref(bits)  # Shape: [batch_size, n_ref]; uses default RV0
+        x = encoder(bits, rv=rv_list)  # Shape: [batch_size, num_rv, n]; uses list of RVs
         return bits, x_ref, x
 
     if use_graph_mode:
@@ -73,19 +73,26 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     else:
         # In eager mode, XLA is not applicable
         bits = source([batch_size, k])
-        x_ref = encoder_ref(bits)  # Shape: [batch_size, n_cb]
-        x_ref = tf.roll(x_ref, shift=starts["rv0"], axis=-1)  # Undo shift of RV0
-        x = encoder(bits, rv=rv_list)  # Shape: [batch_size, num_rv, n]
+        x_ref = encoder_ref(bits)  # Shape: [batch_size, n_ref]; uses default RV0
+        x = encoder(bits, rv=rv_list)  # Shape: [batch_size, num_rv, n]; uses list of RVs
+    
+    # Pad x_ref to n_cb with marker value -1 on the right side
+    x_ref = tf.pad(x_ref, [[0, 0], [0, n_cb - n_ref]], mode="CONSTANT", constant_values=-1)
 
     # Validate encoded bits
     assert x.shape == [batch_size, num_rv, n]
 
     for i, rv in enumerate(rv_list):
         start = starts[rv]
-        x_ref_unrolled = tf.roll(x_ref, shift=-start, axis=-1)
-        x_ref_unrolled = x_ref_unrolled[:, :n]  # Adjust to match n length
-        assert tf.equal(x_ref_unrolled, x[:, i, :]).numpy().all(), \
-            f"RV {rv} encoding mismatch in mode Graph={use_graph_mode}, XLA={use_xla}"
+        # Align reference codeword for comparison
+        x_ref_unrolled = tf.roll(x_ref, shift=-start+starts["rv0"], axis=-1)
+        x_ref_unrolled = x_ref_unrolled[:, :n]  # Adjust to match length n
+        # Compare only non-marker positions (ignore -1 markers)
+        mask = x_ref_unrolled != -1
+        x_rv = x[:, i, :]
+        matches = tf.logical_or(~mask, tf.equal(x_ref_unrolled, x_rv))
+        all_match = tf.reduce_all(matches).numpy()
+        assert all_match, f"RV {rv} encoding mismatch in mode Graph={use_graph_mode}, XLA={use_xla}"
 
     # Print test completion info
     mode_str = f"Graph={use_graph_mode}, XLA={use_xla}"
