@@ -51,11 +51,11 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     n_cb = ldpc_params.n_cb
 
     # Reference encoder assumes no rate matching
-    encoder_ref = LDPC5GEncoder(k, n_cb, allow_low_rates=True)
+    encoder_ref = LDPC5GEncoder(k, n_cb)
 
     # HARQ encoder
-    encoder = LDPC5GEncoder(k, n, allow_low_rates=True)
-    starts = encoder.get_rv_starts()
+    encoder = LDPC5GEncoder(k, n)
+    starts = encoder.rv_starts
 
     # Generate encoded bits
     source = BinarySource()
@@ -113,7 +113,7 @@ def test_harq_decoder(k_n_esno, use_graph_mode, use_xla):
     batch_size = 3
 
     source = BinarySource()
-    encoder = LDPC5GEncoder(k, n, allow_low_rates=True)
+    encoder = LDPC5GEncoder(k, n)
     decoder = LDPC5GDecoder(encoder, harq_mode=True, num_iter=20)
     channel = AWGN()
 
@@ -187,7 +187,7 @@ def test_return_codeword(use_graph_mode, use_xla):
 
     # Set up components similar to decoder test
     source = BinarySource()
-    encoder = LDPC5GEncoder(k, n, allow_low_rates=True)
+    encoder = LDPC5GEncoder(k, n)
     decoder = LDPC5GDecoder(encoder,
                             harq_mode=True,
                             return_infobits=False,  # Get full codewords
@@ -386,36 +386,63 @@ def test_harq_dtypes(precision, dtype_in):
         assert result.dtype == tf.float64
         assert state.dtype == tf.float64
 
-def test_custom_accumulator():
-    """Test that custom accumulator callable works syntactically.
 
-    This test verifies that the HARQ decoder can accept and use a custom
-    accumulator function instead of the default one. This is a syntactic
-    test to ensure the callable replacement mechanism works correctly.
+@pytest.mark.parametrize("k_n", [(100, 200), (400, 900)])
+@pytest.mark.parametrize("batch_shape", [
+    [2, 3],      # 2D batch
+    [2, 3, 4],   # 3D batch
+])
+def test_harq_multidimensional_batch(k_n, batch_shape):
+    """Test HARQ encoder/decoder with multi-dimensional batch shapes.
+
+    This test verifies that the encoder and decoder correctly handle
+    multiple batch dimensions, not just a single batch dimension.
+    The output should match element-by-element when compared to
+    processing each batch element individually.
+
+    Tests:
+    - Multi-dimensional batch shapes work correctly
+    - Results match single-batch processing
+    - Both encoder and decoder preserve batch dimensions
     """
-    k, n = 100, 200
-    batch_size = 3
+    k, n = k_n
+    rv_list = ["rv0", "rv2"]
+    num_rv = len(rv_list)
+
+    # Set up encoder and decoder
     encoder = LDPC5GEncoder(k, n)
+    decoder = LDPC5GDecoder(encoder, harq_mode=True, num_iter=10)
 
-    # Define a simple custom accumulator (just for syntax testing)
-    def simple_accumulator(llr_accumulated, llr_new, transmission_idx):
-        """Simple custom accumulator: same as default but with logging capability."""
-        if llr_accumulated is None:
-            return llr_new
-        else:
-            # Could add logging here if needed
-            return llr_accumulated + llr_new
+    # Generate source bits with multi-dimensional batch
+    source = BinarySource()
+    u = source(batch_shape + [k])
 
-    # Create decoder with custom accumulator
-    decoder = LDPC5GDecoder(encoder,
-                           harq_mode=True,
-                           accumulator=simple_accumulator,
-                           num_iter=5)
+    # Encode with multi-dimensional batch
+    c = encoder(u, rv=rv_list)
+    assert c.shape == batch_shape + [num_rv, n]
 
-    # Test that it works syntactically
-    source = GaussianPriorSource()
-    rv_list = ["rv0", "rv1"]
-    llr_ch = source([batch_size, len(rv_list), n], 0.5)
+    # Add noise
+    source_llr = GaussianPriorSource()
+    llr = source_llr(batch_shape + [num_rv, n], 0.8)
 
-    result = decoder(llr_ch, rv=rv_list)
-    assert result.shape == [batch_size, k]
+    # Decode with multi-dimensional batch
+    u_hat = decoder(llr, rv=rv_list)
+    assert u_hat.shape == batch_shape + [k]
+
+    # Verify against element-by-element processing
+    # Flatten all batch dimensions except the last one
+    total_batch_size = np.prod(batch_shape)
+    u_flat = tf.reshape(u, [total_batch_size, k])
+    c_flat = tf.reshape(c, [total_batch_size, num_rv, n])
+    llr_flat = tf.reshape(llr, [total_batch_size, num_rv, n])
+    u_hat_flat = tf.reshape(u_hat, [total_batch_size, k])
+
+    # Process each batch element individually and compare
+    for i in range(total_batch_size):
+        # Encode single element
+        c_ref = encoder(u_flat[i:i+1, :], rv=rv_list)
+        assert np.allclose(c_ref.numpy(), c_flat[i:i+1, :, :].numpy())
+
+        # Decode single element
+        u_hat_ref = decoder(llr_flat[i:i+1, :, :], rv=rv_list)
+        assert np.allclose(u_hat_ref.numpy(), u_hat_flat[i:i+1, :].numpy())

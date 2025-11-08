@@ -1264,15 +1264,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
         redundancy) where successive LLR receptions are inserted in a circular
         buffer and accumulated. The circular buffer is of size [batch_size, n_cb].
 
-    accumulator: `None` (default) | callable
-        Function to accumulate LLRs from multiple transmissions. If `None`, uses
-        simple addition. The callable should have signature:
-        `accumulator(llr_accumulated, llr_new, transmission_idx)`
-        where `llr_accumulated` is the accumulated LLRs so far (or None for first
-        transmission), `llr_new` is the new LLRs to accumulate, and
-        `transmission_idx` is the transmission index (0, 1, 2, ...).
-        Should return the updated accumulated LLRs.
-
     Input
     -----
     llr_ch: [...,n] or [...,num_rv,n], tf.float
@@ -1340,7 +1331,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
                  return_state=False,
                  precision=None,
                  harq_mode=False,
-                 accumulator=None,
                  **kwargs):
 
         # needs the 5G Encoder to access all 5G parameters
@@ -1423,14 +1413,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
                 cn_schedule.append(np.arange(z) + i*z)
             cn_schedule = tf.stack(cn_schedule, axis=0)
 
-        # Set up accumulator function
-        if accumulator is None:
-            self._accumulator = self._default_accumulator
-        elif callable(accumulator):
-            self._accumulator = accumulator
-        else:
-            raise TypeError("accumulator must be callable or None.")
-
         super().__init__(pcm,
                          cn_update=cn_update,
                          vn_update=vn_update,
@@ -1457,22 +1439,6 @@ class LDPC5GDecoder(LDPCBPDecoder):
     # Sionna block functions
     ########################
 
-    def _default_accumulator(self, llr_accumulated, llr_new, transmission_idx):
-        """Default LLR accumulator: simple addition.
-
-        Args:
-            llr_accumulated: Previous accumulated LLRs or None for first transmission
-            llr_new: New LLRs to accumulate
-            transmission_idx: Index of current transmission (0, 1, 2, ...)
-
-        Returns:
-            Updated accumulated LLRs
-        """
-        if llr_accumulated is None:
-            return llr_new
-        else:
-            return llr_accumulated + llr_new
-    
     def build(self, input_shape, **kwargs):
         """Build block"""
 
@@ -1505,10 +1471,9 @@ class LDPC5GDecoder(LDPCBPDecoder):
         if rv is None or not self._harq_mode:
             rv = ["rv0"]
         else:
-            self.encoder.validate_rv_list(rv)
-            if tf.shape(llr_ch)[-2]!=len(rv_list):
+            if tf.shape(llr_ch)[-2] != len(rv):
                 msg = "In HARQ mode, second last dimension of llr_ch"
-                msg += "must equal len(rv)."
+                msg += " must equal len(rv)."
                 raise ValueError(msg)
     
         k = self.encoder.k
@@ -1521,8 +1486,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
         llr_ch_reshaped = tf.reshape(llr_ch, new_shape)
         batch_size = tf.shape(llr_ch_reshaped)[0]
 
-        rv_starts = self.encoder.get_rv_starts()
-        start_pos = [rv_starts[rv_name] for rv_name in rv]
+        # Get starting positions for all RVs (validates and converts)
+        start_pos = self.encoder.get_start_positions(rv)
 
         llr_accumulated = None
         for rv_idx, _ in enumerate(rv):
@@ -1544,8 +1509,11 @@ class LDPC5GDecoder(LDPCBPDecoder):
             # Implicit undoing of shortening of first two 2*Z positions
             llr_rv_unrolled = tf.roll(llr_rv_padded, shift=start_pos[rv_idx], axis=1)
 
-            # accumulate using the configured accumulator function
-            llr_accumulated = self._accumulator(llr_accumulated, llr_rv_unrolled, rv_idx)
+            # accumulate LLRs using simple addition
+            if llr_accumulated is None:
+                llr_accumulated = llr_rv_unrolled
+            else:
+                llr_accumulated = llr_accumulated + llr_rv_unrolled
 
         # use accumulated LLRs for further processing
         llr_5g = llr_accumulated

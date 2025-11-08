@@ -40,10 +40,6 @@ class LDPC5GEncoder(Block):
         Precision used for internal calculations and outputs.
         If set to `None`, :py:attr:`~sionna.phy.config.precision` is used.
 
-    allow_low_rates: bool, (default `False`)
-        If set to `True`, the encoder will allow coding rates below 1/3 and 1/5,
-        respectively for BG1 and BG2, consistent with 3GPP specifications.
-
     Input
     -----
     bits: [...,k], tf.float
@@ -79,7 +75,6 @@ class LDPC5GEncoder(Block):
                  num_bits_per_symbol=None,
                  bg=None,
                  precision=None,
-                 allow_low_rates=False,
                  **kwargs):
 
         super().__init__(precision=precision, **kwargs)
@@ -107,17 +102,12 @@ class LDPC5GEncoder(Block):
         self._coderate = k / n
         self._check_input = True # check input for consistency (i.e., binary)
 
-        self._allow_low_rates = allow_low_rates # allow rates below 1/3 (BG1) and 1/5 (BG2)
-
         # allow actual code rates slightly larger than 948/1024
         # to account for the quantization procedure in 38.214 5.1.3.1
         if self._coderate>(948/1024): # as specified in 38.212 5.4.2.1
             print(f"Warning: effective coderate r>948/1024 for n={n}, k={k}.")
         if self._coderate>(0.95): # as specified in 38.212 5.4.2.1
             raise ValueError(f"Unsupported coderate (r>0.95) for n={n}, k={k}.")
-        if self._coderate<(1/5) and not self._allow_low_rates:
-            # outer rep. coding currently not supported
-            raise ValueError("Unsupported coderate (r<1/5).")
 
         # construct the basegraph according to 38.212
         # if bg is explicitly provided
@@ -303,14 +293,6 @@ class LDPC5GEncoder(Block):
         if bg=="bg2" and k>3840:
             raise ValueError(
                 f"K is not supported by BG2 (too large) k ={k}.")
-
-        if bg=="bg1" and r<1/3 and not self._allow_low_rates:
-            raise ValueError("Only coderate>1/3 supported for BG1. \
-            Remark: Repetition coding is currently not supported.")
-
-        if bg=="bg2" and r<1/5 and not self._allow_low_rates:
-            raise ValueError("Only coderate>1/5 supported for BG2. \
-            Remark: Repetition coding is currently not supported.")
 
         return bg
 
@@ -639,7 +621,8 @@ class LDPC5GEncoder(Block):
                     f"Invalid RV name '{rv_name}'. Valid RV names are: {sorted(valid_rvs)}"
                 )
 
-    def _get_rv_starts(self) -> dict:
+    @property
+    def rv_starts(self) -> dict:
         """Get RV starting positions mapping as per 3GPP TS 38.212.
 
         Returns
@@ -652,6 +635,30 @@ class LDPC5GEncoder(Block):
             "rv2": self.n_cb // 2,
             "rv3": 3 * self.n_cb // 4
         }
+
+    def get_start_positions(self, rv_list):
+        """Get starting positions for a list of RVs.
+
+        Validates the RV list and returns the corresponding starting positions.
+        Combines validation and position lookup into a single operation.
+
+        Args:
+            rv_list (list): List of RV name strings (e.g., ["rv0", "rv2"]).
+
+        Returns:
+            list: List of starting positions corresponding to the RV names.
+
+        Raises:
+            ValueError: If any RV name is invalid.
+        """
+        # Validate the RV list
+        self._validate_rv_list(rv_list)
+        
+        # Get the RV starts mapping
+        rv_starts = self.rv_starts
+        
+        # Convert RV names to start positions
+        return [rv_starts[rv_name] for rv_name in rv_list]
 
     def build(self, input_shape, **kwargs):
         """"Build block."""
@@ -727,13 +734,12 @@ class LDPC5GEncoder(Block):
 
         c_no_filler = tf.concat([c_no_filler1, c_no_filler2], 1)
 
-        # get RV starting positions mapping
-        rv_starts = self._get_rv_starts()
+        # Get starting positions for all RVs (validates and converts)
+        start_positions = self.get_start_positions(rv)
 
         c_short_list = []
         
-        for rv_name in rv:
-            start = rv_starts[rv_name]
+        for idx, start in enumerate(start_positions):
 
             # check if circular wrap occurs
             if start + self.n <= self.n_cb:
