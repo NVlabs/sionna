@@ -1,5 +1,5 @@
-Performance Tweaks
-==================
+Jetson Performance Tweaks
+=========================
 
 This guide covers key performance optimizations for the Jetson platform, including power settings, CPU governors, and real-time priority settings.
 
@@ -33,20 +33,30 @@ The CPU governor controls how the processor scales frequency based on load. Sett
 
 .. code-block:: bash
 
-   # Set governor for cores 1-4
+   # on AGX Orin
    sudo cpufreq-set -c 0 -g performance
-
-   # Set governor for cores 5-8
    sudo cpufreq-set -c 4 -g performance
-
-   # Set governor for cores 9-12
    sudo cpufreq-set -c 8 -g performance
+
+   # on AGX Thor
+   sudo cpufreq-set -c 0 -g performance
+   sudo cpufreq-set -c 2 -g performance
+   sudo cpufreq-set -c 4 -g performance
+   sudo cpufreq-set -c 6 -g performance
+   sudo cpufreq-set -c 8 -g performance
+   sudo cpufreq-set -c 10 -g performance
+   sudo cpufreq-set -c 12 -g performance
 
 To make these changes persistent across reboots, modify ``/etc/nvpmodel.conf`` to set the default power mode, and create ``/etc/default/cpufrequtils`` to set the CPU governor. This can also be done as follows:
 
 .. code-block:: bash
 
+   # on AGX Orin
    sudo sed -i 's|< PM_CONFIG DEFAULT=2 >|< PM_CONFIG DEFAULT=0 >|' /etc/nvpmodel.conf
+
+   # on AGX Thor
+   sudo sed -i 's|< PM_CONFIG DEFAULT=1 >|< PM_CONFIG DEFAULT=0 >|' /etc/nvpmodel.conf
+
    echo 'GOVERNOR="performance"' | tee /etc/default/cpufrequtils
 
 Default System Mode
@@ -73,6 +83,7 @@ The Ubuntu system in the Jetson ships with booting on graphical mode by default.
    # change default back to GUI
    sudo systemctl set-default graphical.target
 
+Note this is mostly relevant for the Jetson Orin Nano Super.
 
 Real-Time Scheduling
 --------------------

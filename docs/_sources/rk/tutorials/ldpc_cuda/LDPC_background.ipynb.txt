@@ -40,7 +40,7 @@
     "\n",
     "Note that the decoder is implemented using `int` datatypes instead of `float`. This ensures compatibility with OAI.\n",
     "\n",
-    "The Python code of this tutorial can be also found in [tutorials/ldpc_cuda/python/numpy_decoder.py](https://github.com/NVlabs/sionna-rk/blob/main/tutorials/ldpc_cuda/python/numpy_decoder.py)\n",
+    "The Python code of this tutorial can be also found in [plugins/ldpc_cuda/src/python/numpy_decoder.py](https://github.com/NVlabs/sionna-rk/blob/main/plugins/ldpc_cuda/src/python/numpy_decoder.py)\n",
     "\n",
     "### Python Imports\n",
     "\n",
@@ -307,7 +307,7 @@
     "2. **llr_total **: This buffer accumulates the LLRs from the variable nodes. This is of size $Z*68$ for $bg=1$ and $Z*52$ for $bg=2$.\n",
     "3. **llr_msg**: This buffer stores the messages from the check nodes to the variable nodes. This is of size $Z*316$ for $bg=1$ and $Z*197$ for $bg=2$.\n",
     "\n",
-    "Note that in practice as a result of rate-matching many VNs are punctured. This allows more efficient decoders but not updating these unused VNs."
+    "In practice, many VNs are punctured due to rate-matching, allowing decoders to skip updates for these unused nodes and operate more efficiently."
    ]
   },
   {
@@ -734,7 +734,7 @@
    "mimetype": "text/x-python",
    "name": "python",
    "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
+   "pygments_lexer": "python3",
    "version": "3.10.12"
   }
  },

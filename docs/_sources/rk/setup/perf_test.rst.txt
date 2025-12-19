@@ -23,19 +23,17 @@ And to monitor the system:
    # View gNB logs
    docker logs -f oai-gnb
 
-   # Monitor Jetson performance
-   pip install jetson-stats
+   # Monitor performance on DGX Spark
+   nvtop
+
+   # Monitor performance on Jetson
    jtop
 
 The following commands test the performance of the 5G connection:
 
 .. code-block:: bash
 
-   # Install iperf3 on both UE and UPF (if not already installed)
-   sudo apt update
-   sudo apt install iperf3
-
-   # start iperf3 server in EXT-DN Docker container
+   # if not already running, start iperf3 server in EXT-DN Docker container
    docker exec -d oai-ext-dn iperf3 -s
 
    # On the client (UE)

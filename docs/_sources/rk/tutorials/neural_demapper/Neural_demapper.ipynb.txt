@@ -8,7 +8,7 @@
     "\n",
     "![Neural Demapper Basics](../../figs/tutorial_nn_demapper_basic.png)\n",
     "   \n",
-    "This first part of the tutorial covers training and implementation of a neural network (NN) based demapper using Sionna. We keep the neural network architecture straightforward to focus on efficient inference and the integration in the OAI stack.\n",
+    "This first part of the tutorial covers training and implementation of a neural network (NN)-based demapper using Sionna. We keep the neural network architecture straightforward to focus on efficient inference and the integration in the OAI stack.\n",
     " \n",
     "While we use demapping as our example since it is a simple and well-understood task, neural networks could potentially replace many signal processing blocks like channel estimation or equalization.\n",
     "The main focus here is demonstrating how to integrate neural network (NN) components into the physical layer's signal processing pipeline.\n",
@@ -237,7 +237,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
+   "execution_count": null,
    "metadata": {},
    "outputs": [
     {
@@ -270,13 +270,13 @@
    ],
    "source": [
     "import sys\n",
-    "sys.path.append('../../')\n",
+    "sys.path.append('../../../')\n",
     "\n",
     "MAX_LINES = 1000000 # Stop after this many imported lines\n",
     "\n",
     "# Depends on config that was used for data capture\n",
-    "fn_input = '../../logs/demapper_in.txt'\n",
-    "fn_output = '../../logs/demapper_out.txt'\n",
+    "fn_input = '../../../logs/demapper_in.txt'\n",
+    "fn_output = '../../../logs/demapper_out.txt'\n",
     "\n",
     "# Read training data from data dump\n",
     "def read_training_data(in_file, element_shape):\n",
@@ -756,12 +756,12 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 13,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
     "# Save weights for synthetic demapper\n",
-    "fn = \"model/neural_demapper_weights_y2\"\n",
+    "fn = \"../models/neural_demapper_weights_y2\"\n",
     "\n",
     "weights = neural_demapper_synthetic.get_weights()\n",
     "with open(fn, 'wb') as f:\n",
@@ -783,7 +783,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 14,
+   "execution_count": null,
    "metadata": {},
    "outputs": [
     {
@@ -800,8 +800,8 @@
     "###########################################################################\n",
     "\n",
     "# Depends on config that was used for data capture\n",
-    "fn_input = '../../logs/demapper_in.txt'\n",
-    "fn_output = '../../logs/demapper_out.txt'\n",
+    "fn_input = '../../../logs/demapper_in.txt'\n",
+    "fn_output = '../../../logs/demapper_out.txt'\n",
     "\n",
     "# Requires data dump from the previous tutorial\n",
     "demapper_in_data = read_training_data(fn_input, (2, 2))\n",
@@ -917,12 +917,12 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 17,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
     "# Save weights of captured demapper\n",
-    "fn = \"model/neural_demapper_weights_y4\"\n",
+    "fn = \"../models/neural_demapper_weights_y4\"\n",
     "\n",
     "weights = neural_demapper_capture.get_weights()\n",
     "with open(fn, 'wb') as f:\n",
@@ -952,7 +952,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 18,
+   "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -963,7 +963,7 @@
     "else:\n",
     "    num_inputs = 4  # 4xfloat16\n",
     "\n",
-    "fn = f\"model/neural_demapper_weights_y{num_inputs}\"\n",
+    "fn = f\"../models/neural_demapper_weights_y{num_inputs}\"\n",
     "\n",
     "# Load weights via pickle\n",
     "with open(fn, 'rb') as f:\n",
@@ -1005,7 +1005,7 @@
     "onnx.checker.check_model(onnx_model)\n",
     "\n",
     "# And save the ONNX model\n",
-    "onnx.save(onnx_model, f\"model/neural_demapper.{num_inputs}xfloat16.onnx\")\n",
+    "onnx.save(onnx_model, f\"../models/neural_demapper.{num_inputs}xfloat16.onnx\")\n",
     "\n",
     "# And build trtengine\n",
     "trt_command = f'/usr/src/tensorrt/bin/trtexec --fp16'\n",
@@ -1047,7 +1047,7 @@
    "mimetype": "text/x-python",
    "name": "python",
    "nbconvert_exporter": "python",
-   "pygments_lexer": "ipython3",
+   "pygments_lexer": "python3",
    "version": "3.10.12"
   }
  },

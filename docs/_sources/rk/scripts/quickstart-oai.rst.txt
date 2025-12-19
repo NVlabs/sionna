@@ -10,20 +10,22 @@ SYNOPSIS
 .. code-block:: bash
 
     quickstart-oai.sh
-        [--arch (x86|arm64|cuda)]
-        [--clean]
         [-h|--help]
+        [--clean]
+        [--debug]
         [--no-build]
         [--tag <tagname>]
-        --source <kit-rootdir>
-        --dest <openairinterface5g_dir>
+        [--oai-version <version>]
+        [--ci]
+        [--source <kit-rootdir>]
+        [--dest <openairinterface5g_dir>]
 
 DESCRIPTION
 ===========
 
-Start from scratch and performs the steps needed to end with a set of working Docker images for OpenAirInterface. The images can then be started using one of the provided configurations using the start-system script.
+Start from scratch and perform the steps needed to end with a set of working Docker images for OpenAirInterface. The images can then be started using one of the provided configurations using the start-system script.
 
-The script clones the OpenAirInterface repository, applies patches if needed, and calls Docker buildx to build the images. It uses build-oai-images for the build.
+The script clones the OpenAirInterface repository at the specified version, applies patches from the Sionna Research Kit, and calls Docker to build the images.
 
 OPTIONS
 =======
@@ -34,7 +36,15 @@ OPTIONS
 
 .. option:: --dest <openairinterface5g_dir>
 
-    Specify the destination directory for the OpenAirInterface code. Code will be cloned and patched here. Default is 'ext/openairinterface5g'.
+    Specify the destination directory for the OpenAirInterface code. Code will be cloned and patched here. Default is ``ext/openairinterface5g``.
+
+.. option:: --oai-version <version>
+
+    Specify the OAI version/branch to checkout. Default is ``2025.w34``.
+
+.. option:: --tag <tagname>
+
+    Use <tagname> for the created Docker images. Default is ``latest``.
 
 .. option:: --clean
 
@@ -42,27 +52,31 @@ OPTIONS
 
 .. option:: --no-build
 
-    Skip the build step of the Docker images. Default is to build the images.
+    Skip the build step of the Docker images. Only clone and patch the repository.
 
-.. option:: --tag <tagname>
+.. option:: --debug
 
-    Use <tagname> for the created Docker images. Default is 'latest'.
+    Enable debug output during the build process.
 
-.. option:: --arch (x86 | arm64 | cuda)
+.. option:: --ci
 
-    The variant of the Docker images to build. 'x86' is unpatched OAI intended for x86_64 tests. 'arm64' is for CPU-only images compatible. 'cuda' includes support for GPU acceleration. Default is to parse the system architecture.
+    Enable CI mode for automated builds.
+
+.. option:: -h, --help
+
+    Display help message and exit.
 
 EXAMPLES
 ========
 
 .. code-block:: bash
 
-    quickstart-oai.sh
-    quickstart-oai.sh --clean --source .
-    quickstart-oai.sh --clean --arch cuda --source . --dest ext/oai
+    ./quickstart-oai.sh
+    ./quickstart-oai.sh --clean
+    ./quickstart-oai.sh --clean --tag experimental
+    ./quickstart-oai.sh --oai-version 2025.w34 --no-build
 
 SEE ALSO
 ========
 
-:doc:`start-system.sh </scripts/start-system>` , :doc:`build-oai-images.sh </scripts/build-oai-images>`
-
+:doc:`start-system.sh </scripts/start-system>`, :doc:`build-oai-images.sh </scripts/build-oai-images>`

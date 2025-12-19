@@ -14,14 +14,14 @@ SYNOPSIS
 DESCRIPTION
 ===========
 
-Start a set of Docker containers using the configuration files defined in [config-name], from the configs/ directory. If no configuration name is given, uses b200_arm64.
+Start a set of Docker containers using the configuration files defined in [config-name], from the config/ directory. The script starts the 5G core network components (MySQL, AMF, SMF, UPF, ext-DN), the nearRT-RIC, and then the gNB. If the configuration name contains "rfsim", it also starts the software UE.
 
 OPTIONS
 =======
 
 .. option:: config-name
 
-    Use the files in the directory configs/<config-name> to start and configure the Docker containers.
+    Use the files in the directory config/<config-name> to start and configure the Docker containers. Default is ``rfsim``.
 
 EXAMPLES
 ========
@@ -29,7 +29,8 @@ EXAMPLES
 .. code-block:: bash
 
     start-system.sh
-    start-system.sh rfsim_arm64
+    start-system.sh rfsim
+    start-system.sh b200
 
 SEE ALSO
 ========

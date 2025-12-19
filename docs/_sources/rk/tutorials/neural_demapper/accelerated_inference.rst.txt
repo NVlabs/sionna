@@ -22,7 +22,7 @@ For details on efficient memory management when offloading compute-intensive fun
 Demapper Implementation Overview
 --------------------------------
 
-The neural demapper is implemented in Tensorflow and exported to TensorRT, the source code of the inference logic can be found in `tutorials/neural_demapper/runtime/trt_demapper.cpp <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/trt_demapper.cpp>`_. The implementation will be explained in the following sections.
+The neural demapper is implemented in Tensorflow and exported to TensorRT, the source code of the inference logic can be found in `plugins/neural_demapper/src/runtime/trt_demapper.cpp <https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/src/runtime/trt_demapper.cpp>`_. The implementation will be explained in the following sections.
 
 The TRT demapper receives noisy input symbols from the OpenAirInterface stack via the function ``trt_demapper_decode()``, which chunks a given array of symbols into batches of maximum size ``MAX_BLOCK_LEN`` and then calls ``trt_demapper_decode_block()`` to carry out the actual inference on each batch. To leverage data-parallel execution on the GPU, inference is performed for batches of symbols and multiple threads in parallel. The output of the neural demapper is passed back in the form of ``num_bits_per_symbol`` LLRs per input symbol.
 
@@ -30,7 +30,7 @@ To run the TensorRT inference engine on the given ``int16_t``-quantized data, we
 
 .. note::
 
-   The full implementation can be found in `tutorials/neural_demapper/runtime/data_processing.cu <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/data_processing.cu>`_ and `tutorials/neural_demapper/runtime/trt_demapper.cpp <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/trt_demapper.cpp>`_.
+   The full implementation can be found in `plugins/neural_demapper/src/runtime/data_processing.cu <https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/src/runtime/data_processing.cu>`_ and `plugins/neural_demapper/src/runtime/trt_demapper.cpp <https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/src/runtime/trt_demapper.cpp>`_.
 
 Setting up the TensorRT Inference Engine
 ----------------------------------------
@@ -215,7 +215,7 @@ After inference, the conversion back to quantized LLRs follows the same pattern,
 
 The CUDA kernel for normalization runs in a straight-forward 1D CUDA grid, reading the tuples of ``int16_t``-quantized components that make up each complex value in a coalesced (consecutive) way, as one ``int32_t`` value each. Then, the symbol values are normalized with respect to the magnitude values and again written in a coalesced way, fusing each complex symbol into one ``__half2`` value:
 
-.. literalinclude:: data_processing.cu
+.. literalinclude:: ../../../../plugins/neural_demapper/src/runtime/data_processing.cu
    :language: cpp
    :linenos:
    :start-after: START marker-normalize-symbols
@@ -230,7 +230,7 @@ The CUDA kernel for normalization runs in a straight-forward 1D CUDA grid, readi
 
 The CUDA kernel for re-quantization of output LLRs works analogously, converting half-precision floating-point LLR tuples to quantized ``int16_t`` values by fixed-point scaling and rounding:
 
-.. literalinclude:: data_processing.cu
+.. literalinclude:: ../../../../plugins/neural_demapper/src/runtime/data_processing.cu
    :language: cpp
    :linenos:
    :start-after: START marker-quantize-llrs
@@ -244,18 +244,8 @@ Demapper Integration in OAI
 
    Ensure that you have built the TRTengine in the first part of the tutorial.
 
-Finally, we integrate the TensorRT demapper implementation into the OAI stack. After patching, the Dockerfiles in the Sionna Research Kit are already configured for CUDA support. If done manually, you need to patch the system before building the Docker images via
 
-.. code-block:: bash
-
-   ./scripts/patch_oai-tutorials.sh
-
-This automatically patches the OAI stack and adds the CUDA flag to the build pipeline. Note that this is already done if you followed the :ref:`quickstart` tutorial.
-
-After patching, the demapper implementation is located in `tutorials/neural_demapper/... <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/>`_.
-You can now modify the `runtime/trt_demapper.cpp <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/runtime/trt_demapper.cpp>`_ file and implement your own demapper variants.
-
-In order to mount the TensorRT models and config files, you can extend the `oai-gnb` config in `docker-compose.override.yaml`:
+In order to mount the TensorRT models and config files, you need to extend the ``config/common/docker-compose.override.yaml`` file:
 
 .. code-block:: yaml
    :linenos:
@@ -263,10 +253,10 @@ In order to mount the TensorRT models and config files, you can extend the `oai-
    services:
       oai-gnb:
           volumes:
-          - ./models/:/opt/oai-gnb/models
-          - ./demapper_trt.config:/opt/oai-gnb/demapper_trt.config
+          - ../../plugins/neural_demapper/models/:/opt/oai-gnb/models
+          - ../../plugins/neural_demapper/config/demapper_trt.config:/opt/oai-gnb/demapper_trt.config
 
-Pre-trained models are available in `tutorials/neural_demapper/models <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/models>`_.
+Pre-trained models are available in `plugins/neural_demapper/models <https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/models>`_.
 
 The TRT config file format has the following schema:
 
@@ -275,7 +265,7 @@ The TRT config file format has the following schema:
    <trt_engine_file:string> # file name of the TensorRT engine
    <trt_normalized_inputs:int> # flag to indicate if the inputs are normalized
 
-For example, the following config file will use the TensorRT engine `models/neural_demapper.2xfloat16.plan <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/models/neural_demapper.2xfloat16.onnx>`_ and normalize the inputs:
+For example, the following config file will use the TensorRT engine `models/neural_demapper.2xfloat16.plan <https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/models/neural_demapper.2xfloat16.onnx>`_ and normalize the inputs:
 
 .. code-block::
 
@@ -286,13 +276,13 @@ For example, the following config file will use the TensorRT engine `models/neur
 Running the Demapper
 --------------------
 
-The neural demapper is implemented as shared library (see :ref:`data_acquisition`) which can be loaded using the OAI shared library loader. The demapper can now be used as a drop-in replacement for the QAM-16 default implementation. The demapper can be loaded when running the gNB via the following ``GNB_EXTRA_OPTIONS`` in the ``.env`` file of the config folder.
+The neural demapper is implemented as shared library (see :ref:`data_acquisition`) which can be loaded using the OAI shared library loader. The demapper can now be used as a drop-in replacement for the QAM-16 default implementation. The demapper can be loaded when running the gNB via the following ``GNB_EXTRA_OPTIONS`` in the ``config/<config_name>/.env`` file of the config folder.
 
 .. code-block:: bash
 
-   GNB_EXTRA_OPTIONS=--loader.demapper.shlibversion _trt --MACRLCs.[0].dl_max_mcs 10 --MACRLCs.[0].ul_max_mcs 10 --thread-pool 5,6,7,8,9,10,11
+   GNB_EXTRA_OPTIONS=--loader.demapper.shlibversion _trt --MACRLCs.[0].dl_max_mcs 10 --MACRLCs.[0].ul_max_mcs 10
 
-We limit the MCS indices to 10 in order to stay within the QAM-16 modulation order. We strongly recommend to additionally assign dedicated CPU cores to PHY-layer processing via the *thread-pool* option. This assigns the cores 5-11 to the PHY layer thread pool. Note that the lower CPU cores are assigned to the USRP handling such as time synchronization.
+We limit the MCS indices to 10 in order to stay within the QAM-16 modulation order.
 
 Congratulations! You have now successfully implemented demapping using a neural network.
 
@@ -300,6 +290,10 @@ You can track the GPU load via
 
 .. code-block:: bash
 
+   # on DGX Spark
+   $ nvidia-smi
+
+   # on Jetson
    $ jtop
 
 
@@ -312,7 +306,7 @@ In the following section, we focus on various technical aspects of the CUDA impl
 Memory Management
 ^^^^^^^^^^^^^^^^^
 
-Similar to the :ref:`accelerated_ldpc` tutorial, we use the shared system memory architecture of the Jetson platform to avoid the bottleneck of costly memory transfers on traditional split-memory platforms.
+Similar to the :ref:`accelerated_ldpc` tutorial, we use the shared system memory architecture to avoid the bottleneck of costly memory transfers on traditional split-memory platforms.
 
 As previously covered in the :ref:`accelerated_ldpc` tutorial, optimizing memory operations is essential for real-time performance. For the neural demapper implementation, we use the same efficient approach of page-locked memory (via `cudaHostAlloc()`) to enable direct GPU-CPU memory sharing. This allows for simple `memcpy()` operations instead of complex memory management calls, with host caching enabled for CPU access while device caching is disabled for direct memory access. This approach is particularly well-suited for the small buffer sizes used in neural demapping, avoiding the overhead of traditional GPU memory management methods like `cudaMemcpyAsync()` or `cudaMallocManaged()`.
 
@@ -369,7 +363,7 @@ CUDA command graph APIs [Gray2019]_ were introduced to frontload the overhead of
 
 Command graphs are pre-recorded per thread due to the individual intermediate storage buffers used. We run the recording at the end of thread context initialization as introduced above, for each batch size running one *size-0* inference to trigger any kind of lazy runtime allocations, and another inference on dummy inputs for the actual recording:
 
-.. literalinclude:: trt_demapper.cpp
+.. literalinclude:: ../../../../plugins/neural_demapper/src/runtime/trt_demapper.cpp
    :language: cpp
    :linenos:
    :start-after: START marker-record-graph
@@ -452,19 +446,16 @@ To extend the function ``trt_demapper_decode_block()`` with CUDA graph recording
    }
 
 
+.. note::
+
+    Note that CUDA graphs are currently only enabled on DGX Spark. Jetson platform support is disabled pending investigation of stability issues.
+
 Unit tests
 ----------
 
 We have implemented unit tests using `pytest` to allow testing individual parts of the implementation outside of the full 5G stack.
-The unit tests can be found in `tutorials/neural_demapper/tests/ <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/tests/>`_.
+The unit tests can be found in `plugins/neural_demapper/tests/ <https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/tests/>`_.
 The unit tests use `nanobind` to call the TensorRT and CUDA modules from Python and to test against Python-based reference implementations. For more details on how to use nanobind, please refer to the `nanobind documentation <https://nanobind.readthedocs.io/en/latest/>`_.
-
-An example script for building and testing is provided in `tests/build_and_run.sh <https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/tests/build_and_run.sh>`_ (assuming that the requirements of the Sionna framework are installed):
-
-.. literalinclude:: build_and_run.sh
-   :language: bash
-   :start-after: Apache-2.0
-   :linenos:
 
 
 Outlook
@@ -472,5 +463,4 @@ Outlook
 
 This was a first tutorial on accelerating neural network inference using TensorRT and CUDA graphs. The neural demapper itself is a simple network and the focus was on the integration rather than the actual error rate performance.
 
-You are now able to deploy your own neural networks using this tutorial as a blueprint. An interesting starting point could be the `Multi-user MIMO Neural Receiver <https://github.com/NVlabs/neural_rx>`_, which provides a 5G compliant implementation of a neural receiver and already provides a TensorRT export of the trained network.
-
+You are now able to deploy your own neural networks using this tutorial as a blueprint. An interesting starting point could be the :ref:`neural_receiver` tutorial, which provides a 5G compliant implementation of a neural receiver and already provides a TensorRT export of the trained network.

@@ -46,10 +46,10 @@ EXAMPLES
 
 .. code-block:: bash
 
-    get-oai-changed-files.sh --source ./ext/oai-cn5g-fed --dest ./oai-cn5g-files
-    get-oai-changed-files.sh --source ./ext/oai-cn5g-fed --dest ./oai-cn5g-files --patch-file ./patches/oai-cn5g.patch
+    get-oai-cn5g-changed-files.sh --source ./ext/oai-cn5g-fed --dest ./oai-cn5g-files
+    get-oai-cn5g-changed-files.sh --source ./ext/oai-cn5g-fed --dest ./oai-cn5g-files --patch-file ./patches/oai-cn5g.patch
 
 SEE ALSO
 ========
 
-:doc:`quickstart-oai.sh </scripts/quickstart-cn5g>`
+:doc:`quickstart-cn5g.sh </scripts/quickstart-cn5g>`

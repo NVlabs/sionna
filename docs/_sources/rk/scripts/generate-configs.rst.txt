@@ -9,14 +9,13 @@ SYNOPSIS
 
 .. code-block:: bash
 
-    SCRIPT_NAME {MANDATORY_ARG} [OPTIONAL_ARG...]
-    generate-configs.sh 
-        [-h|--help] 
-        [--clean] 
-        [--no-patching] 
-        [--init-nested-repos] 
-        --rk-dir <kit-rootdir> 
-        --oai-dir <openairinterface5g_dir> 
+    generate-configs.sh
+        [-h|--help]
+        [--clean]
+        [--no-patching]
+        [--init-nested-repos]
+        --rk-dir <kit-rootdir>
+        --oai-dir <openairinterface5g_dir>
         --dest <config-dir>
 
 DESCRIPTION
@@ -37,7 +36,7 @@ OPTIONS
 
 .. option:: --dest <config-dir>
 
-    Destination directory where to create the configuration files. Default is '<kit-rootdir>/configs'.
+    Destination directory where to create the configuration files. Default is '<kit-rootdir>/config'.
 
 .. option:: -h, --help
 
@@ -68,13 +67,13 @@ EXAMPLES
 FILES
 =====
 
-*<rk-dir>/patches/configs/config-list.txt*
-    List of configurations to create. Each one is a subdirectory in <configs-dir>.
+*<rk-dir>/patches/config/config-list.txt*
+    List of configurations to create. Each one is a subdirectory in <config-dir>.
 
-*<rk-dir>/patches/configs/config-mappings.txt*
+*<rk-dir>/patches/config/config-mappings.txt*
     File mappings per config, from OAI files to the subdirectory.
 
-*<rk-dir>/patches/configs/config.\*.patch*
+*<rk-dir>/patches/config/config.\*.patch*
     Patch files for each configuration.
 
 SEE ALSO

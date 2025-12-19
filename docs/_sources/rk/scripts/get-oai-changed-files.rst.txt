@@ -14,6 +14,7 @@ SYNOPSIS
         --source <source_directory>
         --dest <destination_directory>
         [--patch-file <patch_file>]
+        [--binary]
 
 DESCRIPTION
 ===========
@@ -40,6 +41,10 @@ OPTIONS
 .. option:: --patch-file <patch_file>
 
     Write a patch file (in git diff format) to <patch_file>.
+
+.. option:: --binary
+
+    Include binary files in the patch output.
 
 EXAMPLES
 ========

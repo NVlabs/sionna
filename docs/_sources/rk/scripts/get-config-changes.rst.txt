@@ -9,10 +9,10 @@ SYNOPSIS
 
 .. code-block:: bash
 
-    get-config-changes.sh 
-        [-h|--help] 
-        [--rk-dir <kit-rootdir>] 
-        --source <source_directory> 
+    get-config-changes.sh
+        [-h|--help]
+        [--rk-dir <kit-rootdir>]
+        --source <source_directory>
         --dest <destination-for-patches>
 
 DESCRIPTION
@@ -20,7 +20,7 @@ DESCRIPTION
 
 Takes a configuration directory and creates a set of patches to capture the changes. It requires the configuration directory to have been initialized with the init-nested-repos when initially generated.
 
-This is script intended to track changes in configuration files and build the initial patches. It is not required in regular use cases. 
+This is script intended to track changes in configuration files and build the initial patches. It is not required in regular use cases.
 
 You can track your own changes using git without the need for the nested repos.
 
@@ -33,7 +33,7 @@ OPTIONS
 
 .. option:: --source <source_directory>
 
-    The configs directory with your configuration files. Required.
+    The config directory with your configuration files. Required.
 
 .. option:: --dest <destination-for-patches>
 
@@ -49,15 +49,15 @@ EXAMPLES
 
 .. code-block:: bash
 
-    ./generate-configs.sh --rk-dir . --source ./configs --dest ./patches/configs
+    ./generate-configs.sh --rk-dir . --source ./config --dest ./patches/config
 
 FILES
 =====
 
-*<rk-dir>/patches/configs/config-list.txt*
-    List of configurations to create. Each one is a subdirectory in <configs-dir>.
+*<rk-dir>/patches/config/config-list.txt*
+    List of configurations to create. Each one is a subdirectory in <config-dir>.
 
-*<rk-dir>/patches/configs/config-mappings.txt*
+*<rk-dir>/patches/config/config-mappings.txt*
     File mappings per config, from OAI files to the subdirectory.
 
 SEE ALSO

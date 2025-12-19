@@ -1,77 +1,91 @@
 .. _kernel:
 
-Custom Linux Kernel
-===================
+Custom Jetson Linux Kernel
+==========================
 
-The 5G core network requires SCTP (Stream Control Transmission Protocol) support in the Linux kernel. By default, this protocol is not enabled in the Jetson Linux kernel. This guide walks through building a custom Linux kernel for the Jetson platform that includes SCTP network protocol support and other required features.
+.. note::
+   The custom kernel is only required for NVIDIA Jetson platforms (AGX Orin,
+   Orin Nano). The AGX Thor requires a custom kernel only if connecting the Quectel modem as user equipment (``qmi_wwan``). The DGX Spark does not require kernel modifications.
+
+The 5G core network requires SCTP (Stream Control Transmission Protocol) support in the Linux kernel. Additionally, connecting a Quectel modem via USB requires the ``qmi_wwan`` kernel module. By default, these are not enabled in the Jetson Linux kernel. This guide walks through building a custom Linux kernel that includes these features.
 
 This guide is based on the `Jetson Linux Kernel Configuration Guide <https://docs.nvidia.com/jetson/l4t/index.html#page/Tegra%20Linux%20Driver%20Package%20Source%20Code%20Guide/kernel_config.html>`_. The following instructions deviate from the original in a few points:
 
-* We do not use the Bootlin toolchain (11.3) but use the provided Ubuntu GCC compiler (11.4) instead, since we are not cross-compiling
-* We add the SCTP network protocol as a module
+* We do not use the Bootlin toolchain (11.3) but use the provided Ubuntu GCC compiler instead, since we are not cross-compiling
+* We add the SCTP network protocol and USB modem drivers as modules
 * We enable advanced routing in the kernel
 * We do not recompile the DTBs (Device Tree Blobs). The system's device tree remains unchanged
 * We backup the original installation; we do not override it
 
 .. note::
-   These steps are summarized in the scripts ``scripts/build-custom-kernel.sh`` and ``scripts/install-custom-kernel.sh``. Realtime kernels are not supported by the scripts at the moment.
+   It is highly recommended NOT to perform these steps as root. Use sudo only when necessary for specific steps.
+
+
+Automated Build (Recommended)
+-----------------------------
+
+The easiest way to build and install the custom kernel is via the provided scripts:
+
+.. code-block:: bash
+
+   ./scripts/build-custom-kernel.sh
+   ./scripts/install-custom-kernel.sh
+   sudo reboot
+
+The scripts automatically:
+
+* Detect the installed L4T version
+* Download the correct kernel sources
+* Apply the required configuration options
+* Build and install the kernel and modules
+* Update the initrd and boot configuration
 
 .. note::
-   It is highly recommended NOT to perform these steps as root. Use sudo or root only when necessary for specific steps.
+   The scripts skip execution if the required modules (``sctp`` and ``qmi_wwan``) are already present. Use ``--force`` to rebuild anyway.
+
+
+Manual Build
+------------
+
+For advanced users who want more control over the build process, the following sections describe the manual steps.
 
 Prerequisites
--------------
+^^^^^^^^^^^^^
 
-Building the kernel requires the following software:
-
-* Git
-* Build Tools
-* GCC
-* OpenSSL development library
-
-Install these required packages via:
+Install the required build tools:
 
 .. code-block:: bash
 
    sudo apt update
-   sudo apt install git-core build-essential bc libssl-dev
+   sudo apt install -y git-core build-essential flex bison bc kmod libssl-dev
 
 Source Code
------------
+^^^^^^^^^^^
 
-Download the source packages (`Driver Package Source Code <https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v3.0/sources/public_sources.tbz2>`_) from the `Jetson Linux Release 36.3 page <https://developer.nvidia.com/embedded/jetson-linux-r363>`_:
+Download and extract the kernel source packages. The exact URL depends on your L4T version:
 
 .. code-block:: bash
 
-   mkdir l4t && cd l4t
-   wget https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v3.0/sources/public_sources.tbz2
+   # Create build directory
+   mkdir -p ext/l4t && cd ext/l4t
 
-Extract the packages:
+   # Download sources (example for L4T 36.4.3)
+   wget https://developer.nvidia.com/downloads/embedded/l4t/r36_release_v4.3/sources/public_sources.tbz2
 
-   .. code-block:: bash
+   # Extract source packages
+   tar xf public_sources.tbz2
+   cd Linux_for_Tegra/source
 
-      # Extract source packages
-      tar xf public_sources.tbz2
+   # Expand required sources
+   tar xf kernel_src.tbz2
+   tar xf kernel_oot_modules_src.tbz2
+   tar xf nvidia_kernel_display_driver_source.tbz2
 
-      # Go into source directory
-      cd Linux_for_Tegra/source
-
-      # Expand required sources (kernel, OOT modules, display driver)
-      tar xf kernel_src.tbz2
-      tar xf kernel_oot_modules_src.tbz2
-      tar xf nvidia_kernel_display_driver_source.tbz2
 
 Kernel Configuration
---------------------
+^^^^^^^^^^^^^^^^^^^^
 
-The preferred approach is to replace `defconfig` with a modified version.
-
-.. code-block:: bash
-
-   # Assuming sionna-rk is cloned in the home directory
-   cp sionna-rk/l4t/kernel/defconfig source/kernel/kernel-jammy-src/arch/arm64/configs/defconfig
-
-Otherwise, configure the kernel to enable the SCTP module in the kernel configuration or edit the file directly to add or modify the following lines:
+The kernel configuration options are stored in ``l4t/kernel/config.options``:
 
 .. code-block:: bash
 
@@ -83,173 +97,94 @@ Otherwise, configure the kernel to enable the SCTP module in the kernel configur
    CONFIG_NF_CT_PROTO_SCTP=y
    CONFIG_SCTP_COOKIE_HMAC_MD5=y
    CONFIG_SCTP_DEFAULT_COOKIE_HMAC_MD5=y
+   CONFIG_USB_NET_DRIVERS=y
+   CONFIG_USB_NET_CDCETHER=m
+   CONFIG_USB_NET_CDC_NCM=m
+   CONFIG_USB_NET_CDC_MBIM=m
+   CONFIG_USB_NET_QMI_WWAN=m
+   CONFIG_USB_WDM=m
+   CONFIG_USB_SERIAL_WWAN=m
 
-The key changes in our config enable:
+These enable:
 
-* SCTP network protocol support
-* Advanced routing capabilities
-* Real-time extensions (optional)
+* **SCTP protocol**: Required for 5G core network communication
+* **Advanced routing**: Required for proper network configuration
+* **USB network drivers**: Required for Quectel modem connectivity (``qmi_wwan``)
+
+To apply these options manually, navigate to the kernel source directory and use the kernel config scripts:
+
+.. code-block:: bash
+
+   cd Linux_for_Tegra/source/kernel/kernel-jammy-src  # or kernel-noble for Thor
+
+   # Start from default config
+   make mrproper
+   make defconfig
+
+   # Apply each option (example)
+   ./scripts/config --file .config --set-val CONFIG_IP_SCTP m
+   # ... repeat for other options
+
+   # Resolve dependencies
+   make olddefconfig
 
 Building the Kernel
--------------------
-
-We now need to re-build the kernel and install the modules.
-To further reduce the latency induced by the scheduler, we also build a real-time kernel that can be used optionally.
-
-If you want to build both regular and realtime kernels, compile, install and test the non-realtime version first, then compile, install and test the realtime version. Or use separate directories for the realtime and non-realtime kernel compilation.
-
-Standard Build
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
-   # Navigate to kernel source directory
-   cd ~/l4t/Linux_for_Tegra/source
+   cd Linux_for_Tegra/source
 
    # Build the kernel
    make -C kernel
 
-   # Create temporary root filesystem target directories
-   mkdir -p ~/l4t/Linux_for_Tegra/rootfs/boot
-   mkdir -p ~/l4t/Linux_for_Tegra/rootfs/kernel
+   # Create temporary rootfs directories
+   mkdir -p Linux_for_Tegra/rootfs/boot
+   mkdir -p Linux_for_Tegra/rootfs/kernel
 
-   # Set the installation target for modules
-   export INSTALL_MOD_PATH=~/l4t/Linux_for_Tegra/rootfs
+   # Set module installation path
+   export INSTALL_MOD_PATH=$PWD/../rootfs
 
-   # Install kernel in temporary rootfs
+   # Install kernel
    sudo -E make install -C kernel
 
-   # Navigate to source directory
-   cd ~/l4t/Linux_for_Tegra/source
+   # Set kernel headers path (adjust for your Ubuntu version)
+   export KERNEL_HEADERS=$PWD/kernel/kernel-jammy-src  # or kernel-noble
 
-   # Build modules (including OOT modules)
-   export KERNEL_HEADERS=$PWD/kernel/kernel-jammy-src
+   # For Thor (Noble), also set:
+   export kernel_name=noble
+
+   # Build and install modules
    make modules
-
-   # Install modules in temporary rootfs
    sudo -E make modules_install
 
-Real-time Build (Optional)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-For real-time support:
-
-.. code-block:: bash
-
-   # Navigate to kernel source directory
-   cd ~/l4t/Linux_for_Tegra/source
-
-   # Enable realtime extensions
-   ./generic_rt_build.sh "enable"
-
-   # Build the kernel
-   make -C kernel
-
-   # Create temporary root filesystem target directories
-   mkdir -p ~/l4t/Linux_for_Tegra/rootfs/boot
-   mkdir -p ~/l4t/Linux_for_Tegra/rootfs/kernel
-
-   # Set the installation target for modules
-   export INSTALL_MOD_PATH=~/l4t/Linux_for_Tegra/rootfs
-
-   # Tell modules to ignore realtime settings
-   export IGNORE_PREEMPT_RT_PRESENCE=1
-
-   # Install kernel in temporary rootfs
-   sudo -E make install -C kernel
-
-   # Navigate to source directory
-   cd ~/l4t/Linux_for_Tegra/source
-
-   # Build modules (including OOT modules)
-   export KERNEL_HEADERS=$PWD/kernel/kernel-jammy-src
-   make modules
-
-   # Install modules in temporary rootfs
-   sudo -E make modules_install
-
-
-.. note::
-   Double check that advanced routing and SCTP modules are properly configured after enabling the realtime kernel, but before building the Docker images.
-
-Installing Kernel Image and Modules
------------------------------------
+Installing the Kernel
+^^^^^^^^^^^^^^^^^^^^^
 
 .. warning::
    Back up your existing kernel before proceeding. Package updates may overwrite custom kernels.
 
-The goal is to have ``Image``, ``initrd`` and kernel modules in two or three different versions installed: original, custom with SCTP, and optionally custom realtime with SCTP. We use in the following builds the postfixes ``.original``, ``.new`` and ``.rt``.
-
-Standard Build
-^^^^^^^^^^^^^^
-
 .. code-block:: bash
 
-   # Backup existing setup (kernel, initrd, and modules)
-   cd /boot
-   sudo cp Image Image.original
-   sudo cp initrd initrd.original
-   sudo cp initrd.img-5.15.136-tegra initrd.img-5.15.136-tegra.original
-   sudo cp -r /lib/modules/5.15.136-tegra /lib/modules/5.15.136-tegra.original
+   # Backup existing kernel and modules
+   sudo cp /boot/Image /boot/Image.original
+   sudo cp /boot/initrd /boot/initrd.original
+   sudo cp -r /lib/modules/$(uname -r) /lib/modules/$(uname -r).original
 
-   # Copy new kernel
-   sudo cp ~/l4t/Linux_for_Tegra/rootfs/boot/Image /boot/Image.new
+   # Install new kernel
+   sudo cp Linux_for_Tegra/rootfs/boot/Image /boot/Image
 
-   # Copy new modules
-   sudo cp -r ~/l4t/Linux_for_Tegra/rootfs/lib/modules/5.15.136-tegra /lib/modules/5.15.136-tegra.new
+   # Install new modules
+   sudo cp -r Linux_for_Tegra/rootfs/lib/modules/$(uname -r) /lib/modules/
 
-   # Create symlinks
-   cd /boot
-   sudo rm Image
-   sudo ln -s Image.new Image
-
-   cd /lib/modules
-   sudo rm -rf /lib/modules/5.15.136-tegra
-   sudo ln -s 5.15.136-tegra.new 5.15.136-tegra
-
-   # Build new initrd
-   cd /boot
+   # Update initrd and boot configuration
    sudo nv-update-initrd
-   sudo mv /boot/initrd initrd.new
-   sudo ln -s initrd.new initrd
-   # this is a backup of the created initrd you just updated
-   sudo cp /boot/initrd /boot/initrd.img-5.15.136-tegra.new
+   sudo nv-update-extlinux generic
 
-Real-time Build (Optional)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Boot Configuration (Optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Note that because the stock realtime kernel is not installed by default, the backups are from the original kernel, and the modules do not override the stock modules.
-
-.. code-block:: bash
-
-   # Backup existing setup (kernel, initrd, and modules)
-   cd /boot
-   sudo cp Image Image.rt.original
-   sudo cp initrd initrd.rt.original
-
-   # Copy new kernel
-   sudo cp ~/l4t/Linux_for_Tegra/rootfs/boot/Image /boot/Image.rt
-
-   # Copy new modules
-   sudo cp -r ~/l4t/Linux_for_Tegra/rootfs/lib/modules/5.15.136-rt-tegra /lib/modules/5.15.136-rt-tegra
-
-   # Create symlinks
-   cd /boot
-   sudo rm Image
-   sudo ln -s Image.rt Image
-
-   # Build new initrd
-   cd /boot
-   sudo nv-update-initrd
-   sudo mv /boot/initrd initrd.rt
-   sudo ln -s initrd.rt initrd
-   # this is a backup of the created initrd you just updated
-   sudo cp /boot/initrd.rt /boot/initrd.img-5.15.136-rt-tegra
-
-Configure Boot Sequence
------------------------
-
-This is equivalent to editing *grub.conf* on a standard system and allows you to boot the system to the old kernel if necessary.
+For more control over boot options, you can manually edit the extlinux configuration. This is equivalent to editing ``grub.conf`` on a standard system and allows you to boot the system to the old kernel if necessary.
 
 .. note::
    This example assumes the system uses an NVMe SSD (root=/dev/nvme0n1p1). Adjust as needed for your setup.
@@ -259,9 +194,9 @@ This is equivalent to editing *grub.conf* on a standard system and allows you to
    cd /boot/extlinux
 
    # Backup current configuration
-   cp extlinux.conf extlinux.conf.original
+   sudo cp extlinux.conf extlinux.conf.original
 
-Edit the original `extlinux.conf` to add another entry. Here is an example configuration. Change the ``DEFAULT`` entry to the label you want to use and reboot:
+Edit ``extlinux.conf`` to add boot entries. Example configuration:
 
 .. code-block:: bash
 
@@ -272,14 +207,8 @@ Edit the original `extlinux.conf` to add another entry. Here is an example confi
 
    LABEL primary
          MENU LABEL primary kernel
-         LINUX /boot/Image.new
-         INITRD /boot/initrd.new
-         APPEND ${cbootargs} root=/dev/nvme0n1p1 rw rootwait rootfstype=ext4 mminit_loglevel=4 console=ttyTCU0,115200 console=ttyAMA0,115200 firmware_class.path=/etc/firmware fbcon=map:0 net.ifnames=0 nospectre_bhb video=efifb:off console=tty0 nv-auto-config
-
-   LABEL realtime
-         MENU LABEL realtime kernel
-         LINUX /boot/Image.rt
-         INITRD /boot/initrd.rt
+         LINUX /boot/Image
+         INITRD /boot/initrd
          APPEND ${cbootargs} root=/dev/nvme0n1p1 rw rootwait rootfstype=ext4 mminit_loglevel=4 console=ttyTCU0,115200 console=ttyAMA0,115200 firmware_class.path=/etc/firmware fbcon=map:0 net.ifnames=0 nospectre_bhb video=efifb:off console=tty0 nv-auto-config
 
    LABEL original
@@ -288,19 +217,25 @@ Edit the original `extlinux.conf` to add another entry. Here is an example confi
          INITRD /boot/initrd.original
          APPEND ${cbootargs} root=/dev/nvme0n1p1 rw rootwait rootfstype=ext4 mminit_loglevel=4 console=ttyTCU0,115200 console=ttyAMA0,115200 firmware_class.path=/etc/firmware fbcon=map:0 net.ifnames=0 nospectre_bhb video=efifb:off console=tty0 nv-auto-config
 
+Change the ``DEFAULT`` entry to the label you want to use and reboot.
 
-Reboot for the changes to take effect.
 
+Verification
+------------
 
-And finally, verify that the modules are correctly loaded:
+After rebooting, verify the modules are available:
 
 .. code-block:: bash
 
-   # List loaded modules
-   lsmod
-
-   # Probe and load a module (including dependencies)
-   sudo modprobe sctp
-
-   # Inspect a module
+   # Check for SCTP module
    modinfo sctp
+
+   # Check for Quectel modem driver
+   modinfo qmi_wwan
+
+   # Load modules
+   sudo modprobe sctp
+   sudo modprobe qmi_wwan
+
+   # List loaded modules
+   lsmod | grep -E "sctp|qmi"

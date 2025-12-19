@@ -9,19 +9,12 @@ SYNOPSIS
 
 .. code-block:: bash
 
-    stop-system.sh [config-name]
+    stop-system.sh
 
 DESCRIPTION
 ===========
 
-Stop running Docker containers based on the layout of the Docker Compose file for the specified configuration. If no configuration is provided, use ``b200_arm64``.
-
-OPTIONS
-=======
-
-.. option:: config-name
-
-    The name of the configuration in the ``configs`` directory. Defaults to ``b200_arm64``.
+Stop all running Docker containers by executing ``docker compose down`` in the common configuration directory.
 
 EXAMPLES
 ========
@@ -29,7 +22,6 @@ EXAMPLES
 .. code-block:: bash
 
     stop-system.sh
-    stop-system.sh rfsim_arm64
 
 SEE ALSO
 ========

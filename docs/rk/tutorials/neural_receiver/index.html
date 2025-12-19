@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Part 2: Capture Data &mdash; Sionna 1.2.1 documentation</title>
+  <title>5G NR PUSCH Neural Receiver &mdash; Sionna 1.2.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
@@ -24,8 +24,8 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Integration of a Neural Demapper" href="../neural_demapper/index.html" />
-    <link rel="prev" title="Part 1: Create a Plugin" href="part1_create_plugin.html" /> 
+    <link rel="next" title="Software-defined End-to-End 5G Network" href="../ue_emulator.html" />
+    <link rel="prev" title="Part 2: GPU-Accelerated inference" href="../neural_demapper/accelerated_inference.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -1394,7 +1394,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Research Kit (RK)</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#hardware-requirements">Hardware Requirements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#step-1-jetson-setup">Step 1: Jetson Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#step-1-dgx-spark-setup">Step 1: DGX Spark Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#step-2-usrp-setup">Step 2: USRP Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#step-3-ue-setup">Step 3: UE Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../quickstart.html#step-4-deploy-5g-stack">Step 4: Deploy 5G Stack</a></li>
@@ -1404,28 +1404,36 @@
 <li class="toctree-l2"><a class="reference internal" href="../../setup.html">Setup</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../setup.html#platform-preparation">Platform Preparation</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/bom.html">Bill of Materials</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/bom.html#computing-platform">Computing Platform</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/bom.html#computing-platforms">Computing Platforms</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/bom.html#rf-components">RF Components</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/bom.html#user-equipment">User Equipment</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/bom.html#optional-components">Optional Components</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../setup/jetson.html">Jetson Setup</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson.html#os-installation">OS Installation</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson.html#post-installation-setup">Post-Installation Setup</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson.html#version-information">Version Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../setup/spark.html">DGX Spark Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/spark.html#post-installation-setup">Post-Installation Setup</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/spark.html#version-information">Version Information</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../setup/kernel.html">Custom Linux Kernel</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#source-code">Source Code</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#kernel-configuration">Kernel Configuration</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#building-the-kernel">Building the Kernel</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#installing-kernel-image-and-modules">Installing Kernel Image and Modules</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#configure-boot-sequence">Configure Boot Sequence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../setup/jetson_thor.html">Jetson AGX Thor Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson_thor.html#post-installation-setup">Post-Installation Setup</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson_thor.html#version-information">Version Information</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../setup/perf.html">Performance Tweaks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../setup/jetson_orin.html">Jetson AGX Orin Setup</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson_orin.html#os-installation">OS Installation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson_orin.html#post-installation-setup">Post-Installation Setup</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson_orin.html#orin-nano">Orin Nano</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/jetson_orin.html#version-information">Version Information</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../setup/kernel.html">Custom Jetson Linux Kernel</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#automated-build-recommended">Automated Build (Recommended)</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#manual-build">Manual Build</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/kernel.html#verification">Verification</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../setup/perf.html">Jetson Performance Tweaks</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#power-management">Power Management</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#default-system-mode">Default System Mode</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/perf.html#real-time-scheduling">Real-Time Scheduling</a></li>
@@ -1433,7 +1441,6 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/UHD.html">USRP Driver Installation</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/UHD.html#key-resources">Key Resources</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/UHD.html#prerequisites">Prerequisites</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/UHD.html#building-uhd">Building UHD</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/UHD.html#post-build-configuration">Post-build Configuration</a></li>
@@ -1457,27 +1464,25 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup.html#software-configuration">Software Configuration</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/OAI.html">OpenAirInterface Setup</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#required-components">Required Components</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#tldr">TLDR</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#getting-the-source-code">Getting the Source Code</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#patching">Patching</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#create-configuration-files">Create configuration files</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#building-oai-ran-images">Building OAI RAN Images</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#building-oai-5g-core-images">Building OAI 5G Core Images</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#building-components-manually">Building Components Manually</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#manual-build-steps">Manual Build Steps</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/OAI.html#build-plugins">Build Plugins</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../setup/5g_config.html">5G System Configuration</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/5g_config.html#generating-configuration-files">Generating Configuration Files</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/5g_config.html#environment-variables">Environment Variables</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../setup/5g_config.html#additional-resources">Additional Resources</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../setup/rfsimulator.html">Using RF Simulator Mode</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/rfsimulator.html#basic-configuration">Basic Configuration</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../setup/rfsimulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../setup/sionna.html">Sionna Installation</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/sionna.html#virtual-environment">Virtual Environment</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/sionna.html#dgx-spark">DGX Spark</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/sionna.html#jetson-thor">Jetson Thor</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/sionna.html#jetson-agx-orin-orin-nano">Jetson AGX Orin &amp; Orin Nano</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/sionna.html#tensorrt-python-bindings">TensorRT Python Bindings</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../setup/sionna.html#verification">Verification</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../../setup/sionna.html">Installing Sionna</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup.html#your-first-call">Your First Call</a><ul>
@@ -1511,9 +1516,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../../setup.html#development-patch-tracking">Development / Patch tracking</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../scripts/get-config-changes.html">get-config-changes.sh</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../scripts/get-oai-changed-files.html">get-oai-changed-files.sh</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../scripts/get-oai-cn5g-changed-files.html">get-oai-cn5g-changed-files.sh</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
-<li class="toctree-l5"><a class="reference internal" href="../../scripts/get-oai-cn5g-commit-versions.html">get-oai-cn5g-commit-versions.sh</a></li>
 </ul>
 </li>
 </ul>
@@ -1522,11 +1524,34 @@
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="../../tutorials.html">Tutorials</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../run_tutorials.html">Running the Tutorials</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#command-cheat-sheet">Command Cheat-sheet</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#gpu-accelerated-ldpc">GPU-Accelerated LDPC</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#demapper-plugin">Demapper Plugin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#data-capture-plugin">Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../data_acquisition/index.html#quick-start-data-capture-plugin">Quick Start: Data Capture Plugin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data_acquisition/index.html#data-format">Data Format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data_acquisition/index.html#writing-your-own-plugin">Writing Your Own Plugin</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/index.html#step-1-define-the-plugin-interface">Step 1: Define the Plugin Interface</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/index.html#step-2-implement-the-plugin-functions">Step 2: Implement the Plugin Functions</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/index.html#step-3-create-the-plugin-loader">Step 3: Create the Plugin Loader</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/index.html#step-4-register-the-plugin">Step 4: Register the Plugin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/index.html#step-5-hook-into-oai-code">Step 5: Hook into OAI Code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../data_acquisition/index.html#step-6-add-cmake-build-rules">Step 6: Add CMake Build Rules</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../data_acquisition/index.html#summary">Summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../data_acquisition/index.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../ric_xapps/index.html">RAN Intelligent Controller (RIC) &amp; xApps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ric_xapps/index.html#system-preparation">System Preparation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ric_xapps/index.html#example-mcs-monitor-xapp">Example: MCS Monitor xApp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ric_xapps/index.html#running-the-xapp">Running the xApp</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ric_xapps/index.html#zeromq-integration">ZeroMQ Integration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ric_xapps/index.html#references">References</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><ul>
@@ -1546,40 +1571,15 @@
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/ldpc_cuda.html#cuda-integration-in-oai">CUDA Integration in OAI</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/ldpc_cuda.html#running-the-decoder">Running the Decoder</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/ldpc_cuda.html#implementation-aspects">Implementation Aspects</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/ldpc_cuda.html#testing">Testing</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../ldpc_cuda/ldpc_cuda.html#outlook-weighted-belief-propagation">Outlook - Weighted Belief Propagation</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../ldpc_cuda/index.html#references">References</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="reference internal" href="index.html">Plugins &amp; Data Acquisition</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="part1_create_plugin.html">Part 1: Create a Plugin</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#architecture-overview">Architecture Overview</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#select-functions">Select Functions</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#define-module-interface">Define Module Interface</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#loading-the-module">Loading the Module</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#use-module-functions">Use Module Functions</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#module-implementation">Module Implementation</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#compiling">Compiling</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#incremental-builds">Incremental Builds</a></li>
-<li class="toctree-l5"><a class="reference internal" href="part1_create_plugin.html#container-changes">Container Changes</a></li>
-</ul>
-</li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">Part 2: Capture Data</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#adding-new-plugin-variant">Adding New Plugin Variant</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#using-new-plugin-variant">Using New Plugin Variant</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#access-captured-files">Access Captured Files</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#capture-format">Capture Format</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#add-timestamps">Add Timestamps</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#account-for-multi-threading">Account for Multi-Threading</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#final-source-code">Final Source Code</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="index.html#references">References</a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="../neural_demapper/index.html">Integration of a Neural Demapper</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../neural_demapper/Neural_demapper.html"> Part 1: Neural Demapper Training and TensorRT Export</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../neural_demapper/Neural_demapper.html">Neural Demapper Training and TensorRT Export</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/Neural_demapper.html#Python-Imports">Python Imports</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/Neural_demapper.html#Background:-APP-Demapping">Background: APP-Demapping</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/Neural_demapper.html#Understanding-the-OAI-Data-Structure">Understanding the OAI Data Structure</a></li>
@@ -1589,7 +1589,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/Neural_demapper.html#Export-TensorRT-Engine">Export TensorRT Engine</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="../neural_demapper/accelerated_inference.html"> Part 2: GPU-Accelerated Inference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../neural_demapper/accelerated_inference.html">Part 2: GPU-Accelerated inference</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/accelerated_inference.html#demapper-implementation-overview">Demapper Implementation Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/accelerated_inference.html#setting-up-the-tensorrt-inference-engine">Setting up the TensorRT Inference Engine</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../neural_demapper/accelerated_inference.html#running-batched-inference">Running Batched Inference</a></li>
@@ -1604,10 +1604,19 @@
 <li class="toctree-l4"><a class="reference internal" href="../neural_demapper/index.html#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">5G NR PUSCH Neural Receiver</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#implementation-details">Implementation Details</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-the-neural-receiver">Running the Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../ue_emulator.html">Software-defined End-to-End 5G Network</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../ue_emulator.html#run-the-gnb">Run the gNB</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ue_emulator.html#run-the-ue">Run the UE</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../ue_emulator.html#test-performance">Test performance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ue_emulator.html#testing-in-rf-simulator-mode">Testing in RF Simulator Mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ue_emulator.html#basic-configuration">Basic Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../debugging.html">Debugging &amp; Troubleshooting</a><ul>
@@ -1650,8 +1659,7 @@
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Research Kit (RK)</a></li>
           <li class="breadcrumb-item"><a href="../../tutorials.html">Tutorials</a></li>
-          <li class="breadcrumb-item"><a href="index.html">Plugins &amp; Data Acquisition</a></li>
-      <li class="breadcrumb-item active">Part 2: Capture Data</li>
+      <li class="breadcrumb-item active">5G NR PUSCH Neural Receiver</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -1660,373 +1668,66 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="part-2-capture-data">
-<h1>Part 2: Capture Data<a class="headerlink" href="#part-2-capture-data" title="Link to this heading"></a></h1>
-<p>In this second part, we will extend the demapper plugin module to capture both inputs and outputs of the demapper to files. The captured data can then be used for analysis, training, and testing of a neural demapper implementation. We focus specifically on capturing data for QPSK and 16-QAM modulation schemes, while allowing the default implementation to handle other modulation formats. Rather than reimplementing the QPSK and 16-QAM demapping algorithms, we leverage the existing OpenAirInterface implementations within our plugin.</p>
-<p>The following sections detail the modifications required for data capture, including timestamping and multi-threading support, as well as instructions for accessing the collected data from within the containers.</p>
-<section id="adding-new-plugin-variant">
-<h2>Adding New Plugin Variant<a class="headerlink" href="#adding-new-plugin-variant" title="Link to this heading"></a></h2>
-<p>The full code of the capture plugin is in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/tutorials/neural_demapper/nr_demapper_capture.c">tutorials/neural_demapper/nr_demapper_capture.c</a>, and also included at the end of this tutorial. To compile this additional variant, we only need to add the following to the <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file. The rest is handled by the already present demapper plugin. If you installed the tutorials via the provided installation scripts, this is already included.</p>
-<div class="highlight-CMake notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c"># capture</span>
-<span class="linenos"> 2</span><span class="nb">set</span><span class="p">(</span><span class="s">PHY_DEMAPPER_CAPTURE_SRC</span>
-<span class="linenos"> 3</span><span class="w">  </span><span class="o">${</span><span class="nv">OPENAIR1_DIR</span><span class="o">}</span><span class="s">/PHY/NR_TRANSPORT/nr_ulsch_llr_computation.c</span>
-<span class="linenos"> 4</span><span class="w">  </span><span class="s">nr_demapper_capture.c</span>
-<span class="linenos"> 5</span><span class="p">)</span>
-<span class="linenos"> 6</span>
-<span class="linenos"> 7</span><span class="nb">add_library</span><span class="p">(</span><span class="s">demapper_capture</span><span class="w"> </span><span class="s">MODULE</span><span class="w"> </span><span class="o">${</span><span class="nv">PHY_DEMAPPER_CAPTURE_SRC</span><span class="o">}</span><span class="p">)</span>
-<span class="linenos"> 8</span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">demapper_capture</span><span class="w"> </span><span class="s">PRIVATE</span><span class="w"> </span><span class="s">pthread</span><span class="p">)</span>
-<span class="linenos"> 9</span>
-<span class="linenos">10</span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">nr-softmodem</span><span class="w"> </span><span class="s">demapper_capture</span><span class="p">)</span>
-<span class="linenos">11</span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">nr-uesoftmodem</span><span class="w"> </span><span class="s">demapper_capture</span><span class="p">)</span>
-<span class="linenos">12</span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">demapper_capture</span><span class="w"> </span><span class="s">generate_T</span><span class="p">)</span>
-</pre></div>
-</div>
+  <section id="g-nr-pusch-neural-receiver">
+<span id="neural-receiver"></span><h1>5G NR PUSCH Neural Receiver<a class="headerlink" href="#g-nr-pusch-neural-receiver" title="Link to this heading"></a></h1>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../../../_images/tutorial_nrx_overview.png"><img alt="Neural Receiver Overview" src="../../../_images/tutorial_nrx_overview.png" style="width: 600px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">Schematic overview of the Neural Receiver replacing the conventional receiver chain.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>This tutorial demonstrates the integration of a neural receiver <a class="reference internal" href="#wiesmayr2024" id="id1"><span>[Wiesmayr2024]</span></a> for the 5G NR Physical Uplink Shared Channel (PUSCH) into the Sionna Research Kit. The core idea is to replace the conventional physical layer receiver signal processing - specifically channel estimation, equalization, and demapping—with a single neural network. Unlike <em>classical</em> receivers, this architecture operates on an entire 5G NR slot, jointly processing the full OFDM time-frequency resource grid to reconstruct the transmitted bits. For comprehensive background on neural receivers, please refer to the <a class="reference external" href="https://nvlabs.github.io/sionna/phy/tutorials/Neural_Receiver.html">Sionna Neural Receiver Tutorial</a>.</p>
+<p>The architecture is designed to be robust and universal, capable of handling a wide range of channel conditions without overfitting to specific realizations. A key focus is real-time inference capability, targeting sub-1 ms inference latency (see <a class="reference internal" href="#wiesmayr2024" id="id2"><span>[Wiesmayr2024]</span></a> for details).</p>
+<p>The source code of the neural receiver is <a class="reference external" href="https://github.com/NVlabs/neural_rx">online available</a>. You can find more details on the NRX model architecture and training process in the <a class="reference external" href="https://github.com/NVlabs/neural_rx/blob/main/notebooks/jumpstart_tutorial.ipynb">Jumpstart Notebook</a>.</p>
+<section id="implementation-details">
+<h2>Implementation Details<a class="headerlink" href="#implementation-details" title="Link to this heading"></a></h2>
+<p>The integration into the OAI stack follows similar concepts as the <a class="reference internal" href="../neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> tutorial. Please refer to that tutorial for an introduction to TensorRT integration and memory management. The main difference here is that we replace more substantial parts of the PUSCH pipeline, which adds complexity to the implementation.</p>
+<p>The neural receiver is integrated into the OpenAirInterface (OAI) stack via the <a class="reference external" href="https://github.com/OPENAIRINTERFACE/openairinterface5g/blob/develop/common/utils/DOC/loader.md">OAI Shared Library Loader</a>. The core logic resides in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_receiver/src/runtime/trt_receiver.cpp">plugins/neural_receiver/src/runtime/trt_receiver.cpp</a>.</p>
+<p>We use TensorRT as the real-time inference engine. The TensorRT engine is built from the ONNX model using the <a class="reference external" href="https://github.com/NVlabs/neural_rx/blob/main/notebooks/real_time_nrx.ipynb">Real-Time Receiver Notebook</a>.</p>
+<p>The following list summarizes the key implementation aspects:</p>
+<ul class="simple">
+<li><p><strong>Slot-Based Processing</strong>: Unlike the default OAI PUSCH processing which operates per OFDM symbol, the neural receiver overrides this behavior to process an entire slot at once. This mechanism is implemented in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/patches/openairinterface5g/openair1/PHY/NR_UE_TRANSPORT/nr_ulsch_demodulation.c">nr_ulsch_demodulation.c</a>.</p></li>
+<li><p><strong>Fixed Input Dimensions</strong>: To avoid the latency penalties associated with dynamic shape reallocation in TensorRT, we fix the number of Physical Resource Blocks (PRBs) to 24. If the scheduled number of PRBs is smaller than the configured maximum, the input is padded. For more than 24 PRBs, the receiver operates on tiles of 24 PRBs.</p></li>
+<li><p><strong>Zero-Copy Memory</strong>: Data transfer between the CPU (OAI stack) and GPU (Neural Receiver) leverages unified memory to avoid memcopy bottlenecks. This is important for low-latency inference.</p></li>
+<li><p><strong>CUDA Acceleration</strong>: Custom CUDA kernels handle data pre-processing and post-processing to further minimize latency (e.g., converting input symbols to float16 and output LLRs to int16).</p></li>
+<li><p><strong>Single-User Processing</strong>: Though the neural receiver is designed to support multi-user MIMO, we limit this tutorial to single-user processing.</p></li>
+</ul>
+<p>Note that for compatibility with the OAI shapes, we have slightly modified the tensor shapes in the neural receiver repository and, thus, checkout the <code class="docutils literal notranslate"><span class="pre">sionna_rk</span></code> branch of the neural receiver repository. This is not strictly necessary, but it simplifies the integration.</p>
 </section>
-<section id="using-new-plugin-variant">
-<h2>Using New Plugin Variant<a class="headerlink" href="#using-new-plugin-variant" title="Link to this heading"></a></h2>
-<p>After compiling the new variant, you can use it by passing the option <code class="docutils literal notranslate"><span class="pre">--loader.demapper.shlibversion</span> <span class="pre">_capture</span></code> to the executable. Alternatively, you can add the following line to the <code class="docutils literal notranslate"><span class="pre">.env</span></code> file in your configuration directory:</p>
-<div class="highlight-default notranslate" id="env"><div class="highlight"><pre><span></span><span class="n">GNB_EXTRA_OPTIONS</span><span class="o">=</span><span class="s2">&quot;--loader.demapper.shlibversion _capture&quot;</span>
+<section id="running-the-neural-receiver">
+<h2>Running the Neural Receiver<a class="headerlink" href="#running-the-neural-receiver" title="Link to this heading"></a></h2>
+<p>To enable the neural receiver in the gNB, configure the shared library loader to use the <code class="docutils literal notranslate"><span class="pre">_neural_rx</span></code> version of the receiver plugin by updating the <code class="docutils literal notranslate"><span class="pre">GNB_EXTRA_OPTIONS</span></code> in the corresponding <code class="docutils literal notranslate"><span class="pre">.env</span></code> file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">GNB_EXTRA_OPTIONS</span><span class="o">=</span><span class="s2">&quot;--loader.receiver.shlibversion _neural_rx&quot;</span><span class="w"> </span>-<span class="w"> </span>--MACRLCs.<span class="o">[</span><span class="m">0</span><span class="o">]</span>.dl_max_mcs<span class="w"> </span><span class="m">10</span><span class="w"> </span>--MACRLCs.<span class="o">[</span><span class="m">0</span><span class="o">]</span>.ul_max_mcs<span class="w"> </span><span class="m">10</span>
 </pre></div>
 </div>
-<p>To verify that the capture variant is being used, check the gNB logs for the following message:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">LOADER</span><span class="p">]</span> <span class="n">library</span> <span class="n">libdemapper_capture</span><span class="o">.</span><span class="n">so</span> <span class="n">successfully</span> <span class="n">loaded</span>
+<p>As our receiver implementation is limited to 16-QAM, we limit the uplink MCS such that only 16-QAM is used. An extension to other modulations is possible but requires careful interfacing with the OAI stack.</p>
+<p>When the gNB starts, it will now automatically load <code class="docutils literal notranslate"><span class="pre">libreceiver_neural_rx.so</span></code> which runs the TensorRT engine.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The default model is exported for 24 PRBs. We recommend to use a compatible gNB configuration. The provided config: <code class="docutils literal notranslate"><span class="pre">GNB_CONFIG=&quot;../common/gnb.sa.band78.24prbs.conf&quot;</span></code> is compatible with the default model.
+Alternatively, you can re-export the model for a different number of PRBs and re-compile the receiver plugin (MAX_BLOCK_LEN is currently hardcoded in the receiver plugin).</p>
+</div>
+<p>Start the system and wait for the gNB to start.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/start_system.sh<span class="w"> </span>rfsim
 </pre></div>
 </div>
+<p>In the gNB log, you can now see the NRX statistics, e.g. the number of inferences per second, the number of PRBs processed per second, and the latency of the inference. Note that this requires traffic to be scheduled on the PUSCH, i.e., run iperf3 on the UE side.</p>
+<p>You are now ready to design, train, and deploy your own neural receiver!</p>
 </section>
-<section id="access-captured-files">
-<h2>Access Captured Files<a class="headerlink" href="#access-captured-files" title="Link to this heading"></a></h2>
-<p>The module captures inputs and outputs to two files: <code class="docutils literal notranslate"><span class="pre">demapper_in.txt</span></code> and <code class="docutils literal notranslate"><span class="pre">demapper_out.txt</span></code>. To access these capture files from the container, you need to mount them to your host system. This can be done by adding volume mappings in your <code class="docutils literal notranslate"><span class="pre">docker-compose.override.yaml</span></code> file in the corresponding <cite>config</cite> folder:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="n">config</span><span class="o">/</span><span class="n">common</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">.</span><span class="n">override</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">template</span> <span class="n">config</span><span class="o">/</span><span class="n">b200_arm64</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="o">.</span><span class="n">override</span><span class="o">.</span><span class="n">yaml</span>
-</pre></div>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<div role="list" class="citation-list">
+<div class="citation" id="wiesmayr2024" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Wiesmayr2024<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>R. Wiesmayr, S. Cammerer, F. Aït Aoudia, J. Hoydis, J. Zakrzewski, and A. Keller, <a class="reference external" href="https://arxiv.org/abs/2409.02912">“Design of a Standard-Compliant Real-Time Neural Receiver for 5G NR”</a>
+in <em>Proc. IEEE International Conference on Machine Learning for Communication and Networking (ICMLCN)</em>, pp. 1-6, 2025.</p>
 </div>
-<p>And edit the file accordingly:</p>
-<div class="literal-block-wrapper docutils container" id="docker-compose-override-yaml">
-<div class="code-block-caption"><span class="caption-number">Listing 12 </span><span class="caption-text">Mount capture files</span><a class="headerlink" href="#docker-compose-override-yaml" title="Link to this code"></a></div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">services</span><span class="p">:</span>
-<span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="p">:</span>
-    <span class="n">volumes</span><span class="p">:</span>
-    <span class="o">-</span> <span class="o">../../</span><span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
-    <span class="o">-</span> <span class="o">../../</span><span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">oai</span><span class="o">-</span><span class="n">gnb</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
-</pre></div>
-</div>
-</div>
-<p>Create the files before running the container:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create the logs directory</span>
-<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="n">logs</span>
-
-<span class="c1"># Create the files</span>
-<span class="n">touch</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">touch</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
-
-<span class="c1"># Make the files writable by the container</span>
-<span class="n">chmod</span> <span class="mi">666</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_in</span><span class="o">.</span><span class="n">txt</span>
-<span class="n">chmod</span> <span class="mi">666</span> <span class="n">logs</span><span class="o">/</span><span class="n">demapper_out</span><span class="o">.</span><span class="n">txt</span>
-</pre></div>
-</div>
-<p>Note that the host filepaths can be arbitrary, as long as they are accessible from the host system. The files must exist before running the container.</p>
-</section>
-<section id="capture-format">
-<h2>Capture Format<a class="headerlink" href="#capture-format" title="Link to this heading"></a></h2>
-<p>The captured data is stored in two text files: one containing the input symbols to the demapper and another containing the corresponding demapped output values. This simple text-based format allows for easy inspection and post-processing of the captured data.</p>
-<p>The input file format is as follows:</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-number">Listing 13 </span><span class="caption-text">input file format</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cm">/*</span>
-<span class="linenos"> 2</span><span class="cm"> * Input file format (f_in):</span>
-<span class="linenos"> 3</span><span class="cm"> * time source resolution (sec.nanosec) - only first line</span>
-<span class="linenos"> 4</span><span class="cm"> * timestamp (sec.nanosec)</span>
-<span class="linenos"> 5</span><span class="cm"> * modulation scheme (string: QPSK, QAM16)</span>
-<span class="linenos"> 6</span><span class="cm"> * nb_re (int32)</span>
-<span class="linenos"> 7</span><span class="cm"> * real imag (for QPSK: int16 &lt;space&gt; int16)</span>
-<span class="linenos"> 8</span><span class="cm"> * real imag ch_mag.r ch_mag.i (for QAM16: int16 &lt;space&gt; int16 &lt;space&gt; int16 &lt;space&gt; int16)̦̦̦̦̦̦</span>
-<span class="linenos"> 9</span><span class="cm"> * ... (done nb_re times)</span>
-<span class="linenos">10</span><span class="cm"> */</span>
-</pre></div>
-</div>
-</div>
-<div class="literal-block-wrapper docutils container" id="demapper-input-txt">
-<div class="code-block-caption"><span class="caption-number">Listing 14 </span><span class="caption-text">Sample input format / demapper_in.txt</span><a class="headerlink" href="#demapper-input-txt" title="Link to this code"></a></div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.000000001</span>         <span class="c1"># Time source resolution (sec.nanosec)</span>
-<span class="mf">1373853.185968662</span>   <span class="c1"># Timestamp (sec.nanosec)</span>
-<span class="n">QPSK</span>                <span class="c1"># Modulation scheme (QPSK or QAM16)</span>
-<span class="mi">96</span>                  <span class="c1"># Number of symbols (resource elements)</span>
-<span class="mi">177</span> <span class="o">-</span><span class="mi">179</span>            <span class="c1"># Input symbols (real, imag)</span>
-<span class="o">-</span><span class="mi">179</span> <span class="mi">176</span>
-<span class="o">-</span><span class="mi">180</span> <span class="o">-</span><span class="mi">177</span>
-<span class="mi">176</span> <span class="mi">178</span>
-<span class="o">-</span><span class="mi">177</span> <span class="o">-</span><span class="mi">177</span>
-<span class="o">-</span><span class="mi">177</span> <span class="mi">177</span>
-</pre></div>
-</div>
-</div>
-<p>And the output file format is as follows:</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-number">Listing 15 </span><span class="caption-text">output file format</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="cm">/*</span>
-<span class="linenos"> 2</span><span class="cm"> * Output file format (f_out):</span>
-<span class="linenos"> 3</span><span class="cm"> * time source resolution (sec.nanosec) - only first line</span>
-<span class="linenos"> 4</span><span class="cm"> * timestamp (sec.nanosec)</span>
-<span class="linenos"> 5</span><span class="cm"> * modulation scheme (string: QPSK, QAM16)</span>
-<span class="linenos"> 6</span><span class="cm"> * nb_re (int32)</span>
-<span class="linenos"> 7</span><span class="cm"> * real imag llr.r llr.i (int16 &lt;space&gt; int16 &lt;space&gt; int16 &lt;space&gt; int16 )</span>
-<span class="linenos"> 8</span><span class="cm"> * ---&gt;number of elements in each row depend on the modulation scheme: QPSK: 2 ; QAM16: 4</span>
-<span class="linenos"> 9</span><span class="cm"> * ... (done nb_re times)</span>
-<span class="linenos">10</span><span class="cm"> */</span>
-</pre></div>
-</div>
-</div>
-<p>With the following sample output format:</p>
-<div class="literal-block-wrapper docutils container" id="demapper-output-txt">
-<div class="code-block-caption"><span class="caption-number">Listing 16 </span><span class="caption-text">Sample output format / demapper_out.txt</span><a class="headerlink" href="#demapper-output-txt" title="Link to this code"></a></div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">0.000000001</span>         <span class="c1"># Time source resolution (sec.nanosec)</span>
-<span class="mf">1373853.185968662</span>   <span class="c1"># Timestamp (sec.nanosec)</span>
-<span class="n">QPSK</span>                <span class="c1"># Modulation scheme (QPSK or QAM16)</span>
-<span class="mi">96</span>                  <span class="c1"># Number of symbols (resource elements)</span>
-<span class="mi">22</span> <span class="o">-</span><span class="mi">23</span>              <span class="c1"># Output symbols (llr1, llr2)</span>
-<span class="o">-</span><span class="mi">23</span> <span class="mi">22</span>
-<span class="o">-</span><span class="mi">23</span> <span class="o">-</span><span class="mi">23</span>
-<span class="mi">22</span> <span class="mi">22</span>
-<span class="o">-</span><span class="mi">23</span> <span class="o">-</span><span class="mi">23</span>
-<span class="o">-</span><span class="mi">23</span> <span class="mi">22</span>
-</pre></div>
-</div>
-</div>
-<p>An example to read the input and output files with Python is provided in the <a class="reference internal" href="../neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> tutorial.</p>
-</section>
-<section id="add-timestamps">
-<h2>Add Timestamps<a class="headerlink" href="#add-timestamps" title="Link to this heading"></a></h2>
-<p>Including timestamps in the data capture enables precise analysis of the data stream by improving synchronization and sequence ordering of data blocks. Here are the key considerations when adding timestamps:</p>
-<p><strong>Resolution</strong>: Each file includes the system’s clock resolution to handle platforms with varying timing precision.</p>
-<p><strong>Monotonicity</strong>: Rapid captures can result in identical timestamps. To prevent this, we use <code class="docutils literal notranslate"><span class="pre">CLOCK_MONOTONIC</span></code> as the clock source, which guarantees strictly increasing timestamps.</p>
-<p><strong>Regularity</strong>: We capture timestamps at the module’s entry point directly before processing begins. This ensures the timestamp closely reflects the actual processing time, unaffected by processing duration or write operations.</p>
-</section>
-<section id="account-for-multi-threading">
-<h2>Account for Multi-Threading<a class="headerlink" href="#account-for-multi-threading" title="Link to this heading"></a></h2>
-<p>Since this is a multi-threaded application, we need to handle concurrent file writes carefully. Multiple threads will attempt to write data simultaneously, which could lead to corrupted output. Although the data processing is complete by the time we write to files, we still need to synchronize the actual file operations. The solution is straightforward - we use a mutex to ensure only one thread can write at a time. We initialize the mutex in our initialization functions and protect all file write operations with mutex locks:</p>
-<div class="literal-block-wrapper docutils container" id="capture-mutex-wrapper">
-<div class="code-block-caption"><span class="caption-number">Listing 17 </span><span class="caption-text">Mutex for file data writes</span><a class="headerlink" href="#capture-mutex-wrapper" title="Link to this code"></a></div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="n">pthread_mutex_t</span><span class="w"> </span><span class="n">capture_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
-
-<span class="c1">// ...</span>
-
-<span class="kt">void</span><span class="w"> </span><span class="nf">capture_function</span><span class="p">(</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">)</span>
-<span class="p">{</span>
-<span class="w">    </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-
-<span class="w">    </span><span class="c1">// write to files</span>
-
-<span class="w">    </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-</section>
-<section id="final-source-code">
-<h2>Final Source Code<a class="headerlink" href="#final-source-code" title="Link to this heading"></a></h2>
-<p>The original demapping function remains active while the capture function runs in parallel, allowing data collection without impacting the normal operation of the connection. The complete implementation of the capture plugin is shown below.</p>
-<div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-number">Listing 18 </span><span class="caption-text">nr_demapper_capture.c</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="linenos">  1</span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">filename_in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;demapper_in.txt&quot;</span><span class="p">;</span>
-<span class="linenos">  2</span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">filename_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;demapper_out.txt&quot;</span><span class="p">;</span>
-<span class="linenos">  3</span><span class="k">static</span><span class="w"> </span><span class="kt">FILE</span><span class="w"> </span><span class="o">*</span><span class="n">f_in</span><span class="p">;</span>
-<span class="linenos">  4</span><span class="k">static</span><span class="w"> </span><span class="kt">FILE</span><span class="w"> </span><span class="o">*</span><span class="n">f_out</span><span class="p">;</span>
-<span class="linenos">  5</span><span class="k">static</span><span class="w"> </span><span class="n">pthread_mutex_t</span><span class="w"> </span><span class="n">capture_lock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
-<span class="linenos">  6</span>
-<span class="linenos">  7</span><span class="c1">// import default implementations</span>
-<span class="linenos">  8</span><span class="kt">void</span><span class="w"> </span><span class="nf">nr_ulsch_qpsk_llr</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos">  9</span><span class="w">                      </span><span class="kt">int16_t</span><span class="w">  </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos"> 10</span><span class="w">                      </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos"> 11</span><span class="w">                      </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">symbol</span><span class="p">);</span>
-<span class="linenos"> 12</span><span class="kt">void</span><span class="w"> </span><span class="nf">nr_ulsch_16qam_llr</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag</span><span class="p">,</span><span class="w"> </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">symbol</span><span class="p">);</span>
-<span class="linenos"> 13</span>
-<span class="linenos"> 14</span><span class="cm">/* configure which clock source to use, will affect resolution */</span>
-<span class="linenos"> 15</span><span class="cp">#define TIMESTAMP_CLOCK_SOURCE CLOCK_MONOTONIC</span>
-<span class="linenos"> 16</span>
-<span class="linenos"> 17</span><span class="cm">/* time processing functions */</span>
-<span class="linenos"> 18</span><span class="kt">void</span><span class="w"> </span><span class="nf">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="kt">FILE</span><span class="o">*</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">timespec</span><span class="w"> </span><span class="o">*</span><span class="n">ts</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos"> 19</span><span class="p">{</span>
-<span class="linenos"> 20</span><span class="w">  </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%jd.%09ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="o">-&gt;</span><span class="n">tv_sec</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="o">-&gt;</span><span class="n">tv_nsec</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 21</span><span class="w">  </span><span class="k">return</span><span class="p">;</span>
-<span class="linenos"> 22</span><span class="p">}</span>
-<span class="linenos"> 23</span>
-<span class="linenos"> 24</span><span class="c1">// START marker-capture-input-format</span>
-<span class="linenos"> 25</span><span class="cm">/*</span>
-<span class="linenos"> 26</span><span class="cm"> * Input file format (f_in):</span>
-<span class="linenos"> 27</span><span class="cm"> * time source resolution (sec.nanosec) - only first line</span>
-<span class="linenos"> 28</span><span class="cm"> * timestamp (sec.nanosec)</span>
-<span class="linenos"> 29</span><span class="cm"> * modulation scheme (string: QPSK, QAM16)</span>
-<span class="linenos"> 30</span><span class="cm"> * nb_re (int32)</span>
-<span class="linenos"> 31</span><span class="cm"> * real imag (for QPSK: int16 &lt;space&gt; int16)</span>
-<span class="linenos"> 32</span><span class="cm"> * real imag ch_mag.r ch_mag.i (for QAM16: int16 &lt;space&gt; int16 &lt;space&gt; int16 &lt;space&gt; int16)̦̦̦̦̦̦</span>
-<span class="linenos"> 33</span><span class="cm"> * ... (done nb_re times)</span>
-<span class="linenos"> 34</span><span class="cm"> */</span>
-<span class="linenos"> 35</span><span class="c1">// END marker-capture-input-format</span>
-<span class="linenos"> 36</span>
-<span class="linenos"> 37</span><span class="c1">// START marker-capture-output-format</span>
-<span class="linenos"> 38</span><span class="cm">/*</span>
-<span class="linenos"> 39</span><span class="cm"> * Output file format (f_out):</span>
-<span class="linenos"> 40</span><span class="cm"> * time source resolution (sec.nanosec) - only first line</span>
-<span class="linenos"> 41</span><span class="cm"> * timestamp (sec.nanosec)</span>
-<span class="linenos"> 42</span><span class="cm"> * modulation scheme (string: QPSK, QAM16)</span>
-<span class="linenos"> 43</span><span class="cm"> * nb_re (int32)</span>
-<span class="linenos"> 44</span><span class="cm"> * real imag llr.r llr.i (int16 &lt;space&gt; int16 &lt;space&gt; int16 &lt;space&gt; int16 )</span>
-<span class="linenos"> 45</span><span class="cm"> * ---&gt;number of elements in each row depend on the modulation scheme: QPSK: 2 ; QAM16: 4</span>
-<span class="linenos"> 46</span><span class="cm"> * ... (done nb_re times)</span>
-<span class="linenos"> 47</span><span class="cm"> */</span>
-<span class="linenos"> 48</span><span class="c1">// END marker-capture-output-format</span>
-<span class="linenos"> 49</span>
-<span class="linenos"> 50</span>
-<span class="linenos"> 51</span><span class="kt">void</span><span class="w"> </span><span class="nf">capture_qpsk</span><span class="p">(</span>
-<span class="linenos"> 52</span><span class="w">            </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos"> 53</span><span class="w">            </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos"> 54</span><span class="w">            </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos"> 55</span><span class="w">            </span><span class="k">struct</span><span class="w"> </span><span class="nc">timespec</span><span class="w"> </span><span class="o">*</span><span class="n">ts</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos"> 56</span><span class="p">{</span>
-<span class="linenos"> 57</span><span class="w">    </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 58</span>
-<span class="linenos"> 59</span><span class="w">    </span><span class="n">c16_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c16_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">rxdataF_comp</span><span class="p">;</span>
-<span class="linenos"> 60</span>
-<span class="linenos"> 61</span><span class="w">    </span><span class="n">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 62</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;QPSK</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 63</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nb_re</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 64</span><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nb_re</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos"> 65</span><span class="w">      </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%hd %hd</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rxF</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">rxF</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">i</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 66</span><span class="w">    </span><span class="n">fflush</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 67</span>
-<span class="linenos"> 68</span><span class="w">    </span><span class="n">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 69</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;QPSK</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 70</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nb_re</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 71</span><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nb_re</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos"> 72</span><span class="w">      </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%hd %hd</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 73</span><span class="w">    </span><span class="n">fflush</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 74</span>
-<span class="linenos"> 75</span><span class="w">    </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 76</span><span class="p">}</span>
-<span class="linenos"> 77</span>
-<span class="linenos"> 78</span><span class="cm">/*</span>
-<span class="linenos"> 79</span><span class="cm"> * from the reference implementation of test_llr.cpp</span>
-<span class="linenos"> 80</span><span class="cm"> * in: rxdataF_comp[nb_re] , each element is a complex number with .r and .i components. Each component is int16_t</span>
-<span class="linenos"> 81</span><span class="cm"> * in: ul_ch_mag[nb_re] , casted then to int16_t it becomes an array of [2*nb_re]. first component is the mag_real, second is mag_imag. both in int16_t</span>
-<span class="linenos"> 82</span><span class="cm"> * out: ulsch_llr[4*nb_re]. each group of 4 are: .r, .i , saturating_sub(mag_real, std::abs(.r) , saturating_sub(mag_imag, std::abs(.i)</span>
-<span class="linenos"> 83</span><span class="cm"> */</span>
-<span class="linenos"> 84</span>
-<span class="linenos"> 85</span><span class="kt">void</span><span class="w"> </span><span class="nf">capture_qam16</span><span class="p">(</span>
-<span class="linenos"> 86</span><span class="w">            </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos"> 87</span><span class="w">            </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag</span><span class="p">,</span>
-<span class="linenos"> 88</span><span class="w">            </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos"> 89</span><span class="w">            </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos"> 90</span><span class="w">            </span><span class="k">struct</span><span class="w"> </span><span class="nc">timespec</span><span class="w"> </span><span class="o">*</span><span class="n">ts</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos"> 91</span><span class="p">{</span>
-<span class="linenos"> 92</span><span class="w">    </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 93</span>
-<span class="linenos"> 94</span><span class="w">    </span><span class="n">c16_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">c16_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">rxdataF_comp</span><span class="p">;</span>
-<span class="linenos"> 95</span><span class="w">    </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag_i16</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ul_ch_mag</span><span class="p">;</span>
-<span class="linenos"> 96</span>
-<span class="linenos"> 97</span><span class="w">    </span><span class="n">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 98</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;QAM16</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos"> 99</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nb_re</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">100</span><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nb_re</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos">101</span><span class="w">      </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%hd %hd %hd %hd</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rxF</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">rxF</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ul_ch_mag_i16</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ul_ch_mag_i16</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">102</span><span class="w">    </span><span class="n">fflush</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">103</span>
-<span class="linenos">104</span><span class="w">    </span><span class="n">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">105</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;QAM16</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">106</span><span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nb_re</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">107</span><span class="w">    </span><span class="k">for</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nb_re</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos">108</span><span class="w">      </span><span class="n">fprintf</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%hd %hd %hd %hd</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">[</span><span class="mi">4</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">[</span><span class="mi">4</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">[</span><span class="mi">4</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">[</span><span class="mi">4</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">109</span><span class="w">    </span><span class="n">fflush</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">110</span>
-<span class="linenos">111</span><span class="w">    </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">112</span><span class="p">}</span>
-<span class="linenos">113</span>
-<span class="linenos">114</span><span class="c1">// Plugin Init / Shutdown</span>
-<span class="linenos">115</span>
-<span class="linenos">116</span><span class="kt">int32_t</span><span class="w"> </span><span class="nf">demapper_init</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos">117</span><span class="p">{</span>
-<span class="linenos">118</span><span class="w">    </span><span class="c1">// initialize capture mutex</span>
-<span class="linenos">119</span><span class="w">    </span><span class="n">pthread_mutex_init</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">120</span>
-<span class="linenos">121</span><span class="w">    </span><span class="c1">// open capture files</span>
-<span class="linenos">122</span><span class="w">    </span><span class="n">f_in</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><span class="w"> </span><span class="n">filename_in</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;w&quot;</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">123</span><span class="w">    </span><span class="n">AssertFatal</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cannot open file %s for writing</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">filename_in</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">124</span>
-<span class="linenos">125</span><span class="w">    </span><span class="n">f_out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><span class="w"> </span><span class="n">filename_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;w&quot;</span><span class="p">);</span>
-<span class="linenos">126</span><span class="w">    </span><span class="n">AssertFatal</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cannot open file %s for writing</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">filename_out</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">127</span>
-<span class="linenos">128</span><span class="w">    </span><span class="c1">// print clock resolution</span>
-<span class="linenos">129</span><span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">timespec</span><span class="w"> </span><span class="n">ts</span><span class="p">;</span>
-<span class="linenos">130</span><span class="w">    </span><span class="n">clock_getres</span><span class="p">(</span><span class="w"> </span><span class="n">TIMESTAMP_CLOCK_SOURCE</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">131</span><span class="w">    </span><span class="n">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">132</span><span class="w">    </span><span class="n">fprint_time</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">133</span>
-<span class="linenos">134</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos">135</span><span class="p">}</span>
-<span class="linenos">136</span>
-<span class="linenos">137</span><span class="kt">int32_t</span><span class="w"> </span><span class="nf">demapper_shutdown</span><span class="p">(</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="p">)</span>
-<span class="linenos">138</span><span class="p">{</span>
-<span class="linenos">139</span><span class="w">    </span><span class="n">fclose</span><span class="p">(</span><span class="w"> </span><span class="n">f_in</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">140</span><span class="w">    </span><span class="n">fclose</span><span class="p">(</span><span class="w"> </span><span class="n">f_out</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">141</span>
-<span class="linenos">142</span><span class="w">    </span><span class="n">pthread_mutex_destroy</span><span class="p">(</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capture_lock</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">143</span>
-<span class="linenos">144</span><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="linenos">145</span><span class="p">}</span>
-<span class="linenos">146</span>
-<span class="linenos">147</span><span class="kt">int</span><span class="w"> </span><span class="nf">demapper_compute_llr</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos">148</span><span class="w">                         </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_mag</span><span class="p">,</span>
-<span class="linenos">149</span><span class="w">                         </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magb</span><span class="p">,</span>
-<span class="linenos">150</span><span class="w">                         </span><span class="kt">int32_t</span><span class="w"> </span><span class="o">*</span><span class="n">ul_ch_magc</span><span class="p">,</span>
-<span class="linenos">151</span><span class="w">                         </span><span class="kt">int16_t</span><span class="w"> </span><span class="o">*</span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos">152</span><span class="w">                         </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos">153</span><span class="w">                         </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">symbol</span><span class="p">,</span>
-<span class="linenos">154</span><span class="w">                         </span><span class="kt">uint8_t</span><span class="w">  </span><span class="n">mod_order</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="linenos">155</span><span class="w">  </span><span class="k">struct</span><span class="w"> </span><span class="nc">timespec</span><span class="w"> </span><span class="n">ts</span><span class="p">;</span>
-<span class="linenos">156</span><span class="w">  </span><span class="n">clock_gettime</span><span class="p">(</span><span class="w"> </span><span class="n">TIMESTAMP_CLOCK_SOURCE</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="w"> </span><span class="p">);</span>
-<span class="linenos">157</span>
-<span class="linenos">158</span><span class="w">  </span><span class="k">switch</span><span class="p">(</span><span class="n">mod_order</span><span class="p">){</span>
-<span class="linenos">159</span><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
-<span class="linenos">160</span><span class="w">    </span><span class="n">nr_ulsch_qpsk_llr</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos">161</span><span class="w">                        </span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos">162</span><span class="w">                        </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos">163</span><span class="w">                        </span><span class="n">symbol</span><span class="p">);</span>
-<span class="linenos">164</span><span class="w">    </span><span class="n">capture_qpsk</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">,</span><span class="w"> </span><span class="n">nb_re</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="p">);</span>
-<span class="linenos">165</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
-<span class="linenos">166</span><span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">4</span><span class="p">:</span>
-<span class="linenos">167</span><span class="w">    </span><span class="n">nr_ulsch_16qam_llr</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span>
-<span class="linenos">168</span><span class="w">                         </span><span class="n">ul_ch_mag</span><span class="p">,</span>
-<span class="linenos">169</span><span class="w">                         </span><span class="n">ulsch_llr</span><span class="p">,</span>
-<span class="linenos">170</span><span class="w">                         </span><span class="n">nb_re</span><span class="p">,</span>
-<span class="linenos">171</span><span class="w">                         </span><span class="n">symbol</span><span class="p">);</span>
-<span class="linenos">172</span><span class="w">    </span><span class="n">capture_qam16</span><span class="p">(</span><span class="n">rxdataF_comp</span><span class="p">,</span><span class="w"> </span><span class="n">ul_ch_mag</span><span class="p">,</span><span class="w"> </span><span class="n">ulsch_llr</span><span class="p">,</span><span class="w"> </span><span class="n">nb_re</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="p">);</span>
-<span class="linenos">173</span><span class="w">      </span><span class="k">break</span><span class="p">;</span>
-<span class="linenos">174</span>
-<span class="linenos">175</span><span class="cp">#if 0</span><span class="c"> // disabled</span>
-<span class="linenos">176</span><span class="c">    case 6:</span>
-<span class="linenos">177</span><span class="c">    nr_ulsch_64qam_llr(rxdataF_comp,</span>
-<span class="linenos">178</span><span class="c">                       ul_ch_mag,</span>
-<span class="linenos">179</span><span class="c">                       ul_ch_magb,</span>
-<span class="linenos">180</span><span class="c">                       ulsch_llr,</span>
-<span class="linenos">181</span><span class="c">                       nb_re,</span>
-<span class="linenos">182</span><span class="c">                       symbol);</span>
-<span class="linenos">183</span><span class="c">      break;</span>
-<span class="linenos">184</span><span class="c">    case 8:</span>
-<span class="linenos">185</span><span class="c">    nr_ulsch_256qam_llr(rxdataF_comp,</span>
-<span class="linenos">186</span><span class="c">                        ul_ch_mag,</span>
-<span class="linenos">187</span><span class="c">                        ul_ch_magb,</span>
-<span class="linenos">188</span><span class="c">                        ul_ch_magc,</span>
-<span class="linenos">189</span><span class="c">                        ulsch_llr,</span>
-<span class="linenos">190</span><span class="c">                        nb_re,</span>
-<span class="linenos">191</span><span class="c">                        symbol);</span>
-<span class="linenos">192</span><span class="c">      break;</span>
-<span class="linenos">193</span><span class="cp">#endif</span>
-<span class="linenos">194</span>
-<span class="linenos">195</span><span class="w">    </span><span class="k">default</span><span class="o">:</span>
-<span class="linenos">196</span><span class="w">      </span><span class="n">AssertFatal</span><span class="p">(</span><span class="mi">1</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span><span class="s">&quot;capture_demapper_compute_llr: invalid/unhandled Qm value, symbol = %d, Qm = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">symbol</span><span class="p">,</span><span class="w"> </span><span class="n">mod_order</span><span class="p">);</span>
-<span class="linenos">197</span><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="c1">// unhandled</span>
-<span class="linenos">198</span><span class="w">  </span><span class="p">}</span>
-<span class="linenos">199</span><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="c1">// handled</span>
-<span class="linenos">200</span><span class="p">}</span>
-</pre></div>
+<div class="citation" id="cammerer2023" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>Cammerer2023<span class="fn-bracket">]</span></span>
+<p>S. Cammerer et al., “A Neural Receiver for 5G NR Multi-user MIMO”,
+IEEE GC Wkshps, 2023.</p>
 </div>
 </div>
 </section>
@@ -2036,8 +1737,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="part1_create_plugin.html" class="btn btn-neutral float-left" title="Part 1: Create a Plugin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../neural_demapper/index.html" class="btn btn-neutral float-right" title="Integration of a Neural Demapper" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../neural_demapper/accelerated_inference.html" class="btn btn-neutral float-left" title="Part 2: GPU-Accelerated inference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ue_emulator.html" class="btn btn-neutral float-right" title="Software-defined End-to-End 5G Network" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
