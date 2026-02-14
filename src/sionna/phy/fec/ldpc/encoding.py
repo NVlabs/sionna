@@ -10,7 +10,6 @@ from importlib_resources import files, as_file
 from . import codes # pylint: disable=relative-beyond-top-level
 import numbers # to check if n, k are numbers
 from sionna.phy import Block
-from typing import Optional
 
 class LDPC5GEncoder(Block):
     # pylint: disable=line-too-long
@@ -45,28 +44,18 @@ class LDPC5GEncoder(Block):
     bits: [...,k], tf.float
         Binary tensor containing the information bits to be encoded.
 
-    rv: list of str | None (default)
-        List of redundancy version strings to generate. Can contain
-        any combination of ["rv0", "rv1", "rv2", "rv3"] in any order,
-        including repeats. If `None`, defaults to single `"rv0"` encoding without
-        adding an RV dimension to the output.
-
     Output
     ------
-    : [...,n] or [...,len(rv),n], tf.float
+    : [...,n], tf.float
         Binary tensor of same shape as inputs besides last dimension has
-        changed to `n` containing the encoded codeword bits. If `rv` is not `None`, 
-        an additional dimension is adde to the output.
-        
+        changed to `n` containing the encoded codeword bits.
+
     Note
     ----
     As specified in [3GPPTS38212_LDPC]_, the encoder also performs
     rate-matching (puncturing and shortening). Thus, the corresponding
     decoder needs to `invert` these operations, i.e., must be compatible with
     the 5G encoding scheme.
-
-    The default RV0 is assumed. But before each transmission, the RV can be
-    set as needed.
     """
 
     def __init__(self,
@@ -91,7 +80,7 @@ class LDPC5GEncoder(Block):
         if k<12:
             raise ValueError("Unsupported code length (k too small).")
 
-        if n>(68*384) or (bg=="bg2" and n>(52*384)):
+        if n>(316*384):
             raise ValueError("Unsupported code length (n too large).")
         if n<0:
             raise ValueError("Unsupported code length (n negative).")
@@ -108,18 +97,19 @@ class LDPC5GEncoder(Block):
             print(f"Warning: effective coderate r>948/1024 for n={n}, k={k}.")
         if self._coderate>(0.95): # as specified in 38.212 5.4.2.1
             raise ValueError(f"Unsupported coderate (r>0.95) for n={n}, k={k}.")
+        if self._coderate<(1/5):
+            # outer rep. coding currently not supported
+            raise ValueError("Unsupported coderate (r<1/5).")
 
         # construct the basegraph according to 38.212
         # if bg is explicitly provided
         self._bg = self._sel_basegraph(self._k, self._coderate, bg)
 
         self._z, self._i_ls, self._k_b = self._sel_lifting(self._k, self._bg)
-
         self._bm = self._load_basegraph(self._i_ls, self._bg)
-        bm_num_cols = self._bm.shape[1]
 
         # total number of codeword bits
-        self._n_ldpc = bm_num_cols * self._z
+        self._n_ldpc = self._bm.shape[1] * self._z
         # if K_real < K _target puncturing must be applied earlier
         self._k_ldpc = self._k_b * self._z
 
@@ -173,18 +163,31 @@ class LDPC5GEncoder(Block):
 
     @property
     def k_ldpc(self):
-        """Number of LDPC information bits including filler bits"""
+        """Number of LDPC information bits after rate-matching"""
         return self._k_ldpc
 
     @property
     def n_cb(self):
-        """Circular buffer length for HARQ (excludes filler bits)."""
-        return self._n_ldpc - self.k_filler
+        """Circular buffer length in spec indexing space.
+
+        This corresponds to the uncompressed sequence before removing filler
+        bits and excludes only the first ``2*z`` positions. For HARQ over the
+        compressed RM buffer, use :py:attr:`n_cb_comp`.
+        """
+        return self._n_ldpc - 2*self.z
+
+    @property
+    def n_cb_comp(self):
+        """Circular buffer length for HARQ over compressed RM buffer.
+
+        The compressed RM buffer excludes filler bits, i.e.,
+        ``n_cb_comp = n_cb - k_filler``.
+        """
+        return self.n_cb - self.k_filler
 
     @property
     def n_ldpc(self):
-        """Number of codeword bits before rate-matching, including
-        filler bits"""
+        """Number of LDPC codeword bits before rate-matching"""
         return self._n_ldpc
 
     @property
@@ -206,7 +209,6 @@ class LDPC5GEncoder(Block):
     def out_int(self):
         """Output interleaver sequence as defined in 5.4.2.2"""
         return self._out_int
-    
     @property
     def out_int_inv(self):
         """Inverse output interleaver sequence as defined in 5.4.2.2"""
@@ -293,6 +295,14 @@ class LDPC5GEncoder(Block):
         if bg=="bg2" and k>3840:
             raise ValueError(
                 f"K is not supported by BG2 (too large) k ={k}.")
+
+        if bg=="bg1" and r<1/3:
+            raise ValueError("Only coderate>1/3 supported for BG1. \
+            Remark: Repetition coding is currently not supported.")
+
+        if bg=="bg2" and r<1/5:
+            raise ValueError("Only coderate>1/5 supported for BG2. \
+            Remark: Repetition coding is currently not supported.")
 
         return bg
 
@@ -621,24 +631,48 @@ class LDPC5GEncoder(Block):
 
     @property
     def rv_starts(self) -> dict:
-        """Get RV starting positions mapping as per 3GPP TS 38.212.
+        """RV start positions ``k0`` from TS 38.212 Table 5.4.2.1-2.
 
-        Returns
-        -------
-        dict: Mapping from RV names to starting positions.
+        This implementation assumes the typical case ``I_LBRM=0``
+        (i.e., ``N_cb=N`` in spec indexing space).
+        """
+        if self._bg == "bg1":
+            coeffs = {"rv0": 0, "rv1": 17, "rv2": 33, "rv3": 56}
+        elif self._bg == "bg2":
+            coeffs = {"rv0": 0, "rv1": 13, "rv2": 25, "rv3": 43}
+        else:
+            raise ValueError("Basegraph not supported.")
+        return {rv_name: coeff*self.z for rv_name, coeff in coeffs.items()}
+
+    def _k0_comp(self, k0):
+        """Map ``k0`` from spec indexing space to compressed RM indexing.
+
+        The compressed RM buffer removes a contiguous filler block from the
+        uncompressed spec indexing space.
+        """
+        filler_start = self._k - 2*self.z
+        filler_len = self.k_filler
+        if filler_len <= 0 or k0 < filler_start:
+            return k0
+        return filler_start if k0 < filler_start + filler_len else k0 - filler_len
+
+    @property
+    def rv_starts_comp(self) -> dict:
+        """RV start positions ``k0`` in compressed RM buffer indexing.
+
+        Same as :py:attr:`rv_starts` but with filler-bit offsets removed,
+        matching the indexing used by :py:meth:`call` in HARQ mode.
         """
         return {
-            "rv0": 2 * self.z,
-            "rv1": self.n_cb // 4,
-            "rv2": self.n_cb // 2,
-            "rv3": 3 * self.n_cb // 4
+            rv_name: self._k0_comp(k0)
+            for rv_name, k0 in self.rv_starts.items()
         }
 
-    def get_start_positions(self, rv_list):
+    def get_start_positions_comp(self, rv_list):
         """Get starting positions for a list of RVs.
 
         Validates the RV list and returns the corresponding starting positions.
-        Combines validation and position lookup into a single operation.
+        Start positions are returned in compressed RM buffer indexing.
 
         Args:
             rv_list (list): List of RV name strings (e.g., ["rv0", "rv2"]).
@@ -653,7 +687,7 @@ class LDPC5GEncoder(Block):
         self._validate_rv_list(rv_list)
 
         # Get the RV starts mapping
-        rv_starts = self.rv_starts
+        rv_starts = self.rv_starts_comp
 
         # Convert RV names to start positions
         return [rv_starts[rv_name] for rv_name in rv_list]
@@ -669,20 +703,17 @@ class LDPC5GEncoder(Block):
 
         This function returns the encoded codewords as specified by the 3GPP NR Initiative [3GPPTS38212_LDPC]_ including puncturing and shortening.
 
+        An optional list ``rv`` can be provided to generate one or multiple
+        redundancy versions in HARQ mode.
+
         Args:
 
         bits (tf.float): Tensor of shape `[...,k]` containing the
                 information bits to be encoded.
-        rv (list, optional): List of redundancy version strings to generate. Can contain
-                any combination of ["rv0", "rv1", "rv2", "rv3"] in any order,
-                including repeats. If None, defaults to single RV0 encoding without
-                adding an RV dimension to the output.
 
         Returns:
 
-        `tf.float`: Tensor of shape `[..., n]` if rv is None (single RV0), or
-                    `[..., num_rv, n]` if rv is provided, where num_rv is the
-                    length of the rv list.
+        `tf.float`: Tensor of shape `[...,n]`.
         """
 
         # Determine HARQ mode and set RV list
@@ -732,51 +763,63 @@ class LDPC5GEncoder(Block):
 
         c_no_filler = tf.concat([c_no_filler1, c_no_filler2], 1)
 
-        # Get starting positions for all RVs (validates and converts)
-        start_positions = self.get_start_positions(rv)
+        if harq_mode:
+            return self._call_harq(c_no_filler, input_shape, rv, batch_size)
 
+        # shorten the first 2*Z positions and end after n bits
+        # (remaining parity bits can be used for HARQ)
+        c_short = tf.slice(c_no_filler, [0, 2*self._z], [batch_size, self.n])
+        # incremental redundancy could be generated by accessing the last bits
+
+        # if num_bits_per_symbol is provided, apply output interleaver as
+        # specified in Sec. 5.4.2.2 in 38.212
+        if self._num_bits_per_symbol is not None:
+            c_short = tf.gather(c_short, self._out_int, axis=-1)
+
+        # Reshape c_short so that it matches the original input dimensions
+        output_shape = input_shape[0:-1] + [self.n]
+        output_shape[0] = -1
+        c_reshaped = tf.reshape(c_short, output_shape)
+
+        return c_reshaped
+
+    def _call_harq(self, c_no_filler, input_shape, rv, batch_size):
+        """HARQ-specific rate-matching path for one or more RVs.
+
+        Reads E bits (here E equals the transmitted length n) from the compressed
+        circular buffer starting at each RV's k0 position.  Per TS 38.212 §5.4.2.1
+        the general formula is e_k = d_{(k0+j) mod N_cb}, j=0..E-1, which allows
+        repetition when E exceeds the effective selectable buffer size. In this
+        compressed implementation, repetition starts when E > n_cb_comp
+        (equivalently E > N_cb - N_filler in spec space), and the current rate
+        guards ensure E <= n_cb_comp (r >= 1/3 for BG1, r >= 1/5 for BG2).
+        The spec allows k/n_cb_comp to fall below these thresholds due to
+        filler-bit removal. In Sionna, this limitation is implementation-
+        specific: the guard is enforced on the configured k/n.
+        """
+        c_rm = tf.slice(c_no_filler, [0, 2*self.z], [batch_size, self.n_cb_comp])
+        start_positions = self.get_start_positions_comp(rv)
         c_short_list = []
-        
-        for idx, start in enumerate(start_positions):
 
-            # check if circular wrap occurs
-            if start + self.n <= self.n_cb:
-                # no wrap: simple slice from start to start+n
-                c_short_rv = tf.slice(c_no_filler, [0, start], [batch_size, self.n])
+        for start in start_positions:
+            if start + self.n <= self.n_cb_comp:
+                c_short_rv = tf.slice(c_rm, [0, start], [batch_size, self.n])
             else:
-                # wrap occurs: concatenate two slices
-                # first part: from start to end of buffer
-                first_part_size = self.n_cb - start
-                first_part = tf.slice(c_no_filler, [0, start],
-                                    [batch_size, first_part_size])
-
-                # second part: from beginning of buffer
+                first_part_size = self.n_cb_comp - start
+                first_part = tf.slice(c_rm, [0, start],
+                                      [batch_size, first_part_size])
                 second_part_size = self.n - first_part_size
-                second_part = tf.slice(c_no_filler, [0, 0],
-                                     [batch_size, second_part_size])
-
-                # concatenate the two parts
+                second_part = tf.slice(c_rm, [0, 0],
+                                       [batch_size, second_part_size])
                 c_short_rv = tf.concat([first_part, second_part], axis=-1)
 
-            # if num_bits_per_symbol is provided, apply output interleaver as
-            # specified in Sec. 5.4.2.2 in 38.212
             if self._num_bits_per_symbol is not None:
                 c_short_rv = tf.gather(c_short_rv, self._out_int, axis=-1)
 
-            # Reshape to [batch_size, 1, n] for proper stacking
             c_short_rv = tf.expand_dims(c_short_rv, axis=1)
             c_short_list.append(c_short_rv)
 
-        # stack all RV versions: [batch_size, num_rv, n]
         c_short = tf.concat(c_short_list, axis=1)
-
-        # reshape to match original input dimensions
         output_shape = input_shape[0:-1] + [len(rv), self.n]
-        output_shape[0] = -1  # It can be None
-        c_reshaped = tf.reshape(c_short, output_shape)
-
-        # remove RV dimension if not in HARQ mode
-        if not harq_mode:
-            c_reshaped = tf.squeeze(c_reshaped, axis=-2)  # Remove the RV dimension
-
-        return c_reshaped
+        output_shape[0] = -1
+        return tf.reshape(c_short, output_shape)

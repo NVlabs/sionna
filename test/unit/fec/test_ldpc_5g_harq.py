@@ -15,6 +15,83 @@ from sionna.phy.mapping import BinarySource
 from sionna.phy.channel import AWGN
 from sionna.phy.mapping import Mapper, Demapper, Constellation
 
+
+def _spec_k0(rv_name, n_cb, bg):
+    """RV start k0 from TS 38.212 Table 5.4.2.1-2 for I_LBRM=0.
+
+    Written in table form with floor operators to mirror the spec:
+      BG1: floor(N_cb * [0, 17, 33, 56] / 66)
+      BG2: floor(N_cb * [0, 13, 25, 43] / 50)
+    """
+    if bg == "bg1":
+        numerators = {"rv0": 0, "rv1": 17, "rv2": 33, "rv3": 56}
+        denominator = 66
+    elif bg == "bg2":
+        numerators = {"rv0": 0, "rv1": 13, "rv2": 25, "rv3": 43}
+        denominator = 50
+    else:
+        raise ValueError(f"Unsupported basegraph {bg}.")
+
+    if rv_name not in numerators:
+        raise ValueError(f"Invalid RV name {rv_name}.")
+
+    # floor() from the spec table
+    return (n_cb * numerators[rv_name]) // denominator
+
+
+def _build_uncompressed_rm_buffer(encoder, bits):
+    """Build uncompressed RM buffer d in TS 38.212 indexing space.
+
+    Returns the sequence d of length N_cb (I_LBRM=0), i.e., after removing the
+    first 2*z bits and before removing filler bits.
+    """
+    bits = tf.reshape(bits, [-1, encoder.k])
+    batch_size = tf.shape(bits)[0]
+
+    u_fill = tf.concat([
+        bits,
+        tf.zeros([batch_size, encoder.k_ldpc - encoder.k], encoder.rdtype)
+    ], axis=1)
+
+    c = encoder._encode_fast(u_fill)
+    c = tf.reshape(c, [batch_size, encoder.n_ldpc])
+    n_cb = encoder.n_ldpc - 2*encoder.z
+    d = c[:, 2*encoder.z:2*encoder.z + n_cb]
+    return d
+
+
+def _spec_rate_match_from_d(d, encoder, rv_name, e_len):
+    """Rate-match according to TS 38.212 §5.4.2.1 with filler skipping.
+
+    Args:
+        d: ndarray, shape [B, N_cb] in uncompressed spec indexing space.
+        encoder: LDPC5GEncoder instance.
+        rv_name: One of {"rv0", "rv1", "rv2", "rv3"}.
+        e_len: Number of output bits E.
+
+    Returns:
+        ndarray of shape [B, E] containing RV-selected bits.
+    """
+    n_cb = encoder.n_ldpc - 2*encoder.z
+    bg = encoder._bg
+    k0 = _spec_k0(rv_name, n_cb, bg)
+
+    filler_start = encoder.k - 2*encoder.z
+    filler_end = filler_start + encoder.k_filler
+    null_mask = np.zeros(n_cb, dtype=bool)
+    null_mask[filler_start:filler_end] = True
+
+    out_idx = []
+    j = 0
+    while len(out_idx) < e_len:
+        idx = (k0 + j) % n_cb
+        # TS 38.212: skip NULL entries in circular buffer d.
+        if not null_mask[idx]:
+            out_idx.append(idx)
+        j += 1
+
+    return d[:, out_idx]
+
 #############################
 # Test cases for LDPC5G HARQ
 #############################
@@ -49,13 +126,14 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
 
     # HARQ encoder
     encoder = LDPC5GEncoder(k, n)
-    starts = encoder.rv_starts
-    n_cb = encoder.n_cb
+    starts_comp = encoder.rv_starts_comp
+    n_cb_comp = encoder.n_cb_comp
 
-    # Reference encoder assumes no rate matching. Unfortunately, the original LDPC5GEncoder
-    # does not allow for rate k / n_cb. So we shorten a little by ignoring the last few bits.
-    # (Ideally, n_ref = n_cb).
-    n_ref = 5 * k if 5 * k < n_cb else 3 * k  # BG1 or BG2
+    # The reference encoder needs to produce the full circular buffer for
+    # comparison.  However, rate k/n_cb_comp can fall below the encoder's
+    # minimum (1/3 BG1, 1/5 BG2) due to filler bits or small k_b, so we
+    # use the lowest accepted rate instead.
+    n_ref = 5 * k if 5 * k < n_cb_comp else 3 * k  # BG2 or BG1
     encoder_ref = LDPC5GEncoder(k, n_ref)
 
     # Generate encoded bits
@@ -76,16 +154,16 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
         x_ref = encoder_ref(bits)  # Shape: [batch_size, n_ref]; uses default RV0
         x = encoder(bits, rv=rv_list)  # Shape: [batch_size, num_rv, n]; uses list of RVs
     
-    # Pad x_ref to n_cb with marker value -1 on the right side
-    x_ref = tf.pad(x_ref, [[0, 0], [0, n_cb - n_ref]], mode="CONSTANT", constant_values=-1)
+    # Pad x_ref to n_cb_comp with marker value -1 on the right side
+    x_ref = tf.pad(x_ref, [[0, 0], [0, n_cb_comp - n_ref]], mode="CONSTANT", constant_values=-1)
 
     # Validate encoded bits
     assert x.shape == [batch_size, num_rv, n]
 
     for i, rv in enumerate(rv_list):
-        start = starts[rv]
+        start = starts_comp[rv]
         # Align reference codeword for comparison
-        x_ref_unrolled = tf.roll(x_ref, shift=-start+starts["rv0"], axis=-1)
+        x_ref_unrolled = tf.roll(x_ref, shift=-start+starts_comp["rv0"], axis=-1)
         x_ref_unrolled = x_ref_unrolled[:, :n]  # Adjust to match length n
         # Compare only non-marker positions (ignore -1 markers)
         mask = x_ref_unrolled != -1
@@ -97,6 +175,71 @@ def test_harq_encoder(k_n, rv_list, use_graph_mode, use_xla):
     # Print test completion info
     mode_str = f"Graph={use_graph_mode}, XLA={use_xla}"
     print(f"HARQ encoder test passed for k={k}, n={n}, {mode_str}")
+
+
+def test_harq_rv_selection_matches_spec():
+    """Comprehensive HARQ RV conformance against TS 38.212 indexing.
+
+    The test sweeps many valid (k, n) operating points and representative RV
+    patterns. For each case, it compares encoder
+    HARQ output to a spec-faithful reference built from uncompressed RM buffer
+    indexing with filler-bit skipping.
+    """
+    tf.random.set_seed(1234)
+
+    rv_patterns = [
+        ["rv0", "rv3"],
+        ["rv0", "rv2", "rv3", "rv1"],
+    ]
+
+    k_values = [
+        56, 104, 136, 248, 344, 472, 632, 856,
+        1032, 1480, 1832, 2360, 2840, 3320, 3832,
+        4312, 5032, 5960, 7032, 7848, 8416,
+    ]
+    rate_targets = [0.92, 0.85, 0.77, 0.69, 0.61, 0.53, 0.45, 0.37, 0.34, 0.28, 0.24, 0.22]
+
+    source = BinarySource()
+    batch_size = 2
+    num_cases_tested = 0
+
+    for k in k_values:
+        for rate in rate_targets:
+            n = int(np.ceil(k / rate))
+
+            # For k > 3824, auto-selection can force BG1, which requires
+            # r >= 1/3 in this implementation.
+            # Skip only this known unsupported region instead of catching all
+            # ValueErrors, so unexpected failures remain visible.
+            if k > 3824 and rate < (1/3):
+                continue
+
+            encoder = LDPC5GEncoder(k, n)
+
+            bits = source([batch_size, k])
+            d = _build_uncompressed_rm_buffer(encoder, bits).numpy()
+
+            for rv_list in rv_patterns:
+                x_impl = encoder(bits, rv=rv_list).numpy()
+                x_ref = np.stack([
+                    _spec_rate_match_from_d(d, encoder, rv_name, n)
+                    for rv_name in rv_list
+                ], axis=1)
+
+                if not np.array_equal(x_impl, x_ref):
+                    pytest.fail(
+                        "HARQ RV mismatch against TS 38.212 reference: "
+                        f"k={k}, n={n}, rv_list={rv_list}, "
+                        f"bg={encoder._bg}, z={encoder.z}, "
+                        f"k_filler={encoder.k_filler}, n_cb={encoder.n_cb}."
+                    )
+
+                num_cases_tested += 1
+
+    # Ensure the sweep really exercised many operating points and RV patterns.
+    assert num_cases_tested >= 300, (
+        f"Insufficient HARQ sweep coverage ({num_cases_tested} cases)."
+    )
 
 @pytest.mark.parametrize("k_n_esno", [(300, 6*140, -0.5), (4500, 6*1800, 1.0)])
 @pytest.mark.parametrize("use_graph_mode", [True, False])
