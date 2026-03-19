@@ -16,11 +16,12 @@ extended according to one's needs.
 
 Sionna RT is available as a standalone package whose source code is located in a
 separate `GitHub repository <https://github.com/NVlabs/sionna-rt>`_.
+Additionally, the `Sionna RT GUI <rt_gui.rst>`_ package can be used to simulate and visualize scenes, paths, and radio maps.
 A technical report describing the algorithms implemented in Sionna RT is available
 `here <https://nvlabs.github.io/sionna/rt/tech-report/index.html>`_.
 
 .. toctree::
-   :hidden: 
+   :hidden:
    :maxdepth: 4
 
    tutorials
@@ -28,3 +29,4 @@ A technical report describing the algorithms implemented in Sionna RT is availab
    api/rt.rst
    developer/developer.rst
    Technical Report <https://nvlabs.github.io/sionna/rt/tech-report/index.html>
+   rt_gui.rst

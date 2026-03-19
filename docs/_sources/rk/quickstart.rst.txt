@@ -110,8 +110,6 @@ For testing and development, create a virtual environment and install Python pac
    # pip install -r requirements_thor.txt for Thor
    # pip install -r requirements_orin.txt for Orin
 
-[TODO] Add export lines for TensorRT
-
 Step 2: USRP Setup
 ------------------
 
@@ -162,7 +160,7 @@ Step 4: Deploy 5G Stack
    :align: center
    :alt: 5G Stack Overview
 
-   Overview of the deployed 5G end-to-end stack with IP adresses and interfaces of each container. Figure from `OpenAirInterface <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers>`_.
+   Overview of the deployed 5G end-to-end stack with IP addresses and interfaces of each container. Figure from `OpenAirInterface <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers>`_.
 
 :numref:`figure_5g_stack` shows the block diagram of the complete system (see `OpenAirInterface5G guide <https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers>`_ for more details). The 5G stack is deployed via Docker containers. The following steps build and deploy the core network components and the RAN components:
 
@@ -185,12 +183,12 @@ Step 4: Deploy 5G Stack
    ./plugins/common/build_all_plugins.sh --host
    ./plugins/common/build_all_plugins.sh --container
 
-The system can be configured via environment variables. You can configure the system by editing the `.env` file in the `config/b200/` or `config/rfsim/` directory, respectively.
+The system can be configured via environment variables. You can configure the system by editing the environment variables in the `.env` file in the `config/b200/` or `config/rfsim/` directory, respectively.
 
 Edit `config/b200/.env` and set the following parameters:
 
-   * Set your USRP serial number
-   * Select the configuration file for desired number of PRBs (default is 24, equals 8.64MHz bandwidth)
+* Set your USRP serial number
+* Select the configuration file for desired number of PRBs (default is 24, equals 8.64MHz bandwidth)
 
 And finally, you can start the system:
 
@@ -256,10 +254,10 @@ And run performance tests:
 
    # On the client (UE); you need to install iperf3 on the host machine
    # Downlink test
-   iperf3 -u -t 10 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135 -R
+   iperf3 -u -t 1000 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135 -R
 
    # Uplink test
-   iperf3 -u -t 10 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135
+   iperf3 -u -t 1000 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135
 
    # Change 1M to the desired throughput in Mbit/s
 

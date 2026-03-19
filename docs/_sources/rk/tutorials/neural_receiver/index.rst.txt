@@ -14,7 +14,7 @@ This tutorial demonstrates the integration of a neural receiver [Wiesmayr2024]_ 
 
 The architecture is designed to be robust and universal, capable of handling a wide range of channel conditions without overfitting to specific realizations. A key focus is real-time inference capability, targeting sub-1 ms inference latency (see [Wiesmayr2024]_ for details).
 
-The source code of the neural receiver is `online available <https://github.com/NVlabs/neural_rx>`_. You can find more details on the NRX model architecture and training process in the `Jumpstart Notebook <https://github.com/NVlabs/neural_rx/blob/main/notebooks/jumpstart_tutorial.ipynb>`_.
+The source code of the neural receiver is `available online <https://github.com/NVlabs/neural_rx>`_. You can find more details on the NRX model architecture and training process in the `Jumpstart Notebook <https://github.com/NVlabs/neural_rx/blob/main/notebooks/jumpstart_tutorial.ipynb>`_.
 
 Implementation Details
 ----------------------

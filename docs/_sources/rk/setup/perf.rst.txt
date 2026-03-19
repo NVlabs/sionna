@@ -6,7 +6,7 @@ This guide covers key performance optimizations for the Jetson platform, includi
 Power Management
 ----------------
 
-Per default the Jetson platform is configured to use the "balanced" power mode.
+By default, the Jetson platform is configured to use the "balanced" power mode.
 For best performance, we recommend to use the "max-performance" power mode as described below.
 
 You can view the current settings with:

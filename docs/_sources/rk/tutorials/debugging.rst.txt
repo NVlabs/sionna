@@ -10,7 +10,7 @@ Attaching a debugger (`gdb` and `VS code`)
 -------------------------------------------
 
 To run a `gdbserver` inside the `gNB` container to which we can attach debuggers to, we override the `docker compose` command line as follows.
-You can find the `docker-compose.override.yaml` file in the `config/common/docker-compose.override.yaml` directory of the Sionna Research Kit.
+You can find the `docker-compose.override.yaml` file at `config/common/docker-compose.override.yaml` of the Sionna Research Kit.
 
 .. code-block:: yaml
    :caption: docker-compose.override.yaml

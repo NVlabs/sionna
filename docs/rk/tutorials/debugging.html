@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Debugging &amp; Troubleshooting &mdash; Sionna 1.2.1 documentation</title>
+  <title>Debugging &amp; Troubleshooting &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -25,7 +25,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="“Made with Sionna”" href="../../made_with_sionna.html" />
-    <link rel="prev" title="Software-defined End-to-End 5G Network" href="ue_emulator.html" /> 
+    <link rel="prev" title="Real-time Channel Emulator" href="channel_emulation/channel_emulation.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -540,6 +540,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1528,6 +1529,7 @@
 <li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1619,6 +1621,18 @@
 <li class="toctree-l4"><a class="reference internal" href="ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
+</ul>
+</li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Debugging &amp; Troubleshooting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
@@ -1674,7 +1688,7 @@
 <section id="attaching-a-debugger-gdb-and-vs-code">
 <h2>Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)<a class="headerlink" href="#attaching-a-debugger-gdb-and-vs-code" title="Link to this heading"></a></h2>
 <p>To run a <cite>gdbserver</cite> inside the <cite>gNB</cite> container to which we can attach debuggers to, we override the <cite>docker compose</cite> command line as follows.
-You can find the <cite>docker-compose.override.yaml</cite> file in the <cite>config/common/docker-compose.override.yaml</cite> directory of the Sionna Research Kit.</p>
+You can find the <cite>docker-compose.override.yaml</cite> file at <cite>config/common/docker-compose.override.yaml</cite> of the Sionna Research Kit.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">docker-compose.override.yaml</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">services</span><span class="p">:</span>
@@ -1816,7 +1830,7 @@ $<span class="w"> </span>/tini<span class="w"> </span>-v<span class="w"> </span>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ue_emulator.html" class="btn btn-neutral float-left" title="Software-defined End-to-End 5G Network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="channel_emulation/channel_emulation.html" class="btn btn-neutral float-left" title="Real-time Channel Emulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../made_with_sionna.html" class="btn btn-neutral float-right" title="“Made with Sionna”" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

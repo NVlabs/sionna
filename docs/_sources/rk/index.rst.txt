@@ -51,5 +51,5 @@ If you use this software, please cite it as:
     author = {Cammerer, Sebastian, and Marcus, Guillermo and Zirr, Tobias and Hoydis, Jakob and {Ait Aoudia}, Fayçal and Wiesmayr, Reinhard and Maggi, Lorenzo and Nimier-David, Merlin and Keller, Alexander},
     note = {https://nvlabs.github.io/sionna/rk/index.html},
     year = {2025},
-    version = {1.1.0}
+    version = {1.2.0}
    }

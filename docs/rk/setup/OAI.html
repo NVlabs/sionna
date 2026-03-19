@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenAirInterface Setup &mdash; Sionna 1.2.1 documentation</title>
+  <title>OpenAirInterface Setup &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -540,6 +540,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1528,6 +1529,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1619,6 +1621,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/debugging.html">Debugging &amp; Troubleshooting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/debugging.html#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/debugging.html#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
@@ -1703,12 +1717,16 @@
 ./plugins/common/build_all_plugins.sh<span class="w"> </span>--container
 </pre></div>
 </div>
+<p>Subsequent builds can be invoked with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/build-oai-images.sh<span class="w"> </span>--tag<span class="w"> </span>latest<span class="w"> </span>./ext/openairinterface5g
+</pre></div>
+</div>
 </div>
 <section id="manual-build-steps">
 <h2>Manual Build Steps<a class="headerlink" href="#manual-build-steps" title="Link to this heading"></a></h2>
 <p>For development or debugging, the individual steps are documented below.</p>
-<p>Clone the OAI repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>--branch<span class="w"> </span><span class="m">2025</span>.w34<span class="w"> </span>https://gitlab.eurecom.fr/oai/openairinterface5g.git<span class="w"> </span>ext/openairinterface5g
+<p>Clone the OAI repository (without submodules initially):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span><span class="m">2025</span>.w34<span class="w"> </span>https://gitlab.eurecom.fr/oai/openairinterface5g.git<span class="w"> </span>ext/openairinterface5g
 </pre></div>
 </div>
 <p>Apply the Sionna Research Kit patches:</p>
@@ -1716,36 +1734,50 @@
 git<span class="w"> </span>apply<span class="w"> </span>--index<span class="w"> </span>&lt;<span class="w"> </span>../../patches/openairinterface5g.patch
 </pre></div>
 </div>
-<p>These patches enable GPU acceleration and contai the plugin infrastructure for the Sionna Research Kit.</p>
-<p>Run the docker builds individually:</p>
+<p>These patches enable GPU acceleration and the plugin infrastructure for the Sionna Research Kit.</p>
+<p>Initialize the submodules:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>ext/openairinterface5g
+git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
+</pre></div>
+</div>
+<p>Use the build script to build the images:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/build-oai-images.sh<span class="w"> </span>--tag<span class="w"> </span>latest<span class="w"> </span>./ext/openairinterface5g
+</pre></div>
+</div>
+<p>Or configure and run the docker builds individually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># needed only for Orin platform (AGX Orin or Orin Nano Super)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">BASE_IMAGE</span><span class="o">=</span><span class="s2">&quot;nvcr.io/nvidia/l4t-jetpack:r36.3.0&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">BOOST_VERSION</span><span class="o">=</span><span class="s2">&quot;1.74.0&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EXTRA_DEB_PKGS</span><span class="o">=</span><span class="s2">&quot;gcc-12 g++-12&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">BUILD_OPTION</span><span class="o">=</span><span class="s2">&quot;--cmake-opt -DCMAKE_C_COMPILER=gcc-12 --cmake-opt -DCMAKE_CXX_COMPILER=g++-12 --cmake-opt -DCMAKE_CUDA_ARCHITECTURES=87 --cmake-opt -DAVX2=OFF --cmake-opt -DAVX512=OFF&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">FLEXRIC_BUILD_OPTIONS</span><span class="o">=</span><span class="s2">&quot;-DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">docker_build_opts</span><span class="o">=</span><span class="s2">&quot;--build-arg BASE_IMAGE --build-arg BOOST_VERSION --build-arg EXTRA_DEB_PKGS --build-arg BUILD_OPTION --build-arg FLEXRIC_BUILD_OPTIONS&quot;</span>
 
-<span class="c1"># Base image</span>
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>ran-base-cuda<span class="w"> </span>--tag<span class="w"> </span>ran-base-cuda:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--file<span class="w"> </span>docker/Dockerfile.base.ubuntu.cuda<span class="w"> </span>.
+<span class="nb">export</span><span class="w"> </span><span class="nv">oai_root</span><span class="o">=</span>./ext/openairinterface5g
 
-<span class="c1"># Build image (run from sionna-rk root to include plugins)</span>
-<span class="nb">cd</span><span class="w"> </span>../..
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>ran-build-cuda<span class="w"> </span>--tag<span class="w"> </span>ran-build-cuda:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--file<span class="w"> </span>ext/openairinterface5g/docker/Dockerfile.build.ubuntu.cuda<span class="w"> </span>.
+<span class="c1"># RAN base image</span>
+docker<span class="w"> </span>build<span class="w"> </span><span class="nv">$docker_build_opts</span><span class="w"> </span>--target<span class="w"> </span>ran-base-cuda<span class="w"> </span>--tag<span class="w"> </span>ran-base-cuda:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--file<span class="w"> </span><span class="nv">$oai_root</span>/docker/Dockerfile.base.ubuntu.cuda<span class="w"> </span><span class="nv">$oai_root</span>
 
-<span class="nb">cd</span><span class="w"> </span>ext/openairinterface5g
+<span class="c1"># RAN build image (run from sionna-rk root to include plugins)</span>
+docker<span class="w"> </span>build<span class="w"> </span><span class="nv">$docker_build_opts</span><span class="w"> </span>--target<span class="w"> </span>ran-build-cuda<span class="w"> </span>--tag<span class="w"> </span>ran-build-cuda:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--file<span class="w"> </span><span class="nv">$oai_root</span>/docker/Dockerfile.build.ubuntu.cuda<span class="w"> </span>.
 
 <span class="c1"># gNodeB</span>
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-gnb-cuda<span class="w"> </span>--tag<span class="w"> </span>oai-gnb-cuda:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--file<span class="w"> </span>docker/Dockerfile.gNB.ubuntu.cuda<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span><span class="nv">$docker_build_opts</span><span class="w"> </span>--target<span class="w"> </span>oai-gnb-cuda<span class="w"> </span>--tag<span class="w"> </span>oai-gnb-cuda:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--file<span class="w"> </span><span class="nv">$oai_root</span>/docker/Dockerfile.gNB.ubuntu.cuda<span class="w"> </span><span class="nv">$oai_root</span>
 
 <span class="c1"># UE</span>
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-nr-ue-cuda<span class="w"> </span>--tag<span class="w"> </span>oai-nr-ue-cuda:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--file<span class="w"> </span>docker/Dockerfile.nrUE.ubuntu.cuda<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span><span class="nv">$docker_build_opts</span><span class="w"> </span>--target<span class="w"> </span>oai-nr-ue-cuda<span class="w"> </span>--tag<span class="w"> </span>oai-nr-ue-cuda:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--file<span class="w"> </span><span class="nv">$oai_root</span>/docker/Dockerfile.nrUE.ubuntu.cuda<span class="w"> </span><span class="nv">$oai_root</span>
 
 <span class="c1"># FlexRIC</span>
-docker<span class="w"> </span>build<span class="w"> </span>--target<span class="w"> </span>oai-flexric-fixed<span class="w"> </span>--tag<span class="w"> </span>oai-flexric:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--file<span class="w"> </span>docker/Dockerfile.flexric.ubuntu<span class="w"> </span>.
+docker<span class="w"> </span>build<span class="w"> </span><span class="nv">$docker_build_opts</span><span class="w"> </span>--target<span class="w"> </span>oai-flexric-fixed<span class="w"> </span>--tag<span class="w"> </span>oai-flexric:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--file<span class="w"> </span><span class="nv">$oai_root</span>/docker/Dockerfile.flexric.ubuntu<span class="w"> </span><span class="nv">$oai_root</span>
 </pre></div>
 </div>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">ran-build-cuda</span></code> must be built from the Sionna Research Kit root directory so that plugins are included in the build context.</p>
-<p>Check that all images were built successfully:</p>
+<p>Check that all images were built successfully (image sizes do not need to match):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>images
 
 REPOSITORY<span class="w">        </span>TAG<span class="w">      </span>SIZE

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.utils.jones &mdash; Sionna 1.2.1 documentation</title>
+  <title>sionna.rt.utils.jones &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -537,6 +537,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1525,6 +1526,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1616,6 +1618,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/debugging.html">Debugging &amp; Troubleshooting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/debugging.html#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/debugging.html#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
@@ -1666,7 +1680,7 @@
              
   <h1>Source code for sionna.rt.utils.jones</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Utilities for Jones calculus&quot;&quot;&quot;</span>
@@ -1883,22 +1897,22 @@
     <span class="n">si_target_local</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="n">k_in_local</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="o">-</span><span class="n">k_in_local</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
     <span class="n">si_target_local</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">si_target_local</span><span class="p">)</span>
     <span class="n">si_target_local</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">normal_incidence</span><span class="p">,</span>
-                                 <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
-                                 <span class="n">si_target_local</span><span class="p">)</span>
+                                <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
+                                <span class="n">si_target_local</span><span class="p">)</span>
     <span class="n">so_current_local</span> <span class="o">=</span> <span class="n">si_target_local</span>
 
-    <span class="n">k_in_world</span> <span class="o">=</span> <span class="n">to_world</span><span class="nd">@k_in_local</span>
-    <span class="n">k_out_world</span> <span class="o">=</span> <span class="n">to_world</span><span class="nd">@k_out_local</span>
+    <span class="n">k_in_world</span> <span class="o">=</span> <span class="n">to_world</span> <span class="o">@</span> <span class="n">k_in_local</span>
+    <span class="n">k_out_world</span> <span class="o">=</span> <span class="n">to_world</span> <span class="o">@</span> <span class="n">k_out_local</span>
 
     <span class="c1"># Rotator for the incident field</span>
     <span class="n">to_local</span> <span class="o">=</span> <span class="n">to_world</span><span class="o">.</span><span class="n">T</span>
     <span class="n">si_current_world</span> <span class="o">=</span> <span class="n">implicit_basis_vector</span><span class="p">(</span><span class="n">k_in_world</span><span class="p">)</span>
-    <span class="n">si_current_local</span> <span class="o">=</span> <span class="n">to_local</span><span class="nd">@si_current_world</span>
+    <span class="n">si_current_local</span> <span class="o">=</span> <span class="n">to_local</span> <span class="o">@</span> <span class="n">si_current_world</span>
     <span class="n">in_rotator</span> <span class="o">=</span> <span class="n">jones_matrix_rotator</span><span class="p">(</span><span class="n">k_in_local</span><span class="p">,</span> <span class="n">si_current_local</span><span class="p">,</span>
                                       <span class="n">si_target_local</span><span class="p">)</span>
 
     <span class="c1"># Rotator for the scattered field</span>
-    <span class="n">so_current_world</span> <span class="o">=</span> <span class="n">to_world</span><span class="nd">@so_current_local</span>
+    <span class="n">so_current_world</span> <span class="o">=</span> <span class="n">to_world</span> <span class="o">@</span> <span class="n">so_current_local</span>
     <span class="n">so_target_world</span> <span class="o">=</span> <span class="n">implicit_basis_vector</span><span class="p">(</span><span class="n">k_out_world</span><span class="p">)</span>
     <span class="n">out_rotator</span> <span class="o">=</span> <span class="n">jones_matrix_rotator</span><span class="p">(</span><span class="n">k_out_world</span><span class="p">,</span> <span class="n">so_current_world</span><span class="p">,</span>
                                        <span class="n">so_target_world</span><span class="p">)</span>
@@ -1912,21 +1926,22 @@
     <span class="n">c2_imag</span> <span class="o">=</span> <span class="n">c2</span><span class="o">.</span><span class="n">imag</span>
 
     <span class="c1"># Real component</span>
-    <span class="n">real</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">(</span><span class="n">c1_real</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_real</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
-                       <span class="n">c1_real</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_real</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">real</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">(</span><span class="n">c1_real</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_real</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                       <span class="n">c1_real</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_real</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">real</span> <span class="o">@=</span> <span class="n">in_rotator</span>
 
     <span class="c1"># Imaginary component</span>
-    <span class="n">imag</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">(</span><span class="n">c1_imag</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_imag</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
-                       <span class="n">c1_imag</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_imag</span><span class="o">*</span><span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">imag</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">(</span><span class="n">c1_imag</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_imag</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+                       <span class="n">c1_imag</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">c2_imag</span> <span class="o">*</span> <span class="n">out_rotator</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">imag</span> <span class="o">@=</span> <span class="n">in_rotator</span>
 
     <span class="c1"># The Jones matrix is returned as a 4x4 real-valued matrix</span>
-    <span class="n">m4f</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix4f</span><span class="p">(</span><span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
-                      <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
-                      <span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
-                      <span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">m4f</span></div>
+    <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix4f</span><span class="p">(</span>
+        <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">imag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">imag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>  <span class="n">real</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="jones_vec_dot">

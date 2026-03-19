@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>install-usrp.sh &mdash; Sionna 1.2.1 documentation</title>
+  <title>install-usrp.sh &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -540,6 +540,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1528,6 +1529,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1619,6 +1621,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/debugging.html">Debugging &amp; Troubleshooting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/debugging.html#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../tutorials/debugging.html#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
@@ -1677,6 +1691,7 @@
 <span class="w">    </span><span class="o">[</span>--force<span class="o">]</span>
 <span class="w">    </span><span class="o">[</span>--verbose<span class="o">]</span>
 <span class="w">    </span><span class="o">[</span>--dry-run<span class="o">]</span>
+<span class="w">    </span><span class="o">[</span>--branch<span class="w"> </span>&lt;branch<span class="p">|</span>tag&gt;<span class="o">]</span>
 </pre></div>
 </div>
 </section>
@@ -1708,6 +1723,13 @@
 </dd></dl>
 
 <dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-install-usrp.sh-branch">
+<span class="sig-name descname"><span class="pre">--branch</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;branch|tag&gt;</span></span><a class="headerlink" href="#cmdoption-install-usrp.sh-branch" title="Link to this definition"></a></dt>
+<dd><p>Clone a specific branch or tag from the UHD repository. If not specified,
+the repository’s default branch is used.</p>
+</dd></dl>
+
+<dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-install-usrp.sh-h">
 <span class="sig-name descname"><span class="pre">-h</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--help</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-install-usrp.sh-h" title="Link to this definition"></a></dt>
 <dd><p>Display help message and exit.</p>
@@ -1719,6 +1741,7 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./install-usrp.sh
 ./install-usrp.sh<span class="w"> </span>--force
 ./install-usrp.sh<span class="w"> </span>--dry-run<span class="w"> </span>--verbose
+./install-usrp.sh<span class="w"> </span>--branch<span class="w"> </span>v4.6.0.0
 </pre></div>
 </div>
 </section>

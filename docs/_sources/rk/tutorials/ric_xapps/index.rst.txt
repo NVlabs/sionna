@@ -77,7 +77,7 @@ After starting the system, monitor the xApp logs:
 
 You will see a slightly different output than the simplified example above as the default xApp runs the ZeroMQ server as explained below. If you want to run the simplified example from above, you can set the ``XAPP_SCRIPT`` environment variable to ``XAPP_SCRIPT=../../plugins/ric_xapps/src/monitor_mcs.py`` before starting the system.
 
-Note that you may need to run `iperf3` to generate traffic on the network; otherwise no slots will be scheduled for transmission and zero MCS will be reported .
+Note that you may need to run `iperf3` to generate traffic on the network; otherwise no slots will be scheduled for transmission and zero MCS will be reported.
 
 ZeroMQ Integration
 ------------------

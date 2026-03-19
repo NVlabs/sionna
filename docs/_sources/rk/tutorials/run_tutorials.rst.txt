@@ -143,3 +143,39 @@ Verify the plugin is loaded by checking the gNB logs:
     Initializing TRT runtime 20
 
 If the receiver is running, you can also see the live statistics in the gNB logs. Note that this requires traffic to be scheduled on the PUSCH, i.e., run iperf3 on the UE side.
+
+Channel Emulation
+-----------------
+
+Enable the :ref:`channel_emulation` by setting the environment variable. Use the file-based mode for pre-computed CIRs or the ZMQ mode for interactive use with the Sionna RT GUI:
+
+.. code-block:: bash
+
+    # File-based CIR (pass-through, no distortion)
+    GNB_EXTRA_OPTIONS="--cir-folder /opt/oai-gnb/plugins/channel_emulation/data/pass_through_cir"
+
+    # ZMQ-based CIR (interactive, use with Sionna RT GUI)
+    GNB_EXTRA_OPTIONS="--cir-zmq-num-taps 48"
+
+Start the system:
+
+.. code-block:: bash
+
+    ./scripts/start_system.sh rfsim
+
+Verify the plugin is loaded by checking the gNB logs:
+
+.. code-block:: text
+
+    [LOADER] library libchn_emu.so successfully loaded
+    Channel Emulator initialized
+
+The :ref:`ric_xapps` stats server can be used to visualize UE statistics (MCS, BLER) alongside the channel emulation. It is automatically started and available on port 5555. It is also integrated into the Sionna RT GUI.
+
+The channel emulator works best with the `Sionna RT GUI <https://github.com/NVlabs/sionna-rt-gui>`_ to generate and export CIRs. It is automatically installed when you install the requirements.txt file, and can be started via:
+
+.. code-block:: bash
+
+    sionna-rt-gui --priority --config spark_rfsim.yaml # or spark_quectel.yaml
+
+The GUI uses `NVIDIA MPS <https://docs.nvidia.com/deploy/mps/index.html>`_, which is required when real-time ray tracing runs concurrently with other CUDA plugins on the GPU (see `NVIDIA MPS <https://docs.nvidia.com/deploy/mps/index.html>`_). The active thread percentage can be configured via the ``MPS_ACTIVE_THREAD_PCT`` environment variable (default: 40%). The scripts `./scripts/start_mps.sh` and `./scripts/stop_mps.sh` can be used to start (and stop) MPS before starting the gNB and the GUI.

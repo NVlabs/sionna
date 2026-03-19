@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.radio_materials.radio_material &mdash; Sionna 1.2.1 documentation</title>
+  <title>sionna.rt.radio_materials.radio_material &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -537,6 +537,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1525,6 +1526,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1616,6 +1618,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/debugging.html">Debugging &amp; Troubleshooting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/debugging.html#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/debugging.html#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
@@ -1666,7 +1680,7 @@
              
   <h1>Source code for sionna.rt.radio_materials.radio_material</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Class implementing a radio material&quot;&quot;&quot;</span>
@@ -2325,8 +2339,8 @@
         <span class="c1"># This is required to enable Dr.Jit to trace this code when the material</span>
         <span class="c1"># is instantiated but not assigned to a scene yet.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">angular_frequency</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span><span class="o">*</span><span class="n">DEFAULT_FREQUENCY</span>
-            <span class="n">wavelength</span> <span class="o">=</span> <span class="n">speed_of_light</span><span class="o">/</span><span class="n">DEFAULT_FREQUENCY</span>
+            <span class="n">angular_frequency</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span> <span class="o">*</span> <span class="n">DEFAULT_FREQUENCY</span>
+            <span class="n">wavelength</span> <span class="o">=</span> <span class="n">speed_of_light</span> <span class="o">/</span> <span class="n">DEFAULT_FREQUENCY</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">angular_frequency</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">angular_frequency</span>
             <span class="n">wavelength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span>
@@ -2341,7 +2355,7 @@
         <span class="c1"># ITU coefficients</span>
         <span class="c1"># r_te, r_tm: TE/TM reflection coefficients</span>
         <span class="c1"># t_te, t_tm: TE/TM transmission coefficients</span>
-        <span class="n">r_te</span><span class="p">,</span> <span class="n">r_tm</span><span class="p">,</span> <span class="n">t_te</span><span class="p">,</span> <span class="n">t_tm</span> <span class="o">=</span>\
+        <span class="n">r_te</span><span class="p">,</span> <span class="n">r_tm</span><span class="p">,</span> <span class="n">t_te</span><span class="p">,</span> <span class="n">t_tm</span> <span class="o">=</span> \
             <span class="n">itu_coefficients_single_layer_slab</span><span class="p">(</span><span class="n">cos_theta_i</span><span class="p">,</span> <span class="n">eta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span>
                                                <span class="n">wavelength</span><span class="p">)</span>
 
@@ -2351,8 +2365,8 @@
         <span class="n">diffraction</span> <span class="o">=</span> <span class="n">sampled_event</span> <span class="o">==</span> <span class="n">InteractionType</span><span class="o">.</span><span class="n">DIFFRACTION</span>
 
         <span class="n">prs</span><span class="p">,</span> <span class="n">prd</span><span class="p">,</span> <span class="n">pt</span><span class="p">,</span> <span class="n">pd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_event_probabilities</span><span class="p">(</span><span class="n">r_te</span><span class="p">,</span> <span class="n">r_tm</span><span class="p">,</span>
-                                                    <span class="n">t_te</span><span class="p">,</span> <span class="n">t_tm</span><span class="p">,</span>
-                                                    <span class="n">loc_en_inter</span><span class="p">)</span>
+                                                     <span class="n">t_te</span><span class="p">,</span> <span class="n">t_tm</span><span class="p">,</span>
+                                                     <span class="n">loc_en_inter</span><span class="p">)</span>
 
         <span class="n">probs</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">specular</span><span class="p">,</span> <span class="n">prs</span><span class="p">,</span> <span class="n">prd</span><span class="p">)</span>
         <span class="n">probs</span><span class="p">[</span><span class="n">transmission</span><span class="p">]</span> <span class="o">=</span> <span class="n">pt</span>
@@ -2433,9 +2447,9 @@
         <span class="n">refraction_enabled</span> <span class="o">=</span> <span class="n">enabled_interactions</span> <span class="o">&amp;</span> <span class="n">InteractionType</span><span class="o">.</span><span class="n">REFRACTION</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
         <span class="c1"># Probability of sampling a specular reflection</span>
-        <span class="n">prs</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">specular_reflection_enabled</span><span class="p">,</span> <span class="n">r</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">s</span><span class="p">),</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">))</span>
+        <span class="n">prs</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">specular_reflection_enabled</span><span class="p">,</span> <span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">s</span><span class="p">),</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">))</span>
         <span class="c1"># Probability of sampling a diffuse reflection</span>
-        <span class="n">prd</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">diffuse_reflection_enabled</span><span class="p">,</span> <span class="n">r</span><span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">))</span>
+        <span class="n">prd</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">diffuse_reflection_enabled</span><span class="p">,</span> <span class="n">r</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">))</span>
         <span class="c1"># Probability of a transmission</span>
         <span class="n">pt</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">refraction_enabled</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">))</span>
 
@@ -2611,13 +2625,13 @@
         <span class="n">solid_angle</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">t</span>
 
         <span class="c1"># Amplitude of the reflected field</span>
-        <span class="n">er_spec</span> <span class="o">=</span> <span class="n">specular_reflection_mat</span><span class="nd">@ei</span>
+        <span class="n">er_spec</span> <span class="o">=</span> <span class="n">specular_reflection_mat</span> <span class="o">@</span> <span class="n">ei</span>
         <span class="n">er_spec_norm</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">er_spec</span><span class="p">)</span>
         <span class="c1"># Amplitude of the incident field</span>
         <span class="n">ei_norm</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ei</span><span class="p">)</span>
         <span class="c1"># Gamma coefficient</span>
         <span class="n">gamma</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">ei_norm</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">,</span>
-                          <span class="n">er_spec_norm</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">ei_norm</span><span class="p">),</span>
+                          <span class="n">er_spec_norm</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">ei_norm</span><span class="p">),</span>
                           <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">))</span>
 
         <span class="c1"># Scattering pattern</span>
@@ -2629,7 +2643,7 @@
         <span class="c1"># from the implicit basis to the spherical basis. Note that this would</span>
         <span class="c1"># be needed otherwise, as the model used for diffuse scattering operates</span>
         <span class="c1"># in the basis defined by the spherical unit vectors.</span>
-        <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fs</span><span class="o">*</span><span class="n">solid_angle</span><span class="p">)</span><span class="o">*</span><span class="n">gamma</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_xpd_jones_mat</span>
+        <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fs</span> <span class="o">*</span> <span class="n">solid_angle</span><span class="p">)</span> <span class="o">*</span> <span class="n">gamma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpd_jones_mat</span>
 
         <span class="k">return</span> <span class="n">jones_mat</span>
 
@@ -2697,7 +2711,7 @@
         <span class="n">phi</span> <span class="o">+=</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span>
 
         <span class="c1"># Compute L</span>
-        <span class="n">l</span> <span class="o">=</span> <span class="n">s</span><span class="o">*</span><span class="n">s_prime</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="n">s_prime</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">s_prime</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">s_prime</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="c1"># Compute diffraction coefficients</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">exterior_angle</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
@@ -2706,12 +2720,12 @@
 
         <span class="k">def</span><span class="w"> </span><span class="nf">a_p_m</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
             <span class="c1"># Compute n_p and n_m</span>
-            <span class="n">n_p</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">round</span><span class="p">(</span> <span class="p">(</span><span class="n">beta</span> <span class="o">+</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">exterior_angle</span><span class="p">)</span> <span class="p">)</span>
-            <span class="n">n_m</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">round</span><span class="p">(</span> <span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">exterior_angle</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">n_p</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">round</span><span class="p">(</span> <span class="p">(</span><span class="n">beta</span> <span class="o">+</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">exterior_angle</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">n_m</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">round</span><span class="p">(</span> <span class="p">(</span><span class="n">beta</span> <span class="o">-</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">exterior_angle</span><span class="p">)</span> <span class="p">)</span>
 
             <span class="c1"># Compute a_p and a_m</span>
-            <span class="n">a_p</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">exterior_angle</span><span class="o">*</span><span class="n">n_p</span> <span class="o">-</span> <span class="n">beta</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-            <span class="n">a_m</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">exterior_angle</span><span class="o">*</span><span class="n">n_m</span> <span class="o">-</span> <span class="n">beta</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">a_p</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">exterior_angle</span> <span class="o">*</span> <span class="n">n_p</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">a_m</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">exterior_angle</span> <span class="o">*</span> <span class="n">n_m</span> <span class="o">-</span> <span class="n">beta</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 
             <span class="k">return</span> <span class="n">a_p</span><span class="p">,</span> <span class="n">a_m</span>
 
@@ -2719,12 +2733,13 @@
         <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">a_p_m</span><span class="p">(</span><span class="n">sum_phi</span><span class="p">)</span>
 
         <span class="n">factor</span> <span class="o">=</span> <span class="o">-</span><span class="n">dr</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Complex2f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
-        <span class="n">factor</span> <span class="o">*=</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span><span class="o">*</span><span class="n">wavenumber</span><span class="p">)</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta0</span><span class="p">))</span>
+        <span class="n">factor</span> <span class="o">*=</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">safe_sqrt</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">two_pi</span> <span class="o">*</span> <span class="n">wavenumber</span><span class="p">)</span>
+                         <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">beta0</span><span class="p">))</span>
 
-        <span class="n">d1</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">dif_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)</span> <span class="p">)</span>
-        <span class="n">d2</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">dif_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)</span> <span class="p">)</span>
-        <span class="n">d3</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">sum_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)</span> <span class="p">)</span>
-        <span class="n">d4</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">sum_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">dif_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">d2</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">dif_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">d3</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">+</span> <span class="n">sum_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">d4</span> <span class="o">=</span> <span class="n">cot</span><span class="p">(</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">sum_phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span> <span class="p">)</span>
 
         <span class="c1"># Complex-valued diffraction coefficients</span>
         <span class="n">d1</span> <span class="o">*=</span> <span class="n">factor</span> <span class="o">*</span> <span class="n">f_utd</span><span class="p">(</span><span class="n">wavenumber</span> <span class="o">*</span> <span class="n">l</span> <span class="o">*</span> <span class="n">a1</span><span class="p">)</span>

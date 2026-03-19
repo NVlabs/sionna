@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>sionna.rt.radio_map_solvers.radio_map_solver &mdash; Sionna 1.2.1 documentation</title>
+  <title>sionna.rt.radio_map_solvers.radio_map_solver &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -14,7 +14,7 @@
   
       <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../../../../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -537,6 +537,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1525,6 +1526,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1616,6 +1618,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../rk/tutorials/debugging.html">Debugging &amp; Troubleshooting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/debugging.html#attaching-a-debugger-gdb-and-vs-code">Attaching a debugger (<cite>gdb</cite> and <cite>VS code</cite>)</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../rk/tutorials/debugging.html#inspecting-and-debugging-inside-a-container-interactively">Inspecting and debugging inside a container interactively</a></li>
@@ -1666,7 +1680,7 @@
              
   <h1>Source code for sionna.rt.radio_map_solvers.radio_map_solver</h1><div class="highlight"><pre>
 <span></span><span class="c1">#</span>
-<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2025 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;Radio map solver&quot;&quot;&quot;</span>
@@ -1911,7 +1925,8 @@
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
         <span class="n">rr_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">rr_prob</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>
-        <span class="n">stop_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">stop_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">modified_scene</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Scene</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RadioMap</span><span class="p">:</span>
         <span class="c1"># pylint: disable=line-too-long</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -1964,6 +1979,11 @@
 <span class="sd">            Russian roulette is enabled</span>
 <span class="sd">        :param stop_threshold: Gain threshold [dB] below which a path is</span>
 <span class="sd">            deactivated</span>
+<span class="sd">        :param modified_scene: Advanced parameter. Can be used to provide a</span>
+<span class="sd">            Mitsuba scene instance that was already extended to contain the</span>
+<span class="sd">            measurement surface. This can be useful when calling the solver</span>
+<span class="sd">            in a loop with the same scene and measurement surface.</span>
+<span class="sd">            Not applicable to planar radio maps.</span>
 
 <span class="sd">        :return: Computed radio map</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2034,9 +2054,15 @@
         <span class="k">if</span> <span class="n">measurement_surface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">measurement_surface</span><span class="p">,</span> <span class="n">SceneObject</span><span class="p">):</span>
                 <span class="n">measurement_surface</span> <span class="o">=</span> <span class="n">measurement_surface</span><span class="o">.</span><span class="n">mi_mesh</span>
-            <span class="n">modified_scene</span> <span class="o">=</span> <span class="n">extend_scene_with_mesh</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span><span class="p">,</span> <span class="n">measurement_surface</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">modified_scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">modified_scene</span> <span class="o">=</span> <span class="n">extend_scene_with_mesh</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span><span class="p">,</span> <span class="n">measurement_surface</span><span class="p">)</span>
             <span class="n">radio_map</span> <span class="o">=</span> <span class="n">MeshRadioMap</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">measurement_surface</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">modified_scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Parameter `modified_scene` should be omitted (or set to None) when using&quot;</span>
+                    <span class="s2">&quot; planar radio maps (i.e., `measurement_surface` is None).&quot;</span>
+                <span class="p">)</span>
             <span class="n">modified_scene</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span>
             <span class="n">radio_map</span> <span class="o">=</span> <span class="n">PlanarRadioMap</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">cell_size</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
 
@@ -2081,9 +2107,6 @@
                         <span class="n">wedges</span><span class="p">,</span>
                         <span class="n">diffraction_lit_region</span>
                     <span class="p">)</span>
-
-        <span class="c1"># Finalizes the computation of the radio maps</span>
-        <span class="n">radio_map</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">radio_map</span></div>
 
@@ -2238,7 +2261,7 @@
             <span class="c1"># For first-order diffraction: project intersection points onto wedges</span>
             <span class="c1"># and store wedge geometry for subsequent diffraction calculations</span>
             <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">hint</span><span class="p">(</span><span class="n">diffraction_enabled</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;scalar&quot;</span><span class="p">):</span>
-                <span class="n">store_wedges</span> <span class="o">=</span> <span class="n">active</span> <span class="o">&amp;</span> <span class="n">si_scene</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>\
+                <span class="n">store_wedges</span> <span class="o">=</span> <span class="n">active</span> <span class="o">&amp;</span> <span class="n">si_scene</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> \
                     <span class="o">&amp;</span> <span class="p">(</span><span class="n">si_scene</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">radio_map</span><span class="o">.</span><span class="n">measurement_surface</span><span class="p">)</span>
                 <span class="c1"># Sample diffraction point on wedges</span>
                 <span class="n">valid_wedge_</span><span class="p">,</span> <span class="n">wedges_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sample_wedge_diffraction_point</span><span class="p">(</span>
@@ -2268,8 +2291,9 @@
             <span class="c1"># the scene and we only need to check that it has hit the measurement surface.</span>
             <span class="n">si_mp</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">hint</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">radio_map</span><span class="p">,</span> <span class="n">PlanarRadioMap</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;scalar&quot;</span><span class="p">):</span>
-                <span class="n">si_mp</span> <span class="o">=</span> <span class="n">radio_map</span><span class="o">.</span><span class="n">measurement_surface</span><span class="o">.</span><span class="n">ray_intersect</span><span class="p">(</span><span class="n">ray</span><span class="p">,</span>
-                                                                <span class="n">active</span><span class="o">=</span><span class="n">active</span><span class="p">)</span>
+                <span class="n">si_mp</span> <span class="o">=</span> <span class="n">radio_map</span><span class="o">.</span><span class="n">measurement_surface</span><span class="o">.</span><span class="n">ray_intersect</span><span class="p">(</span>
+                    <span class="n">ray</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="n">active</span>
+                <span class="p">)</span>
                 <span class="c1"># An intersection with the measurement plane is valid only if</span>
                 <span class="c1"># (i) it was not obstructed by the scene, and (ii) the intersection</span>
                 <span class="c1"># is valid.</span>
@@ -2294,8 +2318,8 @@
                                 <span class="n">ray</span><span class="o">.</span><span class="n">d</span><span class="p">,</span>
                                 <span class="n">tx_indices</span><span class="p">,</span>
                                 <span class="n">update_radio_map</span><span class="p">,</span>
-                                <span class="kc">False</span><span class="p">,</span>
-                                <span class="n">solid_angle</span><span class="p">)</span>
+                                <span class="n">diffracted_paths</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">solid_angle</span><span class="o">=</span><span class="n">solid_angle</span><span class="p">)</span>
 
             <span class="c1"># Update the active state of rays</span>
             <span class="c1"># Active if has hit the scene (which includes the measurement surface</span>
@@ -2356,8 +2380,8 @@
 
             <span class="c1"># Deactivate rays with gains below the set threshold</span>
             <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">hint</span><span class="p">(</span><span class="n">stop_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;scalar&quot;</span><span class="p">):</span>
-                <span class="n">gain_pl</span> <span class="o">=</span> <span class="n">gain</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span>
-                                         <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ray_tube_length</span><span class="p">))</span>
+                <span class="n">gain_pl</span> <span class="o">=</span> <span class="n">gain</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span>
+                                           <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">rcp</span><span class="p">(</span><span class="mf">4.</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ray_tube_length</span><span class="p">))</span>
                 <span class="n">th_continue</span> <span class="o">=</span> <span class="n">scene_int</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">gain_pl</span> <span class="o">&gt;</span> <span class="n">stop_threshold</span><span class="p">)</span>
                 <span class="n">active</span> <span class="o">&amp;=</span> <span class="n">th_continue</span>
 
@@ -2695,7 +2719,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">si</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">SurfaceInteraction3f</span><span class="p">,</span>
         <span class="n">k_world</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
-        <span class="n">e_fields</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">,</span>
+        <span class="n">e_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">],</span>
         <span class="n">solid_angle</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
         <span class="n">sample1</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
         <span class="n">sample2</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point2f</span><span class="p">,</span>
@@ -2724,7 +2748,7 @@
 
         <span class="c1"># Ensure the normal is oriented in the opposite of the direction of</span>
         <span class="c1"># propagation of the incident wave</span>
-        <span class="n">normal_world</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">n</span><span class="o">*</span><span class="n">dr</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="o">-</span><span class="n">k_world</span><span class="p">))</span>
+        <span class="n">normal_world</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="n">dr</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">si</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="o">-</span><span class="n">k_world</span><span class="p">))</span>
         <span class="n">si</span><span class="o">.</span><span class="n">sh_frame</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">normal_world</span>
         <span class="n">si</span><span class="o">.</span><span class="n">initialize_sh_frame</span><span class="p">()</span>
         <span class="n">si</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">normal_world</span>
@@ -2739,7 +2763,7 @@
 
         <span class="c1"># Specify the components that are required</span>
         <span class="n">ctx</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">BSDFContext</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mi</span><span class="o">.</span><span class="n">TransportMode</span><span class="o">.</span><span class="n">Importance</span><span class="p">,</span>
-                            <span class="n">type_mask</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                             <span class="n">type_mask</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="c1"># Samples and evaluate the radio material</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e_field</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">e_fields</span><span class="p">):</span>
@@ -2751,15 +2775,17 @@
             <span class="c1"># `si.t` stores the solid angle</span>
             <span class="n">si</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">solid_angle</span>
             <span class="c1"># Sample and evaluate the radio material</span>
-            <span class="n">sample</span><span class="p">,</span> <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">bsdf</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="n">sample1</span><span class="p">,</span> <span class="n">sample2</span><span class="p">,</span>
-                                                 <span class="n">active</span><span class="p">)</span>
+            <span class="n">bs_sample</span><span class="p">,</span> <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">bsdf</span><span class="p">()</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">si</span><span class="p">,</span> <span class="n">sample1</span><span class="p">,</span> <span class="n">sample2</span><span class="p">,</span>
+                                                    <span class="n">active</span><span class="p">)</span>
             <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">spectrum_to_matrix_4f</span><span class="p">(</span><span class="n">jones_mat</span><span class="p">)</span>
             <span class="c1"># Update the field by applying the Jones matrix</span>
-            <span class="n">e_fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">active</span><span class="p">,</span>
-                                    <span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">(</span><span class="n">jones_mat</span><span class="nd">@e_field</span><span class="p">),</span>
-                                    <span class="n">e_fields</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">e_fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
+                <span class="n">active</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">(</span><span class="n">jones_mat</span> <span class="o">@</span> <span class="n">e_field</span><span class="p">),</span> <span class="n">e_fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">sample</span><span class="p">,</span> <span class="n">e_fields</span>
+        <span class="c1"># Note: we assume that the `bs_sample` returned is the same for all</span>
+        <span class="c1"># `e_field` values, so we just return the last one.</span>
+        <span class="k">return</span> <span class="n">bs_sample</span><span class="p">,</span> <span class="n">e_fields</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_radio_material_diffraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
         <span class="n">shape</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">ShapePtr</span><span class="p">,</span>
@@ -2767,7 +2793,7 @@
         <span class="n">diff_point</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
         <span class="n">ki_world</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
         <span class="n">ko_world</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
-        <span class="n">e_fields</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">,</span>
+        <span class="n">e_fields</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">],</span>
         <span class="n">s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
         <span class="n">s_prime</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
         <span class="n">active</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Bool</span>

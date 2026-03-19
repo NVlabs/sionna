@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quickstart &mdash; Sionna 1.2.1 documentation</title>
+  <title>Quickstart &mdash; Sionna 1.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -15,7 +15,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=ca842793"></script>
+      <script src="../_static/documentation_options.js?v=fd7cadf9"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -540,6 +540,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../rt/rt_gui.html">Sionna RT GUI</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../phy/index.html">Physical Layer (PHY)</a><ul>
@@ -1528,6 +1529,7 @@
 <li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#demapper-capture-plugin">Demapper Capture Plugin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#tensorrt-neural-demapper">TensorRT Neural Demapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#neural-receiver">Neural Receiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/run_tutorials.html#channel-emulation">Channel Emulation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/data_acquisition/index.html">Plugins &amp; Data Acquisition</a><ul>
@@ -1617,6 +1619,18 @@
 <li class="toctree-l4"><a class="reference internal" href="tutorials/ue_emulator.html#testing-in-rf-simulator-mode">Testing in RF Simulator Mode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/ue_emulator.html#basic-configuration">Basic Configuration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tutorials/ue_emulator.html#dynamic-re-configuration">Dynamic Re-configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#running-the-gtc-dc-2025-demo">Running the GTC DC 2025 Demo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#nvidia-mps">NVIDIA MPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#file-based-cir-source">File-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#zmq-based-cir-source">ZMQ-Based CIR Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#technical-background">Technical Background</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#integration-into-oai">Integration into OAI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#limitations">Limitations</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="tutorials/debugging.html">Debugging &amp; Troubleshooting</a><ul>
@@ -1756,7 +1770,6 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 <span class="c1"># pip install -r requirements_orin.txt for Orin</span>
 </pre></div>
 </div>
-<p>[TODO] Add export lines for TensorRT</p>
 </section>
 <section id="step-2-usrp-setup">
 <h2>Step 2: USRP Setup<a class="headerlink" href="#step-2-usrp-setup" title="Link to this heading"></a></h2>
@@ -1800,7 +1813,7 @@ sudo<span class="w"> </span>nmcli<span class="w"> </span>c<span class="w"> </spa
 <figure class="align-center" id="id2">
 <span id="figure-5g-stack"></span><img alt="5G Stack Overview" src="../_images/5g_stack.png" />
 <figcaption>
-<p><span class="caption-number">Fig. 17 </span><span class="caption-text">Overview of the deployed 5G end-to-end stack with IP adresses and interfaces of each container. Figure from <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers">OpenAirInterface</a>.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">Overview of the deployed 5G end-to-end stack with IP addresses and interfaces of each container. Figure from <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers">OpenAirInterface</a>.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p><a class="reference internal" href="#figure-5g-stack"><span class="std std-numref">Fig. 17</span></a> shows the block diagram of the complete system (see <a class="reference external" href="https://gitlab.eurecom.fr/oai/openairinterface5g/-/blob/develop/ci-scripts/yaml_files/5g_rfsimulator/README.md#2-deploy-containers">OpenAirInterface5G guide</a> for more details). The 5G stack is deployed via Docker containers. The following steps build and deploy the core network components and the RAN components:</p>
@@ -1822,14 +1835,12 @@ sudo<span class="w"> </span>nmcli<span class="w"> </span>c<span class="w"> </spa
 ./plugins/common/build_all_plugins.sh<span class="w"> </span>--container
 </pre></div>
 </div>
-<p>The system can be configured via environment variables. You can configure the system by editing the <cite>.env</cite> file in the <cite>config/b200/</cite> or <cite>config/rfsim/</cite> directory, respectively.</p>
+<p>The system can be configured via environment variables. You can configure the system by editing the environment variables in the <cite>.env</cite> file in the <cite>config/b200/</cite> or <cite>config/rfsim/</cite> directory, respectively.</p>
 <p>Edit <cite>config/b200/.env</cite> and set the following parameters:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><p>Set your USRP serial number</p></li>
 <li><p>Select the configuration file for desired number of PRBs (default is 24, equals 8.64MHz bandwidth)</p></li>
 </ul>
-</div></blockquote>
 <p>And finally, you can start the system:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># For real hardware setup using the USRP</span>
 ./scripts/start_system.sh<span class="w"> </span>b200
@@ -1878,10 +1889,10 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 
 <span class="c1"># On the client (UE); you need to install iperf3 on the host machine</span>
 <span class="c1"># Downlink test</span>
-iperf3<span class="w"> </span>-u<span class="w"> </span>-t<span class="w"> </span><span class="m">10</span><span class="w"> </span>-i<span class="w"> </span><span class="m">1</span><span class="w"> </span>-b<span class="w"> </span>1M<span class="w"> </span>-B<span class="w"> </span><span class="m">12</span>.1.1.2<span class="w"> </span>-c<span class="w"> </span><span class="m">192</span>.168.72.135<span class="w"> </span>-R
+iperf3<span class="w"> </span>-u<span class="w"> </span>-t<span class="w"> </span><span class="m">1000</span><span class="w"> </span>-i<span class="w"> </span><span class="m">1</span><span class="w"> </span>-b<span class="w"> </span>1M<span class="w"> </span>-B<span class="w"> </span><span class="m">12</span>.1.1.2<span class="w"> </span>-c<span class="w"> </span><span class="m">192</span>.168.72.135<span class="w"> </span>-R
 
 <span class="c1"># Uplink test</span>
-iperf3<span class="w"> </span>-u<span class="w"> </span>-t<span class="w"> </span><span class="m">10</span><span class="w"> </span>-i<span class="w"> </span><span class="m">1</span><span class="w"> </span>-b<span class="w"> </span>1M<span class="w"> </span>-B<span class="w"> </span><span class="m">12</span>.1.1.2<span class="w"> </span>-c<span class="w"> </span><span class="m">192</span>.168.72.135
+iperf3<span class="w"> </span>-u<span class="w"> </span>-t<span class="w"> </span><span class="m">1000</span><span class="w"> </span>-i<span class="w"> </span><span class="m">1</span><span class="w"> </span>-b<span class="w"> </span>1M<span class="w"> </span>-B<span class="w"> </span><span class="m">12</span>.1.1.2<span class="w"> </span>-c<span class="w"> </span><span class="m">192</span>.168.72.135
 
 <span class="c1"># Change 1M to the desired throughput in Mbit/s</span>
 </pre></div>

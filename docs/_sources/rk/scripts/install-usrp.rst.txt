@@ -14,6 +14,7 @@ SYNOPSIS
         [--force]
         [--verbose]
         [--dry-run]
+        [--branch <branch|tag>]
 
 DESCRIPTION
 ===========
@@ -41,6 +42,11 @@ OPTIONS
 
     Print the commands to execute, but do not perform the operations.
 
+.. option:: --branch <branch|tag>
+
+    Clone a specific branch or tag from the UHD repository. If not specified,
+    the repository's default branch is used.
+
 .. option:: -h, --help
 
     Display help message and exit.
@@ -53,6 +59,7 @@ EXAMPLES
     ./install-usrp.sh
     ./install-usrp.sh --force
     ./install-usrp.sh --dry-run --verbose
+    ./install-usrp.sh --branch v4.6.0.0
 
 SEE ALSO
 ========

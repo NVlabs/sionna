@@ -16,6 +16,13 @@ The installation guide aims to be self-contained. However, the following resourc
 .. note::
    This is also achieved using the script ``scripts/install-usrp.sh``
 
+.. note::
+   If you wish to install a specific UHD version, use the ``--branch`` option
+   with the install script (e.g., ``./install-usrp.sh --branch v4.6.0.0``),
+   or with the git clone command below. Also, ensure the ``UHD_VERSION`` variable in
+   ``ext/openairinterface5g/docker/Dockerfile.base.ubuntu.cuda`` is updated
+   to match the version installed on the host.
+
 Prerequisites
 -------------
 

@@ -15,9 +15,11 @@ Building on this, we show how the physical layer can be accelerated using :ref:`
 The :ref:`neural_receiver` tutorial goes one step further and replaces the entire receiver chain (channel estimation, equalization, demapping) with a neural network.
 Finally, the :ref:`ue_emulator` tutorial allows you to simulate the entire end-to-end system using software defined user equipment (UE). This allows for the evaluation of novel --- non-standard compliant --- algorithms and protocols.
 
+
+
 All tutorials are precompiled during the quickstart setup of the system, and integrated in the compiled images. Check :ref:`run_tutorials` if you want to give them a try before going into the details.
 
-The :ref:`ric_xapps` tutorial introduces the RAN Intelligent Controller (RIC) architecture and demonstrates how to develop xApps for intelligent network control and optimization.
+The :ref:`ric_xapps` tutorial introduces the RAN Intelligent Controller (RIC) architecture and demonstrates how to develop xApps for intelligent network control and optimization. The :ref:`channel_emulation` shows how to emulate the channel using the Sionna ray tracer - in simulation as well as in real RF mode.
 
 Additionally, we provide a tutorial on :ref:`debugging` to help you resolve issues that may arise when working with the Sionna Research Kit.
 
@@ -33,6 +35,7 @@ Besides *AI for RAN*, the AI-RAN alliance also envisions the coexistence of *AI 
    tutorials/neural_demapper/index.rst
    tutorials/neural_receiver/index.rst
    tutorials/ue_emulator.rst
+   tutorials/channel_emulation/channel_emulation.rst
    tutorials/debugging.rst
 
 The best way to get started is to have a look at the :ref:`run_tutorials` section.
