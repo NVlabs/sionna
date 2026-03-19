@@ -1,0 +1,1073 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PHYAbstraction &#8212; Sionna 2.0.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=51b770b3"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'sys/api/sionna.sys.PHYAbstraction';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/sys/api/sionna.sys.PHYAbstraction.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Link Adaptation" href="link_adaptation.html" />
+    <link rel="prev" title="EESM" href="sionna.sys.EESM.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/beginners.html">Beginners</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/PHY_Abstraction.html">Physical Layer Abstraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/LinkAdaptation.html">Link Adaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/Scheduling.html">Proportional Fairness Scheduler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/HexagonalGrid.html">Hexagonal Grid Topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/Power_Control.html">Power Control</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/experts.html">Experts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/SYS_Meets_RT.html">Sionna SYS meets Sionna RT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/notebooks/End-to-End_Example.html">System-Level Simulations</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="sys.html">API Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="abstraction.html">PHY Abstraction</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.EffectiveSINR.html">EffectiveSINR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.EESM.html">EESM</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">PHYAbstraction</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="link_adaptation.html">Link Adaptation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.InnerLoopLinkAdaptation.html">InnerLoopLinkAdaptation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.OuterLoopLinkAdaptation.html">OuterLoopLinkAdaptation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="power_control.html">Power Control</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.open_loop_uplink_power_control.html">open_loop_uplink_power_control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.downlink_fair_power_control.html">downlink_fair_power_control</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="scheduling.html">Scheduling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.PFSchedulerSUMIMO.html">PFSchedulerSUMIMO</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="topology.html">Multicell Topology</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.Hexagon.html">Hexagon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.HexGrid.html">HexGrid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.gen_hexgrid_topology.html">gen_hexgrid_topology</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.get_num_hex_in_grid.html">get_num_hex_in_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.convert_hex_coord.html">convert_hex_coord</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="utils.html">Utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.is_scheduled_in_slot.html">is_scheduled_in_slot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.get_pathloss.html">get_pathloss</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sionna.sys.spread_across_subcarriers.html">spread_across_subcarriers</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">System Level (SYS)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="sys.html" class="nav-link">API Documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="abstraction.html" class="nav-link">PHY Abstraction</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">PHYAbstraction</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="phyabstraction">
+<h1>PHYAbstraction<a class="headerlink" href="#phyabstraction" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">sionna.sys.</span></span><span class="sig-name descname"><span class="pre">PHYAbstraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interp_fun</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.Interpolate.html#sionna.phy.utils.Interpolate" title="sionna.phy.utils.misc.Interpolate"><span class="pre">sionna.phy.utils.misc.Interpolate</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcs_decoder_fun</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.MCSDecoder.html#sionna.phy.utils.MCSDecoder" title="sionna.phy.utils.misc.MCSDecoder"><span class="pre">sionna.phy.utils.misc.MCSDecoder</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_block_fun</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.TransportBlock.html#sionna.phy.utils.TransportBlock" title="sionna.phy.utils.misc.TransportBlock"><span class="pre">sionna.phy.utils.misc.TransportBlock</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sinr_effective_fun</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="sionna.sys.EffectiveSINR.html#sionna.sys.EffectiveSINR" title="sionna.sys.effective_sinr.EffectiveSINR"><span class="pre">sionna.sys.effective_sinr.EffectiveSINR</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_bler_tables_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr_db_interp_min_max_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(-5,</span> <span class="pre">30.01,</span> <span class="pre">0.1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbs_interp_min_max_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(24,</span> <span class="pre">8448,</span> <span class="pre">100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bler_interp_delta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'single'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'double'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../phy/api/block.html#sionna.phy.block.Block" title="sionna.phy.block.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">sionna.phy.block.Block</span></code></a></p>
+<p>Class for physical layer abstraction.</p>
+<p>For a given signal-to-interference-plus-noise-ratio (SINR) provided on a
+per-stream basis, and for a given modulation order, coderate, and number of
+coded bits specified for each user, it produces the corresponding number of
+successfully decoded bits, HARQ feedback, effective SINR, block error rate
+(BLER), and transport BLER (TBLER).</p>
+<p>At object instantiation, precomputed BLER tables are loaded and interpolated
+on a fine (SINR, code block size) grid for each modulation and coding scheme
+(MCS) index.</p>
+<p>When the object is called, the post-equalization SINR is first converted to
+an effective SINR. Then, the effective SINR is used to retrieve the BLER from
+pre-computed and interpolated tables. Finally, the BLER determines the TBLER,
+which represents the probability that at least one code block is incorrectly
+received.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interp_fun</strong> (<a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.Interpolate.html#sionna.phy.utils.Interpolate" title="sionna.phy.utils.misc.Interpolate"><em>sionna.phy.utils.misc.Interpolate</em></a><em> | </em><em>None</em>) – Function for interpolating data defined on rectangular or
+unstructured grids, used for BLER and SINR interpolation.
+If <cite>None</cite>, it is set to an instance of
+<a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.SplineGriddataInterpolation.html#sionna.phy.utils.SplineGriddataInterpolation" title="sionna.phy.utils.SplineGriddataInterpolation"><code class="xref py py-class docutils literal notranslate"><span class="pre">SplineGriddataInterpolation</span></code></a>.</p></li>
+<li><p><strong>mcs_decoder_fun</strong> (<a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.MCSDecoder.html#sionna.phy.utils.MCSDecoder" title="sionna.phy.utils.misc.MCSDecoder"><em>sionna.phy.utils.misc.MCSDecoder</em></a><em> | </em><em>None</em>) – Function mapping MCS indices to modulation order and
+coderate. If <cite>None</cite>, it is set to an instance of
+<a class="reference internal" href="../../phy/api/nr/sionna.phy.nr.utils.MCSDecoderNR.html#sionna.phy.nr.utils.MCSDecoderNR" title="sionna.phy.nr.utils.MCSDecoderNR"><code class="xref py py-class docutils literal notranslate"><span class="pre">MCSDecoderNR</span></code></a>.</p></li>
+<li><p><strong>transport_block_fun</strong> (<a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.TransportBlock.html#sionna.phy.utils.TransportBlock" title="sionna.phy.utils.misc.TransportBlock"><em>sionna.phy.utils.misc.TransportBlock</em></a><em> | </em><em>None</em>) – Function computing the number and size (measured
+in bits) of code blocks within a transport block.
+If <cite>None</cite>, it is set to an instance of
+<a class="reference internal" href="../../phy/api/nr/sionna.phy.nr.utils.TransportBlockNR.html#sionna.phy.nr.utils.TransportBlockNR" title="sionna.phy.nr.utils.TransportBlockNR"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransportBlockNR</span></code></a>.</p></li>
+<li><p><strong>sinr_effective_fun</strong> (<a class="reference internal" href="sionna.sys.EffectiveSINR.html#sionna.sys.EffectiveSINR" title="sionna.sys.effective_sinr.EffectiveSINR"><em>sionna.sys.effective_sinr.EffectiveSINR</em></a><em> | </em><em>None</em>) – Function computing the effective SINR.
+If <cite>None</cite>, it is set to an instance of
+<a class="reference internal" href="sionna.sys.EESM.html#sionna.sys.EESM" title="sionna.sys.EESM"><code class="xref py py-class docutils literal notranslate"><span class="pre">EESM</span></code></a>.</p></li>
+<li><p><strong>load_bler_tables_from</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Name of file(s) containing pre-computed
+SINR-to-BLER tables for different categories, table indices, MCS
+indices, SINR and code block sizes. If “default”, then the pre-computed
+tables stored in “bler_tables/” folder are loaded.</p></li>
+<li><p><strong>snr_db_interp_min_max_delta</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em>) – Tuple of (<cite>min</cite>, <cite>max</cite>, <cite>delta</cite>) values
+[dB] defining the list of SINR [dB] values at which the BLER is
+interpolated, as <cite>min, min+delta, min+2*delta,…,</cite> up until <cite>max</cite>.</p></li>
+<li><p><strong>cbs_interp_min_max_delta</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – Tuple of (<cite>min</cite>, <cite>max</cite>, <cite>delta</cite>) values
+defining the list of code block size values at which the BLER and
+SINR are interpolated, as <cite>min, min+delta, min+2*delta,…,max</cite>.</p></li>
+<li><p><strong>bler_interp_delta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Spacing of the BLER grid at which SINR is
+interpolated.</p></li>
+<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'single'</em><em>, </em><em>'double'</em><em>] </em><em>| </em><em>None</em>) – Precision used for internal calculations and outputs.
+If set to <cite>None</cite>, <a class="reference internal" href="../../phy/api/config.html#sionna.phy.config.Config.precision" title="sionna.phy.config.Config.precision"><code class="xref py py-attr docutils literal notranslate"><span class="pre">precision</span></code></a> is used.</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Device for computation. If <cite>None</cite>,
+<a class="reference internal" href="../../phy/api/config.html#sionna.phy.config.Config.device" title="sionna.phy.config.Config.device"><code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code></a> is used.</p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Inputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>mcs_index</strong> – […, num_ut], <cite>torch.int32</cite>.
+MCS index for each user.</p></li>
+<li><p><strong>sinr</strong> – […, num_ofdm_symbols, num_subcarriers, num_ut, num_streams_per_ut], <cite>torch.float</cite> | <cite>None</cite>.
+Post-equalization SINR in linear scale for each OFDM symbol, subcarrier,
+user and stream.
+If <cite>None</cite>, then <code class="docutils literal notranslate"><span class="pre">sinr_eff</span></code> and <code class="docutils literal notranslate"><span class="pre">num_allocated_re</span></code> are both required.</p></li>
+<li><p><strong>sinr_eff</strong> – […, num_ut], <cite>torch.float</cite> | <cite>None</cite>.
+Effective SINR in linear scale for each user.
+If <cite>None</cite>, then <code class="docutils literal notranslate"><span class="pre">sinr</span></code> is required.</p></li>
+<li><p><strong>num_allocated_re</strong> – […, num_ut], <cite>torch.int32</cite> | <cite>None</cite>.
+Number of allocated resources in a slot, computed across OFDM symbols,
+subcarriers and streams, for each user.
+If <cite>None</cite>, then <code class="docutils literal notranslate"><span class="pre">sinr</span></code> is required.</p></li>
+<li><p><strong>mcs_table_index</strong> – […, num_ut], <cite>torch.int32</cite> | <cite>int</cite>.
+MCS table index. Defaults to 1. For further details, refer to the
+<a class="reference internal" href="link_adaptation.html#mcs-table-cat-note"><span class="std std-ref">Note</span></a>.</p></li>
+<li><p><strong>mcs_category</strong> – […, num_ut], <cite>torch.int32</cite> | <cite>int</cite>.
+MCS table category. Defaults to 0. For further details, refer to the
+<a class="reference internal" href="link_adaptation.html#mcs-table-cat-note"><span class="std std-ref">Note</span></a>.</p></li>
+<li><p><strong>check_mcs_index_validity</strong> – <cite>bool</cite>.
+If <cite>True</cite>, a ValueError is thrown if the input MCS indices are not
+valid for the given configuration. Defaults to <cite>True</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Outputs<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_decoded_bits</strong> – […, num_ut], <cite>torch.int32</cite>.
+Number of successfully decoded bits for each user.</p></li>
+<li><p><strong>harq_feedback</strong> – […, num_ut], -1 | 0 | 1.
+If 0 (1, resp.), then a NACK (ACK, resp.) is received. If -1, feedback
+is missing since the user is not scheduled for transmission.</p></li>
+<li><p><strong>sinr_eff</strong> – […, num_ut], <cite>torch.float</cite>.
+Effective SINR in linear scale for each user.</p></li>
+<li><p><strong>tbler</strong> – […, num_ut], <cite>torch.float</cite>.
+Transport block error rate (BLER) for each user.</p></li>
+<li><p><strong>bler</strong> – […, num_ut], <cite>torch.float</cite>.
+Block error rate (BLER) for each user.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>In this class, the terms SNR (signal-to-noise ratio) and SINR
+(signal-to-interference-plus-noise ratio) can be used interchangeably.
+This is because the equivalent AWGN model used for BLER mapping does not
+explicitly account for interference.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.sys</span><span class="w"> </span><span class="kn">import</span> <span class="n">PHYAbstraction</span><span class="p">,</span> <span class="n">EESM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.nr.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCSDecoderNR</span><span class="p">,</span> <span class="n">TransportBlockNR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">SplineGriddataInterpolation</span>
+
+<span class="c1"># Instantiate the class for BLER and SINR interpolation</span>
+<span class="n">bler_snr_interp_fun</span> <span class="o">=</span> <span class="n">SplineGriddataInterpolation</span><span class="p">()</span>
+<span class="c1"># Instantiate the class for mapping MCS to modulation order and coderate</span>
+<span class="c1"># in 5G NR</span>
+<span class="n">mcs_decoder_fun</span> <span class="o">=</span> <span class="n">MCSDecoderNR</span><span class="p">()</span>
+<span class="c1"># Instantiate the class for computing the number and size of code blocks</span>
+<span class="c1"># within a transport block in 5G NR</span>
+<span class="n">transport_block_fun</span> <span class="o">=</span> <span class="n">TransportBlockNR</span><span class="p">()</span>
+<span class="c1"># Instantiate the class for computing the effective SINR</span>
+<span class="n">sinr_effective_fun</span> <span class="o">=</span> <span class="n">EESM</span><span class="p">()</span>
+
+<span class="c1"># By instantiating a PHYAbstraction object, precomputed BLER tables are</span>
+<span class="c1"># loaded and interpolated on a fine (SINR, code block size) grid for each MCS</span>
+<span class="n">phy_abs</span> <span class="o">=</span> <span class="n">PHYAbstraction</span><span class="p">(</span>
+    <span class="n">interp_fun</span><span class="o">=</span><span class="n">bler_snr_interp_fun</span><span class="p">,</span>
+    <span class="n">mcs_decoder_fun</span><span class="o">=</span><span class="n">mcs_decoder_fun</span><span class="p">,</span>
+    <span class="n">transport_block_fun</span><span class="o">=</span><span class="n">transport_block_fun</span><span class="p">,</span>
+    <span class="n">sinr_effective_fun</span><span class="o">=</span><span class="n">sinr_effective_fun</span><span class="p">)</span>
+
+<span class="c1"># Plot a BLER table</span>
+<span class="n">phy_abs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">plot_subset</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;MCS&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">}}}}},</span>
+                <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../../_images/category0_table1_mcs14.png"><img alt="../../_images/category0_table1_mcs14.png" src="../../_images/category0_table1_mcs14.png" style="width: 70%;" />
+</a>
+</figure>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># One can also compute new BLER tables</span>
+<span class="c1"># SINR values and code block sizes @ new simulations are performed</span>
+<span class="n">snr_dbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">cb_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">8448</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="c1"># MCS values @ new simulations are performed</span>
+<span class="n">sim_set</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="mi">0</span><span class="p">:</span>
+    <span class="p">{</span><span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;MCS&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">15</span><span class="p">]}</span>
+    <span class="p">}}}}</span>
+
+<span class="c1"># Compute new tables</span>
+<span class="n">new_table</span> <span class="o">=</span> <span class="n">phy_abs</span><span class="o">.</span><span class="n">new_bler_table</span><span class="p">(</span>
+    <span class="n">snr_dbs</span><span class="p">,</span>
+    <span class="n">cb_sizes</span><span class="p">,</span>
+    <span class="n">sim_set</span><span class="p">,</span>
+    <span class="n">max_mc_iter</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.load_table">
+<span class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">load_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction.load_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction.load_table" title="Link to this definition">#</a></dt>
+<dd><p>Loads a table stored in JSON file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Name of the JSON file containing the table</p>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>table</strong> – Table loaded from file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.bler_table_filenames">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bler_table_filenames</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.bler_table_filenames" title="Link to this definition">#</a></dt>
+<dd><p><cite>str</cite> | list of <cite>str</cite>: Get/set the absolute path name of the files
+containing BLER tables.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.bler_table">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bler_table</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.bler_table" title="Link to this definition">#</a></dt>
+<dd><p><cite>dict</cite> (read-only): Collection of tables containing BLER values for
+different values of SNR, MCS table, MCS index and CB size.
+<code class="docutils literal notranslate"><span class="pre">bler_table['category'][cat]['index'][mcs_table_index]['MCS'][mcs]['CBS'][cb_size]</span></code>
+contains the lists of BLER values.
+<code class="docutils literal notranslate"><span class="pre">bler_table['category'][cat]['index'][mcs_table_index]['MCS'][mcs]['SNR_db']</span></code>
+contains the list of SNR values.
+<code class="docutils literal notranslate"><span class="pre">bler_table['category'][cat]['index'][mcs_table_index]['MCS'][mcs]['EbN0_db']</span></code>
+contains the list of <span class="math notranslate nohighlight">\(E_b/N_0\)</span> values.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.bler_table_interp">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bler_table_interp</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.bler_table_interp" title="Link to this definition">#</a></dt>
+<dd><p>[n_categories, n_tables, n_mcs, n_cbs_index, n_snr], <cite>torch.float</cite>
+(read-only): Tensor containing BLER values interpolated across SINR and
+CBS values, for different categories and MCS table indices. The first
+axis accounts for the category, e.g., ‘PDSCH’ or ‘PUSCH’ in 5G-NR, the
+second axis corresponds to the 38.214 MCS table index while the third
+axis carries the MCS index.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.snr_table_interp">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">snr_table_interp</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.snr_table_interp" title="Link to this definition">#</a></dt>
+<dd><p>[n_categories, n_tables, n_mcs, n_cbs_index, n_bler], <cite>torch.float</cite>
+(read-only): Tensor containing SINR values interpolated across BLER and
+CBS values, for different categories and MCS table indices. The first
+axis accounts for the category, e.g., ‘PDSCH’ or ‘PUSCH’ in 5G-NR, the
+second axis corresponds to the 38.214 MCS table index and the third axis
+accounts for the MCS index.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.snr_db_interp_min_max_delta">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">snr_db_interp_min_max_delta</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.snr_db_interp_min_max_delta" title="Link to this definition">#</a></dt>
+<dd><p>[3], <cite>tuple</cite>: Get/set the tuple of (<cite>min</cite>, <cite>max</cite>, <cite>delta</cite>) values
+[dB] defining the list of SINR values at which the BLER is
+interpolated, as <cite>min, min+delta, min+2*delta,…,</cite> up until <cite>max</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.cbs_interp_min_max_delta">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">cbs_interp_min_max_delta</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.cbs_interp_min_max_delta" title="Link to this definition">#</a></dt>
+<dd><p>[3], <cite>tuple</cite>: Get/set the tuple of (<cite>min</cite>, <cite>max</cite>, <cite>delta</cite>) values
+defining the list of code block size values at which the BLER and SINR
+are interpolated, as <cite>min, min+delta, min+2*delta,…,</cite> up until <cite>max</cite>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.bler_interp_delta">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">bler_interp_delta</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><a class="headerlink" href="#sionna.sys.PHYAbstraction.bler_interp_delta" title="Link to this definition">#</a></dt>
+<dd><p><cite>float</cite>: Get/set the spacing of the BLER grid at which SINR is
+interpolated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.get_idx_from_grid">
+<span class="sig-name descname"><span class="pre">get_idx_from_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">which</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction.get_idx_from_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction.get_idx_from_grid" title="Link to this definition">#</a></dt>
+<dd><p>Retrieves the index of a SINR or CBS value in the interpolation grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>val</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – Values to be quantized</p></li>
+<li><p><strong>which</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Whether the values are SNR (equivalent to SINR) or CBS.
+Must be “snr” or “cbs”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>idx</strong> – Index of the values in the interpolation grid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.get_bler">
+<span class="sig-name descname"><span class="pre">get_bler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mcs_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcs_table_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mcs_category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cb_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr_eff</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction.get_bler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction.get_bler" title="Link to this definition">#</a></dt>
+<dd><p>Retrieves from interpolated tables the BLER corresponding to a certain
+table index, MCS, CB size, and SINR values provided as input.
+If the corresponding interpolated table is not available, it returns
+<cite>Inf</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mcs_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – MCS index for each user</p></li>
+<li><p><strong>mcs_table_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – MCS table index for each user.
+For further details, refer to the <a class="reference internal" href="link_adaptation.html#mcs-table-cat-note"><span class="std std-ref">Note</span></a>.</p></li>
+<li><p><strong>mcs_category</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – MCS table category for each user.
+For further details, refer to the <a class="reference internal" href="link_adaptation.html#mcs-table-cat-note"><span class="std std-ref">Note</span></a>.</p></li>
+<li><p><strong>cb_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – Code block size for each user</p></li>
+<li><p><strong>snr_eff</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – Effective SINR for each user</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>bler</strong> – BLER corresponding to the input channel type, table index,
+MCS, CB size and SINR, retrieved from internal interpolation tables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.validate_bler_table">
+<span class="sig-name descname"><span class="pre">validate_bler_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction.validate_bler_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction.validate_bler_table" title="Link to this definition">#</a></dt>
+<dd><p>Validates the dictionary structure of <code class="docutils literal notranslate"><span class="pre">self.bler_table</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Outputs<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>is_valid</strong> – <cite>True</cite> if <code class="docutils literal notranslate"><span class="pre">self.bler_table</span></code> has a valid structure</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the structure is invalid</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">Dict</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction.plot" title="Link to this definition">#</a></dt>
+<dd><p>Visualizes and/or saves to file the SINR-to-BLER tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plot_subset</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>Dict</em></a>) – Dictionary containing the list of MCS indices to
+consider, stored at
+<code class="docutils literal notranslate"><span class="pre">plot_subset['category'][category]['index'][mcs_table_index]['MCS']</span></code>.
+If “all”, then plots are produced for all available BLER tables.</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If <cite>True</cite>, then plots are visualized. Defaults to <cite>True</cite>.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Folder path where BLER plots are saved. If <cite>None</cite>,
+then plots are not saved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>fignames</strong> – List of names of files containing BLER plots</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sionna.sys.PHYAbstraction.new_bler_table">
+<span class="sig-name descname"><span class="pre">new_bler_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snr_dbs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cb_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><span class="pre">numpy.ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sim_set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">Dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.SingleLinkChannel.html#sionna.phy.utils.SingleLinkChannel" title="sionna.phy.utils.misc.SingleLinkChannel"><span class="pre">sionna.phy.utils.misc.SingleLinkChannel</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mc_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_bler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compile_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_log</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">Dict</span></a></span></span><a class="reference internal" href="../../_modules/sionna/sys/phy_abstraction.html#PHYAbstraction.new_bler_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.sys.PHYAbstraction.new_bler_table" title="Link to this definition">#</a></dt>
+<dd><p>Computes static tables mapping SNR values of an AWGN channel to the
+corresponding block error rate (BLER) via Monte-Carlo simulations for
+different MCS indices, code block sizes and channel types.
+Note that the newly computed table is merged with the internal
+<code class="docutils literal notranslate"><span class="pre">self.bler_table</span></code>.</p>
+<p>The simulation continues with the next SNR point after
+<code class="docutils literal notranslate"><span class="pre">max_mc_iter</span></code> batches of size <code class="docutils literal notranslate"><span class="pre">batch_size</span></code> have been simulated.
+Early stopping allows to stop the simulation after the first error-free
+SNR point or after reaching a certain <code class="docutils literal notranslate"><span class="pre">target_bler</span></code>.
+For more details, please see <code class="xref py py-func docutils literal notranslate"><span class="pre">sim_ber()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snr_dbs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – List of SNR [dB] value(s) at which the BLER is computed</p></li>
+<li><p><strong>cb_sizes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – List of code block (CB) size(s) at which the BLER is
+computed</p></li>
+<li><p><strong>sim_set</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>Dict</em></a>) – Dictionary containing the list of MCS indices at which
+the BLER is computed via simulation. The dictionary structure is of
+the kind:
+<code class="docutils literal notranslate"><span class="pre">sim_set['category'][category]['index'][mcs_table_index]['MCS'][mcs_list]</span></code>.</p></li>
+<li><p><strong>channel</strong> (<a class="reference internal" href="../../phy/api/utils/sionna.phy.utils.SingleLinkChannel.html#sionna.phy.utils.SingleLinkChannel" title="sionna.phy.utils.misc.SingleLinkChannel"><em>sionna.phy.utils.misc.SingleLinkChannel</em></a><em> | </em><em>None</em>) – Object for simulating single-link, i.e., single-carrier
+and single-stream, channels. If <cite>None</cite>, it is set to an instance of
+<a class="reference internal" href="../../phy/api/nr/sionna.phy.nr.utils.CodedAWGNChannelNR.html#sionna.phy.nr.utils.CodedAWGNChannelNR" title="sionna.phy.nr.utils.CodedAWGNChannelNR"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodedAWGNChannelNR</span></code></a>.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Name of JSON file where the BLER tables are saved.
+If <cite>None</cite>, results are not saved.</p></li>
+<li><p><strong>write_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – If ‘w’, then <code class="docutils literal notranslate"><span class="pre">filename</span></code> is rewritten.
+If ‘a’, then the produced results are appended to <code class="docutils literal notranslate"><span class="pre">filename</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Batch size for Monte-Carlo BLER simulations</p></li>
+<li><p><strong>max_mc_iter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of Monte-Carlo iterations per SNR
+point</p></li>
+<li><p><strong>target_bler</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>) – The simulation stops after the first SNR point
+which achieves a lower block error rate as specified by
+<code class="docutils literal notranslate"><span class="pre">target_bler</span></code>. This requires <code class="docutils literal notranslate"><span class="pre">early_stop</span></code> to be <cite>True</cite>.</p></li>
+<li><p><strong>compile_mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Execution mode of channel call method.
+If <cite>None</cite>, channel is executed as is.</p></li>
+<li><p><strong>early_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If <cite>True</cite>, the simulation stops after the first
+error-free SNR point.</p></li>
+<li><p><strong>filename_log</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Name of logging file. If <cite>None</cite>, logs are not
+produced.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If <cite>True</cite>, the simulation progress is visualized, as
+well as the names of files of results and figures.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>new_table</strong> – Newly computed BLER table</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sionna.sys.EESM.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">EESM</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="link_adaptation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Link Adaptation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction</span></code></a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.load_table"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.load_table()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.bler_table_filenames"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.bler_table_filenames</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.bler_table"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.bler_table</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.bler_table_interp"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.bler_table_interp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.snr_table_interp"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.snr_table_interp</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.snr_db_interp_min_max_delta"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.snr_db_interp_min_max_delta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.cbs_interp_min_max_delta"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.cbs_interp_min_max_delta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.bler_interp_delta"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.bler_interp_delta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.get_idx_from_grid"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.get_idx_from_grid()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.get_bler"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.get_bler()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.validate_bler_table"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.validate_bler_table()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.plot"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.plot()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.sys.PHYAbstraction.new_bler_table"><code class="docutils literal notranslate"><span class="pre">PHYAbstraction.new_bler_table()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/sys/api/sionna.sys.PHYAbstraction.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

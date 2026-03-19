@@ -1,0 +1,1234 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.phy.fec.coding &#8212; Sionna 2.0.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=51b770b3"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/phy/fec/coding';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/phy/fec/coding.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.phy.fec.coding</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.phy.fec.coding</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Code construction, matrix, and I/O utilities for the FEC package.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib_resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span><span class="p">,</span> <span class="n">as_file</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.fec.ldpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">codes</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;load_parity_check_examples&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;alist2mat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;load_alist&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_systematic&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gm2pcm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pcm2gm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;verify_gm_pcm&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;generate_reg_ldpc&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="load_parity_check_examples">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.load_parity_check_examples.html#sionna.phy.fec.utils.load_parity_check_examples">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_parity_check_examples</span><span class="p">(</span>
+    <span class="n">pcm_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads parity-check matrices of built-in example codes.</span>
+
+<span class="sd">    This utility function loads predefined example codes, including Hamming,</span>
+<span class="sd">    BCH, and LDPC codes. The following codes are available:</span>
+
+<span class="sd">    - ``pcm_id`` =0 : `(7,4)` Hamming code with `k=4` information bits and `n=7` codeword length.</span>
+<span class="sd">    - ``pcm_id`` =1 : `(63,45)` BCH code with `k=45` information bits and `n=63` codeword length.</span>
+<span class="sd">    - ``pcm_id`` =2 : `(127,106)` BCH code with `k=106` information bits and `n=127` codeword length.</span>
+<span class="sd">    - ``pcm_id`` =3 : Random LDPC code with variable node degree 3 and check node degree 6, with `k=50` information bits and `n=100` codeword length.</span>
+<span class="sd">    - ``pcm_id`` =4 : 802.11n LDPC code with `k=324` information bits and `n=648` codeword length.</span>
+
+<span class="sd">    :param pcm_id: An integer identifying the code matrix to load.</span>
+<span class="sd">    :param verbose: If `True`, prints the code parameters.</span>
+
+<span class="sd">    :output pcm: The parity-check matrix (values are `0` and `1`).</span>
+
+<span class="sd">    :output k: The number of information bits.</span>
+
+<span class="sd">    :output n: The number of codeword bits.</span>
+
+<span class="sd">    :output coderate: The code rate, assuming full rank of the</span>
+<span class="sd">        parity-check matrix.</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from sionna.phy.fec.coding import load_parity_check_examples</span>
+
+<span class="sd">        pcm, k, n, coderate = load_parity_check_examples(0)</span>
+<span class="sd">        print(f&quot;n={n}, k={k}, rate={coderate:.3f}&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">files</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;example_codes.npy&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">as_file</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="k">as</span> <span class="n">code</span><span class="p">:</span>
+        <span class="n">pcms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pcms</span><span class="p">[</span><span class="n">pcm_id</span><span class="p">])</span>  <span class="c1"># load parity-check matrix</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># number of codeword bits (codeword length)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># number of information bits k per codeword</span>
+    <span class="n">coderate</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">n: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, k: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, coderate: </span><span class="si">{</span><span class="n">coderate</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">coderate</span></div>
+
+
+
+<div class="viewcode-block" id="alist2mat">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.alist2mat.html#sionna.phy.fec.utils.alist2mat">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">alist2mat</span><span class="p">(</span>
+    <span class="n">alist</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Converts an `alist` :cite:p:`MacKay` code definition to a NumPy parity-check matrix.</span>
+
+<span class="sd">    This function converts an `alist` format representation of a code&#39;s</span>
+<span class="sd">    parity-check matrix to a NumPy array. Many example codes in `alist`</span>
+<span class="sd">    format can be found in :cite:p:`UniKL`.</span>
+
+<span class="sd">    About the `alist` format (see :cite:p:`MacKay` for details):</span>
+
+<span class="sd">        - Row 1: Defines the parity-check matrix dimensions `m x n`.</span>
+<span class="sd">        - Row 2: Contains two integers, `max_CN_degree` and `max_VN_degree`.</span>
+<span class="sd">        - Row 3: Lists the degrees of all `n` variable nodes (columns).</span>
+<span class="sd">        - Row 4: Lists the degrees of all `m` check nodes (rows).</span>
+<span class="sd">        - Next `n` rows: Non-zero entries of each column, zero-padded as needed.</span>
+<span class="sd">        - Following `m` rows: Non-zero entries of each row, zero-padded as needed.</span>
+
+<span class="sd">    :param alist: Nested list in `alist` format :cite:p:`MacKay` representing the</span>
+<span class="sd">        parity-check matrix.</span>
+<span class="sd">    :param verbose: If `True`, prints the code parameters.</span>
+
+<span class="sd">    :output pcm: The parity-check matrix.</span>
+
+<span class="sd">    :output k: The number of information bits.</span>
+
+<span class="sd">    :output n: The number of codeword bits.</span>
+
+<span class="sd">    :output coderate: The code rate.</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    Use :func:`~sionna.phy.fec.coding.load_alist` to import an `alist` from a</span>
+<span class="sd">    text file.</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from sionna.phy.fec.coding import load_alist, alist2mat</span>
+
+<span class="sd">        al = load_alist(path=&quot;code.alist&quot;)</span>
+<span class="sd">        pcm, k, n, coderate = alist2mat(al)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid alist format.&quot;</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v_max</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">c_max</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">m</span>
+    <span class="n">coderate</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">n</span>
+
+    <span class="n">vn_profile</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">cn_profile</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># plausibility checks</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vn_profile</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cn_profile</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid alist format.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vn_profile</span><span class="p">)</span> <span class="o">!=</span> <span class="n">v_max</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid alist format.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cn_profile</span><span class="p">)</span> <span class="o">!=</span> <span class="n">c_max</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid alist format.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">vn_profile</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;.alist does not contain (redundant) CN perspective. &quot;</span>
+            <span class="s2">&quot;Recovering parity-check matrix from VN only. &quot;</span>
+            <span class="s2">&quot;Please verify the correctness of the results manually.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">vn_only</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">alist</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vn_profile</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">cn_profile</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid alist format.&quot;</span><span class="p">)</span>
+        <span class="n">vn_only</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="n">num_edges</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># count number of edges</span>
+
+    <span class="k">for</span> <span class="n">idx_v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vn_profile</span><span class="p">[</span><span class="n">idx_v</span><span class="p">]):</span>
+            <span class="c1"># first 4 rows of alist contain meta information</span>
+            <span class="n">idx_c</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">4</span> <span class="o">+</span> <span class="n">idx_v</span><span class="p">][</span><span class="n">idx_i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># &quot;-1&quot; as this is python</span>
+            <span class="n">pcm</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_v</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">num_edges</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># count number of edges (=each non-zero entry)</span>
+
+    <span class="c1"># validate results from CN perspective</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">vn_only</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx_c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">idx_i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cn_profile</span><span class="p">[</span><span class="n">idx_c</span><span class="p">]):</span>
+                <span class="c1"># first 4 rows of alist contain meta information</span>
+                <span class="c1"># following n rows contained VN perspective</span>
+                <span class="n">idx_v</span> <span class="o">=</span> <span class="n">alist</span><span class="p">[</span><span class="mi">4</span> <span class="o">+</span> <span class="n">n</span> <span class="o">+</span> <span class="n">idx_c</span><span class="p">][</span><span class="n">idx_i</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># &quot;-1&quot; as this is python</span>
+                <span class="k">if</span> <span class="n">pcm</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_v</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s2">&quot;Inconsistent alist: CN and VN perspectives disagree.&quot;</span>
+                    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of variable nodes (columns): &quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of check nodes (rows): &quot;</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of information bits per cw: &quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number edges: &quot;</span><span class="p">,</span> <span class="n">num_edges</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Max. VN degree: &quot;</span><span class="p">,</span> <span class="n">v_max</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Max. CN degree: &quot;</span><span class="p">,</span> <span class="n">c_max</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;VN degree: &quot;</span><span class="p">,</span> <span class="n">vn_profile</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CN degree: &quot;</span><span class="p">,</span> <span class="n">cn_profile</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">coderate</span></div>
+
+
+
+<div class="viewcode-block" id="load_alist">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.load_alist.html#sionna.phy.fec.utils.load_alist">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_alist</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reads an `alist` file and returns a nested list describing a code&#39;s</span>
+<span class="sd">    parity-check matrix.</span>
+
+<span class="sd">    This function reads a file in `alist` format :cite:p:`MacKay` and returns a nested</span>
+<span class="sd">    list representing the parity-check matrix. Numerous example codes in</span>
+<span class="sd">    `alist` format are available in :cite:p:`UniKL`.</span>
+
+<span class="sd">    :param path: Path to the `alist` file to be loaded.</span>
+
+<span class="sd">    :output alist: A nested list containing the imported `alist` data</span>
+<span class="sd">        representing the parity-check matrix.</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from sionna.phy.fec.coding import load_alist</span>
+
+<span class="sd">        alist = load_alist(&quot;code.alist&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">alist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+        <span class="c1"># read list line by line (different length)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># append all entries</span>
+            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">word</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">:</span>  <span class="c1"># ignore empty lines</span>
+                <span class="n">alist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">alist</span></div>
+
+
+
+<div class="viewcode-block" id="make_systematic">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.make_systematic.html#sionna.phy.fec.utils.make_systematic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_systematic</span><span class="p">(</span>
+    <span class="n">mat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">is_pcm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Converts a binary matrix to its systematic form.</span>
+
+<span class="sd">    This function transforms a binary matrix into systematic form, where the</span>
+<span class="sd">    first `k` columns (or last `k` columns if ``is_pcm`` is `True`) form an</span>
+<span class="sd">    identity matrix.</span>
+
+<span class="sd">    :param mat: Binary matrix of shape [k, n] to be transformed to systematic</span>
+<span class="sd">        form.</span>
+<span class="sd">    :param is_pcm: If `True`, ``mat`` is treated as a parity-check matrix,</span>
+<span class="sd">        and the identity part will be placed in the last `k` columns.</span>
+
+<span class="sd">    :output mat_sys: The systematic matrix.</span>
+
+<span class="sd">    :output column_swaps: A list of column swap operations performed.</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    This function may swap columns of the input matrix to achieve systematic</span>
+<span class="sd">    form. As a result, the output matrix represents a permuted version of the</span>
+<span class="sd">    code, defined by the ``column_swaps`` list. To revert to the original</span>
+<span class="sd">    column order, apply the inverse permutation in reverse order of the swaps.</span>
+<span class="sd">    If ``is_pcm`` is `True`, indicating a parity-check matrix, the identity</span>
+<span class="sd">    matrix portion will be arranged in the last `k` columns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid matrix dimensions.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check for all-zero columns (=unchecked nodes)</span>
+    <span class="k">if</span> <span class="n">is_pcm</span><span class="p">:</span>
+        <span class="n">c_node_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">c_node_deg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;All-zero column in parity-check matrix detected. &quot;</span>
+                <span class="s2">&quot;It seems as if the code contains unprotected nodes.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+    <span class="n">column_swaps</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># store all column swaps</span>
+
+    <span class="c1"># convert to bool for faster arithmetics</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="c1"># bring in upper triangular form</span>
+    <span class="k">for</span> <span class="n">idx_c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>  <span class="c1"># skip if leading &quot;1&quot; already occurred</span>
+            <span class="c1"># step 1: find next leading &quot;1&quot;</span>
+            <span class="k">for</span> <span class="n">idx_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+                <span class="c1"># skip if entry is &quot;0&quot;</span>
+                <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]:</span>
+                    <span class="n">mat</span><span class="p">[[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_r</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]]</span>  <span class="c1"># swap rows</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># Could not find &quot;1&quot;-entry for column idx_c</span>
+        <span class="c1"># =&gt; swap with columns from non-sys part</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx_cc</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_cc</span><span class="p">]:</span>
+                    <span class="c1"># swap columns</span>
+                    <span class="n">mat</span><span class="p">[:,</span> <span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_cc</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[:,</span> <span class="p">[</span><span class="n">idx_cc</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]]</span>
+                    <span class="n">column_swaps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">idx_c</span><span class="p">,</span> <span class="n">idx_cc</span><span class="p">])</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not succeed; mat is not full rank?&quot;</span><span class="p">)</span>
+
+        <span class="c1"># we can now assume a leading &quot;1&quot; at row idx_c</span>
+        <span class="k">for</span> <span class="n">idx_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]:</span>
+                <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="p">:]</span> <span class="o">^=</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># bin. add of row idx_c to idx_r</span>
+
+    <span class="c1"># remove upper triangle part in inverse order</span>
+    <span class="k">for</span> <span class="n">idx_c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx_r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">idx_c</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="n">idx_c</span><span class="p">]:</span>
+                <span class="n">mat</span><span class="p">[</span><span class="n">idx_r</span><span class="p">,</span> <span class="p">:]</span> <span class="o">^=</span> <span class="n">mat</span><span class="p">[</span><span class="n">idx_c</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># bin. add of row idx_c to idx_r</span>
+
+    <span class="c1"># verify results</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">mat</span><span class="p">[:,</span> <span class="p">:</span><span class="n">m</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">m</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Internal error, could not find systematic matrix.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># bring identity part to end of matrix if parity-check matrix is provided</span>
+    <span class="k">if</span> <span class="n">is_pcm</span><span class="p">:</span>
+        <span class="c1"># individual column swaps instead of copying entire block</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">m</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span>
+            <span class="n">mat</span><span class="p">[:,</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mat</span><span class="p">[:,</span> <span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]]</span>
+            <span class="n">column_swaps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+
+    <span class="c1"># return integer array</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="p">,</span> <span class="n">column_swaps</span></div>
+
+
+
+<div class="viewcode-block" id="gm2pcm">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.gm2pcm.html#sionna.phy.fec.utils.gm2pcm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">gm2pcm</span><span class="p">(</span><span class="n">gm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">verify_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates the parity-check matrix for a given generator matrix.</span>
+
+<span class="sd">    This function converts the generator matrix ``gm`` (denoted as</span>
+<span class="sd">    :math:`\mathbf{G}`) to systematic form and uses the following relationship</span>
+<span class="sd">    to compute the parity-check matrix :math:`\mathbf{H}` over GF(2):</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{G} = [\mathbf{I} |  \mathbf{M}]</span>
+<span class="sd">        \Rightarrow \mathbf{H} = [\mathbf{M}^T | \mathbf{I}]. \tag{1}</span>
+
+<span class="sd">    This is derived from the requirement for an all-zero syndrome, such that:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{H} \mathbf{c}^T = \mathbf{H} * (\mathbf{u} * \mathbf{G})^T =</span>
+<span class="sd">        \mathbf{H} * \mathbf{G}^T * \mathbf{u}^T = \mathbf{0},</span>
+
+<span class="sd">    where :math:`\mathbf{c}` represents an arbitrary codeword and</span>
+<span class="sd">    :math:`\mathbf{u}` the corresponding information bits.</span>
+
+<span class="sd">    This leads to:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{G} * \mathbf{H}^T = \mathbf{0}. \tag{2}</span>
+
+<span class="sd">    It can be seen that (1) satisfies (2), as in GF(2):</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        [\mathbf{I} |  \mathbf{M}] * [\mathbf{M}^T | \mathbf{I}]^T</span>
+<span class="sd">         = \mathbf{M} + \mathbf{M} = \mathbf{0}.</span>
+
+<span class="sd">    :param gm: Binary generator matrix of shape [k, n].</span>
+<span class="sd">    :param verify_results: If `True`, verifies that the generated parity-check</span>
+<span class="sd">        matrix is orthogonal to the generator matrix in GF(2).</span>
+
+<span class="sd">    :output pcm: Binary parity-check matrix of shape [n - k, n].</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    This function requires ``gm`` to have full rank. An error is raised if</span>
+<span class="sd">    ``gm`` does not meet this requirement.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid matrix dimensions.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># bring gm in systematic form</span>
+    <span class="n">gm_sys</span><span class="p">,</span> <span class="n">c_swaps</span> <span class="o">=</span> <span class="n">make_systematic</span><span class="p">(</span><span class="n">gm</span><span class="p">,</span> <span class="n">is_pcm</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">m_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">gm_sys</span><span class="p">[:,</span> <span class="o">-</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span> <span class="p">:]))</span>
+    <span class="n">i_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">m_mat</span><span class="p">,</span> <span class="n">i_mat</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># undo column swaps</span>
+    <span class="k">for</span> <span class="n">swap</span> <span class="ow">in</span> <span class="n">c_swaps</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># reverse ordering when going through list</span>
+        <span class="n">pcm</span><span class="p">[:,</span> <span class="p">[</span><span class="n">swap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">swap</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">pcm</span><span class="p">[:,</span> <span class="p">[</span><span class="n">swap</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">swap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span>  <span class="c1"># swap columns</span>
+
+    <span class="k">if</span> <span class="n">verify_results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="o">=</span><span class="n">gm</span><span class="p">,</span> <span class="n">pcm</span><span class="o">=</span><span class="n">pcm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Resulting parity-check matrix does not match to&quot;</span>
+                <span class="s2">&quot; generator matrix.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pcm</span></div>
+
+
+
+<div class="viewcode-block" id="pcm2gm">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.pcm2gm.html#sionna.phy.fec.utils.pcm2gm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pcm2gm</span><span class="p">(</span><span class="n">pcm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">verify_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates the generator matrix for a given parity-check matrix.</span>
+
+<span class="sd">    This function converts the parity-check matrix ``pcm`` (denoted as</span>
+<span class="sd">    :math:`\mathbf{H}`) to systematic form and uses the following relationship</span>
+<span class="sd">    to compute the generator matrix :math:`\mathbf{G}` over GF(2):</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{G} = [\mathbf{I} | \mathbf{M}]</span>
+<span class="sd">        \Rightarrow \mathbf{H} = [\mathbf{M}^T | \mathbf{I}]. \tag{1}</span>
+
+<span class="sd">    This derivation is based on the requirement for an all-zero syndrome:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{H} \mathbf{c}^T = \mathbf{H} * (\mathbf{u} * \mathbf{G})^T =</span>
+<span class="sd">        \mathbf{H} * \mathbf{G}^T * \mathbf{u}^T = \mathbf{0},</span>
+
+<span class="sd">    where :math:`\mathbf{c}` represents an arbitrary codeword and</span>
+<span class="sd">    :math:`\mathbf{u}` the corresponding information bits.</span>
+
+<span class="sd">    This leads to:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{G} * \mathbf{H}^T = \mathbf{0}. \tag{2}</span>
+
+<span class="sd">    It can be shown that (1) satisfies (2), as in GF(2):</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        [\mathbf{I} | \mathbf{M}] * [\mathbf{M}^T | \mathbf{I}]^T</span>
+<span class="sd">         = \mathbf{M} + \mathbf{M} = \mathbf{0}.</span>
+
+<span class="sd">    :param pcm: Binary parity-check matrix of shape [n - k, n].</span>
+<span class="sd">    :param verify_results: If `True`, verifies that the generated generator</span>
+<span class="sd">        matrix is orthogonal to the parity-check matrix in GF(2).</span>
+
+<span class="sd">    :output gm: Binary generator matrix of shape [k, n].</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    This function requires ``pcm`` to have full rank. An error is raised if</span>
+<span class="sd">    ``pcm`` does not meet this requirement.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">k</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid matrix dimensions.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># bring pcm in systematic form</span>
+    <span class="n">pcm_sys</span><span class="p">,</span> <span class="n">c_swaps</span> <span class="o">=</span> <span class="n">make_systematic</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">is_pcm</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">m_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">pcm_sys</span><span class="p">[:,</span> <span class="p">:</span><span class="n">k</span><span class="p">]))</span>
+    <span class="n">i_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">gm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">i_mat</span><span class="p">,</span> <span class="n">m_mat</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># undo column swaps</span>
+    <span class="k">for</span> <span class="n">swap</span> <span class="ow">in</span> <span class="n">c_swaps</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>  <span class="c1"># reverse ordering when going through list</span>
+        <span class="n">gm</span><span class="p">[:,</span> <span class="p">[</span><span class="n">swap</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">swap</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span> <span class="o">=</span> <span class="n">gm</span><span class="p">[:,</span> <span class="p">[</span><span class="n">swap</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">swap</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]</span>  <span class="c1"># swap columns</span>
+
+    <span class="k">if</span> <span class="n">verify_results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="o">=</span><span class="n">gm</span><span class="p">,</span> <span class="n">pcm</span><span class="o">=</span><span class="n">pcm</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Resulting parity-check matrix does not match to&quot;</span>
+                <span class="s2">&quot; generator matrix.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">gm</span></div>
+
+
+
+<div class="viewcode-block" id="verify_gm_pcm">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.verify_gm_pcm.html#sionna.phy.fec.utils.verify_gm_pcm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_gm_pcm</span><span class="p">(</span><span class="n">gm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pcm</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Verifies that the generator matrix and parity-check matrix are orthogonal in GF(2).</span>
+
+<span class="sd">    For a valid code with an all-zero syndrome, the following condition must</span>
+<span class="sd">    hold:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathbf{H} \mathbf{c}^T = \mathbf{H} * (\mathbf{u} * \mathbf{G})^T =</span>
+<span class="sd">        \mathbf{H} * \mathbf{G}^T * \mathbf{u}^T = \mathbf{0},</span>
+
+<span class="sd">    where :math:`\mathbf{c}` represents an arbitrary codeword and</span>
+<span class="sd">    :math:`\mathbf{u}` the corresponding information bits.</span>
+
+<span class="sd">    Since :math:`\mathbf{u}` can be arbitrary, this leads to the condition:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \mathbf{H} * \mathbf{G}^T = \mathbf{0}.</span>
+
+<span class="sd">    :param gm: Binary generator matrix of shape [k, n].</span>
+<span class="sd">    :param pcm: Binary parity-check matrix of shape [n - k, n].</span>
+
+<span class="sd">    :output is_valid: `True` if ``gm`` and ``pcm`` define a valid pair of</span>
+<span class="sd">        orthogonal parity-check and generator matrices in GF(2).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check for valid dimensions</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">gm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">n_pcm</span> <span class="o">=</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">k_pcm</span> <span class="o">=</span> <span class="n">n_pcm</span> <span class="o">-</span> <span class="n">pcm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">k_pcm</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Inconsistent shape of gm and pcm.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">n_pcm</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Inconsistent shape of gm and pcm.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check that both matrices are binary</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">gm</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">gm</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;gm is not binary.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">pcm</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">pcm</span> <span class="o">==</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;pcm is not binary.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># check for zero syndrome</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">gm</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># mod2 to account for GF(2)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>  <span class="c1"># Check for Non-zero syndrome of H*G&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="generate_reg_ldpc">
+<a class="viewcode-back" href="../../../../phy/api/fec/utils/sionna.phy.fec.utils.generate_reg_ldpc.html#sionna.phy.fec.utils.generate_reg_ldpc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_reg_ldpc</span><span class="p">(</span>
+    <span class="n">v</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">c</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">allow_flex_len</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates a random regular (v, c) LDPC code.</span>
+
+<span class="sd">    This function generates a random Low-Density Parity-Check (LDPC)</span>
+<span class="sd">    parity-check matrix of length ``n`` where each variable node (VN) has</span>
+<span class="sd">    degree ``v`` and each check node (CN) has degree ``c``. Note that the</span>
+<span class="sd">    generated LDPC code is not optimized to avoid short cycles, which may</span>
+<span class="sd">    result in a non-negligible error floor. For encoding, the</span>
+<span class="sd">    :class:`~sionna.phy.fec.linear.encoding.LinearEncoder` block can be used,</span>
+<span class="sd">    but the construction does not guarantee that the parity-check matrix</span>
+<span class="sd">    (``pcm``) has full rank.</span>
+
+<span class="sd">    :param v: Desired degree of each variable node (VN).</span>
+<span class="sd">    :param c: Desired degree of each check node (CN).</span>
+<span class="sd">    :param n: Desired codeword length.</span>
+<span class="sd">    :param allow_flex_len: If `True`, the resulting codeword length may be</span>
+<span class="sd">        slightly increased to meet the degree requirements.</span>
+<span class="sd">    :param verbose: If `True`, prints code parameters.</span>
+
+<span class="sd">    :output pcm: The parity-check matrix.</span>
+
+<span class="sd">    :output k: The number of information bits.</span>
+
+<span class="sd">    :output n: The codeword length.</span>
+
+<span class="sd">    :output coderate: The code rate.</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    This algorithm is designed only for regular node degrees. To achieve</span>
+<span class="sd">    state-of-the-art bit-error-rate performance, optimizing irregular degree</span>
+<span class="sd">    profiles is usually necessary (see :cite:p:`tenBrink`).</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from sionna.phy.fec.coding import generate_reg_ldpc</span>
+
+<span class="sd">        pcm, k, n, rate = generate_reg_ldpc(3, 6, 100, verbose=False)</span>
+<span class="sd">        print(f&quot;Generated LDPC code: n={n}, k={k}, rate={rate:.3f}&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check input values for consistency</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">allow_flex_len</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;allow_flex_len must be bool.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># allow slight change in n to keep num edges</span>
+    <span class="c1"># from CN and VN perspective an integer</span>
+    <span class="k">if</span> <span class="n">allow_flex_len</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">n_mod</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">c</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">((</span><span class="n">v</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_mod</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">n_mod</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting n to: &quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                <span class="k">break</span>
+
+    <span class="c1"># calculate number of nodes</span>
+    <span class="n">coderate</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">v</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span>
+    <span class="n">n_v</span> <span class="o">=</span> <span class="n">n</span>
+    <span class="n">n_c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">v</span> <span class="o">/</span> <span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">n_v</span> <span class="o">-</span> <span class="n">n_c</span>
+
+    <span class="c1"># generate sockets</span>
+    <span class="n">v_socks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_v</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
+    <span class="n">c_socks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_c</span><span class="p">),</span> <span class="n">c</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of edges (VN perspective): &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_socks</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of edges (CN perspective): &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_socks</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_socks</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c_socks</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Number of edges from VN and CN &quot;</span>
+            <span class="s2">&quot;perspective does not match. Consider to (slightly) change n.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># apply random permutations</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">np_rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">v_socks</span><span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">np_rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">c_socks</span><span class="p">)</span>
+
+    <span class="c1"># and generate matrix</span>
+    <span class="n">pcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_c</span><span class="p">,</span> <span class="n">n_v</span><span class="p">])</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">shuffle_max</span> <span class="o">=</span> <span class="mi">200</span>  <span class="c1"># stop if no success</span>
+    <span class="n">shuffle_counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">while</span> <span class="n">cont</span><span class="p">:</span>
+        <span class="c1"># if edge is available, take it</span>
+        <span class="k">if</span> <span class="n">pcm</span><span class="p">[</span><span class="n">c_socks</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">v_socks</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">pcm</span><span class="p">[</span><span class="n">c_socks</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">v_socks</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># and go to next socket</span>
+            <span class="n">shuffle_counter</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># reset counter</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_socks</span><span class="p">):</span>
+                <span class="n">cont</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># shuffle sockets</span>
+            <span class="n">shuffle_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">shuffle_counter</span> <span class="o">&lt;</span> <span class="n">shuffle_max</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">np_rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">v_socks</span><span class="p">[</span><span class="n">idx</span><span class="p">:])</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">np_rng</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">c_socks</span><span class="p">[</span><span class="n">idx</span><span class="p">:])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Stopping LDPC generation - no solution found.&quot;</span><span class="p">)</span>
+                <span class="n">cont</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">v_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">c_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pcm</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">v_deg</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;VN degree not always v.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">c_deg</span> <span class="o">==</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;CN degree not always c.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated regular (</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s2">) LDPC code of length n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Code rate is r=</span><span class="si">{</span><span class="n">coderate</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pcm</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">coderate</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

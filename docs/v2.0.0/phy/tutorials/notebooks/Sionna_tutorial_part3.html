@@ -1,0 +1,1726 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Part 3: Advanced Link-level Simulations &#8212; Sionna 2.0.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=51b770b3"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'phy/tutorials/notebooks/Sionna_tutorial_part3';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/phy/tutorials/notebooks/Sionna_tutorial_part3.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Part 4: Toward Learned Receivers" href="Sionna_tutorial_part4.html" />
+    <link rel="prev" title="Part 2: Differentiable Communication Systems" href="Sionna_tutorial_part2.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../beginners.html">Beginners</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="Hello_World.html">“Hello, world!”</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Part 3: Advanced Link-level Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Simple_MIMO_Simulation.html">Basic MIMO Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Pulse_Shaping_Basics.html">Pulse-shaping Basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Optical_Lumped_Amplification_Channel.html">Optical Channel with Lumped Amplification</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../experts.html">Experts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="5G_NR_PUSCH.html">5G NR PUSCH Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="OFDM_MIMO_Detection.html">OFDM MIMO Channel Estimation and Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Introduction_to_Iterative_Detection_and_Decoding.html">Introduction to Iterative Detection and Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Autoencoder.html">End-to-end Learning with Autoencoders</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Superimposed_Pilots.html">OFDM-based Communications with Superimposed Pilots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="CIR_Dataset.html">Channel Models from Datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Link_Level_Simulations_with_RT.html">Link-level simulations with Sionna RT</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/phy.html">API Documentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/block.html">Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/config.html">Configuration</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/channel/channel.html">Channel Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/channel/wireless/index.html">Wireless</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/channel/wireless/3gpp.html">3GPP 38.901</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.PanelArray.html">PanelArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.Antenna.html">Antenna</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.AntennaArray.html">AntennaArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.TDL.html">TDL</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.CDL.html">CDL</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.UMi.html">UMi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.UMa.html">UMa</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.tr38901.RMa.html">RMa</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/wireless/awgn.html">AWGN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/wireless/cir_dataset.html">CIRDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/wireless/channel_model.html">ChannelModel</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/channel/wireless/flat_fading.html">Flat Fading</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.FlatFadingChannel.html">FlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.GenerateFlatFadingChannel.html">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.ApplyFlatFadingChannel.html">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.SpatialCorrelation.html">SpatialCorrelation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.KroneckerModel.html">KroneckerModel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.PerColumnModel.html">PerColumnModel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/channel/wireless/frequency_domain.html">Frequency (OFDM) Domain</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.OFDMChannel.html">OFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.GenerateOFDMChannel.html">GenerateOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.ApplyOFDMChannel.html">ApplyOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.cir_to_ofdm_channel.html">cir_to_ofdm_channel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/wireless/rayleigh_block_fading.html">RayleighBlockFading</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/channel/wireless/time_domain.html">Time Domain</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.TimeChannel.html">TimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.GenerateTimeChannel.html">GenerateTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.ApplyTimeChannel.html">ApplyTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.cir_to_time_channel.html">cir_to_time_channel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.time_to_ofdm_channel.html">time_to_ofdm_channel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/channel/wireless/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.subcarrier_frequencies.html">subcarrier_frequencies</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.time_lag_discrete_time_channel.html">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.deg_2_rad.html">deg_2_rad</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.rad_2_deg.html">rad_2_deg</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.wrap_angle_0_360.html">wrap_angle_0_360</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.drop_uts_in_sector.html">drop_uts_in_sector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.relocate_uts.html">relocate_uts</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.set_3gpp_scenario_parameters.html">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.gen_single_sector_topology.html">gen_single_sector_topology</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.gen_single_sector_topology_interferers.html">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.exp_corr_mat.html">exp_corr_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/channel/wireless/sionna.phy.channel.one_ring_corr_mat.html">one_ring_corr_mat</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/channel/optical/optical.html">Optical</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/optical/sionna.phy.channel.SSFM.html">SSFM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/optical/sionna.phy.channel.EDFA.html">EDFA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/channel/optical/sionna.phy.channel.utils.time_frequency_vector.html">time_frequency_vector</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/channel/discrete/discrete.html">Discrete</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/fec/fec.html">Forward Error Correction (FEC)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/fec.linear.html">Linear Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.linear.LinearEncoder.html">LinearEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.linear.OSDecoder.html">OSDecoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/ldpc/index.html">Low-Density Parity-Check (LDPC)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.LDPC5GEncoder.html">LDPC5GEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.LDPCBPDecoder.html">LDPCBPDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.LDPC5GDecoder.html">LDPC5GDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/ldpc/node_update_functions.html">Node Update Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.vn_update_sum.html">vn_update_sum</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.cn_update_minsum.html">cn_update_minsum</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.cn_update_offset_minsum.html">cn_update_offset_minsum</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.cn_update_phi.html">cn_update_phi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.cn_update_tanh.html">cn_update_tanh</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/ldpc/decoder_callbacks.html">Decoder Callbacks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.DecoderStatisticsCallback.html">DecoderStatisticsCallback</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.EXITCallback.html">EXITCallback</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/ldpc/sionna.phy.fec.ldpc.WeightedBPCallback.html">WeightedBPCallback</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/polar/index.html">Polar Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.Polar5GEncoder.html">Polar5GEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.PolarEncoder.html">PolarEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.Polar5GDecoder.html">Polar5GDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.PolarSCDecoder.html">PolarSCDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.PolarSCLDecoder.html">PolarSCLDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.PolarBPDecoder.html">PolarBPDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/polar/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.utils.generate_5g_ranking.html">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.utils.generate_polar_transform_mat.html">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.utils.generate_rm_code.html">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/polar/sionna.phy.fec.polar.utils.generate_dense_polar.html">generate_dense_polar</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/conv/index.html">Convolutional Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/conv/sionna.phy.fec.conv.ConvEncoder.html">ConvEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/conv/sionna.phy.fec.conv.ViterbiDecoder.html">ViterbiDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/conv/sionna.phy.fec.conv.BCJRDecoder.html">BCJRDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/conv/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/conv/sionna.phy.fec.conv.utils.polynomial_selector.html">polynomial_selector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/conv/sionna.phy.fec.conv.utils.Trellis.html">Trellis</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/turbo/index.html">Turbo Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/turbo/sionna.phy.fec.turbo.TurboEncoder.html">TurboEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/turbo/sionna.phy.fec.turbo.TurboDecoder.html">TurboDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/turbo/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/turbo/sionna.phy.fec.turbo.utils.polynomial_selector.html">polynomial_selector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/turbo/sionna.phy.fec.turbo.utils.puncture_pattern.html">puncture_pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/turbo/sionna.phy.fec.turbo.utils.TurboTermination.html">TurboTermination</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/fec.crc.html">Cyclic Redundancy Check (CRC)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.crc.CRCEncoder.html">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.crc.CRCDecoder.html">CRCDecoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/fec.interleaving.html">Interleaving</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.interleaving.RowColumnInterleaver.html">RowColumnInterleaver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.interleaving.RandomInterleaver.html">RandomInterleaver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.interleaving.Turbo3GPPInterleaver.html">Turbo3GPPInterleaver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.interleaving.Deinterleaver.html">Deinterleaver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/fec.scrambling.html">Scrambling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.scrambling.Scrambler.html">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.scrambling.Descrambler.html">Descrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/fec/sionna.phy.fec.scrambling.TB5GScrambler.html">TB5GScrambler</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/fec/utils/index.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/utils/linear_codes.html">(Binary) Linear Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.load_parity_check_examples.html">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.alist2mat.html">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.load_alist.html">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.generate_reg_ldpc.html">generate_reg_ldpc</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.make_systematic.html">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.gm2pcm.html">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.pcm2gm.html">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.verify_gm_pcm.html">verify_gm_pcm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/utils/exit_analysis.html">EXIT Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.plot_exit_chart.html">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.get_exit_analytic.html">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.plot_trajectory.html">plot_trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../api/fec/utils/miscellaneous.html">Miscellaneous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.GaussianPriorSource.html">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.bin2int.html">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.int2bin.html">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.int_mod_2.html">int_mod_2</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.llr2mi.html">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.j_fun.html">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../api/fec/utils/sionna.phy.fec.utils.j_fun_inv.html">j_fun_inv</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/mapping/index.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping/Constellation.html">Constellation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping/Mapper.html">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping/Demapper.html">Demapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mapping/SymbolDemapper.html">SymbolDemapper</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/mapping/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.BinarySource.html">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.LLRs2SymbolLogits.html">LLRs2SymbolLogits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.pam.html">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.pam_gray.html">pam_gray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.PAM2QAM.html">PAM2QAM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.PAMSource.html">PAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.qam.html">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.QAM2PAM.html">QAM2PAM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.QAMSource.html">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.SymbolInds2Bits.html">SymbolInds2Bits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.SymbolLogits2LLRs.html">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.SymbolLogits2Moments.html">SymbolLogits2Moments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mapping/sionna.phy.mapping.SymbolSource.html">SymbolSource</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/mimo/index.html">Multiple-Input Multiple-Output (MIMO)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/mimo/stream_management.html">StreamManagement</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/mimo/precoding.html">Precoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.cbf_precoding_matrix.html">cbf_precoding_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.rzf_precoding_matrix.html">rzf_precoding_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.rzf_precoder.html">rzf_precoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.grid_of_beams_dft_ula.html">grid_of_beams_dft_ula</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.grid_of_beams_dft.html">grid_of_beams_dft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.flatten_precoding_mat.html">flatten_precoding_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.normalize_precoding_power.html">normalize_precoding_power</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/mimo/equalization.html">Equalization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.lmmse_matrix.html">lmmse_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.lmmse_equalizer.html">lmmse_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.zf_equalizer.html">zf_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.mf_equalizer.html">mf_equalizer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/mimo/detection.html">Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.LinearDetector.html">LinearDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.MaximumLikelihoodDetector.html">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.KBestDetector.html">KBestDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.EPDetector.html">EPDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.MMSEPICDetector.html">MMSEPICDetector</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/mimo/utility.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.List2LLR.html">List2LLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.List2LLRSimple.html">List2LLRSimple</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.complex2real_vector.html">complex2real_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.real2complex_vector.html">real2complex_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.complex2real_matrix.html">complex2real_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.real2complex_matrix.html">real2complex_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.complex2real_covariance.html">complex2real_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.real2complex_covariance.html">real2complex_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.complex2real_channel.html">complex2real_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.real2complex_channel.html">real2complex_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/mimo/sionna.phy.mimo.whiten_channel.html">whiten_channel</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/nr/index.html">5G NR</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/nr/carrier.html">Carrier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.CarrierConfig.html">CarrierConfig</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/nr/layer_mapping.html">Layer Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.LayerMapper.html">LayerMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.LayerDemapper.html">LayerDemapper</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/nr/pusch.html">PUSCH</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHConfig.html">PUSCHConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHDMRSConfig.html">PUSCHDMRSConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHLSChannelEstimator.html">PUSCHLSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHPilotPattern.html">PUSCHPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHPrecoder.html">PUSCHPrecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHReceiver.html">PUSCHReceiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.PUSCHTransmitter.html">PUSCHTransmitter</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/nr/transport_block.html">Transport Block</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.TBConfig.html">TBConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.TBEncoder.html">TBEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.TBDecoder.html">TBDecoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/nr/utils.html">Utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.calculate_tb_size.html">calculate_tb_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.generate_prng_seq.html">generate_prng_seq</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.decode_mcs_index.html">decode_mcs_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.calculate_num_coded_bits.html">calculate_num_coded_bits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.TransportBlockNR.html">TransportBlockNR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.CodedAWGNChannelNR.html">CodedAWGNChannelNR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nr/sionna.phy.nr.utils.MCSDecoderNR.html">MCSDecoderNR</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/object.html">Object</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/ofdm/index.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/resource_grid.html">Resource Grid</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.ResourceGrid.html">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.ResourceGridMapper.html">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.ResourceGridDemapper.html">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.RemoveNulledSubcarriers.html">RemoveNulledSubcarriers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/modulation.html">Modulation &amp; Demodulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.OFDMModulator.html">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.OFDMDemodulator.html">OFDMDemodulator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/pilot_pattern.html">Pilot Pattern</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.PilotPattern.html">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.EmptyPilotPattern.html">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.KroneckerPilotPattern.html">KroneckerPilotPattern</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/channel_estimation.html">Channel Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.BaseChannelEstimator.html">BaseChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LSChannelEstimator.html">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.BaseChannelInterpolator.html">BaseChannelInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.NearestNeighborInterpolator.html">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LinearInterpolator.html">LinearInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LMMSEInterpolator1D.html">LMMSEInterpolator1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LMMSEInterpolator.html">LMMSEInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.SpatialChannelFilter.html">SpatialChannelFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.tdl_freq_cov_mat.html">tdl_freq_cov_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.tdl_time_cov_mat.html">tdl_time_cov_mat</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/precoding.html">Precoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.RZFPrecoder.html">RZFPrecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.PrecodedChannel.html">PrecodedChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.CBFPrecodedChannel.html">CBFPrecodedChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.EyePrecodedChannel.html">EyePrecodedChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.RZFPrecodedChannel.html">RZFPrecodedChannel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/equalization.html">Equalization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.OFDMEqualizer.html">OFDMEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LMMSEEqualizer.html">LMMSEEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.ZFEqualizer.html">ZFEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.MFEqualizer.html">MFEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.PostEqualizationSINR.html">PostEqualizationSINR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LMMSEPostEqualizationSINR.html">LMMSEPostEqualizationSINR</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/ofdm/detection.html">Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.OFDMDetector.html">OFDMDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.OFDMDetectorWithPrior.html">OFDMDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.LinearDetector.html">LinearDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.MaximumLikelihoodDetector.html">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.MaximumLikelihoodDetectorWithPrior.html">MaximumLikelihoodDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.KBestDetector.html">KBestDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.EPDetector.html">EPDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/ofdm/sionna.phy.ofdm.MMSEPICDetector.html">MMSEPICDetector</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/signal/index.html">Signal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/signal/filters.html">Filters</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.Filter.html">Filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.RaisedCosineFilter.html">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.RootRaisedCosineFilter.html">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.SincFilter.html">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.CustomFilter.html">CustomFilter</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/signal/window_functions.html">Window functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.Window.html">Window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.HannWindow.html">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.HammingWindow.html">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.BlackmanWindow.html">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.CustomWindow.html">CustomWindow</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/signal/utility.html">Utility functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.convolve.html">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.fft.html">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.ifft.html">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.empirical_psd.html">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.empirical_aclr.html">empirical_aclr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.Upsampling.html">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/signal/sionna.phy.signal.Downsampling.html">Downsampling</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/utils/index.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/linear_algebra.html">Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.inv_cholesky.html">inv_cholesky</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.matrix_pinv.html">matrix_pinv</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/metrics.html">Metrics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.compute_ber.html">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.compute_bler.html">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.compute_ser.html">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.count_block_errors.html">count_block_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.count_errors.html">count_errors</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/misc.html">Misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.complex_normal.html">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.db_to_lin.html">db_to_lin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.dbm_to_watt.html">dbm_to_watt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.DeepUpdateDict.html">DeepUpdateDict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.dict_keys_to_int.html">dict_keys_to_int</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.ebnodb2no.html">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.hard_decisions.html">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.Interpolate.html">Interpolate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.lin_to_db.html">lin_to_db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.MCSDecoder.html">MCSDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.sample_bernoulli.html">sample_bernoulli</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.scalar_to_shaped_tensor.html">scalar_to_shaped_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.sim_ber.html">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.SingleLinkChannel.html">SingleLinkChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.SplineGriddataInterpolation.html">SplineGriddataInterpolation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.to_list.html">to_list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.TransportBlock.html">TransportBlock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.watt_to_dbm.html">watt_to_dbm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/numerics.html">Numerics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.bisection_method.html">bisection_method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.expand_bound.html">expand_bound</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/plotting.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.plot_ber.html">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.PlotBER.html">PlotBER</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/random.html">Random number generation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.randint.html">randint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.rand.html">rand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.uniform.html">uniform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.normal.html">normal</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/tensors.html">Tensors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.diag_part_axis.html">diag_part_axis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.enumerate_indices.html">enumerate_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.expand_to_rank.html">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.find_true_position.html">find_true_position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.flatten_dims.html">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.flatten_last_dims.html">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.flatten_multi_index.html">flatten_multi_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.gather_from_batched_indices.html">gather_from_batched_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.insert_dims.html">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.random_tensor_from_values.html">random_tensor_from_values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.split_dim.html">split_dim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/sionna.phy.utils.tensor_values_are_in_set.html">tensor_values_are_in_set</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../developer/index.html">Developer Guides</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/dev_matrix_inversion.html">Matrix inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/dev_rng.html">Random number generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/dev_sionna_block.html">Sionna Block and Object</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Physical Layer (PHY)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../beginners.html" class="nav-link">Beginners</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Part 3: Advanced Link-level Simulations</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; align-items:center; gap:28px; background:transparent;">
+    <a href="https://colab.research.google.com/github/NVlabs/sionna/blob/v2.0.0/tutorials/phy/Sionna_tutorial_part3.ipynb" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <img alt="Colab logo" src="../../../_static/colab_logo.svg" style="width:18px; height:18px; background:transparent;">
+        <span>Run in Google Colab</span>
+    </a>
+    <a href="https://github.com/NVlabs/sionna/blob/v2.0.0/tutorials/phy/Sionna_tutorial_part3.ipynb" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+        <span>View on GitHub</span>
+    </a>
+    <a href="Sionna_tutorial_part3.ipynb" download target="_blank" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <span aria-hidden="true">⬇</span>
+        <span>Download notebook</span>
+    </a>
+</div><section id="Part-3:-Advanced-Link-level-Simulations">
+<h1>Part 3: Advanced Link-level Simulations<a class="headerlink" href="#Part-3:-Advanced-Link-level-Simulations" title="Link to this heading">#</a></h1>
+<p>This tutorial will guide you through Sionna, from its basic principles to the implementation of a point-to-point link with a 5G NR compliant code and a 3GPP channel model. You will also learn how to write custom trainable blocks by implementing a state of the art neural receiver, and how to train and evaluate end-to-end communication systems.</p>
+<p>The tutorial is structured in four notebooks:</p>
+<ul class="simple">
+<li><p>Part I: Getting started with Sionna</p></li>
+<li><p>Part II: Differentiable Communication Systems</p></li>
+<li><p><strong>Part III: Advanced Link-level Simulations</strong></p></li>
+<li><p>Part IV: Toward Learned Receivers</p></li>
+</ul>
+<p>The <a class="reference external" href="https://nvlabs.github.io/sionna/index.html">official documentation</a> provides key material on how to use Sionna and how its components are implemented.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#Imports"><span class="std std-ref">Imports</span></a></p></li>
+<li><p><a class="reference internal" href="#OFDM-Resource-Grid-and-Stream-Management"><span class="std std-ref">OFDM Resource Grid and Stream Management</span></a></p></li>
+<li><p><a class="reference internal" href="#Antenna-Arrays"><span class="std std-ref">Antenna Arrays</span></a></p></li>
+<li><p><a class="reference internal" href="#Channel-Model"><span class="std std-ref">Channel Model</span></a></p></li>
+<li><p><a class="reference internal" href="#Uplink-Transmission-in-the-Frequency-Domain"><span class="std std-ref">Uplink Transmission in the Frequency Domain</span></a></p></li>
+</ul>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Sionna</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sionna</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sn</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sionna.phy</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+    <span class="k">if</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+       <span class="c1"># Install Sionna in Google Colab</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Installing Sionna and restarting the runtime. Please run the cell again.&quot;</span><span class="p">)</span>
+       <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install sionna&quot;</span><span class="p">)</span>
+       <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="k">raise</span> <span class="n">e</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># For plotting</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># Set seed for reproducible results</span>
+<span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="OFDM-Resource-Grid-and-Stream-Management">
+<h2>OFDM Resource Grid and Stream Management<a class="headerlink" href="#OFDM-Resource-Grid-and-Stream-Management" title="Link to this heading">#</a></h2>
+<p>We will setup a realistic SIMO point-to-point link between a mobile user terminal (UT) and a base station (BS). The system we will setup is shown in the figure below.</p>
+<p><img alt="SIMO" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAjgAAAEJCAYAAACZu11jAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAaGVYSWZNTQAqAAAACAAEAQYAAwAAAAEAAgAAARIAAwAAAAEAAQAAASgAAwAAAAEAAgAAh2kABAAAAAEAAAA+AAAAAAADoAEAAwAAAAEAAQAAoAIABAAAAAEAAAI4oAMABAAAAAEAAAEJAAAAAN1hxHgAAALkaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJYTVAgQ29yZSA2LjAuMCI+CiAgIDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+CiAgICAgIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiCiAgICAgICAgICAgIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIgogICAgICAgICAgICB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyI+CiAgICAgICAgIDx0aWZmOkNvbXByZXNzaW9uPjE8L3RpZmY6Q29tcHJlc3Npb24+CiAgICAgICAgIDx0aWZmOlJlc29sdXRpb25Vbml0PjI8L3RpZmY6UmVzb2x1dGlvblVuaXQ+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgICAgIDx0aWZmOlBob3RvbWV0cmljSW50ZXJwcmV0YXRpb24+MjwvdGlmZjpQaG90b21ldHJpY0ludGVycHJldGF0aW9uPgogICAgICAgICA8ZXhpZjpQaXhlbFhEaW1lbnNpb24+NTY4PC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICAgICAgICAgPGV4aWY6Q29sb3JTcGFjZT4xPC9leGlmOkNvbG9yU3BhY2U+CiAgICAgICAgIDxleGlmOlBpeGVsWURpbWVuc2lvbj4yNjU8L2V4aWY6UGl4ZWxZRGltZW5zaW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4K+ubCxgAAQABJREFUeAHtnQecVNX1xw8svUtHQURUBCl2xYodW2zYa9RojMZgSWLy14gllqhRk9iVYG/YoiagEBFBwIaKBZGmotIRkLLU/3wPuevbZRa2vN15M/O7fIaZffPefff97rz7fvd3zj2nxtpUMRUhIASEgBAQAkJACOQQAjVz6Fp0KUJACAgBISAEhIAQcAREcPRDEAJCQAgIASEgBHIOARGcnOtSXZAQEAJCQAgIASEggqPfgBAQAkJACAgBIZBzCIjg5FyX6oKEgBAQAkJACAgBERz9BoSAEBACQkAICIGcQ0AEJ+e6VBckBISAEBACQkAIiODoNyAEhIAQEAJCQAjkHAIiODnXpbogISAEhIAQEAJCQARHvwEhIASEgBAQAkIg5xAQwcm5LtUFCQEhIASEgBAQAiI4+g0IASEgBISAEBACOYeACE7OdakuSAgIASEgBISAEBDB0W9ACAgBISAEhIAQyDkERHByrkt1QUJACAgBISAEhIAIjn4DQkAICAEhIASEQM4hIIKTc12qCxICQkAICAEhIAREcPQbEAJCQAgIASEgBHIOARGcnOtSXZAQEAJCQAgIASEggqPfgBAQAkJACAgBIZBzCIjg5FyX6oKEgBAQAkJACAgBERz9BoSAEBACQkAICIGcQ0AEJ+e6VBckBISAEBACQkAIiODoNyAEhIAQEAJCQAjkHAK1cu6KMnRBM2bMsLFjxxrv4UVTwuf27dtb9MV3u+++u7/4rCIEhIAQEAJCQAjEh0CNtakSX3X5U1MgLpCawYMH26pVq2z77be3tm3bWrt27fwdNPib18yZM/31/fff+zvfffjhh1avXr0iogPhURECQkAICAEhIAQqj4AITjkxhNhAaJ566iknNUceeaT17dvX1Zm6detarVq1il5UHf6GAEVffFdYWGhjxoxxopNrZIdrg/yF1/jx47nknC709W677Wa77LKL8Vu44IILEn29oW/Ce6IbG1Pjdt55Z+vdu7cVFBR4/9BPSS3cM6FveOeeUimOAKo4E8PwrklicXzy/S8RnDL+AgKxGTVqlHXv3t0OPfRQv6kaNmxojRo1ciJTxqqK7bZ8+XLjFcjOvffe66pOnz59vP5+/foV2z8b/vjss8/smmuuMcTBHXbYwZWtbt26ZUPTK9XG1atXGw8lyCrvhx9+eGJJzkknneS/u9A/qI/5UCZMmOD9M27cONt3333t17/+tZPRpF077WLM6dq1q98/9FOdOnWS1syMtwdlnPvt3Xff9XHztNNOk9k/472SnAaI4GykL0oSGxSbrbbayiA2zNjjLBCdhQsXuqoD0eHmvfLKKy1bSM6iRYtc3brvvvvs6KOPtrPPPtsHHcxwSZ4px9mHy5Ytc7IKFvThSy+9ZIMGDXJVJ87zVLQulADIzcknn2z9+/f3/qFv6KN8KGEywYTioYce8r65++67jQkFqk6mC8T4vPPO84f0xRdfbK1atfJ7h/6pUaNGppuXuPOjiodJIqT1gQce8PGZ3zaqjkp+IyCCs4H+52Fw66232o8//ugzcQbBqiA2JZsQiM60adN8AP7kk0/8YZR0ovP222/b73//e7vqqqt8gG7SpEnJS8ubv1Gv5s2bZ6+88ordcMMNNmnSpERcO/5gd955p5tVmzZtmog2ZaoRTCaGDx9ul112mX300UeWhN8r5s2f//znduyxx1rr1q2tZk0tdC3r74Nxk7Hyrrvusu22284uv/zysh6q/XIUgYIBqZKj11apy4LcPPbYY+4gjFyM3R5TVHUMOChDnIuHUY8ePWzJkiWGKtKyZUtLqqkHpYuHea9evVxxatCgQaXwz/aDmW2DwRZbbOGmhmeffdaOOuqojF7WHXfcYR06dLALL7zQf18ZbUwCTo4q0qlTJyeijz/+uJuda9eunbGWDRw40CdQ55xzjrVp06ZaxpqMXWwVnJhxE1KIKW/06NG2YsWKxI6XVXD5qjINAiI4aUDBiRjZeo899nDlhodCJuzfkClm2TvttJM7r77zzjs2e/bsxN20kJv777/fFixYYJdeeqnVr18/Dar5uQnzD6SPB2iXLl1ss802ywgQkJuhQ4faP/7xD5GbSA/wUEQ1efLJJ61jx45OAKtjEhNpgn+E3Lz88sv2hz/8IWNtKNmmbPybvtt88819nPzmm29syy23TIQyl41Y5kKbpX+W6EXIzbBhw1wmPv30051gxO1rU+KUG/yTG7Zx48bG6g/8WiA511577QaPqe4vsYOjWGy77bZ6eJYAH1yaN2/uztY4qGeqYI7BkTjfzVLp8AcTSA4rGvktZ6Lgs8X9g89NJghWJq65qs6JMoefJH05ffr0qjqN6s0CBERwIp2EWWrixImGI/EhhxzicnHk64x+hGQxAEK65s+fnyiSw+D87bff+gM0oyAl9OT0HcvHM0lw+G336dMnoQhlvll77bWX4aSaKYKDczErpfLFGb+qexzTMH5wIjhVjXSy6xfB+V//8AAYMWKEKyUHHHBAIleV8KBk2ejxxx9vH3/8sa9YSsLPC3WAgSRflhqXF3P6jfgc+AVkqvDbZlm0SnoE9txzT485kymCw/gDwcmX1WzpeyG+rRAcyldffeXv+i8/ERDBSfU7gwsOxTjxMstN8iDDw3LXXXe1iy66yJ5//vlEkJw1a9b4zDcTfkrZctvym2KVR6YK507y7zpTuITzZrp/WLbO/aOl4KFHKvfOOEnJFGGtXOt1dFwI5D3BgdzcdNNNvhR87733zoqHACs9WF3Vs2dP+9vf/mYE1lMRAkJACAgBISAEfkIg7wkOM1t8WzD7dO7c+SdkEv5pk002cX8cYuM88cQTCW+tmicEhIAQEAJCoHoRyGuCg3rDqik87vG7CbJm9XZBxc7GSguSehKf57vvvpOKUzEYdZQQEAJCQAjkKAJ5TXBwvGTVFMG+stE/AZJDnAd8cqTi5OgdqssSAiUQYHUQyjPO/dnkY7J06VIjlQntL62Qzy1dYZUm8bYI3qciBMqKQN4SHNQbBgmiFLOCYmOFgYQblGOiNyifcbLNVMFURSBAqTiZ6gGdVwhULwIEJSTsAH54RDb/4x//6NGYq7cVZT8bPoK/+MUvfJxipeVZZ51lX375ZdoKuBaCUc6ZM6fY948++qgHy5w7d26x7fpDCGwIgbwlOKg3kByCfG1MvSEiJjmWyCJOwL1TTjnFOJ6CckLupUw5+krF8W7Qf0IgbxAgN16zZs08fcvvfvc7j8L85ptvepLXpIGA6kIbmRySA40EtIQrIKdfunLcccelzZO2ePFiXwhSmsKTri5tEwLxpsPOEjy56SZPnuxxJ4hPsrGCesMNhiMymZhJS0BYdZyTOZ7EbqRzyFQJKg5RjiFaSc1XlSl8dF4hkGsIQBBYRUmAQlZSEu+FcQqig9qBonvQQQfZueeeawQR/Pvf/+4qD4FCTzvtNN+HyRn1ENj0hBNOsH//+9+e945En+TBQ90+/PDDPRHprFmz7IsvvvBQGr/97W896jP+iygqhNb4zW9+Y19//bWrLIyt+AaSNPSll17yIKBk995nn308SjPqEwENX331VW/v1KlTPbUCcYA4x4knnujJRokbdc899/i1cJ5DDz0017pR11PFCOQlwSEoHTdweZeFQyQIIEUSRWzBI0eOtH/961+ew4bBhEy27777rt/QOACfd955tummm9o///lP+89//uOJ4LjpGTSeeuope+ONN3zWhZmLGDzUwQyGm/zFF190U9gVV1yx0Z8AKg4xNBhgGLSuv/76jR6jHYSAEMheBMhJB5GZNm2aExcmWow9qMnnn3++5zz761//6u/sh68eYw/jHpntGZPYjzGN7NtsnzJlio9rxOSh4J8IGYGAvPfee74//n7sx7jXt29fNzsxflEn59t///09qSz1Q2AgKUwEyQ/FGEV7f/jhB09fAgkjQe+pp57qYzFjJmoPvkWYqKiP8fbkk0+2hx56SCkssvfnmrGW56WJCoLDiqnyLAuH0CCvQoowbTFzOvDAA23rrbf2G5ab9oMPPvBEk5dccokRqwZSg6SKWYsklDvuuKO99dZbPnCgIn344YeuAGF3Jt/U22+/7TOZjz76yMkKg05ZS/v27e2YY45xGbesx2g/ISAEshMBTD6MN88995xdc8017o/z3//+19O4YD5nggQJGjJkiJMctqHykPCViRXEgXQ0TLZQfBlzUEnwJww+hoxdfOYdRWa//fbz8wTScsQRR3hCYpISM7nDEZixEdWGyRbnhMQ0atSoaIXq008/7f44qOC0j/GTiR31Mx4zDlI4R0FBgSvmhx12mLdRSXyz87eayVbnrYJDxFBu8rIWCAvJLpFzX3jhBR84mJWQSHHevHk+MKDsMIBAfJjR4EjHqoHWrVv7TAX5mIJUy8CBJEt93Njsy8CDmenTTz91osSAUtbCTIzZ1fvvvy8zVVlB035CIEsRYEIzYMAAn0i99tprrpowySJbPWMKPjq8My6g3rDPfffdV2TKgkhAGDAV8c44hYmrtAUTbdq0caIC6YCYkHk9Slww4ZMoFNLEuMq58W985plnXFlasGCBI/3LX/7SFSDOA3FCuaYtjK/RAhmjbdTBO98rynMUIX0uCwJ5p+Aww+BGRtItT9wbbi5ucsgJ0iwzqM8//7zYTYepiBuRGxKyw2CAGeuBBx7wz0itkJkgATMItWjRwr9D5WF/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4UJXZM4//3w7/vjjrX79+v49pGfUqFGeIuK7775zlad79+52xRVX2GOPPeZL1zt06FAtBIe23HnnnXbeeefZ5ptvLoIT/08k72oUwcm7LtcFCwEhkIsIYFoK5qVwfSgiCxYssAcffNBJT82aNa1u3brha8/XdMsttxhxYyBILVu2NMxE7dq1833mzJlj7733nis5kI5NNtnE1aDZs2f79+zHa/78+X4cRApTV5s2bVwJItAexIVAhmSLhyy1aNHCVSMyf3McCUVRlZRYtKhb9CEmBERwYgJS1QgBISAEkoZAs2bNvEmkgdhxxx2tdevWBskJBTMURIPs29tss42rJpilQhkzZox98MEHTk6OPfZYO/roo+3pp5+2//73v0Vqz6WXXmqvvfaaZ0GHyECoevbsab/5zW/sb3/7mxMftkN+OJ563nnnHRsxYoSbxmjjkUceaQcccEA4rd6FQCwI/PRLj6U6VSIEhIAQEAJJQeDggw92H5q//OUvdtddd7k/TtTZGLMUagvEJ/jtRNtO8MEbb7zRyQeEBOVm5513tgsvvNBJyRtvvOE5tCAwqD1sh/BAYPDp+eGHH7zeK6+80g455BD363n//fft1ltvdRXn5z//uSs3TzzxhH3zzTfRU+uzEKg0AiI4lYZQFQgBISAEkokAEX0xQeHXMnToUCc5kJFQ6tSp46uWWLlU0rzFPjgbY5oieSVkhWPZ9+OPP3Zig1pDJnRWXHXq1MlNUGRDp665c+f6qizqwDQFMWJ/FCHUHOpCQaI+nJujxCu0T+9CoDIIyERVGfR0rBAQAkIgQQhAEljazYuC/wuvE044webNm2dPPfWUKyehyZilIC4Qli5durgpChKCohMtqDuBtKAE7bPPPnbOOec4yYGgcI5Q8PHBDMb+UdLEdvxwIFW1a9e2XXfd1evheHJwbbnllq72QJZY/VXVZc3aVbZqzQqrWaPAatX8yS+pqs+r+qsPARGc6sNaZxICQkAIVCkCLAnHHyasksIBePLkyda0aVMbP368kxgIRihkMEdxefnll518oKR88cUXxmqrKDkJ+6PKQHYgQJiUICezZs0qRprCvqW9d+3a1f19pk6d6uoQag7qDu1CLaKdECjMYxCiuAvEZunK+TZnyaTU+xxr03A7a9lwm7hPo/oSgIAITgI6QU0QAkJACFQWAeLHYPK5//77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" /></p>
+<section id="Stream-Management">
+<h3>Stream Management<a class="headerlink" href="#Stream-Management" title="Link to this heading">#</a></h3>
+<p>For any type of MIMO simulations, it is required to setup a <code class="docutils literal notranslate"><span class="pre">StreamManagement</span></code> object. It determines which transmitters and receivers communicate data streams with each other. In our scenario, we will configure a single UT equipped with a single antenna and a single BS equipped with multiple antennas. Whether the UT or BS is considered as a transmitter depends on the link direction, which can be either uplink or downlink. The <code class="docutils literal notranslate"><span class="pre">StreamManagement</span></code> has many properties that are used by other
+components, such as precoding and equalization.</p>
+<p>We will configure the system here such that the number of streams per transmitter is equal to the number of UT antennas.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the number of UT and BS antennas</span>
+<span class="n">NUM_UT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">NUM_BS</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">NUM_UT_ANT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">NUM_BS_ANT</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1"># The number of transmitted streams is equal to the number of UT antennas</span>
+<span class="c1"># in both uplink and downlink</span>
+<span class="n">NUM_STREAMS_PER_TX</span> <span class="o">=</span> <span class="n">NUM_UT_ANT</span>
+
+<span class="c1"># Create an RX-TX association matrix.</span>
+<span class="c1"># RX_TX_ASSOCIATION[i,j]=1 means that receiver i gets at least one stream</span>
+<span class="c1"># from transmitter j. Depending on the transmission direction (uplink or downlink),</span>
+<span class="c1"># the role of UT and BS can change.</span>
+<span class="c1"># For example, considering a system with 2 RX and 4 TX, the RX-TX</span>
+<span class="c1"># association matrix could be</span>
+<span class="c1"># [ [1 , 1, 0, 0],</span>
+<span class="c1">#   [0 , 0, 1, 1] ]</span>
+<span class="c1"># which indicates that the RX 0 receives from TX 0 and 1, and RX 1 receives from</span>
+<span class="c1"># TX 2 and 3.</span>
+<span class="c1">#</span>
+<span class="c1"># In this notebook, as we have only a single transmitter and receiver,</span>
+<span class="c1"># the RX-TX association matrix is simply:</span>
+<span class="n">RX_TX_ASSOCIATION</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="c1"># Instantiate a StreamManagement object</span>
+<span class="c1"># This determines which data streams are determined for which receiver.</span>
+<span class="c1"># In this simple setup, this is fairly straightforward. However,</span>
+<span class="c1"># in setups with multiple transmitters and receivers, the stream management</span>
+<span class="c1"># is more involved.</span>
+<span class="n">STREAM_MANAGEMENT</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mimo</span><span class="o">.</span><span class="n">StreamManagement</span><span class="p">(</span><span class="n">RX_TX_ASSOCIATION</span><span class="p">,</span> <span class="n">NUM_STREAMS_PER_TX</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Resource-Grid">
+<h3>Resource Grid<a class="headerlink" href="#Resource-Grid" title="Link to this heading">#</a></h3>
+<p>We will also configure a <code class="docutils literal notranslate"><span class="pre">ResourceGrid</span></code> object. It is used to allocate data symbols and pilot symbols on the resource grid. In this notebook, we use a <code class="docutils literal notranslate"><span class="pre">kronecker</span></code> pilot pattern, as described in the <a class="reference external" href="https://nvlabs.github.io/sionna/phy/tutorials/notebooks/OFDM_MIMO_Detection.html">OFDM-MIMO Detection</a> tutorial.</p>
+<p>Please have a look at the <a class="reference external" href="https://nvlabs.github.io/sionna/phy/api/ofdm/index.html">API documentation</a> for all parameters.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">RESOURCE_GRID</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">ResourceGrid</span><span class="p">(</span><span class="n">num_ofdm_symbols</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                                         <span class="n">fft_size</span><span class="o">=</span><span class="mi">76</span><span class="p">,</span>
+                                         <span class="n">subcarrier_spacing</span><span class="o">=</span><span class="mf">30e3</span><span class="p">,</span>
+                                         <span class="n">num_tx</span><span class="o">=</span><span class="n">NUM_UT</span><span class="p">,</span>
+                                         <span class="n">num_streams_per_tx</span><span class="o">=</span><span class="n">NUM_STREAMS_PER_TX</span><span class="p">,</span>
+                                         <span class="n">cyclic_prefix_length</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                                         <span class="n">pilot_pattern</span><span class="o">=</span><span class="s2">&quot;kronecker&quot;</span><span class="p">,</span>
+                                         <span class="n">pilot_ofdm_symbol_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">pilot_pattern</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_13_0.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_13_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Antenna-Arrays">
+<h2>Antenna Arrays<a class="headerlink" href="#Antenna-Arrays" title="Link to this heading">#</a></h2>
+<p>We use the <code class="docutils literal notranslate"><span class="pre">Antenna</span></code> and <code class="docutils literal notranslate"><span class="pre">AntennaArray</span></code> classes from the 3GPP TR38.901 channel model to configure our antenna elements and arrays. The <code class="docutils literal notranslate"><span class="pre">Antenna</span></code> class consists of a single antenna element, whereas the <code class="docutils literal notranslate"><span class="pre">AntennaArray</span></code> class consists of multiple antenna elements.</p>
+<p>Please have a look at the <a class="reference external" href="https://nvlabs.github.io/sionna/phy/api/channel/wireless/sionna.phy.channel.tr38901.Antenna.html">API documentation</a> for more information.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CARRIER_FREQUENCY</span> <span class="o">=</span> <span class="mf">2.6e9</span> <span class="c1"># Carrier frequency in Hz.</span>
+                          <span class="c1"># This is needed here to define the antenna element spacing.</span>
+
+<span class="n">UT_ARRAY</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">tr38901</span><span class="o">.</span><span class="n">Antenna</span><span class="p">(</span><span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;single&quot;</span><span class="p">,</span>
+                                          <span class="n">polarization_type</span><span class="o">=</span><span class="s2">&quot;V&quot;</span><span class="p">,</span>
+                                          <span class="n">antenna_pattern</span><span class="o">=</span><span class="s2">&quot;38.901&quot;</span><span class="p">,</span>
+                                          <span class="n">carrier_frequency</span><span class="o">=</span><span class="n">CARRIER_FREQUENCY</span><span class="p">)</span>
+<span class="n">UT_ARRAY</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+
+<span class="n">BS_ARRAY</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">tr38901</span><span class="o">.</span><span class="n">AntennaArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                               <span class="n">num_cols</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">NUM_BS_ANT</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+                                               <span class="n">polarization</span><span class="o">=</span><span class="s2">&quot;dual&quot;</span><span class="p">,</span>
+                                               <span class="n">polarization_type</span><span class="o">=</span><span class="s2">&quot;cross&quot;</span><span class="p">,</span>
+                                               <span class="n">antenna_pattern</span><span class="o">=</span><span class="s2">&quot;38.901&quot;</span><span class="p">,</span>
+                                               <span class="n">carrier_frequency</span><span class="o">=</span><span class="n">CARRIER_FREQUENCY</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_16_0.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_16_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BS_ARRAY</span><span class="o">.</span><span class="n">show_element_radiation_pattern</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_17_0.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_17_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_17_1.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_17_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_17_2.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_17_2.png" />
+</div>
+</div>
+</section>
+<section id="Channel-Model">
+<h2>Channel Model<a class="headerlink" href="#Channel-Model" title="Link to this heading">#</a></h2>
+<p>The 3GPP 38.901 channel model offers five different delay profiles, called “CDL-A”, “CDL-B”, “CDL-C”, “CDL-D”, and “CDL-E”. The first three model non line-of-sight (NLoS) channels, whereas the last two model line-of-sight (LoS) channels.</p>
+<p>Please have a look at the <a class="reference external" href="https://nvlabs.github.io/sionna/phy/api/channel/wireless/sionna.phy.channel.tr38901.CDL.html">API documentation</a> for more information.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DELAY_SPREAD</span> <span class="o">=</span> <span class="mf">100e-9</span> <span class="c1"># Nominal delay spread in [s]. Please see the CDL documentation</span>
+                      <span class="c1"># about how to choose this value.</span>
+
+<span class="n">DIRECTION</span> <span class="o">=</span> <span class="s2">&quot;uplink&quot;</span>  <span class="c1"># The `direction` determines if the UT or BS is transmitting.</span>
+                      <span class="c1"># In the `uplink`, the UT is transmitting.</span>
+
+<span class="n">CDL_MODEL</span> <span class="o">=</span> <span class="s2">&quot;C&quot;</span>       <span class="c1"># Suitable values are [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;E&quot;]</span>
+
+<span class="n">SPEED</span> <span class="o">=</span> <span class="mf">10.0</span>          <span class="c1"># UT speed [m/s]. BSs are always assumed to be fixed.</span>
+                      <span class="c1"># The direction of travel will chosen randomly.</span>
+
+<span class="n">CDL</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">tr38901</span><span class="o">.</span><span class="n">CDL</span><span class="p">(</span><span class="n">CDL_MODEL</span><span class="p">,</span>
+                                 <span class="n">DELAY_SPREAD</span><span class="p">,</span>
+                                 <span class="n">CARRIER_FREQUENCY</span><span class="p">,</span>
+                                 <span class="n">UT_ARRAY</span><span class="p">,</span>
+                                 <span class="n">BS_ARRAY</span><span class="p">,</span>
+                                 <span class="n">DIRECTION</span><span class="p">,</span>
+                                 <span class="n">min_speed</span><span class="o">=</span><span class="n">SPEED</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The instance <code class="docutils literal notranslate"><span class="pre">CDL</span></code> of the CDL model can be used to generate batches of random realizations of continuous-time channel impulse responses, consisting of complex gains <code class="docutils literal notranslate"><span class="pre">a</span></code> and delays <code class="docutils literal notranslate"><span class="pre">tau</span></code> for each path. To account for time-varying channels, a channel impulse responses is sampled at the <code class="docutils literal notranslate"><span class="pre">sampling_frequency</span></code> for <code class="docutils literal notranslate"><span class="pre">num_time_samples</span></code> samples. For more details on this, please have a look at the API documentation of the channel models.</p>
+<p>In order to model the channel in the frequency domain, we need <code class="docutils literal notranslate"><span class="pre">num_ofdm_symbols</span></code> samples that are taken once per <code class="docutils literal notranslate"><span class="pre">ofdm_symbol_duration</span></code>, which corresponds to the length of an OFDM symbol plus the cyclic prefix.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">128</span> <span class="c1"># How many examples are processed by Sionna in parallel</span>
+
+<span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">CDL</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span>
+             <span class="n">num_time_steps</span><span class="o">=</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_ofdm_symbols</span><span class="p">,</span>
+             <span class="n">sampling_frequency</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">ofdm_symbol_duration</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="line-block">
+<div class="line">The path gains <code class="docutils literal notranslate"><span class="pre">a</span></code> have shape</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">[batch</span> <span class="pre">size,</span> <span class="pre">num_rx,</span> <span class="pre">num_rx_ant,</span> <span class="pre">num_tx,</span> <span class="pre">num_tx_ant,</span> <span class="pre">num_paths,</span> <span class="pre">num_time_steps]</span></code></div>
+<div class="line">and the delays <code class="docutils literal notranslate"><span class="pre">tau</span></code> have shape</div>
+<div class="line"><code class="docutils literal notranslate"><span class="pre">[batch_size,</span> <span class="pre">num_rx,</span> <span class="pre">num_tx,</span> <span class="pre">num_paths]</span></code>.</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the path gains: &quot;</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the delays:&quot;</span><span class="p">,</span> <span class="n">tau</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Shape of the path gains:  torch.Size([128, 1, 4, 1, 1, 24, 14])
+Shape of the delays: torch.Size([128, 1, 1, 24])
+</pre></div></div>
+</div>
+<p>The delays are assumed to be static within the time-window of interest. Only the complex path gains change over time. The following two figures depict the channel impulse response at a particular time instant and the time-evolution of the gain of one path, respectively.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">tau</span> <span class="o">=</span> <span class="n">tau</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Channel impulse response realization&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">tau</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:]</span><span class="o">/</span><span class="mf">1e-9</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\tau$ [ns]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$|a|$&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Time evolution of path gain&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_ofdm_symbols</span><span class="p">)</span><span class="o">*</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">ofdm_symbol_duration</span><span class="o">/</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">a</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_ofdm_symbols</span><span class="p">)</span><span class="o">*</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">ofdm_symbol_duration</span><span class="o">/</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">a</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,:])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;Real part&quot;</span><span class="p">,</span> <span class="s2">&quot;Imaginary part&quot;</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$t$ [us]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$a$&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_26_0.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_26_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_26_1.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_26_1.png" />
+</div>
+</div>
+<p>See the notebook <a class="reference external" href="https://nvlabs.github.io/sionna/phy/tutorials/notebooks/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO Simulations</a> for more advanced examples.</p>
+</section>
+<section id="Uplink-Transmission-in-the-Frequency-Domain">
+<h2>Uplink Transmission in the Frequency Domain<a class="headerlink" href="#Uplink-Transmission-in-the-Frequency-Domain" title="Link to this heading">#</a></h2>
+<p>We are now ready to simulate a transmission.</p>
+<p>In the following, the channel is simulated in the frequency domain. Therefore, the channel is assumed to be constant over the duration of an OFDM symbol, which leads to not simulating the intercarrier interference (ICI) that could occur due to channel aging over the duration of OFDM symbols.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">OFDMChannel</span></code> layer is used to simulate the channel in the frequency domain and takes care of sampling channel impulse responses, computing the frequency responses, and applying the channel transfer function to the channel inputs (including AWGN).</p>
+<p>Note that it is also possible to simulate the channel in time domain using the <code class="docutils literal notranslate"><span class="pre">TimeChannel</span></code> layer, which enables simulation of ICI. For more information, please have a look at the API documentation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_BITS_PER_SYMBOL</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># QPSK</span>
+<span class="n">CODERATE</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+<span class="c1"># Number of coded bits in a resource grid</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_data_symbols</span><span class="o">*</span><span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">)</span>
+<span class="c1"># Number of information bits in a resource grid</span>
+<span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">CODERATE</span><span class="p">)</span>
+
+<span class="c1"># The binary source will create batches of information bits</span>
+<span class="n">binary_source</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">BinarySource</span><span class="p">()</span>
+
+<span class="c1"># The encoder maps information bits to coded bits</span>
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">LDPC5GEncoder</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># The mapper maps blocks of information bits to constellation symbols</span>
+<span class="n">mapper</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Mapper</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">)</span>
+
+<span class="c1"># The resource grid mapper maps symbols onto an OFDM resource grid</span>
+<span class="n">rg_mapper</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">ResourceGridMapper</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="p">)</span>
+
+<span class="c1"># Frequency domain channel</span>
+<span class="n">channel</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">OFDMChannel</span><span class="p">(</span><span class="n">CDL</span><span class="p">,</span> <span class="n">RESOURCE_GRID</span><span class="p">,</span> <span class="n">add_awgn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># The LS channel estimator will provide channel estimates and error variances</span>
+<span class="n">ls_est</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">LSChannelEstimator</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="p">,</span> <span class="n">interpolation_type</span><span class="o">=</span><span class="s2">&quot;nn&quot;</span><span class="p">)</span>
+
+<span class="c1"># The LMMSE equalizer will provide soft symbols together with noise variance estimates</span>
+<span class="n">lmmse_equ</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">LMMSEEqualizer</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="p">,</span> <span class="n">STREAM_MANAGEMENT</span><span class="p">)</span>
+
+<span class="c1"># The demapper produces LLR for all coded bits</span>
+<span class="n">demapper</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Demapper</span><span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">)</span>
+
+<span class="c1"># The decoder provides hard-decisions on the information bits</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">hard_out</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s now simulate the transmission, and look at the shape of the layers outputs at each stage.</p>
+<p>The utility function <code class="docutils literal notranslate"><span class="pre">ebnodb2no</span></code> takes as additional input the resource grid to account for the pilots when computing the noise power spectral density ratio <span class="math notranslate nohighlight">\(N_0\)</span> from the energy per bit to noise power spectral density ratio <span class="math notranslate nohighlight">\(E_b/N_0\)</span> (in dB).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">no</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+                            <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">,</span>
+                            <span class="n">coderate</span><span class="o">=</span><span class="n">CODERATE</span><span class="p">,</span>
+                            <span class="n">resource_grid</span><span class="o">=</span><span class="n">RESOURCE_GRID</span><span class="p">)</span>
+
+<span class="c1"># Transmitter</span>
+<span class="n">bits</span> <span class="o">=</span> <span class="n">binary_source</span><span class="p">([</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">NUM_UT</span><span class="p">,</span> <span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_streams_per_tx</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of bits: &quot;</span><span class="p">,</span> <span class="n">bits</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">codewords</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of codewords: &quot;</span><span class="p">,</span> <span class="n">codewords</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">mapper</span><span class="p">(</span><span class="n">codewords</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of x: &quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">x_rg</span> <span class="o">=</span> <span class="n">rg_mapper</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of x_rg: &quot;</span><span class="p">,</span> <span class="n">x_rg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Channel</span>
+<span class="n">y</span><span class="p">,</span> <span class="n">h_freq</span> <span class="o">=</span> <span class="n">channel</span><span class="p">(</span><span class="n">x_rg</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of y_rg: &quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of h_freq: &quot;</span><span class="p">,</span> <span class="n">h_freq</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># Receiver</span>
+<span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span> <span class="o">=</span> <span class="n">ls_est</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of h_hat: &quot;</span><span class="p">,</span> <span class="n">h_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of err_var: &quot;</span><span class="p">,</span> <span class="n">err_var</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span> <span class="o">=</span> <span class="n">lmmse_equ</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of x_hat: &quot;</span><span class="p">,</span> <span class="n">x_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of no_eff: &quot;</span><span class="p">,</span> <span class="n">no_eff</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">llr</span> <span class="o">=</span> <span class="n">demapper</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of llr: &quot;</span><span class="p">,</span> <span class="n">llr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">bits_hat</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of bits_hat: &quot;</span><span class="p">,</span> <span class="n">bits_hat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Shape of bits:  torch.Size([128, 1, 1, 912])
+Shape of codewords:  torch.Size([128, 1, 1, 1824])
+Shape of x:  torch.Size([128, 1, 1, 912])
+Shape of x_rg:  torch.Size([128, 1, 1, 14, 76])
+Shape of y_rg:  torch.Size([128, 1, 4, 14, 76])
+Shape of h_freq:  torch.Size([128, 1, 4, 1, 1, 14, 76])
+Shape of h_hat:  torch.Size([128, 1, 4, 1, 1, 14, 76])
+Shape of err_var:  torch.Size([128, 1, 4, 1, 1, 14, 76])
+Shape of x_hat:  torch.Size([128, 1, 1, 912])
+Shape of no_eff:  torch.Size([128, 1, 1, 912])
+Shape of llr:  torch.Size([128, 1, 1, 1824])
+Shape of bits_hat:  torch.Size([128, 1, 1, 912])
+</pre></div></div>
+</div>
+<section id="Creating-an-End-to-End-System">
+<h3>Creating an End-to-End System<a class="headerlink" href="#Creating-an-End-to-End-System" title="Link to this heading">#</a></h3>
+<p>We can now combine all of the above components into a single <code class="docutils literal notranslate"><span class="pre">Block</span></code> that implements a complete transmission chain. In Sionna, the <code class="docutils literal notranslate"><span class="pre">Block</span></code> class is the fundamental building block for creating differentiable communication systems. It inherits from <code class="docutils literal notranslate"><span class="pre">torch.nn.Module</span></code> and provides additional functionality for managing device placement, precision, and random number generation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">OFDMSystem</span><span class="p">(</span><span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">Block</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Complete OFDM system for link-level simulations.</span>
+
+<span class="sd">    This class encapsulates the entire transmitter-channel-receiver chain</span>
+<span class="sd">    for an OFDM system with LDPC coding over a CDL channel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">perfect_csi</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">perfect_csi</span> <span class="o">=</span> <span class="n">perfect_csi</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_data_symbols</span><span class="o">*</span><span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">)</span> <span class="c1"># Number of coded bits</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">CODERATE</span><span class="p">)</span> <span class="c1"># Number of information bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+
+        <span class="c1"># The binary source will create batches of information bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">binary_source</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">BinarySource</span><span class="p">()</span>
+
+        <span class="c1"># The encoder maps information bits to coded bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">LDPC5GEncoder</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># The mapper maps blocks of information bits to constellation symbols</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Mapper</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">)</span>
+
+        <span class="c1"># The resource grid mapper maps symbols onto an OFDM resource grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rg_mapper</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">ResourceGridMapper</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="p">)</span>
+
+        <span class="c1"># Frequency domain channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">OFDMChannel</span><span class="p">(</span><span class="n">CDL</span><span class="p">,</span> <span class="n">RESOURCE_GRID</span><span class="p">,</span> <span class="n">add_awgn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">normalize_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_channel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># The LS channel estimator will provide channel estimates and error variances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ls_est</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">LSChannelEstimator</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="p">,</span> <span class="n">interpolation_type</span><span class="o">=</span><span class="s2">&quot;nn&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The LMMSE equalizer will provide soft symbols together with noise variance estimates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lmmse_equ</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">ofdm</span><span class="o">.</span><span class="n">LMMSEEqualizer</span><span class="p">(</span><span class="n">RESOURCE_GRID</span><span class="p">,</span> <span class="n">STREAM_MANAGEMENT</span><span class="p">)</span>
+
+        <span class="c1"># The demapper produces LLR for all coded bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">Demapper</span><span class="p">(</span><span class="s2">&quot;app&quot;</span><span class="p">,</span> <span class="s2">&quot;qam&quot;</span><span class="p">,</span> <span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">)</span>
+
+        <span class="c1"># The decoder provides hard-decisions on the information bits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">fec</span><span class="o">.</span><span class="n">ldpc</span><span class="o">.</span><span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">,</span> <span class="n">hard_out</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass through the OFDM system.&quot;&quot;&quot;</span>
+        <span class="n">no</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span> <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">NUM_BITS_PER_SYMBOL</span><span class="p">,</span> <span class="n">coderate</span><span class="o">=</span><span class="n">CODERATE</span><span class="p">,</span> <span class="n">resource_grid</span><span class="o">=</span><span class="n">RESOURCE_GRID</span><span class="p">)</span>
+
+        <span class="c1"># Transmitter</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">binary_source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">NUM_UT</span><span class="p">,</span> <span class="n">RESOURCE_GRID</span><span class="o">.</span><span class="n">num_streams_per_tx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">codewords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="p">(</span><span class="n">codewords</span><span class="p">)</span>
+        <span class="n">x_rg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rg_mapper</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># Channel</span>
+        <span class="n">y</span><span class="p">,</span> <span class="n">h_freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="n">x_rg</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+
+        <span class="c1"># Receiver</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">perfect_csi</span><span class="p">:</span>
+            <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span> <span class="o">=</span> <span class="n">h_freq</span><span class="p">,</span> <span class="mf">0.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ls_est</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+        <span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lmmse_equ</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">h_hat</span><span class="p">,</span> <span class="n">err_var</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span>
+        <span class="n">llr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span><span class="p">)</span>
+        <span class="n">bits_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">llr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">bits</span><span class="p">,</span> <span class="n">bits_hat</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Running-the-Simulation">
+<h3>Running the Simulation<a class="headerlink" href="#Running-the-Simulation" title="Link to this heading">#</a></h3>
+<p>Now we run BER simulations for both LS channel estimation and perfect CSI. The <code class="docutils literal notranslate"><span class="pre">PlotBER</span></code> utility makes it easy to run Monte Carlo simulations and plot the results.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">EBN0_DB_MIN</span> <span class="o">=</span> <span class="o">-</span><span class="mf">8.0</span> <span class="c1"># Minimum value of Eb/N0 [dB] for simulations</span>
+<span class="n">EBN0_DB_MAX</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="c1"># Maximum value of Eb/N0 [dB] for simulations</span>
+
+<span class="n">ber_plots</span> <span class="o">=</span> <span class="n">sn</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">PlotBER</span><span class="p">(</span><span class="s2">&quot;OFDM over 3GPP CDL&quot;</span><span class="p">)</span>
+
+<span class="n">model_ls</span> <span class="o">=</span> <span class="n">OFDMSystem</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ber_plots</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model_ls</span><span class="p">,</span>
+                  <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">EBN0_DB_MIN</span><span class="p">,</span> <span class="n">EBN0_DB_MAX</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                  <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span>
+                  <span class="n">num_target_block_errors</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># simulate until 100 block errors occurred</span>
+                  <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;LS Estimation&quot;</span><span class="p">,</span>
+                  <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="n">max_mc_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># run 100 Monte-Carlo simulations (each with batch_size samples)</span>
+                  <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+
+<span class="n">model_pcsi</span> <span class="o">=</span> <span class="n">OFDMSystem</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ber_plots</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model_pcsi</span><span class="p">,</span>
+                  <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">EBN0_DB_MIN</span><span class="p">,</span> <span class="n">EBN0_DB_MAX</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                  <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">,</span>
+                  <span class="n">num_target_block_errors</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># simulate until 100 block errors occurred</span>
+                  <span class="n">legend</span><span class="o">=</span><span class="s2">&quot;Perfect CSI&quot;</span><span class="p">,</span>
+                  <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="n">max_mc_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="c1"># run 100 Monte-Carlo simulations (each with batch_size samples)</span>
+                  <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+
+<span class="n">ber_plots</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+     -8.0 | 4.3150e-01 | 1.0000e+00 |       50372 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -7.421 | 4.2313e-01 | 1.0000e+00 |       49395 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -6.842 | 4.0915e-01 | 1.0000e+00 |       47762 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -6.263 | 4.0056e-01 | 1.0000e+00 |       46760 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -5.684 | 3.8882e-01 | 1.0000e+00 |       45389 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -5.105 | 3.7701e-01 | 1.0000e+00 |       44011 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -4.526 | 3.6298e-01 | 1.0000e+00 |       42373 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -3.947 | 3.4417e-01 | 1.0000e+00 |       40177 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -3.368 | 3.2861e-01 | 1.0000e+00 |       38361 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -2.789 | 3.0912e-01 | 1.0000e+00 |       36086 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -2.211 | 2.9042e-01 | 1.0000e+00 |       33903 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -1.632 | 2.6795e-01 | 1.0000e+00 |       31279 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -1.053 | 2.4026e-01 | 1.0000e+00 |       28047 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -0.474 | 2.0492e-01 | 1.0000e+00 |       23921 |      116736 |          128 |         128 |         0.0 |reached target block errors
+    0.105 | 1.4728e-01 | 9.8438e-01 |       17193 |      116736 |          126 |         128 |         0.0 |reached target block errors
+    0.684 | 3.0796e-02 | 4.4531e-01 |        7190 |      233472 |          114 |         256 |         0.1 |reached target block errors
+    1.263 | 4.7638e-04 | 1.0959e-02 |        4004 |     8404992 |          101 |        9216 |         2.2 |reached target block errors
+    1.842 | 0.0000e+00 | 0.0000e+00 |           0 |    11673600 |            0 |       12800 |         3.0 |reached max iterations
+
+Simulation stopped as no error occurred @ EbNo = 1.8 dB.
+
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+     -8.0 | 2.8361e-01 | 1.0000e+00 |       33108 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -7.421 | 2.6357e-01 | 1.0000e+00 |       30768 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -6.842 | 2.4973e-01 | 1.0000e+00 |       29153 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -6.263 | 2.2761e-01 | 1.0000e+00 |       26570 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -5.684 | 2.0400e-01 | 1.0000e+00 |       23814 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -5.105 | 1.7256e-01 | 1.0000e+00 |       20144 |      116736 |          128 |         128 |         0.0 |reached target block errors
+   -4.526 | 9.7425e-02 | 9.7656e-01 |       11373 |      116736 |          125 |         128 |         0.0 |reached target block errors
+   -3.947 | 1.5525e-02 | 3.8281e-01 |        5437 |      350208 |          147 |         384 |         0.1 |reached target block errors
+   -3.368 | 1.6076e-04 | 8.6806e-03 |        1689 |    10506240 |          100 |       11520 |         2.7 |reached target block errors
+   -2.789 | 0.0000e+00 | 0.0000e+00 |           0 |    11673600 |            0 |       12800 |         3.0 |reached max iterations
+
+Simulation stopped as no error occurred @ EbNo = -2.8 dB.
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Sionna_tutorial_part3_36_1.png" src="../../../_images/phy_tutorials_notebooks_Sionna_tutorial_part3_36_1.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Sionna_tutorial_part2.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Part 2: Differentiable Communication Systems</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Sionna_tutorial_part4.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Part 4: Toward Learned Receivers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Imports">Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#OFDM-Resource-Grid-and-Stream-Management">OFDM Resource Grid and Stream Management</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Stream-Management">Stream Management</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Resource-Grid">Resource Grid</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Antenna-Arrays">Antenna Arrays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Channel-Model">Channel Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Uplink-Transmission-in-the-Frequency-Domain">Uplink Transmission in the Frequency Domain</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Creating-an-End-to-End-System">Creating an End-to-End System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Running-the-Simulation">Running the Simulation</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/phy/tutorials/notebooks/Sionna_tutorial_part3.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

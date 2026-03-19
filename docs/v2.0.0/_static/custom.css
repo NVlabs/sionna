@@ -1,0 +1,120 @@
+/*
+SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+
+*/
+
+/* Hide the "Section Navigation" header in the left sidebar */
+.bd-links__title {
+    display: none !important;
+}
+
+/* Logo text (Sionna) in the top bar */
+.logo__title {
+    color: #76b900 !important;
+}
+
+
+.navbar-brand {
+    margin-right: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+/* Hide the "This Page" header in the secondary sidebar */
+.sidebar-secondary-item div[aria-label="source link"] h3 {
+    display: none;
+}
+
+/* Remove list styling from source link */
+.sidebar-secondary-item div[aria-label="source link"] ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Add file icon before source link */
+.sidebar-secondary-item div[aria-label="source link"] a::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 400;  /* Regular style */
+    content: "\f15c";  /* fa-file-lines icon */
+    margin-right: 0.4em;
+}
+
+/* Change heading font size and weight */
+h1 {
+    font-size: 2rem; /* Default is usually 2em or 32px depending on theme */
+    font-weight: 400;
+}
+
+h2 {
+    font-size: 1.5rem; /* Default is usually 2em or 32px depending on theme */
+    font-weight: 400;
+}
+
+/* Increase page margins (max-width) for main content container */
+.bd-container__inner {
+    max-width: 88rem;
+}
+
+/* Class/function signatures: compact, match body text, tight spacing */
+main article dl.py.class,
+main article dl.py.function {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+main article dt.sig,
+main article .sig,
+main article dt.sig .sig-name,
+main article dt.sig .sig-paren,
+main article dt.sig .sig-param,
+main article dt.sig span {
+    font-size: 0.9375rem !important;
+    line-height: 1.35 !important;
+    word-spacing: normal !important;
+    letter-spacing: normal !important;
+}
+main article dt.sig {
+    padding: 0.2em 0 !important;
+    margin: 0.15em 0 !important;
+    border: none !important;
+}
+main article dl.py.class > dt.sig + dd,
+main article dl.py.function > dt.sig + dd {
+    margin-top: 0.4em;
+    padding-top: 0.25em;
+}
+
+/* Do not highlight the class/function signature when the page is opened (e.g. with #anchor in URL) */
+main article dt.sig:target,
+main article .sig:target {
+    background: none !important;
+    box-shadow: none !important;
+}
+
+/* arXiv logo: keep transparent background, invert for dark mode */
+.arxiv-logo {
+    background: transparent !important;
+}
+html[data-theme="dark"] .arxiv-logo {
+    filter: brightness(0) invert(1);
+    background: transparent !important;
+}
+
+/* Bibliography: tighten entry text, space entries apart via backrefs */
+div.citation > p:not(.cite-backrefs) {
+    margin-bottom: 0.15em;
+}
+div.citation > p.cite-backrefs {
+    margin-top: 0;
+    margin-bottom: 0.3em !important;
+}
+
+/* Rubric headings (Note, Example, Attributes, Methods, etc.): line below, consistent style */
+p.rubric {
+    border-bottom: 1px solid var(--pst-color-border);
+    padding-bottom: 0.4em;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    font-size: 1.1rem;
+    font-weight: 600;
+}

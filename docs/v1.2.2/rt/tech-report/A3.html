@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<title>Appendix C Closed-Form Solution for First-Order Diffraction ‣ Sionna RT: Technical Report</title>
+<!--Generated on Fri Nov 21 10:28:12 2025 by LaTeXML (version 0.8.8) http://dlmf.nist.gov/LaTeXML/.-->
+<link href="LaTeXML.css" rel="stylesheet" type="text/css"/>
+<link href="ltx-article.css" rel="stylesheet" type="text/css"/>
+<meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+<link href="style.css" rel="stylesheet" type="text/css"/>
+<link href="./" rel="up" title="Sionna RT: Technical Report"/>
+<link href="./" rel="start" title="Sionna RT: Technical Report"/>
+</head>
+<body><div class="nav-panel"><div class="nav-panel-header"><h1 class="nav-panel-header-title">NVIDIA Sionna RT</h1><p class="nav-panel-header-subtitle">Technical Report</p></div><div class="nav-panel-content"><nav class="ltx_TOC"><h2 class="nav-panel-toc-title">Contents</h2><ul class="ltx_toclist"><li class="ltx_tocentry"><a class="ltx_tocentry" href="S1.html">Introduction</a></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S2.html">Essential Concepts and Terminology</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS1">Scene Objects and Meshes</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS2">Rays and Paths</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS3">Interactions with Scene Objects</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S2.html#SS4">Ray Tubes</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S3.html">Path Solver</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS1">Generating Candidates by Shooting and Bouncing of Rays (SBR)</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS2">Image Method-based Candidate Processing</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS3">Channel Coefficients, Delays, and Doppler Shifts Computation</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S3.html#SS4">Current Limitations and Potential Improvements</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="S4.html">Radio Map Solver</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS1">Definition of Radio Map</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS2">Computation of Radio Map without Diffraction</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS3">Computation of Radio Map due to Diffraction</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS4">Non-Coherent vs. Coherent Radio Maps</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS5">Handling Multiple Transmit Antennas</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="S4.html#SS6">Practical Notes</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="A1.html">Appendix: Primer on Electromagnetism</a><ul class="ltx_toclist ltx_toclist_subsections"><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS1">Coordinate System, Rotations, and Vector Fields</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS2">Planar Time-Harmonic Waves</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS3">Far Field of a Transmitting Antenna</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS4">Modeling of a Receiving Antenna</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS5">General Propagation Path</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS6">Frequency and Impulse Response</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS7">Specular Reflection and Refraction</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS8">Diffraction</a></li><li class="ltx_tocentry ltx_tocentry_subsection"><a class="ltx_tocentry ltx_tocentry_subsection" href="A1.html#SS9">Diffuse Reflection</a></li></ul></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="A2.html">Appendix: A Brief Overview of Importance Sampling</a></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="A3.html">Appendix: Closed-Form Solution for First-Order Diffraction</a></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="A4.html">Appendix: Weighting Factor for Diffraction Radio Maps</a></li><li class="ltx_tocentry"><a class="ltx_tocentry" href="bib.html">References</a></li></ul></nav></div></div>
+<div class="ltx_page_main">
+<header class="ltx_page_header">
+<div class="ltx_align_left"><a href="A2.html">← Previous</a></div><div class="ltx_align_right"><a href="A4.html">Next →</a></div><div class="ltx_align_center"><a href="index.html">Sionna RT: Technical Report</a></div></header>
+<div class="ltx_page_content">
+<section class="ltx_appendix ltx_authors_1line">
+<h1 class="ltx_title ltx_title_appendix">
+<span class="ltx_tag ltx_tag_appendix">Appendix C </span>Closed-Form Solution for First-Order Diffraction</h1>
+<div class="ltx_para" id="p1">
+<p class="ltx_p">For first-order diffraction, the position of the diffraction point can be determined in closed form.
+Consider a source <math alttext="\mathbf{s}" class="ltx_Math" display="inline" id="p1.m1"><mi>𝐬</mi></math>, a target <math alttext="\mathbf{t}" class="ltx_Math" display="inline" id="p1.m2"><mi>𝐭</mi></math>, and an edge defined by its direction <math alttext="\widehat{\mathbf{e}}" class="ltx_Math" display="inline" id="p1.m3"><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></math>.
+For convenience, we assume the edge passes through the origin of the coordinate system, denoted by <math alttext="\mathbf{o}" class="ltx_Math" display="inline" id="p1.m4"><mi>𝐨</mi></math>.</p>
+</div>
+<div class="ltx_para" id="p2">
+<p class="ltx_p">According to Fermat’s principle, the diffraction point <math alttext="\mathbf{v}" class="ltx_Math" display="inline" id="p2.m1"><mi>𝐯</mi></math> on the edge minimizes the total path length <math alttext="\mathbf{s}\rightarrow\mathbf{v}\rightarrow\mathbf{t}" class="ltx_Math" display="inline" id="p2.m2"><mrow><mi>𝐬</mi><mo stretchy="false">→</mo><mi>𝐯</mi><mo stretchy="false">→</mo><mi>𝐭</mi></mrow></math>. This corresponds to minimizing the function</p>
+<table class="ltx_equation ltx_eqn_table" id="E183">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="{\cal L}\left(x\right)=\left\lVert\mathbf{s}-\mathbf{v}\right\rVert_{2}+\left%
+\lVert\mathbf{v}-\mathbf{t}\right\rVert_{2}" class="ltx_Math" display="block" id="E183.m1"><mrow><mrow><mi class="ltx_font_mathcaligraphic">ℒ</mi><mo>⁢</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow><mo rspace="0.1389em">=</mo><mrow><msub><mrow><mo fence="true" lspace="0.1389em" rspace="0em">∥</mo><mrow><mi>𝐬</mi><mo>−</mo><mi>𝐯</mi></mrow><mo fence="true" lspace="0em" rspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub><mo>+</mo><msub><mrow><mo fence="true" lspace="0em" rspace="0em">∥</mo><mrow><mi>𝐯</mi><mo>−</mo><mi>𝐭</mi></mrow><mo fence="true" lspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub></mrow></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(183)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">where</p>
+<table class="ltx_equation ltx_eqn_table" id="E184">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\mathbf{v}=x\widehat{\mathbf{e}}." class="ltx_Math" display="block" id="E184.m1"><mrow><mrow><mi>𝐯</mi><mo>=</mo><mrow><mi>x</mi><mo>⁢</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(184)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">As shown in <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib22" title="">22</a>]</cite>, <math alttext="{\cal L}\left(\cdot\right)" class="ltx_Math" display="inline" id="p2.m3"><mrow><mi class="ltx_font_mathcaligraphic">ℒ</mi><mo>⁢</mo><mrow><mo>(</mo><mo lspace="0em" rspace="0em">⋅</mo><mo>)</mo></mrow></mrow></math> is strictly convex and thus has a unique minimizer.</p>
+</div>
+<div class="ltx_para" id="p3">
+<p class="ltx_p">We introduce the set of vectors <math alttext="\left(\widehat{\mathbf{u}}_{1},\widehat{\mathbf{u}}_{2},\widehat{\mathbf{u}}_{%
+3}\right)" class="ltx_Math" display="inline" id="p3.m1"><mrow><mo>(</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub><mo>)</mo></mrow></math>, where</p>
+<table class="ltx_equationgroup ltx_eqn_align ltx_eqn_table" id="Ax1.EGx28">
+<tbody id="E185"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_right ltx_eqn_cell"><math alttext="\displaystyle\widehat{\mathbf{u}}_{1}" class="ltx_Math" display="inline" id="E185.m1"><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub></math></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\frac{\mathbf{s}-\left(\widehat{\mathbf{e}}^{\mathsf{T}}\mathbf{%
+s}\right)\widehat{\mathbf{e}}}{\left\lVert\mathbf{s}-\left(\widehat{\mathbf{e}%
+}^{\mathsf{T}}\mathbf{s}\right)\widehat{\mathbf{e}}\right\rVert_{2}}" class="ltx_Math" display="inline" id="E185.m2"><mrow><mi></mi><mo>=</mo><mstyle displaystyle="true"><mfrac><mrow><mi>𝐬</mi><mo>−</mo><mrow><mrow><mo>(</mo><mrow><msup><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mi>𝖳</mi></msup><mo>⁢</mo><mi>𝐬</mi></mrow><mo>)</mo></mrow><mo>⁢</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mrow></mrow><msub><mrow><mo fence="true" rspace="0em">∥</mo><mrow><mi>𝐬</mi><mo>−</mo><mrow><mrow><mo>(</mo><mrow><msup><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mi>𝖳</mi></msup><mo>⁢</mo><mi>𝐬</mi></mrow><mo>)</mo></mrow><mo>⁢</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mrow></mrow><mo fence="true" lspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub></mfrac></mstyle></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(185)</span></td>
+</tr></tbody>
+<tbody id="E186"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_right ltx_eqn_cell"><math alttext="\displaystyle\widehat{\mathbf{u}}_{2}" class="ltx_Math" display="inline" id="E186.m1"><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub></math></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\frac{\mathbf{t}-\left(\widehat{\mathbf{e}}^{\mathsf{T}}\mathbf{%
+s}\right)\widehat{\mathbf{e}}}{\left\lVert\mathbf{t}-\left(\widehat{\mathbf{e}%
+}^{\mathsf{T}}\mathbf{s}\right)\widehat{\mathbf{e}}\right\rVert_{2}}" class="ltx_Math" display="inline" id="E186.m2"><mrow><mi></mi><mo>=</mo><mstyle displaystyle="true"><mfrac><mrow><mi>𝐭</mi><mo>−</mo><mrow><mrow><mo>(</mo><mrow><msup><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mi>𝖳</mi></msup><mo>⁢</mo><mi>𝐬</mi></mrow><mo>)</mo></mrow><mo>⁢</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mrow></mrow><msub><mrow><mo fence="true" rspace="0em">∥</mo><mrow><mi>𝐭</mi><mo>−</mo><mrow><mrow><mo>(</mo><mrow><msup><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mi>𝖳</mi></msup><mo>⁢</mo><mi>𝐬</mi></mrow><mo>)</mo></mrow><mo>⁢</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mrow></mrow><mo fence="true" lspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub></mfrac></mstyle></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(186)</span></td>
+</tr></tbody>
+<tbody id="E187"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_right ltx_eqn_cell"><math alttext="\displaystyle\widehat{\mathbf{u}}_{3}" class="ltx_Math" display="inline" id="E187.m1"><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub></math></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\begin{cases}\widehat{\mathbf{u}}_{1}\times\widehat{\mathbf{u}}_%
+{2}&amp;\text{ if }\widehat{\mathbf{u}}_{1}\times\widehat{\mathbf{u}}_{2}\neq%
+\mathbf{0}\\
+\widehat{\mathbf{e}}&amp;\text{ if }\widehat{\mathbf{u}}_{1}\times\widehat{\mathbf%
+{u}}_{2}=\mathbf{0}\end{cases}." class="ltx_Math" display="inline" id="E187.m2"><mrow><mrow><mi></mi><mo>=</mo><mrow><mo>{</mo><mtable columnspacing="5pt" rowspacing="0pt"><mtr><mtd class="ltx_align_left" columnalign="left"><mrow><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub><mo lspace="0.222em" rspace="0.222em">×</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub></mrow></mtd><mtd class="ltx_align_left" columnalign="left"><mrow><mrow><mrow><mtext> if </mtext><mo>⁢</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub></mrow><mo lspace="0.222em" rspace="0.222em">×</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub></mrow><mo>≠</mo><mn>𝟎</mn></mrow></mtd></mtr><mtr><mtd class="ltx_align_left" columnalign="left"><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mtd><mtd class="ltx_align_left" columnalign="left"><mrow><mrow><mrow><mtext> if </mtext><mo>⁢</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub></mrow><mo lspace="0.222em" rspace="0.222em">×</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub></mrow><mo>=</mo><mn>𝟎</mn></mrow></mtd></mtr></mtable></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(187)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">Note that <math alttext="\widehat{\mathbf{u}}_{3}=\pm\widehat{\mathbf{e}}" class="ltx_Math" display="inline" id="p3.m2"><mrow><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub><mo>=</mo><mrow><mo>±</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></mrow></mrow></math>, and that the source and the edge lie within the plane <math alttext="\left(\mathbf{o},\widehat{\mathbf{u}}_{1},\widehat{\mathbf{e}}\right)" class="ltx_Math" display="inline" id="p3.m3"><mrow><mo>(</mo><mi>𝐨</mi><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub><mo>,</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo>)</mo></mrow></math>.
+A key observation is that rotating the target <math alttext="\mathbf{t}" class="ltx_Math" display="inline" id="p3.m4"><mi>𝐭</mi></math> about the edge does not alter the path length.
+Specifically, let <math alttext="\mathbf{R}_{\widehat{\mathbf{u}}_{3}}\left(\phi\right)" class="ltx_Math" display="inline" id="p3.m5"><mrow><msub><mi>𝐑</mi><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub></msub><mo>⁢</mo><mrow><mo>(</mo><mi>ϕ</mi><mo>)</mo></mrow></mrow></math> denote the rotation matrix for an angle <math alttext="\phi" class="ltx_Math" display="inline" id="p3.m6"><mi>ϕ</mi></math> around the edge <math alttext="\left(\mathbf{o},\widehat{\mathbf{e}}\right)" class="ltx_Math" display="inline" id="p3.m7"><mrow><mo>(</mo><mi>𝐨</mi><mo>,</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo>)</mo></mrow></math>. Then,</p>
+<table class="ltx_equationgroup ltx_eqn_align ltx_eqn_table" id="Ax1.EGx29">
+<tbody id="E188"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_right ltx_eqn_cell"><math alttext="\displaystyle{\cal L}\left(x\right)" class="ltx_Math" display="inline" id="E188.m1"><mrow><mi class="ltx_font_mathcaligraphic">ℒ</mi><mo>⁢</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\left\lVert\mathbf{s}-\mathbf{v}\right\rVert_{2}+\left\lVert%
+\mathbf{v}-\mathbf{t}\right\rVert_{2}" class="ltx_Math" display="inline" id="E188.m2"><mrow><mi></mi><mo rspace="0.1389em">=</mo><mrow><msub><mrow><mo fence="true" lspace="0.1389em" rspace="0em">∥</mo><mrow><mi>𝐬</mi><mo>−</mo><mi>𝐯</mi></mrow><mo fence="true" lspace="0em" rspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub><mo>+</mo><msub><mrow><mo fence="true" lspace="0em" rspace="0em">∥</mo><mrow><mi>𝐯</mi><mo>−</mo><mi>𝐭</mi></mrow><mo fence="true" lspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub></mrow></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(188)</span></td>
+</tr></tbody>
+<tbody id="E189"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_eqn_cell"></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\left\lVert\mathbf{s}-\mathbf{v}\right\rVert_{2}+\lVert\mathbf{v%
+}-\underbrace{\mathbf{R}_{\widehat{\mathbf{u}}_{3}}\left(\phi\right)\mathbf{t}%
+}_{\mathbf{t}^{\prime}}\rVert_{2}" class="ltx_Math" display="inline" id="E189.m1"><mrow><mi></mi><mo rspace="0.1389em">=</mo><mrow><msub><mrow><mo fence="true" lspace="0.1389em" rspace="0em">∥</mo><mrow><mi>𝐬</mi><mo>−</mo><mi>𝐯</mi></mrow><mo fence="true" lspace="0em" rspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub><mo>+</mo><msub><mrow><mo fence="true" lspace="0em" rspace="0em">∥</mo><mrow><mi>𝐯</mi><mo>−</mo><munder><munder accentunder="true"><mrow><msub><mi>𝐑</mi><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub></msub><mo>⁢</mo><mrow><mo>(</mo><mi>ϕ</mi><mo>)</mo></mrow><mo>⁢</mo><mi>𝐭</mi></mrow><mo>⏟</mo></munder><msup><mi>𝐭</mi><mo>′</mo></msup></munder></mrow><mo fence="true" lspace="0em">∥</mo></mrow><mn>2</mn></msub></mrow></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(189)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">holds for any <math alttext="\phi\in\mathbb{R}" class="ltx_Math" display="inline" id="p3.m8"><mrow><mi>ϕ</mi><mo>∈</mo><mi>ℝ</mi></mrow></math>.
+Especially, by rotating the target around the axis (<math alttext="\mathbf{o},\widehat{\mathbf{u}}_{3}" class="ltx_Math" display="inline" id="p3.m9"><mrow><mi>𝐨</mi><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub></mrow></math>) by the angle</p>
+<table class="ltx_equation ltx_eqn_table" id="E191">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="\phi=\pi-\arccos\left(\widehat{\mathbf{u}}_{1}^{\mathsf{T}}\widehat{\mathbf{u}%
+}_{2}\right)," class="ltx_Math" display="block" id="E191.m1"><mrow><mrow><mi>ϕ</mi><mo>=</mo><mrow><mi>π</mi><mo>−</mo><mrow><mi>arccos</mi><mo>⁡</mo><mrow><mo>(</mo><mrow><msubsup><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn><mi>𝖳</mi></msubsup><mo>⁢</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub></mrow><mo>)</mo></mrow></mrow></mrow></mrow><mo>,</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(191)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">the rotated target <math alttext="\mathbf{t}^{\prime}" class="ltx_Math" display="inline" id="p3.m10"><msup><mi>𝐭</mi><mo>′</mo></msup></math> is placed in the same plane <math alttext="\left(\mathbf{o},\widehat{\mathbf{u}}_{1},\widehat{\mathbf{e}}\right)" class="ltx_Math" display="inline" id="p3.m11"><mrow><mo>(</mo><mi>𝐨</mi><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub><mo>,</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo>)</mo></mrow></math> as the source and the edge, but on the side opposite to the source with respect to the edge, as depicted in Figure <a class="ltx_ref" href="#F36" title="Figure 36 ‣ Appendix C Closed-Form Solution for First-Order Diffraction ‣ Sionna RT: Technical Report"><span class="ltx_text ltx_ref_tag">36</span></a>.
+The rotation matrix <math alttext="\mathbf{R}_{\widehat{\mathbf{u}}_{3}}\left(\phi\right)" class="ltx_Math" display="inline" id="p3.m12"><mrow><msub><mi>𝐑</mi><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>3</mn></msub></msub><mo>⁢</mo><mrow><mo>(</mo><mi>ϕ</mi><mo>)</mo></mrow></mrow></math> is given by Rodrigues’ rotation formula <cite class="ltx_cite ltx_citemacro_cite">[<a class="ltx_ref" href="bib.html#bib30" title="">30</a>]</cite>.</p>
+</div>
+<figure class="ltx_figure" id="F36">
+<div class="ltx_flex_figure">
+<div class="ltx_flex_cell ltx_flex_size_2">
+<figure class="ltx_figure ltx_figure_panel ltx_align_center" id="F36.sf1"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_portrait" data-scale-factor="0.3" data-scaled="x44.png" id="F36.sf1.g1" src="x44.png" style="width: 30.0%; height: auto; max-width: 291px; display: block; margin: 0 auto;"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(a)</span> </span><span class="ltx_text" style="font-size:90%;">View in the plane <math alttext="\left(\mathbf{o},\widehat{\mathbf{u}}_{1},\widehat{\mathbf{u}}_{2}\right)" class="ltx_Math" display="inline" id="F36.sf1.m3"><mrow><mo>(</mo><mi>𝐨</mi><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>2</mn></msub><mo>)</mo></mrow></math>, which is perpendicular to the edge <math alttext="\widehat{\mathbf{e}}" class="ltx_Math" display="inline" id="F36.sf1.m4"><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></math>.</span></figcaption>
+</figure>
+</div>
+<div class="ltx_flex_cell ltx_flex_size_2">
+<figure class="ltx_figure ltx_figure_panel ltx_align_center" id="F36.sf2"><img alt="Refer to caption" class="ltx_graphics ltx_centering ltx_img_square" data-scale-factor="0.4" data-scaled="x45.png" id="F36.sf2.g1" src="x45.png" style="width: 40.0%; height: auto; max-width: 415px; display: block; margin: 0 auto;"/>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">(b)</span> </span><span class="ltx_text" style="font-size:90%;">View in the plane <math alttext="\left(\mathbf{o},\widehat{\mathbf{u}}_{1},\widehat{\mathbf{e}}\right)" class="ltx_Math" display="inline" id="F36.sf2.m4"><mrow><mo>(</mo><mi>𝐨</mi><mo>,</mo><msub><mover accent="true"><mi>𝐮</mi><mo>^</mo></mover><mn>1</mn></msub><mo>,</mo><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo>)</mo></mrow></math>, containing <math alttext="\mathbf{s}" class="ltx_Math" display="inline" id="F36.sf2.m5"><mi>𝐬</mi></math>, the edge, and the rotated target <math alttext="\mathbf{t}^{\prime}" class="ltx_Math" display="inline" id="F36.sf2.m6"><msup><mi>𝐭</mi><mo>′</mo></msup></math>.</span></figcaption>
+</figure>
+</div>
+</div>
+<figcaption class="ltx_caption ltx_centering"><span class="ltx_tag ltx_tag_figure"><span class="ltx_text" style="font-size:90%;">Figure 36</span>: </span><span class="ltx_text" style="font-size:90%;">Illustration of rotating the target <math alttext="\mathbf{t}" class="ltx_Math" display="inline" id="F36.m10"><mi>𝐭</mi></math> about the edge <math alttext="\widehat{\mathbf{e}}" class="ltx_Math" display="inline" id="F36.m11"><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover></math> by the angle <math alttext="\phi" class="ltx_Math" display="inline" id="F36.m12"><mi>ϕ</mi></math> to obtain the rotated target <math alttext="\mathbf{t}^{\prime}" class="ltx_Math" display="inline" id="F36.m13"><msup><mi>𝐭</mi><mo>′</mo></msup></math>, which is coplanar with the source <math alttext="\mathbf{s}" class="ltx_Math" display="inline" id="F36.m14"><mi>𝐬</mi></math> and the edge. The diffraction point <math alttext="\mathbf{v}" class="ltx_Math" display="inline" id="F36.m15"><mi>𝐯</mi></math> is such that <math alttext="\mathbf{s}" class="ltx_Math" display="inline" id="F36.m16"><mi>𝐬</mi></math>, <math alttext="\mathbf{v}" class="ltx_Math" display="inline" id="F36.m17"><mi>𝐯</mi></math>, and <math alttext="\mathbf{t}^{\prime}" class="ltx_Math" display="inline" id="F36.m18"><msup><mi>𝐭</mi><mo>′</mo></msup></math> are collinear.</span></figcaption>
+</figure>
+<div class="ltx_para" id="p4">
+<p class="ltx_p">Minimizing <math alttext="{\cal L}\left(x\right)" class="ltx_Math" display="inline" id="p4.m1"><mrow><mi class="ltx_font_mathcaligraphic">ℒ</mi><mo>⁢</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math> with the rotated target <math alttext="\mathbf{t}^{\prime}" class="ltx_Math" display="inline" id="p4.m2"><msup><mi>𝐭</mi><mo>′</mo></msup></math> is equivalent to <math alttext="\mathbf{s}" class="ltx_Math" display="inline" id="p4.m3"><mi>𝐬</mi></math>, <math alttext="\mathbf{v}" class="ltx_Math" display="inline" id="p4.m4"><mi>𝐯</mi></math>, and <math alttext="\mathbf{t}^{\prime}" class="ltx_Math" display="inline" id="p4.m5"><msup><mi>𝐭</mi><mo>′</mo></msup></math> being collinear, i.e.</p>
+<table class="ltx_equationgroup ltx_eqn_align ltx_eqn_table" id="Ax1.EGx30">
+<tbody id="E192"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_right ltx_eqn_cell"><math alttext="\displaystyle(\mathbf{v}-\mathbf{s})\times\overrightarrow{\mathbf{s}\mathbf{t}%
+^{\prime}}" class="ltx_Math" display="inline" id="E192.m1"><mrow><mrow><mo stretchy="false">(</mo><mrow><mi>𝐯</mi><mo>−</mo><mi>𝐬</mi></mrow><mo rspace="0.055em" stretchy="false">)</mo></mrow><mo rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow></math></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\mathbf{0}" class="ltx_Math" display="inline" id="E192.m2"><mrow><mi></mi><mo>=</mo><mn>𝟎</mn></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(192)</span></td>
+</tr></tbody>
+<tbody id="E193"><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_td ltx_align_right ltx_eqn_cell"><math alttext="\displaystyle\Leftrightarrow\quad x\left(\widehat{\mathbf{e}}\times%
+\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}\right)" class="ltx_Math" display="inline" id="E193.m1"><mrow><mo stretchy="false">⇔</mo><mspace width="1em"></mspace><mrow><mi>x</mi><mo>⁢</mo><mrow><mo>(</mo><mrow><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow><mo>)</mo></mrow></mrow></mrow></math></td>
+<td class="ltx_td ltx_align_left ltx_eqn_cell"><math alttext="\displaystyle=\mathbf{s}\times\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}" class="ltx_Math" display="inline" id="E193.m2"><mrow><mi></mi><mo>=</mo><mrow><mi>𝐬</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(193)</span></td>
+</tr></tbody>
+</table>
+<p class="ltx_p">where <math alttext="\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}=\mathbf{t}^{\prime}-\mathbf{s}" class="ltx_Math" display="inline" id="p4.m6"><mrow><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover><mo>=</mo><mrow><msup><mi>𝐭</mi><mo>′</mo></msup><mo>−</mo><mi>𝐬</mi></mrow></mrow></math>.
+Since <math alttext="\widehat{\mathbf{e}}\times\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}" class="ltx_Math" display="inline" id="p4.m7"><mrow><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow></math> and <math alttext="\mathbf{s}\times\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}" class="ltx_Math" display="inline" id="p4.m8"><mrow><mi>𝐬</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow></math> are parallel, the solution for <math alttext="x" class="ltx_Math" display="inline" id="p4.m9"><mi>x</mi></math> is</p>
+<table class="ltx_equation ltx_eqn_table" id="E194">
+<tbody><tr class="ltx_equation ltx_eqn_row ltx_align_baseline">
+<td class="ltx_eqn_cell ltx_eqn_center_padleft"></td>
+<td class="ltx_eqn_cell ltx_align_center"><math alttext="x=\operatorname{sign}\left(\left[\widehat{\mathbf{e}}\times\overrightarrow{%
+\mathbf{s}\mathbf{t}^{\prime}}\right]^{\mathsf{T}}\left[\mathbf{s}\times%
+\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}\right]\right)\frac{\left\lVert%
+\mathbf{s}\times\overrightarrow{\mathbf{s}\mathbf{t}^{\prime}}\right\rVert_{2}%
+}{\left\lVert\widehat{\mathbf{e}}\times\overrightarrow{\mathbf{s}\mathbf{t}^{%
+\prime}}\right\rVert_{2}}." class="ltx_Math" display="block" id="E194.m1"><mrow><mrow><mi>x</mi><mo>=</mo><mrow><mrow><mi>sign</mi><mo>⁡</mo><mrow><mo>(</mo><mrow><msup><mrow><mo>[</mo><mrow><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow><mo>]</mo></mrow><mi>𝖳</mi></msup><mo>⁢</mo><mrow><mo>[</mo><mrow><mi>𝐬</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow><mo>]</mo></mrow></mrow><mo>)</mo></mrow></mrow><mo>⁢</mo><mfrac><msub><mrow><mo fence="true" rspace="0em">∥</mo><mrow><mi>𝐬</mi><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow><mo fence="true" lspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub><msub><mrow><mo fence="true" rspace="0em">∥</mo><mrow><mover accent="true"><mi>𝐞</mi><mo>^</mo></mover><mo lspace="0.222em" rspace="0.222em">×</mo><mover accent="true"><msup><mi>𝐬𝐭</mi><mo>′</mo></msup><mo stretchy="false">→</mo></mover></mrow><mo fence="true" lspace="0em" stretchy="true">∥</mo></mrow><mn>2</mn></msub></mfrac></mrow></mrow><mo lspace="0em">.</mo></mrow></math></td>
+<td class="ltx_eqn_cell ltx_eqn_center_padright"></td>
+<td class="ltx_eqn_cell ltx_eqn_eqno ltx_align_middle ltx_align_right" rowspan="1"><span class="ltx_tag ltx_tag_equation ltx_align_right">(194)</span></td>
+</tr></tbody>
+</table>
+</div>
+</section>
+</div>
+<footer class="ltx_page_footer">
+<div class="ltx_align_center">
+</div>
+<div class="ltx_page_logo">Generated  on Fri Nov 21 10:28:12 2025 by <a class="ltx_LaTeXML_logo" href="http://dlmf.nist.gov/LaTeXML/"><span style="letter-spacing:-0.2em; margin-right:0.1em;">L<span class="ltx_font_smallcaps" style="position:relative; bottom:2.2pt;">a</span>T<span class="ltx_font_smallcaps" style="font-size:120%;position:relative; bottom:-0.2ex;">e</span></span><span style="font-size:90%; position:relative; bottom:-0.2ex;">XML</span><img alt="Mascot Sammy" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAOCAYAAAD5YeaVAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9wKExQZLWTEaOUAAAAddEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q72QlbgAAAdpJREFUKM9tkL+L2nAARz9fPZNCKFapUn8kyI0e4iRHSR1Kb8ng0lJw6FYHFwv2LwhOpcWxTjeUunYqOmqd6hEoRDhtDWdA8ApRYsSUCDHNt5ul13vz4w0vWCgUnnEc975arX6ORqN3VqtVZbfbTQC4uEHANM3jSqXymFI6yWazP2KxWAXAL9zCUa1Wy2tXVxheKA9YNoR8Pt+aTqe4FVVVvz05O6MBhqUIBGk8Hn8HAOVy+T+XLJfLS4ZhTiRJgqIoVBRFIoric47jPnmeB1mW/9rr9ZpSSn3Lsmir1fJZlqWlUonKsvwWwD8ymc/nXwVBeLjf7xEKhdBut9Hr9WgmkyGEkJwsy5eHG5vN5g0AKIoCAEgkEkin0wQAfN9/cXPdheu6P33fBwB4ngcAcByHJpPJl+fn54mD3Gg0NrquXxeLRQAAwzAYj8cwTZPwPH9/sVg8PXweDAauqqr2cDjEer1GJBLBZDJBs9mE4zjwfZ85lAGg2+06hmGgXq+j3+/DsixYlgVN03a9Xu8jgCNCyIegIAgx13Vfd7vdu+FweG8YRkjXdWy329+dTgeSJD3ieZ7RNO0VAXAPwDEAO5VKndi2fWrb9jWl9Esul6PZbDY9Go1OZ7PZ9z/lyuD3OozU2wAAAABJRU5ErkJggg=="/></a>
+</div></footer>
+</div>
+</body>
+</html>

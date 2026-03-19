@@ -1,0 +1,1182 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zf_equalizer &#8212; Sionna 2.0.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=51b770b3"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'phy/api/mimo/sionna.phy.mimo.zf_equalizer';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/phy/api/mimo/sionna.phy.mimo.zf_equalizer.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="mf_equalizer" href="sionna.phy.mimo.mf_equalizer.html" />
+    <link rel="prev" title="lmmse_equalizer" href="sionna.phy.mimo.lmmse_equalizer.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorials/beginners.html">Beginners</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Hello_World.html">“Hello, world!”</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Sionna_tutorial_part1.html">Part 1: Getting Started with Sionna</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Sionna_tutorial_part2.html">Part 2: Differentiable Communication Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Sionna_tutorial_part3.html">Part 3: Advanced Link-level Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Sionna_tutorial_part4.html">Part 4: Toward Learned Receivers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Simple_MIMO_Simulation.html">Basic MIMO Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Pulse_Shaping_Basics.html">Pulse-shaping Basics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Optical_Lumped_Amplification_Channel.html">Optical Channel with Lumped Amplification</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorials/experts.html">Experts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding and Rate-Matching: Polar vs. LDPC Codes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/5G_NR_PUSCH.html">5G NR PUSCH Tutorial</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Bit_Interleaved_Coded_Modulation.html">Bit-Interleaved Coded Modulation (BICM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/MIMO_OFDM_Transmissions_over_CDL.html">MIMO OFDM Transmissions over the CDL Channel Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Neural_Receiver.html">Neural Receiver for OFDM SIMO Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Realistic_Multiuser_MIMO_Simulations.html">Realistic Multiuser MIMO OFDM Simulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/OFDM_MIMO_Detection.html">OFDM MIMO Channel Estimation and Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Introduction_to_Iterative_Detection_and_Decoding.html">Introduction to Iterative Detection and Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Autoencoder.html">End-to-end Learning with Autoencoders</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Weighted_BP_Algorithm.html">Weighted Belief Propagation Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Superimposed_Pilots.html">OFDM-based Communications with Superimposed Pilots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/CIR_Dataset.html">Channel Models from Datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/notebooks/Link_Level_Simulations_with_RT.html">Link-level simulations with Sionna RT</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../phy.html">API Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../block.html">Block</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../config.html">Configuration</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../channel/channel.html">Channel Models</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../channel/wireless/index.html">Wireless</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../channel/wireless/3gpp.html">3GPP 38.901</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.PanelArray.html">PanelArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.Antenna.html">Antenna</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.AntennaArray.html">AntennaArray</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.TDL.html">TDL</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.CDL.html">CDL</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.UMi.html">UMi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.UMa.html">UMa</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.tr38901.RMa.html">RMa</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../channel/wireless/awgn.html">AWGN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../channel/wireless/cir_dataset.html">CIRDataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../channel/wireless/channel_model.html">ChannelModel</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../channel/wireless/flat_fading.html">Flat Fading</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.FlatFadingChannel.html">FlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.GenerateFlatFadingChannel.html">GenerateFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.ApplyFlatFadingChannel.html">ApplyFlatFadingChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.SpatialCorrelation.html">SpatialCorrelation</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.KroneckerModel.html">KroneckerModel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.PerColumnModel.html">PerColumnModel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../channel/wireless/frequency_domain.html">Frequency (OFDM) Domain</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.OFDMChannel.html">OFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.GenerateOFDMChannel.html">GenerateOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.ApplyOFDMChannel.html">ApplyOFDMChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.cir_to_ofdm_channel.html">cir_to_ofdm_channel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4"><a class="reference internal" href="../channel/wireless/rayleigh_block_fading.html">RayleighBlockFading</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../channel/wireless/time_domain.html">Time Domain</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.TimeChannel.html">TimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.GenerateTimeChannel.html">GenerateTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.ApplyTimeChannel.html">ApplyTimeChannel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.cir_to_time_channel.html">cir_to_time_channel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.time_to_ofdm_channel.html">time_to_ofdm_channel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../channel/wireless/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.subcarrier_frequencies.html">subcarrier_frequencies</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.time_lag_discrete_time_channel.html">time_lag_discrete_time_channel</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.deg_2_rad.html">deg_2_rad</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.rad_2_deg.html">rad_2_deg</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.wrap_angle_0_360.html">wrap_angle_0_360</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.drop_uts_in_sector.html">drop_uts_in_sector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.relocate_uts.html">relocate_uts</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.set_3gpp_scenario_parameters.html">set_3gpp_scenario_parameters</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.gen_single_sector_topology.html">gen_single_sector_topology</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.gen_single_sector_topology_interferers.html">gen_single_sector_topology_interferers</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.exp_corr_mat.html">exp_corr_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../channel/wireless/sionna.phy.channel.one_ring_corr_mat.html">one_ring_corr_mat</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../channel/optical/optical.html">Optical</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../channel/optical/sionna.phy.channel.SSFM.html">SSFM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../channel/optical/sionna.phy.channel.EDFA.html">EDFA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../channel/optical/sionna.phy.channel.utils.time_frequency_vector.html">time_frequency_vector</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../channel/discrete/discrete.html">Discrete</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../fec/fec.html">Forward Error Correction (FEC)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/fec.linear.html">Linear Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.linear.LinearEncoder.html">LinearEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.linear.OSDecoder.html">OSDecoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/ldpc/index.html">Low-Density Parity-Check (LDPC)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.LDPC5GEncoder.html">LDPC5GEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.LDPCBPDecoder.html">LDPCBPDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.LDPC5GDecoder.html">LDPC5GDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/ldpc/node_update_functions.html">Node Update Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.vn_update_sum.html">vn_update_sum</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.cn_update_minsum.html">cn_update_minsum</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.cn_update_offset_minsum.html">cn_update_offset_minsum</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.cn_update_phi.html">cn_update_phi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.cn_update_tanh.html">cn_update_tanh</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/ldpc/decoder_callbacks.html">Decoder Callbacks</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.DecoderStatisticsCallback.html">DecoderStatisticsCallback</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.EXITCallback.html">EXITCallback</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/ldpc/sionna.phy.fec.ldpc.WeightedBPCallback.html">WeightedBPCallback</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/polar/index.html">Polar Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.Polar5GEncoder.html">Polar5GEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.PolarEncoder.html">PolarEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.Polar5GDecoder.html">Polar5GDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.PolarSCDecoder.html">PolarSCDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.PolarSCLDecoder.html">PolarSCLDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.PolarBPDecoder.html">PolarBPDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/polar/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.utils.generate_5g_ranking.html">generate_5g_ranking</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.utils.generate_polar_transform_mat.html">generate_polar_transform_mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.utils.generate_rm_code.html">generate_rm_code</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/polar/sionna.phy.fec.polar.utils.generate_dense_polar.html">generate_dense_polar</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/conv/index.html">Convolutional Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/conv/sionna.phy.fec.conv.ConvEncoder.html">ConvEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/conv/sionna.phy.fec.conv.ViterbiDecoder.html">ViterbiDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/conv/sionna.phy.fec.conv.BCJRDecoder.html">BCJRDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/conv/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/conv/sionna.phy.fec.conv.utils.polynomial_selector.html">polynomial_selector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/conv/sionna.phy.fec.conv.utils.Trellis.html">Trellis</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/turbo/index.html">Turbo Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/turbo/sionna.phy.fec.turbo.TurboEncoder.html">TurboEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/turbo/sionna.phy.fec.turbo.TurboDecoder.html">TurboDecoder</a></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/turbo/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/turbo/sionna.phy.fec.turbo.utils.polynomial_selector.html">polynomial_selector</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/turbo/sionna.phy.fec.turbo.utils.puncture_pattern.html">puncture_pattern</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/turbo/sionna.phy.fec.turbo.utils.TurboTermination.html">TurboTermination</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/fec.crc.html">Cyclic Redundancy Check (CRC)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.crc.CRCEncoder.html">CRCEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.crc.CRCDecoder.html">CRCDecoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/fec.interleaving.html">Interleaving</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.interleaving.RowColumnInterleaver.html">RowColumnInterleaver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.interleaving.RandomInterleaver.html">RandomInterleaver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.interleaving.Turbo3GPPInterleaver.html">Turbo3GPPInterleaver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.interleaving.Deinterleaver.html">Deinterleaver</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/fec.scrambling.html">Scrambling</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.scrambling.Scrambler.html">Scrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.scrambling.Descrambler.html">Descrambler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../fec/sionna.phy.fec.scrambling.TB5GScrambler.html">TB5GScrambler</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../fec/utils/index.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/utils/linear_codes.html">(Binary) Linear Codes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.load_parity_check_examples.html">load_parity_check_examples</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.alist2mat.html">alist2mat</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.load_alist.html">load_alist</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.generate_reg_ldpc.html">generate_reg_ldpc</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.make_systematic.html">make_systematic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.gm2pcm.html">gm2pcm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.pcm2gm.html">pcm2gm</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.verify_gm_pcm.html">verify_gm_pcm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/utils/exit_analysis.html">EXIT Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.plot_exit_chart.html">plot_exit_chart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.get_exit_analytic.html">get_exit_analytic</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.plot_trajectory.html">plot_trajectory</a></li>
+</ul>
+</details></li>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../fec/utils/miscellaneous.html">Miscellaneous</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.GaussianPriorSource.html">GaussianPriorSource</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.bin2int.html">bin2int</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.int2bin.html">int2bin</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.int_mod_2.html">int_mod_2</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.llr2mi.html">llr2mi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.j_fun.html">j_fun</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../fec/utils/sionna.phy.fec.utils.j_fun_inv.html">j_fun_inv</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../mapping/index.html">Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../mapping/Constellation.html">Constellation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mapping/Mapper.html">Mapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mapping/Demapper.html">Demapper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mapping/SymbolDemapper.html">SymbolDemapper</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../mapping/utils.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.BinarySource.html">BinarySource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.LLRs2SymbolLogits.html">LLRs2SymbolLogits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.pam.html">pam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.pam_gray.html">pam_gray</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.PAM2QAM.html">PAM2QAM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.PAMSource.html">PAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.qam.html">qam</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.QAM2PAM.html">QAM2PAM</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.QAMSource.html">QAMSource</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.SymbolInds2Bits.html">SymbolInds2Bits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.SymbolLogits2LLRs.html">SymbolLogits2LLRs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.SymbolLogits2Moments.html">SymbolLogits2Moments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../mapping/sionna.phy.mapping.SymbolSource.html">SymbolSource</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Multiple-Input Multiple-Output (MIMO)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="stream_management.html">StreamManagement</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="precoding.html">Precoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.cbf_precoding_matrix.html">cbf_precoding_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.rzf_precoding_matrix.html">rzf_precoding_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.rzf_precoder.html">rzf_precoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.grid_of_beams_dft_ula.html">grid_of_beams_dft_ula</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.grid_of_beams_dft.html">grid_of_beams_dft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.flatten_precoding_mat.html">flatten_precoding_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.normalize_precoding_power.html">normalize_precoding_power</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="equalization.html">Equalization</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.lmmse_matrix.html">lmmse_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.lmmse_equalizer.html">lmmse_equalizer</a></li>
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">zf_equalizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.mf_equalizer.html">mf_equalizer</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="detection.html">Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.LinearDetector.html">LinearDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.MaximumLikelihoodDetector.html">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.KBestDetector.html">KBestDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.EPDetector.html">EPDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.MMSEPICDetector.html">MMSEPICDetector</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="utility.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.List2LLR.html">List2LLR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.List2LLRSimple.html">List2LLRSimple</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.complex2real_vector.html">complex2real_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.real2complex_vector.html">real2complex_vector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.complex2real_matrix.html">complex2real_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.real2complex_matrix.html">real2complex_matrix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.complex2real_covariance.html">complex2real_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.real2complex_covariance.html">real2complex_covariance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.complex2real_channel.html">complex2real_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.real2complex_channel.html">real2complex_channel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="sionna.phy.mimo.whiten_channel.html">whiten_channel</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../nr/index.html">5G NR</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../nr/carrier.html">Carrier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.CarrierConfig.html">CarrierConfig</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../nr/layer_mapping.html">Layer Mapping</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.LayerMapper.html">LayerMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.LayerDemapper.html">LayerDemapper</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../nr/pusch.html">PUSCH</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHConfig.html">PUSCHConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHDMRSConfig.html">PUSCHDMRSConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHLSChannelEstimator.html">PUSCHLSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHPilotPattern.html">PUSCHPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHPrecoder.html">PUSCHPrecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHReceiver.html">PUSCHReceiver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.PUSCHTransmitter.html">PUSCHTransmitter</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../nr/transport_block.html">Transport Block</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.TBConfig.html">TBConfig</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.TBEncoder.html">TBEncoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.TBDecoder.html">TBDecoder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../nr/utils.html">Utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.calculate_tb_size.html">calculate_tb_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.generate_prng_seq.html">generate_prng_seq</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.decode_mcs_index.html">decode_mcs_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.calculate_num_coded_bits.html">calculate_num_coded_bits</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.TransportBlockNR.html">TransportBlockNR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.CodedAWGNChannelNR.html">CodedAWGNChannelNR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../nr/sionna.phy.nr.utils.MCSDecoderNR.html">MCSDecoderNR</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../object.html">Object</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ofdm/index.html">Orthogonal Frequency-Division Multiplexing (OFDM)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/resource_grid.html">Resource Grid</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.ResourceGrid.html">ResourceGrid</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.ResourceGridMapper.html">ResourceGridMapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.ResourceGridDemapper.html">ResourceGridDemapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.RemoveNulledSubcarriers.html">RemoveNulledSubcarriers</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/modulation.html">Modulation &amp; Demodulation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.OFDMModulator.html">OFDMModulator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.OFDMDemodulator.html">OFDMDemodulator</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/pilot_pattern.html">Pilot Pattern</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.PilotPattern.html">PilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.EmptyPilotPattern.html">EmptyPilotPattern</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.KroneckerPilotPattern.html">KroneckerPilotPattern</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/channel_estimation.html">Channel Estimation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.BaseChannelEstimator.html">BaseChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LSChannelEstimator.html">LSChannelEstimator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.BaseChannelInterpolator.html">BaseChannelInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.NearestNeighborInterpolator.html">NearestNeighborInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LinearInterpolator.html">LinearInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LMMSEInterpolator1D.html">LMMSEInterpolator1D</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LMMSEInterpolator.html">LMMSEInterpolator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.SpatialChannelFilter.html">SpatialChannelFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.tdl_freq_cov_mat.html">tdl_freq_cov_mat</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.tdl_time_cov_mat.html">tdl_time_cov_mat</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/precoding.html">Precoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.RZFPrecoder.html">RZFPrecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.PrecodedChannel.html">PrecodedChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.CBFPrecodedChannel.html">CBFPrecodedChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.EyePrecodedChannel.html">EyePrecodedChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.RZFPrecodedChannel.html">RZFPrecodedChannel</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/equalization.html">Equalization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.OFDMEqualizer.html">OFDMEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LMMSEEqualizer.html">LMMSEEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.ZFEqualizer.html">ZFEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.MFEqualizer.html">MFEqualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.PostEqualizationSINR.html">PostEqualizationSINR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LMMSEPostEqualizationSINR.html">LMMSEPostEqualizationSINR</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../ofdm/detection.html">Detection</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.OFDMDetector.html">OFDMDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.OFDMDetectorWithPrior.html">OFDMDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.LinearDetector.html">LinearDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.MaximumLikelihoodDetector.html">MaximumLikelihoodDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.MaximumLikelihoodDetectorWithPrior.html">MaximumLikelihoodDetectorWithPrior</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.KBestDetector.html">KBestDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.EPDetector.html">EPDetector</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../ofdm/sionna.phy.ofdm.MMSEPICDetector.html">MMSEPICDetector</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../signal/index.html">Signal</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../signal/filters.html">Filters</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.Filter.html">Filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.RaisedCosineFilter.html">RaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.RootRaisedCosineFilter.html">RootRaisedCosineFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.SincFilter.html">SincFilter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.CustomFilter.html">CustomFilter</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../signal/window_functions.html">Window functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.Window.html">Window</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.HannWindow.html">HannWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.HammingWindow.html">HammingWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.BlackmanWindow.html">BlackmanWindow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.CustomWindow.html">CustomWindow</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../signal/utility.html">Utility functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.convolve.html">convolve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.fft.html">fft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.ifft.html">ifft</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.empirical_psd.html">empirical_psd</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.empirical_aclr.html">empirical_aclr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.Upsampling.html">Upsampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../signal/sionna.phy.signal.Downsampling.html">Downsampling</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../utils/index.html">Utility Functions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/linear_algebra.html">Linear Algebra</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.inv_cholesky.html">inv_cholesky</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.matrix_pinv.html">matrix_pinv</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/metrics.html">Metrics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.compute_ber.html">compute_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.compute_bler.html">compute_bler</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.compute_ser.html">compute_ser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.count_block_errors.html">count_block_errors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.count_errors.html">count_errors</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/misc.html">Misc</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.complex_normal.html">complex_normal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.db_to_lin.html">db_to_lin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.dbm_to_watt.html">dbm_to_watt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.DeepUpdateDict.html">DeepUpdateDict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.dict_keys_to_int.html">dict_keys_to_int</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.ebnodb2no.html">ebnodb2no</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.hard_decisions.html">hard_decisions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.Interpolate.html">Interpolate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.lin_to_db.html">lin_to_db</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.MCSDecoder.html">MCSDecoder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.sample_bernoulli.html">sample_bernoulli</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.scalar_to_shaped_tensor.html">scalar_to_shaped_tensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.sim_ber.html">sim_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.SingleLinkChannel.html">SingleLinkChannel</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.SplineGriddataInterpolation.html">SplineGriddataInterpolation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.to_list.html">to_list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.TransportBlock.html">TransportBlock</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.watt_to_dbm.html">watt_to_dbm</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/numerics.html">Numerics</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.bisection_method.html">bisection_method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.expand_bound.html">expand_bound</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/plotting.html">Plotting</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.plot_ber.html">plot_ber</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.PlotBER.html">PlotBER</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/random.html">Random number generation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.randint.html">randint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.rand.html">rand</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.uniform.html">uniform</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.normal.html">normal</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/tensors.html">Tensors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.diag_part_axis.html">diag_part_axis</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.enumerate_indices.html">enumerate_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.expand_to_rank.html">expand_to_rank</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.find_true_position.html">find_true_position</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.flatten_dims.html">flatten_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.flatten_last_dims.html">flatten_last_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.flatten_multi_index.html">flatten_multi_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.gather_from_batched_indices.html">gather_from_batched_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.insert_dims.html">insert_dims</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.random_tensor_from_values.html">random_tensor_from_values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.split_dim.html">split_dim</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/sionna.phy.utils.tensor_values_are_in_set.html">tensor_values_are_in_set</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../developer/index.html">Developer Guides</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/dev_matrix_inversion.html">Matrix inversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/dev_rng.html">Random number generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../developer/dev_sionna_block.html">Sionna Block and Object</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Physical Layer (PHY)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../phy.html" class="nav-link">API Documentation</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Multiple-Input Multiple-Output (MIMO)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="equalization.html" class="nav-link">Equalization</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">zf_equalizer</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="zf-equalizer">
+<h1>zf_equalizer<a class="headerlink" href="#zf-equalizer" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="sionna.phy.mimo.zf_equalizer">
+<span class="sig-prename descclassname"><span class="pre">sionna.phy.mimo.</span></span><span class="sig-name descname"><span class="pre">zf_equalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'single'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'double'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><span class="pre">torch.Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../_modules/sionna/phy/mimo/equalization.html#zf_equalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#sionna.phy.mimo.zf_equalizer" title="Link to this definition">#</a></dt>
+<dd><p>MIMO ZF Equalizer.</p>
+<p>This function implements zero-forcing (ZF) equalization for a MIMO link, assuming the
+following model:</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{y} = \mathbf{H}\mathbf{x} + \mathbf{n}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{y}\in\mathbb{C}^M\)</span> is the received signal vector,
+<span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{C}^K\)</span> is the vector of transmitted symbols,
+<span class="math notranslate nohighlight">\(\mathbf{H}\in\mathbb{C}^{M\times K}\)</span> is the known channel matrix,
+and <span class="math notranslate nohighlight">\(\mathbf{n}\in\mathbb{C}^M\)</span> is a noise vector.
+It is assumed that <span class="math notranslate nohighlight">\(\mathbb{E}\left[\mathbf{x}\right]=\mathbb{E}\left[\mathbf{n}\right]=\mathbf{0}\)</span>,
+<span class="math notranslate nohighlight">\(\mathbb{E}\left[\mathbf{x}\mathbf{x}^{\mathsf{H}}\right]=\mathbf{I}_K\)</span> and
+<span class="math notranslate nohighlight">\(\mathbb{E}\left[\mathbf{n}\mathbf{n}^{\mathsf{H}}\right]=\mathbf{S}\)</span>.</p>
+<p>The estimated symbol vector <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\in\mathbb{C}^K\)</span> is given as
+(Eq. 4.10) <span id="id1">[<a class="reference internal" href="../../references.html#id11" title="E. Björnson, J. Hoydis, and L. Sanguinetti. Massive MIMO networks: spectral, energy, and hardware efficiency. Found. Trends Signal Process., 11(3-4):154–655, 2017. URL: https://massivemimobook.com.">BHS2017</a>]</span> :</p>
+<div class="math notranslate nohighlight">
+\[\hat{\mathbf{x}} = \mathbf{G}\mathbf{y}\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\mathbf{G} = \left(\mathbf{H}^{\mathsf{H}}\mathbf{H}\right)^{-1}\mathbf{H}^{\mathsf{H}}.\]</div>
+<p>This leads to the post-equalized per-symbol model:</p>
+<div class="math notranslate nohighlight">
+\[\hat{x}_k = x_k + e_k,\quad k=0,\dots,K-1\]</div>
+<p>where the variances <span class="math notranslate nohighlight">\(\sigma^2_k\)</span> of the effective residual noise
+terms <span class="math notranslate nohighlight">\(e_k\)</span> are given by the diagonal elements of the matrix</p>
+<div class="math notranslate nohighlight">
+\[\mathbb{E}\left[\mathbf{e}\mathbf{e}^{\mathsf{H}}\right]
+= \mathbf{G}\mathbf{S}\mathbf{G}^{\mathsf{H}}.\]</div>
+<p>The function returns <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> and
+<span class="math notranslate nohighlight">\(\boldsymbol{\sigma}^2=\left[\sigma^2_0,\dots, \sigma^2_{K-1}\right]^{\mathsf{T}}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – Received signals with shape […, M]</p></li>
+<li><p><strong>h</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – Channel matrices with shape […, M, K]</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.10)"><em>torch.Tensor</em></a>) – Noise covariance matrices with shape […, M, M]</p></li>
+<li><p><strong>precision</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'single'</em><em>, </em><em>'double'</em><em>] </em><em>| </em><em>None</em>) – Precision used for internal calculations and outputs.
+If set to <cite>None</cite>, <a class="reference internal" href="../config.html#sionna.phy.config.Config.precision" title="sionna.phy.config.Config.precision"><code class="xref py py-attr docutils literal notranslate"><span class="pre">precision</span></code></a> is used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Outputs<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>x_hat</strong> – […, K], <cite>torch.complex</cite>. Estimated symbol vectors.</p></li>
+<li><p><strong>no_eff</strong> – […, K], <cite>torch.float</cite>. Effective noise variance for each stream.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">complex64</span><span class="p">)</span>
+<span class="n">x_hat</span><span class="p">,</span> <span class="n">no_eff</span> <span class="o">=</span> <span class="n">zf_equalizer</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="sionna.phy.mimo.lmmse_equalizer.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">lmmse_equalizer</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="sionna.phy.mimo.mf_equalizer.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">mf_equalizer</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sionna.phy.mimo.zf_equalizer"><code class="docutils literal notranslate"><span class="pre">zf_equalizer()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/phy/api/mimo/sionna.phy.mimo.zf_equalizer.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1377 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>From GSM to 5G - The Evolution of Forward Error Correction &#8212; Sionna 2.0.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=51b770b3"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'phy/tutorials/notebooks/Evolution_of_FEC';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/phy/tutorials/notebooks/Evolution_of_FEC.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.0" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">From GSM to 5G - The Evolution of Forward Error Correction</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; align-items:center; gap:28px; background:transparent;">
+    <a href="https://colab.research.google.com/github/NVlabs/sionna/blob/v2.0.0/tutorials/phy/Evolution_of_FEC.ipynb" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <img alt="Colab logo" src="../../../_static/colab_logo.svg" style="width:18px; height:18px; background:transparent;">
+        <span>Run in Google Colab</span>
+    </a>
+    <a href="https://github.com/NVlabs/sionna/blob/v2.0.0/tutorials/phy/Evolution_of_FEC.ipynb" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+        <span>View on GitHub</span>
+    </a>
+    <a href="Evolution_of_FEC.ipynb" download target="_blank" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <span aria-hidden="true">⬇</span>
+        <span>Download notebook</span>
+    </a>
+</div><section id="From-GSM-to-5G---The-Evolution-of-Forward-Error-Correction">
+<h1>From GSM to 5G - The Evolution of Forward Error Correction<a class="headerlink" href="#From-GSM-to-5G---The-Evolution-of-Forward-Error-Correction" title="Link to this heading">#</a></h1>
+<p>This notebook compares the different FEC schemes from GSM via UMTS and LTE to 5G NR. Please note that a <em>fair</em> comparison of different coding schemes depends on many aspects such as:</p>
+<ul class="simple">
+<li><p>Decoding complexity, latency, and scalability</p></li>
+<li><p>Level of parallelism of the decoding algorithm and memory access patterns</p></li>
+<li><p>Error-floor behavior</p></li>
+<li><p>Rate adaptivity and flexibility</p></li>
+</ul>
+<section id="Table-of-Contents">
+<h2>Table of Contents<a class="headerlink" href="#Table-of-Contents" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#Configuration-and-Imports"><span class="std std-ref">Configuration and Imports</span></a></p></li>
+<li><p><a class="reference internal" href="#System-Model"><span class="std std-ref">System Model</span></a></p></li>
+<li><p><a class="reference internal" href="#Error-Rate-Simulations"><span class="std std-ref">Error Rate Simulations</span></a></p></li>
+<li><p><a class="reference internal" href="#Results-for-Longer-Codewords"><span class="std std-ref">Results for Longer Codewords</span></a></p></li>
+</ul>
+</section>
+<section id="Configuration-and-Imports">
+<h2>Configuration and Imports<a class="headerlink" href="#Configuration-and-Imports" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import Sionna</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sionna.phy</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+    <span class="k">if</span> <span class="s1">&#39;google.colab&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+       <span class="c1"># Install Sionna in Google Colab</span>
+       <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Installing Sionna and restarting the runtime. Please run the cell again.&quot;</span><span class="p">)</span>
+       <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;pip install sionna&quot;</span><span class="p">)</span>
+       <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+       <span class="k">raise</span> <span class="n">e</span>
+
+<span class="n">sionna</span><span class="o">.</span><span class="n">phy</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span> <span class="c1"># Set seed for reproducible random number generation</span>
+
+<span class="c1"># Load the required Sionna components</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapper</span><span class="p">,</span> <span class="n">Demapper</span><span class="p">,</span> <span class="n">Constellation</span><span class="p">,</span> <span class="n">BinarySource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.fec.polar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polar5GEncoder</span><span class="p">,</span> <span class="n">Polar5GDecoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.fec.ldpc</span><span class="w"> </span><span class="kn">import</span> <span class="n">LDPC5GEncoder</span><span class="p">,</span> <span class="n">LDPC5GDecoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.fec.conv</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConvEncoder</span><span class="p">,</span> <span class="n">ViterbiDecoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.fec.turbo</span><span class="w"> </span><span class="kn">import</span> <span class="n">TurboEncoder</span><span class="p">,</span> <span class="n">TurboDecoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ebnodb2no</span><span class="p">,</span> <span class="n">hard_decisions</span><span class="p">,</span> <span class="n">PlotBER</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.channel</span><span class="w"> </span><span class="kn">import</span> <span class="n">AWGN</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="System-Model">
+<h2>System Model<a class="headerlink" href="#System-Model" title="Link to this heading">#</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">System_Model</span><span class="p">(</span><span class="n">Block</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;System model for channel coding BER simulations.</span>
+
+<span class="sd">    This model allows to simulate BERs over an AWGN channel with</span>
+<span class="sd">    QAM modulation. Arbitrary FEC encoder/decoder layers can be used to</span>
+<span class="sd">    initialize the model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        k: int</span>
+<span class="sd">            number of information bits per codeword.</span>
+
+<span class="sd">        n: int</span>
+<span class="sd">            codeword length.</span>
+
+<span class="sd">        num_bits_per_symbol: int</span>
+<span class="sd">            number of bits per QAM symbol.</span>
+
+<span class="sd">        encoder: Sionna Block</span>
+<span class="sd">            A Sionna Block that encodes information bit tensors.</span>
+
+<span class="sd">        decoder: Sionna Block</span>
+<span class="sd">            A Sionna Block that decodes llr tensors.</span>
+
+<span class="sd">        demapping_method: str</span>
+<span class="sd">            A string denoting the demapping method. Can be either &quot;app&quot; or &quot;maxlog&quot;.</span>
+
+<span class="sd">        sim_esno: bool</span>
+<span class="sd">            A boolean defaults to False. If true, no rate-adjustment is done for the SNR calculation.</span>
+
+<span class="sd">    Input</span>
+<span class="sd">    -----</span>
+<span class="sd">        batch_size: int</span>
+<span class="sd">            The batch_size used for the simulation.</span>
+
+<span class="sd">        ebno_db: float</span>
+<span class="sd">            A float defining the simulation SNR.</span>
+
+<span class="sd">    Output</span>
+<span class="sd">    ------</span>
+<span class="sd">        (u, u_hat):</span>
+<span class="sd">            Tuple:</span>
+
+<span class="sd">        u: torch.Tensor</span>
+<span class="sd">            A tensor of shape `[batch_size, k] of 0s and 1s containing the transmitted information bits.</span>
+
+<span class="sd">        u_hat: torch.Tensor</span>
+<span class="sd">            A tensor of shape `[batch_size, k] of 0s and 1s containing the estimated information bits.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">k</span><span class="p">,</span>
+                 <span class="n">n</span><span class="p">,</span>
+                 <span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                 <span class="n">encoder</span><span class="p">,</span>
+                 <span class="n">decoder</span><span class="p">,</span>
+                 <span class="n">demapping_method</span><span class="o">=</span><span class="s2">&quot;app&quot;</span><span class="p">,</span>
+                 <span class="n">sim_esno</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># store values internally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_esno</span> <span class="o">=</span> <span class="n">sim_esno</span> <span class="c1"># disable rate-adjustment for SNR calc</span>
+
+        <span class="c1"># number of bit per QAM symbol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="n">num_bits_per_symbol</span>
+
+        <span class="c1"># init components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">BinarySource</span><span class="p">()</span>
+
+        <span class="c1"># initialize mapper and demapper for constellation object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constellation</span> <span class="o">=</span> <span class="n">Constellation</span><span class="p">(</span><span class="s2">&quot;qam&quot;</span><span class="p">,</span>
+                                <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span> <span class="o">=</span> <span class="n">Mapper</span><span class="p">(</span><span class="n">constellation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span> <span class="o">=</span> <span class="n">Demapper</span><span class="p">(</span><span class="n">demapping_method</span><span class="p">,</span>
+                                 <span class="n">constellation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">constellation</span><span class="p">)</span>
+
+        <span class="c1"># the channel can be replaced by more sophisticated models</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">AWGN</span><span class="p">()</span>
+
+        <span class="c1"># FEC encoder / decoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">ebno_db</span><span class="p">):</span>
+
+        <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">([</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">])</span> <span class="c1"># generate random data</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># uncoded transmission</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">u</span><span class="p">)</span> <span class="c1"># explicitly encode</span>
+
+        <span class="c1"># calculate noise variance</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_esno</span><span class="p">:</span>
+            <span class="n">no</span> <span class="o">=</span> <span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span>
+                       <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">coderate</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># uncoded transmission</span>
+                <span class="n">coderate</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">coderate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+
+            <span class="n">no</span> <span class="o">=</span> <span class="n">ebnodb2no</span><span class="p">(</span><span class="n">ebno_db</span><span class="p">,</span>
+                           <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                           <span class="n">coderate</span><span class="o">=</span><span class="n">coderate</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="c1"># map c to symbols x</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span> <span class="c1"># transmit over AWGN channel</span>
+
+        <span class="n">llr_ch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">demapper</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">no</span><span class="p">)</span> <span class="c1"># demap y to LLRs</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># uncoded transmission</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="n">hard_decisions</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">u_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">llr_ch</span><span class="p">)</span> <span class="c1"># run FEC decoder (incl. rate-recovery)</span>
+        <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">u_hat</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Error-Rate-Simulations">
+<h2>Error Rate Simulations<a class="headerlink" href="#Error-Rate-Simulations" title="Link to this heading">#</a></h2>
+<p>We now compare the different schemes for a codeword length of <span class="math notranslate nohighlight">\(n=1024\)</span> and coderate <span class="math notranslate nohighlight">\(r=0.5\)</span>.</p>
+<p>Let us define the codes to be simulated.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># code parameters</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">512</span> <span class="c1"># number of information bits per codeword</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1024</span> <span class="c1"># desired codeword length</span>
+<span class="n">codes_under_test</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Uncoded transmission</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Uncoded QPSK&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># Conv. code with Viterbi decoding</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">ConvEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">ViterbiDecoder</span><span class="p">(</span><span class="n">gen_poly</span><span class="o">=</span><span class="n">enc</span><span class="o">.</span><span class="n">gen_poly</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;soft_llr&quot;</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;GSM: Convolutional Codes&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># Turbo codes</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">TurboEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">TurboDecoder</span><span class="p">(</span><span class="n">encoder</span><span class="o">=</span><span class="n">enc</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;UMTS/LTE: Turbo Codes&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># LDPC codes</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">LDPC5GEncoder</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="n">encoder</span><span class="o">=</span><span class="n">enc</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;5G: LDPC&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># Polar codes</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">Polar5GEncoder</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">Polar5GDecoder</span><span class="p">(</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec_type</span><span class="o">=</span><span class="s2">&quot;hybSCL&quot;</span><span class="p">,</span> <span class="n">list_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;5G: Polar+CRC&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>Generate a new BER plot figure to save and plot simulation results efficiently.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ber_plot</span> <span class="o">=</span> <span class="n">PlotBER</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>And run the BER simulation for each code.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># QPSK</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span> <span class="c1"># sim SNR range</span>
+
+<span class="c1"># Params</span>
+<span class="c1"># Conv. code batchsize 40000, compile, 1000 Monte Carlo runs, 2000 block errors</span>
+
+<span class="c1"># run ber simulations for each code we have added to the list</span>
+<span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codes_under_test</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Running: &quot;</span> <span class="o">+</span> <span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="c1"># generate a new model with the given encoder/decoder</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">_dynamo</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">System_Model</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                         <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                         <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                         <span class="n">encoder</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="n">decoder</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="n">sim_esno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;5G: Polar+CRC&quot;</span><span class="p">:</span>
+        <span class="n">ber_plot</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
+                      <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">ebno_db</span><span class="p">,</span> <span class="c1"># SNR to simulate</span>
+                      <span class="n">legend</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="c1"># legend string for plotting</span>
+                      <span class="n">max_mc_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="c1"># run 1000 Monte Carlo runs per SNR point</span>
+                      <span class="n">num_target_block_errors</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="c1"># continue with next SNR point after 2000 block errors</span>
+                      <span class="n">target_bler</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span>
+                      <span class="n">batch_size</span><span class="o">=</span><span class="mi">40000</span><span class="p">,</span> <span class="c1"># batch-size per Monte Carlo run</span>
+                      <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># the model returns hard-estimates</span>
+                      <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># stop simulation if no error has been detected at current SNR point</span>
+                      <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># we show the figure after all results are simulated</span>
+                      <span class="n">add_bler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># in case BLER is also interesting</span>
+                      <span class="n">compile_mode</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+                      <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ber_plot</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">ebno_db</span><span class="p">,</span> <span class="c1"># SNR to simulate</span>
+                <span class="n">legend</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="c1"># legend string for plotting</span>
+                <span class="n">max_mc_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="c1"># run 1000 Monte Carlo runs per SNR point</span>
+                <span class="n">num_target_block_errors</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="c1"># continue with next SNR point after 2000 block errors</span>
+                <span class="n">target_bler</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="c1"># batch-size per Monte Carlo run</span>
+                <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># the model returns hard-estimates</span>
+                <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># stop simulation if no error has been detected at current SNR point</span>
+                <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># we show the figure after all results are simulated</span>
+                <span class="n">add_bler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># in case BLER is also interesting</span>
+                <span class="n">compile_mode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+ Running: Uncoded QPSK
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 7.8628e-02 | 1.0000e+00 |     1610302 |    20480000 |        40000 |       40000 |         3.7 |reached target block errors
+      0.2 | 7.3904e-02 | 1.0000e+00 |     1513555 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      0.4 | 6.9233e-02 | 1.0000e+00 |     1417898 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      0.6 | 6.4840e-02 | 1.0000e+00 |     1327929 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      0.8 | 6.0497e-02 | 1.0000e+00 |     1238981 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      1.0 | 5.6324e-02 | 1.0000e+00 |     1153516 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      1.2 | 5.2231e-02 | 1.0000e+00 |     1069684 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      1.4 | 4.8342e-02 | 1.0000e+00 |      990044 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      1.6 | 4.4507e-02 | 1.0000e+00 |      911502 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      1.8 | 4.0951e-02 | 1.0000e+00 |      838674 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      2.0 | 3.7518e-02 | 1.0000e+00 |      768365 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      2.2 | 3.4188e-02 | 1.0000e+00 |      700160 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      2.4 | 3.1158e-02 | 1.0000e+00 |      638114 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      2.6 | 2.8190e-02 | 1.0000e+00 |      577328 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      2.8 | 2.5506e-02 | 1.0000e+00 |      522371 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      3.0 | 2.2833e-02 | 1.0000e+00 |      467614 |    20480000 |        40000 |       40000 |         0.0 |reached target block errors
+      3.2 | 2.0466e-02 | 9.9995e-01 |      419145 |    20480000 |        39998 |       40000 |         0.0 |reached target block errors
+      3.4 | 1.8222e-02 | 9.9992e-01 |      373179 |    20480000 |        39997 |       40000 |         0.0 |reached target block errors
+      3.6 | 1.6182e-02 | 9.9980e-01 |      331406 |    20480000 |        39992 |       40000 |         0.0 |reached target block errors
+      3.8 | 1.4212e-02 | 9.9945e-01 |      291055 |    20480000 |        39978 |       40000 |         0.0 |reached target block errors
+      4.0 | 1.2512e-02 | 9.9855e-01 |      256242 |    20480000 |        39942 |       40000 |         0.0 |reached target block errors
+      4.2 | 1.0901e-02 | 9.9645e-01 |      223261 |    20480000 |        39858 |       40000 |         0.0 |reached target block errors
+      4.4 | 9.4591e-03 | 9.9192e-01 |      193723 |    20480000 |        39677 |       40000 |         0.0 |reached target block errors
+      4.6 | 8.1812e-03 | 9.8510e-01 |      167551 |    20480000 |        39404 |       40000 |         0.0 |reached target block errors
+      4.8 | 6.9707e-03 | 9.7398e-01 |      142759 |    20480000 |        38959 |       40000 |         0.0 |reached target block errors
+      5.0 | 5.9559e-03 | 9.5393e-01 |      121977 |    20480000 |        38157 |       40000 |         0.0 |reached target block errors
+      5.2 | 5.0305e-03 | 9.2463e-01 |      103024 |    20480000 |        36985 |       40000 |         0.0 |reached target block errors
+      5.4 | 4.2201e-03 | 8.8292e-01 |       86428 |    20480000 |        35317 |       40000 |         0.0 |reached target block errors
+      5.6 | 3.5176e-03 | 8.3620e-01 |       72041 |    20480000 |        33448 |       40000 |         0.0 |reached target block errors
+      5.8 | 2.9221e-03 | 7.7945e-01 |       59845 |    20480000 |        31178 |       40000 |         0.0 |reached target block errors
+      6.0 | 2.3646e-03 | 7.0175e-01 |       48426 |    20480000 |        28070 |       40000 |         0.0 |reached target block errors
+      6.2 | 1.9448e-03 | 6.3040e-01 |       39829 |    20480000 |        25216 |       40000 |         0.0 |reached target block errors
+      6.4 | 1.5654e-03 | 5.5017e-01 |       32060 |    20480000 |        22007 |       40000 |         0.0 |reached target block errors
+      6.6 | 1.2596e-03 | 4.7452e-01 |       25796 |    20480000 |        18981 |       40000 |         0.0 |reached target block errors
+      6.8 | 9.8237e-04 | 3.9410e-01 |       20119 |    20480000 |        15764 |       40000 |         0.0 |reached target block errors
+      7.0 | 7.8076e-04 | 3.2925e-01 |       15990 |    20480000 |        13170 |       40000 |         0.0 |reached target block errors
+      7.2 | 5.9370e-04 | 2.6122e-01 |       12159 |    20480000 |        10449 |       40000 |         0.0 |reached target block errors
+      7.4 | 4.6777e-04 | 2.1385e-01 |        9580 |    20480000 |         8554 |       40000 |         0.0 |reached target block errors
+      7.6 | 3.4971e-04 | 1.6390e-01 |        7162 |    20480000 |         6556 |       40000 |         0.0 |reached target block errors
+      7.8 | 2.5928e-04 | 1.2450e-01 |        5310 |    20480000 |         4980 |       40000 |         0.0 |reached target block errors
+
+ Running: GSM: Convolutional Codes
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 1.1227e-01 | 9.9995e-01 |     2299360 |    20480000 |        39998 |       40000 |         2.1 |reached target block errors
+      0.2 | 9.5169e-02 | 9.9962e-01 |     1949051 |    20480000 |        39985 |       40000 |         0.5 |reached target block errors
+      0.4 | 7.9482e-02 | 9.9897e-01 |     1627792 |    20480000 |        39959 |       40000 |         0.3 |reached target block errors
+      0.6 | 6.5401e-02 | 9.9690e-01 |     1339405 |    20480000 |        39876 |       40000 |         0.3 |reached target block errors
+      0.8 | 5.3041e-02 | 9.9190e-01 |     1086288 |    20480000 |        39676 |       40000 |         0.3 |reached target block errors
+      1.0 | 4.1970e-02 | 9.8082e-01 |      859547 |    20480000 |        39233 |       40000 |         0.3 |reached target block errors
+      1.2 | 3.2855e-02 | 9.5805e-01 |      672870 |    20480000 |        38322 |       40000 |         0.3 |reached target block errors
+      1.4 | 2.5128e-02 | 9.2017e-01 |      514622 |    20480000 |        36807 |       40000 |         0.3 |reached target block errors
+      1.6 | 1.8963e-02 | 8.6257e-01 |      388368 |    20480000 |        34503 |       40000 |         0.3 |reached target block errors
+      1.8 | 1.4204e-02 | 7.8838e-01 |      290889 |    20480000 |        31535 |       40000 |         0.3 |reached target block errors
+      2.0 | 1.0426e-02 | 6.9627e-01 |      213520 |    20480000 |        27851 |       40000 |         0.3 |reached target block errors
+      2.2 | 7.6054e-03 | 5.9980e-01 |      155759 |    20480000 |        23992 |       40000 |         0.3 |reached target block errors
+      2.4 | 5.3230e-03 | 4.9920e-01 |      109016 |    20480000 |        19968 |       40000 |         0.3 |reached target block errors
+      2.6 | 3.7516e-03 | 4.0048e-01 |       76832 |    20480000 |        16019 |       40000 |         0.3 |reached target block errors
+      2.8 | 2.6107e-03 | 3.1433e-01 |       53467 |    20480000 |        12573 |       40000 |         0.3 |reached target block errors
+      3.0 | 1.8174e-03 | 2.4133e-01 |       37220 |    20480000 |         9653 |       40000 |         0.3 |reached target block errors
+      3.2 | 1.1991e-03 | 1.7983e-01 |       24558 |    20480000 |         7193 |       40000 |         0.3 |reached target block errors
+      3.4 | 8.2046e-04 | 1.3430e-01 |       16803 |    20480000 |         5372 |       40000 |         0.3 |reached target block errors
+      3.6 | 5.5811e-04 | 9.9450e-02 |       11430 |    20480000 |         3978 |       40000 |         0.3 |reached target block errors
+      3.8 | 3.7876e-04 | 7.3075e-02 |        7757 |    20480000 |         2923 |       40000 |         0.3 |reached target block errors
+      4.0 | 2.6343e-04 | 5.5400e-02 |        5395 |    20480000 |         2216 |       40000 |         0.3 |reached target block errors
+      4.2 | 1.7263e-04 | 3.9988e-02 |        7071 |    40960000 |         3199 |       80000 |         0.6 |reached target block errors
+      4.4 | 1.1975e-04 | 2.9738e-02 |        4905 |    40960000 |         2379 |       80000 |         0.6 |reached target block errors
+      4.6 | 8.1803e-05 | 2.2525e-02 |        5026 |    61440000 |         2703 |      120000 |         0.9 |reached target block errors
+      4.8 | 5.8805e-05 | 1.6908e-02 |        3613 |    61440000 |         2029 |      120000 |         0.9 |reached target block errors
+      5.0 | 4.2505e-05 | 1.3150e-02 |        3482 |    81920000 |         2104 |      160000 |         1.2 |reached target block errors
+      5.2 | 3.1348e-05 | 1.0485e-02 |        3210 |   102400000 |         2097 |      200000 |         1.5 |reached target block errors
+      5.4 | 2.3424e-05 | 8.0143e-03 |        3358 |   143360000 |         2244 |      280000 |         2.1 |reached target block errors
+      5.6 | 1.6962e-05 | 6.2500e-03 |        2779 |   163840000 |         2000 |      320000 |         2.4 |reached target block errors
+      5.8 | 1.2775e-05 | 4.7659e-03 |        2878 |   225280000 |         2097 |      440000 |         3.3 |reached target block errors
+      6.0 | 9.8424e-06 | 3.7696e-03 |        2822 |   286720000 |         2111 |      560000 |         4.2 |reached target block errors
+      6.2 | 7.1045e-06 | 2.8764e-03 |        2619 |   368640000 |         2071 |      720000 |         5.3 |reached target block errors
+      6.4 | 5.4560e-06 | 2.2511e-03 |        2570 |   471040000 |         2071 |      920000 |         6.8 |reached target block errors
+      6.6 | 4.0645e-06 | 1.7259e-03 |        2414 |   593920000 |         2002 |     1160000 |         8.6 |reached target block errors
+      6.8 | 2.9635e-06 | 1.2936e-03 |        2367 |   798720000 |         2018 |     1560000 |        11.5 |reached target block errors
+      7.0 | 2.1747e-06 | 9.7212e-04 |        2316 |  1064960000 |         2022 |     2080000 |        15.4 |reached target block errors
+      7.2 | 1.6149e-06 | 7.3297e-04 |        2282 |  1413120000 |         2023 |     2760000 |        20.5 |reached target block errors
+      7.4 | 1.2724e-06 | 5.8488e-04 |        2241 |  1761280000 |         2012 |     3440000 |        25.7 |reached target block errors
+      7.6 | 9.1408e-07 | 4.2564e-04 |        2209 |  2416640000 |         2009 |     4720000 |        35.3 |reached target block errors
+      7.8 | 6.3213e-07 | 3.0015e-04 |        2162 |  3420160000 |         2005 |     6680000 |        50.2 |reached target block errors
+
+ Running: UMTS/LTE: Turbo Codes
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 1.2064e-01 | 9.8223e-01 |     2470616 |    20480000 |        39289 |       40000 |         5.8 |reached target block errors
+      0.2 | 1.0232e-01 | 9.3540e-01 |     2095564 |    20480000 |        37416 |       40000 |         4.0 |reached target block errors
+      0.4 | 8.0573e-02 | 8.2998e-01 |     1650143 |    20480000 |        33199 |       40000 |         3.9 |reached target block errors
+      0.6 | 5.5438e-02 | 6.4312e-01 |     1135365 |    20480000 |        25725 |       40000 |         3.9 |reached target block errors
+      0.8 | 3.2618e-02 | 4.1755e-01 |      668013 |    20480000 |        16702 |       40000 |         3.9 |reached target block errors
+      1.0 | 1.6011e-02 | 2.2515e-01 |      327899 |    20480000 |         9006 |       40000 |         4.0 |reached target block errors
+      1.2 | 6.3203e-03 | 9.6900e-02 |      129439 |    20480000 |         3876 |       40000 |         4.0 |reached target block errors
+      1.4 | 2.0092e-03 | 3.3075e-02 |       82296 |    40960000 |         2646 |       80000 |         7.9 |reached target block errors
+      1.6 | 4.7038e-04 | 8.7917e-03 |       57800 |   122880000 |         2110 |      240000 |        23.8 |reached target block errors
+      1.8 | 9.4348e-05 | 2.0490e-03 |       48306 |   512000000 |         2049 |     1000000 |        99.3 |reached target block errors
+      2.0 | 1.6878e-05 | 4.2500e-04 |       40788 |  2416640000 |         2006 |     4720000 |       471.2 |reached target block errors
+      2.2 | 2.3230e-06 | 8.2919e-05 |       28688 | 12349440000 |         2000 |    24120000 |      2401.6 |reached target block errors
+
+Simulation stopped as target BLER is reached @ EbNo = 2.2 dB.
+
+
+ Running: 5G: LDPC
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 1.6333e-01 | 9.8288e-01 |     3344916 |    20480000 |        39315 |       40000 |        24.0 |reached target block errors
+      0.2 | 1.4174e-01 | 9.3747e-01 |     2902925 |    20480000 |        37499 |       40000 |         0.8 |reached target block errors
+      0.4 | 1.1403e-01 | 8.2855e-01 |     2335248 |    20480000 |        33142 |       40000 |         0.8 |reached target block errors
+      0.6 | 8.1293e-02 | 6.4882e-01 |     1664888 |    20480000 |        25953 |       40000 |         0.8 |reached target block errors
+      0.8 | 5.0391e-02 | 4.3188e-01 |     1032010 |    20480000 |        17275 |       40000 |         0.8 |reached target block errors
+      1.0 | 2.5704e-02 | 2.3630e-01 |      526419 |    20480000 |         9452 |       40000 |         0.8 |reached target block errors
+      1.2 | 1.0866e-02 | 1.0540e-01 |      222529 |    20480000 |         4216 |       40000 |         0.8 |reached target block errors
+      1.4 | 3.6726e-03 | 3.6437e-02 |      150429 |    40960000 |         2915 |       80000 |         1.6 |reached target block errors
+      1.6 | 1.0378e-03 | 1.0630e-02 |      106272 |   102400000 |         2126 |      200000 |         4.1 |reached target block errors
+      1.8 | 2.0396e-04 | 2.3523e-03 |       91895 |   450560000 |         2070 |      880000 |        18.1 |reached target block errors
+      2.0 | 3.4650e-05 | 4.5293e-04 |       78770 |  2273280000 |         2011 |     4440000 |        94.0 |reached target block errors
+      2.2 | 5.3539e-06 | 9.0388e-05 |       60745 | 11345920000 |         2003 |    22160000 |       462.2 |reached target block errors
+
+Simulation stopped as target BLER is reached @ EbNo = 2.2 dB.
+
+
+ Running: 5G: Polar+CRC
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+      0.0 | 4.0623e-01 | 9.1406e-01 |       53246 |      131072 |          234 |         256 |        10.6 |reached target block errors
+      0.2 | 3.5043e-01 | 8.5156e-01 |       45931 |      131072 |          218 |         256 |        10.9 |reached target block errors
+      0.4 | 2.6915e-01 | 6.7969e-01 |       70555 |      262144 |          348 |         512 |        20.6 |reached target block errors
+      0.6 | 1.8696e-01 | 5.1367e-01 |       49010 |      262144 |          263 |         512 |        18.2 |reached target block errors
+      0.8 | 8.0093e-02 | 2.3730e-01 |       41992 |      524288 |          243 |        1024 |        33.5 |reached target block errors
+      1.0 | 5.0869e-02 | 1.5365e-01 |       40005 |      786432 |          236 |        1536 |        46.6 |reached target block errors
+      1.2 | 1.6019e-02 | 5.2734e-02 |       33595 |     2097152 |          216 |        4096 |       100.9 |reached target block errors
+      1.4 | 4.4879e-03 | 1.6872e-02 |       27647 |     6160384 |          203 |       12032 |       232.2 |reached target block errors
+      1.6 | 1.1732e-03 | 4.7348e-03 |       25373 |    21626880 |          200 |       42240 |       595.1 |reached target block errors
+      1.8 | 2.7621e-04 | 1.2245e-03 |       23098 |    83623936 |          200 |      163328 |      1504.1 |reached target block errors
+      2.0 | 5.0728e-05 | 2.5391e-04 |        6649 |   131072000 |           65 |      256000 |      1480.2 |reached max iterations
+
+Simulation stopped as target BLER is reached @ EbNo = 2.0 dB.
+
+</pre></div></div>
+</div>
+<p>And show the final performance</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># remove &quot;(BLER)&quot; labels from legend</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">legend</span><span class="p">):</span>
+    <span class="n">ber_plot</span><span class="o">.</span><span class="n">legend</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; (BLER)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="c1"># and plot the BLER</span>
+<span class="n">ber_plot</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mf">3.e-4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">show_ber</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Evolution_of_FEC_13_0.png" src="../../../_images/phy_tutorials_notebooks_Evolution_of_FEC_13_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># BER</span>
+<span class="n">ber_plot</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mf">2.e-7</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">show_bler</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Evolution_of_FEC_14_0.png" src="../../../_images/phy_tutorials_notebooks_Evolution_of_FEC_14_0.png" />
+</div>
+</div>
+</section>
+<section id="Results-for-Longer-Codewords">
+<h2>Results for Longer Codewords<a class="headerlink" href="#Results-for-Longer-Codewords" title="Link to this heading">#</a></h2>
+<p>In particular for the data channels, longer codewords are usually required. For these applications, LDPC and Turbo codes are the workhorse of 5G and LTE, respectively.</p>
+<p>Let’s compare LDPC and Turbo codes for <span class="math notranslate nohighlight">\(k=6144\)</span> information bits and coderate <span class="math notranslate nohighlight">\(r=1/3\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># code parameters</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">2048</span> <span class="c1"># number of information bits per codeword</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">6156</span> <span class="c1"># desired codeword length (including termination bits)</span>
+<span class="n">codes_under_test</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Uncoded QPSK</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Uncoded QPSK&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1">#Turbo. codes</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">TurboEncoder</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">constraint_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">terminate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">TurboDecoder</span><span class="p">(</span><span class="n">encoder</span><span class="o">=</span><span class="n">enc</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;UMTS/LTE: Turbo Codes&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># LDPC</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="n">LDPC5GEncoder</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">dec</span> <span class="o">=</span> <span class="n">LDPC5GDecoder</span><span class="p">(</span><span class="n">encoder</span><span class="o">=</span><span class="n">enc</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;5G: LDPC&quot;</span>
+<span class="n">codes_under_test</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">enc</span><span class="p">,</span> <span class="n">dec</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ber_plot_long</span> <span class="o">=</span> <span class="n">PlotBER</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error Rate Performance (k=</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">, n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">num_bits_per_symbol</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># QPSK</span>
+<span class="n">ebno_db</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.8</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span> <span class="c1"># sim SNR range</span>
+
+<span class="c1"># run ber simulations for each code we have added to the list</span>
+<span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">codes_under_test</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> Running: &quot;</span> <span class="o">+</span> <span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="c1"># generate a new model with the given encoder/decoder</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">_dynamo</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">System_Model</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                         <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                         <span class="n">num_bits_per_symbol</span><span class="o">=</span><span class="n">num_bits_per_symbol</span><span class="p">,</span>
+                         <span class="n">encoder</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                         <span class="n">decoder</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                         <span class="n">sim_esno</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># the first argument must be a callable (function) that yields u and u_hat for batch_size and ebno</span>
+    <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="c1"># the function have defined previously</span>
+                     <span class="n">ebno_dbs</span><span class="o">=</span><span class="n">ebno_db</span><span class="p">,</span> <span class="c1"># SNR to simulate</span>
+                     <span class="n">legend</span><span class="o">=</span><span class="n">code</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="c1"># legend string for plotting</span>
+                     <span class="n">max_mc_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="c1"># run 100 Monte Carlo runs per SNR point</span>
+                     <span class="n">num_target_block_errors</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="c1"># continue with next SNR point after 2000 bit errors</span>
+                     <span class="n">target_ber</span><span class="o">=</span><span class="mf">6e-7</span><span class="p">,</span>
+                     <span class="n">batch_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="c1"># batch-size per Monte Carlo run</span>
+                     <span class="n">soft_estimates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># the model returns hard-estimates</span>
+                     <span class="n">early_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># stop simulation if no error has been detected at current SNR point</span>
+                     <span class="n">show_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="c1"># we show the figure after all results are simulated</span>
+                     <span class="n">add_bler</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="c1"># in case BLER is also interesting</span>
+                     <span class="n">compile_mode</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span>
+                     <span class="n">forward_keyboard_interrupt</span><span class="o">=</span><span class="kc">False</span><span class="p">);</span> <span class="c1"># should be True in a loop</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+ Running: Uncoded QPSK
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+     -1.0 | 1.0375e-01 | 1.0000e+00 |     2124739 |    20480000 |        10000 |       10000 |         0.7 |reached target block errors
+     -0.9 | 1.0113e-01 | 1.0000e+00 |     2071076 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.8 | 9.8687e-02 | 1.0000e+00 |     2021105 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.7 | 9.6015e-02 | 1.0000e+00 |     1966395 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.6 | 9.3497e-02 | 1.0000e+00 |     1914813 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.5 | 9.0963e-02 | 1.0000e+00 |     1862918 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.4 | 8.8435e-02 | 1.0000e+00 |     1811152 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.3 | 8.6013e-02 | 1.0000e+00 |     1761549 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.2 | 8.3581e-02 | 1.0000e+00 |     1711741 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.1 | 8.1062e-02 | 1.0000e+00 |     1660141 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+     -0.0 | 7.8659e-02 | 1.0000e+00 |     1610927 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.1 | 7.6257e-02 | 1.0000e+00 |     1561750 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.2 | 7.3902e-02 | 1.0000e+00 |     1513507 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.3 | 7.1619e-02 | 1.0000e+00 |     1466756 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.4 | 6.9390e-02 | 1.0000e+00 |     1421104 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.5 | 6.7019e-02 | 1.0000e+00 |     1372548 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.6 | 6.4807e-02 | 1.0000e+00 |     1327239 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.7 | 6.2735e-02 | 1.0000e+00 |     1284815 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.8 | 6.0580e-02 | 1.0000e+00 |     1240671 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      0.9 | 5.8418e-02 | 1.0000e+00 |     1196393 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.0 | 5.6264e-02 | 1.0000e+00 |     1152291 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.1 | 5.4250e-02 | 1.0000e+00 |     1111047 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.2 | 5.2245e-02 | 1.0000e+00 |     1069980 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.3 | 5.0188e-02 | 1.0000e+00 |     1027842 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.4 | 4.8232e-02 | 1.0000e+00 |      987783 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.5 | 4.6363e-02 | 1.0000e+00 |      949523 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.6 | 4.4518e-02 | 1.0000e+00 |      911722 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+      1.7 | 4.2730e-02 | 1.0000e+00 |      875102 |    20480000 |        10000 |       10000 |         0.0 |reached target block errors
+
+ Running: UMTS/LTE: Turbo Codes
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+     -1.0 | 1.9291e-01 | 1.0000e+00 |     3950804 |    20480000 |        10000 |       10000 |        17.2 |reached target block errors
+     -0.9 | 1.8607e-01 | 1.0000e+00 |     3810786 |    20480000 |        10000 |       10000 |        14.7 |reached target block errors
+     -0.8 | 1.7869e-01 | 1.0000e+00 |     3659632 |    20480000 |        10000 |       10000 |        14.7 |reached target block errors
+     -0.7 | 1.7084e-01 | 1.0000e+00 |     3498859 |    20480000 |        10000 |       10000 |        14.7 |reached target block errors
+     -0.6 | 1.6148e-01 | 1.0000e+00 |     3307032 |    20480000 |        10000 |       10000 |        14.8 |reached target block errors
+     -0.5 | 1.5123e-01 | 9.9990e-01 |     3097118 |    20480000 |         9999 |       10000 |        14.8 |reached target block errors
+     -0.4 | 1.3898e-01 | 9.9930e-01 |     2846298 |    20480000 |         9993 |       10000 |        14.9 |reached target block errors
+     -0.3 | 1.2501e-01 | 9.9510e-01 |     2560299 |    20480000 |         9951 |       10000 |        14.8 |reached target block errors
+     -0.2 | 1.0689e-01 | 9.7480e-01 |     2189101 |    20480000 |         9748 |       10000 |        14.9 |reached target block errors
+     -0.1 | 8.4846e-02 | 9.1780e-01 |     1737649 |    20480000 |         9178 |       10000 |        14.8 |reached target block errors
+     -0.0 | 5.9150e-02 | 7.9580e-01 |     1211386 |    20480000 |         7958 |       10000 |        14.7 |reached target block errors
+      0.1 | 3.4908e-02 | 5.7950e-01 |      714911 |    20480000 |         5795 |       10000 |        14.7 |reached target block errors
+      0.2 | 1.7139e-02 | 3.5490e-01 |      351013 |    20480000 |         3549 |       10000 |        14.6 |reached target block errors
+      0.3 | 6.9062e-03 | 1.7410e-01 |      141439 |    20480000 |         1741 |       10000 |        14.7 |reached target block errors
+      0.4 | 2.3267e-03 | 6.7400e-02 |       47651 |    20480000 |          674 |       10000 |        14.7 |reached target block errors
+      0.5 | 5.5098e-04 | 1.9833e-02 |       33852 |    61440000 |          595 |       30000 |        43.8 |reached target block errors
+      0.6 | 1.2886e-04 | 5.4000e-03 |       26391 |   204800000 |          540 |      100000 |       146.0 |reached target block errors
+      0.7 | 1.9028e-05 | 1.0020e-03 |       19485 |  1024000000 |          501 |      500000 |       726.8 |reached target block errors
+      0.8 | 2.3351e-06 | 1.4749e-04 |       16212 |  6942720000 |          500 |     3390000 |      4924.7 |reached target block errors
+      0.9 | 2.8027e-07 | 2.9600e-05 |        5740 | 20480000000 |          296 |    10000000 |     14576.3 |reached max iterations
+
+Simulation stopped as target BER is reached @ EbNo = 0.9 dB.
+
+
+ Running: 5G: LDPC
+EbNo [dB] |        BER |       BLER |  bit errors |    num bits | block errors |  num blocks | runtime [s] |    status
+---------------------------------------------------------------------------------------------------------------------------------------
+     -1.0 | 2.3028e-01 | 1.0000e+00 |     4716178 |    20480000 |        10000 |       10000 |        25.7 |reached target block errors
+     -0.9 | 2.2436e-01 | 1.0000e+00 |     4594827 |    20480000 |        10000 |       10000 |         1.2 |reached target block errors
+     -0.8 | 2.1745e-01 | 1.0000e+00 |     4453366 |    20480000 |        10000 |       10000 |         1.2 |reached target block errors
+     -0.7 | 2.0868e-01 | 1.0000e+00 |     4273751 |    20480000 |        10000 |       10000 |         1.2 |reached target block errors
+     -0.6 | 1.9895e-01 | 9.9960e-01 |     4074446 |    20480000 |         9996 |       10000 |         1.2 |reached target block errors
+     -0.5 | 1.8486e-01 | 9.9870e-01 |     3786021 |    20480000 |         9987 |       10000 |         1.2 |reached target block errors
+     -0.4 | 1.6662e-01 | 9.9320e-01 |     3412417 |    20480000 |         9932 |       10000 |         1.2 |reached target block errors
+     -0.3 | 1.4036e-01 | 9.6450e-01 |     2874585 |    20480000 |         9645 |       10000 |         1.2 |reached target block errors
+     -0.2 | 1.0994e-01 | 8.9120e-01 |     2251642 |    20480000 |         8912 |       10000 |         1.2 |reached target block errors
+     -0.1 | 7.4402e-02 | 7.3570e-01 |     1523762 |    20480000 |         7357 |       10000 |         1.2 |reached target block errors
+     -0.0 | 4.5781e-02 | 5.3610e-01 |      937598 |    20480000 |         5361 |       10000 |         1.2 |reached target block errors
+      0.1 | 2.1748e-02 | 3.1300e-01 |      445406 |    20480000 |         3130 |       10000 |         1.2 |reached target block errors
+      0.2 | 8.5429e-03 | 1.3960e-01 |      174959 |    20480000 |         1396 |       10000 |         1.2 |reached target block errors
+      0.3 | 2.9373e-03 | 5.1500e-02 |       60156 |    20480000 |          515 |       10000 |         1.2 |reached target block errors
+      0.4 | 6.2913e-04 | 1.3050e-02 |       51538 |    81920000 |          522 |       40000 |         4.9 |reached target block errors
+      0.5 | 1.3983e-04 | 3.1813e-03 |       45821 |   327680000 |          509 |      160000 |        19.6 |reached target block errors
+      0.6 | 2.4656e-05 | 6.7200e-04 |       37872 |  1536000000 |          504 |      750000 |        97.6 |reached target block errors
+      0.7 | 2.7155e-06 | 1.3158e-04 |       21133 |  7782400000 |          500 |     3800000 |       479.8 |reached target block errors
+      0.8 | 3.9248e-07 | 3.7000e-05 |        8038 | 20480000000 |          370 |    10000000 |      1260.0 |reached max iterations
+
+Simulation stopped as target BER is reached @ EbNo = 0.8 dB.
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># and show the figure</span>
+<span class="n">ber_plot_long</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.7</span><span class="p">],</span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">6e-7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># we set the ylim to 1e-5 as otherwise more extensive simualtions would be required for accurate curves.</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Evolution_of_FEC_19_0.png" src="../../../_images/phy_tutorials_notebooks_Evolution_of_FEC_19_0.png" />
+</div>
+</div>
+<p>A comparison of short length codes can be found in the tutorial notebook <a class="reference external" href="https://nvlabs.github.io/sionna/phy/tutorials/notebooks/5G_Channel_Coding_Polar_vs_LDPC_Codes.html">5G Channel Coding Polar vs. LDPC Codes</a>.</p>
+</section>
+<section id="Final-Figure">
+<h2>Final Figure<a class="headerlink" href="#Final-Figure" title="Link to this heading">#</a></h2>
+<p>Combine results from the two simulations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">snrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_snrs</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">bers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_bers</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">legends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_legends</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">is_bler</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="n">ber_plot</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="n">ylabel</span> <span class="o">=</span> <span class="s2">&quot;BLER&quot;</span>
+
+<span class="c1"># generate two subplots</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+
+
+<span class="c1"># Part A</span>
+<span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bers</span><span class="p">):</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">b</span><span class="p">,</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$E_b/N_0$ (dB)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$k=512, n=1024$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+
+<span class="c1"># remove &quot;(BLER)&quot; labels from legend</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">legend</span><span class="p">):</span>
+    <span class="n">ber_plot_long</span><span class="o">.</span><span class="n">legend</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; (BLER)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+<span class="n">snrs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_snrs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">bers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_bers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">legends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_legends</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">is_bler</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">ber_plot_long</span><span class="o">.</span><span class="n">_is_bler</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+
+<span class="c1"># Part B</span>
+<span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">ylim</span><span class="o">=</span><span class="p">[</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$k=2048, n=6156$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># return figure handle</span>
+<span class="c1">#for idx, b in enumerate(bers):</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">snrs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">bers</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">)</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">which</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$E_b/N_0$ (dB)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">legends</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../../../build/doctrees/nbsphinx/phy_tutorials_notebooks_Evolution_of_FEC_22_0.png" src="../../../_images/phy_tutorials_notebooks_Evolution_of_FEC_22_0.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Table-of-Contents">Table of Contents</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Configuration-and-Imports">Configuration and Imports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#System-Model">System Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Error-Rate-Simulations">Error Rate Simulations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Results-for-Longer-Codewords">Results for Longer Codewords</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Final-Figure">Final Figure</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/phy/tutorials/notebooks/Evolution_of_FEC.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
