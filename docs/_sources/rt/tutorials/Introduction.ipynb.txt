@@ -21,6 +21,7 @@
     "Thanks to Dr.Jit's automatic gradient computation, gradients of functions of channel responses or radio maps with respect to most parameters of the ray tracing process, including material properties, antenna and scattering patterns, orientations, and positions of objects, can be efficiently computed and used in various gradient-based optimization problems.\n",
     "\n",
     "Sionna RT relies on Mitsuba 3 for the rendering and handling of scenes, e.g., its XML-file format.\n",
+    "When imported, Sionna RT automatically configures the correct [Mitsuba variant](https://mitsuba.readthedocs.io/en/stable/src/key_topics/variants.html) based on the available hardware.\n",
     "\n",
     "Scene files for Mitsuba 3 can be created, edited, and exported with the popular open-source 3D creation suite [Blender](https://www.blender.org/) and the [Mitsuba-Blender add-on](https://github.com/mitsuba-renderer/mitsuba-blender). One can rapdily create scenes from almost any place in the world using [OpenStreetMap](https://www.openstreetmap.org/) and the [Blender-OSM add-on](https://prochitecture.gumroad.com/l/blender-osm). In Sionna, scenes and radio propagation paths can be either rendered through the lens of configurable cameras via ray tracing or displayed with an integrated 3D viewer. For more detail on scene creation and rendering, we refer to [Sionna RT's API documentation](https://nvlabs.github.io/sionna/rt/api/rt.html) and the available [video tutorial](https://youtu.be/7xHLDxUaQ7c)."
    ]
@@ -35,17 +36,18 @@
   },
   {
    "cell_type": "code",
-   "execution_count": null,
+   "execution_count": 3,
    "id": "572e6856-2fbf-48c8-988d-fbb4f141f023",
-   "metadata": {
-    "execution": {
-     "iopub.execute_input": "2025-03-14T15:45:40.742237Z",
-     "iopub.status.busy": "2025-03-14T15:45:40.742011Z",
-     "iopub.status.idle": "2025-03-14T15:45:41.575875Z",
-     "shell.execute_reply": "2025-03-14T15:45:41.575172Z"
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Mitsuba variant: cuda_ad_mono_polarized\n"
+     ]
     }
-   },
-   "outputs": [],
+   ],
    "source": [
     "# Import or install Sionna\n",
     "try:\n",
@@ -58,13 +60,19 @@
     "# Other imports\n",
     "%matplotlib inline\n",
     "import matplotlib.pyplot as plt\n",
+    "import mitsuba as mi\n",
     "import numpy as np\n",
     "\n",
     "no_preview = True # Toggle to False to use the preview widget\n",
     "\n",
     "# Import relevant components from Sionna RT\n",
     "from sionna.rt import load_scene, PlanarArray, Transmitter, Receiver, Camera,\\\n",
-    "                      PathSolver, RadioMapSolver, subcarrier_frequencies"
+    "                      PathSolver, RadioMapSolver, subcarrier_frequencies\n",
+    "\n",
+    "# Query the Mitsuba variant that was automatically selected by Sionna RT.\n",
+    "# There should be no need to adjust it, but if you do, make sure to select\n",
+    "# a variant ending in `*_ad_mono_polarized`.\n",
+    "print(f\"Mitsuba variant: {mi.variant()}\")"
    ]
   },
   {
@@ -727,7 +735,7 @@
    "id": "ef5a9bc2-b183-4fcd-8788-2c77136b32ac",
    "metadata": {},
    "source": [
-    "Note that the delay of the first arriving path is by default normalized to zero. This behavior can be changed by setting the argument ``normalize_delays`` to `True`.\n",
+    "Note that the delay of the first arriving path is by default normalized to zero. This behavior can be changed by setting the argument ``normalize_delays`` to `False`.\n",
     "\n",
     "We can obtain the channel frequency response in a similar manner:"
    ]
@@ -996,7 +1004,7 @@
  ],
  "metadata": {
   "kernelspec": {
-   "display_name": "Python 3",
+   "display_name": "Python 3 (ipykernel)",
    "language": "python",
    "name": "python3"
   },
@@ -1010,7 +1018,7 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
-   "version": "3.12.11"
+   "version": "3.12.3"
   }
  },
  "nbformat": 4,
