@@ -286,6 +286,103 @@ class TestUMaScenario:
         assert torch.all(los_prob >= 0.0)
         assert torch.all(los_prob <= 1.0)
 
+    def test_h_e_discrete_values(self, device, precision):
+        """Test that h_E effective environment height is sampled from the correct
+        discrete set {12, 15, 18, ...} per TR 38.901 Table 7.4.1-1 Note 1,
+        not from a continuous distribution."""
+        ut_array, bs_array = create_arrays(CARRIER_FREQUENCY, device, precision)
+        scenario = UMaScenario(
+            carrier_frequency=CARRIER_FREQUENCY,
+            o2i_model="low",
+            ut_array=ut_array,
+            bs_array=bs_array,
+            direction="uplink",
+            precision=precision,
+            device=device,
+        )
+        dtype = torch.float32 if precision == "single" else torch.float64
+
+        # Use h_ut well above 13.5m so discrete set has multiple valid values
+        # Valid set for h_ut=22.5m: {12, 15, 18, 21} — 4 values
+        ut_loc = generate_random_loc(
+            BATCH_SIZE, NB_UT, (100, 2000), (100, 2000), (22.5, 22.5),
+            dtype=dtype, device=device
+        )
+        bs_loc = generate_random_loc(
+            BATCH_SIZE, NB_BS, (0, 100), (0, 100), (H_BS, H_BS),
+            dtype=dtype, device=device
+        )
+        ut_orientations = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+        bs_orientations = torch.zeros(BATCH_SIZE, NB_BS, 3, dtype=dtype, device=device)
+        ut_velocities   = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+        in_state = generate_random_bool(BATCH_SIZE, NB_UT, 0.5, device=device)
+
+        scenario.set_topology(
+            ut_loc, bs_loc, ut_orientations, bs_orientations, ut_velocities, in_state
+        )
+
+        # h_e = r + (1 - r) * s, where r is Bernoulli (0 or 1).
+        # When r=1, h_e=1.0 (fixed). When r=0, h_e=s from discrete set.
+        # We extract s by checking only the r=0 cases via h_e values > 1.0
+        h_e = scenario._h_e  # shape: [batch_size, num_bs, num_ut]
+        s_samples = h_e[h_e > 1.0]
+
+        if s_samples.numel() > 0:
+            # Every sampled value must be exactly 12, 15, 18, or 21
+            # Check: (s - 12) must be divisible by 3 with no remainder
+            remainders = torch.remainder(
+                s_samples - torch.tensor(12.0, dtype=dtype, device=device),
+                torch.tensor(3.0, dtype=dtype, device=device),
+            )
+            assert torch.all(remainders < 1e-4), (
+                "h_E samples are not from the discrete set {12, 15, 18, ...} "
+                "as required by TR 38.901 Table 7.4.1-1 Note 1"
+            )
+            # All values must be >= 12
+            assert torch.all(s_samples >= torch.tensor(12.0, dtype=dtype, device=device))
+
+    def test_h_e_edge_case_small_h_ut(self, device, precision):
+        """Test that when h_ut <= 13.5m, h_E defaults to 12m (only valid value)
+        per TR 38.901 Table 7.4.1-1 Note 1 edge case."""
+        ut_array, bs_array = create_arrays(CARRIER_FREQUENCY, device, precision)
+        scenario = UMaScenario(
+            carrier_frequency=CARRIER_FREQUENCY,
+            o2i_model="low",
+            ut_array=ut_array,
+            bs_array=bs_array,
+            direction="uplink",
+            precision=precision,
+            device=device,
+        )
+        dtype = torch.float32 if precision == "single" else torch.float64
+
+        # h_ut = 13.0m → max_value = 11.5m < 12m → only valid s is 12.0
+        ut_loc = generate_random_loc(
+            BATCH_SIZE, NB_UT, (100, 2000), (100, 2000), (13.0, 13.0),
+            dtype=dtype, device=device
+        )
+        bs_loc = generate_random_loc(
+            BATCH_SIZE, NB_BS, (0, 100), (0, 100), (H_BS, H_BS),
+            dtype=dtype, device=device
+        )
+        ut_orientations = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+        bs_orientations = torch.zeros(BATCH_SIZE, NB_BS, 3, dtype=dtype, device=device)
+        ut_velocities   = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+        in_state = generate_random_bool(BATCH_SIZE, NB_UT, 0.5, device=device)
+
+        scenario.set_topology(
+            ut_loc, bs_loc, ut_orientations, bs_orientations, ut_velocities, in_state
+        )
+
+        h_e = scenario._h_e
+        s_samples = h_e[h_e > 1.0]
+
+        if s_samples.numel() > 0:
+            # All s values must be exactly 12.0 when h_ut = 13.0m
+            assert torch.all(
+                torch.abs(s_samples - torch.tensor(12.0, dtype=dtype, device=device)) < 1e-4
+            ), "h_E must equal 12.0m when h_ut <= 13.5m"
+
 
 class TestUMiScenario:
     """Tests for UMiScenario"""
