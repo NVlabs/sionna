@@ -292,27 +292,38 @@ class UMaScenario(SystemLevelScenario):
         )
 
         max_value = h_ut - 1.5
-        # Random uniform integer generation is not supported when maxval and
-        # minval are not scalar. Therefore, we sample from a continuous
-        # distribution.
-        s = (
-            rand(
-                (batch_size, num_bs, num_ut),
-                dtype=self.dtype,
-                device=self.device,
-                generator=self.torch_rng,
-            )
-            * (max_value - 12.0)
-            + 12.0
+        # Per TR 38.901 Table 7.4.1-1 Note 1, h_E must be sampled from a
+        # discrete uniform distribution: {12, 15, 18, ..., h_UT - 1.5}.
+        # torch.randint does not support non-scalar bounds, so we sample
+        # U(0, 1) with scalar bounds and map to a discrete index instead.
+        n_values = torch.floor(
+            (max_value - torch.tensor(12.0, dtype=self.dtype, device=self.device))
+            / torch.tensor(3.0, dtype=self.dtype, device=self.device)
+        ) + torch.tensor(1.0, dtype=self.dtype, device=self.device)
+        n_values = torch.maximum(
+            n_values,
+            torch.tensor(1.0, dtype=self.dtype, device=self.device),
         )
-        # It could happen that h_ut = 13m, and therefore max_value < 13m
+        u = rand(
+            (batch_size, num_bs, num_ut),
+            dtype=self.dtype,
+            device=self.device,
+            generator=self.torch_rng,
+        )
+        s = (
+            torch.tensor(12.0, dtype=self.dtype, device=self.device)
+            + torch.tensor(3.0, dtype=self.dtype, device=self.device)
+            * torch.floor(u * n_values)
+        )
+        # Edge case: when h_ut <= 13.5m, max_value <= 12m, only valid value is 12
         s = torch.where(
-            s < 12.0,
+            max_value < torch.tensor(12.0, dtype=self.dtype, device=self.device),
             torch.tensor(12.0, dtype=self.dtype, device=self.device),
             s,
         )
 
         h_e = r + (1.0 - r) * s
+        self._update_attr("_h_e", h_e)
         h_bs_prime = h_bs - h_e
         h_ut_prime = h_ut - h_e
         distance_breakpoint = 4 * h_bs_prime * h_ut_prime * fc / SPEED_OF_LIGHT
