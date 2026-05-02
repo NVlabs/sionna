@@ -1099,8 +1099,11 @@ class SystemLevelScenario(Object):
             torch.tensor(0.0, dtype=self.dtype, device=self.device),
         )
 
-        # Sample the indoor 2D distances for each BS-UT link
-        distance_2d_in = (
+        # Sample the indoor 2D distances for each BS-UT link.
+        # Per TR 38.901 §7.4.3.1, d_2D-in = min(U1, U2) where U1 and U2
+        # are independent uniform samples over [min_2d_in, max_2d_in].
+        # A single uniform sample was used previously, which is incorrect.
+        u1 = (
             rand(
                 (self.batch_size, self.num_bs, self.num_ut),
                 dtype=self.dtype,
@@ -1109,7 +1112,18 @@ class SystemLevelScenario(Object):
             )
             * (self.max_2d_in - self.min_2d_in)
             + self.min_2d_in
-        ) * indoor_mask
+        )
+        u2 = (
+            rand(
+                (self.batch_size, self.num_bs, self.num_ut),
+                dtype=self.dtype,
+                device=self.device,
+                generator=self.torch_rng,
+            )
+            * (self.max_2d_in - self.min_2d_in)
+            + self.min_2d_in
+        )
+        distance_2d_in = torch.minimum(u1, u2) * indoor_mask
         self._update_attr("_distance_2d_in", distance_2d_in)
 
         # Compute the outdoor 2D distances

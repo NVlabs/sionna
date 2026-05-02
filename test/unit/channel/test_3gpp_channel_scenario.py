@@ -134,6 +134,86 @@ class TestRMaScenario:
         max_err = torch.max(torch.abs(d_2d - d_2d_in - d_2d_out) / d_2d)
         assert max_err <= MAX_ERR
 
+    def test_d2d_in_range_and_outdoor_zero(self, device, precision):
+        """Test that d_2D-in is within [0, max_2d_in] for indoor UTs and
+        exactly 0 for outdoor UTs, per TR 38.901 §7.4.3.1."""
+        ut_array, bs_array = create_arrays(CARRIER_FREQUENCY, device, precision)
+        scenario = RMaScenario(
+            carrier_frequency=CARRIER_FREQUENCY,
+            ut_array=ut_array,
+            bs_array=bs_array,
+            direction="uplink",
+            precision=precision,
+            device=device,
+        )
+        dtype = torch.float32 if precision == "single" else torch.float64
+
+        ut_loc = generate_random_loc(
+            BATCH_SIZE, NB_UT, (100, 2000), (100, 2000), (H_UT, H_UT),
+            dtype=dtype, device=device
+        )
+        bs_loc = generate_random_loc(
+            BATCH_SIZE, NB_BS, (0, 100), (0, 100), (H_BS, H_BS),
+            dtype=dtype, device=device
+        )
+        ut_orientations = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+        bs_orientations = torch.zeros(BATCH_SIZE, NB_BS, 3, dtype=dtype, device=device)
+        ut_velocities   = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+
+        # Force all UTs indoors so we get meaningful d_2d_in samples
+        in_state = torch.ones(BATCH_SIZE, NB_UT, dtype=torch.bool, device=device)
+
+        scenario.set_topology(
+            ut_loc, bs_loc, ut_orientations, bs_orientations, ut_velocities, in_state
+        )
+
+        d_2d_in = scenario.distance_2d_in
+        max_2d_in = scenario.max_2d_in.item()
+
+        # All indoor UTs must have d_2d_in in [0, max_2d_in]
+        assert torch.all(d_2d_in >= torch.tensor(0.0, dtype=dtype, device=device)), \
+            "d_2D-in must be >= 0 for all indoor UTs"
+        assert torch.all(d_2d_in <= torch.tensor(max_2d_in, dtype=dtype, device=device)), \
+            f"d_2D-in must be <= max_2d_in ({max_2d_in}m) for all indoor UTs"
+
+    def test_d2d_in_outdoor_uts_are_zero(self, device, precision):
+        """Test that d_2D-in is exactly 0 for all outdoor UTs."""
+        ut_array, bs_array = create_arrays(CARRIER_FREQUENCY, device, precision)
+        scenario = RMaScenario(
+            carrier_frequency=CARRIER_FREQUENCY,
+            ut_array=ut_array,
+            bs_array=bs_array,
+            direction="uplink",
+            precision=precision,
+            device=device,
+        )
+        dtype = torch.float32 if precision == "single" else torch.float64
+
+        ut_loc = generate_random_loc(
+            BATCH_SIZE, NB_UT, (100, 2000), (100, 2000), (H_UT, H_UT),
+            dtype=dtype, device=device
+        )
+        bs_loc = generate_random_loc(
+            BATCH_SIZE, NB_BS, (0, 100), (0, 100), (H_BS, H_BS),
+            dtype=dtype, device=device
+        )
+        ut_orientations = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+        bs_orientations = torch.zeros(BATCH_SIZE, NB_BS, 3, dtype=dtype, device=device)
+        ut_velocities   = torch.zeros(BATCH_SIZE, NB_UT, 3, dtype=dtype, device=device)
+
+        # Force all UTs outdoors
+        in_state = torch.zeros(BATCH_SIZE, NB_UT, dtype=torch.bool, device=device)
+
+        scenario.set_topology(
+            ut_loc, bs_loc, ut_orientations, bs_orientations, ut_velocities, in_state
+        )
+
+        d_2d_in = scenario.distance_2d_in
+
+        # All outdoor UTs must have d_2d_in exactly 0
+        assert torch.all(d_2d_in == torch.tensor(0.0, dtype=dtype, device=device)), \
+            "d_2D-in must be exactly 0 for all outdoor UTs"
+
     def test_get_param(self, device, precision):
         """Test the get_param() function retrieves correct values"""
         ut_array, bs_array = create_arrays(CARRIER_FREQUENCY, device, precision)
