@@ -100,6 +100,9 @@ During this audit, write only audit artifacts under `audit/` and local
 environment files needed for setup. Do not modify Sionna implementation,
 tests, tutorials, or documentation.
 
+Commit audit artifacts frequently on the `audit` branch so progress is not lost
+if a long-running review is interrupted.
+
 Every audit finding should be tied to at least one of:
 
 - a reproducible failure or minimal example,

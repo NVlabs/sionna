@@ -42,6 +42,8 @@ This file records user-provided decisions that constrain the audit.
 22. The audit should include ideas for improving implementations, making them
     more efficient, simpler, clearer, or easier to maintain. These are
     recommendations only and do not authorize source changes during this audit.
+23. Audit artifacts should be committed frequently on the `audit` branch to
+    preserve progress.
 
 ## Implications For The Audit
 
@@ -76,6 +78,8 @@ This file records user-provided decisions that constrain the audit.
   for file/function/class/method review.
 - Improvement ideas should be recorded separately from correctness findings and
   should include expected benefit, implementation risk, and validation needed.
+- Commit after each substantive audit increment, especially after adding new
+  checklists, reference material, report findings, or workstream results.
 
 ## Remaining Open Questions
 

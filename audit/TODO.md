@@ -180,6 +180,7 @@ be committed unless explicitly requested.
 - [x] Keep improvement opportunities separate from correctness bugs.
 - [x] Treat improvements as report recommendations only, not permission to edit
       source code during this audit.
+- [x] Commit audit artifacts frequently on the `audit` branch.
 
 ## Environment Setup Notes
 
