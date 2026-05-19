@@ -1,0 +1,168 @@
+\documentclass[10pt,logo]{nvidiatechreport}
+
+\usepackage{graphicx}
+\usepackage[acronym]{glossaries}
+\usepackage{siunitx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+\usepackage{subcaption}
+\captionsetup[subfigure]{justification=centering}
+\usepackage{nicefrac}
+\usepackage{framed}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\renewcommand*{\glossaryentrynumbers}[1]{}
+\makeglossaries
+
+
+\DeclareSymbolFont{matha}{OML}{txmi}{m}{it}% txfonts
+\DeclareMathSymbol{\varv}{\mathord}{matha}{118}
+
+% Custom box environment
+\definecolor{shadecolor}{rgb}{0.95, 0.95, 0.95}
+
+\newenvironment{highlightbox}[1]
+  {
+    \begin{shaded}
+    \noindent\textbf{\underline{\large #1}}\par\vspace{0.5em}
+  }
+  {
+    \end{shaded}
+  }
+
+\input{abbreviations.tex}
+\input{macros.tex}
+
+\renewcommand{\reportversion}{1.2}
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title and authors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\title{Sionna RT: Technical Report}
+\author{Fayçal Aït Aoudia, Jakob Hoydis, Merlin Nimier-David, Baptiste Nicolet, Sebastian Cammerer, and Alexander Keller}
+\correspondingauthor{faitaoudia@nvidia.com}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+	Sionna\texttrademark~is an open-source, GPU-accelerated library that, as of version 0.14, incorporates a ray tracer, Sionna~RT, for simulating radio wave propagation.
+	A unique feature of \SRT{} is differentiability, enabling the calculation of gradients for the \glspl{CIR}, radio maps, and other related metrics with respect to system and environmental parameters, such as material properties, antenna patterns, and array geometries.
+	The release of Sionna~1.0 provides a complete overhaul of the ray tracer, significantly improving its speed, memory efficiency, and extensibility.
+	This document details the algorithms employed by \SRT{} to simulate radio wave propagation efficiently, while also addressing their current limitations.
+	Given that the computation of \glspl{CIR} and radio maps requires distinct algorithms, these are detailed in separate sections.
+	For \glspl{CIR}, \SRT{} integrates \gls{SBR} with the image method and uses a hashing-based mechanism to efficiently eliminate duplicate paths. Radio maps are computed using a purely \gls{SBR}-based approach.
+\end{abstract}
+
+\glsresetall
+
+\abscontent
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% List of Acronyms
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%run "makeglossaries main"
+
+\printglossary[type=\acronymtype, title={List of Acronyms}]
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:introduction}
+\input{sections/introduction.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Essential Concepts and Terminology
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Essential Concepts and Terminology}
+\label{sec:essential-concepts}
+\input{sections/essential_concepts.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Architecture of the Path Solver
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Path Solver}
+\label{sec:path-solver}
+\input{sections/path_solver.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Architecture of the Radio Map Solver
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Radio Map Solver}
+\label{sec:radio-map-solver}
+\input{sections/radio_map_solver.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EM Primer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\appendix
+
+\section{Primer on Electromagnetism}
+\label{sec:primer-em}
+\input{sections/primer_em.tex}
+
+\section{A Brief Overview of Importance Sampling}
+\label{sec:importance-sampling}
+\input{sections/importance_sampling.tex}
+
+\section{Closed-Form Solution for First-Order Diffraction}
+\label{sec:diffraction-first-order}
+\input{sections/diffraction_first_order.tex}
+
+\section{Weighting Factor for Diffraction Radio Maps}
+\label{sec:diffraction-radio-map-weighting-factor}
+\input{sections/diffraction_radio_map_weighting_factor.tex}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Version History
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Version History}
+
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{cll}
+\hline
+\textbf{Version} & \textbf{Date} & \textbf{Description} \\
+\hline
+1.2 & September 2025 & Support for first-order diffraction and path solver improvements \\
+1.1 & June 2025 & Support for mesh-based measurement surfaces \\
+1.0 & April 2025 & \textbf{Major release:} Complete re-architecture of Sionna~RT \\
+\hline
+\end{tabular}
+\renewcommand{\arraystretch}{1.0}
+
+\newpage
+
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,bibliography}
+
+\end{document}

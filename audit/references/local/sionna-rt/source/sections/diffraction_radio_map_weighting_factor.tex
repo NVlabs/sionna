@@ -1,0 +1,38 @@
+This section details the computation of the weighting factor $\norm{ \frac{\delta \tv}{\delta x} \times \frac{\delta \tv}{\delta \phi} }$, required for the calculation of the radio map due to diffraction as described in Section~\ref{sec:radio-map-solver-diffraction}.
+Recall that $\tv(x, \phi)$ denotes the reparametrization of a point on the measurement cell $M_i$ reached by a diffracted ray originating from the diffraction point $\vv$ on the edge $\Ec$, with $\phi$ representing the Keller cone azimuth.
+
+We begin by rewriting~\eqref{eq:radio-map-solver-ci-D-reparametrization} as
+\begin{equation}
+    \label{eq:diffraction-radio-map-weighting-factor-reparametrization}
+    \tv(x,\phi) = \vv(x) + \gamma \widehat{\kv}_s(x, \phi),
+\end{equation}
+where $\vv(x) = \ov + x \widehat{\ev}$ is the diffraction point along the edge $\Ec$, and $\widehat{\kv}_s$ denotes the direction of the diffracted ray, defined by the Keller cone azimuth $\phi$ and the opening angle $\beta_0'$:
+\begin{equation}
+    \label{eq:diffraction-radio-map-weighting-factor-kv-s}
+    \widehat{\kv}_s(x, \phi) = \sin\beta_0' \cos\phi\, \widehat{\tv}_0 + \sin\beta_0' \sin\phi\, \widehat{\nv}_0 + \cos\beta_0'\, \widehat{\ev}.
+\end{equation}
+The dependencies of $\vv$ and $\widehat{\kv}_s$ on $x$ and $\phi$ are shown explicitly for clarity.
+Let $\widehat{\nv}$ denote the normal to the measurement cell $M_i$, and $K$ a point on the plane containing the measurement cell.
+Since $\tv$ lies on $M_i$, $\gamma$ can be found by requiring
+\begin{equation}
+    \nv\tp \LB \tv(x, \phi) - K \RB = 0
+\end{equation}
+which yields
+\begin{equation}
+    \label{eq:diffraction-radio-map-weighting-factor-gamma}
+    \gamma = \frac{\nv\tp \LB K - \vv(x) \RB}{\nv\tp \widehat{\kv}_s(x, \phi)}.
+\end{equation}
+Additionally, for a fixed source position $\sv$, the angle of incidence $\beta_0'$ depends on the location of the diffraction point $\vv(x)$ along edge $\Ec$
+\begin{equation}
+    \begin{aligned}
+        \cos\beta_0' &= \frac{\norm{\vv(x) - \sv_{\Ec}}}{\norm{\vv(x) - \sv}}, \\
+        \sin\beta_0' &= \frac{\norm{\sv - \sv_{\Ec}}}{\norm{\vv(x) - \sv}}
+    \end{aligned}
+    \label{eq:diffraction-radio-map-weighting-factor-beta-0}
+\end{equation}
+where $\sv_{\Ec}$ denotes the projection of the source point $\sv$ onto the edge $\Ec$.
+
+Equations~\eqref{eq:diffraction-radio-map-weighting-factor-reparametrization}, \eqref{eq:diffraction-radio-map-weighting-factor-kv-s}, \eqref{eq:diffraction-radio-map-weighting-factor-gamma}, and \eqref{eq:diffraction-radio-map-weighting-factor-beta-0} together provide the reparametrization of $\tv$ in terms of $x$ and $\phi$, for a given source position $\sv$.
+In \SRT{}, the derivatives of $\tv$ with respect to $x$ and $\phi$ are computed via automatic differentiation.
+Specifically, Dr.Jit~\cite{Jakob2022DrJit} is employed to obtain $\frac{\delta \tv}{\delta x} \in \RR^3$ and $\frac{\delta \tv}{\delta \phi} \in \RR^3$ by differentiating through these equations. The weighting factor is then evaluated as the norm of the cross product of these two derivatives.
+One could also have implemented the derivatives by hand, but using automatic differentiation simplifies the implementation without incurring significant overhead.

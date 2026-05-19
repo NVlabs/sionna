@@ -1,0 +1,44 @@
+This section provides a brief overview of importance sampling~\cite{Kloek1978, Wikipedia_Importance_Sampling} in the context of ray tracing for the simulation of radio wave propagation.
+We consider the channel gain $g$~\eqref{eq:channel-gain}.
+To account for a continuum of paths, such as those arising from diffuse reflections, we generalize the gain from a discrete sum to a path integral:
+\begin{equation}
+    g = \int_{\Pc} \abs{a(p)}^2 d\mu(p) .\label{eq:channel-gain-continue}
+\end{equation}
+Here, $\Pc$ represents the high-dimensional space of all possible propagation paths from the transmitter to the receiver.
+A single element $p \in \Pc$ denotes a specific path.
+The term $a(p)$ is the path coefficient associated with that path, and $\mu(p)$ is the measure on the path space $\Pc$.
+For a more in-depth discussion of path integrals within ray tracing, see~\cite[Chapter 8]{Veach:1997:RMC}.
+
+We aim to estimate the channel gain $g$ using $N_S$ samples, by sampling paths following a distribution $q(p)$, such that $q(p) > 0$ if $\abs{a(p)}^2 > 0$ and $\int_{\Pc} q(p) d\mu(p) = 1$.
+The estimate of the channel gain is then given by:
+\begin{equation}
+    \widehat{g} = \frac{1}{N_S} \sum_{n=1}^{N_S} \frac{\abs{a(p_n)}^2}{q(p_n)}. \label{eq:channel-gain-estimate}
+\end{equation}
+An important consideration is that the estimate $\widehat{g}$ is unbiased, i.e., $\mathbb{E}[\widehat{g}] = g$ for any sampling distribution $q(\cdot)$.
+Therefore, we aim to choose the sampling distribution $q(\cdot)$ such that the variance of the estimate $\widehat{g}$ is minimized.
+Practically, this would result in estimating the channel gain with a smaller number of samples $N_S$, i.e., achieving a higher sample efficiency.
+The variance of the estimator $\widehat{g}$ is given by:
+\begin{align}
+    \text{Var}(\widehat{g}) &= \mathbb{E}[\widehat{g}^2] - g^2 \\
+                            &= \frac{1}{N_S^2}\mathbb{E}\left[ \sum_{n=1}^{N_S} \sum_{m=1}^{N_S} \frac{\abs{a(p_n)}^2 \abs{a(p_m)}^2}{q(p_n) q(p_m)} \right] - g^2 \\
+                            &= \frac{1}{N_S}\left(\mathbb{E} \left[ \left( \frac{\abs{a(p)}^2}{q(p)} \right)^2 \right] - g^2\right).
+\end{align}
+where the last equality holds because the samples $p_n$ are independent.
+Observe that
+\begin{equation}
+    \mathbb{E} \left[ \left( \frac{\abs{a(p)}^2}{q(p)} \right)^2 \right]
+    = \int_{\Pc} q(p) \left( \frac{\abs{a(p)}^2}{q(p)} \right)^2 d\mu(p)
+    = \int_{\Pc} \frac{\abs{a(p)}^4}{q(p)} d\mu(p).
+\end{equation}
+If we choose the sampling distribution
+\begin{equation}
+    q^*(p) \coloneqq \frac{\abs{a(p)}^2}{g}
+\end{equation}
+then
+\begin{equation}
+    \mathbb{E} \left[ \left( \frac{\abs{a(p)}^2}{q^*(p)} \right)^2 \right]
+    = \int_{\Pc} g \abs{a(p)}^2 d\mu(p)
+    = g^2.
+\end{equation}
+This implies that the variance of the estimator $\widehat{g}$ is zero, i.e., $\text{Var}(\widehat{g}) = 0$, which is optimal. A zero-variance estimator would allow us to determine the channel gain exactly from a single sample. In practice, however, this is unattainable because evaluating the optimal distribution $q^*(\cdot)$ requires prior knowledge of the path coefficients $a(p)$ and the channel gain $g$—the quantity we aim to estimate. Nevertheless, this result provides useful guidance: an effective sampling distribution $q(\cdot)$ should give more importance to paths that contribute more to the channel gain $g$.
+The distribution $\Qc$, introduced in~\eqref{eq:path-solver-used-dist-event}, is designed as a practical choice by selecting interaction types based on the squared magnitudes of the corresponding reflection and refraction coefficients. However, it does not account for the antenna pattern, the free-space propagation loss, or the scattering pattern from diffuse reflection, and is thus suboptimal. Developing effective, practical importance sampling strategies remains an an open and challenging problem.
