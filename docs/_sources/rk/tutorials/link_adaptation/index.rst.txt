@@ -3,7 +3,7 @@
 Link Adaptation Algorithms
 ==========================
 
-.. figure:: ../../figs/tutorial_la_overview.png
+.. figure:: ../../../doc/source/figs/tutorial_la_overview.png
    :align: center
    :width: 600px
    :alt: Link Adaptation Overview
@@ -16,7 +16,7 @@ The link adaptation function is typically called by the scheduling algorithm, wh
 
 Link adaptation algorithms typically obtain ACK/NACK feedback from HARQ (Hybrid Automatic Repeat Request) and adjust the MCS selection accordingly. In 5G NR, the frame structure can also be configured to include channel state information reference signals (CSI-RS) in the downlink, allowing the user equipment (UE) to report a channel quality indicator (CQI) index in a subsequent uplink transmission. Although important, the CQI report is typically delayed, outdated, and reported in a quantized form (with values ranging from 0 to 15), limiting its utility for accurate link adaptation.
 
-.. figure:: ../../figs/tutorial_la_results.jpg
+.. figure:: ../../../doc/source/figs/tutorial_la_results.jpg
    :align: center
    :width: 600px
    :alt: Link Adaptation Result Preview
