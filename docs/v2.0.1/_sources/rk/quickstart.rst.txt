@@ -13,7 +13,7 @@ By following this guide, you can set up your private software-defined 5G network
 
    .. code-block:: bash
 
-      # Checkout the Github repository
+      # Checkout the GitHub repository
       git clone --recurse-submodules https://github.com/NVlabs/sionna-rk.git
       cd sionna-rk
 
@@ -110,8 +110,6 @@ For testing and development, create a virtual environment and install Python pac
    # pip install -r requirements_thor.txt for Thor
    # pip install -r requirements_orin.txt for Orin
 
-[TODO] Add export lines for TensorRT
-
 Step 2: USRP Setup
 ------------------
 
@@ -185,12 +183,12 @@ Step 4: Deploy 5G Stack
    ./plugins/common/build_all_plugins.sh --host
    ./plugins/common/build_all_plugins.sh --container
 
-The system can be configured via environment variables. You can configure the system by editing the `.env` file in the `config/b200/` or `config/rfsim/` directory, respectively.
+The system can be configured via environment variables. You can configure the system by editing the environment variables in the `.env` file in the `config/b200/` or `config/rfsim/` directory, respectively.
 
 Edit `config/b200/.env` and set the following parameters:
 
-   * Set your USRP serial number
-   * Select the configuration file for desired number of PRBs (default is 24, equals 8.64MHz bandwidth)
+* Set your USRP serial number
+* Select the configuration file for desired number of PRBs (default is 24, equals 8.64MHz bandwidth)
 
 And finally, you can start the system:
 
@@ -256,10 +254,10 @@ And run performance tests:
 
    # On the client (UE); you need to install iperf3 on the host machine
    # Downlink test
-   iperf3 -u -t 10 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135 -R
+   iperf3 -u -t 1000 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135 -R
 
    # Uplink test
-   iperf3 -u -t 10 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135
+   iperf3 -u -t 1000 -i 1 -b 1M -B 12.1.1.2 -c 192.168.72.135
 
    # Change 1M to the desired throughput in Mbit/s
 
@@ -275,4 +273,4 @@ We hope that you have enjoyed this quickstart guide! For inspiration and as blue
 
 Check the :ref:`tutorials` page for more info.
 
-For a detailed configuration and troubleshooting, see the :ref:`setup` guide or visit the `Github Discussions <https://github.com/NVLabs/sionna/discussions>`_.
+For a detailed configuration and troubleshooting, see the :ref:`setup` guide or visit the `GitHub Discussions <https://github.com/NVLabs/sionna/discussions>`_.

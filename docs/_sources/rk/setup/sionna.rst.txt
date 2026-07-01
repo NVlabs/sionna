@@ -6,7 +6,7 @@ Sionna Installation
 Sionna is only required for development purposes. It is not required to run the OpenAirInterface stack.
 
 .. note::
-   TensorFlow installation varies by platform. See the platform-specific sections below.
+   Sionna 2.0 requires PyTorch. See the platform-specific sections below.
 
 
 Virtual Environment
@@ -29,35 +29,36 @@ To activate the environment automatically, add to your ``~/.profile``:
 DGX Spark
 ---------
 
-On DGX Spark, install TensorFlow and all requirements:
+On DGX Spark, install all requirements (including PyTorch and Sionna):
 
 .. code-block:: bash
 
-   pip install tensorflow
    pip install -r requirements.txt
 
 
 Jetson Thor
 -----------
 
-On Jetson Thor, install TensorFlow and all requirements:
+On Jetson Thor, install all requirements:
 
 .. code-block:: bash
 
-   pip install tensorflow
    pip install -r requirements_thor.txt
 
 
 Jetson AGX Orin & Orin Nano
 ---------------------------
 
-On Jetson Orin platforms, TensorFlow requires NVIDIA's pre-built wheels:
+On Jetson Orin platforms, install all requirements:
 
 .. code-block:: bash
 
-   python3 -m pip install --user --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v60 tensorflow==2.16.1+nv24.07
-
    pip install -r requirements_orin.txt
+
+.. note::
+   For Jetson platforms, NVIDIA provides pre-built PyTorch wheels via the
+   `Jetson PyTorch containers <https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html>`_.
+   Refer to the NVIDIA documentation for the latest compatible PyTorch version for your JetPack release.
 
 
 TensorRT Python Bindings
@@ -83,16 +84,19 @@ On AGX Thor:
 Verification
 ------------
 
-Verify that TensorFlow detects the GPU:
+Verify that PyTorch detects the GPU:
 
 .. code-block:: python
 
-   import tensorflow as tf
-   print(tf.__version__)
-   print(tf.config.list_physical_devices('GPU'))
+   import torch
+   print(torch.__version__)
+   print(torch.cuda.is_available())
+   print(torch.cuda.get_device_name(0))
 
-Expected output:
+Expected output (version string, CUDA availability, device name):
 
 .. code-block:: text
 
-   [PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
+   2.x.x
+   True
+   NVIDIA <device name>

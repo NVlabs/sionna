@@ -1,0 +1,754 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Link Adaptation Algorithms &#8212; Sionna 2.0.1</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=f5cff4aa"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'rk/tutorials/link_adaptation/index';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/rk/tutorials/link_adaptation/index.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="OAI’s Link Adaptation Algorithm" href="oai-la/oai-la.html" />
+    <link rel="prev" title="Software-defined End-to-End 5G Network" href="../ue_emulator.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../setup.html">Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../setup/platform_preparation.html">Platform Preparation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/bom.html">Bill of Materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/spark.html">DGX Spark Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/jetson_thor.html">Jetson AGX Thor Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/jetson_orin.html">Jetson AGX Orin Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/perf.html">Jetson Performance Tweaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/x410.html">USRP X410 Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/sim.html">SIM Card Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/quectel.html">Quectel Modem Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../setup/software_configuration.html">Software Configuration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/OAI.html">OpenAirInterface Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/5g_config.html">5G System Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/sionna.html">Sionna Installation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../setup/first_call.html">Your First Call</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/perf_test.html">Connect &amp; Test Performance</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../setup/scripts_reference.html">Documentation of Scripts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/quickstart-oai.html">quickstart-oai.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/quickstart-cn5g.html">quickstart-cn5g.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/configure-system.html">configure-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/install-usrp.html">install-usrp.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/generate-configs.html">generate-configs.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/build-oai-images.html">build-oai-images.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/get-config-changes.html">get-config-changes.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-changed-files.html">get-oai-changed-files.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-cn5g-changed-files.html">get-oai-cn5g-changed-files.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-cn5g-commit-versions.html">get-oai-cn5g-commit-versions.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup/system_upgrade.html">System Upgrades</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../run_tutorials.html">Running the Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../data_acquisition/index.html">Plugins &amp; Data Acquisition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ric_xapps/index.html">RAN Intelligent Controller (RIC) &amp; xApps</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ldpc_cuda/ldpc_cuda.html">Part 2: CUDA Implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../neural_demapper/index.html">Integration of a Neural Demapper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../neural_demapper/Neural_demapper.html">Neural Demapper Training and TensorRT Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../neural_demapper/accelerated_inference.html">Part 2: GPU-Accelerated inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">Link Adaptation Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../debugging.html">Debugging &amp; Troubleshooting</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna-rk">Get the Code</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Research Kit (RK)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Link Adaptation Algorithms</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="link-adaptation-algorithms">
+<span id="link-adaptation"></span><h1>Link Adaptation Algorithms<a class="headerlink" href="#link-adaptation-algorithms" title="Link to this heading">#</a></h1>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../../ext/sionna-rk/plugins/figs/tutorial_la_overview.png"><img alt="Link Adaptation Overview" src="../../ext/sionna-rk/plugins/figs/tutorial_la_overview.png" style="width: 600px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 25 </span><span class="caption-text">Link adaptation is called by the scheduling algorithm and takes HARQ feedback, effective SINR, and scheduling decisions as inputs to determine the optimal MCS.</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>Link adaptation is a fundamental technique in wireless communication systems that dynamically selects the optimal modulation and coding scheme (MCS) to maximize throughput while keeping the block error rate (BLER) close to a target value. The goal is to utilize the available channel capacity as efficiently as possible without exceeding reliability constraints that could impact higher-layer communication and latency requirements.</p>
+<p>The link adaptation function is typically called by the scheduling algorithm, which determines allocation of user data to physical resource blocks (PRBs). For example, the OAI gNB’s MAC scheduler applies a proportional fairness (PF) scheduler that balances throughput and fairness among users. The commonly used target BLER value is 10%, which provides a good balance between throughput and reliability.</p>
+<p>Link adaptation algorithms typically obtain ACK/NACK feedback from HARQ (Hybrid Automatic Repeat Request) and adjust the MCS selection accordingly. In 5G NR, the frame structure can also be configured to include channel state information reference signals (CSI-RS) in the downlink, allowing the user equipment (UE) to report a channel quality indicator (CQI) index in a subsequent uplink transmission. Although important, the CQI report is typically delayed, outdated, and reported in a quantized form (with values ranging from 0 to 15), limiting its utility for accurate link adaptation.</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="../../ext/sionna-rk/plugins/figs/tutorial_la_results.jpg"><img alt="Link Adaptation Result Preview" src="../../ext/sionna-rk/plugins/figs/tutorial_la_results.jpg" style="width: 600px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">MCS comparison of various link adaptation algorithms for an abrupt channel quality increase at time t=0s. Faster adaptation to higher spectral efficiency ultimately results in higher throughput and more resource efficient transmission (see <a class="reference internal" href="#saladpaper" id="id1"><span>[SALADPaper]</span></a> for details).</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In this tutorial, you will learn:</p>
+<ul class="simple">
+<li><p>How link adaptation works in the OAI gNB MAC scheduler</p></li>
+<li><p>How to develop and load MAC layer plugins using the <a class="reference external" href="https://github.com/OPENAIRINTERFACE/openairinterface5g/blob/develop/common/utils/DOC/loader.md">OAI Shared Library Loader</a></p></li>
+<li><p>How to implement Outer Loop Link Adaptation (OLLA) and advanced variants</p></li>
+<li><p>How to collect and analyze link adaptation statistics from a running system</p></li>
+</ul>
+<p>This tutorial demonstrates several link adaptation algorithm variants:</p>
+<ul class="simple">
+<li><p><strong>OAI’s original Link Adaptation (OAI-LA)</strong>: The default algorithm implemented in the OpenAirInterface (OAI) gNB MAC scheduler that uses a sampling-based MCS selection.</p></li>
+<li><p><strong>Outer Loop Link Adaptation (OLLA)</strong>: The industry-standard algorithm that maintains an adaptive SINR offset based on HARQ feedback. This tutorial starts with a simple OLLA implementation that requires minimal adaptation of the OAI gNB MAC and operates on scheduling statistics.</p></li>
+<li><p><strong>Advanced OLLA</strong> <em>(recommended)</em>: Enhanced version with a per-UE HARQ feedback history list and a sigmoid-fit ILLA (Inner Loop Link Adaptation) that interpolates BLER across MCS and code block size.</p></li>
+</ul>
+<p>The MAC plugin architecture introduced here is not limited to link adaptation — it can be used for any MAC layer feature that can be implemented as a dynamically loaded library.</p>
+<p>For a simulation-based introduction to link adaptation, see the <a class="reference external" href="https://nvlabs.github.io/sionna/sys/tutorials/notebooks/LinkAdaptation.html">Sionna Link Adaptation Tutorial</a>. For further details on the development of more advanced link adaptation algorithms, including results from real-world over-the-air experiments, we refer to <a class="reference internal" href="#saladpaper" id="id2"><span>[SALADPaper]</span></a>.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Configuration and Usage</a></li>
+</ul>
+</div>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div role="list" class="citation-list">
+<div class="citation" id="saladpaper" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>SALADPaper<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<ol class="upperalpha simple" start="18">
+<li><p>Wiesmayr, L. Maggi, S. Cammerer, J. Hoydis, F. Aït Aoudia, and A. Keller, <a class="reference external" href="https://arxiv.org/pdf/2510.05784">“SALAD: Self-Adaptive Link Adaptation,”</a> arXiv preprint arXiv:2510.05784, 2024.</p></li>
+</ol>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../ue_emulator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Software-defined End-to-End 5G Network</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="oai-la/oai-la.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">OAI’s Link Adaptation Algorithm</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/rk/tutorials/link_adaptation/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

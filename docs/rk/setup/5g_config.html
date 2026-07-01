@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -585,7 +593,7 @@
 <p>The configuration files are located in the <code class="docutils literal notranslate"><span class="pre">sionna-rk/config</span></code> directory.
 Most configurations are shared between different setups, these can be found in the <code class="docutils literal notranslate"><span class="pre">sionna-rk/config/common</span></code> directory:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">gnb.***.conf</span></code>: GNB configuration file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gnb.***.conf</span></code>: gNB configuration file</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sys_config.yaml</span></code>: OAI CN configuration file</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">nrue_uicc.conf</span></code>: NRUE UICC configuration file (relevant for software-defined UEs)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">docker-compose.override.yml.template</span></code>: Custom overrides for the docker-compose file (e.g. to enable debugging tools)</p></li>
@@ -604,16 +612,16 @@ Most configurations are shared between different setups, these can be found in t
 <section id="environment-variables">
 <h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading">#</a></h2>
 <p>Environment variables can be used to customize the 5G network configuration, e.g., to load plugins or to set the thread pool size.
-These variables are stored in the <code class="docutils literal notranslate"><span class="pre">.env</span></code> file and includes the following variables:</p>
+These variables are stored in the <code class="docutils literal notranslate"><span class="pre">.env</span></code> file and include the following variables:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">USRP_SERIAL</span></code>: Serial number of the USRP device</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">USRP_SERIAL_UE</span></code>: Serial number of the USRP device for the UE (only for software-defined UE)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">GNB_CONFIG</span></code>: Path to the GNB configuration file</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">GNB_EXTRA_OPTIONS</span></code>: Extra options for the GNB, e.g., library loader</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">GNB_THREAD_POOL</span></code>: Thread pool assignment for the GNB</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GNB_CONFIG</span></code>: Path to the gNB configuration file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GNB_EXTRA_OPTIONS</span></code>: Extra options for the gNB, e.g., library loader</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GNB_THREAD_POOL</span></code>: Thread pool assignment for the gNB</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">UE_EXTRA_OPTIONS</span></code>: Extra options for the UE (only for software-defined UE), e.g., library loader</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">USE_B2XX</span></code>: If True, USRP is used (otherwise RF simulator is used)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">GNB_RF_OPTIONS</span></code>: GNB RF options for USRP or rfsim</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GNB_RF_OPTIONS</span></code>: gNB RF options for USRP or rfsim</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">UE_RF_OPTIONS</span></code>: UE RF options for USRP or rfsim</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">&lt;XXX&gt;_TAG</span></code>: Which docker images to use</p></li>
 </ul>

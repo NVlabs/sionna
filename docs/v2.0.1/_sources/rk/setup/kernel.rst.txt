@@ -43,6 +43,8 @@ The scripts automatically:
 .. note::
    The scripts skip execution if the required modules (``sctp`` and ``qmi_wwan``) are already present. Use ``--force`` to rebuild anyway.
 
+.. note::
+   In AGX Orin, newer versions of the system (above R36.4.4) require to fix the L4T version to R36.4.4. Use ``--l4t-version 36.4.4`` when building the kernel.
 
 Manual Build
 ------------

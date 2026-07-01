@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Running the Tutorials" href="tutorials/run_tutorials.html" />
-    <link rel="prev" title="get-oai-commit-versions.sh" href="scripts/get-oai-commit-versions.html" />
+    <link rel="prev" title="System Upgrades" href="setup/system_upgrade.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.0.1" />
@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="setup/kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup/x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -578,9 +586,10 @@
 <p>In a first step, the <a class="reference internal" href="tutorials/data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a> tutorial explains how to create custom plugins and capture real-world 5G signals using the Sionna Research Kit. This introduces the flexible plugin system that enables easy integration of custom code in the OAI stack.
 Building on this, we show how the physical layer can be accelerated using <a class="reference internal" href="tutorials/ldpc_cuda/index.html#accelerated-ldpc"><span class="std std-ref">GPU-Accelerated LDPC Decoding</span></a>. The <a class="reference internal" href="tutorials/neural_demapper/index.html#neural-demapper"><span class="std std-ref">Integration of a Neural Demapper</span></a> tutorial then explains how to train a neural network-based demapper and integrate it in the 5G stack using NVIDIA TensorRT for real-time inference.
 The <a class="reference internal" href="tutorials/neural_receiver/index.html#neural-receiver"><span class="std std-ref">5G NR PUSCH Neural Receiver</span></a> tutorial goes one step further and replaces the entire receiver chain (channel estimation, equalization, demapping) with a neural network.
+Moving up the stack, the <a class="reference internal" href="tutorials/link_adaptation/index.html#link-adaptation"><span class="std std-ref">Link Adaptation Algorithms</span></a> tutorial shows how to modify and customize the link adaptation algorithms in the MAC layer, building on the plugin mechanism introduced in <a class="reference internal" href="tutorials/data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a>. The <a class="reference internal" href="tutorials/ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> tutorial introduces the RAN Intelligent Controller (RIC) architecture and demonstrates how to develop xApps for intelligent network control and optimization. The <a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#channel-emulation"><span class="std std-ref">Real-time Channel Emulator</span></a> tutorial shows how to emulate the channel using the Sionna ray tracer - in simulation as well as in real RF mode, which pairs naturally with the link adaptation tutorial for controlled evaluation.
 Finally, the <a class="reference internal" href="tutorials/ue_emulator.html#ue-emulator"><span class="std std-ref">Software-defined End-to-End 5G Network</span></a> tutorial allows you to simulate the entire end-to-end system using software defined user equipment (UE). This allows for the evaluation of novel — non-standard compliant — algorithms and protocols.</p>
 <p>All tutorials are precompiled during the quickstart setup of the system, and integrated in the compiled images. Check <a class="reference internal" href="tutorials/run_tutorials.html#run-tutorials"><span class="std std-ref">Running the Tutorials</span></a> if you want to give them a try before going into the details.</p>
-<p>The <a class="reference internal" href="tutorials/ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> tutorial introduces the RAN Intelligent Controller (RIC) architecture and demonstrates how to develop xApps for intelligent network control and optimization.</p>
+<p>The <a class="reference internal" href="tutorials/ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> tutorial introduces the RAN Intelligent Controller (RIC) architecture and demonstrates how to develop xApps for intelligent network control and optimization. The <a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html#channel-emulation"><span class="std std-ref">Real-time Channel Emulator</span></a> tutorial shows how to emulate the channel using the Sionna ray tracer - in simulation as well as in real RF mode.</p>
 <p>Additionally, we provide a tutorial on <a class="reference internal" href="tutorials/debugging.html#debugging"><span class="std std-ref">Debugging &amp; Troubleshooting</span></a> to help you resolve issues that may arise when working with the Sionna Research Kit.</p>
 <p>Besides <em>AI for RAN</em>, the AI-RAN alliance also envisions the coexistence of <em>AI and RAN</em> on the same platform. Many examples of LLM deployment on the DGX Spark platform can be found in the <a class="reference external" href="https://build.nvidia.com/spark">NVIDIA DGX Spark Playbooks</a> and <a class="reference external" href="https://www.jetson-ai-lab.com">NVIDIA Jetson AI Lab</a>, respectively.</p>
 <div class="toctree-wrapper compound">
@@ -592,6 +601,7 @@ Finally, the <a class="reference internal" href="tutorials/ue_emulator.html#ue-e
 <li class="toctree-l1"><a class="reference internal" href="tutorials/neural_demapper/index.html">Integration of a Neural Demapper</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -610,12 +620,12 @@ Finally, the <a class="reference internal" href="tutorials/ue_emulator.html#ue-e
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="scripts/get-oai-commit-versions.html"
+       href="setup/system_upgrade.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">get-oai-commit-versions.sh</p>
+        <p class="prev-next-title">System Upgrades</p>
       </div>
     </a>
     <a class="right-next"

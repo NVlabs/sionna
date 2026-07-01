@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -578,7 +586,7 @@
 </a>
 </figure>
 <p>In this tutorial, we will integrate a neural network-based demapper into the signal processing pipeline of the physical uplink shared channel (PUSCH). We use <a class="reference external" href="https://developer.nvidia.com/tensorrt">NVIDIA TensorRT</a> for the accelerated inference and train the neural network using <a class="reference external" href="https://nvlabs.github.io/sionna/">Sionna</a>. Further, training with real world data can be realized by leveraging the previous <a class="reference internal" href="../data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a> tutorial; for label recovery using error-correcting codes see <a class="reference internal" href="#schibisch2018" id="id1"><span>[Schibisch2018]</span></a>.</p>
-<p>Note that main purpose of this tutorial is to show the efficient integration of neural components into the 5G stack. The block error-rate performance gains are not significant for this simple example. However, similar to the <a class="reference internal" href="../ldpc_cuda/index.html#accelerated-ldpc"><span class="std std-ref">GPU-Accelerated LDPC Decoding</span></a> tutorial, the integration requires careful consideration of the memory transfer patterns between the CPU and the GPU to keep the latency as low as possible.</p>
+<p>Note that the main purpose of this tutorial is to show the efficient integration of neural components into the 5G stack. The block error-rate performance gains are not significant for this simple example. However, similar to the <a class="reference internal" href="../ldpc_cuda/index.html#accelerated-ldpc"><span class="std std-ref">GPU-Accelerated LDPC Decoding</span></a> tutorial, the integration requires careful consideration of the memory transfer patterns between the CPU and the GPU to keep the latency as low as possible.</p>
 <p>In this tutorial, you will learn:</p>
 <ul class="simple">
 <li><p>How to export the trained model from Sionna to TensorRT</p></li>

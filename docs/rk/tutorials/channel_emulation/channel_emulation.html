@@ -61,7 +61,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Debugging &amp; Troubleshooting" href="../debugging.html" />
-    <link rel="prev" title="Software-defined End-to-End 5G Network" href="../ue_emulator.html" />
+    <link rel="prev" title="Configuration and Usage" href="../link_adaptation/usage.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.0.1" />
@@ -453,6 +453,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/quectel.html">Quectel Modem Setup</a></li>
@@ -475,8 +476,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -487,6 +488,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -505,6 +507,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -575,36 +583,36 @@
                   
   <section id="real-time-channel-emulator">
 <span id="channel-emulation"></span><h1>Real-time Channel Emulator<a class="headerlink" href="#real-time-channel-emulator" title="Link to this heading">#</a></h1>
-<figure class="align-center" id="id4">
+<figure class="align-center" id="id5">
 <a class="reference internal image-reference" href="../../../_images/gtc_demo_overview.png"><img alt="Channel Emulator Demo Overview" src="../../../_images/gtc_demo_overview.png" style="width: 600px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 25 </span><span class="caption-text">Digital twinning via real-time channel emulation: a UE connected to the gNB with live UE statistics. This demo was presented at <a class="reference external" href="https://developer.nvidia.com/blog/powering-ai-native-6g-research-with-the-nvidia-sionna-research-kit/">GTC DC 2025</a>.</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 29 </span><span class="caption-text">Digital twinning via real-time channel emulation: a UE connected to the gNB with live UE statistics. This demo was presented at <a class="reference external" href="https://developer.nvidia.com/blog/powering-ai-native-6g-research-with-the-nvidia-sionna-research-kit/">GTC DC 2025</a>.</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>Testing AI/ML algorithms under realistic channel conditions is essential for evaluating site-specific performance.
 The CUDA channel emulator applies channel impulse responses (CIRs) to IQ samples in real time, simulating signal propagation as if the user were located in a specific digital twin environment.
-As shown in <a class="reference internal" href="#fig-chemu-overview"><span class="std std-numref">Fig. 26</span></a>, this works with both USRP hardware – using the O-RAN split 8 option – and rfsim mode, providing consistent conditions between fully simulated and real RF setups.</p>
+As shown in <a class="reference internal" href="#fig-chemu-overview"><span class="std std-numref">Fig. 30</span></a>, this works with both USRP hardware – using the O-RAN split 8 option – and rfsim mode, providing consistent conditions between fully simulated and real RF setups.</p>
 <figure class="align-center" id="fig-chemu-overview">
 <a class="reference internal image-reference" href="../../../_images/chemu_overview.png"><img alt="Channel Emulator Technical Overview" src="../../../_images/chemu_overview.png" style="width: 600px;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 26 </span><span class="caption-text">Overview of the CUDA channel emulator integrated into the OAI gNB stack.</span><a class="headerlink" href="#fig-chemu-overview" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 30 </span><span class="caption-text">Overview of the CUDA channel emulator integrated into the OAI gNB stack.</span><a class="headerlink" href="#fig-chemu-overview" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>The channel emulation plugin supports two modes:</p>
 <ul class="simple">
-<li><p><strong>File-based</strong>: Load pre-computed CIRs from disk, e.g., pre-computed and exported from the <a class="reference external" href="https://github.com/NVlabs/sionna-rt-gui">Sionna RT GUI</a>.</p></li>
-<li><p><strong>ZMQ-based</strong>: Receive CIRs at runtime via ZeroMQ streaming from the Sionna RT GUI or custom applications. This mode is well suited for live demos and closed-loop control scenarios. For higher UE velocities, ray tracing update rates may become a bottleneck; in such cases the file-based mode is recommended.</p></li>
+<li><p><strong>File-based</strong>: Load pre-computed CIRs from disk, e.g., pre-computed and exported from the <a class="reference external" href="https://github.com/NVlabs/sionna-rt-gui">SionnaRT GUI</a>.</p></li>
+<li><p><strong>ZMQ-based</strong>: Receive CIRs at runtime via ZeroMQ streaming from the SionnaRT GUI or custom applications. This mode is well suited for live demos and closed-loop control scenarios. For higher UE velocities, ray tracing update rates may become a bottleneck; in such cases the file-based mode is recommended.</p></li>
 </ul>
-<p>The <a class="reference internal" href="../ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> stats server can be used to visualize UE statistics (MCS, BLER) alongside the channel emulation. This is also integrated into the Sionna RT GUI.</p>
+<p>The <a class="reference internal" href="../ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> stats server can be used to visualize UE statistics (MCS, BLER) alongside the channel emulation. This is also integrated into the SionnaRT GUI.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The channel emulator works best with the <a class="reference external" href="https://github.com/NVlabs/sionna-rt-gui">Sionna RT GUI</a> to generate and export CIRs. It is automatically installed when you install the requirements.txt file, and can be started via:</p>
+<p>The channel emulator works best with the <a class="reference external" href="https://github.com/NVlabs/sionna-rt-gui">SionnaRT GUI</a> to generate and export CIRs. It is automatically installed when you install the requirements.txt file, and can be started via:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sionna-rt-gui<span class="w"> </span>--priority<span class="w"> </span>--config<span class="w"> </span>&lt;config.yaml&gt;
 </pre></div>
 </div>
-<p>The GUI uses NVIDIA MPS, which is required when real-time ray tracing runs concurrently with other CUDA plugins on the GPU (see <a class="reference internal" href="#nvidia-mps">NVIDIA MPS</a>). The active thread percentage can be configured via the <code class="docutils literal notranslate"><span class="pre">MPS_ACTIVE_THREAD_PCT</span></code> environment variable (default: 40%). The scripts ./scripts/start_mps.sh and ./scripts/stop_mps.sh can be used to start (and stop) MPS before starting the gNB and the GUI.</p>
+<p>The GUI uses NVIDIA MPS, which is required when real-time ray tracing runs concurrently with other CUDA plugins on the GPU (see <a class="reference internal" href="#nvidia-mps"><span class="std std-ref">NVIDIA MPS</span></a>). The active thread percentage can be configured via the <code class="docutils literal notranslate"><span class="pre">MPS_ACTIVE_THREAD_PCT</span></code> environment variable (default: 40%). The scripts ./scripts/start_mps.sh and ./scripts/stop_mps.sh can be used to start (and stop) MPS before starting the gNB and the GUI.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -612,8 +620,12 @@ As shown in <a class="reference internal" href="#fig-chemu-overview"><span class
 </div>
 <section id="running-the-gtc-dc-2025-demo">
 <h2>Running the GTC DC 2025 Demo<a class="headerlink" href="#running-the-gtc-dc-2025-demo" title="Link to this heading">#</a></h2>
-<p>The channel emulation demo shown at <a class="reference external" href="https://developer.nvidia.com/blog/powering-ai-native-6g-research-with-the-nvidia-sionna-research-kit/">GTC DC 2025</a> can be reproduced using the provided demo script. It starts the full 5G network in rfsim mode with the ZMQ-based channel emulator, connects the UE, launches iperf3 traffic, and optionally starts the Sionna RT GUI:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start MPS</span>
+<p>The channel emulation demo shown at <a class="reference external" href="https://developer.nvidia.com/blog/powering-ai-native-6g-research-with-the-nvidia-sionna-research-kit/">GTC DC 2025</a> can be reproduced using the provided demo script. It starts the full 5G network in rfsim mode with the ZMQ-based channel emulator, connects the UE, launches iperf3 traffic, and optionally starts the SionnaRT GUI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># enable the channel emulator in config/rfsim/.env file</span>
+<span class="c1"># ZMQ-based CIR (interactive, use with SionnaRT GUI)</span>
+<span class="nv">GNB_EXTRA_OPTIONS</span><span class="o">=</span><span class="s2">&quot;--cir-zmq-num-taps 48&quot;</span>
+
+<span class="c1"># Start MPS</span>
 ./scripts/start_mps.sh
 
 <span class="c1"># Start the gNB / 5G system</span>
@@ -626,8 +638,8 @@ sionna-rt-gui<span class="w"> </span>--priority<span class="w"> </span>--config<
 ./scripts/stop_mps.sh
 </pre></div>
 </div>
-<p>The script activates the <a class="reference internal" href="../ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> stats server (<code class="docutils literal notranslate"><span class="pre">monitor_xapp</span></code>), which streams MAC-layer statistics (MCS, BLER, PRB usage) via ZMQ to the Sionna RT GUI for live visualization.</p>
-<p>For simplicity, this uses the rfsim mode as default. However, you can also connect the Quectel modem by selecting the <cite>b200</cite> config file in the demo script.</p>
+<p>The script activates the <a class="reference internal" href="../ric_xapps/index.html#ric-xapps"><span class="std std-ref">RAN Intelligent Controller (RIC) &amp; xApps</span></a> stats server (<cite>monitor_xapp</cite>), which streams MAC-layer statistics (MCS, BLER, PRB usage) via ZMQ to the SionnaRT GUI for live visualization.</p>
+<p>For simplicity, this uses the rfsim mode as default. However, you can also connect the Quectel modem by selecting the <cite>b200</cite> config file in the demo script and set the environment variables accordingly.</p>
 <p>To observe meaningful UE statistics, iperf3 traffic must be running on the UE. The demo script starts a continuous downlink iperf3 session automatically.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># In the UE</span>
 <span class="c1"># add routing if needed</span>
@@ -637,10 +649,10 @@ sudo<span class="w"> </span>ip<span class="w"> </span>route<span class="w"> </sp
 iperf3<span class="w"> </span>-t<span class="w"> </span><span class="m">86400</span><span class="w"> </span>-i<span class="w"> </span><span class="m">1</span><span class="w"> </span>-B<span class="w"> </span><span class="m">12</span>.1.1.2<span class="w"> </span>-c<span class="w"> </span><span class="m">192</span>.168.72.135<span class="w"> </span>-R
 </pre></div>
 </div>
-<p>The default configuration file <code class="docutils literal notranslate"><span class="pre">spark_quectel.yaml</span></code> mentioned earlier is shipped with the Sionna RT GUI and is located in the <code class="docutils literal notranslate"><span class="pre">&lt;venv&gt;/lib/python3.12/site-packages/sionna_rt_gui/data/configs/sionna_rt_gui/</span></code> directory. You can copy it to your local directory and edit as needed.</p>
+<p>The default configuration file <code class="docutils literal notranslate"><span class="pre">spark_quectel.yaml</span></code> mentioned earlier is shipped with the SionnaRT GUI and is located in the <code class="docutils literal notranslate"><span class="pre">&lt;venv&gt;/lib/python3.12/site-packages/sionna_rt_gui/data/configs/sionna_rt_gui/</span></code> directory. You can copy it to your local directory and edit as needed.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The Sionna RT GUI requires RT cores for real-time ray tracing and is designed for DGX Spark. On Jetson platforms, the GUI can run on a separate CUDA-enabled host machine; just forward ports 5555 (stats ZMQ) and 5556 (CIR ZMQ) to the Jetson via ssh port forwarding.</p>
+<p>The SionnaRT GUI requires RT cores for real-time ray tracing and is designed for DGX Spark. On Jetson platforms, the GUI can run on a separate CUDA-enabled host machine; just forward ports 5555 (stats ZMQ) and 5556 (CIR ZMQ) to the Jetson via ssh port forwarding.</p>
 </div>
 </section>
 <section id="configuration">
@@ -659,12 +671,12 @@ iperf3<span class="w"> </span>-t<span class="w"> </span><span class="m">86400</s
 <li><p><code class="docutils literal notranslate"><span class="pre">--cir-folder</span></code>: Folder containing <code class="docutils literal notranslate"><span class="pre">config.json</span></code> and <code class="docutils literal notranslate"><span class="pre">cirs.bin</span></code> (file mode only).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">--cir-zmq-num-taps</span></code>: Number of CIR taps (ZMQ mode only).</p></li>
 </ul>
-<p>A new CIR folder can be generated with the Sionna RT GUI, and then copied to the OAI <cite>plugins/channel_emulation/</cite> directory.</p>
+<p>A new CIR folder can be generated with the SionnaRT GUI, and then copied to the OAI <cite>plugins/channel_emulation/</cite> directory.</p>
 <p>By default, the pass-through CIR folder is used (<code class="docutils literal notranslate"><span class="pre">plugins/channel_emulation/data/pass_through_cir</span></code>), which applies no distortion to the signal and is useful for verifying the setup.</p>
 </section>
 <section id="nvidia-mps">
-<h2>NVIDIA MPS<a class="headerlink" href="#nvidia-mps" title="Link to this heading">#</a></h2>
-<p>When running the Sionna RT GUI alongside the gNB, <a class="reference external" href="https://docs.nvidia.com/deploy/mps/index.html">NVIDIA Multi-Process Service (MPS)</a> is recommended to share the GPU between the ray tracer and the gNB process. Without MPS, these processes are time-sliced, which introduces latency spikes incompatible with the strict real-time requirements of the gNB. Note that the primary reason for MPS is the co-existence of the ray tracing and the gNB process; the individual CUDA plugins within the gNB are less of a concern since they run within the same process.</p>
+<span id="id3"></span><h2>NVIDIA MPS<a class="headerlink" href="#nvidia-mps" title="Link to this heading">#</a></h2>
+<p>When running the SionnaRT GUI alongside the gNB, <a class="reference external" href="https://docs.nvidia.com/deploy/mps/index.html">NVIDIA Multi-Process Service (MPS)</a> is recommended to share the GPU between the ray tracer and the gNB process. Without MPS, these processes are time-sliced, which introduces latency spikes incompatible with the strict real-time requirements of the gNB. Note that the primary reason for MPS is the co-existence of the ray tracing and the gNB process; the individual CUDA plugins within the gNB are less of a concern since they run within the same process.</p>
 <p>MPS must be started <strong>before</strong> launching the gNB. The <code class="docutils literal notranslate"><span class="pre">./scripts/start_mps.sh</span></code> script handles this automatically:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start MPS</span>
 ./scripts/start_mps.sh
@@ -679,7 +691,7 @@ iperf3<span class="w"> </span>-t<span class="w"> </span><span class="m">86400</s
 </section>
 <section id="file-based-cir-source">
 <h2>File-Based CIR Source<a class="headerlink" href="#file-based-cir-source" title="Link to this heading">#</a></h2>
-<p>CIR data can be exported directly from the <a class="reference external" href="https://github.com/NVlabs/sionna-rt-gui">Sionna RT GUI</a> and placed into the <code class="docutils literal notranslate"><span class="pre">plugins/channel_emulation/</span></code> directory for use with the file loader.</p>
+<p>CIR data can be exported directly from the <a class="reference external" href="https://github.com/NVlabs/sionna-rt-gui">SionnaRT GUI</a> and placed into the <code class="docutils literal notranslate"><span class="pre">plugins/channel_emulation/</span></code> directory for use with the file loader.</p>
 <p>The file loader (<code class="docutils literal notranslate"><span class="pre">plugins/channel_emulation/file_loader/</span></code>) reads pre-computed CIRs from a folder containing two files:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">config.json</span></code>: Metadata about the CIR data.</p></li>
@@ -731,19 +743,19 @@ In case the GUI is running on a different machine, you can forward the ports 555
 <li><p><code class="docutils literal notranslate"><span class="pre">cir</span></code>: Push new CIR taps and noise parameters.</p></li>
 </ul>
 <p>The ZMQ source initializes with sensible defaults (pass-through channel) and updates CIRs as messages arrive.
-This is the recommended mode for interactive use with the Sionna RT GUI, which streams CIRs based on the simulated scene. The GUI can run on the same machine (e.g., DGX Spark) or on a remote machine connected over Ethernet.</p>
+This is the recommended mode for interactive use with the SionnaRT GUI, which streams CIRs based on the simulated scene. The GUI can run on the same machine (e.g., DGX Spark) or on a remote machine connected over Ethernet.</p>
 </section>
 <section id="technical-background">
 <h2>Technical Background<a class="headerlink" href="#technical-background" title="Link to this heading">#</a></h2>
-<p>The CUDA channel emulator applies channel impulse responses (CIRs) to data samples to simulate signal distortion caused by the channel as shown in <a class="reference internal" href="#fig-chemu-overview"><span class="std std-numref">Fig. 26</span></a>. It supports a different CIR and noise standard deviation for each OFDM symbol, enabling the modeling of time-varying channels. The channel emulator computes:</p>
+<p>The CUDA channel emulator applies channel impulse responses (CIRs) to data samples to simulate signal distortion caused by the channel as shown in <a class="reference internal" href="#fig-chemu-overview"><span class="std std-numref">Fig. 30</span></a>. It supports a different CIR and noise standard deviation for each OFDM symbol, enabling the modeling of time-varying channels. The channel emulator computes:</p>
 <div class="math notranslate nohighlight" id="equation-eq-channel-emulation">
 <span class="eqno">(66)<a class="headerlink" href="#equation-eq-channel-emulation" title="Link to this equation">#</a></span>\[y[n] = \sum_{\ell=0}^{L-1} h_s[\ell] x[n-\ell] + \sigma_s w[n]\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(y[n]\)</span> is the <span class="math notranslate nohighlight">\(n\)</span>-th output sample, <span class="math notranslate nohighlight">\(h_s[\ell]\)</span> is the tap coefficient at delay <span class="math notranslate nohighlight">\(\ell\)</span> for OFDM symbol <span class="math notranslate nohighlight">\(s\)</span>, <span class="math notranslate nohighlight">\(x[n-\ell]\)</span> is the corresponding input sample, <span class="math notranslate nohighlight">\(\sigma_s\)</span> is the noise standard deviation for OFDM symbol <span class="math notranslate nohighlight">\(s\)</span>, <span class="math notranslate nohighlight">\(w[n]\)</span> is a random normally distributed noise sample, and <span class="math notranslate nohighlight">\(L\)</span> is the number of taps in the CIR.</p>
 <figure class="align-center" id="fig-ofdm-symbols">
-<a class="reference internal image-reference" href="../../../_images/ofdm_symbols.png"><img alt="../../../_images/ofdm_symbols.png" src="../../../_images/ofdm_symbols.png" style="width: 579.0px; height: 292.75px;" />
+<a class="reference internal image-reference" href="../../../_images/ofdm_symbols.png"><img alt="../../../_images/ofdm_symbols.png" height="293" src="../../../_images/ofdm_symbols.png" width="579" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 27 </span><span class="caption-text">Illustration of the OFDM symbols and corresponding time-varying CIRs.</span><a class="headerlink" href="#fig-ofdm-symbols" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 31 </span><span class="caption-text">Illustration of the OFDM symbols and corresponding time-varying CIRs.</span><a class="headerlink" href="#fig-ofdm-symbols" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p><strong>Channel normalization.</strong> To prevent numerical issues, the CIR is normalized and the noise standard deviation is scaled:</p>
@@ -760,17 +772,17 @@ This is the recommended mode for interactive use with the Sionna RT GUI, which s
 <p>Like other plugins, the CUDA channel emulator is provided as a shared library, loaded via the OAI shared library loader. Its implementation resides in <code class="docutils literal notranslate"><span class="pre">plugins/channel_emulation/cuda_emulator/</span></code>.</p>
 <p>The radio unit (RU) invokes the channel emulator to apply CIRs to data samples immediately after reading them from the RF frontend (uplink), and just before writing them to the RF frontend (downlink).</p>
 <figure class="align-center" id="fig-oai-flow-ul">
-<a class="reference internal image-reference" href="../../../_images/oai_flow_ul.png"><img alt="../../../_images/oai_flow_ul.png" src="../../../_images/oai_flow_ul.png" style="width: 310.5px; height: 160.25px;" />
+<a class="reference internal image-reference" href="../../../_images/oai_flow_ul.png"><img alt="../../../_images/oai_flow_ul.png" height="160" src="../../../_images/oai_flow_ul.png" width="310" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 28 </span><span class="caption-text">Uplink processing flow with CUDA channel emulator.</span><a class="headerlink" href="#fig-oai-flow-ul" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 32 </span><span class="caption-text">Uplink processing flow with CUDA channel emulator.</span><a class="headerlink" href="#fig-oai-flow-ul" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="fig-oai-flow-dl">
-<a class="reference internal image-reference" href="../../../_images/oai_flow_dl.png"><img alt="../../../_images/oai_flow_dl.png" src="../../../_images/oai_flow_dl.png" style="width: 310.5px; height: 160.25px;" />
+<a class="reference internal image-reference" href="../../../_images/oai_flow_dl.png"><img alt="../../../_images/oai_flow_dl.png" height="160" src="../../../_images/oai_flow_dl.png" width="310" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 29 </span><span class="caption-text">Downlink processing flow with CUDA channel emulator.</span><a class="headerlink" href="#fig-oai-flow-dl" title="Link to this image">#</a></p>
+<p><span class="caption-number">Fig. 33 </span><span class="caption-text">Downlink processing flow with CUDA channel emulator.</span><a class="headerlink" href="#fig-oai-flow-dl" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
 <p>In both directions, a slot of IQ samples is stored in a circular buffer. The channel emulator applies the CIRs in place before the samples are forwarded. This process is repeated for each slot sequentially.</p>
@@ -816,12 +828,12 @@ This is the recommended mode for interactive use with the Sionna RT GUI, which s
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../ue_emulator.html"
+       href="../link_adaptation/usage.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Software-defined End-to-End 5G Network</p>
+        <p class="prev-next-title">Configuration and Usage</p>
       </div>
     </a>
     <a class="right-next"

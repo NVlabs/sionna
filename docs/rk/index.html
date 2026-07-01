@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="setup/kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup/x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="setup/quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -596,6 +604,7 @@
 <li class="toctree-l2"><a class="reference internal" href="setup/software_configuration.html">Software Configuration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup/first_call.html">Your First Call</a></li>
 <li class="toctree-l2"><a class="reference internal" href="setup/scripts_reference.html">Documentation of Scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
@@ -606,6 +615,7 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorials/neural_demapper/index.html">Integration of a Neural Demapper</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -621,8 +631,8 @@
 <span class="w"> </span><span class="na">title</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Sionna Research Kit}</span><span class="p">,</span>
 <span class="w"> </span><span class="na">author</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Cammerer, Sebastian, and Marcus, Guillermo and Zirr, Tobias and Hoydis, Jakob and {Ait Aoudia}, Fayçal and Wiesmayr, Reinhard and Maggi, Lorenzo and Nimier-David, Merlin and Keller, Alexander}</span><span class="p">,</span>
 <span class="w"> </span><span class="na">note</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{https://nvlabs.github.io/sionna/rk/index.html}</span><span class="p">,</span>
-<span class="w"> </span><span class="na">year</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{2025}</span><span class="p">,</span>
-<span class="w"> </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{1.1.0}</span>
+<span class="w"> </span><span class="na">year</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{2026}</span><span class="p">,</span>
+<span class="w"> </span><span class="na">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{1.3.0}</span>
 <span class="p">}</span>
 </pre></div>
 </div>

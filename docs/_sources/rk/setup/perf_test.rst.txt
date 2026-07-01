@@ -45,5 +45,5 @@ The following commands test the performance of the 5G connection:
 
    # change 1M to the desired throughput in Mbit/s
 
-The above command assume that the UE has assigned the IP address 12.1.1.2 and the ext-dn is at 192.168.72.135 as shown in :numref:`fig_5g_stack`. The IP addresses can be changed to your own configuration.
+The above commands assume that the UE has assigned the IP address 12.1.1.2 and the ext-dn is at 192.168.72.135 as shown in :numref:`fig_5g_stack`. The IP addresses can be changed to your own configuration.
 

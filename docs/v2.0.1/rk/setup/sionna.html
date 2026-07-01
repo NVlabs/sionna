@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -579,7 +587,7 @@
 <p>Sionna is only required for development purposes. It is not required to run the OpenAirInterface stack.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>TensorFlow installation varies by platform. See the platform-specific sections below.</p>
+<p>Sionna 2.0 requires PyTorch. See the platform-specific sections below.</p>
 </div>
 <section id="virtual-environment">
 <h2>Virtual Environment<a class="headerlink" href="#virtual-environment" title="Link to this heading">#</a></h2>
@@ -595,27 +603,29 @@
 </section>
 <section id="dgx-spark">
 <h2>DGX Spark<a class="headerlink" href="#dgx-spark" title="Link to this heading">#</a></h2>
-<p>On DGX Spark, install TensorFlow and all requirements:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>tensorflow
-pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+<p>On DGX Spark, install all requirements (including PyTorch and Sionna):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
 </pre></div>
 </div>
 </section>
 <section id="jetson-thor">
 <h2>Jetson Thor<a class="headerlink" href="#jetson-thor" title="Link to this heading">#</a></h2>
-<p>On Jetson Thor, install TensorFlow and all requirements:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>tensorflow
-pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements_thor.txt
+<p>On Jetson Thor, install all requirements:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements_thor.txt
 </pre></div>
 </div>
 </section>
 <section id="jetson-agx-orin-orin-nano">
 <h2>Jetson AGX Orin &amp; Orin Nano<a class="headerlink" href="#jetson-agx-orin-orin-nano" title="Link to this heading">#</a></h2>
-<p>On Jetson Orin platforms, TensorFlow requires NVIDIA’s pre-built wheels:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--extra-index-url<span class="w"> </span>https://developer.download.nvidia.com/compute/redist/jp/v60<span class="w"> </span><span class="nv">tensorflow</span><span class="o">==</span><span class="m">2</span>.16.1+nv24.07
-
-pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements_orin.txt
+<p>On Jetson Orin platforms, install all requirements:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements_orin.txt
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For Jetson platforms, NVIDIA provides pre-built PyTorch wheels via the
+<a class="reference external" href="https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html">Jetson PyTorch containers</a>.
+Refer to the NVIDIA documentation for the latest compatible PyTorch version for your JetPack release.</p>
 </div>
 </section>
 <section id="tensorrt-python-bindings">
@@ -635,14 +645,17 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 </section>
 <section id="verification">
 <h2>Verification<a class="headerlink" href="#verification" title="Link to this heading">#</a></h2>
-<p>Verify that TensorFlow detects the GPU:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">list_physical_devices</span><span class="p">(</span><span class="s1">&#39;GPU&#39;</span><span class="p">))</span>
+<p>Verify that PyTorch detects the GPU:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_name</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Expected output:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[PhysicalDevice(name=&#39;/physical_device:GPU:0&#39;, device_type=&#39;GPU&#39;)]
+<p>Expected output (version string, CUDA availability, device name):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2.x.x
+True
+NVIDIA &lt;device name&gt;
 </pre></div>
 </div>
 </section>

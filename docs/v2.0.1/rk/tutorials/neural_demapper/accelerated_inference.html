@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../setup/x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../setup/quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -590,7 +598,7 @@
 <p>For details on efficient memory management when offloading compute-intensive functions to the GPU, we refer to the <a class="reference internal" href="../ldpc_cuda/index.html#accelerated-ldpc"><span class="std std-ref">GPU-Accelerated LDPC Decoding</span></a> tutorial.</p>
 <section id="demapper-implementation-overview">
 <h2>Demapper Implementation Overview<a class="headerlink" href="#demapper-implementation-overview" title="Link to this heading">#</a></h2>
-<p>The neural demapper is implemented in Tensorflow and exported to TensorRT, the source code of the inference logic can be found in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/src/runtime/trt_demapper.cpp">plugins/neural_demapper/src/runtime/trt_demapper.cpp</a>. The implementation will be explained in the following sections.</p>
+<p>The neural demapper is implemented in PyTorch and exported to TensorRT, the source code of the inference logic can be found in <a class="reference external" href="https://github.com/NVlabs/sionna-rk/blob/main/plugins/neural_demapper/src/runtime/trt_demapper.cpp">plugins/neural_demapper/src/runtime/trt_demapper.cpp</a>. The implementation will be explained in the following sections.</p>
 <p>The TRT demapper receives noisy input symbols from the OpenAirInterface stack via the function <code class="docutils literal notranslate"><span class="pre">trt_demapper_decode()</span></code>, which chunks a given array of symbols into batches of maximum size <code class="docutils literal notranslate"><span class="pre">MAX_BLOCK_LEN</span></code> and then calls <code class="docutils literal notranslate"><span class="pre">trt_demapper_decode_block()</span></code> to carry out the actual inference on each batch. To leverage data-parallel execution on the GPU, inference is performed for batches of symbols and multiple threads in parallel. The output of the neural demapper is passed back in the form of <code class="docutils literal notranslate"><span class="pre">num_bits_per_symbol</span></code> LLRs per input symbol.</p>
 <p>To run the TensorRT inference engine on the given <code class="docutils literal notranslate"><span class="pre">int16_t</span></code>-quantized data, we dequantize input symbols to half-precision floating-point format on the GPU using a data-parallel CUDA kernel (see <code class="docutils literal notranslate"><span class="pre">norm_int16_symbols_to_float16()</span></code>), and re-quantize output LLRs using another CUDA kernel (see <code class="docutils literal notranslate"><span class="pre">float16_llrs_to_int16()</span></code>).</p>
 <div class="admonition note">
@@ -627,7 +635,7 @@
 </pre></div>
 </div>
 <p>We call the following global initialization routine on program startup:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="k">const</span><span class="o">*</span><span class="w"> </span><span class="n">trt_weight_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;models/neural_demapper_qam16_2.plan&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Training result / trtexec output</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="k">static</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="k">const</span><span class="o">*</span><span class="w"> </span><span class="n">trt_weight_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;models/neural_demapper.2xfloat16.plan&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Training result / trtexec output</span>
 <span class="linenos"> 2</span><span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">trt_normalized_inputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 <span class="linenos"> 3</span>
 <span class="linenos"> 4</span><span class="k">extern</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="w"> </span><span class="n">TRTContext</span><span class="o">*</span><span class="w"> </span><span class="n">trt_demapper_init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
@@ -863,7 +871,7 @@ After inference, the conversion back to quantized LLRs follows the same pattern,
 <h2>Demapper Integration in OAI<a class="headerlink" href="#demapper-integration-in-oai" title="Link to this heading">#</a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Ensure that you have built the TRTengine in the first part of the tutorial.</p>
+<p>Ensure that you have built the TRT engine in the first part of the tutorial.</p>
 </div>
 <p>In order to mount the TensorRT models and config files, you need to extend the <code class="docutils literal notranslate"><span class="pre">config/common/docker-compose.override.yaml</span></code> file:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="nt">services</span><span class="p">:</span>
@@ -887,7 +895,7 @@ After inference, the conversion back to quantized LLRs follows the same pattern,
 </section>
 <section id="running-the-demapper">
 <h2>Running the Demapper<a class="headerlink" href="#running-the-demapper" title="Link to this heading">#</a></h2>
-<p>The neural demapper is implemented as shared library (see <a class="reference internal" href="../data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a>) which can be loaded using the OAI shared library loader. The demapper can now be used as a drop-in replacement for the QAM-16 default implementation. The demapper can be loaded when running the gNB via the following <code class="docutils literal notranslate"><span class="pre">GNB_EXTRA_OPTIONS</span></code> in the <code class="docutils literal notranslate"><span class="pre">config/&lt;config_name&gt;/.env</span></code> file of the config folder.</p>
+<p>The neural demapper is implemented as a shared library (see <a class="reference internal" href="../data_acquisition/index.html#data-acquisition"><span class="std std-ref">Plugins &amp; Data Acquisition</span></a>) which can be loaded using the OAI shared library loader. The demapper can now be used as a drop-in replacement for the QAM-16 default implementation. The demapper can be loaded when running the gNB via the following <code class="docutils literal notranslate"><span class="pre">GNB_EXTRA_OPTIONS</span></code> in the <code class="docutils literal notranslate"><span class="pre">config/&lt;config_name&gt;/.env</span></code> file of the config folder.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">GNB_EXTRA_OPTIONS</span><span class="o">=</span>--loader.demapper.shlibversion<span class="w"> </span>_trt<span class="w"> </span>--MACRLCs.<span class="o">[</span><span class="m">0</span><span class="o">]</span>.dl_max_mcs<span class="w"> </span><span class="m">10</span><span class="w"> </span>--MACRLCs.<span class="o">[</span><span class="m">0</span><span class="o">]</span>.ul_max_mcs<span class="w"> </span><span class="m">10</span>
 </pre></div>
 </div>

@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Using RF Simulator Mode" href="rfsimulator.html" />
-    <link rel="prev" title="USRP Driver Installation" href="UHD.html" />
+    <link rel="prev" title="USRP X410 Configuration" href="x410.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="2.0.1" />
@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../scripts/install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../scripts/start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../scripts/stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../scripts/stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../scripts/build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -576,13 +584,149 @@
                   
   <section id="sim-card-programming">
 <span id="sim"></span><h1>SIM Card Programming<a class="headerlink" href="#sim-card-programming" title="Link to this heading">#</a></h1>
-<p>To connect commercial-off-the-shelf (COTS) user equipment (UE), a SIM card needs to be programmed with specific parameters. This guide walks through programming SIM cards using the <a class="reference external" href="https://open-cells.com">Open Cells</a> UICC programming tool, which allows configuring the necessary authentication and identification parameters for network access.</p>
+<p>To connect commercial-off-the-shelf (COTS) user equipment (UE), a SIM card needs to be programmed with specific authentication and identification parameters for network access.</p>
+<p>We recommend using <a class="reference external" href="https://github.com/osmocom/pysim">pySim</a> with a PC/SC-compatible reader and a programmable SIM, USIM, or ISIM card (for example, Sysmocom cards). The legacy Open Cells UICC programming tool is documented below for reference, but Open Cells has discontinued sales of its SIM cards and programmers, and the tool is no longer actively maintained.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The parameters (<code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">opc</span></code>, <code class="docutils literal notranslate"><span class="pre">spn</span></code>, IMSI, and so on) must match your core network configuration, particularly the Access Management Function (AMF) settings. These values should align with the core network setup defined in the AMF. In OAI tutorials, these parameters are typically configured in an SQL file that initializes the network. Make sure the <code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">opc</span></code>, and <code class="docutils literal notranslate"><span class="pre">spn</span></code> values match your network configuration, and verify that the IMSI number is registered in your OAI database (<code class="docutils literal notranslate"><span class="pre">config/common/oai_db.sql</span></code>).</p>
+</div>
+<section id="programming-with-pysim">
+<span id="sim-pysim"></span><h2>Programming with pySim<a class="headerlink" href="#programming-with-pysim" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://github.com/osmocom/pysim">pySim</a> is an open-source tool for reading and programming programmable SIM, USIM, and ISIM cards. It works with standard PC/SC card readers and third-party programmable cards, and has been successfully used with Sysmocom ISIM cards using the same network parameters as in this guide. See the <a class="reference external" href="https://osmocom.org/projects/pysim/wiki">pySim wiki</a> for further documentation.</p>
 <section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h2>
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h3>
+<p>You will need:</p>
+<ul class="simple">
+<li><p>A programmable SIM, USIM, or ISIM card (for example, from <a class="reference external" href="https://www.sysmocom.de/products/lab/sysmousim/">Sysmocom</a>)</p></li>
+<li><p>A PC/SC-compatible card reader</p></li>
+<li><p>Python 3 and the pySim dependencies</p></li>
+</ul>
+</section>
+<section id="pysim-installation">
+<h3>pySim Installation<a class="headerlink" href="#pysim-installation" title="Link to this heading">#</a></h3>
+<p>The following steps can be done on the Ubuntu host machine.</p>
+<p>Install system dependencies and clone pySim:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>--no-install-recommends<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>pcscd<span class="w"> </span>libpcsclite-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>python3<span class="w"> </span>python3-setuptools<span class="w"> </span>python3-pycryptodome<span class="w"> </span>python3-pyscard<span class="w"> </span>python3-pip<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>pcsc-tools
+
+git<span class="w"> </span>clone<span class="w"> </span>https://gitea.osmocom.org/sim-card/pysim.git
+<span class="nb">cd</span><span class="w"> </span>pysim
+pip3<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>Ensure the PC/SC daemon is running and detect your reader:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>pcscd
+pcsc_scan
+</pre></div>
+</div>
+<p>Note the reader index (for example, <code class="docutils literal notranslate"><span class="pre">0</span></code>) for use with <code class="docutils literal notranslate"><span class="pre">pySim-shell</span></code>.</p>
+</section>
+<section id="programming-sim-card">
+<h3>Programming SIM Card<a class="headerlink" href="#programming-sim-card" title="Link to this heading">#</a></h3>
+<p>Insert the SIM card into the reader, then start the interactive shell:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./pySim-shell.py<span class="w"> </span>-p<span class="w"> </span><span class="m">0</span>
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">0</span></code> with the reader index reported by <code class="docutils literal notranslate"><span class="pre">pcsc_scan</span></code> if needed.</p>
+<p>Verify the administrator PIN (ADM). The default ADM varies by card vendor; the example below uses <code class="docutils literal notranslate"><span class="pre">12345678</span></code>, but sysmocom provides a custom ADM per card:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; verify_adm 12345678
+</pre></div>
+</div>
+<p>Read the current card contents (optional):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF
+pySIM-shell (00:MF)&gt; select ADF.USIM
+pySIM-shell (00:MF/ADF.USIM)&gt; select EF.IMSI
+pySIM-shell (00:MF/ADF.USIM/EF.IMSI)&gt; read_binary_decoded
+</pre></div>
+</div>
+<p>Now program the SIM card with the network parameters. In this example, <code class="docutils literal notranslate"><span class="pre">262</span></code> represents Germany and <code class="docutils literal notranslate"><span class="pre">99</span></code> is unassigned. These parameters are used for a test UE in the OAI tutorial setup.</p>
+<p>Set the IMSI:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.IMSI
+pySIM-shell (00:MF/ADF.USIM/EF.IMSI)&gt; edit_binary_decoded
+</pre></div>
+</div>
+<p>In the editor, set <code class="docutils literal notranslate"><span class="pre">imsi</span></code> to <code class="docutils literal notranslate"><span class="pre">262990100016069</span></code>, save, and exit.</p>
+<p>Set the authentication key and OPc (Milenage algorithm):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.USIM_AUTH_KEY
+pySIM-shell (00:MF/ADF.USIM/EF.USIM_AUTH_KEY)&gt; edit_binary_decoded
+</pre></div>
+</div>
+<p>In the editor, set the contents to (adapt key and op_opc to match your network configuration):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;cfg&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;only_4bytes_res_in_3g&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;sres_deriv_func_in_2g&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;use_opc_instead_of_op&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;algorithm&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;milenage&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;fec86ba6eb707ed08905757b1bb44b8f&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;op_opc&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;c42449363bbad02b66d16bc975d77cc1&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Set the home PLMN to match the IMSI:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM
+pySIM-shell (00:MF/ADF.USIM)&gt; activate_file EF.EHPLMN
+pySIM-shell (00:MF/ADF.USIM)&gt; select EF.EHPLMN
+pySIM-shell (00:MF/ADF.USIM/EF.EHPLMN)&gt; edit_binary_decoded
+</pre></div>
+</div>
+<p>In the editor, set <code class="docutils literal notranslate"><span class="pre">mcc</span></code> to <code class="docutils literal notranslate"><span class="pre">262</span></code> and <code class="docutils literal notranslate"><span class="pre">mnc</span></code> to <code class="docutils literal notranslate"><span class="pre">99</span></code>, save, and exit.</p>
+<p>Set the MSISDN, access control class, and service provider name:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.MSISDN
+pySIM-shell (00:MF/ADF.USIM/EF.MSISDN)&gt; read_records_decoded
+pySIM-shell (00:MF/ADF.USIM/EF.MSISDN)&gt; edit_record_decoded 1
+</pre></div>
+</div>
+<p>In the editor, set the MSISDN number to <code class="docutils literal notranslate"><span class="pre">00000001</span></code>, save, and exit. This is the whole record:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">   </span><span class="nt">&quot;alpha_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;len_of_bcd&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span>
+<span class="w">   </span><span class="nt">&quot;ton_npi&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;ext&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;type_of_number&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;numbering_plan_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;isdn_e164&quot;</span>
+<span class="w">   </span><span class="p">},</span>
+<span class="w">   </span><span class="nt">&quot;dialing_nr&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;00000001&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.ACC
+pySIM-shell (00:MF/ADF.USIM/EF.ACC)&gt; edit_binary_decoded
+</pre></div>
+</div>
+<p>In the editor, enable the access control class 1 (<code class="docutils literal notranslate"><span class="pre">ACC1</span></code>) and disable the rest, save, and exit.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.SPN
+pySIM-shell (00:MF/ADF.USIM/EF.SPN)&gt; edit_binary_decoded
+</pre></div>
+</div>
+<p>In the editor, set the service provider name to <code class="docutils literal notranslate"><span class="pre">OpenAirInterface</span></code>, save, and exit.</p>
+<p>Verify the programmed values:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.IMSI
+pySIM-shell (00:MF/ADF.USIM/EF.IMSI)&gt; read_binary_decoded
+pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.USIM_AUTH_KEY
+pySIM-shell (00:MF/ADF.USIM/EF.USIM_AUTH_KEY)&gt; read_binary_decoded
+pySIM-shell (00:MF)&gt; select MF/ADF.USIM/EF.SPN
+pySIM-shell (00:MF/ADF.USIM/EF.SPN)&gt; read_binary_decoded
+</pre></div>
+</div>
+</section>
+</section>
+<section id="programming-with-open-cells-uicc-deprecated">
+<h2>Programming with Open Cells UICC (Deprecated)<a class="headerlink" href="#programming-with-open-cells-uicc-deprecated" title="Link to this heading">#</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Open Cells has discontinued sales of its SIM cards and USB programmers. The UICC programming tool was primarily tested with Open Cells hardware and may not work reliably with PC/SC readers or third-party cards. This workflow is retained for reference only; use <a class="reference internal" href="#sim-pysim"><span class="std std-ref">Programming with pySim</span></a> instead.</p>
+</div>
+<p>The following walks through programming SIM cards using the <a class="reference external" href="https://open-cells.com">Open Cells</a> UICC programming tool.</p>
+<section id="id2">
+<h3>Prerequisites<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <p>You will need the <a class="reference external" href="https://open-cells.com/index.php/uiccsim-programing/">UICC software and a USB SIM card programmer</a> from Open Cells. Ensure <code class="docutils literal notranslate"><span class="pre">make</span></code> and <code class="docutils literal notranslate"><span class="pre">gcc</span></code> are installed.</p>
 </section>
 <section id="uicc-software-setup">
-<h2>UICC Software Setup<a class="headerlink" href="#uicc-software-setup" title="Link to this heading">#</a></h2>
+<h3>UICC Software Setup<a class="headerlink" href="#uicc-software-setup" title="Link to this heading">#</a></h3>
 <p>The following steps can be done on the Ubuntu host machine.</p>
 <p>Download <a class="reference external" href="https://open-cells.com/d5138782a8739209ec5760865b1e53b0/uicc-v3.3.tgz">UICC v3.3</a> programming tool:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://open-cells.com/d5138782a8739209ec5760865b1e53b0/uicc-v3.3.tgz
@@ -599,8 +743,8 @@ make<span class="w"> </span>program_uicc_pcsc
 </pre></div>
 </div>
 </section>
-<section id="programming-sim-card">
-<h2>Programming SIM Card<a class="headerlink" href="#programming-sim-card" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h3>Programming SIM Card<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <p>Insert the SIM card and connect the USB programmer.
 Read current values:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>./program_uicc<span class="w"> </span>--adm<span class="w"> </span><span class="m">1</span>
@@ -620,11 +764,6 @@ No ADM code of 8 figures, can&#39;t program the UICC
 </pre></div>
 </div>
 <p>Now let’s program the SIM card with the network parameters.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The parameters (<code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">opc</span></code>, <code class="docutils literal notranslate"><span class="pre">spn</span></code>) must match your core network configuration, particularly the Access Management Function (AMF) settings. These values should align with the core network setup defined in the AMF. In OAI tutorials, these parameters are typically configured in an SQL file that initializes the network. Make sure the <code class="docutils literal notranslate"><span class="pre">key</span></code>, <code class="docutils literal notranslate"><span class="pre">opc</span></code>, and <code class="docutils literal notranslate"><span class="pre">spn</span></code> values match your network configuration, and verify that the IMSI number is registered in your OAI database (<code class="docutils literal notranslate"><span class="pre">config/common/oai_db.sql</span></code>).</p>
-</div>
-<p>In this example, 262 represents Germany, and 99 is unassigned. These parameters are used for a test UE in the OAI tutorial setup.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>./program_uicc<span class="w"> </span>--adm<span class="w"> </span><span class="m">12345678</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--imsi<span class="w"> </span><span class="m">262990100016069</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--isdn<span class="w"> </span><span class="m">00000001</span><span class="w"> </span><span class="se">\</span>
@@ -649,10 +788,14 @@ Set HSS SQN value as: 384
 </pre></div>
 </div>
 </section>
+</section>
 <section id="additional-resources">
 <h2>Additional Resources<a class="headerlink" href="#additional-resources" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://open-cells.com/index.php/uiccsim-programing/">UICC Programming Guide</a></p></li>
+<li><p><a class="reference external" href="https://osmocom.org/projects/pysim/wiki">pySim wiki</a></p></li>
+<li><p><a class="reference external" href="https://github.com/osmocom/pysim">pySim repository</a></p></li>
+<li><p><a class="reference external" href="https://downloads.osmocom.org/docs/pysim/master/html/index.html">pySim user manual</a></p></li>
+<li><p><a class="reference external" href="https://open-cells.com/index.php/uiccsim-programing/">UICC Programming Guide</a> (deprecated)</p></li>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Public_land_mobile_network">PLMN Information</a></p></li>
 <li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Mobile_country_code">Mobile Network Codes</a></p></li>
 </ul>
@@ -670,12 +813,12 @@ Set HSS SQN value as: 384
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="UHD.html"
+       href="x410.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">USRP Driver Installation</p>
+        <p class="prev-next-title">USRP X410 Configuration</p>
       </div>
     </a>
     <a class="right-next"
@@ -706,9 +849,18 @@ Set HSS SQN value as: 384
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uicc-software-setup">UICC Software Setup</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#programming-sim-card">Programming SIM Card</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#programming-with-pysim">Programming with pySim</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pysim-installation">pySim Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#programming-sim-card">Programming SIM Card</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#programming-with-open-cells-uicc-deprecated">Programming with Open Cells UICC (Deprecated)</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Prerequisites</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#uicc-software-setup">UICC Software Setup</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Programming SIM Card</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#additional-resources">Additional Resources</a></li>
 </ul>
   </nav></div>

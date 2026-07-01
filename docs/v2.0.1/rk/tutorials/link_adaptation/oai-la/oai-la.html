@@ -1,0 +1,875 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>OAI’s Link Adaptation Algorithm &#8212; Sionna 2.0.1</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=f5cff4aa"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'rk/tutorials/link_adaptation/oai-la/oai-la';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/rk/tutorials/link_adaptation/oai-la/oai-la.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)" href="../olla/olla.html" />
+    <link rel="prev" title="Link Adaptation Algorithms" href="../index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../setup.html">Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/platform_preparation.html">Platform Preparation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/bom.html">Bill of Materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/spark.html">DGX Spark Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/jetson_thor.html">Jetson AGX Thor Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/jetson_orin.html">Jetson AGX Orin Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/perf.html">Jetson Performance Tweaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/x410.html">USRP X410 Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/sim.html">SIM Card Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/quectel.html">Quectel Modem Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/software_configuration.html">Software Configuration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/OAI.html">OpenAirInterface Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/5g_config.html">5G System Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/sionna.html">Sionna Installation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/first_call.html">Your First Call</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/perf_test.html">Connect &amp; Test Performance</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/scripts_reference.html">Documentation of Scripts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/quickstart-oai.html">quickstart-oai.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/quickstart-cn5g.html">quickstart-cn5g.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/configure-system.html">configure-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/install-usrp.html">install-usrp.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/stop-system.html">stop_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/generate-configs.html">generate-configs.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/build-oai-images.html">build-oai-images.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-config-changes.html">get-config-changes.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-changed-files.html">get-oai-changed-files.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-cn5g-changed-files.html">get-oai-cn5g-changed-files.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-cn5g-commit-versions.html">get-oai-cn5g-commit-versions.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../setup/system_upgrade.html">System Upgrades</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../run_tutorials.html">Running the Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../data_acquisition/index.html">Plugins &amp; Data Acquisition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ric_xapps/index.html">RAN Intelligent Controller (RIC) &amp; xApps</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ldpc_cuda/ldpc_cuda.html">Part 2: CUDA Implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../neural_demapper/index.html">Integration of a Neural Demapper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../neural_demapper/Neural_demapper.html">Neural Demapper Training and TensorRT Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../neural_demapper/accelerated_inference.html">Part 2: GPU-Accelerated inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Link Adaptation Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debugging.html">Debugging &amp; Troubleshooting</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna-rk">Get the Code</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Research Kit (RK)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Link Adaptation Algorithms</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">OAI’s Link Adaptation Algorithm</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="oai-s-link-adaptation-algorithm">
+<h1>OAI’s Link Adaptation Algorithm<a class="headerlink" href="#oai-s-link-adaptation-algorithm" title="Link to this heading">#</a></h1>
+<p>The original OpenAirInterface link adaptation algorithm (OAI-LA) implements a
+sampling-based approach for the MCS selection.
+This baseline implementation serves as a foundation for more advanced algorithms
+and demonstrates the basic principles of link adaptation.
+OAI-LA samples different MCS configurations, performing single-step adjustments of the MCS index based on observed BLER statistics.
+It uses CQI reports to determine the maximum MCS index that can be used to achieve the target BLER.</p>
+<section id="algorithm-overview">
+<h2>Algorithm Overview<a class="headerlink" href="#algorithm-overview" title="Link to this heading">#</a></h2>
+<p>The OAI-LA algorithm operates on a simple threshold-based principle:</p>
+<ul class="simple">
+<li><p><em>BLER Monitoring</em>: Tracks the block error rate over a sliding window</p></li>
+<li><p><em>Threshold Comparison</em>: Compares current BLER against upper and lower thresholds</p></li>
+<li><p><em>MCS Adjustment</em>:</p>
+<ul>
+<li><p>Increments MCS if BLER &lt; lower threshold (requires at least 4 DL
+transmissions since the last update)</p></li>
+<li><p>Decrements MCS if BLER &gt; upper threshold, with a floor at MCS 6</p></li>
+<li><p>Decrements MCS if fewer than 4 DL transmissions were scheduled
+(inactivity guard, with a floor at MCS 9)</p></li>
+</ul>
+</li>
+<li><p><em>Stability Constraints</em>: Updates the MCS at most every <code class="docutils literal notranslate"><span class="pre">BLER_UPDATE_FRAME</span></code>
+frames (10 by default) to avoid reacting to transient statistics</p></li>
+<li><p><em>Channel Quality Indicator (CQI) Feedback</em>: Uses CQI reports from CSI-RS to determine the maximum allowable MCS, enabling rapid MCS reduction when channel conditions degrade</p></li>
+</ul>
+<p>The algorithm estimates the average BLER via an exponentially weighted moving average:</p>
+<div class="math notranslate nohighlight">
+\[\text{BLER}_{avg} = \alpha \cdot \text{BLER}_{avg} + (1-\alpha) \cdot \text{BLER}_{window}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{BLER}_{window}\)</span> is the recent BLER, which is computed from
+the changes of the scheduling statistics since the last link adaptation update
+(by default, every 10 frames), and <span class="math notranslate nohighlight">\(\alpha = 0.9\)</span> is the smoothing factor.
+This is implemented in <code class="docutils literal notranslate"><span class="pre">link_adaptation_log.c</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="c1">// last update is longer than x frames ago</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_dl_retx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">bler_window</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="w"> </span><span class="n">num_dl_retx</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">bler</span><span class="p">;</span>
+<span class="w">    </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">bler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BLER_FILTER</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">bler</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">BLER_FILTER</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">bler_window</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The main MCS selection logic is implemented in the <code class="docutils literal notranslate"><span class="pre">link_adaptation_get_mcs_from_bler</span></code> function:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">bler</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">bler_options</span><span class="o">-&gt;</span><span class="n">lower</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">old_mcs</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">max_mcs</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">new_mcs</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">bler</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">bler_options</span><span class="o">-&gt;</span><span class="n">upper</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">old_mcs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="c1">// above threshold</span>
+<span class="w">      </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">old_mcs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">9</span><span class="p">))</span><span class="w">                                </span><span class="c1">// no activity</span>
+<span class="w">    </span><span class="n">new_mcs</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="c1">// else we are within threshold boundaries</span>
+
+</pre></div>
+</div>
+</section>
+<section id="mac-plugin-infrastructure">
+<h2>MAC Plugin Infrastructure<a class="headerlink" href="#mac-plugin-infrastructure" title="Link to this heading">#</a></h2>
+<p>We leverage OAI’s <a class="reference external" href="https://github.com/OPENAIRINTERFACE/openairinterface5g/blob/develop/common/utils/DOC/loader.md">dynamic library loading mechanism</a> to support multiple algorithm variants and incremental builds. This enables runtime selection of different link adaptation algorithms without recompilation.</p>
+<section id="plugin-interface">
+<h3>Plugin Interface<a class="headerlink" href="#plugin-interface" title="Link to this heading">#</a></h3>
+<p>The plugin system defines a standard interface for link adaptation modules in <code class="docutils literal notranslate"><span class="pre">link_adaptation_extern.h</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span>
+<span class="cm">/**</span>
+<span class="cm"> * @brief Link adaptation interface structure</span>
+<span class="cm"> *</span>
+<span class="cm"> * Defines the interface for dynamic library loading of link adaptation modules.</span>
+<span class="cm"> * This structure contains function pointers to the core link adaptation functions</span>
+<span class="cm"> * and is used by the plugin system to load different link adaptation algorithms</span>
+<span class="cm"> * (OLLA, etc.) at runtime.</span>
+<span class="cm"> */</span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">link_adaptation_interface_s</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">link_adaptation_initfunc_t</span><span class="w">     </span><span class="o">*</span><span class="n">init</span><span class="p">;</span><span class="w">           </span><span class="c1">// Initialization function</span>
+<span class="w">    </span><span class="n">link_adaptation_shutdownfunc_t</span><span class="w"> </span><span class="o">*</span><span class="n">shutdown</span><span class="p">;</span><span class="w">       </span><span class="c1">// Shutdown function</span>
+<span class="w">    </span><span class="n">link_adaptation_mcsfunc_t</span><span class="w">      </span><span class="o">*</span><span class="n">get_mcs_from_bler</span><span class="p">;</span><span class="w"> </span><span class="c1">// Main MCS selection function</span>
+<span class="p">}</span><span class="w"> </span><span class="n">link_adaptation_interface_t</span><span class="p">;</span>
+
+<span class="c1">// Global access point for the plugin interface</span>
+<span class="k">extern</span><span class="w"> </span><span class="n">link_adaptation_interface_t</span><span class="w"> </span><span class="n">link_adaptation_interface</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @brief Load link adaptation library</span>
+<span class="cm"> *</span>
+<span class="cm"> * Dynamically loads a link adaptation library based on the specified version.</span>
+<span class="cm"> * The library should export the required functions (init, shutdown, get_mcs_from_bler)</span>
+<span class="cm"> * and populate the interface structure with the appropriate function pointers.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param version Version string identifying which link adaptation algorithm to load</span>
+<span class="cm"> * @param interface Pointer to interface structure to populate with function pointers</span>
+<span class="cm"> * @return 0 on success, negative value on error</span>
+<span class="cm"> */</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">load_link_adaptation_lib</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">version</span><span class="p">,</span><span class="w"> </span><span class="n">link_adaptation_interface_t</span><span class="w"> </span><span class="o">*</span><span class="n">interface</span><span class="p">);</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @brief Free link adaptation library</span>
+<span class="cm"> *</span>
+<span class="cm"> * Unloads the currently loaded link adaptation library and cleans up</span>
+<span class="cm"> * any associated resources. Should be called before loading a different</span>
+<span class="cm"> * library or when shutting down the system.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param interface Pointer to interface structure to clean up</span>
+<span class="cm"> * @return 0 on success, negative value on error</span>
+<span class="cm"> */</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">free_link_adaptation_lib</span><span class="p">(</span><span class="n">link_adaptation_interface_t</span><span class="w"> </span><span class="o">*</span><span class="n">interface</span><span class="p">);</span>
+
+<span class="c1">// Function declarations that will be loaded from the library</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @brief Initialize link adaptation module</span>
+<span class="cm"> *</span>
+<span class="cm"> * Initializes the currently loaded link adaptation module and prepares</span>
+<span class="cm"> * it for operation. This function pointer is populated by the library</span>
+<span class="cm"> * loading mechanism.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return 0 on success, negative value on error</span>
+<span class="cm"> */</span>
+<span class="n">link_adaptation_initfunc_t</span><span class="w">     </span><span class="n">link_adaptation_init</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @brief Shutdown link adaptation module</span>
+<span class="cm"> *</span>
+<span class="cm"> * Cleans up resources and performs any necessary cleanup operations</span>
+<span class="cm"> * for the currently loaded link adaptation module.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @return 0 on success</span>
+<span class="cm"> */</span>
+<span class="n">link_adaptation_shutdownfunc_t</span><span class="w"> </span><span class="n">link_adaptation_shutdown</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @brief Get MCS from BLER statistics</span>
+<span class="cm"> *</span>
+<span class="cm"> * Main link adaptation function that selects the optimal MCS based on</span>
+<span class="cm"> * current channel conditions, historical performance, and ACK/NACK feedback.</span>
+<span class="cm"> * This function pointer is populated by the library loading mechanism.</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param bler_options BLER configuration options</span>
+<span class="cm"> * @param stats MAC layer statistics</span>
+<span class="cm"> * @param bler_stats BLER statistics structure</span>
+<span class="cm"> * @param max_mcs Maximum allowed MCS</span>
+<span class="cm"> * @param frame Current frame number</span>
+<span class="cm"> * @return Selected MCS value</span>
+<span class="cm"> */</span>
+<span class="n">link_adaptation_mcsfunc_t</span><span class="w">      </span><span class="n">link_adaptation_get_mcs_from_bler</span><span class="p">;</span>
+
+</pre></div>
+</div>
+</section>
+<section id="plugin-loading-and-unloading">
+<h3>Plugin Loading and Unloading<a class="headerlink" href="#plugin-loading-and-unloading" title="Link to this heading">#</a></h3>
+<p>The MAC plugin infrastructure automatically loads the appropriate link adaptation library in <code class="docutils literal notranslate"><span class="pre">mac_plugins.c</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span>
+<span class="n">link_adaptation_interface_t</span><span class="w"> </span><span class="n">link_adaptation_interface</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">init_mac_plugins</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">load_link_adaptation_lib</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">link_adaptation_interface</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">free_mac_plugins</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">free_link_adaptation_lib</span><span class="p">(</span><span class="o">&amp;</span><span class="n">link_adaptation_interface</span><span class="p">);</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+<p>See the <a class="reference internal" href="../usage.html#usage"><span class="std std-ref">Configuration and Usage</span></a> section for available plugin variants and configuration details.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Link Adaptation Algorithms</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../olla/olla.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-overview">Algorithm Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mac-plugin-infrastructure">MAC Plugin Infrastructure</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-interface">Plugin Interface</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#plugin-loading-and-unloading">Plugin Loading and Unloading</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/rk/tutorials/link_adaptation/oai-la/oai-la.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

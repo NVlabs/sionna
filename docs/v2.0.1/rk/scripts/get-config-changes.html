@@ -451,6 +451,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../setup/perf.html">Jetson Performance Tweaks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../setup/x410.html">USRP X410 Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../setup/sim.html">SIM Card Programming</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../setup/quectel.html">Quectel Modem Setup</a></li>
@@ -473,8 +474,8 @@
 <li class="toctree-l3"><a class="reference internal" href="install-usrp.html">install-usrp.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="build-custom-kernel.html">build-custom-kernel.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="install-custom-kernel.html">install-custom-kernel.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="start-system.html">start-system.sh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="stop-system.html">stop-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stop-system.html">stop_system.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="generate-configs.html">generate-configs.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="build-cn5g-images.html">build-cn5g-images.sh</a></li>
 <li class="toctree-l3"><a class="reference internal" href="build-oai-images.html">build-oai-images.sh</a></li>
@@ -485,6 +486,7 @@
 <li class="toctree-l3"><a class="reference internal" href="get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
 </ul>
 </details></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup/system_upgrade.html">System Upgrades</a></li>
 </ul>
 </details></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../tutorials.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -503,6 +505,12 @@
 </details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorials/link_adaptation/index.html">Link Adaptation Algorithms</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/olla/olla.html">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/link_adaptation/usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/debugging.html">Debugging &amp; Troubleshooting</a></li>
 </ul>
@@ -589,7 +597,7 @@
 <section id="description">
 <h2>DESCRIPTION<a class="headerlink" href="#description" title="Link to this heading">#</a></h2>
 <p>Takes a configuration directory and creates a set of patches to capture the changes. It requires the configuration directory to have been initialized with the init-nested-repos when initially generated.</p>
-<p>This is script intended to track changes in configuration files and build the initial patches. It is not required in regular use cases.</p>
+<p>This is a script intended to track changes in configuration files and build the initial patches. It is not required in regular use cases.</p>
 <p>You can track your own changes using git without the need for the nested repos.</p>
 </section>
 <section id="options">
@@ -621,7 +629,7 @@
 </section>
 <section id="examples">
 <h2>EXAMPLES<a class="headerlink" href="#examples" title="Link to this heading">#</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./generate-configs.sh<span class="w"> </span>--rk-dir<span class="w"> </span>.<span class="w"> </span>--source<span class="w"> </span>./config<span class="w"> </span>--dest<span class="w"> </span>./patches/config
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./get-config-changes.sh<span class="w"> </span>--rk-dir<span class="w"> </span>.<span class="w"> </span>--source<span class="w"> </span>./config<span class="w"> </span>--dest<span class="w"> </span>./patches/config
 </pre></div>
 </div>
 </section>
@@ -636,7 +644,7 @@
 </section>
 <section id="see-also">
 <h2>SEE ALSO<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h2>
-<p><a class="reference internal" href="generate-configs.html"><span class="doc">generate-configs.sh</span></a>, <a class="reference internal" href="quickstart-cn5g.html"><span class="doc">quickstart-cn5g.sh</span></a>, <a class="reference internal" href="start-system.html"><span class="doc">start-system.sh</span></a></p>
+<p><a class="reference internal" href="generate-configs.html"><span class="doc">generate-configs.sh</span></a>, <a class="reference internal" href="quickstart-cn5g.html"><span class="doc">quickstart-cn5g.sh</span></a>, <a class="reference internal" href="start-system.html"><span class="doc">start_system.sh</span></a></p>
 </section>
 </section>
 

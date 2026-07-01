@@ -12,7 +12,7 @@ The 5G network parameters are configured through the ``gnb.XXX.conf`` files. We 
 The configuration files are located in the ``sionna-rk/config`` directory.
 Most configurations are shared between different setups, these can be found in the ``sionna-rk/config/common`` directory:
 
-* ``gnb.***.conf``: GNB configuration file
+* ``gnb.***.conf``: gNB configuration file
 * ``sys_config.yaml``: OAI CN configuration file
 * ``nrue_uicc.conf``: NRUE UICC configuration file (relevant for software-defined UEs)
 * ``docker-compose.override.yml.template``: Custom overrides for the docker-compose file (e.g. to enable debugging tools)
@@ -37,16 +37,16 @@ Environment Variables
 ---------------------
 
 Environment variables can be used to customize the 5G network configuration, e.g., to load plugins or to set the thread pool size.
-These variables are stored in the ``.env`` file and includes the following variables:
+These variables are stored in the ``.env`` file and include the following variables:
 
 * ``USRP_SERIAL``: Serial number of the USRP device
 * ``USRP_SERIAL_UE``: Serial number of the USRP device for the UE (only for software-defined UE)
-* ``GNB_CONFIG``: Path to the GNB configuration file
-* ``GNB_EXTRA_OPTIONS``: Extra options for the GNB, e.g., library loader
-* ``GNB_THREAD_POOL``: Thread pool assignment for the GNB
+* ``GNB_CONFIG``: Path to the gNB configuration file
+* ``GNB_EXTRA_OPTIONS``: Extra options for the gNB, e.g., library loader
+* ``GNB_THREAD_POOL``: Thread pool assignment for the gNB
 * ``UE_EXTRA_OPTIONS``: Extra options for the UE (only for software-defined UE), e.g., library loader
 * ``USE_B2XX``: If True, USRP is used (otherwise RF simulator is used)
-* ``GNB_RF_OPTIONS``: GNB RF options for USRP or rfsim
+* ``GNB_RF_OPTIONS``: gNB RF options for USRP or rfsim
 * ``UE_RF_OPTIONS``: UE RF options for USRP or rfsim
 * ``<XXX>_TAG``: Which docker images to use
 

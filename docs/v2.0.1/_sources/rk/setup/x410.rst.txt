@@ -1,0 +1,113 @@
+.. _x410:
+
+USRP X410 Configuration
+=======================
+
+This guide describes the additional steps required to run the Sionna Research Kit
+with an Ettus USRP X410. Start from a standard Sionna RK installation, then
+configure Ethernet, update the X410 FPGA image, and point the OAI radio
+configuration at the X410.
+
+Base Sionna RK Installation
+---------------------------
+
+Start with the standard `Sionna RK quickstart <https://nvlabs.github.io/sionna/rk/quickstart.html>`_:
+
+.. code-block:: bash
+
+   # Checkout the Github repository
+   git clone --recurse-submodules https://github.com/NVlabs/sionna-rk.git
+   cd sionna-rk
+
+   # Prepare system
+   make prepare-system
+
+   # Reboot
+   sudo reboot
+
+   # Build Sionna RK images and config
+   make sionna-rk
+
+Configure Ethernet
+------------------
+
+Configure the ConnectX-7 Ethernet interfaces with static IP addresses. See the
+`DGX Spark stacked systems guide <https://build.nvidia.com/spark/connect-two-sparks/stacked-sparks>`_
+for additional background.
+
+.. code-block:: bash
+
+   # Create the netplan configuration file
+   sudo tee /etc/netplan/40-cx7.yaml > /dev/null <<EOF
+   network:
+     version: 2
+     ethernets:
+       enp1s0f0np0:
+         addresses:
+         - "192.168.20.10/24"
+         dhcp4: false
+       enp1s0f1np1:
+         addresses:
+         - "192.168.20.12/24"
+         dhcp4: false
+   EOF
+
+Set up the USRP X410
+--------------------
+
+First, update the X410 filesystem. Depending on the current X410 configuration,
+you may need to connect through the RJ45 management port and SSH into the USRP.
+
+Useful references:
+
+* `Updating filesystems <https://kb.ettus.com/USRP_X410/X440_Getting_Started_Guide#Updating_Filesystems>`_
+* `X4xx SSH access <https://uhd.readthedocs.io/en/latest/page_usrp_x4xx.html#x4xx_getting_started_ssh>`_
+
+Next, update the FPGA image:
+
+.. code-block:: bash
+
+   uhd_image_loader --args type=x4xx,addr=<ip address>,fpga=UC_200
+
+.. note::
+   We use the ``UC_200`` image because it is the only X410 image that also
+   supports DUC/DDC. See the UHD
+   `X4xx FPGA image documentation <https://uhd.readthedocs.io/en/latest/page_usrp_x4xx.html#x4xx_updating_fpga_types>`_
+   for the other supported images.
+
+100 GbE Connection
+------------------
+
+Connect the QSFP28 cable as follows:
+
+* Connect one end to the port farthest from the edge of the DGX Spark.
+* Connect the other end to port 1 on the X410.
+
+Update Sionna RK Configuration
+------------------------------
+
+Edit the ``b200`` environment file:
+
+.. code-block:: bash
+
+   sudo nano ~/sionna-rk/config/b200/.env
+
+Update the RF options to use the X410 address:
+
+.. code-block:: bash
+
+   # =============================================================================
+   # RF Options
+   # =============================================================================
+
+   GNB_RF_OPTIONS="--RUs.[0].sdr_addrs addr=192.168.20.2"
+   #UE_RF_OPTIONS="--usrp-args serial=${USRP_SERIAL_UE} --ue-fo-compensation --band 78"
+
+Run the Stack
+-------------
+
+After these changes, follow the tutorials or start the OAI stack directly:
+
+.. code-block:: bash
+
+   ./scripts/start_system.sh b200

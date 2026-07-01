@@ -1,0 +1,1028 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA) &#8212; Sionna 2.0.1</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=a4c90055" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=f5cff4aa"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'rk/tutorials/link_adaptation/olla/olla';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.0.1';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/rk/tutorials/link_adaptation/olla/olla.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Configuration and Usage" href="../usage.html" />
+    <link rel="prev" title="OAI’s Link Adaptation Algorithm" href="../oai-la/oai-la.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.0.1" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-pypi fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../setup.html">Setup</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/platform_preparation.html">Platform Preparation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/bom.html">Bill of Materials</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/spark.html">DGX Spark Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/jetson_thor.html">Jetson AGX Thor Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/jetson_orin.html">Jetson AGX Orin Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/kernel.html">Custom Jetson Linux Kernel</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/perf.html">Jetson Performance Tweaks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/UHD.html">USRP Driver Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/x410.html">USRP X410 Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/sim.html">SIM Card Programming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/rfsimulator.html">Using RF Simulator Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/quectel.html">Quectel Modem Setup</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/software_configuration.html">Software Configuration</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/OAI.html">OpenAirInterface Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/5g_config.html">5G System Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/sionna.html">Sionna Installation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/first_call.html">Your First Call</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../setup/perf_test.html">Connect &amp; Test Performance</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../setup/scripts_reference.html">Documentation of Scripts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/quickstart-oai.html">quickstart-oai.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/quickstart-cn5g.html">quickstart-cn5g.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/configure-system.html">configure-system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/install-usrp.html">install-usrp.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/build-custom-kernel.html">build-custom-kernel.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/install-custom-kernel.html">install-custom-kernel.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/start-system.html">start_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/stop-system.html">stop_system.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/generate-configs.html">generate-configs.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/build-cn5g-images.html">build-cn5g-images.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/build-oai-images.html">build-oai-images.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-config-changes.html">get-config-changes.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-changed-files.html">get-oai-changed-files.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-cn5g-changed-files.html">get-oai-cn5g-changed-files.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-cn5g-commit-versions.html">get-oai-cn5g-commit-versions.sh</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../scripts/get-oai-commit-versions.html">get-oai-commit-versions.sh</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../setup/system_upgrade.html">System Upgrades</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../run_tutorials.html">Running the Tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../data_acquisition/index.html">Plugins &amp; Data Acquisition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ric_xapps/index.html">RAN Intelligent Controller (RIC) &amp; xApps</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../ldpc_cuda/index.html">GPU-Accelerated LDPC Decoding</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../ldpc_cuda/LDPC_background.html">Part 1: Background &amp; Python Reference Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../ldpc_cuda/ldpc_cuda.html">Part 2: CUDA Implementation</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../neural_demapper/index.html">Integration of a Neural Demapper</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../neural_demapper/Neural_demapper.html">Neural Demapper Training and TensorRT Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../neural_demapper/accelerated_inference.html">Part 2: GPU-Accelerated inference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../neural_receiver/index.html">5G NR PUSCH Neural Receiver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../ue_emulator.html">Software-defined End-to-End 5G Network</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">Link Adaptation Algorithms</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../oai-la/oai-la.html">OAI’s Link Adaptation Algorithm</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../usage.html">Configuration and Usage</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="../../channel_emulation/channel_emulation.html">Real-time Channel Emulator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../debugging.html">Debugging &amp; Troubleshooting</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna-rk">Get the Code</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Research Kit (RK)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Link Adaptation Algorithms</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="inner-outer-loop-link-adaptation-algorithm-illa-olla">
+<h1>Inner &amp; Outer Loop Link Adaptation Algorithm (ILLA &amp; OLLA)<a class="headerlink" href="#inner-outer-loop-link-adaptation-algorithm-illa-olla" title="Link to this heading">#</a></h1>
+<p>The outer-loop link adaptation (OLLA) algorithm is the industry standard for
+link adaptation in cellular communication systems.
+OLLA selects the MCS that meets a target BLER based on pre-computed BLER tables and the latest SINR estimation.
+The latter is adjusted by an offset, updated using fixed step-size rules based on the received ACK/NACKs.
+This procedure drives the long-term BLER close to the target value.</p>
+<figure class="align-center" id="id1">
+<img alt="OLLA Algorithm Overview" src="../../../../_images/olla.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 27 </span><span class="caption-text">OLLA maintains an adaptive SINR offset based on HARQ feedback to achieve target BLER.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The OLLA algorithm uses an inner-loop link adaptation (ILLA) algorithm as a
+subroutine, to select the MCS based on the latest SINR estimation and
+pre-computed BLER-vs-SINR tables.
+The details of the ILLA and OLLA algorithms are presented in the following sections.</p>
+<figure class="align-center" id="id2">
+<img alt="ILLA MCS Selection" src="../../../../_images/illa.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 28 </span><span class="caption-text">Inner Loop Link Adaptation (ILLA) selects the optimal MCS from pre-computed
+BLER tables, based on the corrected SINR.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>In this tutorial, two variants of the OLLA algorithm are implemented:</p>
+<ul class="simple">
+<li><p><em>Simple OLLA</em>: Drives the SINR offset from MAC scheduling statistics (retransmission counters) and looks up the per-MCS SINR threshold from raw BLER-vs-SNR tables (one CSV per MCS). Requires no changes to the OAI gNB MAC.</p></li>
+<li><p><em>Advanced OLLA</em> (recommended): Extends the OAI gNB MAC with a per-UE HARQ feedback history list (direct ACK/NACK access) and approximates the BLER-vs-SINR curve with a sigmoid function, allowing for fine interpolation across SINR.</p></li>
+</ul>
+<section id="algorithm-overview">
+<h2>Algorithm Overview<a class="headerlink" href="#algorithm-overview" title="Link to this heading">#</a></h2>
+<p>OLLA operates on the principle of stochastic approximation, where the SINR is
+corrected by an offset <span class="math notranslate nohighlight">\(\Delta_{\text{offset}}\)</span> that is itself updated
+based on HARQ feedback as follows:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\Delta_{\text{offset}}^{(t+1)} = \begin{cases}
+\Delta_{\text{offset}}^{(t)} + \Delta_{\text{ACK}} &amp; \text{if HARQ}^{(t)} = \text{ACK} \\
+\Delta_{\text{offset}}^{(t)} - \Delta_{\text{NACK}} &amp; \text{if HARQ}^{(t)} = \text{NACK}
+\end{cases}\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta_{\text{offset}}^{(t)}\)</span> is the SINR offset at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<p>The ACK/NACK step sizes <span class="math notranslate nohighlight">\(\Delta_{\text{ACK}}\)</span> and
+<span class="math notranslate nohighlight">\(\Delta_{\text{NACK}}\)</span> are related to each other via the target BLER
+<span class="math notranslate nohighlight">\(\tau\)</span> (typically, <span class="math notranslate nohighlight">\(\tau=0.1\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[\Delta_{\text{ACK}} = \frac{\tau}{1-\tau} \Delta_{\text{NACK}}\]</div>
+<p>The effective SINR is corrected by the offset as:</p>
+<div class="math notranslate nohighlight">
+\[\text{SINR}_{\text{effective}}^{(t)} = \text{SINR}_{\text{reported}}^{(t)} + \Delta_{\text{offset}}^{(t)}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{SINR}_{\text{reported}}^{(t)}\)</span> is the effective SINR from the most recent CQI report.
+Note that, for simplicity, we here use a positive offset formulation, rather than the negative
+offset commonly used in the literature.</p>
+<p>Finally, the MCS is selected as the highest MCS that does not exceed the target
+BLER, according to pre-computed BLER tables and with respect to the effective <span class="math notranslate nohighlight">\(\text{SINR}_{\text{effective}}^{(t)}\)</span>.
+This procedure is commonly referred to as “inner loop link adaptation” (ILLA).</p>
+</section>
+<section id="simple-illa-implementation">
+<h2>Simple ILLA Implementation<a class="headerlink" href="#simple-illa-implementation" title="Link to this heading">#</a></h2>
+<p>We start with the simple ILLA implementation, which is based on pre-computed tables for the required SNR to achieve the BLER target.</p>
+<p>The ILLA module selects the MCS as the highest MCS that does not exceed the
+target BLER, according to pre-computed BLER tables and with respect to the
+(corrected) effective SINR. These tables are designed to achieve the BLER target for a given MCS and code block size (CBS).</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// ILLA (Inner Loop Link Adaptation)</span>
+<span class="c1">// Selects max MCS that achieves BLER target for given SNR</span>
+<span class="c1">// max MCS s.t. BLER(SNR, MCS) &lt; TARGET_BLER</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">illa_select_mcs</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">effective_snr</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">max_mcs</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">min_mcs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">selected_mcs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min_mcs</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">mcs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_mcs</span><span class="p">;</span><span class="w"> </span><span class="n">mcs</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">min_mcs</span><span class="p">;</span><span class="w"> </span><span class="n">mcs</span><span class="o">--</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">effective_snr</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">snr_at_target_bler</span><span class="p">[</span><span class="n">mcs</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">selected_mcs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mcs</span><span class="p">;</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">selected_mcs</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A limitation with the BLER-vs-SNR tables shipped with OAI is that they are
+simulated for only one MCS table index, while 3GPP defines several of them.</p>
+<p>The simple OLLA variant works with existing OAI gNB MAC layer without requiring
+functional changes.
+Thus, the simple OLLA implementation operates solely within the
+<code class="docutils literal notranslate"><span class="pre">get_mcs_from_bler</span></code> function using basic scheduling statistics from
+<code class="docutils literal notranslate"><span class="pre">NR_mac_dir_stats_t</span> <span class="pre">*stats</span></code>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span>
+<span class="w">    </span><span class="c1">// Number of scheduled transmissions since last OLLA update</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+<span class="w">    </span><span class="c1">// Number of retransmissions since last OLLA update (corresponds to # NACKs)</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_dl_retx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)(</span><span class="n">stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+
+<span class="w">    </span><span class="c1">// Calculate number of ACKs and NACKs</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_nacks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_dl_retx</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">num_acks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_dl_sched</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">num_dl_retx</span><span class="p">;</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">// Update OLLA offset based on ACKs and NACKs</span>
+<span class="w">    </span><span class="o">*</span><span class="n">olla_snr_offset</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">num_nacks</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">OLLA_STEP_SIZE</span><span class="p">;</span><span class="w">  </span><span class="c1">// NACKs decrease offset</span>
+<span class="w">    </span><span class="o">*</span><span class="n">olla_snr_offset</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">num_acks</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">OLLA_STEP_SIZE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">OLLA_TARGET_BLER</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0f</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">OLLA_TARGET_BLER</span><span class="p">));</span><span class="w">  </span><span class="c1">// ACKs increase offset</span>
+<span class="w">    </span>
+</pre></div>
+</div>
+</section>
+<section id="advanced-illa-implementation">
+<h2>Advanced ILLA Implementation<a class="headerlink" href="#advanced-illa-implementation" title="Link to this heading">#</a></h2>
+<p>As for simple ILLA, the advanced ILLA implementation relies on pre-computed
+SINR-vs-BLER tables. Yet, unlike simple ILLA, it supports different table
+indices and is based on a finer BLER interpolation against SINR, using the following sigmoid approximation:</p>
+<div class="math notranslate nohighlight">
+\[\text{BLER}(\text{SINR}) \approx 1 - \frac{1}{1 + e^{\frac{- (\text{SINR} - c)}{s}}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(c\)</span> is the center parameter [dB] and <span class="math notranslate nohighlight">\(s\)</span> is the scale
+parameter [dB].
+Such parameters are pre-computed for each MCS by fitting the BLER vs. SINR
+curve obtained via simulations on AWGN channels to the sigmoid function. The
+parameters are stored in the file <code class="docutils literal notranslate"><span class="pre">bler_sigma_fit.csv</span></code>.</p>
+<p>The following table shows a few representative sigmoid parameters from
+<code class="docutils literal notranslate"><span class="pre">bler_sigma_fit.csv</span></code>. Parameters are derived by fitting the BLER vs. SINR
+curves obtained via simulations on AWGN channels with Sionna.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>MCS Index</p></th>
+<th class="head"><p>Center c</p></th>
+<th class="head"><p>Scale s</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>-1.91</p></td>
+<td><p>0.44</p></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>4.84</p></td>
+<td><p>0.51</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>8.36</p></td>
+<td><p>0.52</p></td>
+</tr>
+<tr class="row-odd"><td><p>14</p></td>
+<td><p>12.20</p></td>
+<td><p>0.57</p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p>18.10</p></td>
+<td><p>0.69</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The sigmoid parameters <span class="math notranslate nohighlight">\(c\)</span> and <span class="math notranslate nohighlight">\(s\)</span> are pre-computed per MCS through regression fitting. The low regression loss highlights high accuracy for a wide range of BLER target values. However, it might not be accurate enough for very low BLER targets in ultra reliable low latency communications (URLLC).</p>
+</div>
+<p>The ILLA MCS selection scans from the CQI-capped <code class="docutils literal notranslate"><span class="pre">max_mcs</span></code> downward, picking
+the highest MCS whose target-BLER SINR threshold is below the effective SINR:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">new_mcs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">illa_select_mcs</span><span class="p">(</span><span class="n">effective_snr</span><span class="p">,</span><span class="w"> </span><span class="n">mcs_table_idx</span><span class="p">,</span><span class="w"> </span><span class="n">max_mcs_allowed</span><span class="p">,</span><span class="w"> </span><span class="n">OLLA_MIN_MCS</span><span class="p">);</span>
+
+</pre></div>
+</div>
+</section>
+<section id="olla-implementation">
+<h2>OLLA Implementation<a class="headerlink" href="#olla-implementation" title="Link to this heading">#</a></h2>
+<p>The simple OLLA variant uses simple ILLA as subroutine.
+Conversely, the advanced OLLA uses advanced ILLA, as well as an enhanced
+HARQ feedback, using actual ACK/NACK reports from UE, instead of relying on
+aggregated scheduling statistics.
+This requires additional changes to the OAI gNB PDSCH scheduler in <code class="docutils literal notranslate"><span class="pre">gNB_scheduler_uci.c</span></code>:</p>
+<p>To maintain an MCS history list, direct access to HARQ feedback is provided,
+rather than relying on scheduling statistics. The link adaptation function
+(<code class="docutils literal notranslate"><span class="pre">get_mcs_from_bler</span></code> called by the proportional fairness scheduler) then consumes and resets the list
+as follows:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">ack_nack_stats_t</span><span class="w"> </span><span class="nf">print_mcs_history</span><span class="p">(</span><span class="n">NR_mcs_history_t</span><span class="w"> </span><span class="o">*</span><span class="n">mcs_hist</span><span class="p">,</span><span class="w"> </span><span class="n">rnti_t</span><span class="w"> </span><span class="n">rnti</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ack_nack_stats_t</span><span class="w"> </span><span class="n">stats</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{.</span><span class="n">num_acks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">num_nacks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">cumltv_tbs_ack</span><span class="o">=</span><span class="mi">0</span><span class="p">};</span>
+
+<span class="w">    </span><span class="c1">// Input validation</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">mcs_hist</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LOG_E</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UE %04x: Null pointer in print_mcs_history</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rnti</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">stats</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UE %04x: No MCS history available</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rnti</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">stats</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\n</span><span class="s">MCS History for UE %04x (count: %d):</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rnti</span><span class="p">,</span><span class="w"> </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Index | MCS | Success | Frame.Slot | TB Size</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Start from the oldest entry (head) and move forward</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">NR_mcs_history_entry_t</span><span class="w"> </span><span class="o">*</span><span class="n">entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">entries</span><span class="p">[</span><span class="n">idx</span><span class="p">];</span>
+<span class="w">        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">frame</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">timestamp</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<span class="w">        </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">timestamp</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xFFFF</span><span class="p">;</span>
+<span class="w">        </span><span class="n">stats</span><span class="p">.</span><span class="n">num_acks</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">success</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// update 1st iter HARQ normalized throughput statistic</span>
+<span class="w">        </span><span class="n">stats</span><span class="p">.</span><span class="n">cumltv_tbs_ack</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">success</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">tb_size</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">spectral_efficiency</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">SE_ZERO</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%5d | %3d | %7s | %4d.%2d | %8d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="n">i</span><span class="p">,</span>
+<span class="w">              </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">mcs</span><span class="p">,</span>
+<span class="w">              </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">success</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;ACK&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;NACK&quot;</span><span class="p">,</span>
+<span class="w">              </span><span class="n">frame</span><span class="p">,</span>
+<span class="w">              </span><span class="n">slot</span><span class="p">,</span>
+<span class="w">              </span><span class="n">entry</span><span class="o">-&gt;</span><span class="n">tb_size</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Move to next entry in FIFO order</span>
+<span class="w">        </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">MAX_MCS_HISTORY</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">stats</span><span class="p">.</span><span class="n">num_nacks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">num_acks</span><span class="p">;</span>
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%5d ACK   %5d NACK </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">num_acks</span><span class="p">,</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">num_nacks</span><span class="p">);</span>
+<span class="w">    </span><span class="n">LOG_I</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;----------------------------------------</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Clear the history after printing</span>
+<span class="w">    </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">head</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">tail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">mcs_hist</span><span class="o">-&gt;</span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">stats</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>OLLA parameters are hardcoded in the header files (<code class="docutils literal notranslate"><span class="pre">link_adaptation_olla.h</span></code> for simple OLLA, <code class="docutils literal notranslate"><span class="pre">link_adaptation_mcs_hist_olla.h</span></code> for advanced OLLA). To modify them, edit and recompile:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define OLLA_STEP_SIZE 1.0f     </span><span class="c1">// Adaptation speed</span>
+<span class="cp">#define OLLA_TARGET_BLER 0.1f   </span><span class="c1">// Target 10% BLER</span>
+<span class="cp">#define OLLA_MIN_MCS 3          </span><span class="c1">// Minimum MCS floor</span>
+</pre></div>
+</div>
+<section id="implementation-aspects">
+<h3>Implementation Aspects<a class="headerlink" href="#implementation-aspects" title="Link to this heading">#</a></h3>
+<p>The advanced OLLA implementation includes several key components.
+First, the SINR threshold is pre-computed once per <code class="docutils literal notranslate"><span class="pre">(MCS</span> <span class="pre">table,</span> <span class="pre">MCS)</span></code> pair by
+inverting the sigmoid fit at the target BLER:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/**</span>
+<span class="cm"> * @brief Compute SNR thresholds for target BLER using sigmoid approximation</span>
+<span class="cm"> *</span>
+<span class="cm"> * Pre-computes the SNR values where each MCS achieves the target BLER threshold</span>
+<span class="cm"> * using the inverse of the sigmoid function:</span>
+<span class="cm"> * SNR = center_db + scale_db * log(1/BLER_target - 1)</span>
+<span class="cm"> *</span>
+<span class="cm"> * @note Must be called after sigma_fit_data_table_pdsch is initialized</span>
+<span class="cm"> * @warning Sets SNR to -99.0 dB for unimplemented (table, MCS) combinations</span>
+<span class="cm"> */</span>
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">compute_snr_at_target_bler</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">OLLA_TARGET_BLER</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0.0f</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">OLLA_TARGET_BLER</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LOG_E</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Invalid target BLER %.3f, must be in range (0,1)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">OLLA_TARGET_BLER</span><span class="p">);</span>
+<span class="w">        </span><span class="n">abort</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">log_term</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="mf">1.0f</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">OLLA_TARGET_BLER</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1.0f</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">isfinite</span><span class="p">(</span><span class="n">log_term</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">LOG_E</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Invalid log term for target BLER %.3f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">OLLA_TARGET_BLER</span><span class="p">);</span>
+<span class="w">        </span><span class="n">abort</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">mcs_table_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">mcs_table_idx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">NUM_MCS_TABLES_DEFINED</span><span class="p">;</span><span class="w"> </span><span class="n">mcs_table_idx</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">mcs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">mcs</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">MAX_MCS_IDX</span><span class="p">;</span><span class="w"> </span><span class="n">mcs</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sigma_fit_data_table_pdsch</span><span class="p">[</span><span class="n">mcs_table_idx</span><span class="p">][</span><span class="n">mcs</span><span class="p">].</span><span class="n">cbs_num_info_bits</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">SIGMA_FIT_NOT_IMPLEMENTED</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="kt">float</span><span class="w"> </span><span class="n">sigmoid_center_db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sigma_fit_data_table_pdsch</span><span class="p">[</span><span class="n">mcs_table_idx</span><span class="p">][</span><span class="n">mcs</span><span class="p">].</span><span class="n">sigmoid_center_db</span><span class="p">;</span>
+<span class="w">                </span><span class="kt">float</span><span class="w"> </span><span class="n">sigmoid_scale_db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sigma_fit_data_table_pdsch</span><span class="p">[</span><span class="n">mcs_table_idx</span><span class="p">][</span><span class="n">mcs</span><span class="p">].</span><span class="n">sigmoid_scale_db</span><span class="p">;</span>
+
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sigmoid_scale_db</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">LOG_E</span><span class="p">(</span><span class="n">MAC</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Invalid sigmoid scale parameter (&lt;= 0) for MCS %d, table %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">                          </span><span class="n">mcs</span><span class="p">,</span><span class="w"> </span><span class="n">mcs_table_idx</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">abort</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+
+<span class="w">                </span><span class="n">snr_at_target_bler</span><span class="p">[</span><span class="n">mcs_table_idx</span><span class="p">][</span><span class="n">mcs</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sigmoid_center_db</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sigmoid_scale_db</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">log_term</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">snr_at_target_bler</span><span class="p">[</span><span class="n">mcs_table_idx</span><span class="p">][</span><span class="n">mcs</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">-99.0f</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Further, it includes extended logging for ACK and NACK statistics:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="n">memcpy</span><span class="p">(</span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">,</span><span class="w"> </span><span class="n">stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">stats</span><span class="o">-&gt;</span><span class="n">rounds</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">log_file_out</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">timespec</span><span class="w"> </span><span class="n">ts</span><span class="p">;</span>
+<span class="w">        </span><span class="n">clock_gettime</span><span class="p">(</span><span class="n">CLOCK_REALTIME</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ts</span><span class="p">);</span>
+<span class="w">        </span><span class="n">fprintf</span><span class="p">(</span><span class="n">log_file_out</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%ld.%09ld,%d,%d,%d,%d,%d,%d,%d,%d,%.6f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">ts</span><span class="p">.</span><span class="n">tv_sec</span><span class="p">,</span><span class="w"> </span><span class="n">ts</span><span class="p">.</span><span class="n">tv_nsec</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="p">,</span><span class="w"> </span><span class="n">rnti</span><span class="p">,</span><span class="w"> </span><span class="n">max_mcs</span><span class="p">,</span><span class="w"> </span><span class="n">old_mcs</span><span class="p">,</span><span class="w"> </span><span class="n">new_mcs</span><span class="p">,</span>
+<span class="w">                </span><span class="n">num_acks</span><span class="p">,</span><span class="w"> </span><span class="n">num_nacks</span><span class="p">,</span><span class="w"> </span><span class="n">ack_nack_stats</span><span class="p">.</span><span class="n">cumltv_tbs_ack</span><span class="p">,</span><span class="w"> </span><span class="n">bler_stats</span><span class="o">-&gt;</span><span class="n">bler</span><span class="p">);</span>
+<span class="w">        </span><span class="n">fflush</span><span class="p">(</span><span class="n">log_file_out</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+</pre></div>
+</div>
+<p>This provides detailed statistics on the number of reported ACKs and NACKs, as well as the cumulative first-HARQ iteration throughput normalized by spectral efficiency.</p>
+<p>See the <a class="reference internal" href="../usage.html#usage"><span class="std std-ref">Configuration and Usage</span></a> section for more details on how to use the link adaptation algorithms.</p>
+</section>
+<section id="cqi-feedback">
+<span id="olla-ignore-cqi"></span><h3>CQI Feedback<a class="headerlink" href="#cqi-feedback" title="Link to this heading">#</a></h3>
+<p>OAI-LA and OLLA depend on CQI (Channel Quality Indicator) reports.
+They both use the <code class="docutils literal notranslate"><span class="pre">max_mcs</span></code> parameter from CQI feedback to compute the
+reported SNR from CQI reports:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">float</span><span class="w"> </span><span class="n">reported_snr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snr_at_target_bler</span><span class="p">[</span><span class="n">mcs_table_idx</span><span class="p">][</span><span class="n">max_mcs_allowed</span><span class="p">];</span>
+</pre></div>
+</div>
+<p>If the CQI reports are unreliable, it may be preferable to simply ignore them and rely solely on HARQ-based adaptation.
+To this aim, you can set <code class="docutils literal notranslate"><span class="pre">max_mcs</span></code> to a fixed value (e.g., <code class="docutils literal notranslate"><span class="pre">28</span></code>) in the code, or set the global constant in <code class="docutils literal notranslate"><span class="pre">link_adaptation_mcs_hist_olla.h</span></code>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define MAX_MCS_IDX 28</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../oai-la/oai-la.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">OAI’s Link Adaptation Algorithm</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../usage.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Configuration and Usage</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#algorithm-overview">Algorithm Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-illa-implementation">Simple ILLA Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#advanced-illa-implementation">Advanced ILLA Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#olla-implementation">OLLA Implementation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-aspects">Implementation Aspects</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cqi-feedback">CQI Feedback</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/rk/tutorials/link_adaptation/olla/olla.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
