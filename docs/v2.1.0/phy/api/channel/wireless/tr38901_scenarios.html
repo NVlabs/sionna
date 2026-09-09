@@ -1,0 +1,679 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>System-Level Scenarios &#8212; Sionna 2.1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../_static/documentation_options.js?v=20623aea"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'phy/api/channel/wireless/tr38901_scenarios';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.1.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/phy/api/channel/wireless/tr38901_scenarios.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.1.0" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">System-Level Scenarios</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="system-level-scenarios">
+<h1>System-Level Scenarios<a class="headerlink" href="#system-level-scenarios" title="Link to this heading">#</a></h1>
+<p>The scenario classes hold the versioned TR 38.901 parameter tables and the
+topology-dependent state used by the system-level channel generators. They do
+not generate channel impulse responses themselves. The complete
+<a class="reference internal" href="sionna.phy.channel.tr38901.UMi.html#sionna.phy.channel.tr38901.UMi" title="sionna.phy.channel.tr38901.UMi"><code class="xref py py-class docutils literal notranslate"><span class="pre">UMi</span></code></a>, <a class="reference internal" href="sionna.phy.channel.tr38901.UMa.html#sionna.phy.channel.tr38901.UMa" title="sionna.phy.channel.tr38901.UMa"><code class="xref py py-class docutils literal notranslate"><span class="pre">UMa</span></code></a>, <a class="reference internal" href="sionna.phy.channel.tr38901.RMa.html#sionna.phy.channel.tr38901.RMa" title="sionna.phy.channel.tr38901.RMa"><code class="xref py py-class docutils literal notranslate"><span class="pre">RMa</span></code></a>, <a class="reference internal" href="sionna.phy.channel.tr38901.InH.html#sionna.phy.channel.tr38901.InH" title="sionna.phy.channel.tr38901.InH"><code class="xref py py-class docutils literal notranslate"><span class="pre">InH</span></code></a>, and <a class="reference internal" href="sionna.phy.channel.tr38901.InF.html#sionna.phy.channel.tr38901.InF" title="sionna.phy.channel.tr38901.InF"><code class="xref py py-class docutils literal notranslate"><span class="pre">InF</span></code></a>
+channel models construct the corresponding scenario object internally, so most
+users should instantiate those channel classes instead.</p>
+<p>The lower-level scenario API is useful when working directly with components
+such as <a class="reference internal" href="sionna.phy.channel.tr38901.LSPGenerator.html#sionna.phy.channel.tr38901.LSPGenerator" title="sionna.phy.channel.tr38901.LSPGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LSPGenerator</span></code></a> or <a class="reference internal" href="sionna.phy.channel.tr38901.RaysGenerator.html#sionna.phy.channel.tr38901.RaysGenerator" title="sionna.phy.channel.tr38901.RaysGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">RaysGenerator</span></code></a>. In particular,
+<a class="reference internal" href="sionna.phy.channel.tr38901.InFScenario.html#sionna.phy.channel.tr38901.InFScenario" title="sionna.phy.channel.tr38901.InFScenario"><code class="xref py py-class docutils literal notranslate"><span class="pre">InFScenario</span></code></a> stores the selected factory sub-scenario, hall and clutter
+geometry, versioned LoS/NLoS parameters, and the topology state used internally
+by <a class="reference internal" href="sionna.phy.channel.tr38901.InF.html#sionna.phy.channel.tr38901.InF" title="sionna.phy.channel.tr38901.InF"><code class="xref py py-class docutils literal notranslate"><span class="pre">InF</span></code></a>.</p>
+<p><a class="reference internal" href="sionna.phy.channel.tr38901.RMaScenario.html#sionna.phy.channel.tr38901.RMaScenario" title="sionna.phy.channel.tr38901.RMaScenario"><code class="xref py py-class docutils literal notranslate"><span class="pre">RMaScenario</span></code></a> additionally owns the mutually exclusive indoor and in-car
+UT states required by Table 7.2-3. If <code class="docutils literal notranslate"><span class="pre">in_car</span></code> is omitted on its first
+topology call, non-indoor UTs are interpreted as in-car. The ordinary-window
+car penetration model is the default; the optional metallized-window mean from
+Section 7.4.3.2 can be selected when constructing <a class="reference internal" href="sionna.phy.channel.tr38901.RMa.html#sionna.phy.channel.tr38901.RMa" title="sionna.phy.channel.tr38901.RMa"><code class="xref py py-class docutils literal notranslate"><span class="pre">RMa</span></code></a> or
+<a class="reference internal" href="sionna.phy.channel.tr38901.RMaScenario.html#sionna.phy.channel.tr38901.RMaScenario" title="sionna.phy.channel.tr38901.RMaScenario"><code class="xref py py-class docutils literal notranslate"><span class="pre">RMaScenario</span></code></a>.</p>
+<p>For InF-SL, InF-DL, InF-SH, and InF-DH, omitted hall and clutter parameters use
+the calibration assumptions in Table 7.8-7 of
+<span class="bibtex-citation" id="id1">[<a class="reference internal" href="../../../references.html#id48" title="3GPP. Study on channel model for frequencies from 0.5 to 100 GHz. 3GPP TR 38.901, 2026. version 19.2.0, Release 19. URL: https://www.etsi.org/deliver/etsi_tr/138900_138999/138901/19.02.00_60/tr_138901v190200p.pdf.">TR38901V1920</a>]</span>. Table 7.8-7 does not define an InF-HH
+calibration layout. The InF-HH defaults exposed by <a class="reference internal" href="sionna.phy.channel.tr38901.InF.html#sionna.phy.channel.tr38901.InF" title="sionna.phy.channel.tr38901.InF"><code class="xref py py-class docutils literal notranslate"><span class="pre">InF</span></code></a> and
+<a class="reference internal" href="sionna.phy.channel.tr38901.InFScenario.html#sionna.phy.channel.tr38901.InFScenario" title="sionna.phy.channel.tr38901.InFScenario"><code class="xref py py-class docutils literal notranslate"><span class="pre">InFScenario</span></code></a> are therefore implementation assumptions; pass explicit
+hall and clutter values when modelling a specific InF-HH deployment.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.SystemLevelScenario.html#sionna.phy.channel.tr38901.SystemLevelScenario" title="sionna.phy.channel.tr38901.SystemLevelScenario"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SystemLevelScenario</span></code></a>(carrier_frequency, ...)</p></td>
+<td><p>Base class for setting up the scenario for system level 3GPP channel simulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.UMiScenario.html#sionna.phy.channel.tr38901.UMiScenario" title="sionna.phy.channel.tr38901.UMiScenario"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UMiScenario</span></code></a>(carrier_frequency, o2i_model, ...)</p></td>
+<td><p>3GPP TR 38.901 urban microcell (UMi) channel model scenario.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.UMaScenario.html#sionna.phy.channel.tr38901.UMaScenario" title="sionna.phy.channel.tr38901.UMaScenario"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UMaScenario</span></code></a>(carrier_frequency, o2i_model, ...)</p></td>
+<td><p>3GPP TR 38.901 urban macrocell (UMa) channel model scenario.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.RMaScenario.html#sionna.phy.channel.tr38901.RMaScenario" title="sionna.phy.channel.tr38901.RMaScenario"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RMaScenario</span></code></a>(carrier_frequency, ut_array, ...)</p></td>
+<td><p>3GPP TR 38.901 rural macrocell (RMa) channel model scenario.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.InHScenario.html#sionna.phy.channel.tr38901.InHScenario" title="sionna.phy.channel.tr38901.InHScenario"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InHScenario</span></code></a>(carrier_frequency, ...[, ...])</p></td>
+<td><p>3GPP TR 38.901 indoor hotspot (InH) channel model scenario.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.InFScenario.html#sionna.phy.channel.tr38901.InFScenario" title="sionna.phy.channel.tr38901.InFScenario"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InFScenario</span></code></a>(carrier_frequency, ...[, ...])</p></td>
+<td><p>3GPP TR 38.901 indoor factory (InF) channel model scenario.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="lower-level-generators">
+<h2>Lower-Level Generators<a class="headerlink" href="#lower-level-generators" title="Link to this heading">#</a></h2>
+<p>The following public components support custom assembly of the TR 38.901
+generation steps. The high-level channel classes configure and call them
+automatically.</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.LSPGenerator.html#sionna.phy.channel.tr38901.LSPGenerator" title="sionna.phy.channel.tr38901.LSPGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LSPGenerator</span></code></a>(scenario)</p></td>
+<td><p>Sample large scale parameters (LSP) and pathloss given a channel scenario, e.g., UMa, UMi, RMa, InH, or InF</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.RaysGenerator.html#sionna.phy.channel.tr38901.RaysGenerator" title="sionna.phy.channel.tr38901.RaysGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RaysGenerator</span></code></a>(scenario[, ...])</p></td>
+<td><p>Sample rays according to a given channel scenario and large scale parameters (LSP).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.Topology.html#sionna.phy.channel.tr38901.Topology" title="sionna.phy.channel.tr38901.Topology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Topology</span></code></a>(velocities, moving_end, los_aoa, ...)</p></td>
+<td><p>Class for conveniently storing the network topology information required for sampling channel impulse responses</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="sionna.phy.channel.tr38901.ChannelCoefficientsGenerator.html#sionna.phy.channel.tr38901.ChannelCoefficientsGenerator" title="sionna.phy.channel.tr38901.ChannelCoefficientsGenerator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChannelCoefficientsGenerator</span></code></a>(...[, ...])</p></td>
+<td><p>Sample channel impulse responses according to LSPs rays</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lower-level-generators">Lower-Level Generators</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../../_sources/phy/api/channel/wireless/tr38901_scenarios.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

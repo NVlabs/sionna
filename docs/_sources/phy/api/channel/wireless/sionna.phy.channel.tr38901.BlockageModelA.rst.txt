@@ -1,0 +1,11 @@
+﻿BlockageModelA
+==============
+
+.. currentmodule:: sionna.phy.channel.tr38901
+
+.. autoclass:: BlockageModelA
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :member-order: alphabetical
+   :exclude-members: call, forward, build

@@ -1,0 +1,945 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.sys.metrics &#8212; Sionna 2.1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../_static/documentation_options.js?v=20623aea"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/sys/metrics';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.1.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/sys/metrics.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.1.0" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.sys.metrics</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.sys.metrics</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">"""System-level metric utilities."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna._validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_tensor_all</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span><span class="p">,</span> <span class="n">dtypes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Precision</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"coupling_loss_db"</span><span class="p">,</span>
+    <span class="s2">"received_power_dbm"</span><span class="p">,</span>
+    <span class="s2">"serving_indices"</span><span class="p">,</span>
+    <span class="s2">"geometry_sir_db"</span><span class="p">,</span>
+    <span class="s2">"geometry_sinr_db"</span><span class="p">,</span>
+    <span class="s2">"wideband_sir_db"</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_dtype</span><span class="p">(</span><span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">precision</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">return</span> <span class="n">dtypes</span><span class="p">[</span><span class="n">precision</span><span class="p">][</span><span class="s2">"torch"</span><span class="p">][</span><span class="s2">"dtype"</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_tensor</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">_dtype</span><span class="p">(</span><span class="n">precision</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="ow">and</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">device</span>
+    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">device</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_log_interference_ratio</span><span class="p">(</span>
+    <span class="n">relative_power_db</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">serving</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Return the natural logarithm of relative interference power."""</span>
+    <span class="n">bs_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">relative_power_db</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">relative_power_db</span><span class="o">.</span><span class="n">device</span>
+    <span class="p">)</span>
+    <span class="n">non_serving</span> <span class="o">=</span> <span class="n">bs_indices</span> <span class="o">!=</span> <span class="n">serving</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">relative_power_neper</span> <span class="o">=</span> <span class="n">relative_power_db</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">logsumexp</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">non_serving</span><span class="p">,</span>
+            <span class="n">relative_power_neper</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">relative_power_neper</span><span class="p">,</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="coupling_loss_db">
+<a class="viewcode-back" href="../../../sys/api/sionna.sys.coupling_loss_db.html#sionna.sys.coupling_loss_db">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coupling_loss_db</span><span class="p">(</span>
+    <span class="n">path_gain_db</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Computes the coupling loss from a path gain in dB.</span>
+
+<span class="sd">    The coupling loss :math:`\mathrm{CL}_{b,u}` between BS :math:`b` and UT</span>
+<span class="sd">    :math:`u` is the negative path gain,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathrm{CL}_{b,u}[\mathrm{dB}]</span>
+<span class="sd">        = -G_{b,u}[\mathrm{dB}],</span>
+
+<span class="sd">    where :math:`G_{b,u}` includes all gains and losses between transmitter and</span>
+<span class="sd">    receiver. It is used in the link budget</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        P_{r,b,u}[\mathrm{dBm}]</span>
+<span class="sd">        = P_{\mathrm{tx},b}[\mathrm{dBm}]</span>
+<span class="sd">        - \mathrm{CL}_{b,u}[\mathrm{dB}].</span>
+
+<span class="sd">    This convention follows the coupling-loss definition used for 3GPP system</span>
+<span class="sd">    calibration in Section 7.8 of :cite:p:`TR38901V160100`. Coupling loss is one of</span>
+<span class="sd">    the Phase 1 calibration metrics and is also used as input for the geometry</span>
+<span class="sd">    SIR, geometry SINR, and wideband SIR metrics.</span>
+
+<span class="sd">    :param path_gain_db: Path gain [dB].</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :output coupling_loss: Coupling loss [dB].</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from sionna.sys import coupling_loss_db</span>
+
+<span class="sd">        cl = coupling_loss_db(-120.0)</span>
+<span class="sd">        print(cl)</span>
+<span class="sd">        # tensor(120.)</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">_to_tensor</span><span class="p">(</span><span class="n">path_gain_db</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="received_power_dbm">
+<a class="viewcode-back" href="../../../sys/api/sionna.sys.received_power_dbm.html#sionna.sys.received_power_dbm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">received_power_dbm</span><span class="p">(</span>
+    <span class="n">tx_power_dbm</span><span class="p">,</span>
+    <span class="n">coupling_loss</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Computes received power from transmit power and coupling loss.</span>
+
+<span class="sd">    For transmit power :math:`P_{\mathrm{tx},b}` and coupling loss</span>
+<span class="sd">    :math:`\mathrm{CL}_{b,u}`, the received power is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        P_{r,b,u}[\mathrm{dBm}]</span>
+<span class="sd">        = P_{\mathrm{tx},b}[\mathrm{dBm}]</span>
+<span class="sd">        - \mathrm{CL}_{b,u}[\mathrm{dB}].</span>
+
+<span class="sd">    This link-budget relation is used by the 3GPP TR 38.901 calibration</span>
+<span class="sd">    metrics in Section 7.8 of :cite:p:`TR38901V160100` to convert coupling losses</span>
+<span class="sd">    into desired and interfering received powers.</span>
+
+<span class="sd">    :param tx_power_dbm: Transmit power [dBm].</span>
+<span class="sd">    :param coupling_loss: Coupling loss [dB].</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :output rx_power_dbm: Received power [dBm].</span>
+<span class="sd">    """</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">_to_tensor</span><span class="p">(</span><span class="n">coupling_loss</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">tx</span> <span class="o">=</span> <span class="n">_to_tensor</span><span class="p">(</span><span class="n">tx_power_dbm</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tx</span> <span class="o">-</span> <span class="n">cl</span></div>
+
+
+
+<div class="viewcode-block" id="serving_indices">
+<a class="viewcode-back" href="../../../sys/api/sionna.sys.serving_indices.html#sionna.sys.serving_indices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">serving_indices</span><span class="p">(</span><span class="n">coupling_loss</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Returns the serving-cell indices for minimum coupling loss.</span>
+
+<span class="sd">    The serving BS is selected as</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        b^\star(u) = \arg\min_b \mathrm{CL}_{b,u}.</span>
+
+<span class="sd">    This minimum-coupling-loss association is used by the 3GPP TR 38.901</span>
+<span class="sd">    calibration metrics in Section 7.8 of :cite:p:`TR38901V160100` before computing</span>
+<span class="sd">    geometry SIR and geometry SINR.</span>
+
+<span class="sd">    :param coupling_loss: Coupling loss [dB] with shape ``[..., num_bs]``.</span>
+
+<span class="sd">    :output serving: Serving BS indices with shape ``[...]``.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">coupling_loss</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="geometry_sir_db">
+<a class="viewcode-back" href="../../../sys/api/sionna.sys.geometry_sir_db.html#sionna.sys.geometry_sir_db">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">geometry_sir_db</span><span class="p">(</span>
+    <span class="n">coupling_loss</span><span class="p">,</span>
+    <span class="n">serving</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Computes geometry SIR from coupling losses.</span>
+
+<span class="sd">    Geometry SIR is the interference-limited signal-to-interference ratio</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathrm{SIR}_{u}</span>
+<span class="sd">        = \frac{P_{r,b^\star,u}}</span>
+<span class="sd">               {\sum_{b\ne b^\star} P_{r,b,u}},</span>
+
+<span class="sd">    where :math:`b^\star` is the serving BS and received powers are obtained</span>
+<span class="sd">    from coupling losses. Transmit powers are assumed equal for all base stations and</span>
+<span class="sd">    therefore cancel.</span>
+
+<span class="sd">    Geometry SIR is a 3GPP TR 38.901 system calibration metric from Section</span>
+<span class="sd">    7.8 of :cite:p:`TR38901V160100`. It is used to verify interference geometry</span>
+<span class="sd">    independently of thermal noise.</span>
+
+<span class="sd">    The ratio is evaluated from relative gains in the log domain, making the</span>
+<span class="sd">    result invariant to large common coupling-loss offsets without numerical</span>
+<span class="sd">    underflow or overflow.</span>
+
+<span class="sd">    :param coupling_loss: Coupling loss [dB] with shape ``[..., num_bs]``.</span>
+<span class="sd">    :param serving: Serving BS indices with shape ``[...]``. If `None`, the</span>
+<span class="sd">        serving BS is selected by :func:`~sionna.sys.serving_indices`.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :output sir: Geometry SIR [dB] with shape ``[...]``.</span>
+<span class="sd">    """</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">_to_tensor</span><span class="p">(</span><span class="n">coupling_loss</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">serving</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">serving</span> <span class="o">=</span> <span class="n">serving_indices</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">serving</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">serving</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">desired_cl</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">take_along_dim</span><span class="p">(</span>
+        <span class="n">cl</span><span class="p">,</span> <span class="n">serving</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">relative_power_db</span> <span class="o">=</span> <span class="n">desired_cl</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">cl</span>
+    <span class="n">log_interference_ratio</span> <span class="o">=</span> <span class="n">_log_interference_ratio</span><span class="p">(</span>
+        <span class="n">relative_power_db</span><span class="p">,</span> <span class="n">serving</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="mf">10.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">))</span> <span class="o">*</span> <span class="n">log_interference_ratio</span></div>
+
+
+
+<div class="viewcode-block" id="geometry_sinr_db">
+<a class="viewcode-back" href="../../../sys/api/sionna.sys.geometry_sinr_db.html#sionna.sys.geometry_sinr_db">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">geometry_sinr_db</span><span class="p">(</span>
+    <span class="n">coupling_loss</span><span class="p">,</span>
+    <span class="n">tx_power_dbm</span><span class="p">,</span>
+    <span class="n">bandwidth_hz</span><span class="p">,</span>
+    <span class="n">noise_figure_db</span><span class="p">,</span>
+    <span class="n">serving</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Computes geometry SINR from coupling losses and receiver noise.</span>
+
+<span class="sd">    Geometry SINR is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathrm{SINR}_{u}</span>
+<span class="sd">        = \frac{P_{r,b^\star,u}}</span>
+<span class="sd">               {\sum_{b\ne b^\star} P_{r,b,u} + N},</span>
+
+<span class="sd">    where :math:`N` is the thermal noise power including receiver noise figure</span>
+<span class="sd">    over the configured bandwidth,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        N[\mathrm{dBm}]</span>
+<span class="sd">        = -174 + 10\log_{10}(B[\mathrm{Hz}]) + F[\mathrm{dB}].</span>
+
+<span class="sd">    Geometry SINR is used in the Phase 1 system calibration described in</span>
+<span class="sd">    Section 7.8 of :cite:p:`TR38901V160100`. It verifies the combined effect of</span>
+<span class="sd">    serving-cell association, interference geometry, transmit power, bandwidth,</span>
+<span class="sd">    and receiver noise figure.</span>
+
+<span class="sd">    :param coupling_loss: Coupling loss [dB] with shape ``[..., num_bs]``.</span>
+<span class="sd">    :param tx_power_dbm: Transmit power [dBm].</span>
+<span class="sd">    :param bandwidth_hz: Finite, positive bandwidth [Hz].</span>
+<span class="sd">    :param noise_figure_db: Receiver noise figure [dB].</span>
+<span class="sd">    :param serving: Serving BS indices with shape ``[...]``. If `None`, the</span>
+<span class="sd">        serving BS is selected by :func:`~sionna.sys.serving_indices`.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :output sinr: Geometry SINR [dB] with shape ``[...]``.</span>
+<span class="sd">    """</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">_to_tensor</span><span class="p">(</span><span class="n">coupling_loss</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">serving</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">serving</span> <span class="o">=</span> <span class="n">serving_indices</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">serving</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">serving</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">rx_dbm</span> <span class="o">=</span> <span class="n">received_power_dbm</span><span class="p">(</span>
+        <span class="n">tx_power_dbm</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">device</span>
+    <span class="p">)</span>
+    <span class="n">desired_dbm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">take_along_dim</span><span class="p">(</span>
+        <span class="n">rx_dbm</span><span class="p">,</span> <span class="n">serving</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">relative_power_db</span> <span class="o">=</span> <span class="n">rx_dbm</span> <span class="o">-</span> <span class="n">desired_dbm</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">log_interference_ratio</span> <span class="o">=</span> <span class="n">_log_interference_ratio</span><span class="p">(</span>
+        <span class="n">relative_power_db</span><span class="p">,</span> <span class="n">serving</span>
+    <span class="p">)</span>
+
+    <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">_to_tensor</span><span class="p">(</span><span class="n">bandwidth_hz</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bandwidth</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`bandwidth_hz` must contain finite, positive values"</span><span class="p">)</span>
+    <span class="n">check_tensor_all</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">bandwidth</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"bandwidth_hz"</span><span class="p">,</span>
+        <span class="n">message</span><span class="o">=</span><span class="s2">"`bandwidth_hz` must contain finite, positive values"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">noise_figure</span> <span class="o">=</span> <span class="n">_to_tensor</span><span class="p">(</span><span class="n">noise_figure_db</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">cl</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">noise_dbm</span> <span class="o">=</span> <span class="o">-</span><span class="mf">174.0</span> <span class="o">+</span> <span class="mf">10.0</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span> <span class="o">+</span> <span class="n">noise_figure</span>
+    <span class="n">log_noise_ratio</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">noise_dbm</span> <span class="o">-</span> <span class="n">desired_dbm</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
+    <span class="n">log_denominator_ratio</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span>
+        <span class="n">log_interference_ratio</span><span class="p">,</span> <span class="n">log_noise_ratio</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="mf">10.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">))</span> <span class="o">*</span> <span class="n">log_denominator_ratio</span></div>
+
+
+
+<div class="viewcode-block" id="wideband_sir_db">
+<a class="viewcode-back" href="../../../sys/api/sionna.sys.wideband_sir_db.html#sionna.sys.wideband_sir_db">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">wideband_sir_db</span><span class="p">(</span>
+    <span class="n">coupling_loss</span><span class="p">,</span>
+    <span class="n">serving</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Computes wideband SIR from coupling losses.</span>
+
+<span class="sd">    For a serving BS :math:`b^\star(u)` selected by minimum coupling loss,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        b^\star(u) = \arg\min_b \mathrm{CL}_{b,u},</span>
+
+<span class="sd">    the wideband SIR is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \mathrm{SIR}^{\mathrm{WB}}_u</span>
+<span class="sd">        = \frac{10^{-\mathrm{CL}_{b^\star,u}/10}}</span>
+<span class="sd">               {\sum_{b\ne b^\star}10^{-\mathrm{CL}_{b,u}/10}}.</span>
+
+<span class="sd">    The returned value is :math:`10\log_{10}(\mathrm{SIR}^{\mathrm{WB}}_u)`.</span>
+<span class="sd">    Equal BS transmit powers are assumed and therefore cancel.</span>
+
+<span class="sd">    With equal BS transmit powers and no small-scale fading, this expression is</span>
+<span class="sd">    numerically identical to :func:`~sionna.sys.geometry_sir_db`. The separate</span>
+<span class="sd">    name is kept because 3GPP TR 38.901 Phase 2 calibration in Section 7.8 of</span>
+<span class="sd">    :cite:p:`TR38901V160100` refers to the corresponding quantity as wideband SIR. It</span>
+<span class="sd">    verifies the large-scale interference geometry used before evaluating the</span>
+<span class="sd">    Phase 2 small-scale fading metrics.</span>
+
+<span class="sd">    :param coupling_loss: Coupling loss [dB] with shape ``[..., num_bs]``.</span>
+<span class="sd">    :param serving: Serving BS indices with shape ``[...]``. If `None`, the</span>
+<span class="sd">        serving BS is selected by :func:`~sionna.sys.serving_indices`.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`,</span>
+<span class="sd">        :attr:`~sionna.phy.config.Config.device` is used.</span>
+
+<span class="sd">    :output sir: Wideband SIR [dB] with shape ``[...]``.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">geometry_sir_db</span><span class="p">(</span>
+        <span class="n">coupling_loss</span><span class="p">,</span> <span class="n">serving</span><span class="o">=</span><span class="n">serving</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

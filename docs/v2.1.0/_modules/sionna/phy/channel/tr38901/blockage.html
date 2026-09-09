@@ -1,0 +1,1512 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.phy.channel.tr38901.blockage &#8212; Sionna 2.1.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../../_static/documentation_options.js?v=20623aea"></script>
+    <script src="../../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/phy/channel/tr38901/blockage';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.1.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/phy/channel/tr38901/blockage.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.1.0" />
+  
+    
+    <script src="../../../../../_static/searchtools.js"></script>
+    <script src="../../../../../_static/language_data.js"></script>
+    <script src="../../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.phy.channel.tr38901.blockage</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.phy.channel.tr38901.blockage</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">"""Blockage models for 3GPP TR 38.901 system-level channels."""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna._validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_tensor_all</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.object</span><span class="w"> </span><span class="kn">import</span> <span class="n">Object</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.channel.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deg_2_rad</span><span class="p">,</span> <span class="n">rad_2_deg</span><span class="p">,</span> <span class="n">wrap_angle_0_360</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">normal</span><span class="p">,</span> <span class="n">rand</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.spatial_consistency</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">spatial_consistency_correlation_matrix</span><span class="p">,</span>
+    <span class="n">spatial_consistency_matrix_sqrt</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_topology_buffer</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.system_level_scenario</span><span class="w"> </span><span class="kn">import</span> <span class="n">SystemLevelScenario</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"BlockageModelA"</span><span class="p">,</span> <span class="s2">"BlockageModelB"</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="BlockageModelA">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelA.html#sionna.phy.channel.tr38901.BlockageModelA">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockageModelA</span><span class="p">(</span><span class="n">Object</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Stochastic blockage model A from 3GPP TR 38.901.</span>
+
+<span class="sd">    This model implements the add-on blockage procedure from Section 7.6.4.1</span>
+<span class="sd">    of :cite:p:`TR38901V1920`. It generates rectangular angular blocking regions</span>
+<span class="sd">    around each UT and returns the corresponding blockage attenuation for the</span>
+<span class="sd">    cluster arrival angles. The LOS/NLOS state of a link is not changed by this</span>
+<span class="sd">    model.</span>
+
+<span class="sd">    For non-self-blocking regions, the loss for a cluster with azimuth angle</span>
+<span class="sd">    of arrival :math:`\phi_\mathrm{AOA}` and zenith angle of arrival</span>
+<span class="sd">    :math:`\theta_\mathrm{ZOA}` is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        L_\mathrm{dB}</span>
+<span class="sd">        = -20 \log_{10}\left(</span>
+<span class="sd">            1 - (F_{A_1}+F_{A_2})(F_{Z_1}+F_{Z_2})</span>
+<span class="sd">          \right)</span>
+
+<span class="sd">    if :math:`|\phi_\mathrm{AOA}-\phi_k|&lt;x_k` and</span>
+<span class="sd">    :math:`|\theta_\mathrm{ZOA}-\theta_k|&lt;y_k`, and zero otherwise. The terms</span>
+<span class="sd">    :math:`F_{A_1}`, :math:`F_{A_2}`, :math:`F_{Z_1}`, and :math:`F_{Z_2}`</span>
+<span class="sd">    follow Eq. (7.6-23) with the signs from Table 7.6.4.1-3 of</span>
+<span class="sd">    :cite:p:`TR38901V1920`. A compliant Model A realization also</span>
+<span class="sd">    includes one self-blocking region. An additional 30 dB loss is added for</span>
+<span class="sd">    clusters inside the selected portrait or landscape region from Table</span>
+<span class="sd">    7.6.4.1-1. The explicit ``"none"`` mode omits this region and is a</span>
+<span class="sd">    non-standard extension.</span>
+
+<span class="sd">    The non-self-blocker centre angles are generated as all-correlated uniform</span>
+<span class="sd">    random variables over BS links, following Section 7.6.3.4 of</span>
+<span class="sd">    :cite:p:`TR38901V1920`. The specified exponential</span>
+<span class="sd">    correlation :math:`\rho_u` is imposed with a Gaussian copula whose latent</span>
+<span class="sd">    correlation is :math:`\rho_g=2\sin(\pi\rho_u/6)`.</span>
+<span class="sd">    Their spatial correlation distance is 10 m for outdoor UMi, UMa, and RMa</span>
+<span class="sd">    UTs, 5 m for O2I UTs, and 5 m for InH UTs, as specified by</span>
+<span class="sd">    Table 7.6.4.1-4.</span>
+
+<span class="sd">    Model A is not available for InF because Tables 7.6.4.1-2 and 7.6.4.1-4</span>
+<span class="sd">    provide neither blocker distributions nor spatial-correlation distances</span>
+<span class="sd">    for InF. Use :class:`BlockageModelB` with explicit blocker geometry for</span>
+<span class="sd">    indoor-factory channels.</span>
+
+<span class="sd">    The optional, on-demand temporal variability of blockage described by TR</span>
+<span class="sd">    38.901 is currently not supported. Blockage attenuation does not evolve</span>
+<span class="sd">    over the time samples of a generated channel realization.</span>
+
+<span class="sd">    :param scenario: System-level TR 38.901 scenario.</span>
+<span class="sd">    :param self_blocking: Self-blocking mode. Must be ``"portrait"`` or</span>
+<span class="sd">        ``"landscape"`` for a compliant Model A realization. The explicit</span>
+<span class="sd">        value ``"none"`` disables self-blocking as a non-standard extension.</span>
+<span class="sd">    :param num_non_self_blockers: Number of non-self-blocking regions. The</span>
+<span class="sd">        default value of 4 follows Section 7.6.4.1 of</span>
+<span class="sd">        :cite:p:`TR38901V1920`.</span>
+<span class="sd">    :param precision: Precision used for internal calculations. If `None`,</span>
+<span class="sd">        the scenario precision is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`, the scenario device is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">    :input aoa: Cluster azimuth angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut, num_clusters]``.</span>
+<span class="sd">    :input zoa: Cluster zenith angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut, num_clusters]``.</span>
+<span class="sd">    :input los_aoa: Optional LOS azimuth angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut]``.</span>
+<span class="sd">    :input los_zoa: Optional LOS zenith angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut]``.</span>
+
+<span class="sd">    :output cluster_loss_db: Blockage attenuation [dB] for each cluster, shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut, num_clusters]``.</span>
+<span class="sd">    :output los_loss_db: Blockage attenuation [dB] for the deterministic LOS</span>
+<span class="sd">        component, or `None` if ``los_aoa`` or ``los_zoa`` is `None`.</span>
+<span class="sd">    """</span>
+
+    <span class="n">_SELF_BLOCKING_PARAMS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"portrait"</span><span class="p">:</span> <span class="p">(</span><span class="mf">260.0</span><span class="p">,</span> <span class="mf">120.0</span><span class="p">,</span> <span class="mf">100.0</span><span class="p">,</span> <span class="mf">80.0</span><span class="p">),</span>
+        <span class="s2">"landscape"</span><span class="p">:</span> <span class="p">(</span><span class="mf">40.0</span><span class="p">,</span> <span class="mf">160.0</span><span class="p">,</span> <span class="mf">110.0</span><span class="p">,</span> <span class="mf">75.0</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scenario</span><span class="p">:</span> <span class="s2">"SystemLevelScenario"</span><span class="p">,</span>
+        <span class="n">self_blocking</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">num_non_self_blockers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">precision</span> <span class="k">if</span> <span class="n">precision</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">precision</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">device</span> <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">device</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">self_blocking</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"self_blocking must explicitly select 'portrait' or "</span>
+                <span class="s2">"'landscape'; use 'none' only for the non-standard no-self "</span>
+                <span class="s2">"variant"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">self_blocking</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"none"</span><span class="p">,</span> <span class="s2">"portrait"</span><span class="p">,</span> <span class="s2">"landscape"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"self_blocking must be 'portrait', 'landscape', or 'none'"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">num_non_self_blockers</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"num_non_self_blockers must be int"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_non_self_blockers</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"num_non_self_blockers must be non-negative"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">scenario</span><span class="o">.</span><span class="n">scenario_kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"umi"</span><span class="p">,</span> <span class="s2">"uma"</span><span class="p">,</span> <span class="s2">"rma"</span><span class="p">,</span> <span class="s2">"inh"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Blockage model A is specified for UMi, UMa, RMa, and InH "</span>
+                <span class="s2">"system-level scenarios."</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span> <span class="o">=</span> <span class="n">scenario</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking</span> <span class="o">=</span> <span class="n">self_blocking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span> <span class="o">=</span> <span class="n">num_non_self_blockers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_matrix_sqrt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_phi</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_x</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_y</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">self_blocking</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking_params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">phi_sb</span><span class="p">,</span> <span class="n">x_sb</span><span class="p">,</span> <span class="n">theta_sb</span><span class="p">,</span> <span class="n">y_sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SELF_BLOCKING_PARAMS</span><span class="p">[</span><span class="n">self_blocking</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking_params</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">phi_sb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">x_sb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">theta_sb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">y_sb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">self_blocking</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Self-blocking mode. One of ``"none"``, ``"portrait"``, or</span>
+<span class="sd">        ``"landscape"``. The ``"none"`` mode is non-standard."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_non_self_blockers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Number of non-self-blocking regions."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">requires_ray_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""`False` because model A computes one loss per cluster."""</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">aoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">zoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">los_aoa</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">los_zoa</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Compute cluster and LOS blockage attenuation."""</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_phi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topology_updated_callback</span><span class="p">()</span>
+
+        <span class="n">cluster_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">aoa</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cluster_loss</span> <span class="o">=</span> <span class="n">cluster_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_non_self_blocking_loss</span><span class="p">(</span><span class="n">aoa</span><span class="p">,</span> <span class="n">zoa</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking</span> <span class="o">!=</span> <span class="s2">"none"</span><span class="p">:</span>
+            <span class="n">cluster_loss</span> <span class="o">=</span> <span class="n">cluster_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking_loss</span><span class="p">(</span><span class="n">aoa</span><span class="p">,</span> <span class="n">zoa</span><span class="p">)</span>
+
+        <span class="n">los_loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">los_aoa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">los_zoa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">los_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">los_aoa</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">los_loss</span> <span class="o">=</span> <span class="n">los_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_non_self_blocking_loss</span><span class="p">(</span>
+                    <span class="n">los_aoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">los_zoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking</span> <span class="o">!=</span> <span class="s2">"none"</span><span class="p">:</span>
+                <span class="n">los_loss</span> <span class="o">=</span> <span class="n">los_loss</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking_loss</span><span class="p">(</span>
+                    <span class="n">los_aoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">los_zoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cluster_loss</span><span class="p">,</span> <span class="n">los_loss</span>
+
+<div class="viewcode-block" id="BlockageModelA.topology_updated_callback">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelA.html#sionna.phy.channel.tr38901.BlockageModelA.topology_updated_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topology_updated_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Sample topology-dependent blockage parameters."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_matrix_sqrt</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sample_non_self_blockers</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BlockageModelA.reset_topology">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelA.html#sionna.phy.channel.tr38901.BlockageModelA.reset_topology">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Reset topology-dependent blockage buffers."""</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"_matrix_sqrt"</span><span class="p">,</span> <span class="s2">"_blocker_phi"</span><span class="p">,</span> <span class="s2">"_blocker_x"</span><span class="p">,</span> <span class="s2">"_blocker_y"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BlockageModelA.allocate_topology_tensors">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelA.html#sionna.phy.channel.tr38901.BlockageModelA.allocate_topology_tensors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">allocate_topology_tensors</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_bs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_ut</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Pre-allocate topology-dependent blockage buffers.</span>
+
+<span class="sd">        Model A samples one blocker realization per UT and shares it across</span>
+<span class="sd">        base stations. ``num_bs`` is retained for the common channel-allocation</span>
+<span class="sd">        interface but does not determine a buffer dimension here.</span>
+<span class="sd">        """</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">num_bs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_topology</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"_matrix_sqrt"</span><span class="p">,</span> <span class="s2">"_blocker_phi"</span><span class="p">,</span> <span class="s2">"_blocker_x"</span><span class="p">,</span> <span class="s2">"_blocker_y"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffers</span><span class="p">:</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">blocker_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_matrix_sqrt"</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="p">,</span>
+                <span class="n">num_ut</span><span class="p">,</span>
+                <span class="n">num_ut</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_blocker_phi"</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">blocker_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_blocker_x"</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">blocker_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">"_blocker_y"</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">blocker_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_scenario_is_indoor_hotspot</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Return `True` for InH scenarios."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span><span class="o">.</span><span class="n">scenario_kind</span> <span class="o">==</span> <span class="s2">"inh"</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_blockage_states</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""UT-state labels for blockage spatial consistency."""</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario_is_indoor_hotspot</span><span class="p">():</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">scenario</span><span class="o">.</span><span class="n">num_ut</span><span class="p">),</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">indoor</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">indoor</span> <span class="o">&amp;</span> <span class="nb">bool</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">o2i_pathloss_enabled</span><span class="p">)</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="n">indoor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">states</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">scenario</span><span class="o">.</span><span class="n">ut_spatial_region_ids</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_blockage_correlation_distance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Correlation distance from Table 7.6.4.1-4."""</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario_is_indoor_hotspot</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">scenario</span><span class="o">.</span><span class="n">num_ut</span><span class="p">),</span>
+                <span class="mf">5.0</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">scenario</span><span class="o">.</span><span class="n">indoor</span> <span class="o">&amp;</span> <span class="nb">bool</span><span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">o2i_pathloss_enabled</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_matrix_sqrt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Compute the latent-Gaussian UT-domain spatial filter."""</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span>
+        <span class="n">uniform_correlation</span> <span class="o">=</span> <span class="n">spatial_consistency_correlation_matrix</span><span class="p">(</span>
+            <span class="n">scenario</span><span class="o">.</span><span class="n">matrix_ut_distance_2d</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_blockage_correlation_distance</span><span class="p">(),</span>
+            <span class="n">states</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_blockage_states</span><span class="p">(),</span>
+            <span class="n">correlation_distance_layout</span><span class="o">=</span><span class="s2">"per_terminal"</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">gaussian_correlation</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">uniform_correlation</span>
+        <span class="p">)</span>
+        <span class="n">gaussian_correlation</span> <span class="o">=</span> <span class="n">gaussian_correlation</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">matrix_sqrt</span> <span class="o">=</span> <span class="n">spatial_consistency_matrix_sqrt</span><span class="p">(</span>
+            <span class="n">gaussian_correlation</span><span class="p">,</span>
+            <span class="n">precision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">precision</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_matrix_sqrt"</span><span class="p">,</span> <span class="n">matrix_sqrt</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_spatial_uniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Generate all-correlated uniform random variables over UTs."""</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">normal</span><span class="p">(</span>
+            <span class="n">shape</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">torch_rng</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">tail_shape</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_matrix_sqrt</span><span class="p">,</span> <span class="n">samples</span><span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">num_ut</span><span class="p">,</span> <span class="o">*</span><span class="n">tail_shape</span><span class="p">)</span>
+        <span class="n">sqrt_two</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">erfc</span><span class="p">(</span><span class="o">-</span><span class="n">samples</span> <span class="o">/</span> <span class="n">sqrt_two</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+        <span class="k">return</span> <span class="n">samples</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">eps</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sample_non_self_blockers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Sample non-self-blocking regions from Table 7.6.4.1-2."""</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">scenario</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">scenario</span><span class="o">.</span><span class="n">num_ut</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_non_self_blockers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">empty</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_blocker_phi"</span><span class="p">,</span> <span class="n">empty</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_blocker_x"</span><span class="p">,</span> <span class="n">empty</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_blocker_y"</span><span class="p">,</span> <span class="n">empty</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">phi</span> <span class="o">=</span> <span class="mf">360.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spatial_uniform</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario_is_indoor_hotspot</span><span class="p">():</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="mf">15.0</span> <span class="o">+</span> <span class="mf">30.0</span> <span class="o">*</span> <span class="n">rand</span><span class="p">(</span>
+                <span class="n">shape</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">torch_rng</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">+</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">rand</span><span class="p">(</span>
+                <span class="n">shape</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">torch_rng</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="mf">5.0</span> <span class="o">+</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">rand</span><span class="p">(</span>
+                <span class="n">shape</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+                <span class="n">generator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">torch_rng</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_blocker_phi"</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_blocker_x"</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_buffer</span><span class="p">(</span><span class="s2">"_blocker_y"</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Update or register a topology-dependent buffer."""</span>
+        <span class="n">update_topology_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_unit_sphere_vector</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Vector on the TR 38.901 unit sphere."""</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_forward_rotation_matrix</span><span class="p">(</span><span class="n">orientations</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Forward composite rotation matrix from Eq. (7.1-4)."""</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">orientations</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">orientations</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">orientations</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">row_1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">b</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">row_2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">b</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">row_3</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">b</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">c</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">row_1</span><span class="p">,</span> <span class="n">row_2</span><span class="p">,</span> <span class="n">row_3</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gcs_to_lcs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">orientations</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Transform GCS angles to LCS angles following Eqs. (7.1-7)-(7.1-8)."""</span>
+        <span class="n">rho_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_sphere_vector</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+        <span class="n">rot_inv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_rotation_matrix</span><span class="p">(</span><span class="n">orientations</span><span class="p">)</span><span class="o">.</span><span class="n">mT</span>
+        <span class="n">rot_rho</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">rot_inv</span><span class="p">,</span> <span class="n">rho_hat</span><span class="p">)</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">rot_rho</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">theta_prime</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">acos</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">xy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">rot_rho</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">rot_rho</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">phi_prime</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">theta_prime</span><span class="p">,</span> <span class="n">phi_prime</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_signed_angular_difference_deg</span><span class="p">(</span>
+        <span class="n">angle</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">reference</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Signed circular difference in degrees within ``[-180, 180)``."""</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">remainder</span><span class="p">(</span><span class="n">angle</span> <span class="o">-</span> <span class="n">reference</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">,</span> <span class="mf">360.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">180.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_self_blocking_loss</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">aoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">zoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Compute the optional self-blocking loss."""</span>
+        <span class="n">phi_sb</span><span class="p">,</span> <span class="n">x_sb</span><span class="p">,</span> <span class="n">theta_sb</span><span class="p">,</span> <span class="n">y_sb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_self_blocking_params</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span>
+        <span class="n">orientations</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">ut_orientations</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">orientations</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">aoa</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">orientations</span> <span class="o">=</span> <span class="n">orientations</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">theta_prime</span><span class="p">,</span> <span class="n">phi_prime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gcs_to_lcs</span><span class="p">(</span>
+            <span class="n">orientations</span><span class="p">,</span>
+            <span class="n">deg_2_rad</span><span class="p">(</span><span class="n">zoa</span><span class="p">),</span>
+            <span class="n">deg_2_rad</span><span class="p">(</span><span class="n">aoa</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">theta_prime</span> <span class="o">=</span> <span class="n">rad_2_deg</span><span class="p">(</span><span class="n">theta_prime</span><span class="p">)</span>
+        <span class="n">phi_prime</span> <span class="o">=</span> <span class="n">wrap_angle_0_360</span><span class="p">(</span><span class="n">rad_2_deg</span><span class="p">(</span><span class="n">phi_prime</span><span class="p">))</span>
+        <span class="n">phi_diff</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_signed_angular_difference_deg</span><span class="p">(</span>
+                <span class="n">phi_prime</span><span class="p">,</span>
+                <span class="n">phi_sb</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">theta_diff</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta_prime</span> <span class="o">-</span> <span class="n">theta_sb</span><span class="p">)</span>
+        <span class="n">blocked</span> <span class="o">=</span> <span class="p">(</span><span class="n">phi_diff</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x_sb</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">theta_diff</span> <span class="o">&lt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">y_sb</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">blocked</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_non_self_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndim</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Broadcast non-self-blocker parameters."""</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_phi</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_x</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_y</span>
+        <span class="c1"># [batch, ut, blocker] -&gt; [batch, 1, ut, 1, blocker]</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">phi</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">ndim</span><span class="p">:</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">phi</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_non_self_blocking_loss</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">aoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">zoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Compute non-self-blocking loss from Eqs. (7.6-22)-(7.6-27)."""</span>
+        <span class="n">phi_k</span><span class="p">,</span> <span class="n">x_k</span><span class="p">,</span> <span class="n">y_k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_non_self_parameters</span><span class="p">(</span><span class="n">aoa</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">theta_k</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">90.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+            <span class="mf">2.0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario_is_indoor_hotspot</span><span class="p">()</span> <span class="k">else</span> <span class="mf">10.0</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">wavelength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span><span class="o">.</span><span class="n">lambda_0</span>
+
+        <span class="n">aoa</span> <span class="o">=</span> <span class="n">aoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">zoa</span> <span class="o">=</span> <span class="n">zoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">phi_delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_signed_angular_difference_deg</span><span class="p">(</span><span class="n">aoa</span><span class="p">,</span> <span class="n">phi_k</span><span class="p">)</span>
+        <span class="n">theta_delta</span> <span class="o">=</span> <span class="n">zoa</span> <span class="o">-</span> <span class="n">theta_k</span>
+
+        <span class="n">active</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">phi_delta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">x_k</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">theta_delta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">y_k</span><span class="p">)</span>
+
+        <span class="n">a1</span> <span class="o">=</span> <span class="n">phi_delta</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x_k</span>
+        <span class="n">a2</span> <span class="o">=</span> <span class="n">phi_delta</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x_k</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">theta_delta</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">y_k</span>
+        <span class="n">z2</span> <span class="o">=</span> <span class="n">theta_delta</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">y_k</span>
+
+        <span class="n">sign_a1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">phi_delta</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">x_k</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">sign_a2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">phi_delta</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">x_k</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">sign_z1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">theta_delta</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">y_k</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">sign_z2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">theta_delta</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">y_k</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">f_a1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knife_edge_term</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">sign_a1</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">)</span>
+        <span class="n">f_a2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knife_edge_term</span><span class="p">(</span><span class="n">a2</span><span class="p">,</span> <span class="n">sign_a2</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">)</span>
+        <span class="n">f_z1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knife_edge_term</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">sign_z1</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">)</span>
+        <span class="n">f_z2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knife_edge_term</span><span class="p">(</span><span class="n">z2</span><span class="p">,</span> <span class="n">sign_z2</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">)</span>
+
+        <span class="n">product</span> <span class="o">=</span> <span class="p">(</span><span class="n">f_a1</span> <span class="o">+</span> <span class="n">f_a2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">f_z1</span> <span class="o">+</span> <span class="n">f_z2</span><span class="p">)</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">argument</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">product</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="mf">20.0</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">loss</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_knife_edge_term</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">angle_deg</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">sign</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">r</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">wavelength</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Term from Eq. (7.6-23)."""</span>
+        <span class="n">angle_rad</span> <span class="o">=</span> <span class="n">deg_2_rad</span><span class="p">(</span><span class="n">angle_deg</span><span class="p">)</span>
+        <span class="n">cos_angle</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle_rad</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+        <span class="n">radicand</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">wavelength</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">cos_angle</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">radicand</span> <span class="o">=</span> <span class="n">radicand</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">sign</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">radicand</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">pi</span></div>
+
+
+
+<div class="viewcode-block" id="BlockageModelB">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelB.html#sionna.phy.channel.tr38901.BlockageModelB">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BlockageModelB</span><span class="p">(</span><span class="n">Object</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Geometric blockage model B from 3GPP TR 38.901.</span>
+
+<span class="sd">    This model implements the rectangular-screen blockage add-on from Section</span>
+<span class="sd">    7.6.4.2 of :cite:p:`TR38901V1920`. A set of physical blocker screens is placed</span>
+<span class="sd">    in the global coordinate system. For every sub-path, the screen is rotated</span>
+<span class="sd">    around its centre such that the incoming ray is perpendicular to the screen</span>
+<span class="sd">    and the loss is computed from the simple knife-edge diffraction model</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        L_\mathrm{dB}</span>
+<span class="sd">        = -20 \log_{10}\left(</span>
+<span class="sd">            1 - (F_{h_1}+F_{h_2})(F_{w_1}+F_{w_2})</span>
+<span class="sd">          \right)</span>
+
+<span class="sd">    where the four :math:`F` terms follow Eq. (7.6-30) of</span>
+<span class="sd">    :cite:p:`TR38901V1920`. Losses from multiple screens are summed in dB. The</span>
+<span class="sd">    LOS/NLOS state of each link is not changed by this model.</span>
+
+<span class="sd">    The positions and dimensions of the blockers are simulation assumptions.</span>
+<span class="sd">    Recommended dimensions for humans, vehicles, AGVs, and industrial robots</span>
+<span class="sd">    are listed in Table 7.6.4.2-5 of :cite:p:`TR38901V1920`.</span>
+
+<span class="sd">    The optional, on-demand temporal variability of blockage described by TR</span>
+<span class="sd">    38.901 is currently not supported. Blockage attenuation does not evolve</span>
+<span class="sd">    over the time samples of a generated channel realization.</span>
+
+<span class="sd">    When used with</span>
+<span class="sd">    :class:`~sionna.phy.channel.tr38901.ChannelCoefficientsGenerator`, the</span>
+<span class="sd">    returned losses are applied as per-ray amplitude factors</span>
+<span class="sd">    :math:`10^{-L_\mathrm{dB}/20}` before the channel paths are coherently</span>
+<span class="sd">    summed. This convention is also used by the bundled blockage Model B RSRP</span>
+<span class="sd">    calibration curves.</span>
+
+<span class="sd">    :param scenario: System-level TR 38.901 scenario.</span>
+<span class="sd">    :param blocker_centers: Blocker screen centres [m], shape</span>
+<span class="sd">        ``[num_blockers, 3]`` or ``[batch size, num_blockers, 3]``.</span>
+<span class="sd">    :param blocker_widths: Blocker widths [m], shape ``[num_blockers]`` or</span>
+<span class="sd">        ``[batch size, num_blockers]``.</span>
+<span class="sd">    :param blocker_heights: Blocker heights [m], shape ``[num_blockers]`` or</span>
+<span class="sd">        ``[batch size, num_blockers]``.</span>
+<span class="sd">    :param precision: Precision used for internal calculations. If `None`,</span>
+<span class="sd">        the scenario precision is used.</span>
+<span class="sd">    :param device: Device for computation. If `None`, the scenario device is</span>
+<span class="sd">        used.</span>
+
+<span class="sd">    :input aoa: Ray azimuth angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut, num_clusters, num_rays]``.</span>
+<span class="sd">    :input zoa: Ray zenith angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut, num_clusters, num_rays]``.</span>
+<span class="sd">    :input los_aoa: Optional LOS azimuth angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut]``.</span>
+<span class="sd">    :input los_zoa: Optional LOS zenith angles of arrival [degree], shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut]``.</span>
+
+<span class="sd">    :output ray_loss_db: Blockage attenuation [dB] for each ray, shape</span>
+<span class="sd">        ``[batch size, num_bs, num_ut, num_clusters, num_rays]``.</span>
+<span class="sd">    :output los_loss_db: Blockage attenuation [dB] for the deterministic LOS</span>
+<span class="sd">        component, or `None` if ``los_aoa`` or ``los_zoa`` is `None`.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scenario</span><span class="p">:</span> <span class="s2">"SystemLevelScenario"</span><span class="p">,</span>
+        <span class="n">blocker_centers</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">blocker_widths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">blocker_heights</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">precision</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">precision</span> <span class="k">if</span> <span class="n">precision</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">precision</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">device</span> <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">device</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span> <span class="o">=</span> <span class="n">scenario</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">blocker_centers</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">widths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">blocker_widths</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">heights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">blocker_heights</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">centers</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">centers</span> <span class="o">=</span> <span class="n">centers</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">centers</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"blocker_centers must have shape [num_blockers, 3] or "</span>
+                <span class="s2">"[batch size, num_blockers, 3]"</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">widths</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">widths</span> <span class="o">=</span> <span class="n">widths</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">heights</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">heights</span> <span class="o">=</span> <span class="n">heights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">widths</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">heights</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"blocker_widths and blocker_heights must have shape "</span>
+                <span class="s2">"[num_blockers] or [batch size, num_blockers]"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">widths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="n">heights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"blocker_widths and blocker_heights must match the number of "</span>
+                <span class="s2">"blocker_centers"</span>
+            <span class="p">)</span>
+        <span class="n">batch_dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">widths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">heights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">max_batch_dim</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">batch_dims</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_batch_dim</span><span class="p">)</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">batch_dims</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Batch dimensions of blocker_centers, blocker_widths, and "</span>
+                <span class="s2">"blocker_heights are inconsistent"</span>
+            <span class="p">)</span>
+        <span class="n">check_tensor_all</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">widths</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">heights</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"blocker dimensions"</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="s2">"blocker widths and heights must be positive"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_blocker_centers"</span><span class="p">,</span> <span class="n">centers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_blocker_widths"</span><span class="p">,</span> <span class="n">widths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">"_blocker_heights"</span><span class="p">,</span> <span class="n">heights</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">requires_ray_angles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""`True` because model B computes one loss per ray."""</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_blockers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Number of configured blocker screens."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">aoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">zoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">los_aoa</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">los_zoa</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Compute ray and LOS blockage attenuation."""</span>
+        <span class="k">if</span> <span class="n">aoa</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">zoa</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">aoa</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Model B expects ray angles with shape "</span>
+                <span class="s2">"[batch size, num_bs, num_ut, num_clusters, num_rays]"</span>
+            <span class="p">)</span>
+
+        <span class="n">ray_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_screen_loss</span><span class="p">(</span><span class="n">aoa</span><span class="p">,</span> <span class="n">zoa</span><span class="p">,</span> <span class="n">direct_path</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">los_loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">los_aoa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">los_zoa</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">los_loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_screen_loss</span><span class="p">(</span>
+                <span class="n">los_aoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">los_zoa</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">direct_path</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ray_loss</span><span class="p">,</span> <span class="n">los_loss</span>
+
+<div class="viewcode-block" id="BlockageModelB.topology_updated_callback">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelB.html#sionna.phy.channel.tr38901.BlockageModelB.topology_updated_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">topology_updated_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Model B blocker geometry is explicit and topology-independent."""</span></div>
+
+
+<div class="viewcode-block" id="BlockageModelB.reset_topology">
+<a class="viewcode-back" href="../../../../../phy/api/channel/wireless/sionna.phy.channel.tr38901.BlockageModelB.html#sionna.phy.channel.tr38901.BlockageModelB.reset_topology">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Model B has no topology-dependent random buffers."""</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_blockers_for_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Return blocker geometry broadcast to ``batch_size``."""</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_centers</span>
+        <span class="n">widths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_widths</span>
+        <span class="n">heights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blocker_heights</span>
+        <span class="k">if</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">centers</span> <span class="o">=</span> <span class="n">centers</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">widths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">widths</span> <span class="o">=</span> <span class="n">widths</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">heights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">batch_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">heights</span> <span class="o">=</span> <span class="n">heights</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">batch_size</span>
+            <span class="ow">or</span> <span class="n">widths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">batch_size</span>
+            <span class="ow">or</span> <span class="n">heights</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">batch_size</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Batch-specific blocker geometry must match the current "</span>
+                <span class="s2">"topology batch size"</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">centers</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">heights</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_unit_sphere_vector</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">phi</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Vector on the TR 38.901 unit sphere."""</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_screen_loss</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">aoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">zoa</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">direct_path</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Compute total loss from all screens."""</span>
+        <span class="n">scenario</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">aoa</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">centers</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">heights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_blockers_for_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+
+        <span class="n">ray_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_sphere_vector</span><span class="p">(</span><span class="n">deg_2_rad</span><span class="p">(</span><span class="n">zoa</span><span class="p">),</span> <span class="n">deg_2_rad</span><span class="p">(</span><span class="n">aoa</span><span class="p">))</span>
+        <span class="n">ray_dir</span> <span class="o">=</span> <span class="n">ray_dir</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">rx</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">ut_loc</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">tx</span> <span class="o">=</span> <span class="n">scenario</span><span class="o">.</span><span class="n">bs_virtual_loc</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="n">centers</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+        <span class="n">widths</span> <span class="o">=</span> <span class="n">widths</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+        <span class="n">heights</span> <span class="o">=</span> <span class="n">heights</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="n">loss_top</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projected_loss</span><span class="p">(</span>
+            <span class="n">ray_dir</span><span class="p">,</span>
+            <span class="n">rx</span><span class="p">,</span>
+            <span class="n">tx</span><span class="p">,</span>
+            <span class="n">centers</span><span class="p">,</span>
+            <span class="n">widths</span><span class="p">,</span>
+            <span class="n">direct_path</span><span class="o">=</span><span class="n">direct_path</span><span class="p">,</span>
+            <span class="n">projection</span><span class="o">=</span><span class="s2">"top"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">loss_side</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projected_loss</span><span class="p">(</span>
+            <span class="n">ray_dir</span><span class="p">,</span>
+            <span class="n">rx</span><span class="p">,</span>
+            <span class="n">tx</span><span class="p">,</span>
+            <span class="n">centers</span><span class="p">,</span>
+            <span class="n">heights</span><span class="p">,</span>
+            <span class="n">direct_path</span><span class="o">=</span><span class="n">direct_path</span><span class="p">,</span>
+            <span class="n">projection</span><span class="o">=</span><span class="s2">"side"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">product</span> <span class="o">=</span> <span class="n">loss_side</span><span class="p">[</span><span class="s2">"f_sum"</span><span class="p">]</span> <span class="o">*</span> <span class="n">loss_top</span><span class="p">[</span><span class="s2">"f_sum"</span><span class="p">]</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="mf">20.0</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">log10</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">product</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">))</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="n">loss_side</span><span class="p">[</span><span class="s2">"active"</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">loss_top</span><span class="p">[</span><span class="s2">"active"</span><span class="p">]</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">loss</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_projected_loss</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ray_dir</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">rx</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">tx</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">centers</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">size</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">direct_path</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">projection</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Compute projected knife-edge terms for one screen dimension."""</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+        <span class="k">if</span> <span class="n">projection</span> <span class="o">==</span> <span class="s2">"top"</span><span class="p">:</span>
+            <span class="n">norm_xy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ray_dir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">ray_dir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">norm_xy</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">u</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">rel</span> <span class="o">=</span> <span class="n">centers</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">center_parallel</span> <span class="o">=</span> <span class="p">(</span><span class="n">rel</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">center_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">rel</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">direct_path</span><span class="p">:</span>
+                <span class="n">tx_rel</span> <span class="o">=</span> <span class="n">tx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">tx_parallel</span> <span class="o">=</span> <span class="p">(</span><span class="n">tx_rel</span> <span class="o">*</span> <span class="n">u</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">tx_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">tx_rel</span> <span class="o">*</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">path_length</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">tx_parallel</span><span class="o">.</span><span class="n">square</span><span class="p">()</span> <span class="o">+</span> <span class="n">tx_offset</span><span class="o">.</span><span class="n">square</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tx_parallel</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">tx_offset</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">path_length</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">projection</span> <span class="o">==</span> <span class="s2">"side"</span><span class="p">:</span>
+            <span class="n">norm_xy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ray_dir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+            <span class="n">u_parallel</span> <span class="o">=</span> <span class="n">norm_xy</span>
+            <span class="n">u_vertical</span> <span class="o">=</span> <span class="n">ray_dir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">rel_xy</span> <span class="o">=</span> <span class="n">centers</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">horizontal_dir</span> <span class="o">=</span> <span class="n">ray_dir</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">norm_xy</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">rel_horizontal</span> <span class="o">=</span> <span class="p">(</span><span class="n">rel_xy</span> <span class="o">*</span> <span class="n">horizontal_dir</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">rel_vertical</span> <span class="o">=</span> <span class="n">centers</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">center_parallel</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">rel_horizontal</span> <span class="o">*</span> <span class="n">u_parallel</span> <span class="o">+</span> <span class="n">rel_vertical</span> <span class="o">*</span> <span class="n">u_vertical</span>
+            <span class="p">)</span>
+            <span class="n">center_offset</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="o">-</span><span class="n">rel_horizontal</span> <span class="o">*</span> <span class="n">u_vertical</span> <span class="o">+</span> <span class="n">rel_vertical</span> <span class="o">*</span> <span class="n">u_parallel</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">direct_path</span><span class="p">:</span>
+                <span class="n">tx_rel_xy</span> <span class="o">=</span> <span class="n">tx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">tx_horizontal</span> <span class="o">=</span> <span class="p">(</span><span class="n">tx_rel_xy</span> <span class="o">*</span> <span class="n">horizontal_dir</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">tx_vertical</span> <span class="o">=</span> <span class="n">tx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rx</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+                <span class="n">tx_parallel</span> <span class="o">=</span> <span class="n">tx_horizontal</span> <span class="o">*</span> <span class="n">u_parallel</span> <span class="o">+</span> <span class="n">tx_vertical</span> <span class="o">*</span> <span class="n">u_vertical</span>
+                <span class="n">tx_offset</span> <span class="o">=</span> <span class="o">-</span><span class="n">tx_horizontal</span> <span class="o">*</span> <span class="n">u_vertical</span> <span class="o">+</span> <span class="n">tx_vertical</span> <span class="o">*</span> <span class="n">u_parallel</span>
+                <span class="n">path_length</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">tx_parallel</span><span class="o">.</span><span class="n">square</span><span class="p">()</span> <span class="o">+</span> <span class="n">tx_offset</span><span class="o">.</span><span class="n">square</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tx_parallel</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">tx_offset</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">path_length</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"projection must be 'top' or 'side'"</span><span class="p">)</span>
+
+        <span class="n">edge_1</span> <span class="o">=</span> <span class="n">center_offset</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">size</span>
+        <span class="n">edge_2</span> <span class="o">=</span> <span class="n">center_offset</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">size</span>
+        <span class="n">d1_1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">center_parallel</span><span class="o">.</span><span class="n">square</span><span class="p">()</span> <span class="o">+</span> <span class="n">edge_1</span><span class="o">.</span><span class="n">square</span><span class="p">())</span>
+        <span class="n">d1_2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">center_parallel</span><span class="o">.</span><span class="n">square</span><span class="p">()</span> <span class="o">+</span> <span class="n">edge_2</span><span class="o">.</span><span class="n">square</span><span class="p">())</span>
+
+        <span class="n">intersects</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">center_offset</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">size</span>
+        <span class="k">if</span> <span class="n">direct_path</span><span class="p">:</span>
+            <span class="n">d2_1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">tx_parallel</span> <span class="o">-</span> <span class="n">center_parallel</span><span class="p">)</span><span class="o">.</span><span class="n">square</span><span class="p">()</span>
+                              <span class="o">+</span> <span class="p">(</span><span class="n">tx_offset</span> <span class="o">-</span> <span class="n">edge_1</span><span class="p">)</span><span class="o">.</span><span class="n">square</span><span class="p">())</span>
+            <span class="n">d2_2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">tx_parallel</span> <span class="o">-</span> <span class="n">center_parallel</span><span class="p">)</span><span class="o">.</span><span class="n">square</span><span class="p">()</span>
+                              <span class="o">+</span> <span class="p">(</span><span class="n">tx_offset</span> <span class="o">-</span> <span class="n">edge_2</span><span class="p">)</span><span class="o">.</span><span class="n">square</span><span class="p">())</span>
+            <span class="n">excess_1</span> <span class="o">=</span> <span class="n">d1_1</span> <span class="o">+</span> <span class="n">d2_1</span> <span class="o">-</span> <span class="n">path_length</span>
+            <span class="n">excess_2</span> <span class="o">=</span> <span class="n">d1_2</span> <span class="o">+</span> <span class="n">d2_2</span> <span class="o">-</span> <span class="n">path_length</span>
+            <span class="n">sign_metric_1</span> <span class="o">=</span> <span class="n">d1_1</span> <span class="o">+</span> <span class="n">d2_1</span>
+            <span class="n">sign_metric_2</span> <span class="o">=</span> <span class="n">d1_2</span> <span class="o">+</span> <span class="n">d2_2</span>
+            <span class="n">between_endpoints</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">center_parallel</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="n">center_parallel</span> <span class="o">&lt;</span> <span class="n">path_length</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="n">eps</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="n">between_endpoints</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">excess_1</span> <span class="o">=</span> <span class="n">d1_1</span> <span class="o">-</span> <span class="n">center_parallel</span>
+            <span class="n">excess_2</span> <span class="o">=</span> <span class="n">d1_2</span> <span class="o">-</span> <span class="n">center_parallel</span>
+            <span class="n">sign_metric_1</span> <span class="o">=</span> <span class="n">d1_1</span>
+            <span class="n">sign_metric_2</span> <span class="o">=</span> <span class="n">d1_2</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="n">center_parallel</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+
+        <span class="n">sign_1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">intersects</span> <span class="o">|</span> <span class="p">(</span><span class="n">sign_metric_1</span> <span class="o">&gt;</span> <span class="n">sign_metric_2</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">sign_2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">intersects</span> <span class="o">|</span> <span class="p">(</span><span class="n">sign_metric_2</span> <span class="o">&gt;</span> <span class="n">sign_metric_1</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="n">f_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knife_edge_term</span><span class="p">(</span><span class="n">excess_1</span><span class="p">,</span> <span class="n">sign_1</span><span class="p">)</span>
+        <span class="n">f_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_knife_edge_term</span><span class="p">(</span><span class="n">excess_2</span><span class="p">,</span> <span class="n">sign_2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">"f_sum"</span><span class="p">:</span> <span class="n">f_1</span> <span class="o">+</span> <span class="n">f_2</span><span class="p">,</span> <span class="s2">"active"</span><span class="p">:</span> <span class="n">active</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_knife_edge_term</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">excess_distance</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">sign</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Knife-edge term from Eq. (7.6-30)."""</span>
+        <span class="n">radicand</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scenario</span><span class="o">.</span><span class="n">lambda_0</span><span class="p">)</span> <span class="o">*</span> <span class="n">excess_distance</span>
+        <span class="n">radicand</span> <span class="o">=</span> <span class="n">radicand</span><span class="o">.</span><span class="n">clamp_min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">sign</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">radicand</span><span class="p">))</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">pi</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
