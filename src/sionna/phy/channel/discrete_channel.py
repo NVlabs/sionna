@@ -8,6 +8,7 @@ from typing import Optional, Tuple, Union
 
 import torch
 
+from sionna._validation import check_binary
 from sionna.phy import Block
 from sionna.phy.config import Precision
 from sionna.phy.utils import expand_to_rank, rand
@@ -82,10 +83,14 @@ class BinaryMemorylessChannel(Block):
             \operatorname{log} \frac{1-p_{b,1}}{p_{b,0}}, \qquad \text{if} \, y=1 \\
         \end{cases}
 
-    The error probability :math:`p_\text{b}` can be either scalar or a
-    tensor (broadcastable to the shape of the input). This allows
-    different erasure probabilities per bit position. In any case, its last
-    dimension must be of length 2 and is interpreted as :math:`p_\text{b,0}` and
+    Probabilities at the closed endpoints :math:`\{0,1\}` are accepted. For
+    LLR outputs they are clamped away from the endpoints before the logarithm
+    so that the LLRs remain finite and then saturate at ``llr_max``.
+
+    The error probability :math:`p_\text{b}` can be a length-2 sequence of
+    scalars or a tensor whose last dimension has length 2 (broadcastable to
+    the shape of the input). This allows different flip probabilities per bit
+    position. The last dimension is interpreted as :math:`p_\text{b,0}` and
     :math:`p_\text{b,1}`.
 
     :param return_llrs: If `True`, the layer returns log-likelihood ratios
@@ -103,16 +108,14 @@ class BinaryMemorylessChannel(Block):
         :math:`\{0,1\}` or :math:`\{-1,1\}`, respectively.
 
     :input pb: [...,2], `torch.Tensor`.
-        Error probability. Can be a tuple of two scalars or of any
-        shape that can be broadcasted to the shape of ``x``. It has an
-        additional last dimension which is interpreted as
-        :math:`p_\text{b,0}` and :math:`p_\text{b,1}`.
+        Error probability. Can be a tuple of two scalars or a tensor of any
+        shape that can be broadcast to ``x`` with a last dimension of length
+        2, interpreted as :math:`p_\text{b,0}` and :math:`p_\text{b,1}`.
 
     :output y: [...,n], `torch.Tensor`.
-        Output sequence of same length as the input ``x``. If
-        ``return_llrs`` is `False`, the output is ternary where a `-1` and
-        `0` indicate an erasure for the binary and bipolar input,
-        respectively.
+        Output sequence of the same length as ``x``. Binary (or bipolar)
+        symbols when ``return_llrs`` is `False`, or log-likelihood ratios
+        when ``return_llrs`` is `True`.
 
     .. rubric:: Examples
 
@@ -181,23 +184,16 @@ class BinaryMemorylessChannel(Block):
         # Register as buffer for CUDAGraph compatibility
         self.register_buffer("_temperature", torch.tensor(value, dtype=self.dtype, device=self.device))
 
-    @torch.compiler.disable
     def _check_inputs(self, x: torch.Tensor) -> None:
-        """Check input x for consistency, i.e., verify
-        that all values are binary or bipolar values.
-
-        This method is excluded from torch.compile to avoid recompilation
-        issues caused by the mutable _check_input flag.
-        """
-        if self._check_input:
-            x_float = x.to(self.dtype)
-            if self._bipolar_input:
-                valid = torch.logical_or(x_float == -1, x_float == 1)
-            else:
-                valid = torch.logical_or(x_float == 0, x_float == 1)
-
-            if not valid.all():
-                raise ValueError("Input must be binary.")
+        """Validate binary inputs once eagerly and on every compiled call."""
+        if torch.compiler.is_compiling() or self._check_input:
+            check_binary(
+                x.to(self.dtype),
+                name="x",
+                bipolar=self._bipolar_input,
+                message="Input must be binary.",
+            )
+        if not torch.compiler.is_compiling():
             self._check_input = False
 
     def _check_dtype(self, x: torch.Tensor, allow_uint: bool = True) -> None:
@@ -261,18 +257,29 @@ class BinaryMemorylessChannel(Block):
         return _STEBinarizer.apply(e_cat[..., 0])
 
     def build(self, *input_shapes) -> None:
-        """Verify correct input shapes."""
-        pb_shapes = input_shapes[1]
-        # Allow tuple of scalars as alternative input
-        if isinstance(pb_shapes, (tuple, list)):
-            if len(pb_shapes) != 2:
-                raise ValueError("Last dim of pb must be of length 2.")
-        else:
-            if len(pb_shapes) > 0:
-                if pb_shapes[-1] != 2:
-                    raise ValueError("Last dim of pb must be of length 2.")
-            else:
-                raise ValueError("Last dim of pb must be of length 2.")
+        """No shape validation in ``build``; ``pb`` is checked in ``call``."""
+
+    def _validate_pb(
+        self, pb: Union[Tuple[float, float], torch.Tensor]
+    ) -> None:
+        """Validate ``pb`` against the documented public contract."""
+        if isinstance(pb, (tuple, list)):
+            if len(pb) != 2:
+                raise ValueError(
+                    "pb as a sequence must contain exactly two probabilities "
+                    "(p_b,0 and p_b,1)."
+                )
+            return
+        if not isinstance(pb, torch.Tensor):
+            raise TypeError(
+                "pb must be a torch.Tensor or a length-2 sequence of "
+                "probabilities."
+            )
+        if pb.ndim == 0 or pb.shape[-1] != 2:
+            raise ValueError(
+                "Last dimension of pb must have length 2 "
+                f"(got shape {tuple(pb.shape)})."
+            )
 
     def call(
         self,
@@ -282,6 +289,7 @@ class BinaryMemorylessChannel(Block):
         """Apply discrete binary memoryless channel to inputs."""
         # Check input dtype for consistency with parameters
         self._check_dtype(x)
+        self._validate_pb(pb)
 
         # Allow pb to be a tuple of two scalars
         if isinstance(pb, (tuple, list)):
@@ -332,9 +340,15 @@ class BinaryMemorylessChannel(Block):
                 y = 2 * y - 1  # transform to bipolar
 
             # Remark: Sionna uses the logit definition log[p(x=1)/p(x=0)]
-            eps = self._eps
-            y0 = -(torch.log(pb1 + eps) - torch.log(1 - pb0 - eps))
-            y1 = torch.log(1 - pb1 - eps) - torch.log(pb0 + eps)
+            # Clamp away from {0,1} using the working precision's machine eps
+            # so both endpoints keep strictly positive log arguments (1e-9 is
+            # below float32 eps and would make 1-eps round back to 1.0).
+            # LLRs then saturate and are clipped to +/- llr_max.
+            eps = torch.finfo(pb0.dtype).eps
+            pb0_llr = pb0.clamp(eps, 1.0 - eps)
+            pb1_llr = pb1.clamp(eps, 1.0 - eps)
+            y0 = -(torch.log(pb1_llr) - torch.log(1.0 - pb0_llr))
+            y1 = torch.log(1.0 - pb1_llr) - torch.log(pb0_llr)
 
             # Multiply by y to keep gradient
             y = torch.where(y == 1, y1, y0).to(y.dtype) * y
@@ -391,10 +405,10 @@ class BinarySymmetricChannel(BinaryMemorylessChannel):
         can be broadcasted to the shape of ``x``.
 
     :output y: [...,n], `torch.Tensor`.
-        Output sequence of same length as the input ``x``. If
-        ``return_llrs`` is `False`, the output is ternary where a `-1` and
-        `0` indicate an erasure for the binary and bipolar input,
-        respectively.
+        Output sequence of the same length as ``x``. Binary (or bipolar)
+        symbols when ``return_llrs`` is `False`, or log-likelihood ratios
+        when ``return_llrs`` is `True`. Endpoint flip probabilities are
+        accepted; LLR outputs remain finite and saturate at ``llr_max``.
 
     .. rubric:: Examples
 

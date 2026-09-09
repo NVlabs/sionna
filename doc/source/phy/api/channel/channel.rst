@@ -7,7 +7,7 @@ various communication media. It supports three main categories of channels:
 :doc:`wireless/index`
    Models for wireless radio channels, including additive white Gaussian noise
    (AWGN), flat fading with spatial correlation, Rayleigh block fading, and
-   standardized 3GPP models (TDL, CDL, UMi, UMa, RMa) from TR 38.901. These
+   standardized 3GPP models (TDL, CDL, UMi, UMa, RMa, InH, InF) from TR 38.901. These
    models generate channel impulse responses (CIRs) that can be applied in the
    time domain or frequency domain (OFDM). The module also supports loading
    externally generated CIRs from datasets.

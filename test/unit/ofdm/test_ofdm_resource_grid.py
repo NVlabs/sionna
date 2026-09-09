@@ -120,9 +120,78 @@ class TestResourceGrid:
         assert torch.all(type_grid[..., :5] == 2)  # Left guards
         assert torch.all(type_grid[..., -5:] == 2)  # Right guards
 
+    @pytest.mark.parametrize(
+        ("fft_size", "guards", "expected_indices", "expected_types"),
+        [
+            (8, (4, 0), [5, 6, 7], [2, 2, 2, 2, 3, 0, 0, 0]),
+            (8, (0, 3), [0, 1, 2, 3], [0, 0, 0, 0, 3, 2, 2, 2]),
+            (7, (3, 0), [4, 5, 6], [2, 2, 2, 3, 0, 0, 0]),
+            (7, (0, 3), [0, 1, 2], [0, 0, 0, 3, 2, 2, 2]),
+        ],
+    )
+    def test_guard_carriers_adjacent_to_dc(
+        self,
+        fft_size,
+        guards,
+        expected_indices,
+        expected_types,
+        device,
+        precision,
+    ):
+        """Guard regions may end immediately next to the nulled DC carrier."""
+        rg = ResourceGrid(
+            num_ofdm_symbols=1,
+            fft_size=fft_size,
+            subcarrier_spacing=30e3,
+            num_guard_carriers=guards,
+            dc_null=True,
+            precision=precision,
+            device=device,
+        )
+
+        np.testing.assert_array_equal(
+            rg.effective_subcarrier_ind, expected_indices
+        )
+        assert rg.num_effective_subcarriers == len(expected_indices)
+        torch.testing.assert_close(
+            rg.build_type_grid()[0, 0, 0],
+            torch.tensor(expected_types, dtype=torch.int32, device=device),
+        )
+
+    @pytest.mark.parametrize("guards", [(5, 0), (6, 0), (0, 4), (0, 5)])
+    def test_guard_carriers_cannot_include_dc(
+        self, guards, device, precision
+    ):
+        """A separately nulled DC carrier cannot also be a guard carrier."""
+        with pytest.raises(ValueError, match="include the DC subcarrier"):
+            ResourceGrid(
+                num_ofdm_symbols=1,
+                fft_size=8,
+                subcarrier_spacing=30e3,
+                num_guard_carriers=guards,
+                dc_null=True,
+                precision=precision,
+                device=device,
+            )
+
+    def test_resource_grid_requires_effective_subcarrier(
+        self, device, precision
+    ):
+        """Validation runs before pilot-pattern construction."""
+        with pytest.raises(ValueError, match="at least one effective"):
+            ResourceGrid(
+                num_ofdm_symbols=1,
+                fft_size=8,
+                subcarrier_spacing=30e3,
+                num_guard_carriers=(4, 3),
+                dc_null=True,
+                precision=precision,
+                device=device,
+            )
+
     def test_invalid_params(self, device, precision):
         """Test that invalid parameters raise errors"""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             ResourceGrid(
                 num_ofdm_symbols=0,
                 fft_size=64,
@@ -131,7 +200,7 @@ class TestResourceGrid:
                 device=device,
             )
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             ResourceGrid(
                 num_ofdm_symbols=14,
                 fft_size=64,

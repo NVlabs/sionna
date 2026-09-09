@@ -7,6 +7,8 @@
 from typing import Callable, Optional, Tuple, Union
 
 import torch
+
+from sionna._validation import check_one_of, check_tensor_all
 from sionna.phy import config, dtypes
 
 __all__ = ["expand_bound", "bisection_method"]
@@ -19,6 +21,7 @@ def expand_bound(
     step_expand: float = 2.0,
     max_n_iter: int = 100,
     precision: Optional[str] = None,
+    device: Optional[str] = None,
     **kwargs,
 ) -> torch.Tensor:
     r"""
@@ -39,6 +42,9 @@ def expand_bound(
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`,
         :attr:`~sionna.phy.config.Config.precision` is used.
+    :param device: Device for computation. If `None`, the device of ``bound``
+        is used when it is a tensor, and
+        :attr:`~sionna.phy.config.Config.device` otherwise.
     :param kwargs: Additional arguments for function ``f``.
 
     :output bound: [...], `torch.float`.
@@ -65,17 +71,17 @@ def expand_bound(
     else:
         dtype = dtypes[precision]["torch"]["dtype"]
 
-    # Determine device from input tensor, fall back to config.device
-    if isinstance(bound, torch.Tensor):
-        device = bound.device
-    else:
-        device = config.device
+    # Explicit device wins, then the device of the input tensor, then config
+    if device is None:
+        if isinstance(bound, torch.Tensor):
+            device = bound.device
+        else:
+            device = config.device
 
-    # Cast inputs - preserve the device of input tensor
     if not isinstance(bound, torch.Tensor):
         bound = torch.tensor(bound, dtype=dtype, device=device)
     else:
-        bound = bound.to(dtype=dtype)  # Keep on original device
+        bound = bound.to(dtype=dtype, device=device)
 
     if not isinstance(step_expand, torch.Tensor):
         step_expand = torch.tensor(step_expand, dtype=dtype, device=device)
@@ -83,8 +89,17 @@ def expand_bound(
         step_expand = step_expand.to(dtype=dtype, device=device)
 
     # Validate inputs
-    assert side in ["left", "right"], "side must be 'left' or 'right'"
-    assert step_expand > 1, "step_expand must be > 1"
+    check_one_of(
+        side,
+        ("left", "right"),
+        name="side",
+        message="side must be 'left' or 'right'",
+    )
+    check_tensor_all(
+        step_expand > 1,
+        name="step_expand",
+        message="`step_expand` must be > 1",
+    )
 
     # Initialize left and right bounds for search intervals
     if side == "left":
@@ -100,9 +115,15 @@ def expand_bound(
             step = torch.pow(torch.abs(step_expand), i)
             bound = torch.where(condition, bound - step, bound)
 
-        assert torch.all(
-            f(bound, **kwargs) >= 0
-        ), "Root cannot be found. Please either increase 'step_expand' or 'max_n_iter'"
+        check_tensor_all(
+            f(bound, **kwargs) >= 0,
+            name="bound",
+            message=(
+                "Root cannot be bracketed on the left; increase "
+                "`step_expand` or `max_n_iter`"
+            ),
+            error_type=RuntimeError,
+        )
     else:
         for i in range(max_n_iter):
             f_val = f(bound, **kwargs)
@@ -116,9 +137,15 @@ def expand_bound(
             step = torch.pow(torch.abs(step_expand), i)
             bound = torch.where(condition, bound + step, bound)
 
-        assert torch.all(
-            f(bound, **kwargs) <= 0
-        ), "Root cannot be found. Please either increase 'step_expand' or 'max_n_iter'"
+        check_tensor_all(
+            f(bound, **kwargs) <= 0,
+            name="bound",
+            message=(
+                "Root cannot be bracketed on the right; increase "
+                "`step_expand` or `max_n_iter`"
+            ),
+            error_type=RuntimeError,
+        )
 
     return bound
 
@@ -136,6 +163,7 @@ def bisection_method(
     max_n_iter: int = 100,
     return_brackets: bool = False,
     precision: Optional[str] = None,
+    device: Optional[str] = None,
     **kwargs,
 ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]]:
     r"""
@@ -160,7 +188,7 @@ def bisection_method(
         geometric progression of ``step_expand`` until ``f`` becomes positive,
         for each batch.
         If `False`, then ``left`` is not decreased. Defaults to `True`.
-    :param expand_to_right: If `True` and ``f(left)`` is positive, then ``right`` is increased by a
+    :param expand_to_right: If `True` and ``f(right)`` is positive, then ``right`` is increased by a
         geometric progression of ``step_expand`` until ``f`` becomes negative,
         for each batch.
         If `False`, then ``right`` is not increased. Defaults to `True`.
@@ -175,6 +203,9 @@ def bisection_method(
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`,
         :attr:`~sionna.phy.config.Config.precision` is used.
+    :param device: Device for computation. If `None`, the device of ``left``
+        (or ``right``) is used when either is a tensor, and
+        :attr:`~sionna.phy.config.Config.device` otherwise.
     :param kwargs: Additional arguments for function ``f``.
 
     :output x_opt: [...], `torch.float`.
@@ -217,29 +248,32 @@ def bisection_method(
     else:
         dtype = dtypes[precision]["torch"]["dtype"]
 
-    # Determine device from input tensors, fall back to config.device
-    if isinstance(left, torch.Tensor):
-        device = left.device
-    elif isinstance(right, torch.Tensor):
-        device = right.device
-    else:
-        device = config.device
+    # Explicit device wins, then the device of an input tensor, then config
+    if device is None:
+        if isinstance(left, torch.Tensor):
+            device = left.device
+        elif isinstance(right, torch.Tensor):
+            device = right.device
+        else:
+            device = config.device
 
-    # Cast inputs - preserve the device of input tensors
     if not isinstance(left, torch.Tensor):
         left = torch.tensor(left, dtype=dtype, device=device)
     else:
-        left = left.to(dtype=dtype)  # Keep on original device
+        left = left.to(dtype=dtype, device=device)
 
     if not isinstance(right, torch.Tensor):
         right = torch.tensor(right, dtype=dtype, device=device)
     else:
-        right = right.to(dtype=dtype)  # Keep on original device
+        right = right.to(dtype=dtype, device=device)
 
     eps_x = torch.tensor(eps_x, dtype=dtype, device=device)
 
-    # Validate inputs
-    assert torch.all(left <= right), "bound_left must be <= bound_right"
+    check_tensor_all(
+        left <= right,
+        name="left",
+        message="`left` must be <= `right`",
+    )
 
     # -------------------------- #
     # Expand (or not) end points #
@@ -253,6 +287,7 @@ def bisection_method(
             step_expand=step_expand,
             max_n_iter=max_n_iter,
             precision=precision,
+            device=device,
             **kwargs,
         )
     else:
@@ -267,6 +302,7 @@ def bisection_method(
             step_expand=step_expand,
             max_n_iter=max_n_iter,
             precision=precision,
+            device=device,
             **kwargs,
         )
     else:

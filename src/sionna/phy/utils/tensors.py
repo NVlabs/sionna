@@ -8,7 +8,9 @@ from typing import Any, List, Optional, Union
 
 import torch
 
+from sionna._validation import check_tensor_all
 from sionna.phy import config
+from sionna.phy.utils.random import randint as _randint
 
 __all__ = [
     "expand_to_rank",
@@ -76,7 +78,7 @@ def flatten_dims(tensor: torch.Tensor, num_dims: int, axis: int) -> torch.Tensor
 
     :param tensor: Input tensor
     :param num_dims: Number of dimensions to combine. Must be larger than
-        two and less or equal than the rank of ``tensor``.
+        two and less than or equal to the rank of ``tensor``.
     :param axis: Index of the dimension from which to start
 
     :output tensor: A tensor of the same type as ``tensor`` with ``num_dims`` - 1 lesser
@@ -97,10 +99,14 @@ def flatten_dims(tensor: torch.Tensor, num_dims: int, axis: int) -> torch.Tensor
         print(y.shape)
         # torch.Size([2, 12, 5])
     """
-    assert num_dims >= 2, "`num_dims` must be >= 2"
-    assert num_dims <= tensor.dim(), "`num_dims` must <= rank(`tensor`)"
-    assert 0 <= axis <= tensor.dim() - 1, "0 <= `axis` <= rank(tensor) - 1"
-    assert num_dims + axis <= tensor.dim(), "`num_dims` + `axis` <= rank(`tensor`)"
+    if not (num_dims >= 2):
+        raise ValueError("`num_dims` must be >= 2")
+    if not (num_dims <= tensor.dim()):
+        raise ValueError("`num_dims` must be <= rank(`tensor`)")
+    if not 0 <= axis <= tensor.dim() - 1:
+        raise ValueError("`axis` must satisfy 0 <= `axis` <= rank(`tensor`) - 1")
+    if not (num_dims + axis <= tensor.dim()):
+        raise ValueError("`num_dims` + `axis` must be <= rank(`tensor`)")
 
     return torch.flatten(tensor, start_dim=axis, end_dim=axis + num_dims - 1)
 
@@ -113,7 +119,7 @@ def flatten_last_dims(tensor: torch.Tensor, num_dims: int = 2) -> torch.Tensor:
 
     :param tensor: Input tensor
     :param num_dims: Number of dimensions to combine. Must be greater than
-        or equal to two and less or equal than the rank of ``tensor``.
+        or equal to two and less than or equal to the rank of ``tensor``.
 
     :output tensor: A tensor of the same type as ``tensor`` with ``num_dims`` - 1 lesser
         dimensions, but the same number of elements
@@ -133,8 +139,10 @@ def flatten_last_dims(tensor: torch.Tensor, num_dims: int = 2) -> torch.Tensor:
         print(y.shape)
         # torch.Size([2, 12])
     """
-    assert num_dims >= 2, "`num_dims` must be >= 2"
-    assert num_dims <= tensor.dim(), "`num_dims` must <= rank(`tensor`)"
+    if not (num_dims >= 2):
+        raise ValueError("`num_dims` must be >= 2")
+    if not (num_dims <= tensor.dim()):
+        raise ValueError("`num_dims` must be <= rank(`tensor`)")
 
     return torch.flatten(tensor, start_dim=-num_dims)
 
@@ -172,10 +180,12 @@ def insert_dims(tensor: torch.Tensor, num_dims: int, axis: int = -1) -> torch.Te
         print(y.shape)
         # torch.Size([3, 4, 1, 1])
     """
-    assert num_dims >= 0, "`num_dims` must be nonnegative."
+    if not (num_dims >= 0):
+        raise ValueError("`num_dims` must be nonnegative")
 
     rank = tensor.dim()
-    assert -(rank + 1) <= axis <= rank, "`axis` is out of range `[-(D+1), D]`)"
+    if not -(rank + 1) <= axis <= rank:
+        raise ValueError("`axis` must be in the range [-(D+1), D]")
 
     axis = axis if axis >= 0 else rank + axis + 1
     shape = list(tensor.shape)
@@ -214,7 +224,8 @@ def split_dim(
         print(y.shape)
         # torch.Size([2, 3, 4])
     """
-    assert 0 <= axis <= tensor.dim() - 1, "0 <= `axis` <= rank(tensor) - 1"
+    if not 0 <= axis <= tensor.dim() - 1:
+        raise ValueError("`axis` must satisfy 0 <= `axis` <= rank(`tensor`) - 1")
 
     s = tensor.shape
     new_shape = list(s[:axis]) + list(shape) + list(s[axis + 1 :])
@@ -273,13 +284,15 @@ def diag_part_axis(tensor: torch.Tensor, axis: int, offset: int = 0) -> torch.Te
         #  [ 9 13 17]
         #  [18 22 26]]
     """
-    assert tensor.dim() >= 2, "The input tensor must have rank >= 2."
+    if tensor.dim() < 2:
+        raise ValueError("The input tensor must have rank >= 2")
 
     rank = tensor.dim()
     if axis < 0:
         axis = rank + axis
 
-    assert 0 <= axis <= rank - 2, "Input value of 'axis' out of boundaries."
+    if not 0 <= axis <= rank - 2:
+        raise ValueError("`axis` must satisfy 0 <= `axis` <= rank(`tensor`) - 2")
 
     # torch.diagonal extracts diagonal from dim1 and dim2, placing it at the end
     diag = torch.diagonal(tensor, offset=offset, dim1=axis, dim2=axis + 1)
@@ -316,9 +329,16 @@ def flatten_multi_index(
     indices = indices.to(torch.int64)
     shape_tensor = torch.tensor(shape, dtype=torch.int64, device=indices.device)
 
-    # Assert that indices are within valid bounds
-    assert torch.all(indices >= 0), "indices must be non-negative"
-    assert torch.all(indices < shape_tensor), "indices out of bounds"
+    check_tensor_all(
+        indices >= 0,
+        name="indices",
+        message="`indices` must be non-negative",
+    )
+    check_tensor_all(
+        indices < shape_tensor,
+        name="indices",
+        message="`indices` are out of bounds for `shape`",
+    )
 
     # Compute strides: [prod(shape[1:]), prod(shape[2:]), ..., shape[-1], 1]
     ones = torch.ones(1, dtype=torch.int64, device=indices.device)
@@ -409,7 +429,9 @@ def random_tensor_from_values(
 ) -> torch.Tensor:
     r"""Generates a tensor of the specified ``shape``, with elements randomly sampled from the provided set of ``values``.
 
-    :param values: The set of values to sample from
+    :param values: The set of values to sample from. The output is placed on
+        the device of ``values``, or on
+        :attr:`~sionna.phy.config.Config.device` for list inputs.
     :param shape: The desired shape of the output tensor
     :param dtype: Desired dtype of the output
 
@@ -424,20 +446,24 @@ def random_tensor_from_values(
 
         values = [0, 10, 20]
         shape = [2, 3]
-        print(random_tensor_from_values(values, shape).numpy())
+        print(random_tensor_from_values(values, shape).cpu().numpy())
         # array([[ 0, 20,  0],
         #        [10,  0, 20]], dtype=int32)
     """
     if not isinstance(values, torch.Tensor):
         values = torch.tensor(values, device=config.device)
 
-    indices = torch.randint(
+    device = values.device
+    generator = (
+        None if torch.compiler.is_compiling() else config.torch_rng(str(device))
+    )
+    indices = _randint(
         low=0,
         high=len(values),
         size=tuple(shape),
         dtype=torch.int64,
-        device=config.device,
-        generator=config.torch_rng(),
+        device=device,
+        generator=generator,
     )
     tensor = values[indices]
     if dtype is not None:
@@ -448,7 +474,9 @@ def random_tensor_from_values(
 def enumerate_indices(bounds: Union[List[int], torch.Tensor]) -> torch.Tensor:
     r"""Enumerates all indices between 0 (included) and ``bounds`` (excluded) in lexicographic order.
 
-    :param bounds: Collection of index bounds
+    :param bounds: Collection of index bounds. The output is placed on the
+        device of ``bounds``, or on
+        :attr:`~sionna.phy.config.Config.device` for list inputs.
 
     :output indices: Collection of all indices, in lexicographic order, with shape
         [prod(bounds), len(bounds)]
@@ -459,7 +487,7 @@ def enumerate_indices(bounds: Union[List[int], torch.Tensor]) -> torch.Tensor:
 
         from sionna.phy.utils import enumerate_indices
 
-        print(enumerate_indices([2, 3]).numpy())
+        print(enumerate_indices([2, 3]).cpu().numpy())
         # [[0 0]
         #  [0 1]
         #  [0 2]
@@ -469,10 +497,12 @@ def enumerate_indices(bounds: Union[List[int], torch.Tensor]) -> torch.Tensor:
     """
     if isinstance(bounds, torch.Tensor):
         bounds_list = bounds.tolist()
+        device = bounds.device
     else:
         bounds_list = list(bounds)
+        device = config.device
 
-    ranges = [torch.arange(b, device=config.device) for b in bounds_list]
+    ranges = [torch.arange(b, device=device) for b in bounds_list]
     return torch.cartesian_prod(*ranges)
 
 
@@ -507,7 +537,8 @@ def find_true_position(
         print(find_true_position(x, side='last').item())
         # 4
     """
-    assert side in ["first", "last"], "input side must be 'first' or 'last'"
+    if side not in ("first", "last"):
+        raise ValueError("side must be 'first' or 'last'")
 
     # Check if any True exists along the axis
     any_true = torch.any(bool_tensor, dim=axis)

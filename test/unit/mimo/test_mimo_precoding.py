@@ -174,9 +174,12 @@ class TestGridOfBeamsDFTULA:
         num_ant = 8
         oversmpl = 2
 
-        gob = grid_of_beams_dft_ula(num_ant, oversmpl, precision=precision)
+        gob = grid_of_beams_dft_ula(
+            num_ant, oversmpl, precision=precision, device=device
+        )
 
         assert gob.shape == (num_ant * oversmpl, num_ant)
+        assert gob.device == torch.device(device)
 
     def test_gob_ula_orthogonality(self, device, precision):
         """Test that beams in the DFT GoB are orthogonal."""
@@ -214,9 +217,12 @@ class TestGridOfBeamsDFT:
         num_ant_v = 4
         num_ant_h = 8
 
-        gob = grid_of_beams_dft(num_ant_v, num_ant_h, precision=precision)
+        gob = grid_of_beams_dft(
+            num_ant_v, num_ant_h, precision=precision, device=device
+        )
 
         assert gob.shape == (num_ant_v, num_ant_h, num_ant_v * num_ant_h)
+        assert gob.device == torch.device(device)
 
     def test_gob_with_oversampling(self, device, precision):
         """Test GoB with oversampling."""
@@ -324,14 +330,39 @@ class TestNormalizePrecodingPower:
 
         # Each row should have specified power
         row_power = (vec_norm.abs() ** 2).sum(dim=-1)
-        expected = torch.tensor([1.0, 4.0, 0.25], device=device, dtype=row_power.dtype)  # power squared
-        # Wait, the function multiplies by power, not power^2
-        # So the actual power should be |tx_power|^2 * original_unit_power = tx_power^2
-        # But we normalize to unit first, so power = |tx_power|^2
-        # Actually looking at the code: precoding_vec = (precoding_vec / norm) * tx_power
-        # So norm becomes |tx_power|
-        expected = torch.tensor([1.0, 4.0, 0.25], device=device, dtype=row_power.dtype)
+        expected = torch.tensor(
+            tx_power_list, device=device, dtype=row_power.dtype
+        )
         assert torch.allclose(row_power, expected, atol=atol)
+
+    def test_negative_custom_power_raises(self, device, precision):
+        """Transmit powers must be nonnegative."""
+        vec = complex_normal((2, 8), precision=precision, device=device)
+
+        with pytest.raises(ValueError, match="nonnegative"):
+            normalize_precoding_power(
+                vec, [1.0, -0.5], precision=precision
+            )
+
+    def test_zero_norm_vector_raises(self, device, precision):
+        """A zero-norm precoding vector has no normalized representation."""
+        vec = complex_normal((2, 8), precision=precision, device=device)
+        vec[1] = 0
+
+        with pytest.raises(ValueError, match="zero norm"):
+            normalize_precoding_power(vec, precision=precision)
+
+    @pytest.mark.gpu
+    def test_normalization_compiles_as_fullgraph(self, device):
+        """Zero-norm validation must not split valid compiled calls."""
+        if not device.startswith("cuda"):
+            pytest.skip("This compile regression requires a CUDA device")
+
+        normalize = torch.compile(normalize_precoding_power, fullgraph=True)
+        vec = complex_normal((2, 8), device=device)
+        actual = normalize(vec)
+        expected = normalize_precoding_power(vec)
+        torch.testing.assert_close(actual, expected)
 
     def test_normalize_1d_input(self, device, precision):
         """Test normalization with 1D input."""

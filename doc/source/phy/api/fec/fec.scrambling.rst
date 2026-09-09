@@ -16,10 +16,10 @@ respectively. The :class:`~sionna.phy.fec.scrambling.Descrambler` implement the 
 
 To simplify distributed graph execution (e.g., by running scrambler and
 descrambler in a different sub-graph/device), the scramblers are implemented
-stateless. Thus, the internal seed cannot be update on runtime and does not
+stateless. Thus, the internal seed cannot be updated at runtime and does not
 change after the initialization.
-However, if required an explicit random seed can be passed as additional input
-the scrambler/descrambler pair when calling the layer.
+However, if required, an explicit random seed can be passed as additional input
+to the scrambler/descrambler pair when calling the layer.
 
 Further, the :class:`~sionna.phy.fec.scrambling.TB5GScrambler` enables 5G NR compliant
 scrambling as specified in :cite:p:`3GPPTS38211`.
@@ -42,8 +42,8 @@ scrambler:
    c_descr = descrambler(c_scr)
 
    # --- advanced usage ---
-   # provide explicite seed if a new random seed should be used for each call
+   # provide explicit seed if a new random seed should be used for each call
    s = torch.randint(0, 12345678, ())
 
-   c_scr = scrambler([c, s])
-   c_descr = descrambler([c_scr, s])
+   c_scr = scrambler(c, seed=s)
+   c_descr = descrambler(c_scr, seed=s)

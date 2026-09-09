@@ -130,11 +130,7 @@ class TestLinkAdaptation:
 
         illa = InnerLoopLinkAdaptation(phy_abstraction=phy_abs, device=device)
 
-        # Compile the call method
-        if mode != "default":
-            compiled_call = torch.compile(illa.call, mode=mode)
-        else:
-            compiled_call = illa.call
+        compiled_call = torch.compile(illa.call, mode=mode)
 
         # Generate SINR
         sinr = torch.rand(
@@ -150,3 +146,49 @@ class TestLinkAdaptation:
         mcs_index = compiled_call(sinr)
 
         assert mcs_index.shape == (batch_size, num_ut)
+
+    @pytest.mark.parametrize("bler_target", [0.0, 1.0, -0.1, 1.1])
+    def test_olla_bler_target_validation(self, device, bler_target):
+        """OLLA rejects BLER targets outside the open interval (0, 1)."""
+        phy_abs = PHYAbstraction(device=device)
+        with pytest.raises(ValueError, match="bler_target"):
+            OuterLoopLinkAdaptation(
+                phy_abs, num_ut=2, bler_target=bler_target, device=device
+            )
+
+    def test_olla_parameter_validation(self, device):
+        """OLLA validates positive delta and ordered offset bounds."""
+        phy_abs = PHYAbstraction(device=device)
+        with pytest.raises(ValueError, match="delta_up"):
+            OuterLoopLinkAdaptation(
+                phy_abs, num_ut=2, delta_up=0.0, device=device
+            )
+        with pytest.raises(ValueError, match="offset_min"):
+            OuterLoopLinkAdaptation(
+                phy_abs,
+                num_ut=2,
+                offset_min=5.0,
+                offset_max=0.0,
+                device=device,
+            )
+
+        olla = OuterLoopLinkAdaptation(phy_abs, num_ut=2, device=device)
+        with pytest.raises(ValueError, match="bler_target"):
+            olla.bler_target = 1.0
+        with pytest.raises(ValueError, match="offset_min"):
+            olla.offset_min = olla.offset_max + 1.0
+        with pytest.raises(ValueError, match="offset_min"):
+            olla.offset_max = olla.offset_min - 1.0
+
+    @pytest.mark.parametrize("bler_target", [0.0, 1.0, -0.1, 1.1])
+    def test_illa_bler_target_validation(self, device, bler_target):
+        """ILLA rejects BLER targets outside the open interval (0, 1)."""
+        phy_abs = PHYAbstraction(device=device)
+        with pytest.raises(ValueError, match="bler_target"):
+            InnerLoopLinkAdaptation(
+                phy_abs, bler_target=bler_target, device=device
+            )
+
+        illa = InnerLoopLinkAdaptation(phy_abs, bler_target=0.1, device=device)
+        with pytest.raises(ValueError, match="bler_target"):
+            illa.bler_target = bler_target

@@ -160,7 +160,7 @@ class OFDMDetector(Block):
         mask = resource_grid.pilot_pattern.mask
         num_data_symbols = resource_grid.pilot_pattern.num_data_symbols
         data_ind = torch.argsort(
-            flatten_last_dims(mask.to(torch.float32)), dim=-1, descending=False,
+            flatten_last_dims(mask), dim=-1, descending=False,
             stable=True
         )
         self._data_ind = data_ind[..., :num_data_symbols].to(device=self.device)

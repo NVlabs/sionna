@@ -2,6 +2,8 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
+import copy
+
 import pytest
 import torch
 import numpy as np
@@ -25,6 +27,13 @@ class TestConfigSingleton:
 
 class TestConfigPrecision:
     """Tests for precision settings."""
+
+    @pytest.fixture(autouse=True)
+    def restore_precision(self):
+        """`config` is a singleton, so these assignments outlive the test."""
+        original = config.precision
+        yield
+        config.precision = original
 
     def test_precision_single(self):
         """Test single precision settings."""
@@ -136,6 +145,88 @@ class TestConfigSeed:
         # (statistically extremely unlikely to be the same)
         values = [config.np_rng.random() for _ in range(10)]
         assert len(set(values)) > 1  # At least some values should differ
+
+    @pytest.mark.parametrize(
+        "invalid_seed, exception",
+        [
+            ("abc", TypeError),
+            (1.5, TypeError),
+            (True, TypeError),
+            (-1, ValueError),
+            (2**64, ValueError),
+        ],
+    )
+    def test_invalid_seed_assignment_is_transactional(
+        self, invalid_seed, exception
+    ):
+        """Rejected seeds must not mutate any existing RNG stream."""
+        config.seed = 123
+        py_rng = config.py_rng
+        np_rng = config.np_rng
+        torch_rngs = {
+            device: config.torch_rng(device) for device in config.available_devices
+        }
+
+        # Advance every explicit stream before taking its state snapshot.
+        py_rng.random()
+        np_rng.random()
+        for device, generator in torch_rngs.items():
+            torch.rand(1, device=device, generator=generator)
+
+        py_state = py_rng.getstate()
+        np_state = copy.deepcopy(np_rng.bit_generator.state)
+        torch_states = {
+            device: generator.get_state().clone()
+            for device, generator in torch_rngs.items()
+        }
+        default_cpu_state = torch.default_generator.get_state().clone()
+        default_cuda_states = [
+            generator.get_state().clone()
+            for generator in torch.cuda.default_generators
+        ]
+
+        with pytest.raises(exception):
+            config.seed = invalid_seed
+
+        assert config.seed == 123
+        assert config.py_rng is py_rng
+        assert config.np_rng is np_rng
+        assert config.py_rng.getstate() == py_state
+        np.testing.assert_equal(config.np_rng.bit_generator.state, np_state)
+        for device, generator in torch_rngs.items():
+            assert config.torch_rng(device) is generator
+            assert torch.equal(generator.get_state(), torch_states[device])
+        assert torch.equal(torch.default_generator.get_state(), default_cpu_state)
+        for generator, state in zip(
+            torch.cuda.default_generators, default_cuda_states
+        ):
+            assert torch.equal(generator.get_state(), state)
+
+    @pytest.mark.parametrize("seed", [np.int32(321), np.int64(321)])
+    def test_numpy_integer_seed(self, seed):
+        """Preserve support for NumPy integer seeds."""
+        config.seed = seed
+        values = config.np_rng.random(4).tolist()
+
+        config.seed = 321
+        assert config.np_rng.random(4).tolist() == values
+
+    def test_maximum_seed_wraps_device_offsets(self):
+        """The full uint64 seed range remains valid on multiple devices."""
+        seed = 2**64 - 1
+        config.seed = seed
+
+        for offset, device in enumerate(config.available_devices):
+            expected = (seed + offset) % 2**64
+            assert config.torch_rng(device).initial_seed() == expected
+            if device == "cpu":
+                assert torch.default_generator.initial_seed() == expected
+            else:
+                device_idx = int(device.split(":")[1])
+                assert (
+                    torch.cuda.default_generators[device_idx].initial_seed()
+                    == expected
+                )
 
     def test_device_specific_seed_offsets(self):
         """Test that different devices get different random streams with same base seed."""

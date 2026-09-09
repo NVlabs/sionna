@@ -27,7 +27,7 @@ change from one OFDM symbol to the next in the event of mobility, even if it is
 assumed static over the duration of an OFDM symbol.
 
 For every receive antenna :math:`l` of every receiver :math:`v`, the
-received signal :math:`y_{v, l, s, n}`` for resource element
+received signal :math:`y_{v, l, s, n}` for resource element
 :math:`(s, n)` is computed by
 
 .. math::
@@ -36,7 +36,7 @@ received signal :math:`y_{v, l, s, n}`` for resource element
       + w_{v, l, s, n}
 
 where :math:`x_{u, k, s, n}` is the baseband symbol transmitted by transmitter
-:math:`u`` on antenna :math:`k` and resource element :math:`(s, n)`, and
+:math:`u` on antenna :math:`k` and resource element :math:`(s, n)`, and
 :math:`w_{v, l, s, n} \sim \mathcal{CN}\left(0,N_0\right)` the additive white
 Gaussian noise.
 
@@ -56,7 +56,7 @@ Gaussian noise.
    ISI nor ICI is assumed, but allows the simulation of these effects in the
    event of a non-stationary channel or long delay spreads.
    Note that simulating the channel in the time domain is typically significantly
-   more computationally demanding that simulating the channel in the frequency
+   more computationally demanding than simulating the channel in the frequency
    domain.
 
 

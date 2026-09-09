@@ -100,7 +100,7 @@ class TestPolarEncoder:
         frozen_pos, _ = generate_5g_ranking(k, n)
         enc = PolarEncoder(frozen_pos, n, device=device)
 
-        @torch.compile
+        @torch.compile(fullgraph=True)
         def run_graph(u):
             return enc(u)
 
@@ -116,6 +116,20 @@ class TestPolarEncoder:
         u = source([bs + 1, k])
         x = run_graph(u)
         assert x.shape == (bs + 1, n)
+
+    def test_non_binary_input_raises(self, device):
+        """Binary checks stay enabled after a valid call; check_input=False skips them."""
+        k, n, bs = 100, 256, 10
+        frozen_pos, _ = generate_5g_ranking(k, n)
+        enc = PolarEncoder(frozen_pos, n, device=device)
+        u = torch.zeros(bs, k, device=device)
+        enc(u)
+        u[3, 7] = 2
+        with pytest.raises(ValueError, match="Input must be binary"):
+            enc(u)
+
+        enc_off = PolarEncoder(frozen_pos, n, device=device, check_input=False)
+        assert enc_off(u).shape[-1] == n
 
     def test_ref_implementation(self, device):
         """Test channel rankings against reference implementation based on
@@ -233,6 +247,19 @@ class TestPolar5GEncoder:
         c_hat = torch.zeros_like(c)
         assert torch.equal(c, c_hat)
 
+    def test_non_binary_input_raises(self, device):
+        """Binary checks stay enabled after a valid call; check_input=False skips them."""
+        k, n, bs = 100, 200, 10
+        enc = Polar5GEncoder(k, n, device=device)
+        u = torch.zeros(bs, k, device=device)
+        enc(u)
+        u[3, 7] = 2
+        with pytest.raises(ValueError, match="Input must be binary"):
+            enc(u)
+
+        enc_off = Polar5GEncoder(k, n, device=device, check_input=False)
+        assert enc_off(u).shape[-1] == n
+
     def test_multi_dimensional(self, device):
         """Test against arbitrary shapes."""
         k = 56
@@ -261,7 +288,7 @@ class TestPolar5GEncoder:
         source = BinarySource(device=device)
         enc = Polar5GEncoder(k, n, device=device)
 
-        @torch.compile
+        @torch.compile(fullgraph=True)
         def run_graph(u):
             return enc(u)
 

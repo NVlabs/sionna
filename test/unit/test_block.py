@@ -55,6 +55,70 @@ class ComplexMultiplier(Block):
         return x * self.factor
 
 
+class ScaleLayer(Block):
+    """A block whose build creates plain tensors rather than parameters."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.build_counter = 0
+
+    def build(self, x_shape):
+        self.build_counter += 1
+        self.scale = torch.ones(
+            x_shape[-1], dtype=self.dtype, device=self.device
+        )
+
+    def call(self, x):
+        return x * self.scale
+
+
+class NestedScaleLayer(Block):
+    """A parent block used to verify nested cold initialization."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.scale = ScaleLayer(**kwargs)
+
+    def call(self, x):
+        return self.scale(x)
+
+
+class RebuildBlock(Block):
+    """A block that can invalidate shape-dependent state after initialization."""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.size = None
+
+    def build(self, x_shape):
+        if x_shape[-1] == 3:
+            raise ValueError("unsupported test shape")
+        self.size = x_shape[-1]
+
+    def call(self, x):
+        if x.shape[-1] != self.size:
+            self._built = False
+            self.build(x.shape)
+            self._built = True
+        return x
+
+
+def _assert_converted(value, block):
+    """Recursively check Block's dtype/device conversion contract."""
+    if isinstance(value, dict):
+        for item in value.values():
+            _assert_converted(item, block)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _assert_converted(item, block)
+    elif isinstance(value, torch.Tensor):
+        assert value.device == torch.device(block.device)
+        if value.is_complex():
+            assert value.dtype == block.cdtype
+        elif value.is_floating_point():
+            assert value.dtype == block.dtype
+
+
 def test_block_without_call():
     """Test that calling Block without implementing call() raises NotImplementedError."""
     block = Block()
@@ -111,15 +175,16 @@ def test_conversion(device):
     ],
 )
 def test_compilation(device, mode, args, kwargs):
+    torch._dynamo.reset()
     block = DummyBlock(device=device)
-
-    @torch.compile(mode=mode)
-    def fun(*args, **kwargs):
-        return block(*args, **kwargs)
-
+    fun = torch.compile(block, mode=mode)
     x, y = fun(*args, **kwargs)
+
+    assert block.built
     assert len(x) == len(args)
     assert len(y) == len(kwargs)
+    _assert_converted(x, block)
+    _assert_converted(y, block)
 
 
 def test_lazy_initialization(device):
@@ -243,18 +308,94 @@ def test_optimization_loop(device, precision):
 
 def test_build_compilation(device, mode):
     """
-    Test that block builds are compiled.
+    Test conversion, lazy build, and gradients for a compiled parametric block.
     """
-    model = DenseLayer(units=1, device=device)
+    torch._dynamo.reset()
+    model = DenseLayer(units=1, precision="double", device=device)
 
-    @torch.compile(mode=mode)
-    def fun(x):
-        return model(x)
-
-    x = torch.ones(1, 4)
-    y = fun(x)
+    # build() creates parameters, which Dynamo cannot trace, so the block is
+    # initialized eagerly before compilation as documented on Block.
+    x = torch.ones(1, 4, dtype=torch.float32, device=device)
+    model(x)
     assert model.built
+
+    compiled_model = torch.compile(model, mode=mode, fullgraph=True)
+    y = compiled_model(x)
+    assert model.build_counter == 1
+    assert y.dtype == torch.float64
+    assert y.device == torch.device(device)
 
     y.norm().backward()
     assert torch.norm(model.w.grad) > 0
     assert torch.norm(model.b.grad) > 0
+
+    compiled_model(x)
+    assert model.build_counter == 1
+
+
+def test_cold_fullgraph_compilation_rejects_parameter_creation(device):
+    """Pin the one case where a block must be built before it is compiled."""
+    torch._dynamo.reset()
+    model = DenseLayer(units=1, device=device)
+    compiled = torch.compile(model, fullgraph=True)
+
+    with pytest.raises(torch._dynamo.exc.Unsupported, match="Parameter"):
+        compiled(torch.ones(1, 4, device=device))
+
+
+def test_cold_compilation_builds_once_and_settles(device):
+    """A cold compiled block converts, builds once, then stops recompiling."""
+    torch._dynamo.reset()
+    compiled_graphs = []
+
+    def backend(graph_module, _example_inputs):
+        compiled_graphs.append(graph_module)
+        return graph_module.forward
+
+    model = NestedScaleLayer(precision="double", device=device)
+    compiled_model = torch.compile(model, backend=backend, fullgraph=True)
+    x = torch.ones(3, 4, dtype=torch.float32, device=device)
+
+    y = compiled_model(x)
+    assert y.shape == (3, 4)
+    assert y.dtype == torch.float64
+    assert model.built
+    assert model.scale.built
+    assert model.scale.build_counter == 1
+
+    # The first call also flips `built`, which invalidates its guard and costs
+    # one extra trace. Both must then settle.
+    for _ in range(3):
+        assert torch.allclose(compiled_model(x), y)
+    assert model.scale.build_counter == 1
+    assert len(compiled_graphs) <= 2
+
+
+def test_rebuild_after_failed_shape_change(device):
+    """Rebuilds after initialization stay repeatable and recover from errors."""
+    model = RebuildBlock(device=device)
+    model(torch.ones(1, 2, device=device))
+
+    with pytest.raises(ValueError, match="unsupported test shape"):
+        model(torch.ones(1, 3, device=device))
+    assert not model.built
+
+    output = model(torch.ones(1, 4, device=device))
+    assert output.shape == (1, 4)
+    assert model.built
+    assert model.size == 4
+
+
+def test_build_precedes_user_forward_pre_hooks(device):
+    """Preserve the eager ordering of build and user pre-hooks."""
+    model = DenseLayer(device=device)
+    built_states = []
+    # Prepending puts the hook ahead of every other pre-hook, so it observes an
+    # unbuilt block unless Block.__call__ builds before delegating.
+    handle = model.register_forward_pre_hook(
+        lambda module, _args: built_states.append(module.built), prepend=True
+    )
+
+    model(torch.ones(1, 4, device=device))
+    handle.remove()
+    assert built_states == [True]

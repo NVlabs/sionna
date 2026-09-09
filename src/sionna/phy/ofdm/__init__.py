@@ -33,13 +33,12 @@ from .equalization import (
 )
 from .channel_estimation import (
     BaseChannelEstimator,
+    BasePilotChannelEstimator,
     LSChannelEstimator,
+    LMMSEChannelEstimator,
     BaseChannelInterpolator,
     NearestNeighborInterpolator,
     LinearInterpolator,
-    LMMSEInterpolator1D,
-    SpatialChannelFilter,
-    LMMSEInterpolator,
     tdl_freq_cov_mat,
     tdl_time_cov_mat,
 )

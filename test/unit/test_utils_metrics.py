@@ -2,9 +2,47 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
+import pytest
 import torch
 from sionna.phy.utils import metrics
 from sionna.phy.config import dtypes
+
+
+@pytest.mark.parametrize(
+    "metric_name",
+    [
+        "compute_ber",
+        "compute_ser",
+        "compute_bler",
+        "count_errors",
+        "count_block_errors",
+    ],
+)
+def test_metrics_reject_mismatched_shapes(metric_name, device):
+    """Metrics never broadcast estimates across incompatible shapes."""
+    metric = getattr(metrics, metric_name)
+    values = torch.zeros((2, 1), device=device)
+    estimates = torch.zeros((2, 3), device=device)
+    with pytest.raises(ValueError, match="same shape"):
+        metric(values, estimates)
+
+
+@pytest.mark.parametrize(
+    "metric_name",
+    [
+        "compute_ber",
+        "compute_ser",
+        "compute_bler",
+        "count_errors",
+        "count_block_errors",
+    ],
+)
+def test_metrics_reject_empty_inputs(metric_name, device):
+    """Metrics do not report NaN or zero for an empty observation."""
+    metric = getattr(metrics, metric_name)
+    values = torch.empty((0, 4), device=device)
+    with pytest.raises(ValueError, match="must not be empty"):
+        metric(values, values.clone())
 
 
 def test_compute_ber(device, precision):

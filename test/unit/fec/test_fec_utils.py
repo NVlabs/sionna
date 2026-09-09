@@ -31,9 +31,6 @@ from sionna.phy.fec.utils import (
 # Get path to test codes directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
 test_dir = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
-ext_test_dir = os.path.abspath(
-    os.path.join(current_dir, os.pardir, os.pardir, os.pardir, "ext", "sionna", "test")
-)
 
 
 # =============================================================================
@@ -411,7 +408,7 @@ class TestAlist:
 
     def test_load_alist_file(self):
         """Test loading alist from file."""
-        path = os.path.join(ext_test_dir, "codes", "ldpc", "wimax_576_0.5.alist")
+        path = os.path.join(test_dir, "codes", "ldpc", "wimax_576_0.5.alist")
 
         # Skip if file doesn't exist
         if not os.path.exists(path):
@@ -560,6 +557,16 @@ class TestLoadParityCheck:
         assert n == 7
         assert k == 4
         assert np.isclose(coderate, 4 / 7)
+
+    def test_codes_load_without_pickle(self):
+        """Built-in example codes must load without pickle."""
+        from importlib_resources import files, as_file
+        from sionna.phy.fec.ldpc import codes
+
+        source = files(codes).joinpath("example_codes.npz")
+        with as_file(source) as path:
+            with np.load(path, allow_pickle=False) as pcms:
+                assert set(pcms.files) == {f"pcm_{i}" for i in range(5)}
 
 
 # =============================================================================

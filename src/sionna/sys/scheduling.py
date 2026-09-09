@@ -127,7 +127,8 @@ class PFSchedulerSUMIMO(Block):
         self._num_streams_per_ut = int(num_streams_per_ut)
 
         # Validate and store beta as Python float to avoid device issues with torch.compile
-        assert 0.0 < beta < 1.0, "Discount factor 'beta' must be within (0, 1)"
+        if not 0.0 < beta < 1.0:
+            raise ValueError("Discount factor 'beta' must be within (0, 1)")
         self._beta_value = float(beta)
 
         # Register state tensors as buffers for proper device tracking
@@ -171,7 +172,8 @@ class PFSchedulerSUMIMO(Block):
 
     @beta.setter
     def beta(self, value: float) -> None:
-        assert 0.0 < value < 1.0, "Discount factor 'beta' must be within (0, 1)"
+        if not 0.0 < value < 1.0:
+            raise ValueError("Discount factor 'beta' must be within (0, 1)")
         self._beta_value = float(value)
 
     def call(
@@ -185,20 +187,23 @@ class PFSchedulerSUMIMO(Block):
         # Validate and cast inputs #
         # ------------------------ #
         expected_rate_last_slot_shape = self._batch_size + [self._num_ut]
-        assert list(rate_last_slot.shape) == expected_rate_last_slot_shape, (
-            f"Inconsistent 'rate_last_slot' shape: expected {expected_rate_last_slot_shape}, "
-            f"got {list(rate_last_slot.shape)}"
-        )
+        if list(rate_last_slot.shape) != expected_rate_last_slot_shape:
+            raise ValueError(
+                f"Inconsistent 'rate_last_slot' shape: expected "
+                f"{expected_rate_last_slot_shape}, got {list(rate_last_slot.shape)}"
+            )
 
         expected_rate_achievable_shape = self._batch_size + [
             self._num_ofdm_sym,
             self._num_freq_res,
             self._num_ut,
         ]
-        assert list(rate_achievable_curr_slot.shape) == expected_rate_achievable_shape, (
-            f"Inconsistent 'rate_achievable_curr_slot' shape: expected "
-            f"{expected_rate_achievable_shape}, got {list(rate_achievable_curr_slot.shape)}"
-        )
+        if list(rate_achievable_curr_slot.shape) != expected_rate_achievable_shape:
+            raise ValueError(
+                f"Inconsistent 'rate_achievable_curr_slot' shape: expected "
+                f"{expected_rate_achievable_shape}, "
+                f"got {list(rate_achievable_curr_slot.shape)}"
+            )
 
         # [batch_size, num_ut]
         rate_last_slot = rate_last_slot.to(self.dtype)

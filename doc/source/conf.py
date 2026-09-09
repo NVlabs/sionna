@@ -11,6 +11,15 @@ sys.path.insert(0, os.path.abspath("../../src"))
 sys.path.insert(0, os.path.abspath("./rt"))
 sys.path.insert(0, os.path.abspath("."))
 
+# Load the RT stack here so that it is already initialized when Sphinx forks
+# its parallel read workers. Importing Mitsuba/Dr.Jit inside a forked child
+# segfaults, which aborts parallel builds. Missing or broken installations are
+# ignored; autodoc then reports the RT pages as import failures.
+try:
+    import sionna.rt  # noqa: F401  pylint: disable=unused-import
+except Exception:  # pylint: disable=broad-except
+    pass
+
 
 # -- Project information -----------------------------------------------------
 project = "Sionna"
@@ -131,6 +140,11 @@ autodoc_type_aliases = {
     "List": "list",
     "Dict": "dict",
 }
+# Globally exclude inherited Keras/Block plumbing methods from rendered docs.
+# `build` is a Keras lifecycle hook, not a user-facing API.
+autodoc_default_options = {
+    "exclude-members": "build",
+}
 autosummary_generate = True  # Generate autosummary pages for all modules
 autosummary_generate_overwrite = True  # Overwrite existing autosummary pages
 
@@ -147,6 +161,22 @@ html_js_files = [
 ]
 html_css_files = ["custom.css"]
 numfig = True
+
+# -- MathJax (v4) configuration ----------------------------------------------
+# Sphinx 9 defaults to MathJax 4, which scales inline math so that the math
+# font's ex-height matches the surrounding text ("matchFontHeight", on by
+# default). With the pydata theme's sans-serif font stack this overshoots and
+# renders the serif math noticeably larger than the body text. Disabling it
+# makes inline math render at its natural size relative to the text.
+# The final visual size is then set via CSS (``mjx-container`` in custom.css),
+# which is deterministic and not overridden by MathJax's persisted contextual
+# menu "Scale All Math" setting.
+# (nbsphinx merges the required ``tex``/``options`` entries into this dict.)
+mathjax4_config = {
+    "chtml": {
+        "matchFontHeight": False,
+    },
+}
 
 html_theme_options = {
     "logo": {

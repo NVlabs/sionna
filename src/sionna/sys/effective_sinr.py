@@ -8,11 +8,13 @@ import json
 import os
 import warnings
 from abc import abstractmethod
+from numbers import Real
 from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import torch
 
+from sionna._validation import check_tensor_values_in
 from sionna.phy import Block, config, dtypes
 from sionna.phy.config import Precision
 from sionna.phy.utils import (
@@ -63,7 +65,12 @@ class EffectiveSINR(Block):
     """
 
     def calibrate(self) -> None:
-        """Optional method for calibrating the Effective SINR model."""
+        """Optional calibration hook for subclasses.
+
+        The base implementation is a no-op. Concrete models such as
+        :class:`~sionna.sys.EESM` ship fixed parameters and do not recalibrate
+        when this method is called.
+        """
         pass
 
     @abstractmethod
@@ -92,11 +99,16 @@ class EESM(EffectiveSINR):
     across all utilized streams and subcarriers for each user :math:`u`:
 
     .. math::
-        \mathrm{SINR}^{\mathrm{eff}}_u = -\beta_u \log \left( \frac{1}{CS}
-        \sum_{c=1}^{C} \sum_{s=1}^{S_c} e^{-\frac{\mathrm{SINR}_{u,c,s}}{\beta_u}} \right),
+        \mathrm{SINR}^{\mathrm{eff}}_u = -\beta_u \log \left(
+        \frac{1}{|\mathcal{R}_u|}
+        \sum_{(c,s)\in\mathcal{R}_u}
+        e^{-\frac{\mathrm{SINR}_{u,c,s}}{\beta_u}}
+        \right),
         \quad \forall\, u
 
-    where :math:`\beta>0` is a parameter depending on the Modulation and Coding
+    where :math:`\mathcal{R}_u` is the set of used (positive-SINR) resource
+    elements for user :math:`u` across subcarriers and streams, and
+    :math:`\beta>0` is a parameter depending on the Modulation and Coding
     Scheme (MCS) of user :math:`u`.
 
     If ``per_stream`` is `True`, it computes the effective SINR aggregated
@@ -104,8 +116,11 @@ class EESM(EffectiveSINR):
     :math:`s`:
 
     .. math::
-        \mathrm{SINR}^{\mathrm{eff}}_{u,s} = -\beta_u \log \left( \frac{1}{C}
-        \sum_{c=1}^{C} e^{-\frac{\mathrm{SINR}_{u,c,s}}{\beta_u}} \right),
+        \mathrm{SINR}^{\mathrm{eff}}_{u,s} = -\beta_u \log \left(
+        \frac{1}{|\mathcal{R}_{u,s}|}
+        \sum_{c\in\mathcal{R}_{u,s}}
+        e^{-\frac{\mathrm{SINR}_{u,c,s}}{\beta_u}}
+        \right),
         \quad \forall\, u,s.
 
     :param load_beta_table_from: File name from which the tables containing the
@@ -129,9 +144,14 @@ class EESM(EffectiveSINR):
     :input mcs_index: [..., num_ut], `torch.int32`.
         Modulation and coding scheme (MCS) index for each user.
     :input mcs_table_index: [..., num_ut], `torch.int32` (default: 1).
-        MCS table index for each user.
+        MCS table index for each user. The default beta table covers indices
+        ``{1, 2}`` only; unsupported indices raise ``ValueError``. Supply a
+        custom beta table, or bypass EESM by passing ``sinr_eff`` and
+        ``num_allocated_re`` to :class:`~sionna.sys.PHYAbstraction`.
     :input mcs_category: [..., num_ut], `torch.int32` (default: `None`).
-        MCS table category for each user.
+        Accepted for API symmetry with :class:`~sionna.sys.PHYAbstraction`.
+        The default beta parameters are category-independent (shared across
+        PUSCH/PDSCH for the same table index) and this argument is unused.
     :input per_stream: `bool` (default: `False`).
         If `True`, then the effective SINR is computed on a per-user and
         per-stream basis and is aggregated across different subcarriers.
@@ -147,12 +167,21 @@ class EESM(EffectiveSINR):
         If ``per_stream`` is `False`, then ``sinr_eff`` has shape
         ``[..., num_ut]``, and ``sinr_eff[..., u]`` is the effective SINR for
         user ``u`` across all streams and subcarriers.
+        Users, or streams, without any used resource are assigned a null
+        effective SINR of exactly 0.
 
     .. rubric:: Notes
 
     If the input SINR is zero for a specific stream, the stream is
     considered unused and does not contribute to the effective SINR
-    computation.
+    computation. The averages above are therefore over used resources only,
+    not over the full ``C`` / ``CS`` grid.
+
+    A user, or stream, whose resources are all unused has no defined effective
+    SINR and is assigned exactly 0, which lies outside the range spanned by
+    ``sinr_eff_min_db`` and ``sinr_eff_max_db``. Consumers that treat
+    non-positive values as missing, such as
+    :class:`~sionna.sys.OuterLoopLinkAdaptation`, depend on this convention.
 
     .. rubric:: Examples
 
@@ -252,7 +281,9 @@ class EESM(EffectiveSINR):
                     self._beta_table.deep_update(subtable)
             except FileNotFoundError:
                 warnings.warn(
-                    f"EESM beta parameters file '{f}' does not exist. Skipping..."
+                    f"EESM beta parameters file '{f}' does not exist. Skipping...",
+                    UserWarning,
+                    stacklevel=2,
                 )
 
         if self._beta_table == {}:
@@ -286,9 +317,27 @@ class EESM(EffectiveSINR):
         if not set(self._beta_table.keys()) >= {"index"}:
             raise ValueError("Key must be 'index'")
         for table_index in self._beta_table["index"]:
-            if not isinstance(self._beta_table["index"][table_index], list):
+            if not isinstance(table_index, int) or table_index < 1:
+                raise ValueError("EESM table indices must be positive integers")
+            betas = self._beta_table["index"][table_index]
+            if not isinstance(betas, list):
                 raise ValueError(
                     f"self.beta_table['index'][{table_index}] must be a list"
+                )
+            if len(betas) == 0:
+                raise ValueError(
+                    f"self.beta_table['index'][{table_index}] must be non-empty"
+                )
+            if any(
+                isinstance(beta, bool)
+                or not isinstance(beta, Real)
+                or not np.isfinite(beta)
+                or beta <= 0
+                for beta in betas
+            ):
+                raise ValueError(
+                    f"self.beta_table['index'][{table_index}] must contain "
+                    "finite positive beta values"
                 )
         return True
 
@@ -314,6 +363,21 @@ class EESM(EffectiveSINR):
         mcs_table_index = scalar_to_shaped_tensor(
             mcs_table_index, torch.int32, batch_dim + [num_ut], device=self.device
         )
+        supported_table_indices = sorted(self._beta_table["index"].keys())
+        check_tensor_values_in(
+            mcs_table_index,
+            supported_table_indices,
+            name="mcs_table_index",
+            message=(
+                "mcs_table_index must be in "
+                f"{supported_table_indices} for the loaded EESM beta table. "
+                "Pass sinr_eff and num_allocated_re to PHYAbstraction to bypass "
+                "EESM, or supply a custom beta table covering the requested "
+                "indices."
+            ),
+        )
+        # The default beta parameters are category-independent.
+        _ = mcs_category
 
         # Transpose SINR from / to:
         # [..., num_ofdm_symbols, num_subcarriers, num_ut, num_streams_per_ut]
@@ -362,10 +426,12 @@ class EESM(EffectiveSINR):
         # If per_stream is False: [..., num_ut]
         sinr_eff = -beta_expand2 * sinr_eff
 
-        # Assign a null SINR to users with no assigned resources
-        sinr_eff = torch.where(num_used_res > 0, sinr_eff, torch.tensor(0.0, device=self.device))
-
         # Project sinr_eff within [self._sinr_eff_min, self._sinr_eff_max]
         sinr_eff = torch.clamp(sinr_eff, self._sinr_eff_min, self._sinr_eff_max)
+
+        # Assign a null SINR to users with no assigned resources
+        sinr_eff = torch.where(
+            num_used_res > 0, sinr_eff, torch.zeros_like(sinr_eff)
+        )
 
         return sinr_eff

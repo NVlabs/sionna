@@ -319,6 +319,24 @@ class TestEbnoDb2No:
         no_4 = ebnodb2no(10.0, num_bits_per_symbol=4, coderate=0.5, device=device)
         assert np.isclose(no_2.item() / no_4.item(), 2.0, rtol=1e-5)
 
+    @pytest.mark.parametrize("num_bits_per_symbol", [0, -1])
+    def test_nonpositive_num_bits_per_symbol(self, num_bits_per_symbol):
+        """The modulation order must be positive."""
+        with pytest.raises(ValueError, match="positive"):
+            ebnodb2no(10.0, num_bits_per_symbol, 0.5)
+
+    @pytest.mark.parametrize("num_bits_per_symbol", [1.5, True])
+    def test_nonintegral_num_bits_per_symbol(self, num_bits_per_symbol):
+        """The modulation order must be an integer, excluding booleans."""
+        with pytest.raises(TypeError, match="integer"):
+            ebnodb2no(10.0, num_bits_per_symbol, 0.5)
+
+    @pytest.mark.parametrize("coderate", [0.0, -0.1, 1.1, np.nan, np.inf])
+    def test_invalid_coderate(self, coderate):
+        """Coderates must be finite and lie within (0, 1]."""
+        with pytest.raises(ValueError, match=r"within \(0, 1\]"):
+            ebnodb2no(10.0, 4, coderate)
+
 
 # =============================================================================
 # Tests for hard_decisions
@@ -396,6 +414,35 @@ class TestSampleBernoulli:
         """Verify output is boolean tensor."""
         samples = sample_bernoulli([100], p=0.5, device=device)
         assert samples.dtype == torch.bool
+
+    @pytest.mark.parametrize("p", [-0.1, 1.1, np.nan, np.inf])
+    def test_invalid_scalar_probability(self, p, device):
+        """Scalar probabilities must be finite and within [0, 1]."""
+        with pytest.raises(ValueError, match=r"within \[0, 1\]"):
+            sample_bernoulli([10], p=p, device=device)
+
+    def test_invalid_sequence_probability(self, device):
+        """Every value in a host-side probability sequence is validated."""
+        with pytest.raises(ValueError, match=r"within \[0, 1\]"):
+            sample_bernoulli([2], p=[0.2, -0.1], device=device)
+
+    def test_tensor_probability_is_not_validated(self, device):
+        """Reading back a device tensor would stall the host, so skip it."""
+        p = torch.tensor([0.2, -0.1], device=device)
+        assert sample_bernoulli([2], p=p, device=device).shape == (2,)
+
+    @pytest.mark.parametrize("as_tensor", [False, True])
+    def test_compiled(self, as_tensor, device):
+        """Validation must not force a graph break or a data-dependent guard."""
+
+        @torch.compile(fullgraph=True)
+        def sample(p):
+            return sample_bernoulli([32], p=p, device=device)
+
+        p = torch.tensor(0.5, device=device) if as_tensor else 0.5
+        result = sample(p)
+        assert result.shape == (32,)
+        assert result.dtype == torch.bool
 
 
 # =============================================================================
@@ -763,6 +810,57 @@ class TestSimBer:
         with pytest.raises(TypeError, match="verbose must be bool"):
             sim_ber(dummy_mc_fun, torch.zeros(1), 1, 1, verbose="yes")
 
+    @pytest.mark.parametrize(
+        ("argument", "value", "error"),
+        [
+            ("batch_size", 0, ValueError),
+            ("batch_size", -1, ValueError),
+            ("batch_size", 1.5, TypeError),
+            ("batch_size", True, TypeError),
+            ("max_mc_iter", 0, ValueError),
+            ("max_mc_iter", -1, ValueError),
+            ("max_mc_iter", 1.5, TypeError),
+            ("max_mc_iter", True, TypeError),
+        ],
+    )
+    def test_positive_sample_count_validation(self, argument, value, error):
+        """Zero-sample simulations fail before invoking the callback."""
+
+        def dummy_mc_fun(batch_size, ebno_db):  # noqa: ARG001
+            return torch.zeros(10), torch.zeros(10)
+
+        kwargs = {"batch_size": 1, "max_mc_iter": 1, argument: value}
+        with pytest.raises(error, match=argument):
+            sim_ber(
+                dummy_mc_fun,
+                torch.zeros(1),
+                verbose=False,
+                **kwargs,
+            )
+
+    @pytest.mark.parametrize(
+        "outputs",
+        [
+            (torch.empty(1, 0), torch.empty(1, 0)),
+            (torch.empty(0, 10), torch.empty(0, 10)),
+            (torch.zeros(2, 4), torch.zeros(2, 5)),
+        ],
+    )
+    def test_invalid_mc_fun_output_shape(self, outputs):
+        """Empty and mismatched callback outputs fail explicitly."""
+
+        def mc_fun(batch_size, ebno_db):  # noqa: ARG001
+            return outputs
+
+        with pytest.raises(ValueError, match="mc_fun"):
+            sim_ber(
+                mc_fun,
+                torch.zeros(1),
+                batch_size=1,
+                max_mc_iter=1,
+                verbose=False,
+            )
+
     def test_precision_output(self, precision, device):
         """Verify output tensors have correct precision."""
         shape = (100, 100)
@@ -968,9 +1066,9 @@ class TestScalarToShapedTensor:
         assert torch.all(result == 1.0)
 
     def test_from_shaped_tensor_mismatched_shape_raises(self, device):
-        """Verify mismatched shape raises assertion error."""
+        """Verify mismatched shape raises a value error."""
         inp = torch.ones([2, 4], device=device)
-        with pytest.raises(AssertionError, match="Inconsistent shape"):
+        with pytest.raises(ValueError, match="Inconsistent shape"):
             scalar_to_shaped_tensor(inp, torch.float32, [2, 3], device=device)
 
     def test_docstring_examples(self, device):
@@ -1082,6 +1180,31 @@ class TestSplineGriddataInterpolation:
         with pytest.raises(ValueError, match="Too few points"):
             interp.struct(z, x, y, x, y, spline_degree=1)
 
+    def test_struct_all_zero(self):
+        """An all-zero BLER table interpolates to exact zeros."""
+        interp = SplineGriddataInterpolation()
+        x = np.array([0.0, 1.0])
+        y = np.array([0.0, 1.0])
+        result = interp.struct(
+            np.zeros((2, 2)),
+            x,
+            y,
+            np.array([0.0, 0.5, 1.0]),
+            np.array([0.0, 0.5, 1.0]),
+        )
+        assert result.shape == (3, 3)
+        assert np.array_equal(result, np.zeros((3, 3)))
+
+    def test_struct_near_all_zero(self):
+        """A table with one nonzero sample still uses spline interpolation."""
+        interp = SplineGriddataInterpolation()
+        x = np.array([0.0, 1.0])
+        y = np.array([0.0, 1.0])
+        z = np.array([[0.0, 0.0], [0.0, 0.5]])
+        result = interp.struct(z, x, y, x, y)
+        assert np.all(np.isfinite(result))
+        assert np.isclose(result[-1, -1], 0.5)
+
     def test_unstruct_basic(self):
         """Verify basic unstructured interpolation."""
         interp = SplineGriddataInterpolation()
@@ -1161,13 +1284,13 @@ class TestSingleLinkChannel:
         assert channel.num_coded_bits == 204
 
     def test_invalid_num_bits_per_symbol(self, device):
-        """Verify assertion for non-positive num_bits_per_symbol."""
+        """Verify value error for non-positive num_bits_per_symbol."""
 
         class ConcreteSingleLinkChannel(SingleLinkChannel):
             def call(self, batch_size, ebno_db):
                 return torch.zeros(batch_size), torch.zeros(batch_size)
 
-        with pytest.raises(AssertionError, match="positive integer"):
+        with pytest.raises(ValueError, match="positive integer"):
             ConcreteSingleLinkChannel(
                 num_bits_per_symbol=0,
                 num_info_bits=1024,
@@ -1176,19 +1299,50 @@ class TestSingleLinkChannel:
             )
 
     def test_invalid_target_coderate(self, device):
-        """Verify assertion for out-of-range target_coderate."""
+        """Verify an explicit error for out-of-range target_coderate."""
 
         class ConcreteSingleLinkChannel(SingleLinkChannel):
             def call(self, batch_size, ebno_db):
                 return torch.zeros(batch_size), torch.zeros(batch_size)
 
-        with pytest.raises(AssertionError, match="within"):
+        with pytest.raises(ValueError, match="within"):
             ConcreteSingleLinkChannel(
                 num_bits_per_symbol=4,
                 num_info_bits=1024,
                 target_coderate=1.5,  # Invalid: > 1
                 device=device,
             )
+
+    @pytest.mark.parametrize("value", [0.0, -0.1, 1.1, np.nan, np.inf])
+    def test_target_coderate_boundaries_preserve_state(self, value, device):
+        """Rejected updates do not leave the channel in an invalid state."""
+
+        class ConcreteSingleLinkChannel(SingleLinkChannel):
+            def call(self, batch_size, ebno_db):
+                return torch.zeros(batch_size), torch.zeros(batch_size)
+
+        channel = ConcreteSingleLinkChannel(
+            num_bits_per_symbol=4,
+            num_info_bits=100,
+            target_coderate=0.5,
+            device=device,
+        )
+        with pytest.raises(ValueError, match="within"):
+            channel.target_coderate = value
+        assert channel.target_coderate == 0.5
+        assert channel.num_coded_bits == 200
+
+    def test_target_coderate_valid_endpoints(self, device):
+        """The upper endpoint and a small positive coderate are valid."""
+
+        class ConcreteSingleLinkChannel(SingleLinkChannel):
+            def call(self, batch_size, ebno_db):
+                return torch.zeros(batch_size), torch.zeros(batch_size)
+
+        channel = ConcreteSingleLinkChannel(4, 100, 1.0, device=device)
+        assert channel.num_coded_bits == 100
+        channel.target_coderate = 0.01
+        assert channel.num_coded_bits == 10_000
 
     def test_property_setters_update_num_coded_bits(self, device):
         """Verify changing properties updates num_coded_bits."""

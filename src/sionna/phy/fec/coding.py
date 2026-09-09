@@ -63,11 +63,10 @@ def load_parity_check_examples(
         pcm, k, n, coderate = load_parity_check_examples(0)
         print(f"n={n}, k={k}, rate={coderate:.3f}")
     """
-    source = files(codes).joinpath("example_codes.npy")
+    source = files(codes).joinpath("example_codes.npz")
     with as_file(source) as code:
-        pcms = np.load(code, allow_pickle=True)
-
-    pcm = np.array(pcms[pcm_id])  # load parity-check matrix
+        with np.load(code) as pcms:
+            pcm = np.array(pcms[f"pcm_{pcm_id}"])
     n = int(pcm.shape[1])  # number of codeword bits (codeword length)
     k = int(n - pcm.shape[0])  # number of information bits k per codeword
     coderate = k / n
@@ -148,7 +147,9 @@ def alist2mat(
         warnings.warn(
             ".alist does not contain (redundant) CN perspective. "
             "Recovering parity-check matrix from VN only. "
-            "Please verify the correctness of the results manually."
+            "Please verify the correctness of the results manually.",
+            UserWarning,
+            stacklevel=2,
         )
         vn_only = True
     else:
@@ -267,13 +268,15 @@ def make_systematic(
         if np.any(c_node_deg == 0):
             warnings.warn(
                 "All-zero column in parity-check matrix detected. "
-                "It seems as if the code contains unprotected nodes."
+                "It seems as if the code contains unprotected nodes.",
+                UserWarning,
+                stacklevel=2,
             )
 
     mat = np.copy(mat)
     column_swaps = []  # store all column swaps
 
-    # convert to bool for faster arithmetics
+    # convert to bool for faster arithmetic
     mat = mat.astype(bool)
 
     # bring in upper triangular form
@@ -630,7 +633,11 @@ def generate_reg_ldpc(
                 config.np_rng.shuffle(v_socks[idx:])
                 config.np_rng.shuffle(c_socks[idx:])
             else:
-                warnings.warn("Stopping LDPC generation - no solution found.")
+                warnings.warn(
+                    "Stopping LDPC generation - no solution found.",
+                    RuntimeWarning,
+                    stacklevel=2,
+                )
                 cont = False
 
     v_deg = np.sum(pcm, axis=0)

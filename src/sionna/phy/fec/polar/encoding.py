@@ -10,9 +10,10 @@ import numbers
 import numpy as np
 import torch
 
+from sionna._validation import check_binary
 from sionna.phy import Block
 from sionna.phy.fec.crc import CRCEncoder
-from sionna.phy.fec.polar.utils import generate_5g_ranking
+from sionna.phy.fec.polar.utils import _is_pow2, generate_5g_ranking
 
 
 __all__ = ["PolarEncoder", "Polar5GEncoder"]
@@ -32,6 +33,8 @@ class PolarEncoder(Block):
         If `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param check_input: If `True` (default), check that inputs are binary
+        on every call. Set to `False` to skip the check and reduce overhead.
 
     :input bits: [..., k], `torch.float`.
         Binary tensor containing the information bits to be encoded.
@@ -72,6 +75,7 @@ class PolarEncoder(Block):
         *,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        check_input: bool = True,
         **kwargs,
     ):
         super().__init__(precision=precision, device=device, **kwargs)
@@ -84,7 +88,7 @@ class PolarEncoder(Block):
         if len(frozen_pos) > n:
             msg = "Number of elements in frozen_pos cannot be greater than n."
             raise ValueError(msg)
-        if np.log2(n) != int(np.log2(n)):
+        if not _is_pow2(n):
             raise ValueError("n must be a power of 2.")
 
         self._k = n - len(frozen_pos)
@@ -103,7 +107,9 @@ class PolarEncoder(Block):
             torch.tensor(info_pos, dtype=torch.int64, device=self.device),
         )
 
-        self._check_input = True  # Check input for binary values during first call
+        if not isinstance(check_input, bool):
+            raise TypeError("check_input must be bool.")
+        self._check_input = check_input
 
         self._nb_stages = int(np.log2(self._n))
         self._ind_gather = self._gen_indices(self._n)
@@ -144,21 +150,14 @@ class PolarEncoder(Block):
 
         return ind_gather
 
-    @torch.compiler.disable
     def _validate_binary_input(self, u: torch.Tensor) -> None:
-        """Validate that input tensor contains only binary values.
-
-        This method is decorated with @torch.compiler.disable to avoid
-        recompilation issues caused by the mutable _check_input flag.
-        """
+        """Validate binary inputs when ``check_input`` is enabled."""
         if self._check_input:
-            u_test = u.float()
-            is_binary = torch.logical_or(
-                torch.eq(u_test, 0.0), torch.eq(u_test, 1.0)
-            ).all()
-            if not is_binary:
-                raise ValueError("Input must be binary.")
-            self._check_input = False
+            check_binary(
+                u.float(),
+                name="bits",
+                message="Input must be binary.",
+            )
 
     def build(self, input_shape: Tuple[int, ...]) -> None:
         """Build and check if ``k`` and ``input_shape`` match."""
@@ -181,7 +180,6 @@ class PolarEncoder(Block):
         new_shape = (-1, self._k)
         u = bits.reshape(new_shape)
 
-        # Validate input (excluded from compilation to avoid recompilation)
         self._validate_binary_input(u)
 
         # Copy info bits to information set; other positions are frozen (=0)
@@ -219,9 +217,9 @@ class PolarEncoder(Block):
 
 class Polar5GEncoder(PolarEncoder):
     # pylint: disable=line-too-long
-    """5G compliant Polar encoder including rate-matching following
-    :cite:p:`3GPPTS38212` for the uplink scenario (`UCI`) and downlink
-    scenario (`DCI`).
+    """5G NR Polar encoder with rate-matching following :cite:p:`3GPPTS38212`.
+    Uplink (`UCI`) follows the spec; downlink (`DCI`) uses the same structure
+    but is not bit-exact (see Notes).
 
     This block performs polar encoding for ``k`` information bits and
     rate-matching such that the codeword length is ``n``. This includes the CRC
@@ -242,6 +240,8 @@ class Polar5GEncoder(PolarEncoder):
         If `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param check_input: If `True` (default), check that inputs are binary
+        on every call. Set to `False` to skip the check and reduce overhead.
 
     :input bits: [..., k], `torch.float`.
         Binary tensor containing the information bits to be encoded.
@@ -297,6 +297,7 @@ class Polar5GEncoder(PolarEncoder):
         *,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        check_input: bool = True,
         **kwargs,
     ):
         if not isinstance(k, numbers.Number):
@@ -336,7 +337,12 @@ class Polar5GEncoder(PolarEncoder):
 
         # Init super-class (PolarEncoder)
         super().__init__(
-            frozen_pos, n_polar, precision=precision, device=device, **kwargs
+            frozen_pos,
+            n_polar,
+            precision=precision,
+            device=device,
+            check_input=check_input,
+            **kwargs,
         )
 
         # Assign CRC encoder after super().__init__() for nn.Module compatibility
@@ -359,6 +365,11 @@ class Polar5GEncoder(PolarEncoder):
     def enc_crc(self) -> CRCEncoder:
         """CRC encoder block used for CRC concatenation."""
         return self._enc_crc
+
+    @property
+    def channel_type(self) -> str:
+        """Channel type, either ``"uplink"`` or ``"downlink"``."""
+        return self._channel_type
 
     @property
     def k_target(self) -> int:
@@ -712,7 +723,7 @@ class Polar5GEncoder(PolarEncoder):
         new_shape = (-1, input_shape[-1])
         u = bits.reshape(new_shape)
 
-        # CRC encode
+        # CRC encode. Binary check is done once in PolarEncoder.call.
         u_crc = self._enc_crc(u)
 
         # For downlink only: apply input bit interleaver

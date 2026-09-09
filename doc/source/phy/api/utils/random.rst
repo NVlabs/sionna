@@ -10,3 +10,4 @@ Random number generation
    rand
    uniform
    normal
+   complex_normal

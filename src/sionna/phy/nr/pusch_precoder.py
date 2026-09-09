@@ -20,9 +20,11 @@ class PUSCHPrecoder(Block):
 
     Each transmitter is assumed to have its own precoding matrix.
 
-    :param precoding_matrices: List of precoding matrices, one for each
-        transmitter. All precoding matrices must have the same shape.
-        Shape: [num_tx, num_antenna_ports, num_layers].
+    :param precoding_matrices: List of length `num_tx` containing one
+        two-dimensional precoding matrix per transmitter. Each matrix must
+        have shape [num_antenna_ports, num_layers], and all matrices must have
+        the same shape. Internally, the matrices are stacked to shape
+        [num_tx, num_antenna_ports, num_layers].
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation.

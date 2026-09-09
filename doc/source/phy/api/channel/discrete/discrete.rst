@@ -30,7 +30,7 @@ Running:
 
 >>> x = torch.zeros((128,)) # x is the channel input
 >>> pb = 0.1 # pb is the bit flipping probability
->>> y = bsc((x, pb))
+>>> y = bsc(x, pb)
 
 .. autoclass:: sionna.phy.channel.BinaryErasureChannel
    :members:

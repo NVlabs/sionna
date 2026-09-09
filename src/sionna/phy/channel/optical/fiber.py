@@ -192,17 +192,14 @@ class SSFM(Block):
             self._n_ssfm = -1  # adaptive == -1
             self._adaptive = True
         elif isinstance(n_ssfm, int):
-            assert n_ssfm > 0, "n_ssfm must be positive"
+            if n_ssfm <= 0:
+                raise ValueError("n_ssfm must be positive")
             self._n_ssfm = n_ssfm
             self._adaptive = False
         else:
             raise ValueError(
                 "Unsupported parameter for n_ssfm. Either an integer or 'adaptive'."
             )
-
-        # Only used for constant step width
-        if not self._adaptive:
-            self._dz = self._length / self._n_ssfm
 
         # Register as buffers for CUDAGraph compatibility
         self.register_buffer("_n_sp", torch.tensor(n_sp, dtype=self.dtype, device=self.device))
@@ -218,12 +215,8 @@ class SSFM(Block):
         self._with_manakov = with_manakov
         self._with_nonlinearity = with_nonlinearity
 
-        self._rho_n = H * self._f_c * self._alpha * self._length * self._n_sp  # (W/Hz)
-
-        # Calculate noise power depending on simulation bandwidth
-        self._p_n_ase = self._rho_n / self._sample_duration / self._t_norm  # (Ws)
-        if self._with_manakov:
-            self._p_n_ase = self._p_n_ase / 2.0
+        self._update_derived_state()
+        self.register_load_state_dict_post_hook(self._refresh_derived_state)
 
         # Pre-compute Hamming window
         if self._half_window_length > 0:
@@ -234,6 +227,28 @@ class SSFM(Block):
             ))
         else:
             self.register_buffer("_window", None)
+
+    def _update_derived_state(self) -> None:
+        """Update values derived from registered buffers."""
+        # Only used for constant step width
+        if not self._adaptive:
+            self._dz = self._length / self._n_ssfm
+
+        # `time_frequency_vector()` takes a float, and reading it back with
+        # `.item()` inside `call()` forces a Dynamo graph break under
+        # `torch.compile`. Read it off the buffer so it carries the rounding of
+        # `self.dtype`, which affects the frequency spacing at single precision.
+        self._sample_duration_value = self._sample_duration.item()
+
+        self._rho_n = H * self._f_c * self._alpha * self._length * self._n_sp
+        self._p_n_ase = self._rho_n / self._sample_duration / self._t_norm
+        if self._with_manakov:
+            self._p_n_ase = self._p_n_ase / 2.0
+
+    def _refresh_derived_state(self, module, incompatible_keys) -> None:
+        """Refresh values derived from buffers after loading state."""
+        del module, incompatible_keys
+        self._update_derived_state()
 
     def _apply_linear_operator(
         self,
@@ -346,9 +361,10 @@ class SSFM(Block):
         :output x: Channel output after fiber propagation
         """
         if self._with_manakov:
-            assert (
-                inputs.shape[-2] == 2
-            ), "For Manakov mode, second to last dimension must be 2."
+            if inputs.dim() < 2 or inputs.shape[-2] != 2:
+                raise ValueError(
+                    "For Manakov mode, second to last dimension must be 2."
+                )
 
         x = inputs.to(dtype=self.cdtype, device=self.device)
         input_shape = x.shape
@@ -356,7 +372,7 @@ class SSFM(Block):
         # Generate frequency vectors
         _, f = utils.time_frequency_vector(
             input_shape[-1],
-            self._sample_duration.item(),
+            self._sample_duration_value,
             precision=self.precision,
             device=self.device,
         )

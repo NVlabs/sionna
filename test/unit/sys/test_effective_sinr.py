@@ -4,6 +4,8 @@
 #
 """Unit tests for sionna.sys.effective_sinr"""
 
+import json
+
 import numpy as np
 import pytest
 import torch
@@ -44,6 +46,29 @@ def get_sinr_eff_numpy(
 
 class TestEffectiveSINR:
     """Tests for the EESM effective SINR computation."""
+
+    def test_unused_resources_return_zero(self, device):
+        """Unused users and streams remain zero below the clamp floor."""
+        eff_sinr_obj = EESM(device=device)
+        sinr = torch.zeros(1, 2, 3, 2, 2, device=device)
+        mcs = torch.zeros(1, 2, dtype=torch.int32, device=device)
+
+        for per_stream in (False, True):
+            sinr_eff = eff_sinr_obj(sinr, mcs, per_stream=per_stream)
+            torch.testing.assert_close(sinr_eff, torch.zeros_like(sinr_eff))
+
+        sinr[..., 0, 0] = 1.0
+        sinr_eff = eff_sinr_obj(sinr, mcs)
+        assert sinr_eff[0, 0] > 0
+        assert sinr_eff[0, 1] == 0
+
+        sinr_eff_per_stream = eff_sinr_obj(sinr, mcs, per_stream=True)
+        assert sinr_eff_per_stream[0, 0, 0] > 0
+        assert sinr_eff_per_stream[0, 0, 1] == 0
+        torch.testing.assert_close(
+            sinr_eff_per_stream[0, 1],
+            torch.zeros_like(sinr_eff_per_stream[0, 1]),
+        )
 
     def test_sinr_eff_vs_numpy(self, device):
         """Check that the effective SINR computation matches its Numpy counterpart."""
@@ -148,11 +173,7 @@ class TestEffectiveSINR:
 
         eff_sinr_obj = EESM(precision=precision, device=device)
 
-        # Compile the call method
-        if mode != "default":
-            compiled_call = torch.compile(eff_sinr_obj.call, mode=mode)
-        else:
-            compiled_call = eff_sinr_obj.call
+        compiled_call = torch.compile(eff_sinr_obj.call, mode=mode)
 
         # Generate inputs
         sinr = torch.rand(
@@ -171,3 +192,53 @@ class TestEffectiveSINR:
 
         # Basic shape check
         assert sinr_eff.shape == (batch_size, num_ut)
+
+    @pytest.mark.parametrize("table_index", [0, 3, 4])
+    def test_unsupported_mcs_table_index_raises(self, device, table_index):
+        """Default EESM betas cover tables 1-2 only."""
+        eesm = EESM(device=device)
+        sinr = torch.ones(1, 2, 4, 1, 1, device=device)
+        mcs = torch.zeros(1, 1, dtype=torch.int32, device=device)
+        with pytest.raises(ValueError, match="mcs_table_index"):
+            eesm(sinr, mcs, mcs_table_index=table_index)
+
+    @pytest.mark.parametrize(
+        "betas",
+        [[], [1.0, 0.0], [1.0, -1.0], [1.0, float("inf")], [1.0, "bad"]],
+    )
+    def test_invalid_beta_table_raises(self, device, tmp_path, betas):
+        """Beta rows must be non-empty and finite positive."""
+        path = tmp_path / "betas.json"
+        path.write_text(json.dumps({"index": {"1": betas}}))
+        with pytest.raises(ValueError, match="non-empty|finite positive"):
+            EESM(load_beta_table_from=str(path), device=device)
+
+    def test_default_beta_table_contract(self, device):
+        """Default beta table has expected indices and ignores category."""
+        eesm = EESM(device=device)
+        assert set(eesm.beta_table["index"]) == {1, 2}
+        assert {idx: len(row) for idx, row in eesm.beta_table["index"].items()} == {
+            1: 29,
+            2: 28,
+        }
+        assert eesm.validate_beta_table() is True
+
+        sinr = torch.ones(1, 2, 4, 1, 1, device=device)
+        mcs = torch.zeros(1, 1, dtype=torch.int32, device=device)
+        category_zero = eesm(sinr, mcs, mcs_table_index=1, mcs_category=0)
+        category_one = eesm(sinr, mcs, mcs_table_index=1, mcs_category=1)
+        assert torch.equal(category_zero, category_one)
+
+    def test_noncontiguous_custom_beta_indices(self, device, tmp_path):
+        """Only explicitly loaded table indices are accepted."""
+        path = tmp_path / "betas.json"
+        path.write_text(
+            json.dumps({"index": {"1": [1.0], "3": [2.0]}})
+        )
+        eesm = EESM(load_beta_table_from=str(path), device=device)
+        sinr = torch.ones(1, 2, 4, 1, 1, device=device)
+        mcs = torch.zeros(1, 1, dtype=torch.int32, device=device)
+
+        assert eesm(sinr, mcs, mcs_table_index=3).shape == (1, 1)
+        with pytest.raises(ValueError, match="mcs_table_index"):
+            eesm(sinr, mcs, mcs_table_index=2)

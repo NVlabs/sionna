@@ -6,7 +6,9 @@
 
 import torch
 
+from sionna.phy import config
 from sionna.phy.channel import CIRDataset, TimeChannel
+from sionna.phy.channel.cir_dataset import _CIRIterableDataset
 
 
 class SimpleGenerator:
@@ -501,3 +503,36 @@ class TestCIRDatasetWithTimeChannel:
 
         assert y.dtype == cdtype
         assert h_time.dtype == cdtype
+
+
+class TestCIRDatasetRNG:
+    """CIRDataset shuffle order must follow sionna.phy.config.seed."""
+
+    def test_shuffle_reproducible_under_config_seed(self, device):
+        """Resetting config.seed reproduces the shuffle-buffer order."""
+
+        class IndexedGenerator:
+            """Yields identifiable samples so shuffle order is observable."""
+
+            def __init__(self, num_samples: int = 8):
+                self.num_samples = num_samples
+
+            def __call__(self):
+                for i in range(self.num_samples):
+                    a = torch.full((1, 1, 1, 1, 1, 1), float(i), dtype=torch.complex64)
+                    tau = torch.full((1, 1, 1), float(i), dtype=torch.float32)
+                    yield a, tau
+
+        def collect_order():
+            dataset = _CIRIterableDataset(IndexedGenerator(), buffer_size=8)
+            return [int(a.real.item()) for a, _ in dataset]
+
+        config.seed = 123
+        first = collect_order()
+        config.seed = 123
+        second = collect_order()
+        config.seed = 456
+        third = collect_order()
+
+        assert first == second
+        assert first != third

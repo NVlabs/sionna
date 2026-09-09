@@ -206,7 +206,7 @@ def get_exit_analytic(
     mi_ec = np.zeros_like(mi_a)
     for i in range(1, c_max):
         # Convert to tensor, compute, convert back
-        mi_a_tensor = torch.tensor(1 - mi_a, dtype=torch.float32)
+        mi_a_tensor = torch.from_numpy(1 - mi_a)
         j_inv_result = j_fun_inv(mi_a_tensor)
         j_result = j_fun((i - 1.0) * j_inv_result)
         mi_ec += r[i] * j_result.numpy()
@@ -215,7 +215,7 @@ def get_exit_analytic(
     # Exit function of variable node update
     mi_ev = np.zeros_like(mi_a)
     for i in range(1, v_max):
-        mi_a_tensor = torch.tensor(mi_a, dtype=torch.float32)
+        mi_a_tensor = torch.from_numpy(mi_a)
         j_inv_result = j_fun_inv(mi_a_tensor)
         j_result = j_fun(mu_llr + (i - 1.0) * j_inv_result)
         mi_ev += lam[i] * j_result.numpy()

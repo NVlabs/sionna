@@ -171,11 +171,7 @@ class TestScheduler:
             device=device,
         )
 
-        # Compile the call method
-        if mode != "default":
-            compiled_call = torch.compile(scheduler.call, mode=mode)
-        else:
-            compiled_call = scheduler.call
+        compiled_call = torch.compile(scheduler.call, mode=mode)
 
         rate_last_slot = torch.rand(batch_size, num_ut, device=device) * 100
         rate_achievable_curr_slot = torch.rand(
@@ -185,3 +181,18 @@ class TestScheduler:
         is_scheduled = compiled_call(rate_last_slot, rate_achievable_curr_slot)
 
         assert is_scheduled.shape == (batch_size, num_ofdm_sym, num_freq_res, num_ut, 1)
+
+    def test_invalid_beta(self, device):
+        """Test that a beta outside the unit interval is rejected."""
+        with pytest.raises(ValueError, match="within"):
+            PFSchedulerSUMIMO(2, 1, 1, beta=1.0, device=device)
+
+    def test_invalid_rate_last_slot_shape(self, device):
+        """Test that a misshaped rate_last_slot is rejected."""
+        scheduler = PFSchedulerSUMIMO(2, 1, 1, batch_size=1, device=device)
+
+        with pytest.raises(ValueError, match="rate_last_slot"):
+            scheduler(
+                torch.ones(2, device=device),
+                torch.ones(1, 1, 1, 2, device=device),
+            )

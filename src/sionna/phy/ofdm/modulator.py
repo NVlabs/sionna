@@ -7,6 +7,7 @@ from typing import Optional, Union
 import numpy as np
 import torch
 
+from sionna._validation import check_tensor_all
 from sionna.phy import Block
 from sionna.phy.config import Precision
 from sionna.phy.signal import ifft
@@ -76,8 +77,11 @@ class OFDMModulator(Block):
         else:
             value = value.to(dtype=torch.int32, device=self.device)
 
-        if not torch.all(value >= 0):
-            raise ValueError("`cyclic_prefix_length` must be nonnegative.")
+        check_tensor_all(
+            value >= 0,
+            name="cyclic_prefix_length",
+            message="`cyclic_prefix_length` must be nonnegative.",
+        )
         if not 0 <= value.dim() <= 1:
             raise ValueError("`cyclic_prefix_length` must be of rank 0 or 1.")
 
@@ -100,8 +104,11 @@ class OFDMModulator(Block):
         num_ofdm_symbols, fft_size = input_shape[-2:]
         cp_len = self._cyclic_prefix_length
 
-        if not torch.all(cp_len <= fft_size):
-            raise ValueError("`cyclic_prefix_length` cannot be larger than `fft_size`.")
+        check_tensor_all(
+            cp_len <= fft_size,
+            name="cyclic_prefix_length",
+            message="`cyclic_prefix_length` cannot be larger than `fft_size`.",
+        )
 
         if cp_len.dim() == 1:
             if cp_len.shape[0] != num_ofdm_symbols:

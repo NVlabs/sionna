@@ -8,6 +8,7 @@ import pytest
 import numpy as np
 import torch
 
+from sionna.phy import config as phy_config
 from sionna.phy.utils import compute_ber
 from sionna.phy.channel import OFDMChannel, RayleighBlockFading, TimeChannel
 from sionna.phy.nr import PUSCHConfig, PUSCHTransmitter, PUSCHReceiver
@@ -92,6 +93,31 @@ def run_test(
 
 class TestPUSCHReceiver:
     """Tests for PUSCHReceiver."""
+
+    def test_device_override_propagates_from_transmitter(self, device):
+        """Transmitter and receiver remain colocated despite global defaults."""
+        global_device = next(
+            (candidate for candidate in phy_config.available_devices
+             if candidate != device),
+            None,
+        )
+        if global_device is None:
+            pytest.skip("Test requires two available devices")
+        phy_config.device = global_device
+
+        pusch_config = PUSCHConfig()
+        pusch_config.n_size_bwp = 12
+        transmitter = PUSCHTransmitter(pusch_config, device=device)
+        receiver = PUSCHReceiver(
+            transmitter,
+            channel_estimator="perfect",
+            device=device,
+        )
+
+        assert receiver.device == device
+        assert receiver.resource_grid.device == device
+        for _, buffer in receiver.named_buffers():
+            assert buffer.device == torch.device(device)
 
     def test_01(self):
         """Test perfect and imperfect CSI in freq and time domain."""

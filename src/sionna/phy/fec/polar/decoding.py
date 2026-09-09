@@ -6,16 +6,18 @@
 successive cancellation list (SCL) and iterative belief propagation (BP)
 decoding."""
 
-from typing import Optional, Tuple, Union
+from typing import NamedTuple, Optional, Tuple, Union
+import enum
 import numbers
 import warnings
 import numpy as np
 import torch
-import torch.nn.functional as F
+from torch.nn.functional import softplus
 
 from sionna.phy import Block
 from sionna.phy.fec.crc import CRCDecoder, CRCEncoder
 from sionna.phy.fec.polar.encoding import Polar5GEncoder
+from sionna.phy.fec.polar.utils import _is_pow2
 
 
 __all__ = [
@@ -24,6 +26,95 @@ __all__ = [
     "PolarBPDecoder",
     "Polar5GDecoder",
 ]
+
+# Workaround for an upstream inductor C++ codegen bug on torch <= 2.11.
+# When the inner SCL / BP decode loop is fused with surrounding ops
+# (e.g. rate matching in ``Polar5GDecoder``), inductor produces invalid
+# C++ — ``decltype(scalar)::blendv`` on int8 for SCL (pytorch#178148),
+# or a gcc ICE on the very large fused BP kernel. The SCL codegen bug is
+# fixed in torch >= 2.12 (see also pytorch#180212). We force a dynamo
+# graph break around the inner SCL loop only on CPU instances of
+# affected torch versions; CUDA (Triton) and torch >= 2.12 keep the full
+# fused compile. Eager execution is never affected.
+#
+
+_NEEDS_CPU_COMPILE_BREAK = tuple(
+    int(p) for p in torch.__version__.split("+", 1)[0].split(".")[:2]
+) < (2, 12)
+_CPU_COMPILE_BREAK_WARNED = [False]
+
+
+def _install_cpu_compile_break(decoder, attr_name):
+    """Wrap a bound decode method with ``torch.compiler.disable`` so
+    that, when traced by ``torch.compile``, dynamo graph-breaks here
+    and runs the inner loop eagerly. Eager calls go straight through
+    to the original method. A one-shot warning is emitted on the
+    first compiled invocation so users on old torch learn that
+    compile-mode throughput is reduced and that upgrading to
+    torch >= 2.12 restores full fused-compile performance."""
+    disabled = torch.compiler.disable(recursive=False)(getattr(decoder, attr_name))
+
+    def _wrapper(*args, **kwargs):
+        if torch.compiler.is_compiling() and not _CPU_COMPILE_BREAK_WARNED[0]:
+            _CPU_COMPILE_BREAK_WARNED[0] = True
+            warnings.warn(
+                "torch < 2.12 contains an inductor C++ codegen bug that "
+                "breaks torch.compile of the SCL / BP inner decode loop "
+                "on CPU. A dynamo graph break is being inserted around "
+                "the inner loop as a workaround; the rest of the decoder "
+                "still compiles, but compile-mode throughput is reduced. "
+                "Upgrade to torch >= 2.12 to recover full fused-compile "
+                "performance.",
+                RuntimeWarning,
+                stacklevel=3,
+            )
+        return disabled(*args, **kwargs)
+
+    setattr(decoder, attr_name, _wrapper)
+
+
+class _Op(enum.IntEnum):
+    """Opcodes for the SCL decoder tape."""
+    F = 0            # check-node: push LLRs to left child
+    G = 1            # variable-node: push LLRs to right child
+    COMBINE = 2      # Polar XOR combine hard decisions upward
+    LEAF_FROZEN = 3  # single frozen bit (forced to 0)
+    LEAF_INFO = 4    # single info bit: fork paths, prune to L
+    R0 = 5           # fast-SCL: whole sub-tree is frozen (rate 0)
+    REP = 6          # fast-SCL: repetition code (only last bit info)
+    R1 = 7           # fast-SCL: whole sub-tree is info (rate 1), M=1 flip
+
+
+class _TapeEntry(NamedTuple):
+    """A single SCL decoder instruction.
+
+    ``op``, ``stage``, ``off`` and ``length`` describe the Polar-tree
+    region the op acts on. ``slot_a``, ``slot_b`` and ``slot_c`` are
+    pre-computed workspace offsets whose meaning depends on ``op``;
+    construct entries through the ``_make_*`` factories on
+    :class:`PolarSCLDecoder` to keep the conventions self-documenting.
+
+    Per-opcode conventions:
+
+    * ``F``           — ``slot_a = llr_src``, ``slot_b = llr_dst``.
+    * ``G``           — ``slot_a = llr_src``, ``slot_b = llr_dst``,
+      ``slot_c = u_src``.
+    * ``COMBINE``     — ``slot_a = u_src``, ``slot_b = u_dst``.
+    * ``LEAF_FROZEN`` — ``slot_a = llr_src``.
+    * ``LEAF_INFO``   — ``slot_a = llr_src``.
+    * ``R0``          — ``slot_a = llr_src``, ``slot_b = u_dst``
+      (zero when ``stage == n_stages``).
+    * ``REP``         — ``slot_a = llr_src``, ``slot_b = u_dst``.
+    * ``R1``          — ``slot_a = llr_src``, ``slot_b = u_dst``
+      (zero when ``stage == n_stages``).
+    """
+    op: int
+    stage: int
+    off: int
+    length: int
+    slot_a: int = 0
+    slot_b: int = 0
+    slot_c: int = 0
 
 
 class PolarSCDecoder(Block):
@@ -99,7 +190,7 @@ class PolarSCDecoder(Block):
         if len(frozen_pos) > n:
             msg = "Num. of elements in frozen_pos cannot be greater than n."
             raise ValueError(msg)
-        if np.log2(n) != int(np.log2(n)):
+        if not _is_pow2(n):
             raise ValueError("n must be a power of 2.")
 
         # Store internal attributes
@@ -294,34 +385,24 @@ class PolarSCDecoder(Block):
 
 class PolarSCLDecoder(Block):
     # pylint: disable=line-too-long
-    """Successive cancellation list (SCL) decoder :cite:p:`Tal_SCL` for Polar codes
-    and Polar-like codes.
+    """Fast successive cancellation list (SCL) decoder for Polar and Polar-like
+    codes :cite:p:`Tal_SCL` :cite:p:`Hashemi_SSCL`. Rate-1 nodes use a
+    single-flip (``M=1``) shortcut rather than exact list decoding; see Notes.
 
     :param frozen_pos: Array of `int` defining the ``n-k`` indices of the
         frozen positions.
     :param n: Defining the codeword length.
-    :param list_size: Defines the list size of the decoder.
+    :param list_size: Defining the list size ``L`` of the decoder. Must
+        be a power of 2.
     :param crc_degree: Defining the CRC polynomial to be used. Can be any
         value from `{CRC24A, CRC24B, CRC24C, CRC16, CRC11, CRC6}`.
-    :param use_hybrid_sc: If `True`, SC decoding is applied and only the
-        codewords with invalid CRC are decoded with SCL. This option
-        requires an outer CRC specified via ``crc_degree``.
-    :param use_fast_scl: If `True`, tree pruning is used to reduce
-        the decoding complexity. The output is equivalent to the
-        non-pruned version (besides numerical differences).
-    :param cpu_only: If `True`, a NumPy-based decoder runs on the CPU.
-        This option is usually slower, but also more memory efficient
-        and in particular recommended for larger blocklengths.
-    :param use_scatter: If `True`, scatter update is used for tensor
-        updates. This option is usually slower, but more memory efficient.
     :param ind_iil_inv: If not `None`, the sequence is used as inverse
-        input bit interleaver before evaluating the CRC. This only
-        affects the CRC evaluation but the output sequence is not
-        permuted.
+        input-bit interleaver before the CRC is evaluated. This only
+        affects CRC evaluation; the output sequence is not permuted.
     :param return_crc_status: If `True`, the decoder additionally returns
         the CRC status indicating if a codeword was (most likely)
-        correctly recovered. This is only available if ``crc_degree`` is
-        not `None`.
+        correctly recovered. This is only available if ``crc_degree``
+        is not `None`.
     :param precision: Precision used for internal calculations and outputs.
         If `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
@@ -342,28 +423,50 @@ class PolarSCLDecoder(Block):
     .. rubric:: Notes
 
     This block implements the successive cancellation list (SCL) decoder
-    as described in :cite:p:`Tal_SCL` but uses LLR-based message updates
-    :cite:p:`Stimming_LLR`. The implementation follows the notation from
-    :cite:p:`Gross_Fast_SCL`, :cite:p:`Hashemi_SSCL`. If option ``use_fast_scl`` is
-    active, tree pruning is used and tree nodes are combined if possible
-    (see :cite:p:`Hashemi_SSCL` for details).
+    as described in :cite:p:`Tal_SCL` using LLR-domain message updates
+    :cite:p:`Stimming_LLR`. At construction time, the decoder performs a
+    single depth-first traversal of the Polar decoding tree and generates
+    a fixed sequence of message-passing instructions (the decoder `tape`).
+    The traversal also applies the fast-SCL node shortcuts of
+    :cite:p:`Hashemi_SSCL`, which collapse common sub-trees into single
+    ops to avoid descending all the way to per-bit leaves.
 
-    For longer code lengths, the complexity of the decoding graph becomes
-    large and we recommend to use the ``cpu_only`` option that uses an
-    embedded NumPy decoder. Further, this function recursively unrolls the
-    SCL decoding tree, thus, for larger values of ``n`` building the
-    decoding graph can become time consuming. Please consider the
-    ``cpu_only`` option if building the graph takes too long.
+    Each tape entry is therefore one of ``F`` (check-node update), ``G``
+    (variable-node update), ``COMBINE`` (upward XOR combine), a single
+    frozen or info leaf decision, or one of the fast-SCL node shortcuts
+    ``R0`` / ``REP`` / ``R1``. Decoding replays this tape over shared
+    workspace tensors, so the sequence of launched kernels does not
+    depend on the channel input and is compatible with `torch.compile`
+    and CUDA graph capture.
 
-    A hybrid SC/SCL decoder as proposed in :cite:p:`Cammerer_Hybrid_SCL` (using
-    SC instead of BP) can be activated with option ``use_hybrid_sc`` iff
-    an outer CRC is available. Please note that the results are not
-    exactly SCL performance caused by the false positive rate of the CRC.
+    The fast-SCL shortcuts cover three special sub-tree shapes: an
+    all-frozen sub-tree is replaced by a single ``R0`` op, a repetition
+    sub-tree (all leaves frozen except the last) by a single ``REP``
+    op, and a rate-1 sub-tree (no frozen leaves) by a single ``R1``
+    op. ``R1`` uses the single-flip approximation `(M=1)`, i.e., it
+    keeps two alternatives per surviving path: the maximum-likelihood
+    codeword and the codeword with the least-reliable bit flipped.
+
+    Only the currently active region of the Polar tree is materialized per
+    path: LLRs occupy a flat buffer of size ``n - 1`` indexed by stage,
+    hard decisions for stages ``1 .. n_stages - 1`` occupy ``2n - 4``
+    slots, and stage-0 leaf decisions live in a persistent ``[B, 2L, n]``
+    tensor.
+    The per-op workspace offsets are pre-computed during tape construction
+    so that decoding issues plain tensor slices without any per-op address
+    arithmetic.
+
+    With CRC-aided decoding, the decoder selects the surviving path
+    with the smallest path metric *after* adding a large CRC-failure
+    penalty to every path that does not check. If no path passes the
+    CRC, the path with the smallest underlying metric is returned and
+    its ``crc_status`` is `False`.
 
     As commonly done, we assume frozen bits are set to `0`. Please note
-    that - although its practical relevance is only little - setting frozen
-    bits to `1` may result in `affine` codes instead of linear code as the
-    `all-zero` codeword is not necessarily part of the code any more.
+    that - although its practical relevance is only little - setting
+    frozen bits to `1` may result in `affine` codes instead of a linear
+    code as the all-zero codeword is not necessarily part of the code
+    any more.
 
     .. rubric:: Examples
 
@@ -393,10 +496,6 @@ class PolarSCLDecoder(Block):
         n: int,
         list_size: int = 8,
         crc_degree: Optional[str] = None,
-        use_hybrid_sc: bool = False,
-        use_fast_scl: bool = True,
-        cpu_only: bool = False,
-        use_scatter: bool = False,
         ind_iil_inv: Optional[np.ndarray] = None,
         return_crc_status: bool = False,
         *,
@@ -406,81 +505,47 @@ class PolarSCLDecoder(Block):
     ):
         super().__init__(precision=precision, device=device, **kwargs)
 
+        # ---- validate scalar inputs --------------------------------------
         if not isinstance(n, numbers.Number):
             raise TypeError("n must be a number.")
         n = int(n)
         if not isinstance(list_size, int):
             raise TypeError("list_size must be integer.")
-        if not isinstance(cpu_only, bool):
-            raise TypeError("cpu_only must be bool.")
-        if not isinstance(use_scatter, bool):
-            raise TypeError("use_scatter must be bool.")
-        if not isinstance(use_fast_scl, bool):
-            raise TypeError("use_fast_scl must be bool.")
-        if not isinstance(use_hybrid_sc, bool):
-            raise TypeError("use_hybrid_sc must be bool.")
         if not isinstance(return_crc_status, bool):
             raise TypeError("return_crc_status must be bool.")
-
         if not np.issubdtype(frozen_pos.dtype, int):
             raise TypeError("frozen_pos contains non int.")
         if len(frozen_pos) > n:
-            msg = "Num. of elements in frozen_pos cannot be greater than n."
-            raise ValueError(msg)
-        if np.log2(n) != int(np.log2(n)):
+            raise ValueError(
+                "Num. of elements in frozen_pos cannot be greater than n."
+            )
+        if not _is_pow2(n):
             raise ValueError("n must be a power of 2.")
-        if np.log2(list_size) != int(np.log2(list_size)):
+        if n < 2:
+            raise ValueError("n must be at least 2.")
+        if not _is_pow2(list_size):
             raise ValueError("list_size must be a power of 2.")
 
-        # CPU mode is recommended for larger values of n
-        if n > 128 and cpu_only is False and use_hybrid_sc is False:
-            warnings.warn(
-                "Required resource allocation is large "
-                "for the selected blocklength. Consider option `cpu_only=True`."
-            )
-
-        # CPU mode is recommended for larger values of L
-        if list_size > 32 and cpu_only is False and use_hybrid_sc is False:
-            warnings.warn(
-                "Resource allocation is high for the "
-                "selected list_size. Consider option `cpu_only=True`."
-            )
-
-        # Internal decoder parameters
-        self._use_fast_scl = use_fast_scl
-        self._use_scatter = use_scatter
-        self._cpu_only = cpu_only
-        self._use_hybrid_sc = use_hybrid_sc
-
-        # Store internal attributes
+        # ---- store immutable code / decoder parameters -------------------
         self._n = n
         self._frozen_pos = frozen_pos
-        self._k = self._n - len(self._frozen_pos)
+        self._k = n - len(frozen_pos)
         self._list_size = list_size
-        self._info_pos = np.setdiff1d(np.arange(self._n), self._frozen_pos)
+        self._info_pos = np.setdiff1d(np.arange(n), frozen_pos)
         self._llr_max = 30.0
         if self._k != len(self._info_pos):
             raise ArithmeticError("Internal error: invalid info_pos generated.")
 
-        # Create a frozen bit vector
-        self._frozen_ind = np.zeros(self._n)
-        self._frozen_ind[self._frozen_pos] = 1
-        self._cw_ind = np.arange(self._n)
-        self._n_stages = int(np.log2(self._n))
+        self._frozen_ind = np.zeros(n, dtype=np.int8)
+        self._frozen_ind[frozen_pos] = 1
+        self._n_stages = int(np.log2(n))
 
-        # Register frozen indicator as tensor buffer for torch.compile compatibility
-        self.register_buffer(
-            "_frozen_ind_t",
-            torch.tensor(self._frozen_ind, dtype=self.dtype, device=self.device),
-        )
-
-        # Register info_pos as tensor buffer to avoid torch.tensor() in call
         self.register_buffer(
             "_info_pos_t",
             torch.tensor(self._info_pos, dtype=torch.int64, device=self.device),
         )
 
-        # Init CRC check (if needed)
+        # ---- CRC setup ---------------------------------------------------
         if crc_degree is not None:
             self._use_crc = True
             self._crc_encoder = CRCEncoder(
@@ -494,898 +559,626 @@ class PolarSCLDecoder(Block):
             self._use_crc = False
             self._k_crc = 0
         if self._k < self._k_crc:
-            msg = "Value of k is too small for given CRC_degree."
-            raise ValueError(msg)
+            raise ValueError("Value of k is too small for given CRC_degree.")
 
         if (crc_degree is None) and return_crc_status:
-            self._return_crc_status = False
             raise ValueError("Returning CRC status requires given crc_degree.")
-        else:
-            self._return_crc_status = return_crc_status
+        self._return_crc_status = return_crc_status
 
-        # Store the inverse interleaver pattern
+        # ---- optional CRC input-bit de-interleaver -----------------------
         if ind_iil_inv is not None:
             if ind_iil_inv.shape[0] != self._k:
-                raise ValueError("ind_int must be of length k+k_crc.")
-            self._ind_iil_inv = ind_iil_inv
+                raise ValueError("ind_iil_inv must be of length k.")
             self._iil = True
-            # Register as tensor buffer to avoid torch.tensor() in call
             self.register_buffer(
                 "_ind_iil_inv_t",
-                torch.tensor(ind_iil_inv, dtype=torch.int32, device=self.device),
+                torch.tensor(ind_iil_inv, dtype=torch.int64,
+                             device=self.device),
             )
         else:
             self._iil = False
 
-        # Use SC decoder first and use numpy-based SCL as "afterburner"
-        if self._use_hybrid_sc:
-            self._decoder_sc = PolarSCDecoder(
-                frozen_pos, n, precision=precision, device=device
-            )
-            if not self._use_crc:
-                raise ValueError("Hybrid SC requires outer CRC.")
+        # ---- build tape --------------------------------------------------
+        # The decoder uses two small 1-D scratch buffers per path:
+        #   * ``llr``  holds intermediate LLRs            (size ``n - 1``).
+        #   * ``uhat`` holds intermediate bit decisions   (size ``2n - 4``).
+        # ``_slot_llr[s]`` / ``_slot_uhat[s]`` give the offset at which
+        # stage ``s`` lives inside the corresponding buffer; the tape
+        # entries built next bake these offsets in so that the decode
+        # loop only needs plain tensor slicing.
+        # Stages ``0 .. n_stages - 1`` are stored in ``llr`` at offset
+        # ``2^s - 1``. Stage ``n_stages`` is the channel input and is
+        # read directly from ``llr_ch`` by the decode loop, so it has
+        # no slot in ``llr``. We use ``None`` as a sentinel for that
+        # stage rather than the buffer-size value ``n - 1``: any tape
+        # entry that accidentally indexes ``llr`` with this slot will
+        # raise ``TypeError`` on ``None + offset`` instead of silently
+        # producing an out-of-bounds (and empty) slice.
+        self._slot_llr = [(1 << s) - 1 for s in range(self._n_stages)]
+        self._slot_llr.append(None)
+        self._llr_flat_size = max((1 << self._n_stages) - 1, 1)
+        self._slot_uhat = [0] + [
+            (1 << (s + 1)) - 4 for s in range(1, self._n_stages + 1)
+        ]
+        self._uhat_flat_size = max((1 << (self._n_stages + 1)) - 4, 1)
+        self._tape = self._build_tape()
 
+        # Initial path-metric vector. Only slots 0 and L are valid
+        # (these are the seeds of the u=0 and u=1 halves of the first
+        # info-leaf split); the remaining 2L-2 slots are seeded with
+        # ``+inf`` so that the first topk deterministically discards
+        # them regardless of how much real paths have accumulated.
+        #
+        # Note: the list reaches full ``L``-path utilisation only after
+        # ``ceil(log2(L))`` info-leaf forks have been consumed, since
+        # each fork doubles the number of finite-metric paths from the
+        # initial pair. For codes whose first ``log2(L)`` info bits land
+        # in fast-SCL ``R1`` sub-trees (which fork only once via the
+        # single-flip approximation rather than per bit), full diversity
+        # is reached even later. This warm-up does not affect
+        # correctness — discarded ``+inf`` slots never compete with real
+        # paths — but it slightly reduces effective list diversity over
+        # the first few decoded bits.
+        pm_init = np.full(2 * list_size, np.inf, dtype=np.float64)
+        pm_init[0] = 0.0
+        pm_init[list_size] = 0.0
+        self.register_buffer(
+            "_pm_init",
+            torch.tensor(pm_init, dtype=self.dtype, device=self.device),
+        )
+
+        # On affected torch versions on CPU, force a graph break around
+        # the inner SCL tape replay so it isn't fused with surrounding
+        # ops by inductor's CPU codegen (see ``_NEEDS_CPU_COMPILE_BREAK``
+        # at the top of this module). CUDA / newer torch versions skip
+        # this and keep the full fused compile.
+        if _NEEDS_CPU_COMPILE_BREAK and torch.device(self.device).type == "cpu":
+            _install_cpu_compile_break(self, "_decode")
+
+    # ------------------------------------------------------------------
+    # Read-only properties
+    # ------------------------------------------------------------------
     @property
-    def n(self) -> int:
+    def n(self):
         """Codeword length."""
         return self._n
 
     @property
-    def k(self) -> int:
-        """Number of information bits."""
+    def k(self):
+        """Number of information bits (including any outer CRC)."""
         return self._k
 
     @property
-    def k_crc(self) -> int:
-        """Number of CRC bits."""
+    def k_crc(self):
+        """Length of the outer CRC (0 if none)."""
         return self._k_crc
 
     @property
-    def frozen_pos(self) -> np.ndarray:
+    def frozen_pos(self):
         """Frozen positions for Polar decoding."""
         return self._frozen_pos
 
     @property
-    def info_pos(self) -> np.ndarray:
+    def info_pos(self):
         """Information bit positions for Polar encoding."""
         return self._info_pos
 
     @property
-    def llr_max(self) -> float:
-        """Maximum LLR value for internal calculations."""
+    def llr_max(self):
+        """Internal LLR clipping magnitude."""
         return self._llr_max
 
     @property
-    def list_size(self) -> int:
-        """List size for SCL decoding."""
+    def list_size(self):
+        """Decoder list size ``L``."""
         return self._list_size
 
-    # NumPy-based decoder helper functions
+    # ==================================================================
+    # Tape construction
+    # ==================================================================
+    @staticmethod
+    def _make_F(stage, off, length, llr_src, llr_dst):
+        """``F`` op — check-node update at an internal tree node.
 
-    def _cn_op_np(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Check node update (boxplus) for LLRs in NumPy.
-
-        See :cite:p:`Stimming_LLR` and :cite:p:`Hashemi_SSCL` for detailed equations.
+        Pushes LLRs from the parent stage down to the left child as
+        ``boxplus(x, y)``, where ``x`` and ``y`` are the two halves of
+        the parent-stage LLR vector.
         """
-        x_in = np.maximum(np.minimum(x, self._llr_max), -self._llr_max)
-        y_in = np.maximum(np.minimum(y, self._llr_max), -self._llr_max)
+        return _TapeEntry(_Op.F, stage, off, length, llr_src, llr_dst)
 
-        llr_out = np.log(1 + np.exp(x_in + y_in))
-        llr_out -= np.log(np.exp(x_in) + np.exp(y_in))
+    @staticmethod
+    def _make_G(stage, off, length, llr_src, llr_dst, u_src):
+        """``G`` op — variable-node update at an internal tree node.
 
-        return llr_out
-
-    def _vn_op_np(
-        self, x: np.ndarray, y: np.ndarray, u_hat: np.ndarray
-    ) -> np.ndarray:
-        """Variable node update (boxplus) for LLRs in Numpy."""
-        return np.multiply((1 - 2 * u_hat), x) + y
-
-    def _update_rate0_code_np(self, cw_ind: np.ndarray) -> None:
-        """Update rate-0 (i.e., all frozen) sub-code at pos ``cw_ind``.
-
-        See Eq. (26) in :cite:p:`Hashemi_SSCL`.
+        Pushes LLRs from the parent stage down to the right child,
+        conditioned on the left child's hard decision ``u``: returns
+        ``x + y`` if ``u == 0`` and ``y - x`` if ``u == 1``.
         """
-        n = len(cw_ind)
-        stage_ind = int(np.log2(n))
+        return _TapeEntry(_Op.G, stage, off, length, llr_src, llr_dst, u_src)
 
-        ind = np.expand_dims(self._dec_pointer, axis=-1)
-        llr_in = np.take_along_axis(
-            self.msg_llr[:, :, stage_ind, cw_ind], ind, axis=1
-        )
+    @staticmethod
+    def _make_combine(stage, off, length, u_src, u_dst):
+        """``COMBINE`` op — propagate hard decisions upward.
 
-        llr_clip = np.maximum(np.minimum(llr_in, self._llr_max), -self._llr_max)
-        pm_val = np.log(1 + np.exp(-llr_clip))
-        self.msg_pm += np.sum(pm_val, axis=-1)
-
-    def _update_rep_code_np(self, cw_ind: np.ndarray) -> None:
-        """Update rep. code sub-code at position ``cw_ind``.
-
-        See Eq. (31) in :cite:p:`Hashemi_SSCL`.
+        Once both children of an internal node have produced their hard
+        decisions ``ul`` (left) and ``ur`` (right), this writes the
+        parent-stage decision pair ``(ul ^ ur, ur)`` so the next
+        ``G`` / ``COMBINE`` further up the tree can read it.
         """
-        n = len(cw_ind)
-        stage_ind = int(np.log2(n))
-        bs = self._dec_pointer.shape[0]
+        return _TapeEntry(_Op.COMBINE, stage, off, length, u_src, u_dst)
 
-        llr = np.zeros([bs, 2 * self._list_size, n])
-        for i in range(bs):
-            llr_i = self.msg_llr[i, self._dec_pointer[i, :], stage_ind, :]
-            llr[i, :, :] = llr_i[:, cw_ind]
+    def _make_leaf_frozen(self, off, llr_src):
+        """``LEAF_FROZEN`` op — frozen bit (decoded as ``0``).
 
-        llr[:, self._list_size :, :] = -llr[:, self._list_size :, :]
-        llr_in = np.maximum(np.minimum(llr, self._llr_max), -self._llr_max)
-        pm_val = np.sum(np.log(1 + np.exp(-llr_in)), axis=-1)
-        self.msg_pm += pm_val
+        Updates the path metric with the cost of the LLR disagreeing
+        with the forced ``u = 0`` decision; emits no bit decision
+        because frozen bits are known to both encoder and decoder.
 
-        for i in range(bs):
-            ind_dec = self._dec_pointer[i, self._list_size :]
-            for j in cw_ind:
-                self.msg_uhat[i, ind_dec, stage_ind, j] = 1
-
-        self._update_single_bit_np([cw_ind[-1]])
-        self._sort_decoders_np()
-        self._duplicate_paths_np()
-
-    def _update_single_bit_np(self, ind_u: list) -> None:
-        """Update single bit at position ``ind_u`` of all decoders."""
-        if self._frozen_ind[ind_u] == 0:
-            ind_dec = np.expand_dims(
-                self._dec_pointer[:, self._list_size :], axis=-1
+        ``slot_a`` is forced to 0 by convention: the F/G chain has
+        already deposited the stage-0 LLR for bit ``off`` at offset 0
+        before this op runs. The assertion guards against tape
+        construction errors that would otherwise be silent.
+        """
+        if not 0 <= off < self._n:
+            raise RuntimeError(
+                f"LEAF_FROZEN off={off} out of range [0, {self._n}); "
+                "the decoder tape is invalid."
             )
-            uhat_slice = self.msg_uhat[:, :, 0, ind_u]
-            np.put_along_axis(uhat_slice, ind_dec, 1.0, axis=1)
-            self.msg_uhat[:, :, 0, ind_u] = uhat_slice
+        return _TapeEntry(_Op.LEAF_FROZEN, 0, off, 1, llr_src)
 
-    def _update_pm_np(self, ind_u: list) -> None:
-        """Update path metric of all decoders at bit position ``ind_u``.
+    @staticmethod
+    def _make_leaf_info(off, llr_src):
+        """``LEAF_INFO`` op — information bit, splits each path.
 
-        We apply Eq. (10) from :cite:p:`Stimming_LLR`.
+        Forks every surviving path into two candidates (``u = 0`` and
+        ``u = 1``), updates each metric, then prunes back to the
+        ``L`` smallest-metric paths.
         """
-        ind = np.expand_dims(self._dec_pointer, axis=-1)
-        u_hat = np.take_along_axis(self.msg_uhat[:, :, 0, ind_u], ind, axis=1)
-        u_hat = np.squeeze(u_hat, axis=-1)
-        llr_in = np.take_along_axis(self.msg_llr[:, :, 0, ind_u], ind, axis=1)
-        llr_in = np.squeeze(llr_in, axis=-1)
+        return _TapeEntry(_Op.LEAF_INFO, 0, off, 1, llr_src)
 
-        llr_clip = np.maximum(np.minimum(llr_in, self._llr_max), -self._llr_max)
-        self.msg_pm += np.log(
-            1 + np.exp(-np.multiply((1 - 2 * u_hat), llr_clip))
+    @staticmethod
+    def _make_R0(stage, off, length, llr_src, u_dst):
+        """``R0`` op — rate-0 (all-frozen) sub-tree shortcut.
+
+        A whole sub-tree whose leaves are all frozen decodes to the
+        all-zero codeword. Adds the LLR-disagreement cost over the
+        block to every path in one step (replaces the entire
+        ``F``/``G``/``COMBINE``/leaf chain).
+        """
+        return _TapeEntry(_Op.R0, stage, off, length, llr_src, u_dst)
+
+    @staticmethod
+    def _make_REP(stage, off, length, llr_src, u_dst):
+        """``REP`` op — repetition sub-tree shortcut.
+
+        A sub-tree where every leaf is frozen except the last is a
+        repetition code: the only two valid codewords are all-zero
+        and all-one. Splits each path into those two hypotheses,
+        updates the metrics in one step, then prunes to ``L``.
+        """
+        return _TapeEntry(_Op.REP, stage, off, length, llr_src, u_dst)
+
+    @staticmethod
+    def _make_R1(stage, off, length, llr_src, u_dst):
+        """``R1`` op — rate-1 (no-frozen) sub-tree shortcut, ``M = 1`` flip.
+
+        A sub-tree with no frozen leaves is unconstrained: the
+        maximum-likelihood codeword-stage decision is just
+        ``sign(LLR)``. To still benefit from the list, we keep one
+        alternative per path that flips the least-reliable bit
+        (Hashemi *et al.*'s single-flip approximation).
+        """
+        return _TapeEntry(_Op.R1, stage, off, length, llr_src, u_dst)
+
+    def _build_tape(self):
+        """Generate the SCL instruction sequence.
+
+        Performs a depth-first traversal of the Polar decoding tree.
+        At each internal node the pattern is
+        ``F -> left subtree -> G -> right subtree -> COMBINE``. Leaves
+        are either frozen or information bits. Fast-SCL shortcuts
+        collapse all-frozen sub-trees into ``R0``, rate-1 sub-trees
+        into ``R1``, and repetition sub-trees (all leaves frozen
+        except the last) into ``REP``.
+
+        Every emitted instruction is annotated with the workspace
+        offsets it reads/writes so the decoder issues plain tensor
+        slices without per-op address arithmetic at run time.
+        """
+        frozen = self._frozen_ind
+        n_stages = self._n_stages
+        sl = self._slot_llr
+        su = self._slot_uhat
+        tape = []
+
+        def u_dst_for(stage, off):
+            """Where this sub-tree writes its hard decisions for the
+            enclosing COMBINE to read at ``stage``. Returns 0 for
+            outer-stage sub-trees, whose result is never read upward."""
+            if stage >= n_stages:
+                return 0
+            pos_in_parent = off & ((1 << (stage + 1)) - 1)
+            return su[stage] + pos_in_parent
+
+        def visit(stage, off, length):
+            """Recursively generate tape ops for the sub-tree at
+            ``[off, off + length)`` rooted at ``stage``.
+
+            If the sub-tree matches one of the fast-SCL patterns
+            (all-frozen, rate-1, or repetition) it is collapsed into a
+            single ``R0`` / ``R1`` / ``REP`` op. Otherwise the standard
+            ``F`` -> left subtree -> ``G`` -> right subtree -> ``COMBINE``
+            sequence is generated, recursing on each half. Length-1
+            sub-trees terminate the recursion at a frozen or info leaf.
+            """
+            if length == 1:
+                if frozen[off]:
+                    tape.append(self._make_leaf_frozen(off, sl[0]))
+                else:
+                    tape.append(self._make_leaf_info(off, sl[0]))
+                return
+            sub = frozen[off:off + length]
+            n_frozen = int(sub.sum())
+            if n_frozen == length:
+                tape.append(self._make_R0(
+                    stage, off, length, sl[stage],
+                    u_dst_for(stage, off),
+                ))
+                return
+            if n_frozen == 0:
+                tape.append(self._make_R1(
+                    stage, off, length, sl[stage],
+                    u_dst_for(stage, off),
+                ))
+                return
+            if n_frozen == length - 1 and sub[-1] == 0:
+                tape.append(self._make_REP(
+                    stage, off, length, sl[stage],
+                    u_dst_for(stage, off),
+                ))
+                return
+            half = length // 2
+            # F: read parent-stage LLRs, write child-stage left half.
+            tape.append(self._make_F(
+                stage, off, length, sl[stage], sl[stage - 1]
+            ))
+            visit(stage - 1, off, half)
+            # G reads the left-child hard decisions at the child stage.
+            pos_in_child = off & (length - 1)
+            u_left = su[stage - 1] + pos_in_child
+            tape.append(self._make_G(
+                stage, off, length, sl[stage], sl[stage - 1], u_left
+            ))
+            visit(stage - 1, off + half, half)
+            # COMBINE merges the two child halves; skipped at the outer
+            # stage because the caller only reads stage-0 bits.
+            if stage < n_stages:
+                pos_in_parent = off & ((1 << (stage + 1)) - 1)
+                tape.append(self._make_combine(
+                    stage, off, length, u_left, su[stage] + pos_in_parent
+                ))
+
+        visit(n_stages, 0, self._n)
+        return tuple(tape)
+
+    # ==================================================================
+    # Vectorized per-op primitives (over [B, 2L, ...])
+    # ==================================================================
+    def _cn(self, x, y):
+        """Check-node update (boxplus) for LLR inputs.
+
+        Closed-form stable identity (see :cite:p:`Stimming_LLR`,
+        :cite:p:`Hashemi_SSCL`):
+
+        .. math::
+
+            \\text{boxplus}(x, y) = \\text{sign}(x)\\,\\text{sign}(y)
+                \\, \\min(|x|, |y|)
+                + \\text{softplus}(-|x + y|)
+                - \\text{softplus}(-|x - y|).
+
+        Inputs are clamped to ``[-llr_max, llr_max]`` so that VN
+        outputs (which can grow up to ``2 * llr_max``) are bounded
+        before they re-enter the next ``F`` op.
+        """
+        x_c = torch.clamp(x, -self._llr_max, self._llr_max)
+        y_c = torch.clamp(y, -self._llr_max, self._llr_max)
+        return (
+            torch.sign(x_c) * torch.sign(y_c)
+            * torch.minimum(x_c.abs(), y_c.abs())
+            + softplus(-(x_c + y_c).abs())
+            - softplus(-(x_c - y_c).abs())
         )
 
-    def _sort_decoders_np(self) -> None:
-        """Sort decoders according to their path metric."""
-        ind = np.argsort(self.msg_pm, axis=-1)
-        self.msg_pm = np.take_along_axis(self.msg_pm, ind, axis=1)
-        self._dec_pointer = np.take_along_axis(self._dec_pointer, ind, axis=1)
+    @staticmethod
+    def _vn(x, y, u):
+        """Variable-node update for LLR inputs.
 
-    def _duplicate_paths_np(self) -> None:
-        """Copy first ``list_size``/2 paths into lower part.
-
-        Decoder indices are encoded in ``self._dec_pointer``.
+        Returns ``x + y`` if the left-child hard decision ``u`` is 0,
+        and ``y - x`` if ``u`` is 1.
         """
-        ind_low = self._dec_pointer[:, : self._list_size]
-        ind_up = self._dec_pointer[:, self._list_size :]
+        return (1.0 - 2.0 * u) * x + y
 
-        for i in range(ind_up.shape[0]):
-            self.msg_uhat[i, ind_up[i, :], :, :] = self.msg_uhat[
-                i, ind_low[i, :], :, :
-            ]
-            self.msg_llr[i, ind_up[i, :], :, :] = self.msg_llr[
-                i, ind_low[i, :], :, :
-            ]
+    @staticmethod
+    def _polar_transform_inplace(u_hat, length):
+        """Apply the size-``length`` Polar butterfly transform in place.
 
-        self.msg_pm[:, self._list_size :] = self.msg_pm[:, : self._list_size]
+        Used by the rate-1 op to map codeword-stage hard decisions
+        ``c_hat`` back to the stage-0 information bits ``u_hat``;
+        the Polar transform is its own inverse over `GF(2)`.
 
-    def _polar_decode_scl_np(self, cw_ind: np.ndarray) -> None:
-        """Recursive decoding function in NumPy.
-
-        We follow the terminology from :cite:p:`Hashemi_SSCL` and
-        :cite:p:`Stimming_LLR` and branch the messages into a `left` and `right`
-        update paths until reaching a leaf node.
-
-        Tree pruning as proposed in :cite:p:`Hashemi_SSCL` is used to minimize
-        the tree depth while maintaining the same output.
+        ``u_hat`` is modified in place. The same tensor is also
+        returned so the function can be chained, but callers should
+        not rely on the return value to obtain a fresh copy.
         """
-        n = len(cw_ind)
-        stage_ind = int(np.log2(n))
+        shape = u_hat.shape
+        prefix = shape[:-1]
+        stride = 1
+        while stride < length:
+            v = u_hat.view(*prefix, length // (2 * stride), 2, stride)
+            v[..., 0, :] ^= v[..., 1, :]
+            stride *= 2
+        return u_hat
 
-        if n > 1:
-            if self._use_fast_scl:
-                if np.sum(self._frozen_ind[cw_ind]) == n:
-                    self._update_rate0_code_np(cw_ind)
-                    return
-                if (
-                    self._frozen_ind[cw_ind[-1]] == 0
-                    and np.sum(self._frozen_ind[cw_ind[:-1]]) == n - 1
-                ):
-                    self._update_rep_code_np(cw_ind)
-                    return
+    # ------------------------------------------------------------------
+    # Path pruning (topk + tile)
+    # ------------------------------------------------------------------
+    def _topk_tile(self, pm, llr, uhat, bits):
+        """Prune ``2L`` candidate paths back to the best ``L`` and re-tile.
 
-            cw_ind_left = cw_ind[0 : int(n / 2)]
-            cw_ind_right = cw_ind[int(n / 2) :]
+        After every info-leaf / ``REP`` / ``R1`` op each of the ``L``
+        surviving paths has been split into two candidates, leaving
+        ``2L`` paths along the list dimension. This helper:
 
-            # Left branch
-            llr_left = self.msg_llr[:, :, stage_ind, cw_ind_left]
-            llr_right = self.msg_llr[:, :, stage_ind, cw_ind_right]
+        1. picks the ``L`` paths with the smallest path metric, and
+        2. duplicates that selection back up to ``2L`` (slots ``0..L-1``
+           and ``L..2L-1`` carry the same ``L`` survivors), so the next
+           info-leaf can fork the top half into ``u = 0`` and the bottom
+           half into ``u = 1`` without further bookkeeping.
 
-            self.msg_llr[:, :, stage_ind - 1, cw_ind_left] = self._cn_op_np(
-                llr_left, llr_right
-            )
-
-            self._polar_decode_scl_np(cw_ind_left)
-
-            # Right branch
-            u_hat_left_up = self.msg_uhat[:, :, stage_ind - 1, cw_ind_left]
-            llr_left = self.msg_llr[:, :, stage_ind, cw_ind_left]
-            llr_right = self.msg_llr[:, :, stage_ind, cw_ind_right]
-
-            self.msg_llr[:, :, stage_ind - 1, cw_ind_right] = self._vn_op_np(
-                llr_left, llr_right, u_hat_left_up
-            )
-
-            self._polar_decode_scl_np(cw_ind_right)
-
-            # Combine u_hat
-            u_hat_left_up = self.msg_uhat[:, :, stage_ind - 1, cw_ind_left]
-            u_hat_right_up = self.msg_uhat[:, :, stage_ind - 1, cw_ind_right]
-
-            u_hat_left = (u_hat_left_up != u_hat_right_up) + 0
-            u_hat = np.concatenate([u_hat_left, u_hat_right_up], axis=-1)
-
-            self.msg_uhat[:, :, stage_ind, cw_ind] = u_hat
-
-        else:
-            self._update_single_bit_np(cw_ind)
-            self._update_pm_np(cw_ind)
-
-            if self._frozen_ind[cw_ind] == 0:
-                self._sort_decoders_np()
-                self._duplicate_paths_np()
-
-    def _decode_np_batch(
-        self, llr_ch: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Decode batch of ``llr_ch`` with Numpy decoder."""
-        bs = llr_ch.shape[0]
-
-        self.msg_uhat = np.zeros(
-            [bs, 2 * self._list_size, self._n_stages + 1, self._n]
+        ``pm``, ``llr``, ``uhat`` and ``bits`` are gathered along the
+        list dimension with the same index, so each path keeps a
+        consistent view of its workspace state. Returns the gathered
+        ``(pm, llr, uhat, bits)``.
+        """
+        B = pm.shape[0]
+        L = self._list_size
+        # Pre-doubling the L indices to 2L (via ``repeat(1, 2)``) lets
+        # us produce the tiled survivor layout in a single ``gather``
+        # call instead of separate ``gather`` + ``concat`` ops.
+        _, top = torch.topk(-pm, L, dim=-1)
+        idx = top.repeat(1, 2)
+        pm = torch.gather(pm, 1, idx)
+        llr = torch.gather(
+            llr, 1, idx.view(B, 2 * L, 1).expand(-1, -1, llr.shape[2])
         )
-        self.msg_llr = np.zeros(
-            [bs, 2 * self._list_size, self._n_stages + 1, self._n]
+        uhat = torch.gather(
+            uhat, 1, idx.view(B, 2 * L, 1).expand(-1, -1, uhat.shape[2])
         )
-        self.msg_pm = np.zeros([bs, 2 * self._list_size])
-
-        self.msg_pm[:, 1 : self._list_size] = self._llr_max
-        self.msg_pm[:, self._list_size + 1 :] = self._llr_max
-
-        self._dec_pointer = np.arange(2 * self._list_size)
-        self._dec_pointer = np.tile(
-            np.expand_dims(self._dec_pointer, axis=0), [bs, 1]
+        bits = torch.gather(
+            bits, 1, idx.view(B, 2 * L, 1).expand(-1, -1, bits.shape[2])
         )
+        return pm, llr, uhat, bits
 
-        self.msg_llr[:, :, self._n_stages, :] = np.expand_dims(llr_ch, axis=1)
+    # ==================================================================
+    # Main decode
+    # ==================================================================
+    def _decode(self, llr_ch):
+        """SCL decoding on the packed workspace.
 
-        self._polar_decode_scl_np(self._cw_ind)
+        Replays the decoder tape over the following per-path tensors:
 
-        self._sort_decoders_np()
+          * ``llr[B, 2L, n - 1]``    — LLRs for stages ``s < n_stages``.
+            Stage ``s`` occupies ``2^s`` slots starting at offset
+            ``2^s - 1``. Channel LLRs (stage ``n_stages``) are read from
+            ``llr_ch`` directly and are not copied into this buffer.
+          * ``uhat[B, 2L, 2n - 4]``  — intermediate hard decisions for
+            stages ``1 .. n_stages - 1``. The slot for stage ``n_stages``
+            is unused because the outer ``COMBINE`` is skipped.
+          * ``bits[B, 2L, n]``       — persistent stage-0 leaf decisions.
 
-        for ind in range(bs):
-            self.msg_uhat[ind, :, :, :] = self.msg_uhat[
-                ind, self._dec_pointer[ind], :, :
-            ]
-        return self.msg_uhat, self.msg_pm
+        Channel LLRs are assumed pre-clamped (see ``call``); ``_cn``
+        is the only place that clamps after that. Inputs to other ops
+        are bounded by ``2 * llr_max`` (immediately after a VN), and
+        ``softplus`` handles those magnitudes precisely.
 
-    def _decode_np_hybrid(
-        self,
-        llr_ch: np.ndarray,
-        u_hat_sc: np.ndarray,
-        crc_valid: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Hybrid SCL decoding stage that decodes iff CRC from previous SC
-        decoding attempt failed.
-
-        This option avoids the usage of the high-complexity SCL decoder in
-        cases where SC would be sufficient. For further details we refer to
-        :cite:p:`Cammerer_Hybrid_SCL` (we use SC instead of the proposed BP
-        stage).
-
-        This decoder does not exactly implement SCL as the CRC can be
-        false positive after the SC stage. However, in these cases SCL+CRC
-        may also yield the wrong results.
+        Returns ``(bits, pm)`` sorted in ascending order of ``pm``,
+        so index 0 is the surviving path with the smallest metric.
+        ``bits.shape = [B, 2L, n]``.
         """
-        bs = llr_ch.shape[0]
-        crc_valid = np.squeeze(crc_valid, axis=-1)
-        ind_invalid = np.arange(bs)[np.invert(crc_valid)]
+        B = llr_ch.shape[0]
+        L = self._list_size
+        n = self._n
+        n_stages = self._n_stages
+        dev, dt = llr_ch.device, llr_ch.dtype
 
-        llr_ch_hyb = np.take(llr_ch, ind_invalid, axis=0)
-        msg_uhat_hyb, msg_pm_hyb = self._decode_np_batch(llr_ch_hyb)
-
-        msg_uhat = np.zeros([bs, 2 * self._list_size, 1, self._n])
-        msg_pm = np.ones([bs, 2 * self._list_size]) * self._llr_max * self.k
-        msg_pm[:, 0] = 0
-
-        msg_uhat[:, 0, 0, self._info_pos] = u_hat_sc
-
-        ind_hyb = 0
-        for ind in range(bs):
-            if not crc_valid[ind]:
-                msg_uhat[ind, :, 0, :] = msg_uhat_hyb[ind_hyb, :, 0, :]
-                msg_pm[ind, :] = msg_pm_hyb[ind_hyb, :]
-                ind_hyb += 1
-
-        return msg_uhat, msg_pm
-
-    # =========================================================================
-    # PyTorch tensor-based decoder helper functions (for GPU acceleration)
-    # =========================================================================
-
-    def _cn_op_pt(
-        self, x: torch.Tensor, y: torch.Tensor
-    ) -> torch.Tensor:
-        """Check-node update (boxplus) for LLR inputs in PyTorch.
-
-        Operations are performed element-wise.
-        See :cite:p:`Stimming_LLR` and :cite:p:`Hashemi_SSCL` for detailed equations.
-        """
-        x_in = torch.clamp(x, min=-self._llr_max, max=self._llr_max)
-        y_in = torch.clamp(y, min=-self._llr_max, max=self._llr_max)
-
-        # Implements log(1+e^(x+y)) - log(e^x+e^y)
-        llr_out = F.softplus(x_in + y_in)
-        llr_out = llr_out - torch.logsumexp(
-            torch.stack([x_in, y_in], dim=-1), dim=-1
+        llr = torch.zeros(B, 2 * L, self._llr_flat_size, dtype=dt, device=dev)
+        uhat = torch.zeros(
+            B, 2 * L, self._uhat_flat_size, dtype=torch.int8, device=dev
         )
-        return llr_out
+        bits = torch.zeros(B, 2 * L, n, dtype=torch.int8, device=dev)
+        pm = self._pm_init.to(dtype=dt, device=dev).expand(B, -1).clone()
 
-    def _vn_op_pt(
-        self, x: torch.Tensor, y: torch.Tensor, u_hat: torch.Tensor
-    ) -> torch.Tensor:
-        """Variable node update for LLR inputs in PyTorch.
+        for entry in self._tape:
+            op = entry.op
+            stage, off, length = entry.stage, entry.off, entry.length
+            half = length // 2
 
-        Operations are performed element-wise.
+            if op == _Op.F:
+                src, dst = entry.slot_a, entry.slot_b
+                if stage == n_stages:
+                    # Add size-1 path axis so channel LLRs broadcast over 2L.
+                    x = llr_ch[:, off:off + half].unsqueeze(1)
+                    y = llr_ch[:, off + half:off + length].unsqueeze(1)
+                else:
+                    x = llr[:, :, src:src + half]
+                    y = llr[:, :, src + half:src + length]
+                llr[:, :, dst:dst + half] = self._cn(x, y)
 
-        See :cite:p:`Stimming_LLR` and :cite:p:`Hashemi_SSCL` for detailed equations.
-        """
-        return (1 - 2 * u_hat) * x + y
+            elif op == _Op.G:
+                src, dst, u_src = entry.slot_a, entry.slot_b, entry.slot_c
+                if stage == n_stages:
+                    # Add size-1 path axis so channel LLRs broadcast over 2L.
+                    x = llr_ch[:, off:off + half].unsqueeze(1)
+                    y = llr_ch[:, off + half:off + length].unsqueeze(1)
+                else:
+                    x = llr[:, :, src:src + half]
+                    y = llr[:, :, src + half:src + length]
+                # Left-child hard decisions live in `bits` when the
+                # child is a leaf stage (stage==1), otherwise in `uhat`.
+                if stage == 1:
+                    u = bits[:, :, off:off + half].to(dt)
+                else:
+                    u = uhat[:, :, u_src:u_src + half].to(dt)
+                llr[:, :, dst:dst + half] = self._vn(x, y, u)
 
-    def _sort_decoders_pt(
-        self,
-        msg_pm: torch.Tensor,
-        msg_uhat: torch.Tensor,
-        msg_llr: torch.Tensor,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Sort decoders according to their path metric in PyTorch."""
-        ind = torch.argsort(msg_pm, dim=-1)
+            elif op == _Op.COMBINE:
+                u_src, u_dst = entry.slot_a, entry.slot_b
+                if stage == 1:
+                    ul = bits[:, :, off:off + half]
+                    ur = bits[:, :, off + half:off + length]
+                else:
+                    ul = uhat[:, :, u_src:u_src + half]
+                    ur = uhat[:, :, u_src + half:u_src + length]
+                uhat[:, :, u_dst:u_dst + half] = ul ^ ur
+                uhat[:, :, u_dst + half:u_dst + length] = ur
 
-        # For msg_pm: [batch, 2*L]
-        msg_pm = torch.gather(msg_pm, 1, ind)
+            elif op == _Op.LEAF_FROZEN:
+                l_val = llr[:, :, entry.slot_a]
+                pm.add_(softplus(-l_val))
 
-        # For msg_uhat: [batch, 2*L, stages+1, n]
-        ind_expanded = ind.unsqueeze(-1).unsqueeze(-1).expand(
-            -1, -1, msg_uhat.shape[2], msg_uhat.shape[3]
-        )
-        msg_uhat = torch.gather(msg_uhat, 1, ind_expanded)
+            elif op == _Op.LEAF_INFO:
+                # Top L paths: u=0 (bits already 0). Bottom L: u=1.
+                bits[:, L:, off] = 1
+                l_val = llr[:, :, entry.slot_a]
+                u = bits[:, :, off].to(dt)
+                pm.add_(softplus(-(1.0 - 2.0 * u) * l_val))
+                pm, llr, uhat, bits = self._topk_tile(pm, llr, uhat, bits)
 
-        # For msg_llr: [batch, 2*L, stages+1, n]
-        ind_expanded = ind.unsqueeze(-1).unsqueeze(-1).expand(
-            -1, -1, msg_llr.shape[2], msg_llr.shape[3]
-        )
-        msg_llr = torch.gather(msg_llr, 1, ind_expanded)
+            elif op == _Op.R0:
+                if stage == n_stages:
+                    # Add size-1 path axis so channel LLRs broadcast over 2L.
+                    l_val = llr_ch[:, off:off + length].unsqueeze(1)
+                else:
+                    src = entry.slot_a
+                    l_val = llr[:, :, src:src + length]
+                pm.add_(softplus(-l_val).sum(dim=-1))
+                # R0 skips the internal COMBINE chain. The path-pruning
+                # gather can reorder rows of `uhat`, so we explicitly
+                # zero this region for every path before the parent
+                # COMBINE reads it.
+                if stage < n_stages:
+                    u_dst = entry.slot_b
+                    uhat[:, :, u_dst:u_dst + length] = 0
 
-        return msg_pm, msg_uhat, msg_llr
-
-    def _duplicate_paths_pt(
-        self,
-        msg_uhat: torch.Tensor,
-        msg_llr: torch.Tensor,
-        msg_pm: torch.Tensor,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Duplicate paths by copying the upper branch into the lower one."""
-        # Take first list_size paths and tile them
-        msg_uhat = msg_uhat[:, : self._list_size, :, :].repeat(1, 2, 1, 1)
-        msg_llr = msg_llr[:, : self._list_size, :, :].repeat(1, 2, 1, 1)
-        msg_pm = msg_pm[:, : self._list_size].repeat(1, 2)
-        return msg_uhat, msg_llr, msg_pm
-
-    def _update_pm_pt(
-        self,
-        ind_u: np.ndarray,
-        msg_uhat: torch.Tensor,
-        msg_llr: torch.Tensor,
-        msg_pm: torch.Tensor,
-    ) -> torch.Tensor:
-        """Update path metric after updating bit_pos ``ind_u`` in PyTorch.
-
-        We implement Eq. (10) from :cite:p:`Stimming_LLR`.
-        """
-        u_hat = msg_uhat[:, :, 0, ind_u[0]]
-        llr = msg_llr[:, :, 0, ind_u[0]]
-
-        llr_in = torch.clamp(llr, min=-self._llr_max, max=self._llr_max)
-
-        # Numerically stable: log(1 + exp(-x))
-        msg_pm = msg_pm + F.softplus(-(1 - 2 * u_hat) * llr_in)
-        return msg_pm
-
-    def _update_single_bit_pt(
-        self, ind_u: np.ndarray, msg_uhat: torch.Tensor
-    ) -> torch.Tensor:
-        """Update single bit at position ``ind_u`` for all decoders in PyTorch.
-
-        Uses branchless computation for torch.compile compatibility.
-        For info bits (non-frozen), sets upper half decoders' bit to 1.
-        For frozen bits, sets to 0 (no-op since frozen bits are 0).
-        """
-        # Get info bit indicator from tensor buffer (1 if info, 0 if frozen)
-        # This avoids data-dependent Python control flow
-        is_info_bit = 1.0 - self._frozen_ind_t[ind_u[0]]
-
-        # Set upper half decoders' bit at position ind_u
-        # Value is 1 for info bits, 0 for frozen bits (branchless)
-        msg_uhat1 = msg_uhat[:, : self._list_size, :, :]
-        msg_uhat21 = msg_uhat[:, self._list_size :, 0:1, : ind_u[0]]
-        msg_uhat22 = msg_uhat[:, self._list_size :, 0:1, ind_u[0] + 1 :]
-
-        # Insert value: 1 if info bit, 0 if frozen
-        batch_size = msg_uhat.shape[0]
-        msg_insert = is_info_bit * torch.ones(
-            batch_size, self._list_size, 1, 1,
-            dtype=msg_uhat.dtype, device=msg_uhat.device
-        )
-
-        msg_uhat23 = torch.cat([msg_uhat21, msg_insert, msg_uhat22], dim=3)
-        msg_uhat24 = msg_uhat[:, self._list_size :, 1:, :]
-
-        msg_uhat2 = torch.cat([msg_uhat23, msg_uhat24], dim=2)
-        msg_uhat = torch.cat([msg_uhat1, msg_uhat2], dim=1)
-
-        return msg_uhat
-
-    def _update_rate0_code_pt(
-        self,
-        msg_pm: torch.Tensor,
-        msg_uhat: torch.Tensor,
-        msg_llr: torch.Tensor,
-        cw_ind: np.ndarray,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Update rate-0 sub-code (all frozen) at pos ``cw_ind`` in PyTorch.
-
-        See Eq. (26) in :cite:p:`Hashemi_SSCL`.
-        """
-        n = len(cw_ind)
-        stage_ind = int(np.log2(n))
-
-        llr = msg_llr[:, :, stage_ind, cw_ind[0] : cw_ind[-1] + 1]
-        llr_in = torch.clamp(llr, min=-self._llr_max, max=self._llr_max)
-
-        # Update path metric for complete sub-block
-        pm_val = F.softplus(-llr_in)
-        msg_pm = msg_pm + pm_val.sum(dim=-1)
-
-        return msg_pm, msg_uhat, msg_llr
-
-    def _update_rep_code_pt(
-        self,
-        msg_pm: torch.Tensor,
-        msg_uhat: torch.Tensor,
-        msg_llr: torch.Tensor,
-        cw_ind: np.ndarray,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Update rep. code sub-code at position ``cw_ind`` in PyTorch.
-
-        See Eq. (31) in :cite:p:`Hashemi_SSCL`.
-        """
-        n = len(cw_ind)
-        stage_ind = int(np.log2(n))
-
-        # Get LLRs for this sub-code
-        llr = msg_llr[:, :, stage_ind, cw_ind[0] : cw_ind[-1] + 1]
-        llr_in = torch.clamp(llr, min=-self._llr_max, max=self._llr_max)
-
-        # Upper branch has negative LLR values (bit is 1)
-        llr_low = llr_in[:, : self._list_size, :]
-        llr_up = -llr_in[:, self._list_size :, :]
-        llr_pm = torch.cat([llr_low, llr_up], dim=1)
-
-        pm_val = F.softplus(-llr_pm)
-        msg_pm = msg_pm + pm_val.sum(dim=-1)
-
-        # Set bits to 1 for upper branch decoders
-        # Use split/concat approach
-        msg_uhat1 = msg_uhat[:, : self._list_size, :, :]
-
-        msg_uhat21 = msg_uhat[:, self._list_size :, stage_ind : stage_ind + 1, : cw_ind[0]]
-        msg_uhat22 = msg_uhat[:, self._list_size :, stage_ind : stage_ind + 1, cw_ind[-1] + 1 :]
-
-        batch_size = msg_uhat.shape[0]
-        msg_ones = torch.ones(
-            batch_size, self._list_size, 1, n,
-            dtype=msg_uhat.dtype, device=msg_uhat.device
-        )
-
-        msg_uhat23 = torch.cat([msg_uhat21, msg_ones, msg_uhat22], dim=3)
-        msg_uhat24_1 = msg_uhat[:, self._list_size :, :stage_ind, :]
-        msg_uhat24_2 = msg_uhat[:, self._list_size :, stage_ind + 1 :, :]
-
-        msg_uhat2 = torch.cat([msg_uhat24_1, msg_uhat23, msg_uhat24_2], dim=2)
-        msg_uhat = torch.cat([msg_uhat1, msg_uhat2], dim=1)
-
-        # Branch last bit and update
-        msg_uhat = self._update_single_bit_pt([cw_ind[-1]], msg_uhat)
-        msg_pm, msg_uhat, msg_llr = self._sort_decoders_pt(msg_pm, msg_uhat, msg_llr)
-        msg_uhat, msg_llr, msg_pm = self._duplicate_paths_pt(msg_uhat, msg_llr, msg_pm)
-
-        return msg_pm, msg_uhat, msg_llr
-
-    def _update_left_branch_pt(
-        self,
-        msg_llr: torch.Tensor,
-        stage_ind: int,
-        cw_ind_left: np.ndarray,
-        cw_ind_right: np.ndarray,
-    ) -> torch.Tensor:
-        """Update messages of left branch in PyTorch."""
-        llr_left_in = msg_llr[:, :, stage_ind, cw_ind_left[0] : cw_ind_left[-1] + 1]
-        llr_right_in = msg_llr[:, :, stage_ind, cw_ind_right[0] : cw_ind_right[-1] + 1]
-
-        llr_left_out = self._cn_op_pt(llr_left_in, llr_right_in)
-
-        # Use split/concatenation approach
-        llr_left0 = msg_llr[:, :, stage_ind - 1, : cw_ind_left[0]]
-        llr_right = msg_llr[:, :, stage_ind - 1, cw_ind_right[0] : cw_ind_right[-1] + 1]
-        llr_right1 = msg_llr[:, :, stage_ind - 1, cw_ind_right[-1] + 1 :]
-
-        llr_s = torch.cat([llr_left0, llr_left_out, llr_right, llr_right1], dim=2)
-        llr_s = llr_s.unsqueeze(2)
-
-        msg_llr1 = msg_llr[:, :, : stage_ind - 1, :]
-        msg_llr2 = msg_llr[:, :, stage_ind:, :]
-        msg_llr = torch.cat([msg_llr1, llr_s, msg_llr2], dim=2)
-
-        return msg_llr
-
-    def _update_right_branch_pt(
-        self,
-        msg_llr: torch.Tensor,
-        msg_uhat: torch.Tensor,
-        stage_ind: int,
-        cw_ind_left: np.ndarray,
-        cw_ind_right: np.ndarray,
-    ) -> torch.Tensor:
-        """Update messages for right branch in PyTorch."""
-        u_hat_left_up = msg_uhat[:, :, stage_ind - 1, cw_ind_left[0] : cw_ind_left[-1] + 1]
-        llr_left_in = msg_llr[:, :, stage_ind, cw_ind_left[0] : cw_ind_left[-1] + 1]
-        llr_right = msg_llr[:, :, stage_ind, cw_ind_right[0] : cw_ind_right[-1] + 1]
-
-        llr_right_out = self._vn_op_pt(llr_left_in, llr_right, u_hat_left_up)
-
-        # Use split/concatenation approach
-        llr_left0 = msg_llr[:, :, stage_ind - 1, : cw_ind_left[0]]
-        llr_left = msg_llr[:, :, stage_ind - 1, cw_ind_left[0] : cw_ind_left[-1] + 1]
-        llr_right1 = msg_llr[:, :, stage_ind - 1, cw_ind_right[-1] + 1 :]
-
-        llr_s = torch.cat([llr_left0, llr_left, llr_right_out, llr_right1], dim=2)
-        llr_s = llr_s.unsqueeze(2)
-
-        msg_llr1 = msg_llr[:, :, : stage_ind - 1, :]
-        msg_llr2 = msg_llr[:, :, stage_ind:, :]
-        msg_llr = torch.cat([msg_llr1, llr_s, msg_llr2], dim=2)
-
-        return msg_llr
-
-    def _update_branch_u_pt(
-        self,
-        msg_uhat: torch.Tensor,
-        stage_ind: int,
-        cw_ind_left: np.ndarray,
-        cw_ind_right: np.ndarray,
-    ) -> torch.Tensor:
-        """Update ``u_hat`` messages after executing both branches in PyTorch."""
-        u_hat_left_up = msg_uhat[:, :, stage_ind - 1, cw_ind_left[0] : cw_ind_left[-1] + 1]
-        u_hat_right_up = msg_uhat[:, :, stage_ind - 1, cw_ind_right[0] : cw_ind_right[-1] + 1]
-
-        # Combine u_hat via XOR
-        u_hat_left = (u_hat_left_up.int() ^ u_hat_right_up.int()).to(msg_uhat.dtype)
-
-        # Use split/concatenation approach
-        u_hat_left_0 = msg_uhat[:, :, stage_ind, : cw_ind_left[0]]
-        u_hat_right_1 = msg_uhat[:, :, stage_ind, cw_ind_right[-1] + 1 :]
-
-        u_hat = torch.cat([u_hat_left_0, u_hat_left, u_hat_right_up, u_hat_right_1], dim=2)
-
-        msg_uhat1 = msg_uhat[:, :, :stage_ind, :]
-        msg_uhat2 = msg_uhat[:, :, stage_ind + 1 :, :]
-        u_hat = u_hat.unsqueeze(2)
-
-        msg_uhat = torch.cat([msg_uhat1, u_hat, msg_uhat2], dim=2)
-
-        return msg_uhat
-
-    def _polar_decode_scl_pt(
-        self,
-        cw_ind: np.ndarray,
-        msg_uhat: torch.Tensor,
-        msg_llr: torch.Tensor,
-        msg_pm: torch.Tensor,
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        """Recursive decoding function for SCL decoding in PyTorch.
-
-        We follow the terminology from :cite:p:`Hashemi_SSCL` and
-        :cite:p:`Stimming_LLR` and branch the messages into a `left` and `right`
-        update paths until reaching a leaf node.
-
-        Tree pruning as proposed in :cite:p:`Hashemi_SSCL` is used to minimize
-        the tree depth while maintaining the same output.
-        """
-        n = len(cw_ind)
-        stage_ind = int(np.log2(n))
-
-        if n > 1:
-            # Prune tree if rate-0 subcode is detected
-            if self._use_fast_scl:
-                if np.sum(self._frozen_ind[cw_ind]) == n:
-                    msg_pm, msg_uhat, msg_llr = self._update_rate0_code_pt(
-                        msg_pm, msg_uhat, msg_llr, cw_ind
+            elif op == _Op.REP:
+                if stage == n_stages:
+                    # Whole code is a single REP subtree — channel LLRs
+                    # are shared across all paths, so broadcast to 2L
+                    # before splitting into the two hypotheses.
+                    l_val = (
+                        llr_ch[:, off:off + length]
+                        .unsqueeze(1)
+                        .expand(B, 2 * L, length)
                     )
-                    return msg_uhat, msg_llr, msg_pm
+                else:
+                    src = entry.slot_a
+                    l_val = llr[:, :, src:src + length]
+                llr_pm = torch.cat(
+                    [l_val[:, :L, :], -l_val[:, L:, :]], dim=1
+                )
+                pm.add_(softplus(-llr_pm).sum(dim=-1))
+                u_dst = entry.slot_b
+                if stage < n_stages:
+                    uhat[:, :L, u_dst:u_dst + length] = 0
+                    uhat[:, L:, u_dst:u_dst + length] = 1
+                bits[:, L:, off + length - 1] = 1
+                pm, llr, uhat, bits = self._topk_tile(pm, llr, uhat, bits)
 
-                if (
-                    self._frozen_ind[cw_ind[-1]] == 0
-                    and np.sum(self._frozen_ind[cw_ind[:-1]]) == n - 1
-                ):
-                    msg_pm, msg_uhat, msg_llr = self._update_rep_code_pt(
-                        msg_pm, msg_uhat, msg_llr, cw_ind
+            elif op == _Op.R1:
+                # Rate-1 sub-tree. ML codeword-stage decision is the
+                # sign of the LLRs; the M=1 flip alternative inverts
+                # the least-reliable bit on the bottom-L paths.
+                if stage == n_stages:
+                    l_val = (
+                        llr_ch[:, off:off + length]
+                        .unsqueeze(1)
+                        .expand(B, 2 * L, length)
                     )
-                    return msg_uhat, msg_llr, msg_pm
+                else:
+                    src = entry.slot_a
+                    l_val = llr[:, :, src:src + length]
+                abs_l = l_val.abs()
+                pm_add = softplus(-abs_l).sum(dim=-1)
+                delta, j = abs_l.min(dim=-1)
+                c_hat = (l_val < 0).to(torch.int8)
+                flip = torch.zeros_like(c_hat)
+                flip[:, L:].scatter_(2, j[:, L:].unsqueeze(-1), 1)
+                c_hat = c_hat ^ flip
+                pm_add[:, L:] = pm_add[:, L:] + delta[:, L:]
+                pm.add_(pm_add)
+                # Parent COMBINE reads c_hat at stage s. We must store
+                # c_hat into uhat *before* mutating it via the Polar
+                # transform on the way to `bits`.
+                if stage < n_stages:
+                    u_dst = entry.slot_b
+                    uhat[:, :, u_dst:u_dst + length] = c_hat
+                self._polar_transform_inplace(c_hat, length)
+                bits[:, :, off:off + length] = c_hat
+                pm, llr, uhat, bits = self._topk_tile(pm, llr, uhat, bits)
+            else:
+                raise RuntimeError(f"Unknown tape op {op!r}")
 
-            # Split index into left and right part
-            cw_ind_left = cw_ind[: n // 2]
-            cw_ind_right = cw_ind[n // 2 :]
+        ind = torch.argsort(pm, dim=-1)
+        pm = torch.gather(pm, 1, ind)
+        bits = torch.gather(bits, 1, ind.view(B, 2 * L, 1).expand(-1, -1, n))
+        return bits, pm
 
-            # ----- Left branch -----
-            msg_llr = self._update_left_branch_pt(
-                msg_llr, stage_ind, cw_ind_left, cw_ind_right
-            )
-
-            # Call sub-graph decoder of left branch
-            msg_uhat, msg_llr, msg_pm = self._polar_decode_scl_pt(
-                cw_ind_left, msg_uhat, msg_llr, msg_pm
-            )
-
-            # ----- Right branch -----
-            msg_llr = self._update_right_branch_pt(
-                msg_llr, msg_uhat, stage_ind, cw_ind_left, cw_ind_right
-            )
-
-            # Call sub-graph decoder of right branch
-            msg_uhat, msg_llr, msg_pm = self._polar_decode_scl_pt(
-                cw_ind_right, msg_uhat, msg_llr, msg_pm
-            )
-
-            # Update uhat at current stage
-            msg_uhat = self._update_branch_u_pt(
-                msg_uhat, stage_ind, cw_ind_left, cw_ind_right
-            )
-
-        else:
-            # Leaf node: perform basic decoding op (=decision)
-            msg_uhat = self._update_single_bit_pt(cw_ind, msg_uhat)
-            msg_pm = self._update_pm_pt(cw_ind, msg_uhat, msg_llr, msg_pm)
-
-            if self._frozen_ind[cw_ind] == 0:  # Position is non-frozen
-                msg_pm, msg_uhat, msg_llr = self._sort_decoders_pt(
-                    msg_pm, msg_uhat, msg_llr
-                )
-                msg_uhat, msg_llr, msg_pm = self._duplicate_paths_pt(
-                    msg_uhat, msg_llr, msg_pm
-                )
-
-        return msg_uhat, msg_llr, msg_pm
-
-    @torch.compiler.disable
-    def _decode_pt_hybrid(
-        self, llr_ch: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Hybrid SC/SCL decoding in PyTorch.
-
-        Runs SC decoding first, checks CRC, then runs SCL only for samples
-        with failed CRC. This is more efficient than full SCL when most
-        samples decode correctly.
-
-        Note:
-            This function is marked with @torch.compiler.disable because
-            it uses data-dependent conditional logic that causes graph breaks.
-        """
-        batch_size = llr_ch.shape[0]
-        device = llr_ch.device
-        dtype = llr_ch.dtype
-
-        # Step 1: Run SC decoding on all samples
-        u_hat_sc = self._decoder_sc(-llr_ch)
-
-        # Step 2: Check CRC to find which samples need SCL
-        # Apply input bit interleaver inverse before CRC check if needed
-        if self._iil:
-            u_hat_sc_crc = u_hat_sc[:, self._ind_iil_inv_t]
-        else:
-            u_hat_sc_crc = u_hat_sc
-        _, crc_valid = self._crc_decoder(u_hat_sc_crc)
-        crc_valid = crc_valid.squeeze(-1)  # [batch_size]
-
-        # Step 3: Initialize output with SC results
-        msg_uhat = torch.zeros(
-            batch_size, 2 * self._list_size, 1, self._n,
-            dtype=dtype, device=device
-        )
-        msg_pm = torch.ones(
-            batch_size, 2 * self._list_size,
-            dtype=dtype, device=device
-        ) * self._llr_max * self.k
-        msg_pm[:, 0] = 0  # SC result has zero path metric
-
-        # Place SC results in first decoder slot at info positions
-        msg_uhat[:, 0, 0, self._info_pos_t] = u_hat_sc
-
-        # Step 4: Find samples with invalid CRC
-        invalid_mask = ~crc_valid
-        invalid_indices = torch.nonzero(invalid_mask, as_tuple=True)[0]
-
-        # Step 5: Run SCL only on invalid samples (if any)
-        if invalid_indices.numel() > 0:
-            llr_invalid = llr_ch[invalid_indices]
-            msg_uhat_scl, msg_pm_scl = self._decode_pt(llr_invalid)
-
-            # Merge SCL results into output
-            # msg_uhat_scl has shape [num_invalid, 2*L, stages+1, n]
-            # We only need the final stage (index 0 after sorting)
-            msg_uhat[invalid_indices] = msg_uhat_scl[:, :, 0:1, :]
-            msg_pm[invalid_indices] = msg_pm_scl
-
-        return msg_uhat, msg_pm
-
-    @torch.compiler.disable
-    def _decode_pt(
-        self, llr_ch: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Main decoding function in PyTorch.
-
-        Initializes memory and calls recursive decoding function.
-
-        Note:
-            This function is marked with @torch.compiler.disable because the
-            recursive SCL algorithm uses position-dependent slicing that causes
-            graph breaks. Disabling compilation here allows the rest of the
-            model to be compiled while this runs in eager mode.
-        """
-        batch_size = llr_ch.shape[0]
-        device = llr_ch.device
-        dtype = llr_ch.dtype
-
-        # Allocate memory for all 2*list_size decoders
-        msg_uhat = torch.zeros(
-            batch_size, 2 * self._list_size, self._n_stages + 1, self._n,
-            dtype=dtype, device=device
-        )
-        msg_llr = torch.zeros(
-            batch_size, 2 * self._list_size, self._n_stages, self._n,
-            dtype=dtype, device=device
-        )
-
-        # Init all 2*L decoders with same llr_ch
-        llr_ch_expanded = llr_ch.reshape(-1, 1, 1, self._n)
-        llr_ch_expanded = llr_ch_expanded.expand(-1, 2 * self._list_size, 1, -1)
-
-        # Init last stage with llr_ch
-        msg_llr = torch.cat([msg_llr, llr_ch_expanded], dim=2)
-
-        # Init all remaining L-1 decoders with high penalty
-        pm0 = torch.zeros(batch_size, 1, dtype=dtype, device=device)
-        pm1 = self._llr_max * torch.ones(
-            batch_size, self._list_size - 1, dtype=dtype, device=device
-        )
-        msg_pm = torch.cat([pm0, pm1, pm0, pm1], dim=1)
-
-        # Call recursive graph function
-        msg_uhat, msg_llr, msg_pm = self._polar_decode_scl_pt(
-            self._cw_ind, msg_uhat, msg_llr, msg_pm
-        )
-
-        # Sort output
-        msg_pm, msg_uhat, msg_llr = self._sort_decoders_pt(
-            msg_pm, msg_uhat, msg_llr
-        )
-
-        return msg_uhat, msg_pm
-
-    def build(self, input_shape: Tuple[int, ...]) -> None:
-        """Build and check if shape of input is invalid."""
+    # ==================================================================
+    # Public API
+    # ==================================================================
+    def build(self, input_shape):
         if input_shape[-1] != self._n:
             raise ValueError("Invalid input shape.")
 
-    def call(
-        self, llr_ch: torch.Tensor
-    ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
-        """Successive cancellation list (SCL) decoding function.
-
-        This function performs successive cancellation list decoding
-        and returns the estimated information bits.
-
-        An outer CRC can be applied optionally by setting ``crc_degree``.
-
-        :param llr_ch: Tensor of shape `[..., n]` containing the
-            channel LLR values (as logits).
-
-        :output b_hat: Tensor of shape `[..., k]` containing hard-decided
-            estimations of all ``k`` information bits.
-
-        :output crc_status: CRC status. Returned only if
-            ``return_crc_status`` is `True`.
-
-        Note: This function recursively unrolls the SCL decoding tree,
-        thus, for larger values of ``n`` building the decoding graph can
-        become time consuming. Please consider the ``cpu_only`` option
-        instead.
-        """
+    def call(self, llr_ch):
         input_shape = llr_ch.shape
-        new_shape = (-1, self._n)
-        llr_ch = llr_ch.reshape(new_shape)
+        llr_ch = llr_ch.reshape(-1, self._n)
+        # Convert input logits to LLRs and clamp once at ingest. All
+        # downstream ops rely on bounded inputs to ``_cn`` and on
+        # ``softplus`` for the leaf/R0/R1/REP path-metric updates,
+        # which are precise for inputs of magnitude up to ~2*llr_max.
+        llr_ch = torch.clamp(-llr_ch, -self._llr_max, self._llr_max)
 
-        llr_ch = -1.0 * llr_ch  # Logits to LLRs
+        bits, msg_pm = self._decode(llr_ch)  # [B, 2L, n], [B, 2L]
 
-        # Choose decoder implementation
-        if self._use_hybrid_sc:
-            # Hybrid SC/SCL: use SC first, then SCL for failed CRC
-            # Uses PyTorch implementation for GPU acceleration
-            msg_uhat, msg_pm = self._decode_pt_hybrid(llr_ch)
-        elif self._cpu_only:
-            # CPU-only mode: use NumPy decoder (more memory efficient)
-            llr_np = llr_ch.cpu().numpy()
-            msg_uhat, msg_pm = self._decode_np_batch(llr_np)
-            msg_uhat = torch.tensor(
-                msg_uhat, dtype=self.dtype, device=self.device
-            )
-            msg_pm = torch.tensor(msg_pm, dtype=self.dtype, device=self.device)
-        else:
-            # Default: use PyTorch tensor-based decoder (GPU-accelerated)
-            msg_uhat, msg_pm = self._decode_pt(llr_ch)
-
-        # Check CRC (and remove CRC parity bits)
         if self._use_crc:
-            # Use pre-registered tensor buffer instead of torch.tensor()
-            u_hat_list = msg_uhat[:, :, 0, self._info_pos_t]
-
+            u_hat_list = bits[:, :, self._info_pos_t].to(llr_ch.dtype)
             if self._iil:
-                # Use pre-registered tensor buffer
                 u_hat_list_crc = u_hat_list[:, :, self._ind_iil_inv_t]
             else:
                 u_hat_list_crc = u_hat_list
-
+            # ``CRCDecoder`` returns ``crc_valid`` with shape
+            # [B, 2L, 1]; the trailing singleton is squeezed for the
+            # path-metric penalty and again before reshaping the
+            # public crc_status output.
             _, crc_valid = self._crc_decoder(u_hat_list_crc)
-            pm_penalty = (
-                (1.0 - crc_valid.float()) * self._llr_max * self.k
-            )
+            pm_penalty = (1.0 - crc_valid.float()) * self._llr_max * self._k
             msg_pm = msg_pm + pm_penalty.squeeze(-1)
 
-        # Select most likely candidate
         cand_ind = torch.argmin(msg_pm, dim=-1)
-        batch_indices = torch.arange(msg_uhat.shape[0], device=msg_uhat.device)
-        c_hat = msg_uhat[batch_indices, cand_ind, 0, :]
-        # Use pre-registered tensor buffer
+        batch_indices = torch.arange(bits.shape[0], device=bits.device)
+        c_hat = bits[batch_indices, cand_ind, :].to(llr_ch.dtype)
         u_hat = c_hat[:, self._info_pos_t]
 
-        # Reconstruct input shape
-        output_shape = list(input_shape[:-1]) + [self.k]
+        output_shape = list(input_shape[:-1]) + [self._k]
         u_hat_reshape = u_hat.reshape(output_shape)
 
         if self._return_crc_status:
-            crc_status = crc_valid[batch_indices, cand_ind]
-            output_shape_crc = list(input_shape[:-1])
-            crc_status = crc_status.reshape(output_shape_crc)
+            crc_status = crc_valid[batch_indices, cand_ind].squeeze(-1)
+            crc_status = crc_status.reshape(list(input_shape[:-1]))
             return u_hat_reshape, crc_status
-        else:
-            return u_hat_reshape
-
+        return u_hat_reshape
 
 class PolarBPDecoder(Block):
     # pylint: disable=line-too-long
@@ -1465,7 +1258,7 @@ class PolarBPDecoder(Block):
         if len(frozen_pos) > n:
             msg = "Num. of elements in frozen_pos cannot be greater than n."
             raise ValueError(msg)
-        if np.log2(n) != int(np.log2(n)):
+        if not _is_pow2(n):
             raise ValueError("n must be a power of 2.")
 
         if not isinstance(hard_out, bool):
@@ -1479,10 +1272,16 @@ class PolarBPDecoder(Block):
         if self._k != len(self._info_pos):
             raise ArithmeticError("Internal error: invalid info_pos generated.")
 
-        # Register info_pos as buffer for torch.compile compatibility
+        # Register info/frozen positions as buffers for torch.compile
+        # compatibility (avoid numpy indexing inside the hot loop).
         self.register_buffer(
             "_info_pos_t",
             torch.tensor(self._info_pos, dtype=torch.int64, device=self.device),
+        )
+        self.register_buffer(
+            "_frozen_pos_t",
+            torch.tensor(self._frozen_pos, dtype=torch.int64,
+                         device=self.device),
         )
 
         if not isinstance(num_iter, int):
@@ -1495,6 +1294,39 @@ class PolarBPDecoder(Block):
         self._hard_out = hard_out
 
         self._n_stages = int(np.log2(self._n))
+
+        # Pre-compute the per-stage butterfly index patterns once so the
+        # decode loop only performs tensor ops (no numpy, no allocation).
+        ind_range = np.arange(self._n // 2)
+        stage_ind_1 = []
+        stage_ind_2 = []
+        stage_ind_inv = []
+        for ind_s in range(self._n_stages):
+            ind_1 = ind_range * 2 - np.mod(ind_range, 2**ind_s)
+            ind_2 = ind_1 + 2**ind_s
+            ind_inv = np.argsort(np.concatenate([ind_1, ind_2], axis=0))
+            stage_ind_1.append(ind_1)
+            stage_ind_2.append(ind_2)
+            stage_ind_inv.append(ind_inv)
+        self.register_buffer(
+            "_stage_ind_1",
+            torch.tensor(np.stack(stage_ind_1), dtype=torch.int64,
+                         device=self.device),
+        )
+        self.register_buffer(
+            "_stage_ind_2",
+            torch.tensor(np.stack(stage_ind_2), dtype=torch.int64,
+                         device=self.device),
+        )
+        self.register_buffer(
+            "_stage_ind_inv",
+            torch.tensor(np.stack(stage_ind_inv), dtype=torch.int64,
+                         device=self.device),
+        )
+
+        # See ``_NEEDS_CPU_COMPILE_BREAK`` at the top of this module.
+        if _NEEDS_CPU_COMPILE_BREAK and torch.device(self.device).type == "cpu":
+            _install_cpu_compile_break(self, "_decode_bp")
 
     @property
     def n(self) -> int:
@@ -1530,15 +1362,21 @@ class PolarBPDecoder(Block):
     def num_iter(self, num_iter: int) -> None:
         """Number of decoding iterations."""
         if not isinstance(num_iter, int):
-            raise ValueError("num_iter must be int.")
-        if num_iter < 0:
-            raise ValueError("num_iter cannot be negative.")
+            raise TypeError("num_iter must be integer.")
+        if num_iter <= 0:
+            raise ValueError("num_iter must be a positive value.")
         self._num_iter = num_iter
 
     @property
     def hard_out(self) -> bool:
         """Indicates if decoder hard-decides outputs."""
         return self._hard_out
+
+    @hard_out.setter
+    def hard_out(self, hard_out: bool) -> None:
+        if not isinstance(hard_out, bool):
+            raise TypeError("hard_out must be bool.")
+        self._hard_out = hard_out
 
     def _boxplus(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         """Check-node update (boxplus) for LLR inputs."""
@@ -1550,6 +1388,98 @@ class PolarBPDecoder(Block):
 
         return llr_out
 
+    def _bp_iter_graph_break(self) -> None:
+        """Break the compile graph between BP iterations on CPU.
+
+        Without this, dynamo unrolls all ``num_iter`` sweeps into one
+        inductor kernel that can exceed GCC's size limits and ICE during
+        C++ codegen (see pytorch#180212).
+        """
+        if (
+            torch.compiler.is_compiling()
+            and torch.device(self.device).type == "cpu"
+        ):
+            torch._dynamo.graph_break()
+
+    def _bp_single_iteration(
+        self,
+        ind_it: int,
+        llr_ch: torch.Tensor,
+        msg_l_prev,
+        msg_r_in: torch.Tensor,
+        zeros_half: torch.Tensor,
+    ):
+        """One forward/backward BP sweep.
+
+        Returns ``(msg_l_iter, msg_r_iter)`` — per-stage message tensors
+        for this iteration.
+        """
+        msg_l_iter = [None] * (self._n_stages + 1)
+        msg_r_iter = [None] * (self._n_stages + 1)
+
+        # Update left-to-right messages
+        for ind_s in range(self._n_stages):
+            ind_1 = self._stage_ind_1[ind_s]
+            ind_2 = self._stage_ind_2[ind_s]
+            ind_inv = self._stage_ind_inv[ind_s]
+
+            if ind_s == self._n_stages - 1:
+                l1_in = llr_ch[:, ind_1]
+                l2_in = llr_ch[:, ind_2]
+            elif ind_it == 0:
+                l1_in = zeros_half
+                l2_in = zeros_half
+            else:
+                l_in = msg_l_prev[ind_s + 1]
+                l1_in = l_in[:, ind_1]
+                l2_in = l_in[:, ind_2]
+
+            if ind_s == 0:
+                r1_in = msg_r_in[:, ind_1]
+                r2_in = msg_r_in[:, ind_2]
+            else:
+                r_in = msg_r_iter[ind_s]
+                r1_in = r_in[:, ind_1]
+                r2_in = r_in[:, ind_2]
+
+            r1_out = self._boxplus(r1_in, l2_in + r2_in)
+            r2_out = self._boxplus(r1_in, l1_in) + r2_in
+
+            r_out = torch.cat([r1_out, r2_out], 1)
+            r_out = r_out[:, ind_inv]
+            msg_r_iter[ind_s + 1] = r_out
+
+        # Update right-to-left messages
+        for ind_s in range(self._n_stages - 1, -1, -1):
+            ind_1 = self._stage_ind_1[ind_s]
+            ind_2 = self._stage_ind_2[ind_s]
+            ind_inv = self._stage_ind_inv[ind_s]
+
+            if ind_s == self._n_stages - 1:
+                l1_in = llr_ch[:, ind_1]
+                l2_in = llr_ch[:, ind_2]
+            else:
+                l_in = msg_l_iter[ind_s + 1]
+                l1_in = l_in[:, ind_1]
+                l2_in = l_in[:, ind_2]
+
+            if ind_s == 0:
+                r1_in = msg_r_in[:, ind_1]
+                r2_in = msg_r_in[:, ind_2]
+            else:
+                r_in = msg_r_iter[ind_s]
+                r1_in = r_in[:, ind_1]
+                r2_in = r_in[:, ind_2]
+
+            l1_out = self._boxplus(l1_in, l2_in + r2_in)
+            l2_out = self._boxplus(r1_in, l1_in) + l2_in
+
+            l_out = torch.cat([l1_out, l2_out], 1)
+            l_out = l_out[:, ind_inv]
+            msg_l_iter[ind_s] = l_out
+
+        return msg_l_iter, msg_r_iter
+
     def _decode_bp(
         self, llr_ch: torch.Tensor, num_iter: int
     ) -> torch.Tensor:
@@ -1557,89 +1487,26 @@ class PolarBPDecoder(Block):
         bs = llr_ch.shape[0]
         device = llr_ch.device
 
-        # Store intermediate tensors in lists
         msg_l = [[None] * (self._n_stages + 1) for _ in range(num_iter)]
         msg_r = [[None] * (self._n_stages + 1) for _ in range(num_iter)]
 
-        # Init frozen positions with infinity
         msg_r_in = torch.zeros((bs, self._n), dtype=self.dtype, device=device)
-        msg_r_in[:, self._frozen_pos] = self._llr_max
+        msg_r_in[:, self._frozen_pos_t] = self._llr_max
 
-        # Perform decoding iterations
+        zeros_half = torch.zeros((bs, self._n // 2), dtype=self.dtype,
+                                 device=device)
+
+        msg_l_prev = None
         for ind_it in range(num_iter):
-            # Update left-to-right messages
-            for ind_s in range(self._n_stages):
-                ind_range = np.arange(int(self._n / 2))
-                ind_1 = ind_range * 2 - np.mod(ind_range, 2**ind_s)
-                ind_2 = ind_1 + 2**ind_s
+            msg_l_iter, msg_r_iter = self._bp_single_iteration(
+                ind_it, llr_ch, msg_l_prev, msg_r_in, zeros_half
+            )
+            msg_l[ind_it] = msg_l_iter
+            msg_r[ind_it] = msg_r_iter
+            msg_l_prev = msg_l_iter
+            if ind_it + 1 < num_iter:
+                self._bp_iter_graph_break()
 
-                # Load incoming l messages
-                if ind_s == self._n_stages - 1:
-                    l1_in = llr_ch[:, ind_1]
-                    l2_in = llr_ch[:, ind_2]
-                elif ind_it == 0:
-                    l1_in = torch.zeros(
-                        (bs, int(self._n / 2)), dtype=self.dtype, device=device
-                    )
-                    l2_in = torch.zeros(
-                        (bs, int(self._n / 2)), dtype=self.dtype, device=device
-                    )
-                else:
-                    l_in = msg_l[ind_it - 1][ind_s + 1]
-                    l1_in = l_in[:, ind_1]
-                    l2_in = l_in[:, ind_2]
-
-                # Load incoming r messages
-                if ind_s == 0:
-                    r1_in = msg_r_in[:, ind_1]
-                    r2_in = msg_r_in[:, ind_2]
-                else:
-                    r_in = msg_r[ind_it][ind_s]
-                    r1_in = r_in[:, ind_1]
-                    r2_in = r_in[:, ind_2]
-
-                r1_out = self._boxplus(r1_in, l2_in + r2_in)
-                r2_out = self._boxplus(r1_in, l1_in) + r2_in
-
-                # Re-concatenate output
-                ind_inv = np.argsort(np.concatenate([ind_1, ind_2], axis=0))
-                r_out = torch.cat([r1_out, r2_out], 1)
-                r_out = r_out[:, ind_inv]
-                msg_r[ind_it][ind_s + 1] = r_out
-
-            # Update right-to-left messages
-            for ind_s in range(self._n_stages - 1, -1, -1):
-                ind_range = np.arange(int(self._n / 2))
-                ind_1 = ind_range * 2 - np.mod(ind_range, 2**ind_s)
-                ind_2 = ind_1 + 2**ind_s
-                ind_inv = np.argsort(np.concatenate([ind_1, ind_2], axis=0))
-
-                # Load messages
-                if ind_s == self._n_stages - 1:
-                    l1_in = llr_ch[:, ind_1]
-                    l2_in = llr_ch[:, ind_2]
-                else:
-                    l_in = msg_l[ind_it][ind_s + 1]
-                    l1_in = l_in[:, ind_1]
-                    l2_in = l_in[:, ind_2]
-
-                if ind_s == 0:
-                    r1_in = msg_r_in[:, ind_1]
-                    r2_in = msg_r_in[:, ind_2]
-                else:
-                    r_in = msg_r[ind_it][ind_s]
-                    r1_in = r_in[:, ind_1]
-                    r2_in = r_in[:, ind_2]
-
-                # Node update functions
-                l1_out = self._boxplus(l1_in, l2_in + r2_in)
-                l2_out = self._boxplus(r1_in, l1_in) + l2_in
-
-                l_out = torch.cat([l1_out, l2_out], 1)
-                l_out = l_out[:, ind_inv]
-                msg_l[ind_it][ind_s] = l_out
-
-        # Recover u_hat using pre-registered buffer
         u_hat = msg_l[num_iter - 1][0][:, self._info_pos_t]
 
         if self._hard_out:
@@ -1656,7 +1523,7 @@ class PolarBPDecoder(Block):
     def build(self, input_shape: Tuple[int, ...]) -> None:
         """Build and check if shape of input is invalid."""
         if input_shape[-1] != self._n:
-            raise ValueError("Invalid input shape")
+            raise ValueError("Invalid input shape.")
 
     def call(self, llr_ch: torch.Tensor) -> torch.Tensor:
         """Iterative BP decoding function.
@@ -1693,16 +1560,17 @@ class PolarBPDecoder(Block):
 
 class Polar5GDecoder(Block):
     # pylint: disable=line-too-long
-    """Wrapper for 5G compliant decoding including rate-recovery and CRC
-    removal.
+    """Wrapper for 5G NR Polar decoding including rate-recovery and CRC
+    removal. Matches :class:`~sionna.phy.fec.polar.encoding.Polar5GEncoder`,
+    including the downlink (`DCI`) deviations described there.
 
     :param enc_polar: Instance of the
         :class:`~sionna.phy.fec.polar.encoding.Polar5GEncoder` used for
         encoding including rate-matching.
     :param dec_type: Defining the decoder to be used. Must be one of
-        `{"SC", "SCL", "hybSCL", "BP"}`.
+        `{"SC", "SCL", "BP"}`.
     :param list_size: Defining the list size iff list-decoding is used.
-        Only required for ``dec_types`` `{"SCL", "hybSCL"}`.
+        Only required for ``dec_type`` `"SCL"`.
     :param num_iter: Defining the number of BP iterations. Only required
         for ``dec_type`` `"BP"`.
     :param return_crc_status: If `True`, the decoder additionally returns
@@ -1733,6 +1601,9 @@ class Polar5GDecoder(Block):
     Although the decoding `list size` is not provided by 3GPP
     :cite:p:`3GPPTS38212`, the consortium has agreed on a `list size` of 8 for
     the 5G decoding reference curves :cite:p:`Bioglio_Design`.
+    ``dec_type="SCL"`` uses
+    :class:`~sionna.phy.fec.polar.decoding.PolarSCLDecoder`, including the
+    rate-1 single-flip approximation.
 
     All list-decoders apply `CRC-aided` decoding, however, the non-list
     decoders (`"SC"` and `"BP"`) cannot materialize the CRC leading to an
@@ -1783,8 +1654,8 @@ class Polar5GDecoder(Block):
         self._n_polar = enc_polar.n_polar
         self._k_polar = enc_polar.k_polar
         self._k_crc = enc_polar.enc_crc.crc_length
-        self._bil = enc_polar._channel_type == "uplink"
-        self._iil = enc_polar._channel_type == "downlink"
+        self._bil = enc_polar.channel_type == "uplink"
+        self._iil = enc_polar.channel_type == "downlink"
         self._llr_max = 100
         self._enc_polar = enc_polar
         self._dec_type = dec_type
@@ -1794,11 +1665,13 @@ class Polar5GDecoder(Block):
 
         # Initialize decoder
         if dec_type == "SC":
-            print(
-                "Warning: 5G Polar codes use an integrated CRC that "
-                "cannot be materialized with SC decoding and, thus, "
-                "causes a degraded performance. Please consider SCL "
-                "decoding instead."
+            warnings.warn(
+                "5G Polar codes use an integrated CRC that cannot be "
+                "materialized with SC decoding and, thus, causes a "
+                "degraded performance. Please consider SCL decoding "
+                "instead.",
+                UserWarning,
+                stacklevel=2,
             )
             self._polar_dec = PolarSCDecoder(
                 self._enc_polar.frozen_pos,
@@ -1816,23 +1689,14 @@ class Polar5GDecoder(Block):
                 precision=precision,
                 device=device,
             )
-        elif dec_type == "hybSCL":
-            self._polar_dec = PolarSCLDecoder(
-                self._enc_polar.frozen_pos,
-                self._n_polar,
-                crc_degree=self._enc_polar.enc_crc.crc_degree,
-                list_size=list_size,
-                use_hybrid_sc=True,
-                ind_iil_inv=self.ind_iil_inv,
-                precision=precision,
-                device=device,
-            )
         elif dec_type == "BP":
-            print(
-                "Warning: 5G Polar codes use an integrated CRC that "
-                "cannot be materialized with BP decoding and, thus, "
-                "causes a degraded performance. Please consider SCL "
-                "decoding instead."
+            warnings.warn(
+                "5G Polar codes use an integrated CRC that cannot be "
+                "materialized with BP decoding and, thus, causes a "
+                "degraded performance. Please consider SCL decoding "
+                "instead.",
+                UserWarning,
+                stacklevel=2,
             )
             if not isinstance(num_iter, int):
                 raise TypeError("num_iter must be int.")
@@ -1855,11 +1719,11 @@ class Polar5GDecoder(Block):
 
         self._return_crc_status = return_crc_status
         if self._return_crc_status:
-            if dec_type in ("SCL", "hybSCL"):
+            if dec_type == "SCL":
                 self._dec_crc = self._polar_dec._crc_decoder
             else:
                 self._dec_crc = CRCDecoder(
-                    self._enc_polar._enc_crc,
+                    self._enc_polar.enc_crc,
                     precision=precision,
                     device=device,
                 )

@@ -576,7 +576,23 @@ class TestPrecodingCompile:
             dtype=rdtype, device=device
         )
 
-        h_eff_compiled = compiled_channel(h, tx_power, alpha=0.1)
+        try:
+            h_eff_compiled = compiled_channel(h, tx_power, alpha=0.1)
+        except RuntimeError as error:
+            torch_version = torch.__version__.partition("+")[0]
+            error_type = type(error)
+            if (
+                device.startswith("cuda")
+                and torch_version == "2.11.0"
+                and error_type.__module__ == "torch._inductor.exc"
+                and error_type.__name__ == "InductorError"
+                and "KeyError: 'complex" in str(error)
+            ):
+                pytest.xfail(
+                    "PyTorch #185396: Inductor cannot generate a Triton "
+                    "signature for complex tensors"
+                )
+            raise
 
         precoded_channel2 = RZFPrecodedChannel(
             rg, sm, precision=precision, device=device

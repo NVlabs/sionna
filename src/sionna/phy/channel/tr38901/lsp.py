@@ -11,9 +11,14 @@ from typing import Optional
 
 import torch
 
-from sionna.phy import config
 from sionna.phy.object import Object
 from sionna.phy.utils import normal
+
+from .spatial_consistency import (
+    spatial_consistency_correlation_matrix,
+    spatial_consistency_matrix_sqrt,
+)
+from .utils import update_topology_buffer
 
 __all__ = ["LSP", "LSPGenerator"]
 
@@ -35,6 +40,8 @@ class LSP:
         shape [batch size, num tx, num rx]
     :param zsd: Zenith angle spread of departure [deg],
         shape [batch size, num tx, num rx]
+    :param pathloss: Optional path loss [dB] sampled with these LSPs,
+        shape [batch size, num tx, num rx]
     """
 
     def __init__(
@@ -46,6 +53,7 @@ class LSP:
         k_factor: torch.Tensor,
         zsa: torch.Tensor,
         zsd: torch.Tensor,
+        pathloss: Optional[torch.Tensor] = None,
     ) -> None:
         self.ds = ds
         self.asd = asd
@@ -54,22 +62,28 @@ class LSP:
         self.k_factor = k_factor
         self.zsa = zsa
         self.zsd = zsd
+        self.pathloss = pathloss
 
 
 class LSPGenerator(Object):
     r"""Sample large scale parameters (LSP) and pathloss given a channel
-    scenario, e.g., UMa, UMi, RMa
+    scenario, e.g., UMa, UMi, RMa, InH, or InF
 
     This class implements steps 1 to 4 of the TR 38.901 specifications
     (section 7.5), as well as path-loss generation (Section 7.4.1) with O2I
     low- and high- loss models (Section 7.4.3).
 
     Note that a global scenario is set for the entire batches when instantiating
-    this class (UMa, UMi, or RMa). However, each UT-BS link can have its
+    this class (UMa, UMi, RMa, InH, or InF). However, each UT-BS link can have
+    its
     specific state (LoS, NLoS, or indoor).
 
     The batch size is set by the ``scenario`` given as argument when
     constructing the class.
+
+    Spatial filtering is evaluated for the UT locations in the current
+    topology snapshot. Every call samples a fresh LSP field; realizations are
+    not retained across topology updates.
 
     :param scenario: Scenario used to generate LSPs
 
@@ -88,24 +102,39 @@ class LSPGenerator(Object):
     def __init__(self, scenario) -> None:
         super().__init__(precision=scenario.precision, device=scenario.device)
         self._scenario = scenario
+        self._use_legacy_o2i_model = (
+            scenario.scenario_kind in ("umi", "uma")
+            and bool(scenario.carrier_frequency < 6e9)
+        )
+        self.register_buffer(
+            "_standard_lsp_order",
+            torch.tensor([3, 4, 0, 1, 2, 6, 5], device=self.device),
+        )
+        self.register_buffer(
+            "_internal_lsp_order",
+            torch.tensor([2, 3, 4, 0, 1, 6, 5], device=self.device),
+        )
 
     def sample_pathloss(self) -> torch.Tensor:
         """Generate pathlosses [dB] for each BS-UT link.
 
-        :output pathloss: [batch size, number of BSs, number of UTs], `torch.float`.
+        :output pathloss: [batch size, number of base stations, number of UTs], `torch.float`.
             Pathloss [dB] for each BS-UT link.
         """
         # Pre-computed basic pathloss
         pl_b = self._scenario.basic_pathloss
 
         # O2I penetration
-        if self._scenario.o2i_model == "low":
-            pl_o2i = self._o2i_low_loss()
-        else:  # 'high'
-            pl_o2i = self._o2i_high_loss()
+        if self._scenario.o2i_pathloss_enabled:
+            if self._scenario.o2i_model == "low":
+                pl_o2i = self._o2i_low_loss()
+            else:  # 'high'
+                pl_o2i = self._o2i_high_loss()
+        else:
+            pl_o2i = torch.zeros_like(pl_b)
 
-        # Total path loss, including O2I penetration
-        pl = pl_b + pl_o2i
+        # Total path loss, including building and car penetration
+        pl = pl_b + pl_o2i + self._car_penetration_loss()
 
         return pl
 
@@ -126,20 +155,24 @@ class LSPGenerator(Object):
             generator=self.torch_rng,
         )
 
-        # Applying cross-LSP correlation
-        s = s.unsqueeze(4)
-        s = self._cross_lsp_correlation_matrix_sqrt @ s
-        s = s.squeeze(4)
-
-        # Applying spatial correlation
+        # WINNER II Section 3.3.1 first filters one independent spatial field
+        # per LSP, then applies the same-link cross-LSP Cholesky transform.
         s = s.permute(0, 1, 3, 2).unsqueeze(3)
         s = torch.matmul(s, self._spatial_lsp_correlation_matrix_sqrt.transpose(-1, -2))
         s = s.squeeze(3).permute(0, 1, 3, 2)
+
+        # TR 38.901 Step 4 mandates the Cholesky order
+        # [SF, K, DS, ASD, ASA, ZSD, ZSA]. Convert back to the public internal
+        # order [DS, ASD, ASA, SF, K, ZSA, ZSD] afterwards.
+        s = s.index_select(-1, self._standard_lsp_order).unsqueeze(-1)
+        s = self._cross_lsp_correlation_matrix_sqrt @ s
+        s = s.squeeze(-1).index_select(-1, self._internal_lsp_order)
 
         # Scaling and transposing LSPs to the right mean and variance
         lsp_log_mean = self._scenario.lsp_log_mean
         lsp_log_std = self._scenario.lsp_log_std
         lsp_log = lsp_log_std * s + lsp_log_mean
+        lsp_log = self._scenario.share_by_bs_site(lsp_log)
 
         # Mapping to linear domain
         lsp = torch.pow(
@@ -170,6 +203,11 @@ class LSPGenerator(Object):
                 lsp[:, :, :, 6],
                 torch.tensor(52.0, dtype=self.dtype, device=self.device),
             ),
+            pathloss=(
+                self.sample_pathloss()
+                if self._scenario.pathloss_enabled
+                else None
+            ),
         )
 
         return lsp
@@ -187,11 +225,15 @@ class LSPGenerator(Object):
         # Compute LSP spatial correlation matrix
         self._compute_lsp_spatial_correlation_sqrt()
 
+        # Compute the correlation matrix for the random O2I penetration term
+        self._compute_o2i_penetration_correlation_sqrt()
+
     def reset_topology(self) -> None:
         """Reset topology-dependent buffers."""
         for name in (
             "_cross_lsp_correlation_matrix_sqrt",
             "_spatial_lsp_correlation_matrix_sqrt",
+            "_o2i_penetration_correlation_matrix_sqrt",
         ):
             if hasattr(self, name):
                 delattr(self, name)
@@ -217,6 +259,16 @@ class LSPGenerator(Object):
                 device=self.device,
             ),
         )
+        self.register_buffer(
+            "_o2i_penetration_correlation_matrix_sqrt",
+            torch.zeros(
+                batch_size,
+                num_ut,
+                num_ut,
+                dtype=self.dtype,
+                device=self.device,
+            ),
+        )
 
     ########################################
     # Internal utility methods
@@ -228,7 +280,7 @@ class LSPGenerator(Object):
         matrix square root for filtering.
 
         The resulting tensor is of shape
-        [batch size, number of BSs, number of UTs, 7, 7),
+        [batch size, number of base stations, number of UTs, 7, 7),
         7 being the number of LSPs to correlate.
         """
         # The following 7 LSPs are correlated:
@@ -325,9 +377,14 @@ class LSPGenerator(Object):
         # ZSD vs ZSA
         cross_lsp_corr_mat = _add_param(cross_lsp_corr_mat, "corrZSDvsZSA", 5, 6)
 
-        # Compute and store the square root of the cross-LSP correlation
-        # matrix (use cholesky_ex for CUDA graph compatibility)
-        chol, _ = torch.linalg.cholesky_ex(cross_lsp_corr_mat, check_errors=False)
+        cross_lsp_corr_mat = cross_lsp_corr_mat.index_select(
+            -2, self._standard_lsp_order
+        ).index_select(-1, self._standard_lsp_order)
+        # Step 4 explicitly prescribes a Cholesky square root in the standard
+        # LSP-vector order.
+        chol, _ = torch.linalg.cholesky_ex(
+            cross_lsp_corr_mat, check_errors=False
+        )
         self._update_buffer("_cross_lsp_correlation_matrix_sqrt", chol)
 
     def _compute_lsp_spatial_correlation_sqrt(self) -> None:
@@ -337,7 +394,7 @@ class LSPGenerator(Object):
         the users. Each LSP is spatially correlated according to a different
         spatial correlation matrix.
 
-        The links involving different BSs are not correlated.
+        The links involving different base stations are not correlated.
         UTs in different state (LoS, NLoS, O2I) are not assumed to be
         correlated.
 
@@ -351,7 +408,7 @@ class LSPGenerator(Object):
         distance) and :math:`D_X` the correlation distance of LSP X.
 
         The resulting tensor is of shape
-        [batch size, number of BSs, 7, number of UTs, number of UTs),
+        [batch size, number of base stations, 7, number of UTs, number of UTs),
         7 being the number of LSPs.
         """
         # Tensors of bool indicating which pair of UTs to correlate.
@@ -365,10 +422,22 @@ class LSPGenerator(Object):
         los_ut = self._scenario.los
         los_pair_bool = los_ut.unsqueeze(3) & los_ut.unsqueeze(2)
         # NLoS
-        nlos_ut = (~self._scenario.los) & (~indoor)
+        if self._scenario.use_indoor_lsp_params:
+            nlos_ut = (~self._scenario.los) & (~indoor)
+        else:
+            nlos_ut = ~self._scenario.los
         nlos_pair_bool = nlos_ut.unsqueeze(3) & nlos_ut.unsqueeze(2)
         # O2I
-        o2i_pair_bool = indoor.unsqueeze(3) & indoor.unsqueeze(2)
+        if self._scenario.use_indoor_lsp_params:
+            o2i_pair_bool = indoor.unsqueeze(3) & indoor.unsqueeze(2)
+        else:
+            o2i_pair_bool = torch.zeros_like(nlos_pair_bool)
+        region_ids = self._scenario.ut_spatial_region_ids
+        same_region = region_ids.unsqueeze(-1) == region_ids.unsqueeze(-2)
+        same_region = same_region.unsqueeze(1)
+        los_pair_bool = los_pair_bool & same_region
+        nlos_pair_bool = nlos_pair_bool & same_region
+        o2i_pair_bool = o2i_pair_bool & same_region
 
         # Stacking the correlation matrix
         # One correlation matrix per LSP
@@ -440,29 +509,107 @@ class LSPGenerator(Object):
             ut_dist_2d * distance_scaling_matrices
         ) * filtering_matrices
 
-        # Compute and store the square root of the spatial correlation matrix
-        # (use cholesky_ex for CUDA graph compatibility)
-        chol, _ = torch.linalg.cholesky_ex(spatial_lsp_correlation, check_errors=False)
+        # Compute and store the square root of the spatial correlation matrix.
+        # Co-located terminals lead to positive-semidefinite, but singular,
+        # matrices. The spatial-consistency square-root helper handles this
+        # case without adding artificial jitter. For co-sited sectors, only
+        # representative base stations need to be factorized; the factors are identical
+        # within a site because topology updates share the link state by site.
+        representatives = self._scenario.bs_site_representatives
+        bs_index = torch.arange(
+            self._scenario.num_bs, dtype=torch.int64, device=self.device
+        ).reshape(1, -1)
+        if (
+            representatives is not None
+            and not torch.compiler.is_compiling()
+            and bool(torch.any(representatives != bs_index))
+        ):
+            chol = torch.empty_like(spatial_lsp_correlation)
+            for batch_ind in range(self._scenario.batch_size):
+                unique_reps, inverse = torch.unique(
+                    representatives[batch_ind],
+                    sorted=True,
+                    return_inverse=True,
+                )
+                rep_chol = spatial_consistency_matrix_sqrt(
+                    spatial_lsp_correlation[batch_ind, unique_reps],
+                    precision=self.precision,
+                    device=self.device,
+                )
+                chol[batch_ind] = rep_chol[inverse]
+        else:
+            chol = spatial_consistency_matrix_sqrt(
+                spatial_lsp_correlation,
+                precision=self.precision,
+                device=self.device,
+            )
         self._update_buffer("_spatial_lsp_correlation_matrix_sqrt", chol)
 
     def _update_buffer(self, name: str, value: torch.Tensor) -> None:
         """Update or register a buffer for topology-dependent tensors."""
-        existing = getattr(self, name, None)
-        if existing is not None and name in self._buffers:
-            if existing.shape != value.shape:
-                raise RuntimeError(
-                    f"Cannot change shape of '{name}'. "
-                    f"Expected {existing.shape}, got {value.shape}. "
-                    f"Call reset_topology() or allocate_topology_tensors() first."
-                )
-            existing.copy_(value)
-            return
-        if torch.compiler.is_compiling():
-            raise RuntimeError(
-                f"Cannot initialize buffer '{name}' inside torch.compile. "
-                f"Call allocate_topology_tensors() or run one eager warmup first."
+        update_topology_buffer(
+            self,
+            name,
+            value,
+            "Call reset_topology() or allocate_topology_tensors() first.",
+        )
+
+    def _compute_o2i_penetration_correlation_sqrt(self) -> None:
+        """Precompute the 10 m random-penetration correlation factor."""
+        if self._scenario._enable_spatial_consistency:
+            correlation = spatial_consistency_correlation_matrix(
+                self._scenario.matrix_ut_distance_2d,
+                torch.tensor(10.0, dtype=self.dtype, device=self.device),
+                states=self._scenario.ut_spatial_region_ids,
+                precision=self.precision,
+                device=self.device,
             )
-        self.register_buffer(name, value)
+            factor = spatial_consistency_matrix_sqrt(
+                correlation,
+                precision=self.precision,
+                device=self.device,
+            )
+        else:
+            factor = torch.eye(
+                self._scenario.num_ut,
+                dtype=self.dtype,
+                device=self.device,
+            ).expand(self._scenario.batch_size, -1, -1).clone()
+        self._update_buffer(
+            "_o2i_penetration_correlation_matrix_sqrt", factor
+        )
+
+    def _sample_o2i_penetration_random(self, stddev: float) -> torch.Tensor:
+        """Sample one spatially consistent penetration term per UT."""
+        white = normal(
+            (self._scenario.batch_size, 1, self._scenario.num_ut),
+            dtype=self.dtype,
+            device=self.device,
+            generator=self.torch_rng,
+        )
+        sample = torch.matmul(
+            self._o2i_penetration_correlation_matrix_sqrt,
+            white.transpose(1, 2),
+        ).squeeze(-1)
+        sample = sample * stddev
+        return sample.unsqueeze(1).expand(-1, self._scenario.num_bs, -1)
+
+    def _car_penetration_loss(self) -> torch.Tensor:
+        """Sample the UT-specific car penetration loss of Section 7.4.3.2."""
+        if self._scenario.scenario_kind != "rma":
+            return torch.zeros_like(self._scenario.basic_pathloss)
+
+        sample = normal(
+            (self._scenario.batch_size, 1, self._scenario.num_ut),
+            dtype=self.dtype,
+            device=self.device,
+            generator=self.torch_rng,
+        )
+        sample = (
+            5.0 * sample + self._scenario.car_penetration_loss_mean
+        )
+        sample = sample.expand(-1, self._scenario.num_bs, -1)
+        return sample * self._scenario.in_car.unsqueeze(1).to(self.dtype)
 
     def _o2i_low_loss(self) -> torch.Tensor:
         """Compute for each BS-UT link the pathloss due to the O2I
@@ -471,13 +618,15 @@ class LSPGenerator(Object):
 
         UTs located outdoor (LoS and NLoS) get O2I pathloss of 0dB.
 
-        :output pl_o2i: [batch size, number of BSs, number of UTs], `torch.float`.
+        :output pl_o2i: [batch size, number of base stations, number of UTs], `torch.float`.
             O2I penetration low-loss in dB for each BS-UT link.
         """
+        if self._use_legacy_o2i_model:
+            return self._o2i_legacy_loss()
+
         fc = self._scenario.carrier_frequency / 1e9  # Carrier frequency (GHz)
         batch_size = self._scenario.batch_size
         num_ut = self._scenario.num_ut
-        num_bs = self._scenario.num_bs
 
         # Material penetration losses
         # fc must be in GHz
@@ -510,15 +659,7 @@ class LSPGenerator(Object):
 
         # Random path loss component
         # Gaussian distributed with standard deviation 4.4 in dB
-        pl_rnd = (
-            normal(
-                (batch_size, num_bs, num_ut),
-                dtype=self.dtype,
-                device=self.device,
-                generator=self.torch_rng,
-            )
-            * 4.4
-        )
+        pl_rnd = self._sample_o2i_penetration_random(4.4)
         pl_rnd = pl_rnd * indoor_mask
 
         return pl_tw + pl_in + pl_rnd
@@ -530,17 +671,22 @@ class LSPGenerator(Object):
 
         UTs located outdoor (LoS and NLoS) get O2I pathloss of 0dB.
 
-        :output pl_o2i: [batch size, number of BSs, number of UTs], `torch.float`.
+        :output pl_o2i: [batch size, number of base stations, number of UTs], `torch.float`.
             O2I penetration high-loss in dB for each BS-UT link.
         """
+        if self._use_legacy_o2i_model:
+            return self._o2i_legacy_loss()
+
         fc = self._scenario.carrier_frequency / 1e9  # Carrier frequency (GHz)
         batch_size = self._scenario.batch_size
         num_ut = self._scenario.num_ut
-        num_bs = self._scenario.num_bs
 
         # Material penetration losses
         # fc must be in GHz
-        l_iirglass = 23.0 + 0.3 * fc
+        if self._scenario.spec_version == "19.2":
+            l_iirglass = 25.4 + 0.11 * fc
+        else:
+            l_iirglass = 23.0 + 0.3 * fc
         l_concrete = 5.0 + 4.0 * fc
 
         # Path loss through external wall
@@ -570,16 +716,18 @@ class LSPGenerator(Object):
         # Random path loss component
         # Gaussian distributed with standard deviation 6.5 in dB for the
         # high loss model
-        pl_rnd = (
-            normal(
-                (batch_size, num_bs, num_ut),
-                dtype=self.dtype,
-                device=self.device,
-                generator=self.torch_rng,
-            )
-            * 6.5
-        )
+        pl_rnd = self._sample_o2i_penetration_random(6.5)
         pl_rnd = pl_rnd * indoor_mask
 
         return pl_tw + pl_in + pl_rnd
 
+    def _o2i_legacy_loss(self) -> torch.Tensor:
+        """Return the below-6-GHz UMi/UMa penetration loss.
+
+        Table 7.4.3-3 specifies a fixed 20 dB external-wall loss and no
+        random penetration-loss component. The indoor propagation loss is
+        still 0.5 dB per metre of indoor distance.
+        """
+        indoor_mask = self._scenario.indoor.unsqueeze(1).to(self.dtype)
+        wall_loss = torch.tensor(20.0, dtype=self.dtype, device=self.device)
+        return wall_loss * indoor_mask + 0.5 * self._scenario.distance_2d_in

@@ -89,6 +89,79 @@ class TestPowerControl:
         # Check that power is non-negative
         assert (tx_power >= 0).all()
 
+    def test_downlink_fair_power_control_reference(self, device, precision):
+        """Check total power, lower bounds, KKT conditions, and utility."""
+        rdtype = torch.float32 if precision == "single" else torch.float64
+        pathloss = torch.tensor(
+            [[1.0, 1.2, 1.5]], dtype=rdtype, device=device
+        )
+        num_allocated_re = torch.tensor(
+            [[1.0, 2.0, 4.0]], dtype=rdtype, device=device
+        )
+        guaranteed_power_ratio = 0.15
+        bs_max_power_dbm = 30.0
+        max_power = dbm_to_watt(
+            torch.tensor(bs_max_power_dbm, dtype=rdtype, device=device),
+            precision=precision,
+        )
+
+        tx_power, utility, mu_inv = downlink_fair_power_control(
+            pathloss,
+            interference_plus_noise=1.0,
+            num_allocated_re=num_allocated_re,
+            bs_max_power_dbm=bs_max_power_dbm,
+            guaranteed_power_ratio=guaranteed_power_ratio,
+            fairness=0.0,
+            return_lagrangian=True,
+            precision=precision,
+        )
+
+        # Waterfilling with cq=[1, 5/6, 2/3] leaves the third user below its
+        # guaranteed floor, so it sits at the floor and the remaining 0.95 W is
+        # shared at water level mu^-1 = 1.45 across the first two users.
+        expected_mu_inv = torch.tensor([1.45], dtype=rdtype, device=device)
+        expected_tx_power = torch.tensor(
+            [[0.45, 0.50, 0.05]], dtype=rdtype, device=device
+        )
+        torch.testing.assert_close(
+            tx_power, expected_tx_power, rtol=1e-3, atol=1e-4
+        )
+        torch.testing.assert_close(
+            mu_inv, expected_mu_inv, rtol=1e-3, atol=1e-4
+        )
+        torch.testing.assert_close(
+            tx_power.sum(dim=-1),
+            max_power.reshape(1),
+            rtol=1e-3,
+            atol=1e-4,
+        )
+
+        guaranteed_power = (
+            guaranteed_power_ratio * max_power / pathloss.shape[-1]
+        )
+        assert torch.all(tx_power >= guaranteed_power - 1e-4)
+
+        # The utility must use the per-resource power inside the logarithm.
+        cq = 1.0 / pathloss
+        expected_utility = num_allocated_re * torch.log1p(
+            expected_tx_power / num_allocated_re * cq
+        )
+        torch.testing.assert_close(
+            utility, expected_utility, rtol=1e-3, atol=1e-4
+        )
+
+        is_above_floor = tx_power > guaranteed_power + 1e-4
+        kkt_residual = (
+            cq * mu_inv.unsqueeze(-1)
+            - (1.0 + tx_power / num_allocated_re * cq)
+        )
+        torch.testing.assert_close(
+            kkt_residual[is_above_floor],
+            torch.zeros_like(kkt_residual[is_above_floor]),
+            rtol=0.0,
+            atol=1e-3,
+        )
+
     @pytest.mark.parametrize("mode", ["default", "reduce-overhead"])
     def test_ul_power_control_compiled(self, device, mode):
         """Test that open_loop_uplink_power_control works with torch.compile."""
@@ -103,11 +176,7 @@ class TestPowerControl:
 
         num_allocated_subcarriers = torch.randint(12, 52, (batch_size, num_ut), device=device)
 
-        # Compile the function
-        if mode != "default":
-            compiled_fn = torch.compile(open_loop_uplink_power_control, mode=mode)
-        else:
-            compiled_fn = open_loop_uplink_power_control
+        compiled_fn = torch.compile(open_loop_uplink_power_control, mode=mode)
 
         tx_power = compiled_fn(
             pathloss,

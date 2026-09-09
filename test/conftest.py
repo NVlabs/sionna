@@ -35,26 +35,39 @@ import sys
 import torch
 
 
+def resolve_device_option(
+    device_option: str, *, cuda_available: bool | None = None
+) -> str:
+    """Resolve ``--device`` to ``cpu``, ``gpu``, or ``all``.
+
+    ``auto`` becomes ``gpu`` when CUDA is available, otherwise ``cpu``.
+    """
+    if cuda_available is None:
+        cuda_available = torch.cuda.is_available()
+    if device_option == "auto":
+        return "gpu" if cuda_available else "cpu"
+    return device_option
+
+
 def pytest_addoption(parser):
     """Add command line options for device selection."""
     parser.addoption(
         "--device",
         action="store",
-        default="gpu",
-        choices=["cpu", "gpu", "all"],
-        help="Device to run tests on: cpu, gpu, or all (default: gpu)"
+        default="auto",
+        choices=["auto", "cpu", "gpu", "all"],
+        help=(
+            "Device to run tests on: auto, cpu, gpu, or all "
+            "(default: auto = gpu if CUDA is available, else cpu)"
+        ),
     )
     parser.addoption(
         "--gc-interval",
         action="store",
         default=50,
         type=int,
-        help="Perform aggressive garbage collection every N tests (default: 50)"
+        help="Perform aggressive garbage collection every N tests (default: 50)",
     )
-
-
-# Counter for periodic cleanup
-_test_counter = 0
 
 
 def pytest_configure(config) -> None:
@@ -63,19 +76,34 @@ def pytest_configure(config) -> None:
 
     # Configure PyTorch CUDA memory allocator for better memory management
     # during long test runs. This helps reduce memory fragmentation.
-    if "PYTORCH_CUDA_ALLOC_CONF" not in os.environ and "PYTORCH_ALLOC_CONF" not in os.environ:
+    if (
+        "PYTORCH_CUDA_ALLOC_CONF" not in os.environ
+        and "PYTORCH_ALLOC_CONF" not in os.environ
+    ):
         # expandable_segments helps reduce fragmentation by allowing
         # the allocator to release memory back to the system more easily
         os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 
+    # Resolve --device before importing sionna. Never bake cuda:0 into the
+    # environment on a CPU-only host.
+    device_option = resolve_device_option(config.getoption("--device"))
+    config.option.device = device_option
+
+    if device_option == "gpu" and not torch.cuda.is_available():
+        pytest.exit(
+            "CUDA is not available. Re-run with --device=cpu (or omit --device "
+            "to auto-select cpu on this host).",
+            returncode=1,
+        )
+
     # Set SIONNA_DEVICE env var BEFORE importing sionna
     # This controls the default device for all tests
-    device_option = config.getoption("--device", default="gpu")
     if device_option == "cpu":
         os.environ["SIONNA_DEVICE"] = "cpu"
     elif device_option == "gpu":
         os.environ["SIONNA_DEVICE"] = "cuda:0"
     # Note: sionna.phy.config should read SIONNA_DEVICE if set
+    # "--device=all" leaves the env unset; per-test fixtures set config.device.
 
     # Add test subdirectories to path for direct imports of test utilities
     test_dir = os.path.dirname(os.path.abspath(__file__))
@@ -90,24 +118,43 @@ def pytest_configure(config) -> None:
         sys.path.insert(0, src_dir)
 
     import sionna
-    
+
     # Also set config.device directly after import
     if device_option == "cpu":
         sionna.phy.config.device = "cpu"
-    elif device_option == "gpu" and torch.cuda.is_available():
+    elif device_option == "gpu":
         sionna.phy.config.device = "cuda:0"
 
 
 @pytest.fixture(autouse=True)
 def set_seed():
+    """Seed each test and undo any global config it leaves behind.
+
+    Tests that mutate `config.device` or `config.precision` without restoring
+    them would otherwise change the device and precision of every later test.
+    """
     import sionna.phy
-    sionna.phy.config.seed = 42
+
+    config = sionna.phy.config
+    config.seed = 42
+    original_device = config.device
+    original_precision = config.precision
+    yield
+    config.device = original_device
+    config.precision = original_precision
 
 
-def _clear_all_gpu_memory():
+def _clear_compile_cache():
+    """Clear torch.compile caches which can hold GPU memory."""
+    try:
+        torch._dynamo.reset()
+    except Exception:
+        pass  # Ignore if dynamo is not available or reset fails
+
+
+def clear_all_gpu_memory():
     """Helper to aggressively clear GPU memory on all available CUDA devices."""
     # Force Python garbage collection first (multiple passes for cyclic refs)
-    gc.collect()
     gc.collect()
     gc.collect()
 
@@ -121,42 +168,8 @@ def _clear_all_gpu_memory():
                 # Reset memory stats to help with fragmentation tracking
                 torch.cuda.reset_peak_memory_stats()
 
-
-def _clear_compile_cache():
-    """Clear torch.compile caches which can hold GPU memory."""
-    try:
-        torch._dynamo.reset()
-    except Exception:
-        pass  # Ignore if dynamo is not available or reset fails
-
-
-@pytest.fixture(autouse=True)
-def clear_gpu_memory(request):
-    """
-    Fixture that clears GPU memory before and after each test
-    to prevent out-of-memory errors when running the full test suite.
-    """
-    global _test_counter
-    _test_counter += 1
-
-    gc_interval = request.config.getoption("--gc-interval", default=50)
-
-    _clear_all_gpu_memory()
-    yield
-    # More aggressive cleanup after test
-    _clear_all_gpu_memory()
     # Additional gc pass to catch any lingering references
     gc.collect()
-
-    # Periodic extra-aggressive cleanup to combat fragmentation
-    if _test_counter % gc_interval == 0 and torch.cuda.is_available():
-        # Force a more thorough cleanup periodically
-        gc.collect()
-        gc.collect()
-        torch.cuda.empty_cache()
-        torch.cuda.synchronize()
-        # Reset the CUDA memory allocator's internal state
-        torch.cuda.reset_peak_memory_stats()
 
 
 def pytest_runtest_teardown(item, nextitem):
@@ -165,43 +178,38 @@ def pytest_runtest_teardown(item, nextitem):
     If the next test is in a different class or module (or there is no next test),
     perform aggressive memory cleanup to free class/module-scoped fixture data.
     """
-    current_class = getattr(item, 'cls', None)
-    next_class = getattr(nextitem, 'cls', None) if nextitem else None
-    current_module = getattr(item, 'module', None)
-    next_module = getattr(nextitem, 'module', None) if nextitem else None
+    current_class = getattr(item, "cls", None)
+    next_class = getattr(nextitem, "cls", None) if nextitem else None
+    current_module = getattr(item, "module", None)
+    next_module = getattr(nextitem, "module", None) if nextitem else None
 
     # If we're switching classes, modules, or finishing, do aggressive cleanup
     if current_class != next_class or current_module != next_module:
         # Clear torch.compile caches
         _clear_compile_cache()
-        # Multiple GC passes
-        gc.collect()
-        gc.collect()
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            torch.cuda.synchronize()
+        # Clear GPU memory
+        clear_all_gpu_memory()
 
 
 def pytest_generate_tests(metafunc):
     """Generate test parameters based on --device option."""
     if "device" in metafunc.fixturenames:
+        # Already resolved from "auto" in pytest_configure; "gpu" without CUDA
+        # exits there, so this only sees cpu / gpu-with-CUDA / all.
         device_option = metafunc.config.getoption("--device")
 
         if device_option == "cpu":
             devices = ["cpu"]
         elif device_option == "gpu":
-            if torch.cuda.is_available():
-                devices = ["cuda:0"]
-            else:
-                pytest.skip("CUDA not available")
-                devices = []
+            devices = ["cuda:0"]
         else:  # "all"
             devices = ["cpu"]
             if torch.cuda.is_available():
                 devices.append("cuda:0")
 
-        metafunc.parametrize("device", devices)
+        # Indirect so the `device` fixture below runs and restores
+        # `config.device` afterwards; without it the params bypass the fixture.
+        metafunc.parametrize("device", devices, indirect=True)
 
 
 @pytest.fixture
@@ -212,6 +220,7 @@ def device(request):
     Also sets the global config.device for the duration of the test.
     """
     from sionna.phy import config
+
     device = request.param
     if device not in config.available_devices:
         pytest.skip(f"Device {device} not available")
@@ -222,8 +231,11 @@ def device(request):
     yield device
     config.device = original_device
 
+
 # List of precisions to test
 PRECISIONS = ["single", "double"]
+
+
 @pytest.fixture(params=PRECISIONS)
 def precision(request):
     """
@@ -231,8 +243,14 @@ def precision(request):
     """
     return request.param
 
-# List of compilation modes to test
-MODES = ["default", "max-autotune", "reduce-overhead"]
+
+# Compilation modes for torch.compile tests. max-autotune is intentionally
+# omitted from the shared fixture: it dominates suite runtime while only a
+# subset of compile tests need it. Opt in per-test with an explicit
+# @pytest.mark.parametrize("mode", [...]) when coverage is required.
+MODES = ["default", "reduce-overhead"]
+
+
 @pytest.fixture(params=MODES)
 def mode(request):
     """

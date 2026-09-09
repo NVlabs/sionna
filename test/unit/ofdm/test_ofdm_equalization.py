@@ -8,6 +8,7 @@ import pytest
 import numpy as np
 import torch
 
+from sionna.phy import config
 from sionna.phy.ofdm import (
     ResourceGrid,
     OFDMEqualizer,
@@ -18,7 +19,7 @@ from sionna.phy.ofdm import (
     RZFPrecodedChannel,
     EyePrecodedChannel,
 )
-from sionna.phy.mimo import StreamManagement, lmmse_matrix
+from sionna.phy.mimo import StreamManagement, lmmse_equalizer, lmmse_matrix
 from sionna.phy.channel import (
     RayleighBlockFading,
     cir_to_ofdm_channel,
@@ -54,6 +55,8 @@ class TestLMMSEEqualizer:
     def test_output_shape(self, device, precision, resource_grid, stream_management):
         """Test that LMMSEEqualizer produces correct output shape."""
         cdtype = torch.complex64 if precision == "single" else torch.complex128
+        dtype = torch.float32 if precision == "single" else torch.float64
+        config.precision = "double" if precision == "single" else "single"
 
         equalizer = LMMSEEqualizer(
             resource_grid=resource_grid,
@@ -98,6 +101,53 @@ class TestLMMSEEqualizer:
         expected_shape = (batch_size, num_tx, num_streams_per_tx, num_data_symbols)
         assert x_hat.shape == expected_shape
         assert no_eff.shape == expected_shape
+        assert x_hat.dtype == cdtype
+        assert no_eff.dtype == dtype
+
+    def test_preserves_callable_contract_and_casts_outputs(
+        self, device, resource_grid, stream_management
+    ):
+        """Custom callables keep three inputs and outputs are normalized."""
+        def single_precision_equalizer(y, h, s):
+            return lmmse_equalizer(y, h, s, precision="single")
+
+        equalizer = OFDMEqualizer(
+            equalizer=single_precision_equalizer,
+            resource_grid=resource_grid,
+            stream_management=stream_management,
+            precision="double",
+            device=device,
+        )
+        batch_size = 1
+        y = complex_normal(
+            (
+                batch_size,
+                1,
+                4,
+                resource_grid.num_ofdm_symbols,
+                resource_grid.fft_size,
+            ),
+            precision="double",
+            device=device,
+        )
+        h_hat = complex_normal(
+            (
+                batch_size,
+                1,
+                4,
+                resource_grid.num_tx,
+                resource_grid.num_streams_per_tx,
+                resource_grid.num_ofdm_symbols,
+                resource_grid.num_effective_subcarriers,
+            ),
+            precision="double",
+            device=device,
+        )
+
+        x_hat, no_eff = equalizer(y, h_hat, 0.01, 0.1)
+
+        assert x_hat.dtype == torch.complex128
+        assert no_eff.dtype == torch.float64
 
     def test_scalar_err_var(self, device, precision, resource_grid, stream_management):
         """Test that equalizer works with scalar float err_var (perfect CSI case)."""
@@ -205,6 +255,8 @@ class TestZFEqualizer:
     def test_output_shape(self, device, precision, resource_grid, stream_management):
         """Test that ZFEqualizer produces correct output shape."""
         cdtype = torch.complex64 if precision == "single" else torch.complex128
+        dtype = torch.float32 if precision == "single" else torch.float64
+        config.precision = "double" if precision == "single" else "single"
 
         equalizer = ZFEqualizer(
             resource_grid=resource_grid,
@@ -249,6 +301,8 @@ class TestZFEqualizer:
         expected_shape = (batch_size, num_tx, num_streams_per_tx, num_data_symbols)
         assert x_hat.shape == expected_shape
         assert no_eff.shape == expected_shape
+        assert x_hat.dtype == cdtype
+        assert no_eff.dtype == dtype
 
 
 class TestMFEqualizer:
@@ -257,6 +311,8 @@ class TestMFEqualizer:
     def test_output_shape(self, device, precision, resource_grid, stream_management):
         """Test that MFEqualizer produces correct output shape."""
         cdtype = torch.complex64 if precision == "single" else torch.complex128
+        dtype = torch.float32 if precision == "single" else torch.float64
+        config.precision = "double" if precision == "single" else "single"
 
         equalizer = MFEqualizer(
             resource_grid=resource_grid,
@@ -301,6 +357,8 @@ class TestMFEqualizer:
         expected_shape = (batch_size, num_tx, num_streams_per_tx, num_data_symbols)
         assert x_hat.shape == expected_shape
         assert no_eff.shape == expected_shape
+        assert x_hat.dtype == cdtype
+        assert no_eff.dtype == dtype
 
     def test_positive_noise_variance(
         self, device, precision, resource_grid, stream_management

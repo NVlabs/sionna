@@ -61,6 +61,13 @@ which avoids synchronization points and is preferred for CUDA graph compatibilit
     y_temp = torch.linalg.solve_triangular(l, y, upper=False)
     x = torch.linalg.solve_triangular(l.mH, y_temp, upper=True)
 
+The unchecked status is an intentional performance contract. Callers must
+guarantee that the input is Hermitian positive definite; otherwise the result
+is undefined and may contain finite-looking incorrect values, infinities, or
+NaNs. Likewise, :func:`~sionna.phy.utils.matrix_pinv` assumes a tall or square
+matrix with full column rank. Use PyTorch's checked or rank-revealing routines
+when these preconditions cannot be guaranteed.
+
 For one-off scripts, the simpler :torch:`torch.linalg.cholesky` and
 :torch:`torch.cholesky_solve` are also valid. Ready-to-use utilities built on
 these patterns include :func:`~sionna.phy.utils.inv_cholesky` and

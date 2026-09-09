@@ -245,3 +245,64 @@ class TestEmpiricalACLR:
 
         aclr = empirical_aclr(x, oversampling=2.0, precision=precision)
         assert aclr.item() > 0
+
+    def test_fullgraph_compile(self, device, precision):
+        """A valid ACLR computation must not synchronize a tensor to Python."""
+        cdtype = dtypes[precision]["torch"]["cdtype"]
+        x = torch.randn(16, 128, dtype=cdtype, device=device)
+
+        def aclr_fn(signal):
+            return empirical_aclr(
+                signal, oversampling=2.0, precision=precision
+            )
+
+        expected = aclr_fn(x)
+        actual = torch.compile(aclr_fn, fullgraph=True)(x)
+
+        torch.testing.assert_close(actual, expected)
+
+    @pytest.mark.parametrize("oversampling", [0.0, -1.0, -2.5])
+    def test_invalid_oversampling_rejected(self, device, oversampling):
+        """A non-positive oversampling factor must be reported.
+
+        The frequency axis spans ``[-0.5*oversampling, 0.5*oversampling]``, so a
+        negative factor reverses it and a zero factor collapses it, in both
+        cases returning a plausible-looking number.
+        """
+        x = torch.randn(16, 128, dtype=torch.complex64, device=device)
+
+        with pytest.raises(ValueError, match="oversampling"):
+            empirical_aclr(x, oversampling=oversampling)
+
+    @pytest.mark.parametrize("f_min,f_max", [(0.5, -0.5), (0.1, 0.1), (1.0, 0.0)])
+    def test_swapped_or_empty_band_rejected(self, device, f_min, f_max):
+        """A swapped or degenerate in-band must be reported, not divided by."""
+        x = torch.randn(16, 128, dtype=torch.complex64, device=device)
+
+        with pytest.raises(ValueError, match="f_min"):
+            empirical_aclr(x, oversampling=2.0, f_min=f_min, f_max=f_max)
+
+    def test_band_outside_spectrum_rejected(self, device):
+        """An in-band that does not overlap the spectrum must be reported."""
+        x = torch.randn(16, 128, dtype=torch.complex64, device=device)
+
+        with pytest.raises(ValueError, match="lies outside the spectrum"):
+            empirical_aclr(x, oversampling=2.0, f_min=5.0, f_max=9.0)
+
+    def test_band_narrower_than_resolution_rejected(self, device):
+        """An in-band selecting no frequency bin must be reported."""
+        x = torch.randn(16, 128, dtype=torch.complex64, device=device)
+
+        with pytest.raises(ValueError, match="no frequency bin"):
+            empirical_aclr(x, oversampling=2.0, f_min=0.0, f_max=1e-9)
+
+    def test_empty_out_of_band_is_zero(self, device):
+        """An empty out-of-band is legitimate and yields an ACLR of zero.
+
+        This is the default configuration: at ``oversampling=1`` the spectrum
+        spans exactly the in-band, so there is no out-of-band power.
+        """
+        x = torch.randn(16, 128, dtype=torch.complex64, device=device)
+
+        assert empirical_aclr(x).item() == 0.0
+        assert empirical_aclr(x, f_min=-9.0, f_max=9.0).item() == 0.0

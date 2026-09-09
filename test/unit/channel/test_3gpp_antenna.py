@@ -5,6 +5,8 @@
 """Tests for 3GPP TR 38.901 antenna classes"""
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pytest
 import torch
 
 from sionna.phy import PI, SPEED_OF_LIGHT, dtypes
@@ -14,6 +16,10 @@ from sionna.phy.channel.tr38901 import (
     PanelArray,
     Antenna,
     AntennaArray,
+    HandheldUTArray,
+    UMi,
+    ChannelCoefficientsGenerator,
+    Topology,
 )
 
 
@@ -91,9 +97,493 @@ class TestAntennaElement:
         """Test that pattern property returns the correct value"""
         ant_omni = AntennaElement(pattern="omni", precision=precision, device=device)
         ant_38901 = AntennaElement(pattern="38.901", precision=precision, device=device)
+        ant_handheld = AntennaElement(pattern="38.901-handheld", precision=precision, device=device)
 
         assert ant_omni.pattern == "omni"
         assert ant_38901.pattern == "38.901"
+        assert ant_handheld.pattern == "38.901-handheld"
+
+    def test_38901_handheld_pattern_from_table(self, device, precision):
+        """Test the TR 38.901 Table 7.3-2 handheld UT pattern values"""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        ant = AntennaElement(pattern="38.901-handheld",
+                             precision=precision,
+                             device=device)
+
+        theta_deg = torch.tensor([90.0, 90.0, 27.5, 27.5, 90.0, 90.0],
+                                 dtype=dtype,
+                                 device=device)
+        phi_deg = torch.tensor([0.0, 62.5, 0.0, 62.5, 125.0, 180.0],
+                               dtype=dtype,
+                               device=device)
+        expected_gain_db = torch.tensor([5.3, 2.3, 2.3, -0.7, -6.7, -17.2],
+                                        dtype=dtype,
+                                        device=device)
+
+        theta = theta_deg * PI / 180
+        phi = phi_deg * PI / 180
+        f_theta, f_phi = ant.field(theta, phi)
+        gain_db = 10 * torch.log10(f_theta**2 + f_phi**2)
+
+        assert torch.allclose(gain_db, expected_gain_db,
+                              rtol=0.0, atol=1e-5)
+
+
+class TestHandheldUTArray:
+    """Tests for the TR 38.901 handheld UT antenna array"""
+
+    def test_invalid_polarization_type_preserves_context(self, device):
+        """Validation errors identify the selected polarization mode."""
+        with pytest.raises(ValueError, match="single polarization"):
+            HandheldUTArray(
+                carrier_frequency=7e9,
+                polarization="single",
+                polarization_type="cross",
+                device=device,
+            )
+        with pytest.raises(ValueError, match="dual polarization"):
+            HandheldUTArray(
+                carrier_frequency=7e9,
+                polarization="dual",
+                polarization_type="V",
+                device=device,
+            )
+
+    def test_four_corner_candidate_positions(self, device, precision):
+        """Test the Figure 7.3-2 four-corner candidate subset"""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations="tr38901-4",
+            precision=precision,
+            device=device,
+        )
+
+        expected = torch.tensor(
+            [
+                [-0.075, -0.035, 0.0],
+                [-0.075, 0.035, 0.0],
+                [0.075, -0.035, 0.0],
+                [0.075, 0.035, 0.0],
+            ],
+            dtype=dtype,
+            device=device,
+        )
+        assert array.antenna_locations == (1, 7, 3, 5)
+        assert array.num_ant == 4
+        assert torch.allclose(array.ant_pos, expected, atol=1e-7)
+
+    def test_candidate_position_numbering_matches_spec(self, device, precision):
+        """Test the Figure 7.3-2 candidate numbering."""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations="tr38901",
+            precision=precision,
+            device=device,
+        )
+
+        expected = torch.tensor(
+            [
+                [-0.075, -0.035, 0.0],
+                [0.0, -0.035, 0.0],
+                [0.075, -0.035, 0.0],
+                [0.075, 0.0, 0.0],
+                [0.075, 0.035, 0.0],
+                [0.0, 0.035, 0.0],
+                [-0.075, 0.035, 0.0],
+                [-0.075, 0.0, 0.0],
+            ],
+            dtype=dtype,
+            device=device,
+        )
+
+        assert array.antenna_locations == tuple(range(1, 9))
+        assert torch.allclose(array.ant_pos, expected, atol=1e-7)
+
+    def test_dual_polarization_indices_and_positions(self, device, precision):
+        """Test dual-polarized handheld arrays duplicate candidate positions"""
+        array = HandheldUTArray(
+            carrier_frequency=15e9,
+            polarization="dual",
+            antenna_locations=(1, 2, 3),
+            precision=precision,
+            device=device,
+        )
+
+        assert array.num_ant == 6
+        assert torch.equal(array.ant_ind_pol1,
+                           torch.tensor([0, 1, 2], device=device))
+        assert torch.equal(array.ant_ind_pol2,
+                           torch.tensor([3, 4, 5], device=device))
+        assert torch.allclose(array.ant_pos[:3], array.ant_pos[3:])
+        assert torch.equal(
+            array.port_field_component,
+            torch.tensor([0, 0, 0, 1, 1, 1], device=device),
+        )
+
+    def test_candidate_boresight_and_polarization_axes(self, device, precision):
+        """Test Clause 7.3 center-to-candidate and tangential directions."""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations="tr38901",
+            precision=precision,
+            device=device,
+        )
+
+        boresight = array.port_basis[:, :, 0]
+        polarization_axis = -array.port_basis[:, :, 2]
+        candidate_direction = array.ant_pos / torch.linalg.norm(
+            array.ant_pos, dim=-1, keepdim=True
+        )
+
+        assert torch.allclose(boresight, candidate_direction, atol=1e-6)
+        assert torch.allclose(boresight[:, 2],
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+        assert torch.allclose(polarization_axis[:, 2],
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+        assert torch.allclose(torch.sum(boresight*polarization_axis, dim=-1),
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+
+        device_normal = torch.tensor([0.0, 0.0, 1.0],
+                                     dtype=dtype,
+                                     device=device)
+        expected_polarization_axis = torch.linalg.cross(
+            boresight, device_normal.expand_as(boresight), dim=-1
+        )
+        expected_polarization_axis = expected_polarization_axis \
+            / torch.linalg.norm(expected_polarization_axis,
+                                dim=-1,
+                                keepdim=True)
+        assert torch.allclose(polarization_axis,
+                              expected_polarization_axis,
+                              atol=1e-6)
+
+    def test_dual_cross_polarization_axes_match_spec(self, device, precision):
+        """Test Clause 7.3 dual-field 45 degree polarization rotation."""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=15e9,
+            polarization="dual",
+            polarization_type="cross",
+            antenna_locations="tr38901",
+            precision=precision,
+            device=device,
+        )
+
+        boresight = array.port_basis[:8, :, 0]
+        pol1 = -array.port_basis[:8, :, 2]
+        pol2 = array.port_basis[8:, :, 1]
+        single_pol = torch.linalg.cross(
+            boresight,
+            torch.tensor([0.0, 0.0, 1.0],
+                         dtype=dtype,
+                         device=device).expand_as(boresight),
+            dim=-1,
+        )
+        single_pol = single_pol / torch.linalg.norm(
+            single_pol, dim=-1, keepdim=True
+        )
+        orthogonal_pol = torch.linalg.cross(boresight, single_pol, dim=-1)
+
+        expected_projection = torch.full([8],
+                                         1/np.sqrt(2),
+                                         dtype=dtype,
+                                         device=device)
+        assert torch.allclose(torch.sum(pol1*single_pol, dim=-1),
+                              expected_projection,
+                              atol=1e-6)
+        assert torch.allclose(torch.sum(pol1*orthogonal_pol, dim=-1),
+                              expected_projection,
+                              atol=1e-6)
+        assert torch.allclose(torch.sum(pol1*pol2, dim=-1),
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+        assert torch.allclose(torch.sum(pol2*boresight, dim=-1),
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+
+    def test_dual_vh_polarization_axes_are_orthogonal(self, device, precision):
+        """Test VH ports use orthogonal local field components."""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=15e9,
+            polarization="dual",
+            polarization_type="VH",
+            antenna_locations="tr38901",
+            precision=precision,
+            device=device,
+        )
+
+        boresight = array.port_basis[:8, :, 0]
+        pol1 = -array.port_basis[:8, :, 2]
+        pol2 = array.port_basis[8:, :, 1]
+        assert torch.allclose(torch.sum(pol1*pol2, dim=-1),
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+        assert torch.allclose(torch.sum(pol2*boresight, dim=-1),
+                              torch.zeros(8, dtype=dtype, device=device),
+                              atol=1e-6)
+
+    def test_device_size_uses_depth_and_width(self, device, precision):
+        """Test the handheld device dimensions follow TR 38.901 axes."""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations=(2,),
+            device_depth=0.2,
+            device_width=0.1,
+            precision=precision,
+            device=device,
+        )
+
+        expected = torch.tensor([[0.0, -0.05, 0.0]],
+                                dtype=dtype,
+                                device=device)
+        assert torch.allclose(array.device_size,
+                              torch.tensor([0.2, 0.1],
+                                           dtype=dtype,
+                                           device=device))
+        assert torch.allclose(array.ant_pos, expected, atol=1e-7)
+
+    def test_element_field_has_table_power_at_candidate_boresight(self, device, precision):
+        """Test per-candidate field rotation and Table 7.3-2 gain"""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations=(6,),
+            precision=precision,
+            device=device,
+        )
+
+        theta = torch.tensor([PI/2], dtype=dtype, device=device)
+        phi = torch.tensor([PI/2], dtype=dtype, device=device)
+        field = array.element_field(theta, phi)
+        power = torch.sum(field**2, dim=-1)
+        expected = torch.tensor(10**(5.3/10), dtype=dtype, device=device)
+
+        assert field.shape == (1, 1, 2)
+        assert torch.allclose(power.squeeze(), expected, rtol=1e-5)
+
+    def test_element_field_applies_port_power_offsets(self, device, precision):
+        """Test optional antenna-imbalance attenuation"""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations=(6,),
+            port_power_offsets_db=[3.0],
+            precision=precision,
+            device=device,
+        )
+
+        theta = torch.tensor([PI/2], dtype=dtype, device=device)
+        phi = torch.tensor([PI/2], dtype=dtype, device=device)
+        field = array.element_field(theta, phi)
+        power = torch.sum(field**2, dim=-1)
+        expected = torch.tensor(10**((5.3 - 3.0)/10),
+                                dtype=dtype,
+                                device=device)
+
+        assert torch.allclose(power.squeeze(), expected, rtol=1e-5)
+
+    def test_channel_coefficients_use_handheld_element_fields(self, device, precision):
+        """Test that channel coefficients accept per-port handheld fields"""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        tx_array = Antenna(
+            polarization="single",
+            polarization_type="H",
+            antenna_pattern="omni",
+            carrier_frequency=7e9,
+            precision=precision,
+            device=device,
+        )
+        rx_array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations=(6,),
+            precision=precision,
+            device=device,
+        )
+        gen = ChannelCoefficientsGenerator(
+            carrier_frequency=7e9,
+            tx_array=tx_array,
+            rx_array=rx_array,
+            subclustering=False,
+            precision=precision,
+            device=device,
+        )
+
+        zeros = torch.zeros([1, 1, 3], dtype=dtype, device=device)
+        link = torch.zeros([1, 1, 1], dtype=dtype, device=device)
+        topology = Topology(
+            velocities=zeros,
+            moving_end="rx",
+            los_aoa=link,
+            los_aod=link,
+            los_zoa=link,
+            los_zod=link,
+            los=torch.ones([1, 1, 1], dtype=torch.bool, device=device),
+            distance_3d=torch.ones([1, 1, 1], dtype=dtype, device=device),
+            tx_orientations=zeros,
+            rx_orientations=zeros,
+        )
+
+        aoa = torch.tensor([[[[[PI/2]]]]], dtype=dtype, device=device)
+        aod = torch.tensor([[[[[0.0]]]]], dtype=dtype, device=device)
+        zoa = torch.tensor([[[[[PI/2]]]]], dtype=dtype, device=device)
+        zod = torch.tensor([[[[[PI/2]]]]], dtype=dtype, device=device)
+        h_phase = torch.eye(2, dtype=dtypes[precision]["torch"]["cdtype"],
+                            device=device).reshape(1, 1, 1, 1, 1, 2, 2)
+
+        h_field = gen._step_11_field_matrix(
+            topology, aoa, aod, zoa, zod, h_phase
+        )
+
+        assert h_field.shape == (1, 1, 1, 1, 1, 1, 1)
+        assert torch.abs(h_field).squeeze() > 0.0
+
+    def test_channel_coefficients_rotate_handheld_ut_orientation(
+        self, device, precision
+    ):
+        """Test UT orientation rotates handheld positions and field response."""
+        dtype = dtypes[precision]["torch"]["dtype"]
+        cdtype = dtypes[precision]["torch"]["cdtype"]
+        tx_array = Antenna(
+            polarization="single",
+            polarization_type="H",
+            antenna_pattern="omni",
+            carrier_frequency=7e9,
+            precision=precision,
+            device=device,
+        )
+        rx_array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations=(6,),
+            precision=precision,
+            device=device,
+        )
+        gen = ChannelCoefficientsGenerator(
+            carrier_frequency=7e9,
+            tx_array=tx_array,
+            rx_array=rx_array,
+            subclustering=False,
+            precision=precision,
+            device=device,
+        )
+
+        zeros = torch.zeros([1, 1, 3], dtype=dtype, device=device)
+        link = torch.zeros([1, 1, 1], dtype=dtype, device=device)
+
+        def topology(rx_orientations):
+            return Topology(
+                velocities=zeros,
+                moving_end="rx",
+                los_aoa=link,
+                los_aod=link,
+                los_zoa=link,
+                los_zod=link,
+                los=torch.ones([1, 1, 1], dtype=torch.bool, device=device),
+                distance_3d=torch.ones([1, 1, 1],
+                                       dtype=dtype,
+                                       device=device),
+                tx_orientations=zeros,
+                rx_orientations=rx_orientations,
+            )
+
+        yaw_90 = torch.tensor([[[PI/2, 0.0, 0.0]]],
+                              dtype=dtype,
+                              device=device)
+        rx_pos = gen._step_11_get_rx_antenna_positions(topology(yaw_90))
+        expected_pos = torch.tensor([[[[-0.035, 0.0, 0.0]]]],
+                                    dtype=dtype,
+                                    device=device)
+        assert torch.allclose(rx_pos, expected_pos, atol=1e-6)
+
+        aod = torch.tensor([[[[[0.0]]]]], dtype=dtype, device=device)
+        zod = torch.tensor([[[[[PI/2]]]]], dtype=dtype, device=device)
+        h_phase = torch.eye(2, dtype=cdtype, device=device)
+        h_phase = h_phase.reshape(1, 1, 1, 1, 1, 2, 2)
+
+        def field(rx_orientations, aoa, zoa):
+            aoa = torch.tensor([[[[[aoa]]]]], dtype=dtype, device=device)
+            zoa = torch.tensor([[[[[zoa]]]]], dtype=dtype, device=device)
+            return gen._step_11_field_matrix(
+                topology(rx_orientations), aoa, aod, zoa, zod, h_phase
+            )
+
+        reference = field(zeros, PI/2, PI/2)
+        rotated = field(yaw_90, PI, PI/2)
+        off_boresight = field(yaw_90, PI/2, PI/2)
+
+        assert torch.allclose(rotated, reference, rtol=1e-5, atol=1e-6)
+        assert torch.abs(rotated).squeeze() > torch.abs(off_boresight).squeeze()
+
+    def test_show_methods(self, device, precision):
+        """Test handheld array visualization helpers."""
+        array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="dual",
+            antenna_locations="tr38901-4",
+            precision=precision,
+            device=device,
+        )
+
+        plt.close("all")
+        array.show()
+        assert len(plt.get_fignums()) == 1
+        ax = plt.gcf().axes[0]
+        assert ax.get_title() == "Handheld UT Array"
+        assert ax.get_xlabel() == "y (m)"
+        assert ax.get_ylabel() == "x (m)"
+
+        plt.close("all")
+        array.show_element_radiation_pattern()
+        assert len(plt.get_fignums()) == 3
+        plt.close("all")
+
+    def test_system_level_channel_accepts_handheld_ut_array(self, device, precision):
+        """Test handheld arrays can be passed to system-level models."""
+        bs_array = PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=7e9,
+            precision=precision,
+            device=device,
+        )
+        ut_array = HandheldUTArray(
+            carrier_frequency=7e9,
+            polarization="single",
+            antenna_locations=(6,),
+            precision=precision,
+            device=device,
+        )
+
+        channel = UMi(
+            carrier_frequency=7e9,
+            o2i_model="low",
+            ut_array=ut_array,
+            bs_array=bs_array,
+            direction="downlink",
+            precision=precision,
+            device=device,
+        )
+
+        assert channel._scenario.ut_array is ut_array
+        assert channel._scenario.spec_version == "19.2"
 
 
 class TestAntennaPanel:
@@ -168,6 +658,28 @@ class TestAntennaPanel:
 
 class TestPanelArray:
     """Tests for the PanelArray class"""
+
+    def test_invalid_polarization_type_preserves_context(self, device):
+        """Validation errors identify the selected polarization mode."""
+        kwargs = {
+            "num_rows_per_panel": 1,
+            "num_cols_per_panel": 1,
+            "antenna_pattern": "omni",
+            "carrier_frequency": 3.5e9,
+            "device": device,
+        }
+        with pytest.raises(ValueError, match="single polarization"):
+            PanelArray(
+                polarization="single",
+                polarization_type="cross",
+                **kwargs,
+            )
+        with pytest.raises(ValueError, match="dual polarization"):
+            PanelArray(
+                polarization="dual",
+                polarization_type="V",
+                **kwargs,
+            )
 
     def test_num_antennas_single_panel_single_pol(self, device, precision):
         """Test total antenna count for single panel, single polarization"""
@@ -481,4 +993,3 @@ class TestAntennaArray:
         )
 
         assert isinstance(array, PanelArray)
-

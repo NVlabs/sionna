@@ -7,14 +7,20 @@
 import pytest
 import numpy as np
 import torch
+from scipy.special import jv
 
+from sionna.phy import PI, SPEED_OF_LIGHT, config
+from sionna.phy.object import Object
 from sionna.phy.ofdm import (
     ResourceGrid,
     ResourceGridMapper,
+    BaseChannelEstimator,
+    BasePilotChannelEstimator,
     LSChannelEstimator,
+    BaseChannelInterpolator,
     NearestNeighborInterpolator,
     LinearInterpolator,
-    LMMSEInterpolator,
+    LMMSEChannelEstimator,
     PilotPattern,
     KroneckerPilotPattern,
     tdl_freq_cov_mat,
@@ -27,10 +33,11 @@ from sionna.phy.channel import (
     exp_corr_mat,
     gen_single_sector_topology,
 )
-from sionna.phy.channel.tr38901 import PanelArray, UMi, TDL
+from sionna.phy.channel.tr38901 import PanelArray, UMi, TDL, models
 from sionna.phy.mimo import StreamManagement
 from sionna.phy.mapping import QAMSource
 from sionna.phy.utils import complex_normal, ebnodb2no
+from sionna.phy.ofdm.channel_estimation import _PilotGroupMixin
 
 
 # ============================================================================
@@ -249,6 +256,137 @@ def resource_grid(device, precision):
         device=device,
     )
 
+# ============================================================================
+# BaseChannelEstimator shape test
+# ============================================================================
+
+class _FullGridChannelEstimator(BaseChannelEstimator):
+    def call(self, y, no):
+        err_var = torch.ones(
+            (*y.shape[:3], *self._pilot_pattern.mask.shape),
+            device=self.device, dtype=y.real.dtype
+        )
+        h_hat = torch.zeros(
+            (*y.shape[:3], *self._pilot_pattern.mask.shape),
+            device=self.device, dtype=y.dtype
+        )
+        return h_hat, err_var
+
+class TestBaseChannelEstimator:
+
+    def test_output_shape(self, device, precision, resource_grid):
+        estimator = _FullGridChannelEstimator(
+            resource_grid=resource_grid,
+            precision=precision,
+            device=device,
+        )
+
+        batch_size = 4
+        num_rx = 1
+        num_rx_ant = 4
+        num_ofdm_symbols = resource_grid.num_ofdm_symbols
+        fft_size = resource_grid.fft_size
+        num_tx = resource_grid.num_tx
+        num_streams_per_tx = resource_grid.num_streams_per_tx
+        num_effective_subcarriers = resource_grid.num_effective_subcarriers
+
+        y = complex_normal(
+            (batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size),
+            precision=precision,
+            device=device,
+        )
+        no = torch.ones(1, device=device) * 0.1
+
+        h_hat, err_var = estimator(y, no)
+
+        expected_shape = (
+            batch_size,
+            num_rx,
+            num_rx_ant,
+            num_tx,
+            num_streams_per_tx,
+            num_ofdm_symbols,
+            num_effective_subcarriers,
+        )
+        assert h_hat.shape == expected_shape
+        assert err_var.shape == expected_shape
+
+# ============================================================================
+# BasePilotChannelEstimator shape tests
+# ============================================================================
+
+class _RecordingPilotChannelEstimator(BasePilotChannelEstimator):
+    def estimate_at_pilot_locations(self, y_pilots, no):
+        self._y_pilots = y_pilots.detach().clone()
+        self._no = no.detach().clone()
+
+        h_hat = torch.zeros_like(y_pilots)
+        err_var = torch.zeros_like(y_pilots, dtype=no.dtype)
+        return h_hat, err_var
+
+class _RecordingInterpolator(BaseChannelInterpolator):
+
+    def __init__(self, num_ofdm_symbols, num_effective_subcarriers):
+        self._was_called = False
+        self._num_ofdm_symbols = num_ofdm_symbols
+        self._num_effective_subcarriers = num_effective_subcarriers
+
+    def __call__(self, h_hat, err_var):
+        self._was_called = True
+
+        h_est = torch.zeros(
+            (*h_hat.shape[:-1], self._num_ofdm_symbols, self._num_effective_subcarriers),
+            device=h_hat.device, dtype=h_hat.dtype
+        )
+        err_var_est = torch.zeros_like(h_est, device=err_var.device, dtype=err_var.dtype)
+
+        return h_est, err_var_est
+
+class TestBasePilotChannelEstimator:
+    def test_output_shape(self, device, precision, resource_grid):
+        interpolator = _RecordingInterpolator(
+            resource_grid.num_ofdm_symbols,
+            resource_grid.num_effective_subcarriers
+        )
+        estimator = _RecordingPilotChannelEstimator(
+            resource_grid=resource_grid,
+            interpolator=interpolator,
+            precision=precision,
+            device=device,
+        )
+
+        batch_size = 4
+        num_rx = 1
+        num_rx_ant = 4
+        num_ofdm_symbols = resource_grid.num_ofdm_symbols
+        fft_size = resource_grid.fft_size
+        num_tx = resource_grid.num_tx
+        num_streams_per_tx = resource_grid.num_streams_per_tx
+        num_effective_subcarriers = resource_grid.num_effective_subcarriers
+
+        y = complex_normal(
+            (batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size),
+            precision=precision,
+            device=device,
+        )
+        no = torch.ones(1, device=device) * 0.1
+
+        h_hat, err_var = estimator(y, no)
+
+        expected_shape = (
+            batch_size,
+            num_rx,
+            num_rx_ant,
+            num_tx,
+            num_streams_per_tx,
+            num_ofdm_symbols,
+            num_effective_subcarriers,
+        )
+        assert h_hat.shape == expected_shape
+        assert err_var.shape == expected_shape
+        assert estimator._y_pilots.shape == (batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, resource_grid.pilot_pattern.num_pilot_symbols)
+        assert interpolator._was_called
+
 
 # ============================================================================
 # LSChannelEstimator shape tests
@@ -297,33 +435,6 @@ class TestLSChannelEstimator:
         assert h_hat.shape == expected_shape
         assert err_var.shape == expected_shape
 
-    def test_no_interpolation(self, device, precision, resource_grid):
-        """Test LSChannelEstimator with no interpolation."""
-        estimator = LSChannelEstimator(
-            resource_grid=resource_grid,
-            interpolation_type=None,
-            precision=precision,
-            device=device,
-        )
-
-        batch_size = 4
-        num_rx = 1
-        num_rx_ant = 4
-        num_ofdm_symbols = resource_grid.num_ofdm_symbols
-        fft_size = resource_grid.fft_size
-        num_pilot_symbols = resource_grid.pilot_pattern.num_pilot_symbols
-
-        y = complex_normal(
-            (batch_size, num_rx, num_rx_ant, num_ofdm_symbols, fft_size),
-            precision=precision,
-            device=device,
-        )
-        no = torch.ones(1, device=device) * 0.1
-
-        h_hat, err_var = estimator(y, no)
-
-        # Without interpolation, output is at pilot locations only
-        assert h_hat.shape[-1] == num_pilot_symbols
 
     def test_error_variance_positive(self, device, precision, resource_grid):
         """Test that error variance is non-negative."""
@@ -553,6 +664,70 @@ class TestNearestNeighborInterpolator:
         assert h_hat.shape == expected_shape
         assert err_var.shape == expected_shape
 
+    def test_time_averaging_uses_pilot_bearing_symbols(self, device, precision):
+        """Time averaging equally weights frequency-interpolated pilot symbols."""
+        mask = torch.zeros(
+            1,
+            1,
+            7,
+            5,
+            dtype=torch.bool,
+            device=device,
+        )
+        mask[0, 0, 0, [0, 4]] = True
+        mask[0, 0, 2, [1, 3]] = True
+        pilots = torch.ones(
+            1,
+            1,
+            4,
+            dtype=torch.complex64 if precision == "single" else torch.complex128,
+            device=device,
+        )
+        pilot_pattern = PilotPattern(
+            mask,
+            pilots,
+            precision=precision,
+            device=device,
+        )
+        interpolator = NearestNeighborInterpolator(
+            pilot_pattern,
+            time_avg=True,
+        )
+
+        channel_at_pilots = torch.tensor(
+            [1.0, 5.0, 10.0, 14.0],
+            dtype=pilots.dtype,
+            device=device,
+        ).reshape(1, 1, 1, 1, 1, 4)
+        variance_at_pilots = torch.tensor(
+            [2.0, 2.0, 6.0, 6.0],
+            dtype=pilots.real.dtype,
+            device=device,
+        ).reshape(1, 1, 1, 1, 1, 4)
+
+        channel_estimate, error_variance = interpolator(
+            channel_at_pilots,
+            variance_at_pilots,
+        )
+
+        expected_frequency_estimate = torch.tensor(
+            [5.5, 5.5, 5.5, 9.5, 9.5],
+            dtype=pilots.dtype,
+            device=device,
+        )
+        expected_channel = expected_frequency_estimate.reshape(
+            1, 1, 1, 1, 1, 1, 5
+        ).expand(1, 1, 1, 1, 1, 7, 5)
+        expected_variance = torch.full(
+            (1, 1, 1, 1, 1, 7, 5),
+            4.0,
+            dtype=pilots.real.dtype,
+            device=device,
+        )
+
+        torch.testing.assert_close(channel_estimate, expected_channel)
+        torch.testing.assert_close(error_variance, expected_variance)
+
 
 class TestLinearInterpolator:
     """Tests for LinearInterpolator class."""
@@ -623,6 +798,39 @@ class TestLinearInterpolator:
 
 class TestTDLCovarianceMatrices:
     """Tests for TDL covariance matrix functions."""
+
+    def test_defaults_follow_config(self, precision, device):
+        """Default covariance dtype and device follow the global configuration."""
+        config.precision = precision
+        expected_dtype = (
+            torch.complex64 if precision == "single" else torch.complex128
+        )
+
+        freq_cov = tdl_freq_cov_mat("A", 30e3, 8, 100e-9)
+        time_cov = tdl_time_cov_mat("A", 3.0, 3.5e9, 35.7e-6, 8)
+
+        for cov_mat in (freq_cov, time_cov):
+            assert cov_mat.dtype == expected_dtype
+            assert cov_mat.device == torch.device(device)
+
+    def test_parameter_resolver_is_used(self, monkeypatch):
+        """Test both covariance helpers use the versioned TDL resolver."""
+        resolved_files = []
+        parameter_file = models.parameter_file
+
+        def tracked_parameter_file(filename, spec_version="19.2"):
+            resolved_files.append((filename, spec_version))
+            return parameter_file(filename, spec_version)
+
+        monkeypatch.setattr(models, "parameter_file", tracked_parameter_file)
+
+        tdl_freq_cov_mat("A", 30e3, 8, 100e-9)
+        tdl_time_cov_mat("A", 3.0, 3.5e9, 35.7e-6, 8)
+
+        assert resolved_files == [
+            ("TDL-A.json", "19.2"),
+            ("TDL-A.json", "19.2"),
+        ]
 
     @pytest.mark.parametrize("model", ["A", "B", "C", "D", "E"])
     def test_tdl_freq_cov_mat_shape(self, precision, model):
@@ -708,6 +916,37 @@ class TestTDLCovarianceMatrices:
         diag = torch.diag(cov_mat)
         assert torch.allclose(diag.real, torch.ones_like(diag.real), atol=atol)
 
+    @pytest.mark.parametrize("model", ["D", "E"])
+    def test_tdl_time_cov_mat_default_los_doppler_peak(self, precision, model):
+        """Test LoS covariance uses the default TR 38.901 0.7 Doppler peak."""
+        speed = 10.0
+        carrier_frequency = 3.5e9
+        ofdm_symbol_duration = 1e-3
+        cov_mat = tdl_time_cov_mat(
+            model,
+            speed,
+            carrier_frequency,
+            ofdm_symbol_duration,
+            2,
+            precision=precision,
+        )
+
+        params = models.load_json(models.parameter_file(f"TDL-{model}.json"))
+        powers = np.power(10.0, np.asarray(params["powers"]) / 10.0)
+        powers /= powers.sum()
+        doppler = 2.0 * PI * speed / SPEED_OF_LIGHT * carrier_frequency
+        argument = doppler * ofdm_symbol_duration
+        expected = (
+            powers[1:].sum() * jv(0.0, argument)
+            + powers[0] * np.exp(1j * argument * 0.7)
+        )
+        expected = torch.tensor(
+            expected, dtype=cov_mat.dtype, device=cov_mat.device
+        )
+        atol = 1e-5 if precision == "single" else 1e-12
+
+        torch.testing.assert_close(cov_mat[1, 0], expected, atol=atol, rtol=atol)
+
 
 # ============================================================================
 # Compilation tests
@@ -753,7 +992,7 @@ class TestChannelEstimatorCompilation:
         assert torch.allclose(err_var_compiled, err_var_orig, atol=1e-4)
 
     def test_lmmse_estimator_compiles(self, device, precision):
-        """Test that LSChannelEstimator with LMMSE interpolator can be compiled."""
+        """Test that LMMSEChannelEstimator can be compiled."""
         rg = ResourceGrid(
             num_ofdm_symbols=14,
             fft_size=32,
@@ -769,10 +1008,11 @@ class TestChannelEstimatorCompilation:
         cov_freq = tdl_freq_cov_mat("A", 30e3, 32, 100e-9, precision)
         cov_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        lmmse_inter = LMMSEInterpolator(rg.pilot_pattern, cov_time, cov_freq, order="f-t")
-        estimator = LSChannelEstimator(
+        estimator = LMMSEChannelEstimator(
             resource_grid=rg,
-            interpolator=lmmse_inter,
+            cov_mat_time=cov_time,
+            cov_mat_freq=cov_freq,
+            order="f-t",
             precision=precision,
             device=device,
         )
@@ -893,11 +1133,11 @@ class TestMultiplePilotPatterns:
 
 
 # ============================================================================
-# LMMSE Interpolator tests
+# LMMSE Channel Estimator tests
 # ============================================================================
 
-class TestLMMSEInterpolator:
-    """Tests for LMMSEInterpolator class."""
+class TestLMMSEChannelEstimator:
+    """Tests for LMMSEChannelEstimator class."""
 
     # Batch size for the tests
     BATCH_SIZE = 1
@@ -1140,7 +1380,7 @@ class TestLMMSEInterpolator:
     # ========================================================================
 
     def test_output_shape(self, device, precision):
-        """Test that LSChannelEstimator with LMMSEInterpolator produces correct output shape."""
+        """Test that LMMSEChannelEstimator produces correct output shape."""
         rg = ResourceGrid(
             num_ofdm_symbols=14,
             fft_size=64,
@@ -1153,16 +1393,14 @@ class TestLMMSEInterpolator:
             device=device,
         )
 
-        cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 64, 100e-9, precision)
+        cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 64, 100e-9, precision=precision)
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        interpolator = LMMSEInterpolator(
-            rg.pilot_pattern, cov_mat_time, cov_mat_freq, order="f-t"
-        )
-
-        estimator = LSChannelEstimator(
+        estimator = LMMSEChannelEstimator(
             resource_grid=rg,
-            interpolator=interpolator,
+            cov_mat_time=cov_mat_time,
+            cov_mat_freq=cov_mat_freq,
+            order="f-t",
             precision=precision,
             device=device,
         )
@@ -1197,9 +1435,68 @@ class TestLMMSEInterpolator:
         assert h_hat.shape == expected_shape
         assert err_var.shape == expected_shape
 
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA is unavailable")
+    @pytest.mark.parametrize(
+        ("config_device", "explicit_device"),
+        [
+            ("cpu", "cuda:0"),
+            ("cuda:0", "cpu"),
+        ],
+    )
+    def test_explicit_device_overrides_config_device(
+        self,
+        monkeypatch,
+        config_device,
+        explicit_device,
+    ):
+        """Test that explicit device and precision propagate to nested filters."""
+        monkeypatch.setattr(config, "device", config_device)
+        device = explicit_device
+        precision = "double"
+
+        resource_grid = ResourceGrid(
+            num_ofdm_symbols=4,
+            fft_size=8,
+            subcarrier_spacing=30e3,
+            num_tx=1,
+            num_streams_per_tx=1,
+            pilot_pattern="kronecker",
+            pilot_ofdm_symbol_indices=[1, 3],
+            precision=precision,
+            device=device,
+        )
+        cov_mat_freq = tdl_freq_cov_mat(
+            "A", 30e3, 8, 100e-9, precision=precision
+        )
+        cov_mat_time = tdl_time_cov_mat(
+            "A", 3.0, 3.5e9, 35.7e-6, 4, precision=precision
+        )
+        estimator = LMMSEChannelEstimator(
+            resource_grid,
+            cov_mat_time,
+            cov_mat_freq,
+            order="f-t",
+            precision=precision,
+            device=device,
+        )
+
+        y = complex_normal(
+            (2, 1, 1, 4, 8),
+            precision=precision,
+            device=device,
+        )
+        no = torch.tensor(0.1, dtype=torch.float64, device=device)
+
+        h_hat, err_var = estimator(y, no)
+
+        assert h_hat.device == torch.device(device)
+        assert err_var.device == torch.device(device)
+        assert h_hat.dtype == torch.complex128
+        assert err_var.dtype == torch.float64
+
     @pytest.mark.parametrize("order", ["f-t", "t-f"])
     def test_output_valid(self, device, precision, order):
-        """Test that LSChannelEstimator with LMMSEInterpolator produces valid (non-NaN) output."""
+        """Test that LMMSEChannelEstimator produces valid (non-NaN) output."""
         rg = ResourceGrid(
             num_ofdm_symbols=14,
             fft_size=64,
@@ -1212,16 +1509,14 @@ class TestLMMSEInterpolator:
             device=device,
         )
 
-        cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 64, 100e-9, precision)
+        cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 64, 100e-9, precision=precision)
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        interpolator = LMMSEInterpolator(
-            rg.pilot_pattern, cov_mat_time, cov_mat_freq, order=order
-        )
-
-        estimator = LSChannelEstimator(
+        estimator = LMMSEChannelEstimator(
             resource_grid=rg,
-            interpolator=interpolator,
+            cov_mat_time=cov_mat_time,
+            cov_mat_freq=cov_mat_freq,
+            order=order,
             precision=precision,
             device=device,
         )
@@ -1246,7 +1541,7 @@ class TestLMMSEInterpolator:
         assert (err_var >= 0).all()
 
     def test_with_spatial_smoothing(self, device, precision):
-        """Test LSChannelEstimator with LMMSEInterpolator including spatial smoothing."""
+        """Test LMMSEChannelEstimator including spatial smoothing."""
         num_rx_ant = 4
         rg = ResourceGrid(
             num_ofdm_symbols=14,
@@ -1264,13 +1559,12 @@ class TestLMMSEInterpolator:
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
         cov_mat_space = exp_corr_mat(0.9, num_rx_ant, precision=precision)
 
-        interpolator = LMMSEInterpolator(
-            rg.pilot_pattern, cov_mat_time, cov_mat_freq, cov_mat_space, order="t-s-f"
-        )
-
-        estimator = LSChannelEstimator(
+        estimator = LMMSEChannelEstimator(
             resource_grid=rg,
-            interpolator=interpolator,
+            cov_mat_time=cov_mat_time,
+            cov_mat_freq=cov_mat_freq,
+            cov_mat_space=cov_mat_space,
+            order="t-s-f",
             precision=precision,
             device=device,
         )
@@ -1313,8 +1607,8 @@ class TestLMMSEInterpolator:
         cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 12, 100e-9, precision)
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, order="hello")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="hello")
 
     def test_order_validation_double_dash(self, precision):
         """Test that double dashes in order raise an error."""
@@ -1332,8 +1626,8 @@ class TestLMMSEInterpolator:
         cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 12, 100e-9, precision)
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, order="f--t")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="f--t")
 
     def test_order_validation_duplicate_dims(self, precision):
         """Test that duplicate dimensions in order raise an error."""
@@ -1351,11 +1645,11 @@ class TestLMMSEInterpolator:
         cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 12, 100e-9, precision)
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, order="f-f-t")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="f-f-t")
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, order="f-t-t")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="f-t-t")
 
     def test_order_validation_missing_dims(self, precision):
         """Test that missing time or frequency dimensions raise an error."""
@@ -1375,11 +1669,11 @@ class TestLMMSEInterpolator:
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
         cov_mat_space = exp_corr_mat(0.9, num_rx_ant, precision=precision)
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, cov_mat_space, order="f-s")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, cov_mat_space, order="f-s")
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, cov_mat_space, order="s-t")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, cov_mat_space, order="s-t")
 
     def test_order_validation_spatial_without_cov_mat(self, precision):
         """Test that spatial smoothing without spatial covariance matrix raises an error."""
@@ -1397,8 +1691,8 @@ class TestLMMSEInterpolator:
         cov_mat_freq = tdl_freq_cov_mat("A", 30e3, 12, 100e-9, precision)
         cov_mat_time = tdl_time_cov_mat("A", 10.0, 3.5e9, 35.7e-6, 14, precision=precision)
 
-        with pytest.raises(AssertionError):
-            LMMSEInterpolator(rg.pilot_pattern, cov_mat_time, cov_mat_freq, order="f-t-s")
+        with pytest.raises(ValueError):
+            LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="f-t-s")
 
     # ========================================================================
     # E2E tests against reference implementation
@@ -1451,18 +1745,16 @@ class TestLMMSEInterpolator:
         )
         cov_mat_space = exp_corr_mat(0.9, num_rx_ant, precision=precision)
 
-        lmmse_inter_ft = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, order="f-t")
-        ls_est_lmmse_ft = LSChannelEstimator(rg, interpolator=lmmse_inter_ft, precision=precision, device=device)
+        lmmse_est_ft = LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="f-t", precision=precision, device=device)
 
-        lmmse_inter_tf = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, order="t-f")
-        ls_est_lmmse_tf = LSChannelEstimator(rg, interpolator=lmmse_inter_tf, precision=precision, device=device)
 
-        lmmse_inter_tsf = LMMSEInterpolator(pilot_pattern, cov_mat_time, cov_mat_freq, cov_mat_space, order="t-s-f")
-        ls_est_lmmse_tsf = LSChannelEstimator(rg, interpolator=lmmse_inter_tsf, precision=precision, device=device)
+        lmmse_est_tf = LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, order="t-f", precision=precision, device=device)
 
-        ls_no_interp = LSChannelEstimator(rg, interpolation_type=None, precision=precision, device=device)
+        lmmse_est_tsf = LMMSEChannelEstimator(rg, cov_mat_time, cov_mat_freq, cov_mat_space, order="t-s-f", precision=precision, device=device)
 
-        no = ebnodb2no(ebno_db, num_bits_per_symbol, coderate=1.0)
+        ls_estimator = LSChannelEstimator(rg, precision=precision, device=device)
+
+        no = ebnodb2no(ebno_db, num_bits_per_symbol, coderate=1.0, device=device)
         x = qam_source([batch_size, num_tx, num_streams_per_tx, rg.num_data_symbols])
         x_rg = rg_mapper(x)
 
@@ -1470,10 +1762,11 @@ class TestLMMSEInterpolator:
         h_freq = cir_to_ofdm_channel(frequencies, a, tau, normalize=True)
         y = channel_freq(x_rg, h_freq, no)
 
-        h_hat_lmmse_ft, err_var_lmmse_ft = ls_est_lmmse_ft(y, no)
-        h_hat_lmmse_tf, err_var_lmmse_tf = ls_est_lmmse_tf(y, no)
-        h_hat_lmmse_tsf, err_var_lmmse_tsf = ls_est_lmmse_tsf(y, no)
-        h_hat_no_int, err_var_no_int = ls_no_interp(y, no)
+        h_hat_lmmse_ft, err_var_lmmse_ft = lmmse_est_ft(y, no)
+        h_hat_lmmse_tf, err_var_lmmse_tf = lmmse_est_tf(y, no)
+        h_hat_lmmse_tsf, err_var_lmmse_tsf = lmmse_est_tsf(y, no)
+        y_pilots = ls_estimator._extract_pilots(y)
+        h_hat_no_int, err_var_no_int = ls_estimator.estimate_at_pilot_locations(y_pilots, no)
 
         # Convert to numpy
         h_hat_no_int_np = h_hat_no_int.cpu().numpy()
@@ -1701,4 +1994,229 @@ class TestLMMSEInterpolator:
         self._run_lmmse_e2e_test(
             1, 1, num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size,
             pilot_pattern.mask.cpu().numpy(), pilot_pattern.pilots.cpu().numpy(), precision
+        )
+
+class _PilotGroupUser(_PilotGroupMixin, Object):
+    """Minimal Sionna object exercising only PilotGroupMixin."""
+
+    def __init__(self, pilot_pattern, group_over, device):
+        super().__init__(device=device)
+        self._init_pilot_groups(
+            pilot_pattern=pilot_pattern,
+            group_over=group_over,
+        )
+
+class TestPilotGroupMixin:
+    """Tests for pilot grouping, coordinate access, and gather/scatter."""
+
+    @staticmethod
+    def _resource_grid(
+        *,
+        fft_size,
+        num_ofdm_symbols,
+        pilot_symbols,
+        num_tx,
+        num_streams,
+        device,
+    ):
+        return ResourceGrid(
+            num_ofdm_symbols=num_ofdm_symbols,
+            fft_size=fft_size,
+            subcarrier_spacing=30e3,
+            num_tx=num_tx,
+            num_streams_per_tx=num_streams,
+            pilot_pattern="kronecker",
+            pilot_ofdm_symbol_indices=list(pilot_symbols),
+            device=device,
+        )
+
+    @pytest.mark.parametrize(
+        "fft_size,num_symbols,pilot_symbols,num_tx,num_streams",
+        [
+            (12, 7, (1, 5), 2, 1),
+            (16, 9, (0, 4, 8), 2, 2),
+        ],
+    )
+    def test_subcarrier_groups_have_expected_coordinates(
+        self, device, fft_size, num_symbols, pilot_symbols, num_tx, num_streams
+    ):
+        """Subcarrier groups follow deterministic TX-stream-symbol ordering."""
+        grid = TestPilotGroupMixin._resource_grid(
+            fft_size=fft_size,
+            num_ofdm_symbols=num_symbols,
+            pilot_symbols=pilot_symbols,
+            num_tx=num_tx,
+            num_streams=num_streams,
+            device=device,
+        )
+        user = _PilotGroupUser(
+            grid.pilot_pattern, ("subcarrier",), device
+        )
+
+        expected_tx = []
+        expected_stream = []
+        expected_symbol = []
+        expected_subcarriers = []
+        num_sequences = num_tx * num_streams
+
+        for tx_index in range(num_tx):
+            for stream_index in range(num_streams):
+                sequence_index = tx_index * num_streams + stream_index
+                for symbol_index in pilot_symbols:
+                    expected_tx.append(tx_index)
+                    expected_stream.append(stream_index)
+                    expected_symbol.append(symbol_index)
+                    expected_subcarriers.append(
+                        torch.arange(
+                            sequence_index,
+                            fft_size,
+                            num_sequences,
+                            device=device,
+                        )
+                    )
+
+        torch.testing.assert_close(
+            user._pilot_group_constant_coord("tx"),
+            torch.tensor(expected_tx, device=device),
+        )
+        torch.testing.assert_close(
+            user._pilot_group_constant_coord("stream"),
+            torch.tensor(expected_stream, device=device),
+        )
+        torch.testing.assert_close(
+            user._pilot_group_constant_coord("symbol"),
+            torch.tensor(expected_symbol, device=device),
+        )
+        torch.testing.assert_close(
+            user._pilot_group_varying_coord("subcarrier"),
+            torch.stack(expected_subcarriers),
+        )
+
+    @pytest.mark.parametrize("group_over", [("subcarrier",), ("symbol",)])
+    def test_gather_scatter_is_lossless_for_active_pilots(self, device, group_over):
+        """Gathering and scattering preserves every active compact pilot value."""
+        grid = TestPilotGroupMixin._resource_grid(
+            fft_size=12,
+            num_ofdm_symbols=7,
+            pilot_symbols=(1, 5),
+            num_tx=2,
+            num_streams=1,
+            device=device,
+        )
+        user = _PilotGroupUser(grid.pilot_pattern, group_over, device)
+
+        pilots = grid.pilot_pattern.pilots
+        active_values = torch.arange(
+            pilots.numel(), device=device, dtype=pilots.real.dtype
+        ).reshape_as(pilots)
+        values = torch.where(pilots.abs() > 0, active_values, 0)
+        values = values.expand(3, 2, *values.shape)
+
+        grouped = user._gather_pilot_groups(values)
+        restored = user._scatter_pilot_groups(
+            torch.zeros_like(values), grouped
+        )
+        torch.testing.assert_close(restored, values)
+
+    def test_unknown_group_dimension_is_rejected(self, device):
+        """Unknown coordinate names fail during construction."""
+        grid = TestPilotGroupMixin._resource_grid(
+            fft_size=12,
+            num_ofdm_symbols=7,
+            pilot_symbols=(1, 5),
+            num_tx=2,
+            num_streams=1,
+            device=device,
+        )
+        with pytest.raises(ValueError, match="Unknown pilot group dimension"):
+            _PilotGroupUser(grid.pilot_pattern, ("frequency",), device)
+
+    def test_non_kronecker_groups(self, device):
+        """Non-Kronecker pilot patterns are supported."""
+        mask = torch.zeros((1, 1, 3, 6), dtype=torch.bool, device=device)
+        mask[0, 0, 0, [0, 2, 5]] = True
+        mask[0, 0, 2, [1, 3, 4]] = True
+        pilots = torch.ones((1, 1, 6), dtype=torch.complex64, device=device)
+        pattern = PilotPattern(mask, pilots, device=device)
+
+        user = _PilotGroupUser(pattern, ("subcarrier",), device)
+
+        torch.testing.assert_close(
+            user._pilot_group_constant_coord("symbol"),
+            torch.tensor([0, 2], device=device),
+        )
+        torch.testing.assert_close(
+            user._pilot_group_varying_coord("subcarrier"),
+            torch.tensor([[0, 2, 5], [1, 3, 4]], device=device),
+        )
+
+    def test_multi_dimensional_groups(self, device):
+        """Multi-dimensional groups are supported."""
+        grid = TestPilotGroupMixin._resource_grid(
+            fft_size=12,
+            num_ofdm_symbols=7,
+            pilot_symbols=(1, 5),
+            num_tx=2,
+            num_streams=1,
+            device=device,
+        )
+        user = _PilotGroupUser(
+            grid.pilot_pattern,
+            ("symbol", "subcarrier"),
+            device,
+        )
+        torch.testing.assert_close(
+            user._pilot_group_constant_coord("tx"),
+            torch.tensor([0, 1], device=device)
+        )
+        torch.testing.assert_close(
+            user._pilot_group_constant_coord("stream"),
+            torch.tensor([0, 0], device=device)
+        )
+        with pytest.raises(
+            ValueError,
+            match="Pilot groups do not have a fixed symbol coordinate"
+        ):
+            user._pilot_group_constant_coord("symbol")
+
+    def test_ragged_active_groups(self, device):
+        """Ragged active groups are rejected."""
+        mask = torch.zeros((1, 1, 3, 6), dtype=torch.bool, device=device)
+        mask[0, 0, 0, [0, 2, 5]] = True
+        mask[0, 0, 2, [1, 3, 4]] = True
+        pilots = torch.ones((1, 1, 6), dtype=torch.complex64, device=device)
+        pilots[..., -1] = 0
+
+        with pytest.raises(ValueError, match="equal-length groups"):
+            _PilotGroupUser(
+                PilotPattern(mask, pilots, device=device),
+                ("subcarrier",),
+                device,
+            )
+
+    def test_gather_compiles_as_full_graph(self, device):
+        """Pilot gathering produces the same eager and compiled result."""
+        grid = TestPilotGroupMixin._resource_grid(
+            fft_size=12,
+            num_ofdm_symbols=7,
+            pilot_symbols=(1, 5),
+            num_tx=2,
+            num_streams=1,
+            device=device,
+        )
+        user = _PilotGroupUser(
+            grid.pilot_pattern, ("subcarrier",), device
+        )
+        values = grid.pilot_pattern.pilots.expand(
+            2, 3, *grid.pilot_pattern.pilots.shape
+        )
+
+        compiled = torch.compile(
+            user._gather_pilot_groups,
+            backend="eager",
+            fullgraph=True,
+        )
+        torch.testing.assert_close(
+            compiled(values),
+            user._gather_pilot_groups(values)
         )

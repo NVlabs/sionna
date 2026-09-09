@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION & AFFILIATES.
 SPDX-License-Identifier: Apache-2.0
 
 -->
-# Sionna 2.0: An Open-Source Library for Research on Communication Systems
+# Sionna 2.1: An Open-Source Library for Research on Communication Systems
 
 Sionna&trade; is an open-source Python-based library for research on
 communication systems.
@@ -38,7 +38,7 @@ If you want to run the tutorial notebooks on your machine, you also need
 [JupyterLab](https://jupyter.org/). You can alternatively test them on [Google
 Colab](https://colab.research.google.com/). Although not necessary, we recommend
 running Sionna in a [Docker container](https://www.docker.com) and/or [Python virtual
-enviroment](https://docs.python.org/3/library/venv.html).
+environment](https://docs.python.org/3/library/venv.html).
 
 ## Installation via pip
 The recommended way to install Sionna is via pip:
@@ -123,6 +123,6 @@ If you use this software, please cite it as:
  author = {Hoydis, Jakob and Cammerer, Sebastian and {Ait Aoudia}, Fayçal and Nimier-David, Merlin and Maggi, Lorenzo and Marcus, Guillermo and Vem, Avinash and Keller, Alexander},
  note = {https://nvlabs.github.io/sionna/},
  year = {2022},
- version = {2.0.1}
+ version = {2.1.0}
 }
 ```

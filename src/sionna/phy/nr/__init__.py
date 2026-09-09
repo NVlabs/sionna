@@ -12,6 +12,7 @@ from .utils import (
     generate_prng_seq,
     decode_mcs_index,
     calculate_num_coded_bits,
+    calculate_codeword_bits,
     calculate_tb_size,
     MCSDecoderNR,
     TransportBlockNR,
@@ -24,7 +25,7 @@ from .pusch_config import PUSCHConfig, check_pusch_configs
 from .pusch_pilot_pattern import PUSCHPilotPattern
 from .pusch_precoder import PUSCHPrecoder
 from .pusch_transmitter import PUSCHTransmitter
-from .pusch_channel_estimation import PUSCHLSChannelEstimator
+from .pusch_channel_estimation import PUSCHLSChannelEstimator, PUSCHLMMSEChannelEstimator
 from .pusch_receiver import PUSCHReceiver
 
 
@@ -36,6 +37,7 @@ __all__ = [
     "generate_prng_seq",
     "decode_mcs_index",
     "calculate_num_coded_bits",
+    "calculate_codeword_bits",
     "calculate_tb_size",
     "MCSDecoderNR",
     "TransportBlockNR",
@@ -50,6 +52,7 @@ __all__ = [
     "PUSCHPrecoder",
     "PUSCHTransmitter",
     "PUSCHLSChannelEstimator",
+    "PUSCHLMMSEChannelEstimator",
     "PUSCHReceiver",
 ]
 

@@ -11,6 +11,7 @@ import torch
 from scipy.stats import kstest, rayleigh, rice
 from scipy.special import jv
 
+import sionna.phy.channel.tr38901.tdl as tdl_module
 from sionna.phy import PI, SPEED_OF_LIGHT
 from sionna.phy.channel.tr38901 import TDL
 from sionna.phy.channel import exp_corr_mat
@@ -19,6 +20,27 @@ from channel_test_utils import (
     TDL_DELAYS,
     TDL_RICIAN_K,
 )
+
+TDL_DEFAULT_DELAY_SPREAD = 100e-9
+TDL_MODELS = [
+    'A', 'B', 'C', 'D', 'E', 'A10', 'A30', 'B100', 'C60', 'C300', 'D10', 'D30'
+]
+TDL_FIXED_DELAY_SPREADS = {
+    'A10': 10e-9,
+    'A30': 30e-9,
+    'B100': 100e-9,
+    'C60': 60e-9,
+    'C300': 300e-9,
+    'D10': 10e-9,
+    'D30': 30e-9,
+}
+TDL_LOS_MODELS = {model for model, k_factor in TDL_RICIAN_K.items()
+                  if k_factor is not None}
+
+
+def _delay_spread_for_model(model):
+    """Return the test delay spread for a TDL model."""
+    return TDL_FIXED_DELAY_SPREADS.get(model, TDL_DEFAULT_DELAY_SPREAD)
 
 
 def _cleanup_gpu_memory(device):
@@ -35,26 +57,32 @@ class TestTDL:
     BATCH_SIZE = 10000
     CARRIER_FREQUENCY = 3.5e9  # Hz
     SAMPLING_FREQUENCY = 15e3  # Hz
-    DELAY_SPREAD = 100e-9  # s
+    DELAY_SPREAD = TDL_DEFAULT_DELAY_SPREAD  # s
     NUM_TIME_STEPS = 100
     NUM_SINUSOIDS = 20
     SPEED = 150  # m/s
     MAX_DOPPLER = 2. * PI * SPEED / SPEED_OF_LIGHT * CARRIER_FREQUENCY
     LoS_AoA = np.pi / 4
     MAX_ERR = 5e-2
+    MAX_FIXED_DELAY_ERR_NS = 5e-4
 
-    @pytest.mark.parametrize("model", ['A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'])
+    @pytest.mark.parametrize("spec_version", ["16.1", "19.2"])
+    def test_spec_version(self, spec_version, device, precision):
+        """Test explicit and default-version TDL parameter loading."""
+        tdl = TDL(
+            model="A",
+            delay_spread=self.DELAY_SPREAD,
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            precision=precision,
+            device=device,
+            spec_version=spec_version,
+        )
+        assert tdl.spec_version == spec_version
+
+    @pytest.mark.parametrize("model", TDL_MODELS)
     def test_pdp(self, model, device):
         """Test power delay profiles match expected values"""
-        # Set delay spread based on model
-        if model == 'A30':
-            delay_spread = 30e-9
-        elif model == 'B100':
-            delay_spread = 100e-9
-        elif model == 'C300':
-            delay_spread = 300e-9
-        else:
-            delay_spread = self.DELAY_SPREAD
+        delay_spread = _delay_spread_for_model(model)
 
         # Create TDL model
         tdl = TDL(
@@ -82,26 +110,140 @@ class TestTDL:
         assert max_err <= self.MAX_ERR, f"Power profile error for {model}: {max_err}"
 
         # Check delays
-        if model in ('A30', 'B100', 'C300'):
-            ref_tau = np.expand_dims(TDL_DELAYS[model], axis=0) * 1e-9  # ns to s
+        if model in TDL_FIXED_DELAY_SPREADS:
+            tau_np = tau_np * 1e9  # s to ns
+            ref_tau = np.expand_dims(TDL_DELAYS[model], axis=0)
+            max_err = np.max(np.abs(ref_tau - tau_np))
+            assert max_err <= self.MAX_FIXED_DELAY_ERR_NS, \
+                f"Delay error for {model}: {max_err} ns"
         else:
             tau_np = tau_np / self.DELAY_SPREAD
             ref_tau = np.expand_dims(TDL_DELAYS[model], axis=0)
-        max_err = np.max(np.abs(ref_tau - tau_np))
-        assert max_err <= self.MAX_ERR, f"Delay error for {model}: {max_err}"
+            max_err = np.max(np.abs(ref_tau - tau_np))
+            assert max_err <= self.MAX_ERR, \
+                f"Normalized delay error for {model}: {max_err}"
 
-    @pytest.mark.parametrize("model", ['A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'])
+    @pytest.mark.parametrize("model", TDL_MODELS)
+    def test_exact_profile_delays(self, model, device, precision):
+        """Pin every profile's deterministic tap delays."""
+        delay_spread = _delay_spread_for_model(model)
+        tdl = TDL(
+            model=model,
+            delay_spread=delay_spread,
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            precision=precision,
+            device=device,
+        )
+
+        expected = torch.as_tensor(
+            TDL_DELAYS[model], dtype=tdl.dtype, device=device
+        )
+        assert tdl.num_clusters == expected.numel()
+
+        if model in TDL_FIXED_DELAY_SPREADS:
+            # Fixed-profile reference delays are specified in nanoseconds.
+            actual = tdl.delays * 1e9
+            atol = self.MAX_FIXED_DELAY_ERR_NS if precision == "single" \
+                else 1e-10
+        else:
+            # Scalable-profile reference delays are normalized by delay spread.
+            actual = tdl.delays / tdl.delay_spread
+            atol = 5e-6 if precision == "single" else 1e-12
+
+        torch.testing.assert_close(actual, expected, rtol=0.0, atol=atol)
+
+    @pytest.mark.parametrize(
+        "model,fixed_delay_spread",
+        TDL_FIXED_DELAY_SPREADS.items(),
+    )
+    def test_fixed_delay_spread_override_and_immutability(
+        self, model, fixed_delay_spread, device, precision, capsys
+    ):
+        """Fixed profiles override and reject delay-spread changes."""
+        requested_delay_spread = 1e-6
+        tdl = TDL(
+            model=model,
+            delay_spread=requested_delay_spread,
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            precision=precision,
+            device=device,
+        )
+
+        fixed_delay_spread_ns = int(round(fixed_delay_spread * 1e9))
+        assert f"set to {fixed_delay_spread_ns}ns" in capsys.readouterr().out
+        expected_delay_spread_ns = torch.tensor(
+            float(fixed_delay_spread_ns), dtype=tdl.dtype, device=device
+        )
+        atol = self.MAX_FIXED_DELAY_ERR_NS if precision == "single" \
+            else 1e-10
+        torch.testing.assert_close(
+            tdl.delay_spread * 1e9,
+            expected_delay_spread_ns,
+            rtol=0.0,
+            atol=atol,
+        )
+
+        original_delay_spread = tdl.delay_spread.clone()
+        original_delays = tdl.delays.clone()
+        tdl.delay_spread = requested_delay_spread
+
+        assert "delay spread cannot be set" in capsys.readouterr().out
+        assert torch.equal(tdl.delay_spread, original_delay_spread)
+        assert torch.equal(tdl.delays, original_delays)
+
+    @pytest.mark.parametrize("model", ["D10", "D30"])
+    def test_fixed_los_first_tap_combination(self, model, device, precision):
+        """Pin the combined zero-delay tap and 12.2 dB K-factor."""
+        tdl = TDL(
+            model=model,
+            delay_spread=TDL_FIXED_DELAY_SPREADS[model],
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            precision=precision,
+            device=device,
+        )
+
+        assert tdl.los is True
+        assert tdl.num_clusters == len(TDL_DELAYS[model])
+        assert torch.count_nonzero(tdl.delays == 0).item() == 1
+
+        expected_powers = np.power(10.0, TDL_POWERS[model] / 10.0)
+        expected_powers = expected_powers / np.sum(expected_powers)
+        expected_first_tap_power = torch.tensor(
+            expected_powers[0], dtype=tdl.dtype, device=device
+        )
+        torch.testing.assert_close(
+            tdl.mean_powers[0],
+            expected_first_tap_power,
+            rtol=1e-6,
+            atol=5e-8,
+        )
+
+        first_tap_diffuse_power = tdl.mean_powers[0] - tdl.mean_power_los
+        assert first_tap_diffuse_power > 0
+        expected_k_factor = torch.tensor(
+            np.power(10.0, TDL_RICIAN_K[model] / 10.0),
+            dtype=tdl.dtype,
+            device=device,
+        )
+        torch.testing.assert_close(
+            tdl.k_factor,
+            expected_k_factor,
+            rtol=3e-7 if precision == "single" else 1e-12,
+            atol=0.0,
+        )
+        torch.testing.assert_close(
+            tdl.mean_power_los / first_tap_diffuse_power,
+            expected_k_factor,
+            # The subtraction above recovers a small diffuse component from
+            # the combined first-tap power and loses a few float32 bits.
+            rtol=1e-6 if precision == "single" else 1e-12,
+            atol=0.0,
+        )
+
+    @pytest.mark.parametrize("model", TDL_MODELS)
     def test_taps_powers_distributions(self, model, device):
         """Test the distribution of the taps powers"""
-        # Set delay spread based on model
-        if model == 'A30':
-            delay_spread = 30e-9
-        elif model == 'B100':
-            delay_spread = 100e-9
-        elif model == 'C300':
-            delay_spread = 300e-9
-        else:
-            delay_spread = self.DELAY_SPREAD
+        delay_spread = _delay_spread_for_model(model)
 
         # Create TDL model
         tdl = TDL(
@@ -125,7 +267,7 @@ class TestTDL:
         powers = np.abs(h_np)
 
         for i, p in enumerate(ref_powers):
-            if i == 0 and (model == 'D' or model == 'E'):
+            if i == 0 and model in TDL_LOS_MODELS:
                 # First tap of LoS models follows Rice distribution
                 K = np.power(10.0, TDL_RICIAN_K[model] / 10.0)
                 P0 = ref_powers[0]
@@ -168,18 +310,10 @@ class TestTDL:
         c = 1j * K * np.sin(t * max_doppler * np.cos(theta_0))
         return (a + b + c) / (1 + K)
 
-    @pytest.mark.parametrize("model", ['A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'])
+    @pytest.mark.parametrize("model", TDL_MODELS)
     def test_autocorrelation(self, model, device):
         """Test the temporal autocorrelation matches theoretical values"""
-        # Set delay spread based on model
-        if model == 'A30':
-            delay_spread = 30e-9
-        elif model == 'B100':
-            delay_spread = 100e-9
-        elif model == 'C300':
-            delay_spread = 300e-9
-        else:
-            delay_spread = self.DELAY_SPREAD
+        delay_spread = _delay_spread_for_model(model)
 
         # Create TDL model
         tdl = TDL(
@@ -204,7 +338,7 @@ class TestTDL:
         time = np.arange(max_lag) / self.SAMPLING_FREQUENCY
 
         for i, p in enumerate(ref_powers):
-            if i == 0 and (model == 'D' or model == 'E'):
+            if i == 0 and model in TDL_LOS_MODELS:
                 # LoS model first tap
                 h_tap = h_np[:, i, :]
                 r = self._corr(h_tap, max_lag)
@@ -638,6 +772,59 @@ class TestTDL:
         assert tdl_los.k_factor > 0
         assert tdl_los.mean_power_los > 0
 
+    @pytest.mark.parametrize("model", ["D", "E"])
+    def test_default_los_doppler_phase(self, model, monkeypatch, device):
+        """Test generated LoS phase has the TR 38.901 0.7 Doppler peak."""
+
+        def zero_rand(shape, *, dtype, device, generator=None):
+            del generator
+            return torch.zeros(shape, dtype=dtype, device=device)
+
+        monkeypatch.setattr(tdl_module, "rand", zero_rand)
+
+        speed = 10.0
+        carrier_frequency = 3.5e9
+        sampling_frequency = 1e3
+        tdl_los = TDL(
+            model=model,
+            delay_spread=100e-9,
+            carrier_frequency=carrier_frequency,
+            num_sinusoids=1,
+            min_speed=speed,
+            max_speed=speed,
+            device=device,
+        )
+        h, _ = tdl_los(
+            batch_size=1,
+            num_time_steps=4,
+            sampling_frequency=sampling_frequency,
+        )
+
+        sample_times = torch.arange(
+            4, dtype=tdl_los.dtype, device=device
+        ) / sampling_frequency
+        max_doppler = (
+            2.0 * PI * speed / SPEED_OF_LIGHT * carrier_frequency
+        )
+        diffuse_phase = -max_doppler * sample_times - PI
+        diffuse = torch.sqrt(torch.real(tdl_los._mean_powers[0])) * torch.polar(
+            torch.ones_like(sample_times), diffuse_phase
+        )
+        first_tap = h[0, 0, 0, 0, 0, 0]
+        specular = first_tap - diffuse
+        phase_increment = torch.angle(specular[1:] * specular[:-1].conj())
+        expected = torch.full_like(
+            phase_increment,
+            max_doppler / sampling_frequency * 0.7,
+        )
+
+        torch.testing.assert_close(
+            phase_increment,
+            expected,
+            atol=1e-5,
+            rtol=1e-5,
+        )
+
     def test_nlos_model_properties(self, device):
         """Test NLoS model specific properties"""
         tdl_nlos = TDL(
@@ -648,10 +835,10 @@ class TestTDL:
         )
 
         assert tdl_nlos.los is False
-        # K-factor and mean_power_los should raise assertion for NLoS
-        with pytest.raises(AssertionError):
+        # K-factor and mean_power_los are unavailable for NLoS models
+        with pytest.raises(RuntimeError):
             _ = tdl_nlos.k_factor
-        with pytest.raises(AssertionError):
+        with pytest.raises(RuntimeError):
             _ = tdl_nlos.mean_power_los
 
     def test_delay_spread_setter(self, device):

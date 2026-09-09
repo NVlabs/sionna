@@ -137,6 +137,59 @@ class Object(torch.nn.Module):
             return tuple(v.shape)
         return ()
 
+    def _check_device(self, name: str, child: "Object") -> None:
+        """Reject a sub-object that lives on a different device.
+
+        Tensors created by the child stay on the child's device, so the
+        mismatch would otherwise surface much later as a bare PyTorch error
+        that names two devices but not the object responsible. Precision is
+        deliberately not checked here because mixed-precision composition can
+        be intentional and does not create cross-device runtime errors.
+        """
+        # Nothing to compare against until Object.__init__ has run.
+        parent_device = self.__dict__.get("_device_str")
+        child_device = child.__dict__.get("_device_str")
+        if parent_device is None or child_device is None:
+            return
+        if child_device != parent_device:
+            attr = name.lstrip("_")
+            raise ValueError(
+                f"{type(self).__name__} is on device {parent_device!r}, but its "
+                f"{attr} ({type(child).__name__}) is on device {child_device!r}. "
+                f"Build both on the same device, e.g. "
+                f"{type(child).__name__}(..., device={parent_device!r})."
+            )
+
+    def _check_contained_devices(
+        self, name: str, value: Any, seen: Optional[set[int]] = None
+    ) -> None:
+        """Recursively validate Object instances held by common containers."""
+        if isinstance(value, Object):
+            self._check_device(name, value)
+            return
+        container_types = (
+            dict,
+            list,
+            tuple,
+            set,
+            torch.nn.ModuleDict,
+            torch.nn.ModuleList,
+        )
+        if not isinstance(value, container_types):
+            return
+        if seen is None:
+            seen = set()
+        value_id = id(value)
+        if value_id in seen:
+            return
+        seen.add(value_id)
+        if isinstance(value, (dict, torch.nn.ModuleDict)):
+            for key, child in value.items():
+                self._check_contained_devices(f"{name}[{key!r}]", child, seen)
+        else:
+            for index, child in enumerate(value):
+                self._check_contained_devices(f"{name}[{index}]", child, seen)
+
     def __setattr__(self, name: str, value: Any) -> None:
         """Override to ensure property setters are called even for nn.Module values.
 
@@ -145,6 +198,7 @@ class Object(torch.nn.Module):
         checks if there's a property descriptor with a setter on the class and
         uses it instead.
         """
+        self._check_contained_devices(name, value)
         cls = type(self)
         descriptor = getattr(cls, name, None)
         if (

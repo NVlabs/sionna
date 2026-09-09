@@ -19,8 +19,13 @@ from sionna.phy.fec.ldpc import (
     cn_update_tanh,
     cn_update_offset_minsum,
     vn_update_sum,
+    EXITCallback,
 )
-from sionna.phy.fec.utils import GaussianPriorSource, load_parity_check_examples
+from sionna.phy.fec.utils import (
+    GaussianPriorSource,
+    llr2mi,
+    load_parity_check_examples,
+)
 from sionna.phy.fec.linear import LinearEncoder
 from sionna.phy.utils import hard_decisions, sim_ber, ebnodb2no
 from sionna.phy.mapping import BinarySource
@@ -28,6 +33,22 @@ from sionna.phy.channel import AWGN
 
 
 CN_UPDATES = ["minsum", "boxplus", "boxplus-phi", "offset-minsum"]
+
+
+def test_exit_callback_compiles_fullgraph(device):
+    """Padded-message handling must not branch on tensor data."""
+    callback = EXITCallback(num_iter=2, device=device)
+
+    @torch.compile(fullgraph=True)
+    def apply(msg):
+        return callback(msg, 0)
+
+    msg = torch.tensor([0.0, 1.0, -2.0], device=device)
+    torch.testing.assert_close(apply(msg), msg)
+    torch.testing.assert_close(apply(torch.zeros_like(msg)), torch.zeros_like(msg))
+    actual = callback.mi[0]
+    expected = (llr2mi(-msg[msg != 0]) / 2.0).to(actual.dtype)
+    torch.testing.assert_close(actual, expected)
 
 
 #############################
@@ -979,6 +1000,108 @@ class TestLDPC5GDecoder:
 
         assert y.abs().max() <= llr_max + 1e-5
         assert msg.abs().max() <= llr_max + 1e-5
+
+    @pytest.mark.parametrize("cn_update", CN_UPDATES)
+    def test_llr_max_none_roundtrip(self, device, cn_update):
+        """llr_max=None must decode noiseless codewords for every CN update."""
+        k, n, bs = 100, 200, 8
+        enc = LDPC5GEncoder(k, n, device=device)
+        bits = BinarySource(device=device)([bs, k])
+        c = enc(bits)
+        llr_ch = 10.0 * (2.0 * c - 1.0)
+
+        dec_clip = LDPC5GDecoder(
+            enc, num_iter=20, cn_update=cn_update, device=device
+        )
+        dec_none = LDPC5GDecoder(
+            enc, num_iter=20, cn_update=cn_update, llr_max=None, device=device
+        )
+        u_clip = dec_clip(llr_ch)
+        u_none = dec_none(llr_ch)
+        assert torch.equal(u_clip, bits)
+        assert torch.equal(u_none, bits)
+
+    @pytest.mark.parametrize("cn_update", CN_UPDATES)
+    def test_llr_max_none_harq_roundtrip(self, device, cn_update):
+        """HARQ with llr_max=None must match clipped decoding on perfect LLRs."""
+        k, n, bs = 100, 200, 8
+        enc = LDPC5GEncoder(k, n, device=device)
+        bits = BinarySource(device=device)([bs, k])
+        rv = [0, 2]
+        c = enc(bits, rv=rv)
+        llr_ch = 10.0 * (2.0 * c - 1.0)
+
+        dec_clip = LDPC5GDecoder(
+            enc, num_iter=20, cn_update=cn_update, harq_mode=True, device=device
+        )
+        dec_none = LDPC5GDecoder(
+            enc,
+            num_iter=20,
+            cn_update=cn_update,
+            harq_mode=True,
+            llr_max=None,
+            device=device,
+        )
+        u_clip = dec_clip(llr_ch, rv=rv)
+        u_none = dec_none(llr_ch, rv=rv)
+        assert torch.equal(u_clip, bits)
+        assert torch.equal(u_none, bits)
+
+    @pytest.mark.parametrize("cn_update", CN_UPDATES)
+    def test_llr_max_none_unclipped_and_finite(self, device, cn_update):
+        """llr_max=None must not clip messages and must stay finite."""
+        k, n, bs = 50, 100, 4
+        enc = LDPC5GEncoder(k, n, device=device)
+        dec = LDPC5GDecoder(
+            enc,
+            cn_update=cn_update,
+            hard_out=False,
+            num_iter=5,
+            return_infobits=False,
+            return_state=True,
+            llr_max=None,
+            device=device,
+        )
+        llr_ch = 50.0 * torch.randn(bs, n, device=device)
+        y, msg = dec(llr_ch)
+        assert torch.isfinite(y).all()
+        assert torch.isfinite(msg).all()
+        assert y.abs().max() > 20.0
+
+    @pytest.mark.parametrize(
+        "k,n,ebno_db",
+        [
+            (100, 200, 5.0),
+            (200, 300, 4.5),
+            (80, 240, 3.5),
+        ],
+    )
+    def test_llr_max_none_bler(self, device, k, n, ebno_db):
+        """Same noisy observations: unclipped must recover every codeword
+        that clipped decoding recovers."""
+        bs = 128
+        torch.manual_seed(0)
+        enc = LDPC5GEncoder(k, n, device=device)
+        bits = BinarySource(device=device)([bs, k])
+        c = enc(bits)
+        no = ebnodb2no(ebno_db, num_bits_per_symbol=1, coderate=k / n)
+        x = (2.0 * c - 1.0).to(torch.complex64)
+        y = AWGN(device=device)(x, no)
+        llr_ch = 2.0 * torch.real(y) / no
+
+        dec_clip = LDPC5GDecoder(enc, num_iter=20, device=device)
+        dec_none = LDPC5GDecoder(
+            enc, num_iter=20, llr_max=None, device=device
+        )
+        u_clip = dec_clip(llr_ch)
+        u_none = dec_none(llr_ch)
+        ok_clip = ~torch.any(u_clip != bits, dim=-1)
+        ok_none = ~torch.any(u_none != bits, dim=-1)
+
+        assert ok_clip.any(), "clipped decoder failed every codeword"
+        assert torch.all(ok_none | ~ok_clip), (
+            "unclipped decoder lost a codeword that clipped decoding recovered"
+        )
 
     @pytest.mark.parametrize("shape", [[], [2, 3], [2, 3, 4, 5]])
     def test_batch_and_multidimension_5g(self, device, shape):

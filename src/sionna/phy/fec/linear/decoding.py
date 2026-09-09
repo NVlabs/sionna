@@ -184,7 +184,9 @@ class OSDecoder(Block):
                 f"Required memory complexity is large for the "
                 f"given code parameters and t={t}. Please consider small "
                 f"batch-sizes to keep the inference complexity small and "
-                f"activate torch.compile() if possible."
+                f"activate torch.compile() if possible.",
+                UserWarning,
+                stacklevel=2,
             )
         if num_symbols > 1e11:  # empirically found to be a good trade-off
             raise ResourceWarning(

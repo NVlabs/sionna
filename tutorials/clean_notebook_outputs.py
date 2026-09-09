@@ -27,12 +27,12 @@ _TRUNC_PLACEHOLDER_RE = re.compile(
 def clean_notebook(path):
     with open(path, "r", encoding="utf-8") as f:
         nb = nbformat.read(f, as_version=4)
+    original = nbformat.writes(nb)
 
     # Merge consecutive stream entries and apply bare-\r collapsing
     pp = CoalesceStreamsPreprocessor(enabled=True)
     nb, _ = pp.preprocess(nb, {})
 
-    changed = False
     for cell in nb.cells:
         if cell.cell_type != "code":
             continue
@@ -44,11 +44,11 @@ def clean_notebook(path):
             cleaned = _TRUNC_PLACEHOLDER_RE.sub("", cleaned)
             if cleaned != text:
                 out.text = cleaned
-                changed = True
 
-    if changed:
+    cleaned_notebook = nbformat.writes(nb)
+    if cleaned_notebook != original:
         with open(path, "w", encoding="utf-8") as f:
-            nbformat.write(nb, f)
+            f.write(cleaned_notebook)
 
 
 if __name__ == "__main__":

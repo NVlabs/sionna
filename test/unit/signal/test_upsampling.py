@@ -4,6 +4,7 @@
 #
 """Tests for Upsampling block"""
 
+import pytest
 import torch
 
 from sionna.phy import dtypes
@@ -12,6 +13,25 @@ from sionna.phy.signal import Upsampling
 
 class TestUpsampling:
     """Tests for the Upsampling class"""
+
+    @pytest.mark.parametrize("samples_per_symbol", [0, -1, -4])
+    def test_invalid_samples_per_symbol_rejected(self, device, samples_per_symbol):
+        """A non-positive upsampling factor must be reported, not applied.
+
+        Zero silently produced an empty tensor and negative values failed deep
+        inside ``torch.nn.functional.pad``.
+        """
+        with pytest.raises(ValueError, match="samples_per_symbol"):
+            Upsampling(samples_per_symbol=samples_per_symbol, device=device)
+
+    def test_first_dimension_axis_supported(self, device):
+        """``axis=0`` must work; the implementation is dimension-agnostic."""
+        x = torch.arange(12.0, device=device).reshape(3, 4)
+        y = Upsampling(samples_per_symbol=2, axis=0, device=device)(x)
+
+        assert list(y.shape) == [6, 4]
+        assert torch.equal(y[0], x[0])
+        assert torch.all(y[1] == 0)
 
     def test_shape_default_axis(self, device, precision):
         """Test the output shape with default axis (-1)"""

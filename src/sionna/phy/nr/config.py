@@ -21,8 +21,12 @@ class Config(ABC):
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
-            if key in dir(self):
-                setattr(self, key, value)
+            if key not in dir(self):
+                raise TypeError(
+                    f"{type(self).__name__} got an unexpected keyword "
+                    f"argument '{key}'"
+                )
+            setattr(self, key, value)
 
     def _ifndef(self, name: str, value) -> None:
         """Set a default value for an attribute if it doesn't exist."""

@@ -15,6 +15,7 @@ from sionna.phy.signal import (
     RaisedCosineFilter,
     RootRaisedCosineFilter,
     SincFilter,
+    empirical_aclr,
 )
 
 
@@ -111,6 +112,104 @@ class TestCustomFilter:
                     out = filt(inp, "full")
                     out_shape = input_shape[:-1] + [input_shape[-1] + filter_length - 1]
                     assert list(out.shape) == out_shape
+
+    @pytest.mark.parametrize("samples_per_symbol", [1, 2, 3, 4, 8, 16])
+    @pytest.mark.parametrize("filter_length", [3, 5, 7, 9, 11, 15, 17, 101, 103])
+    def test_arbitrary_odd_length(self, device, samples_per_symbol, filter_length):
+        """Any odd number of coefficients must be accepted.
+
+        The length is taken from the coefficients themselves; it is not derived
+        from a symbol span, so lengths that do not cover a whole number of
+        symbols are valid.
+        """
+        coefficients = torch.randn(filter_length, device=device)
+        filt = CustomFilter(
+            samples_per_symbol, coefficients=coefficients, device=device
+        )
+
+        assert filt.length == filter_length
+        assert filt.span_in_symbols == max(
+            1, filter_length // samples_per_symbol
+        )
+        assert filt.coefficients.shape[-1] == filter_length
+        assert len(filt.sampling_times) == filter_length
+
+        inp = torch.randn([4, 300], device=device)
+        assert list(filt(inp, "full").shape) == [4, 300 + filter_length - 1]
+        assert list(filt(inp, "same").shape) == [4, 300]
+        assert list(filt(inp, "valid").shape) == [4, 300 - filter_length + 1]
+
+    @pytest.mark.parametrize("new_length", [5, 21, 101])
+    def test_length_tracks_reassigned_coefficients(self, device, new_length):
+        """``length`` must follow the coefficients, not the constructor.
+
+        ``coefficients`` is a public setter, so a filter reassigned after
+        construction must not keep reporting its original length — that would
+        also give ``sampling_times`` and ``show()`` the wrong axis.
+        """
+        filt = CustomFilter(4, coefficients=torch.randn(9, device=device),
+                            device=device)
+        assert filt.length == 9
+        assert filt.span_in_symbols == 2
+
+        filt.coefficients = torch.randn(new_length, device=device)
+
+        assert filt.length == new_length
+        assert filt.span_in_symbols == max(1, new_length // 4)
+        assert filt.coefficients.shape[-1] == new_length
+        assert len(filt.sampling_times) == new_length
+
+        inp = torch.randn([2, 200], device=device)
+        assert list(filt(inp, "valid").shape) == [2, 200 - new_length + 1]
+
+    @pytest.mark.parametrize("window_type", ["hann", "custom"])
+    def test_length_change_rejected_with_window(self, device, window_type):
+        """A windowed filter must reject length changes atomically."""
+        coefficients = torch.randn(9, device=device)
+        if window_type == "custom":
+            window = CustomWindow(torch.ones(9, device=device), device=device)
+        else:
+            window = window_type
+
+        filt = CustomFilter(
+            4, coefficients=coefficients, window=window, device=device
+        )
+
+        with pytest.raises(ValueError, match="while a window is active"):
+            filt.coefficients = torch.randn(21, device=device)
+
+        # A failed assignment leaves the original, usable state unchanged.
+        assert filt.length == 9
+        assert filt.window.length == 9
+        assert torch.equal(filt.coefficients, coefficients)
+
+        # Same-length reassignment remains supported with an active window.
+        replacement = torch.randn(9, device=device)
+        filt.coefficients = replacement
+        assert torch.equal(filt.coefficients, replacement)
+
+        inp = torch.randn([2, 200], device=device)
+        assert list(filt(inp, "valid").shape) == [2, 192]
+        assert torch.isfinite(filt.aclr)
+
+    def test_even_length_rejected(self, device):
+        """An even number of coefficients must raise, not assert.
+
+        A bare ``assert`` is stripped under ``python -O``, which would leave a
+        filter with no centre tap.
+        """
+        with pytest.raises(ValueError, match="must be odd"):
+            CustomFilter(4, coefficients=torch.randn(8, device=device), device=device)
+
+    def test_invalid_samples_per_symbol_rejected(self, device):
+        """A non-positive oversampling factor must raise."""
+        for samples_per_symbol in [0, -1]:
+            with pytest.raises(ValueError, match="samples_per_symbol"):
+                CustomFilter(
+                    samples_per_symbol,
+                    coefficients=torch.randn(9, device=device),
+                    device=device,
+                )
 
     @pytest.mark.parametrize("inp_complex", [False, True])
     @pytest.mark.parametrize("fil_complex", [False, True])
@@ -447,6 +546,61 @@ class TestFilterACLR:
         )
         aclr = rrc.aclr
         assert aclr.item() > 0
+
+    # `samples_per_symbol` must be > 1, otherwise the in-band covers the whole
+    # spectrum and the ACLR is trivially zero for every filter. Lengths are of
+    # the form 4k+1 so that `CustomFilter` accepts them.
+    @pytest.mark.parametrize("filter_length", [1021, 1025, 1201, 2049])
+    def test_aclr_long_filters(self, device, filter_length):
+        """ACLR must work for filters longer than the 1024-bin spectrum.
+
+        The spectrum length is a resolution floor, not a length limit: it is
+        zero-padded to at least 1024 bins, so a longer filter must widen the
+        FFT rather than pad by a negative amount.
+        """
+        coefficients = torch.exp(
+            -torch.linspace(-1.0, 1.0, filter_length, device=device) ** 2
+        )
+        filt = CustomFilter(4, coefficients=coefficients, device=device)
+
+        aclr = filt.aclr
+        assert aclr.dim() == 0
+        assert torch.isfinite(aclr)
+        assert aclr.item() > 0.0
+
+    @pytest.mark.parametrize("filter_length", [65, 257, 1021])
+    def test_aclr_unchanged_below_spectrum_length(
+        self, device, precision, filter_length
+    ):
+        """Filters at or below 1024 taps must keep their previous ACLR.
+
+        For these the padded length is exactly 1024, so widening the FFT for
+        long filters must not perturb the short-filter values.
+        """
+        coefficients = torch.exp(
+            -torch.linspace(-1.0, 1.0, filter_length, device=device) ** 2
+        )
+        filt = CustomFilter(
+            4, coefficients=coefficients, precision=precision, device=device
+        )
+
+        normalized = filt.coefficients / torch.sqrt(
+            torch.sum(torch.abs(filt.coefficients) ** 2)
+        )
+        padded = torch.cat(
+            [
+                normalized,
+                torch.zeros(
+                    1024 - filter_length, dtype=normalized.dtype, device=device
+                ),
+            ]
+        )
+        expected = empirical_aclr(
+            padded.to(filt.cdtype), oversampling=4, precision=precision
+        )
+
+        assert expected.item() > 0.0
+        torch.testing.assert_close(filt.aclr, expected)
 
     def test_aclr_differentiable(self, device):
         """Test if ACLR computation is differentiable"""

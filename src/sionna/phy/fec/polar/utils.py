@@ -7,7 +7,6 @@
 from typing import List, Tuple
 import numbers
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.special import comb
 from importlib_resources import files, as_file
 from . import codes
@@ -19,6 +18,11 @@ __all__ = [
     "generate_rm_code",
     "generate_dense_polar",
 ]
+
+
+def _is_pow2(x: int) -> bool:
+    """True iff ``x`` is a positive power of two."""
+    return x > 0 and (x & (x - 1)) == 0
 
 
 def generate_5g_ranking(
@@ -72,7 +76,7 @@ def generate_5g_ranking(
         raise ValueError("n must be >=32.")
     if n < k:
         raise ValueError("Invalid coderate (>1).")
-    if np.log2(n) != int(np.log2(n)):
+    if not _is_pow2(n):
         raise ValueError("n must be a power of 2.")
 
     # Load the channel ranking from csv format in folder "codes"
@@ -275,7 +279,7 @@ def generate_dense_polar(
         msg = "Number of elements in frozen_pos cannot be greater than n."
         raise ValueError(msg)
 
-    if np.log2(n) != int(np.log2(n)):
+    if not _is_pow2(n):
         raise ValueError("n must be a power of 2.")
 
     k = n - len(frozen_pos)
@@ -293,7 +297,6 @@ def generate_dense_polar(
     if verbose:
         print("Shape of the generator matrix: ", gm_true.shape)
         print("Shape of the parity-check matrix: ", pcm.shape)
-        plt.spy(pcm)
 
     # Verify result, i.e., check that H*G has an all-zero syndrome.
     s = np.mod(np.matmul(pcm, np.transpose(gm_true)), 2)

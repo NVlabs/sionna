@@ -4,6 +4,7 @@
 #
 """Tests for Downsampling block"""
 
+import pytest
 import torch
 
 from sionna.phy import dtypes
@@ -12,6 +13,46 @@ from sionna.phy.signal import Downsampling
 
 class TestDownsampling:
     """Tests for the Downsampling class"""
+
+    @pytest.mark.parametrize("samples_per_symbol", [0, -1, -4])
+    def test_invalid_samples_per_symbol_rejected(self, device, samples_per_symbol):
+        """A non-positive downsampling factor must name the offending parameter."""
+        with pytest.raises(ValueError, match="samples_per_symbol"):
+            Downsampling(samples_per_symbol=samples_per_symbol, device=device)
+
+    @pytest.mark.parametrize("offset", [-1, -4])
+    def test_negative_offset_rejected(self, device, offset):
+        """A negative offset must not be reinterpreted as counting from the end.
+
+        ``call()`` slices ``x[..., offset::samples_per_symbol]``, so a negative
+        offset used to select samples from the end of the signal and return
+        them without any error.
+        """
+        with pytest.raises(ValueError, match="offset"):
+            Downsampling(samples_per_symbol=2, offset=offset, device=device)
+
+    @pytest.mark.parametrize("num_symbols", [-1, -10])
+    def test_negative_num_symbols_rejected(self, device, num_symbols):
+        """A negative num_symbols must not silently truncate from the end."""
+        with pytest.raises(ValueError, match="num_symbols"):
+            Downsampling(
+                samples_per_symbol=2, num_symbols=num_symbols, device=device
+            )
+
+    def test_zero_num_symbols_accepted(self, device):
+        """Zero is a degenerate but well-defined request for no symbols."""
+        x = torch.arange(8.0, device=device)
+        y = Downsampling(samples_per_symbol=2, num_symbols=0, device=device)(x)
+        assert list(y.shape) == [0]
+
+    def test_first_dimension_axis_supported(self, device):
+        """``axis=0`` must work; the implementation is dimension-agnostic."""
+        x = torch.arange(12.0, device=device).reshape(4, 3)
+        y = Downsampling(samples_per_symbol=2, axis=0, device=device)(x)
+
+        assert list(y.shape) == [2, 3]
+        assert torch.equal(y[0], x[0])
+        assert torch.equal(y[1], x[2])
 
     def test_shape_default_axis(self, device, precision):
         """Test the output shape with default axis (-1)"""

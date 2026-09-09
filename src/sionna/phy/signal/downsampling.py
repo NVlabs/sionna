@@ -24,8 +24,7 @@ class Downsampling(Block):
     :param num_symbols: Total number of symbols to be retained after
         downsampling. If `None`, all available symbols are retained.
         Defaults to `None`.
-    :param axis: Dimension to be downsampled. Must not be the first dimension.
-        Defaults to -1.
+    :param axis: Dimension to be downsampled. Defaults to -1.
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation. If `None`,
@@ -35,8 +34,10 @@ class Downsampling(Block):
         Tensor to be downsampled. `n` is the size of the `axis` dimension.
 
     :output y: [..., k, ...], `torch.float` or `torch.complex`.
-        Downsampled tensor, where ``k``
-        is min((``n``-``offset``)//``samples_per_symbol``, ``num_symbols``).
+        Downsampled tensor. The number of available output samples is
+        ``k_available = max(0, ceil((n-offset)/samples_per_symbol))``.
+        If ``num_symbols`` is `None`, then ``k = k_available``. Otherwise,
+        ``k = min(k_available, num_symbols)``.
 
     .. rubric:: Examples
 
@@ -63,6 +64,27 @@ class Downsampling(Block):
         **kwargs,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
+
+        if samples_per_symbol < 1:
+            raise ValueError(
+                "samples_per_symbol must be a positive integer, "
+                f"got {samples_per_symbol}"
+            )
+
+        # A negative offset or num_symbols would be reinterpreted by Python
+        # slice semantics as counting back from the end of the signal, which
+        # silently returns the wrong samples instead of failing.
+        if offset < 0:
+            raise ValueError(
+                f"offset must be a non-negative integer, got {offset}"
+            )
+
+        if num_symbols is not None and num_symbols < 0:
+            raise ValueError(
+                "num_symbols must be a non-negative integer or None, "
+                f"got {num_symbols}"
+            )
+
         self._samples_per_symbol = samples_per_symbol
         self._offset = offset
         self._num_symbols = num_symbols

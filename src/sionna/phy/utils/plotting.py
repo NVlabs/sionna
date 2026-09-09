@@ -16,6 +16,50 @@ from sionna.phy.utils import sim_ber
 __all__ = ["plot_ber", "PlotBER"]
 
 
+def _normalize_curves(snr_db, ber):
+    """Normalize single and multiple error-rate curves."""
+    ber_curves = ber if isinstance(ber, list) else [ber]
+    if not ber_curves:
+        raise ValueError("ber must contain at least one curve.")
+
+    num_curves = len(ber_curves)
+    snr_curves = snr_db if isinstance(snr_db, list) else [snr_db] * num_curves
+    if len(snr_curves) != num_curves:
+        raise ValueError("snr_db has invalid size.")
+    for snr_curve, ber_curve in zip(snr_curves, ber_curves):
+        if len(snr_curve) != len(ber_curve):
+            raise ValueError("Each SNR curve must match its BER curve length.")
+    return snr_curves, ber_curves
+
+
+def _normalize_legend(legend, num_curves):
+    """Normalize and validate curve labels."""
+    if isinstance(legend, str):
+        return [legend] * num_curves
+    if not isinstance(legend, list):
+        raise TypeError("legend must be str or list of str.")
+    if len(legend) != num_curves:
+        raise ValueError("legend has invalid size.")
+    if not all(isinstance(entry, str) for entry in legend):
+        raise TypeError("legend must be str or list of str.")
+    return legend
+
+
+def _normalize_is_bler(is_bler, num_curves):
+    """Normalize and validate BER/BLER curve flags."""
+    if is_bler is None:
+        return [False] * num_curves
+    if isinstance(is_bler, bool):
+        return [is_bler] * num_curves
+    if not isinstance(is_bler, list):
+        raise TypeError("is_bler must be bool or list of bool.")
+    if len(is_bler) != num_curves:
+        raise ValueError("is_bler has invalid size.")
+    if not all(isinstance(value, bool) for value in is_bler):
+        raise TypeError("is_bler must be bool or list of bool.")
+    return is_bler
+
+
 def plot_ber(
     snr_db: Union[np.ndarray, List[np.ndarray]],
     ber: Union[np.ndarray, List[np.ndarray]],
@@ -61,34 +105,13 @@ def plot_ber(
         ber = np.array([0.2, 0.1, 0.05, 0.01, 0.001, 0.0001])
         fig, ax = plot_ber(snr, ber, legend="AWGN", title="BER vs SNR")
     """
-    # legend must be a list or string
-    if not isinstance(legend, list):
-        if not isinstance(legend, str):
-            raise TypeError("legend must be str or list of str.")
-        legend = [legend]
-
     if not isinstance(title, str):
         raise TypeError("title must be str.")
 
-    # broadcast snr if ber is list
-    if isinstance(ber, list):
-        if not isinstance(snr_db, list):
-            snr_db = [snr_db] * len(ber)
-
-    # check that is_bler is list of same size and contains only bools
-    if is_bler is None:
-        if isinstance(ber, list):
-            is_bler = [False] * len(ber)
-        else:
-            is_bler = False
-    else:
-        if isinstance(is_bler, list):
-            if len(is_bler) != len(ber):
-                raise ValueError("is_bler has invalid size.")
-        else:
-            if not isinstance(is_bler, bool):
-                raise TypeError("is_bler must be bool or list of bool.")
-            is_bler = [is_bler]
+    snr_curves, ber_curves = _normalize_curves(snr_db, ber)
+    num_curves = len(ber_curves)
+    legend = _normalize_legend(legend, num_curves)
+    is_bler = _normalize_is_bler(is_bler, num_curves)
 
     fig, ax = plt.subplots(figsize=(16, 10))
 
@@ -102,13 +125,11 @@ def plot_ber(
 
     plt.title(title, fontsize=25)
 
-    if isinstance(ber, list):
-        for idx, b in enumerate(ber):
-            line_style = "--" if is_bler[idx] else ""
-            plt.semilogy(snr_db[idx], b, line_style, linewidth=2)
-    else:
-        line_style = "--" if is_bler else ""
-        plt.semilogy(snr_db, ber, line_style, linewidth=2)
+    for snr_curve, ber_curve, curve_is_bler in zip(
+        snr_curves, ber_curves, is_bler
+    ):
+        line_style = "--" if curve_is_bler else ""
+        plt.semilogy(snr_curve, ber_curve, line_style, linewidth=2)
 
     plt.grid(which="both")
     if ebno:
@@ -116,7 +137,9 @@ def plot_ber(
     else:
         plt.xlabel(r"$E_s/N_0$ (dB)", fontsize=25)
     plt.ylabel(ylabel, fontsize=25)
-    plt.legend(legend, fontsize=20)
+    # Skip the legend rather than drawing an empty box for blank labels.
+    if any(legend):
+        plt.legend(legend, fontsize=20)
 
     if save_fig:
         plt.savefig(path)
@@ -235,6 +258,11 @@ class PlotBER:
             is_bler_list = self._is_bler + [is_bler]
         else:
             is_bler_list = self._is_bler + is_bler
+
+        # Curves supplied without a label or a BER/BLER flag get a default one,
+        # so that omitting either argument is not a size mismatch.
+        legends += [""] * (len(bers) - len(legends))
+        is_bler_list += [False] * (len(bers) - len(is_bler_list))
 
         # deactivate BER/BLER
         if len(is_bler_list) > 0:

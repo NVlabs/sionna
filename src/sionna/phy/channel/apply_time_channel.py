@@ -6,13 +6,12 @@
 
 from typing import Optional, Union
 
-import numpy as np
-import scipy.linalg
 import torch
 
 from sionna.phy import Block
 from sionna.phy.utils import insert_dims
 from sionna.phy.channel.awgn import AWGN
+from sionna.phy.channel.utils import _toeplitz
 
 __all__ = ["ApplyTimeChannel"]
 
@@ -30,16 +29,16 @@ class ApplyTimeChannel(Block):
     time samples, as it is the result of filtering the channel input of length
     ``num_time_samples`` with the time-variant channel filter of length
     ``l_tot``. In the case of a single-input single-output link and given a sequence of channel
-    inputs :math:`x_0,\cdots,x_{N_B}`, where :math:`N_B` is ``num_time_samples``, this
+    inputs :math:`x_0,\cdots,x_{N_B-1}`, where :math:`N_B` is ``num_time_samples``, this
     layer outputs
 
     .. math::
-        y_b = \sum_{\ell = 0}^{L_{\text{tot}}} x_{b-\ell} \bar{h}_{b,\ell} + w_b
+        y_b = \sum_{\ell = 0}^{L_{\text{tot}}-1} x_{b-\ell} \bar{h}_{b,\ell} + w_b
 
     where :math:`L_{\text{tot}}` corresponds ``l_tot``, :math:`w_b` to the additive noise, and
     :math:`\bar{h}_{b,\ell}` to the :math:`\ell^{th}` tap of the :math:`b^{th}` channel sample.
     This layer outputs :math:`y_b` for :math:`b` ranging from 0 to
-    :math:`N_B + L_{\text{tot}} - 1`, and :math:`x_{b}` is set to 0 for :math:`b \geq N_B`.
+    :math:`N_B + L_{\text{tot}} - 2`, and :math:`x_{b}` is set to 0 for :math:`b \geq N_B`.
 
     For multiple-input multiple-output (MIMO) links, the channel output is computed for each antenna
     of each receiver and by summing over all the antennas of all transmitters.
@@ -142,15 +141,23 @@ class ApplyTimeChannel(Block):
         # In this example, the index `num_time_samples`=10 corresponds to the
         # zero symbol. The vector of transmitted symbols is padded with one
         # zero at the end.
-        first_column = np.concatenate(
-            [np.arange(0, num_time_samples), np.full([l_tot - 1], num_time_samples)]
+        first_column = torch.cat(
+            [
+                torch.arange(0, num_time_samples, dtype=torch.int64,
+                             device=self.device),
+                torch.full([l_tot - 1], num_time_samples, dtype=torch.int64,
+                           device=self.device),
+            ]
         )
-        first_row = np.concatenate([[0], np.full([l_tot - 1], num_time_samples)])
+        first_row = torch.cat(
+            [
+                torch.zeros(1, dtype=torch.int64, device=self.device),
+                torch.full([l_tot - 1], num_time_samples, dtype=torch.int64,
+                           device=self.device),
+            ]
+        )
         # Register as buffer for CUDA graph compatibility
-        g = scipy.linalg.toeplitz(first_column, first_row)
-        self.register_buffer(
-            "_g", torch.tensor(g, dtype=torch.int64, device=self.device)
-        )
+        self.register_buffer("_g", _toeplitz(first_column, first_row))
 
     @property
     def num_time_samples(self) -> int:

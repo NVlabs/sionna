@@ -9,6 +9,14 @@ from sionna.sys.link_adaptation import (
     InnerLoopLinkAdaptation,
     OuterLoopLinkAdaptation,
 )
+from sionna.sys.metrics import (
+    coupling_loss_db,
+    geometry_sinr_db,
+    geometry_sir_db,
+    received_power_dbm,
+    serving_indices,
+    wideband_sir_db,
+)
 from sionna.sys.phy_abstraction import PHYAbstraction
 from sionna.sys.power_control import (
     downlink_fair_power_control,
@@ -18,8 +26,12 @@ from sionna.sys.scheduling import PFSchedulerSUMIMO
 from sionna.sys.topology import (
     HexGrid,
     Hexagon,
+    IndoorFactoryTopology,
     convert_hex_coord,
     gen_hexgrid_topology,
+    gen_tr38901_indoor_factory_topology,
+    gen_tr38901_indoor_office_topology,
+    gen_tr38901_multicell_topology,
     get_num_hex_in_grid,
 )
 from sionna.sys.utils import (
@@ -35,6 +47,13 @@ __all__ = [
     # link_adaptation
     "InnerLoopLinkAdaptation",
     "OuterLoopLinkAdaptation",
+    # metrics
+    "coupling_loss_db",
+    "received_power_dbm",
+    "serving_indices",
+    "geometry_sir_db",
+    "geometry_sinr_db",
+    "wideband_sir_db",
     # phy_abstraction
     "PHYAbstraction",
     # power_control
@@ -47,7 +66,11 @@ __all__ = [
     "convert_hex_coord",
     "Hexagon",
     "HexGrid",
+    "IndoorFactoryTopology",
     "gen_hexgrid_topology",
+    "gen_tr38901_multicell_topology",
+    "gen_tr38901_indoor_office_topology",
+    "gen_tr38901_indoor_factory_topology",
     # utils
     "is_scheduled_in_slot",
     "get_pathloss",

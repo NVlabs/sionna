@@ -22,7 +22,7 @@ If you want to run the tutorial notebooks on your machine, you also need
 `JupyterLab <https://jupyter.org/>`_. You can alternatively test them on `Google
 Colab <https://colab.research.google.com/>`_. Although not necessary, we recommend
 running Sionna in a `Docker container <https://www.docker.com>`_ and/or `Python virtual
-enviroment <https://docs.python.org/3/library/venv.html>`_.
+environment <https://docs.python.org/3/library/venv.html>`_.
 
 The `Sionna Research Kit <rk/index.html>`_ runs on the `NVIDIA DGX
 Spark <https://www.nvidia.com/en-us/products/workstations/dgx-spark/>`_. We refer to the `quickstart guide <rk/quickstart.html>`_ for a detailed introduction.

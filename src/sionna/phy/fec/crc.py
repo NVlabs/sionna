@@ -116,7 +116,9 @@ class CRCEncoder(Block):
         if self._k is None:
             warnings.warn(
                 "CRC encoder is not initialized yet. "
-                "Input dimensions are unknown."
+                "Input dimensions are unknown.",
+                RuntimeWarning,
+                stacklevel=2,
             )
         return self._k
 
@@ -126,7 +128,9 @@ class CRCEncoder(Block):
         if self._n is None:
             warnings.warn(
                 "CRC encoder is not initialized yet. "
-                "Output dimensions are unknown."
+                "Output dimensions are unknown.",
+                RuntimeWarning,
+                stacklevel=2,
             )
         return self._n
 

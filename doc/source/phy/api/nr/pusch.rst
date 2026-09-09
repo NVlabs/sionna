@@ -9,6 +9,7 @@ PUSCH
    PUSCHConfig
    PUSCHDMRSConfig
    PUSCHLSChannelEstimator
+   PUSCHLMMSEChannelEstimator
    PUSCHPilotPattern
    PUSCHPrecoder
    PUSCHReceiver

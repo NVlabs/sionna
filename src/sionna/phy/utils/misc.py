@@ -6,6 +6,7 @@
 
 from abc import ABC, abstractmethod
 import math
+from numbers import Integral, Real
 import time
 from typing import Any, Callable, List, Optional, Tuple, Union
 
@@ -16,10 +17,12 @@ from scipy.interpolate import RectBivariateSpline, griddata
 from sionna.phy import config, dtypes, Block
 from sionna.phy.config import Precision
 from sionna.phy.utils.metrics import count_errors, count_block_errors
-from sionna.phy.utils.random import rand as _rand
+from sionna.phy.utils.random import (  # pylint: disable=unused-import
+    complex_normal,  # re-exported so `utils.misc.complex_normal` keeps working
+    rand as _rand,
+)
 
 __all__ = [
-    "complex_normal",
     "lin_to_db",
     "db_to_lin",
     "watt_to_dbm",
@@ -38,59 +41,6 @@ __all__ = [
     "TransportBlock",
     "SingleLinkChannel",
 ]
-
-
-def complex_normal(
-    shape: Union[List[int], Tuple[int, ...], torch.Size],
-    var: float = 1.0,
-    precision: Optional[Precision] = None,
-    device: Optional[str] = None,
-) -> torch.Tensor:
-    r"""Generates a tensor of complex normal random variables.
-
-    .. rubric:: Notes
-
-    This function uses :meth:`~sionna.phy.config.Config.torch_rng` internally,
-    which causes graph breaks when used with ``torch.compile``. For compiled
-    code inside a :class:`~sionna.phy.Block`, generate noise inline using
-    ``self.torch_rng`` directly.
-
-    :param shape: Desired shape.
-    :param var: Total variance, i.e., each complex dimension has variance ``var/2``.
-        Defaults to 1.0.
-    :param precision: Precision used for internal calculations and outputs.
-        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
-    :param device: Device for computation. If `None`,
-        :attr:`~sionna.phy.config.Config.device` is used.
-
-    :output x: Tensor of complex normal random variables.
-
-    .. rubric:: Examples
-
-    .. code-block:: python
-
-        from sionna.phy.utils import complex_normal
-
-        x = complex_normal([2, 3], var=2.0)
-        print(x.shape)
-        # torch.Size([2, 3])
-    """
-    if precision is None:
-        precision = config.precision
-    if device is None:
-        device = config.device
-
-    dtype = dtypes[precision]["torch"]["dtype"]
-
-    # Half the variance for each dimension
-    stddev = math.sqrt(var / 2.0)
-
-    # Generate complex Gaussian noise with the right variance
-    xr = torch.randn(shape, dtype=dtype, device=device,
-                     generator=config.torch_rng(device)) * stddev
-    xi = torch.randn(shape, dtype=dtype, device=device,
-                     generator=config.torch_rng(device)) * stddev
-    return torch.complex(xr, xi)
 
 
 def lin_to_db(
@@ -124,7 +74,7 @@ def lin_to_db(
     else:
         dtype = dtypes[precision]["torch"]["dtype"]
 
-    # Determine device - prefer input tensor's device, then explicit device, then config
+    # Explicit device wins, then the device of the input tensor, then config
     if device is None:
         if isinstance(x, torch.Tensor):
             device = x.device
@@ -170,7 +120,7 @@ def db_to_lin(
     else:
         dtype = dtypes[precision]["torch"]["dtype"]
 
-    # Determine device - prefer input tensor's device, then explicit device, then config
+    # Explicit device wins, then the device of the input tensor, then config
     if device is None:
         if isinstance(x, torch.Tensor):
             device = x.device
@@ -296,6 +246,17 @@ def ebnodb2no(
         no = ebnodb2no(ebno_db=10.0, num_bits_per_symbol=4, coderate=0.5)
         print(no.item())
     """
+    if isinstance(num_bits_per_symbol, bool) or not isinstance(
+        num_bits_per_symbol, Integral
+    ):
+        raise TypeError("num_bits_per_symbol must be an integer.")
+    if num_bits_per_symbol <= 0:
+        raise ValueError("num_bits_per_symbol must be positive.")
+    if isinstance(coderate, bool) or not isinstance(coderate, Real):
+        raise TypeError("coderate must be a real number.")
+    if not math.isfinite(coderate) or not 0 < coderate <= 1:
+        raise ValueError("coderate must be finite and within (0, 1].")
+
     if precision is None:
         dtype = config.dtype
     else:
@@ -361,7 +322,9 @@ def sample_bernoulli(
     r"""Generates samples from a Bernoulli distribution with probability ``p``.
 
     :param shape: Shape of the tensor to sample.
-    :param p: Probability (broadcastable with ``shape``).
+    :param p: Probability (broadcastable with ``shape``). Values outside
+        [0, 1] are rejected, except for a tensor-valued ``p``, where checking
+        it would force a device synchronization.
     :param precision: Precision used for internal calculations.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation. If `None`,
@@ -385,6 +348,18 @@ def sample_bernoulli(
 
     if device is None:
         device = config.device
+
+    # Validate on the host only. A scalar broadcasts against the samples for
+    # free, whereas copying it to the device blocks until the queued work
+    # drains, and reading back a device tensor would stall just the same.
+    if isinstance(p, Real):
+        if not (math.isfinite(p) and 0.0 <= p <= 1.0):
+            raise ValueError("p must contain finite values within [0, 1].")
+    elif not isinstance(p, torch.Tensor):
+        values = np.asarray(p, dtype=np.float64)
+        if not np.all(np.isfinite(values) & (values >= 0.0) & (values <= 1.0)):
+            raise ValueError("p must contain finite values within [0, 1].")
+        p = torch.as_tensor(p, dtype=dtype, device=device)
 
     generator = None if torch.compiler.is_compiling() else config.torch_rng(device)
     z = _rand(shape, dtype=dtype, device=device, generator=generator)
@@ -478,6 +453,8 @@ def _check_mc_stopping(bit_errors_i, block_errors_i,
 def _check_early_stop(bit_errors_i, block_errors_i, nb_bits_i, nb_blocks_i,
                       target_ber, target_bler):
     """Return _SimStatus if an early-stop condition across SNR points is met."""
+    if nb_bits_i == 0 or nb_blocks_i == 0:
+        return None
     if block_errors_i == 0:
         return _SimStatus.NO_ERROR
     if bit_errors_i / nb_bits_i < target_ber:
@@ -602,6 +579,14 @@ def sim_ber(
         raise TypeError("soft_estimates must be bool.")
     if not isinstance(verbose, bool):
         raise TypeError("verbose must be bool.")
+    if isinstance(batch_size, bool) or not isinstance(batch_size, Integral):
+        raise TypeError("batch_size must be an integer.")
+    if batch_size <= 0:
+        raise ValueError("batch_size must be positive.")
+    if isinstance(max_mc_iter, bool) or not isinstance(max_mc_iter, Integral):
+        raise TypeError("max_mc_iter must be an integer.")
+    if max_mc_iter <= 0:
+        raise ValueError("max_mc_iter must be positive.")
 
     # Handle target_ber / target_bler
     if target_ber is not None:
@@ -655,6 +640,18 @@ def sim_ber(
                 with torch.no_grad():
                     b, b_hat = mc_fun(
                         batch_size=batch_size, ebno_db=ebno_dbs[snr_idx])
+                    if not isinstance(b, torch.Tensor) or not isinstance(
+                        b_hat, torch.Tensor
+                    ):
+                        raise TypeError("mc_fun must return two tensors.")
+                    if b.shape != b_hat.shape:
+                        raise ValueError(
+                            "mc_fun must return tensors with the same shape."
+                        )
+                    if b.ndim == 0 or b.numel() == 0 or b.shape[-1] == 0:
+                        raise ValueError(
+                            "mc_fun must return tensors with a non-empty bit dimension."
+                        )
                     if soft_estimates:
                         b_hat = hard_decisions(b_hat)
 
@@ -876,7 +873,10 @@ def scalar_to_shaped_tensor(
             shape, dtype=dtype, device=device
         )
     else:
-        assert list(inp.shape) == list(shape), "Inconsistent shape"
+        if list(inp.shape) != list(shape):
+            raise ValueError(
+                f"Inconsistent shape: expected {list(shape)}, got {list(inp.shape)}"
+            )
         return inp.to(dtype=dtype, device=device)
 
 
@@ -1046,6 +1046,8 @@ class SplineGriddataInterpolation(Interpolate):
         # Compute log10(mat), replacing zeros with a "low" value to avoid inf
         log_mat = np.zeros(z.shape)
         mat_is0 = z == 0
+        if np.all(mat_is0):
+            return np.zeros((len(x_interp), len(y_interp)), dtype=float)
         if mat_is0.sum() > 0:
             log_mat_not0 = np.log10(z[~mat_is0])
             min_log_mat_not0 = min(log_mat_not0)
@@ -1230,7 +1232,8 @@ class SingleLinkChannel(Block):
 
     @num_bits_per_symbol.setter
     def num_bits_per_symbol(self, value: int) -> None:
-        assert value > 0, "num_bits_per_symbol must be a positive integer"
+        if not (value > 0):
+            raise ValueError("num_bits_per_symbol must be a positive integer")
         self._num_bits_per_symbol = int(value)
         self.set_num_coded_bits()
 
@@ -1241,7 +1244,8 @@ class SingleLinkChannel(Block):
 
     @num_info_bits.setter
     def num_info_bits(self, value: int) -> None:
-        assert value > 0, "num_info_bits must be a positive integer"
+        if not (value > 0):
+            raise ValueError("num_info_bits must be a positive integer")
         self._num_info_bits = int(value)
         self.set_num_coded_bits()
 
@@ -1252,8 +1256,11 @@ class SingleLinkChannel(Block):
 
     @target_coderate.setter
     def target_coderate(self, value: float) -> None:
-        assert 0 <= value <= 1, "target_coderate must be within [0, 1]"
-        self._target_coderate = value
+        if isinstance(value, bool) or not isinstance(value, Real):
+            raise TypeError("target_coderate must be a real number")
+        if not math.isfinite(value) or not 0 < value <= 1:
+            raise ValueError("target_coderate must be finite and within (0, 1]")
+        self._target_coderate = float(value)
         self.set_num_coded_bits()
 
     @property

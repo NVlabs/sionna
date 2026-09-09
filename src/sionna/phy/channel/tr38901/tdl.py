@@ -4,8 +4,6 @@
 #
 """Tapped delay line (TDL) channel model from 3GPP TR38.901 specification"""
 
-import json
-from importlib_resources import files
 from typing import Optional, Tuple
 
 import numpy as np
@@ -17,13 +15,58 @@ from sionna.phy.channel import ChannelModel
 
 from . import models
 
+_TDL_PARAMETER_FILES = {
+    "A": ("TDL-A.json", None),
+    "B": ("TDL-B.json", None),
+    "C": ("TDL-C.json", None),
+    "D": ("TDL-D.json", None),
+    "E": ("TDL-E.json", None),
+    "A10": ("TDL-A10.json", 10e-9),
+    "A30": ("TDL-A30.json", 30e-9),
+    "B100": ("TDL-B100.json", 100e-9),
+    "C60": ("TDL-C60.json", 60e-9),
+    "C300": ("TDL-C300.json", 300e-9),
+    "D10": ("TDL-D10.json", 10e-9),
+    "D30": ("TDL-D30.json", 30e-9),
+}
+
 
 class TDL(ChannelModel):
     # pylint: disable=line-too-long
     r"""
-    Tapped delay line (TDL) channel model from the 3GPP :cite:p:`TR38901` specification
+    Tapped delay line (TDL) channel model from the 3GPP :cite:p:`TR38901V1920` specification
 
     The power delay profiles (PDPs) are normalized to have a total energy of one.
+
+    Two families of delay profiles are available. They differ in how the tap
+    delays are obtained.
+
+    The *scalable* profiles ``"A"`` to ``"E"`` from TR 38.901 tabulate tap
+    delays that are normalized to an RMS delay spread of one. The delays used
+    in the simulation are these normalized values multiplied by
+    ``delay_spread``, so a single profile shape describes short and long delay
+    spreads alike, and ``delay_spread`` is what represents the propagation
+    scenario. Typical values are tabulated under Notes below.
+
+    The *fixed-delay* profiles ``"A10"`` to ``"D30"`` from Annex B.2.1 of
+    :cite:p:`TS38101-4` tabulate absolute tap delays in nanoseconds and are
+    defined for UE conformance and performance testing. Their RMS delay spread
+    is part of the profile definition and is stated in nanoseconds by the model
+    name, for example 30 ns for ``"A30"``. Since the tap delays are absolute,
+    they are used as tabulated and ``delay_spread`` scales nothing. It can
+    therefore be omitted for these profiles; a value that differs from the one
+    of the profile is overridden at construction, with a message printed, and
+    later assignments to :attr:`delay_spread` are ignored. Reading the property
+    returns the delay spread of the profile.
+    These profiles are normally referenced together with
+    a maximum Doppler frequency, as listed in the Doppler combination tables
+    below.
+
+    .. note::
+
+        The scalable TR 38.901 models apply from 0.5 GHz to 100 GHz and for
+        system bandwidths of at most 2 GHz. These applicability limits are not
+        enforced by this class.
 
     Channel coefficients are generated using a sum-of-sinusoids model :cite:p:`SoS`.
     Channel aging is simulated in the event of mobility.
@@ -69,14 +112,27 @@ class TDL(ChannelModel):
     ``rx_corr_mat`` and  :math:`\mathbf{R}_{\text{tx}}` the correlation matrix at
     the transmitter ``tx_corr_mat``.
 
-    :param model: TDL model to use. One of 'A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'.
-    :param delay_spread: RMS delay spread [s].
-        For the 'A30', 'B100', and 'C300' models, the delay spread must be set
-        to 30ns, 100ns, and 300ns, respectively.
+    :param model: TDL model to use. Must be one of ``"A"``, ``"B"``,
+        ``"C"``, ``"D"``, ``"E"``, ``"A10"``, ``"A30"``, ``"B100"``,
+        ``"C60"``, ``"C300"``, ``"D10"``, or ``"D30"``. The models
+        ``"A"`` to ``"E"`` are the scalable TR 38.901 TDL profiles. The
+        models ``"A10"``, ``"A30"``, ``"B100"``, ``"C60"``, ``"C300"``,
+        ``"D10"``, and ``"D30"`` are the fixed-delay
+        Annex B.2.1 delay profiles from :cite:p:`TS38101-4`.
+    :param delay_spread: RMS delay spread [s]. Required for the scalable
+        profiles ``"A"`` to ``"E"``, whose normalized tap delays it scales. The
+        fixed-delay TS 38.101-4 models tabulate absolute tap delays, so this
+        parameter can be omitted for them; it then takes the delay spread of
+        the profile, which is ``10 ns`` for ``"A10"`` and ``"D10"``, ``30 ns``
+        for ``"A30"`` and ``"D30"``, ``60 ns`` for ``"C60"``, ``100 ns`` for
+        ``"B100"``, and ``300 ns`` for ``"C300"``. A value that differs from
+        the one of the profile is discarded and a message is printed.
     :param carrier_frequency: Carrier frequency [Hz]
     :param num_sinusoids: Number of sinusoids for the sum-of-sinusoids model. Defaults to 20.
     :param los_angle_of_arrival: Angle-of-arrival for LoS path [radian]. Only used with LoS models.
-        Defaults to pi/4.
+        Defaults to ``arccos(0.7)``, placing the LoS Doppler peak at 0.7 times
+        the maximum Doppler shift as specified by
+        :cite:p:`TR38901V1920`.
     :param min_speed: Minimum speed [m/s]. Defaults to 0.0.
     :param max_speed: Maximum speed [m/s]. If set to `None`,
         then ``max_speed`` takes the same value as ``min_speed``.
@@ -100,6 +156,10 @@ class TDL(ChannelModel):
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param spec_version: Version of the TR 38.901 parameter tables to use.
+        Supported values are ``"16.1"`` and ``"19.2"``. Defaults to
+        ``"19.2"``. This selector applies only to the scalable TDL-A through
+        TDL-E profiles, not to the fixed TS 38.101-4 profiles.
 
     :input batch_size: `int`.
         Batch size.
@@ -118,36 +178,175 @@ class TDL(ChannelModel):
 
     .. rubric:: Examples
 
-    The following code snippet shows how to setup a TDL channel model assuming
-    an OFDM waveform:
+    The following code snippet shows how to set up a TDL channel model and
+    generate channel impulse responses:
 
     .. code-block:: python
 
+        import torch
         from sionna.phy.channel.tr38901 import TDL
-        from sionna.phy.channel import OFDMChannel
 
-        tdl = TDL(model="A",
-                  delay_spread=300e-9,
-                  carrier_frequency=3.5e9,
-                  min_speed=0.0,
-                  max_speed=3.0)
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-        channel = OFDMChannel(channel_model=tdl,
-                              resource_grid=rg)
+        channel_model = TDL(model="A",
+                            delay_spread=300e-9,
+                            carrier_frequency=3.5e9,
+                            min_speed=0.0,
+                            max_speed=3.0,
+                            num_rx_ant=2,
+                            num_tx_ant=1,
+                            device=device)
 
-    where ``rg`` is an instance of :class:`~sionna.phy.ofdm.ResourceGrid`.
+        h, tau = channel_model(batch_size=32,
+                               num_time_steps=14,
+                               sampling_frequency=30.72e6)
+
+    .. rubric:: Available Model Options
+
+    +------------+------------------+---------------------+---------------------+
+    | ``model``  | Source           | Delay handling      | LoS component       |
+    +============+==================+=====================+=====================+
+    | ``"A"``    | TR 38.901        | Scaled by           | No                  |
+    |            |                  | ``delay_spread``    |                     |
+    +------------+------------------+---------------------+---------------------+
+    | ``"B"``    | TR 38.901        | Scaled by           | No                  |
+    |            |                  | ``delay_spread``    |                     |
+    +------------+------------------+---------------------+---------------------+
+    | ``"C"``    | TR 38.901        | Scaled by           | No                  |
+    |            |                  | ``delay_spread``    |                     |
+    +------------+------------------+---------------------+---------------------+
+    | ``"D"``    | TR 38.901        | Scaled by           | Yes                 |
+    |            |                  | ``delay_spread``    |                     |
+    +------------+------------------+---------------------+---------------------+
+    | ``"E"``    | TR 38.901        | Scaled by           | Yes                 |
+    |            |                  | ``delay_spread``    |                     |
+    +------------+------------------+---------------------+---------------------+
+    | ``"A10"``  | TS 38.101-4      | Fixed, 10 ns RMS    | No                  |
+    +------------+------------------+---------------------+---------------------+
+    | ``"A30"``  | TS 38.101-4      | Fixed, 30 ns RMS    | No                  |
+    +------------+------------------+---------------------+---------------------+
+    | ``"B100"`` | TS 38.101-4      | Fixed, 100 ns RMS   | No                  |
+    +------------+------------------+---------------------+---------------------+
+    | ``"C60"``  | TS 38.101-4      | Fixed, 60 ns RMS    | No                  |
+    +------------+------------------+---------------------+---------------------+
+    | ``"C300"`` | TS 38.101-4      | Fixed, 300 ns RMS   | No                  |
+    +------------+------------------+---------------------+---------------------+
+    | ``"D10"``  | TS 38.101-4      | Fixed, 10 ns RMS    | Yes                 |
+    +------------+------------------+---------------------+---------------------+
+    | ``"D30"``  | TS 38.101-4      | Fixed, 30 ns RMS    | Yes                 |
+    +------------+------------------+---------------------+---------------------+
+
+    The fixed-delay resources contain the profiles standardized by TS 38.101-4
+    V19.2.2. Their release and frequency-range availability is:
+
+    .. list-table:: Fixed-delay profile availability
+       :header-rows: 1
+
+       * - Specification
+         - FR1 profiles
+         - FR2 profiles
+         - Restriction
+       * - TS 38.101-4 V16.1
+         - ``"A30"``, ``"B100"``, ``"C300"``
+         - ``"A30"``, ``"C60"``
+         - None
+       * - Added by TS 38.101-4 V19.2.2
+         - ``"D30"``
+         - ``"D30"``, ``"A10"``, ``"D10"``
+         - ``"A10"`` and ``"D10"`` apply only for channel bandwidths
+           greater than 200 MHz
+
+    The class has no channel-bandwidth argument and does not enforce these
+    fixed-profile restrictions. Select a profile appropriate for the simulated
+    frequency range and bandwidth.
+
+    .. rubric:: TS 38.101-4 Doppler Combinations
+
+    Annex B.2.2 of TS 38.101-4 defines full propagation-condition names by
+    combining a fixed delay profile with a maximum Doppler frequency. These
+    full names are not passed to ``model`` directly. Instead, select the delay
+    profile with ``model`` and set ``min_speed`` and ``max_speed`` to realize
+    the desired Doppler frequency.
+
+    .. list-table:: FR1 channel model parameters from TS 38.101-4 Table B.2.2-1
+       :header-rows: 1
+
+       * - TS 38.101-4 name
+         - ``model``
+         - :math:`f_{\mathrm{D,max}}`
+       * - ``TDLA30-5``
+         - ``"A30"``
+         - 5 Hz
+       * - ``TDLA30-10``
+         - ``"A30"``
+         - 10 Hz
+       * - ``TDLA30-20``
+         - ``"A30"``
+         - 20 Hz
+       * - ``TDLA30-180``
+         - ``"A30"``
+         - 180 Hz
+       * - ``TDLA30-195``
+         - ``"A30"``
+         - 195 Hz
+       * - ``TDLA30-1400``
+         - ``"A30"``
+         - 1400 Hz
+       * - ``TDLA30-2700``
+         - ``"A30"``
+         - 2700 Hz
+       * - ``TDLB100-400``
+         - ``"B100"``
+         - 400 Hz
+       * - ``TDLC300-100``
+         - ``"C300"``
+         - 100 Hz
+       * - ``TDLC300-600``
+         - ``"C300"``
+         - 600 Hz
+       * - ``TDLC300-1200``
+         - ``"C300"``
+         - 1200 Hz
+       * - ``TDLD30-5``
+         - ``"D30"``
+         - 5 Hz
+
+    .. list-table:: FR2 channel model parameters from TS 38.101-4 Table B.2.2-2
+       :header-rows: 1
+
+       * - TS 38.101-4 name
+         - ``model``
+         - :math:`f_{\mathrm{D,max}}`
+       * - ``TDLA30-35``
+         - ``"A30"``
+         - 35 Hz
+       * - ``TDLA30-75``
+         - ``"A30"``
+         - 75 Hz
+       * - ``TDLA30-300``
+         - ``"A30"``
+         - 300 Hz
+       * - ``TDLC60-300``
+         - ``"C60"``
+         - 300 Hz
+       * - ``TDLD30-75``
+         - ``"D30"``
+         - 75 Hz
 
     .. rubric:: Notes
 
-    The following tables from :cite:p:`TR38901` provide typical values for the delay
-    spread.
+    The scalable profiles do not define a delay spread of their own, so a value
+    must be chosen for ``delay_spread``. Table 7.7.3-1 of
+    :cite:p:`TR38901V1920` provides example scaling parameters for this purpose,
+    reproduced below. They span the range of RMS delay spreads observed in
+    measurements for the typical 5G evaluation scenarios.
 
     +--------------------------+-------------------+
     | Model                    | Delay spread [ns] |
     +==========================+===================+
     | Very short delay spread  | :math:`10`        |
     +--------------------------+-------------------+
-    | Short short delay spread | :math:`10`        |
+    | Short delay spread       | :math:`30`        |
     +--------------------------+-------------------+
     | Nominal delay spread     | :math:`100`       |
     +--------------------------+-------------------+
@@ -155,6 +354,15 @@ class TDL(ChannelModel):
     +--------------------------+-------------------+
     | Very long delay spread   | :math:`1000`      |
     +--------------------------+-------------------+
+
+    Table 7.7.3-2, reproduced below, relates these values to scenarios and
+    carrier frequencies, for information only. The short-delay profile is the
+    median RMS delay spread of the LoS case, while the normal-delay and
+    long-delay profiles are the median and the 90th percentile of the NLoS case.
+    A TDL profile is not tied to a scenario: any of these delay spreads may
+    occur in any scenario, but some values are more likely in some scenarios
+    than in others. The table does not apply to the fixed-delay profiles, whose
+    delay spread is part of the profile definition.
 
     +-----------------------------------------------+------+------+----------+-----+----+-----+
     |              Delay spread [ns]                |             Frequency [GHz]             |
@@ -189,15 +397,28 @@ class TDL(ChannelModel):
     |                        +----------------------+-----------------------------------------+
     |                        | Long delay profile   | 616                                     |
     +------------------------+----------------------+-----------------------------------------+
+
+    .. note::
+
+        TS 38.101-4 model names combine a fixed delay profile with a maximum
+        Doppler frequency, e.g., ``TDLA30-10``. In this class, ``model``
+        selects only the fixed delay profile, e.g., ``model="A30"``. The
+        ``min_speed`` and ``max_speed`` arguments are still used and determine
+        the Doppler spread through ``carrier_frequency``. To emulate a TS
+        38.101-4 model with maximum Doppler frequency
+        :math:`f_\mathrm{D,max}`, use
+        ``max_speed = f_D_max*c/carrier_frequency``, where :math:`c` is the
+        speed of light. Set ``min_speed`` to the same value for a deterministic
+        speed, or to a lower value to sample speeds uniformly over an interval.
     """
 
     def __init__(
         self,
         model: str,
-        delay_spread: float,
-        carrier_frequency: float,
+        delay_spread: Optional[float] = None,
+        carrier_frequency: Optional[float] = None,
         num_sinusoids: int = 20,
-        los_angle_of_arrival: float = PI / 4.,
+        los_angle_of_arrival: float = np.arccos(0.7),
         min_speed: float = 0.,
         max_speed: Optional[float] = None,
         num_rx_ant: int = 1,
@@ -207,40 +428,38 @@ class TDL(ChannelModel):
         tx_corr_mat: Optional[torch.Tensor] = None,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        spec_version: str = "19.2",
     ) -> None:
         super().__init__(precision=precision, device=device)
+        self._spec_version = models._validate_spec_version(spec_version)
+
+        # carrier_frequency only defaults to None so that delay_spread, which
+        # precedes it, can be omitted for the fixed-delay profiles
+        if carrier_frequency is None:
+            raise TypeError("carrier_frequency is required")
 
         # Set the file from which to load the model
-        assert model in ('A', 'B', 'C', 'D', 'E', 'A30', 'B100', 'C300'), \
-            "Invalid TDL model"
-        if model == 'A':
-            parameters_fname = "TDL-A.json"
-        elif model == 'B':
-            parameters_fname = "TDL-B.json"
-        elif model == 'C':
-            parameters_fname = "TDL-C.json"
-        elif model == 'D':
-            parameters_fname = "TDL-D.json"
-        elif model == 'E':
-            parameters_fname = "TDL-E.json"
-        elif model == 'A30':
-            parameters_fname = "TDL-A30.json"
-            if delay_spread != 30e-9:
-                print("Warning: Delay spread is set to 30ns with this model")
-                delay_spread = 30e-9
-        elif model == 'B100':
-            parameters_fname = "TDL-B100.json"
-            if delay_spread != 100e-9:
-                print("Warning: Delay spread is set to 100ns with this model")
-                delay_spread = 100e-9
-        elif model == 'C300':
-            parameters_fname = "TDL-C300.json"
-            if delay_spread != 300e-9:
-                print("Warning: Delay spread is set to 300ns with this model")
-                delay_spread = 300e-9
+        if model not in _TDL_PARAMETER_FILES:
+            raise ValueError(
+                f"model must be one of {list(_TDL_PARAMETER_FILES)}"
+            )
+        parameters_fname, fixed_delay_spread = _TDL_PARAMETER_FILES[model]
+        if fixed_delay_spread is None:
+            if delay_spread is None:
+                raise TypeError("delay_spread is required for the scalable "
+                                f"model '{model}'")
+        elif delay_spread is None:
+            delay_spread = fixed_delay_spread
+        elif delay_spread != fixed_delay_spread:
+            delay_spread_ns = int(round(fixed_delay_spread * 1e9))
+            print(f"Warning: Delay spread is set to {delay_spread_ns}ns with this model")
+            delay_spread = fixed_delay_spread
 
         # Load model parameters
-        self._load_parameters(parameters_fname)
+        self._load_parameters(
+            parameters_fname,
+            fixed_profile=fixed_delay_spread is not None,
+        )
 
         self._num_rx_ant = num_rx_ant
         self._num_tx_ant = num_tx_ant
@@ -253,8 +472,10 @@ class TDL(ChannelModel):
         if max_speed is None:
             self.register_buffer("_max_speed", self._min_speed.clone())
         else:
-            assert max_speed >= min_speed, \
-                "min_speed cannot be larger than max_speed"
+            if not (max_speed >= min_speed):
+                raise ValueError(
+                    "min_speed cannot be larger than max_speed"
+                )
             self.register_buffer("_max_speed", torch.tensor(max_speed, dtype=self.dtype, device=self.device))
 
         # Pre-compute maximum and minimum Doppler shifts
@@ -305,6 +526,11 @@ class TDL(ChannelModel):
         return self._num_clusters
 
     @property
+    def spec_version(self) -> str:
+        """Version of the TR 38.901 parameter tables in use."""
+        return self._spec_version
+
+    @property
     def los(self) -> bool:
         r"""`True` if this is a LoS model. `False` otherwise."""
         return self._los
@@ -312,7 +538,10 @@ class TDL(ChannelModel):
     @property
     def k_factor(self) -> torch.Tensor:
         r"""K-factor in linear scale. Only available with LoS models."""
-        assert self._los, "This property is only available for LoS models"
+        if not self._los:
+            raise RuntimeError(
+                "This property is only available for LoS models"
+            )
         return torch.real(self._los_power / self._mean_powers[0])
 
     @property
@@ -337,7 +566,10 @@ class TDL(ChannelModel):
     def mean_power_los(self) -> torch.Tensor:
         r"""LoS component power in linear scale.
         Only available with LoS models."""
-        assert self._los, "This property is only available for LoS models"
+        if not self._los:
+            raise RuntimeError(
+                "This property is only available for LoS models"
+            )
         return torch.real(self._los_power)
 
     @property
@@ -488,7 +720,7 @@ class TDL(ChannelModel):
         """
         return 2. * PI * speed / SPEED_OF_LIGHT * self._carrier_frequency
 
-    def _load_parameters(self, fname: str) -> None:
+    def _load_parameters(self, fname: str, fixed_profile: bool) -> None:
         r"""Load parameters of a TDL model.
 
         The model parameters are stored as JSON files with the following keys:
@@ -502,10 +734,13 @@ class TDL(ChannelModel):
         to correspond to the specular and NLoS component, in this order.
 
         :param fname: File from which to load the parameters.
+        :param fixed_profile: Whether ``fname`` is a fixed TS 38.101-4 profile.
         """
-        source = files(models).joinpath(fname)
-        with open(source) as parameter_file:
-            params = json.load(parameter_file)
+        if fixed_profile:
+            source = models.fixed_tdl_parameter_file(fname)
+        else:
+            source = models.parameter_file(fname, self.spec_version)
+        params = models.load_json(source)
 
         # LoS scenario ?
         self._los = bool(params['los'])
@@ -542,4 +777,3 @@ class TDL(ChannelModel):
 
         self._delays = delays
         self._mean_powers = mean_powers
-

@@ -7,7 +7,6 @@
 import os
 import numpy as np
 import pytest
-import warnings
 import torch
 
 from sionna.phy.fec.polar.encoding import PolarEncoder, Polar5GEncoder
@@ -252,6 +251,14 @@ class TestPolarSCLDecoder:
         with pytest.raises(BaseException):
             PolarSCLDecoder(frozen_pos, n + 1)
 
+        # list_size not a pow of 2
+        with pytest.raises(ValueError):
+            PolarSCLDecoder(frozen_pos, n, list_size=3)
+
+        # return_crc_status without crc_degree
+        with pytest.raises(ValueError):
+            PolarSCLDecoder(frozen_pos, n, return_crc_status=True)
+
     def test_valid_inputs(self):
         """Test that valid shapes are accepted."""
         param_valid = [
@@ -263,9 +270,7 @@ class TestPolarSCLDecoder:
 
         for k, n in param_valid:
             frozen_pos, _ = generate_5g_ranking(k, n)
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                dec = PolarSCLDecoder(frozen_pos, n)
+            dec = PolarSCLDecoder(frozen_pos, n)
             assert dec.k == k
             assert dec.n == n
 
@@ -329,9 +334,7 @@ class TestPolarSCLDecoder:
 
         frozen_pos, _ = generate_5g_ranking(k, n)
         source = BinarySource(device=device)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            dec = PolarSCLDecoder(frozen_pos, n, device=device)
+        dec = PolarSCLDecoder(frozen_pos, n, device=device)
 
         b = source([100, n])
         b_res = b.reshape([4, 5, 5, n])
@@ -363,7 +366,7 @@ class TestPolarSCLDecoder:
         for i in range(bs):
             assert torch.equal(c[0, :, :], c[i, :, :])
 
-    @pytest.mark.parametrize("list_size", [1, 2, 8])
+    @pytest.mark.parametrize("list_size", [1, 2, 8, 16])
     def test_list_sizes(self, device, list_size):
         """Test that different list sizes work."""
         bs = 10
@@ -423,40 +426,11 @@ class TestPolarSCLDecoder:
 
         llr = source([batch_size, n], 0.5)
 
-        dec = PolarSCLDecoder(frozen_pos, n, precision=precision, device=device)
+        dec = PolarSCLDecoder(
+            frozen_pos, n, precision=precision, device=device
+        )
         x = dec(llr)
         assert x.dtype == dt_out
-
-    def test_hybrid_scl(self, device):
-        """Verify hybrid SC decoding option."""
-        bs = 10
-        n = 32
-        k = 16
-        crc_degree = "CRC11"
-        list_sizes = [1, 2, 8]
-
-        frozen_pos, _ = generate_5g_ranking(k, n)
-        source = BinarySource(device=device)
-        enc = PolarEncoder(frozen_pos, n, device=device)
-        enc_crc = CRCEncoder(crc_degree, device=device)
-        k_crc = enc_crc.crc_length
-
-        u = source([bs, k - k_crc])
-        u_crc = enc_crc(u)
-        c = enc(u_crc)
-        llr_ch = 20.0 * (2.0 * c - 1)  # Demod BPSK without noise
-
-        for list_size in list_sizes:
-            dec = PolarSCLDecoder(
-                frozen_pos,
-                n,
-                list_size=list_size,
-                use_hybrid_sc=True,
-                crc_degree=crc_degree,
-                device=device,
-            )
-            u_hat = dec(llr_ch)
-            assert torch.equal(u_crc, u_hat)
 
     def test_return_crc_scl(self, device):
         """Test that correct CRC status is returned."""
@@ -470,11 +444,8 @@ class TestPolarSCLDecoder:
         enc = PolarEncoder(frozen_pos, n, device=device)
         crc_enc = CRCEncoder("CRC11", device=device)
         dec = PolarSCLDecoder(
-            frozen_pos,
-            n,
-            crc_degree="CRC11",
-            return_crc_status=True,
-            device=device,
+            frozen_pos, n, crc_degree="CRC11",
+            return_crc_status=True, device=device
         )
         k_crc = crc_enc.crc_length
 
@@ -487,6 +458,27 @@ class TestPolarSCLDecoder:
         # Without noise, CRC should always be valid
         assert crc_status.all()
         assert torch.equal(u_crc, u_hat)
+
+    def test_torch_compile(self, device):
+        """Test that torch.compile works for the tape-based SCL decoder."""
+        bs = 10
+        k = 100
+        n = 128
+        source = BinarySource(device=device)
+        frozen_pos, _ = generate_5g_ranking(k, n)
+        dec = PolarSCLDecoder(frozen_pos, n, device=device)
+
+        @torch.compile
+        def run_graph(u):
+            return dec(u)
+
+        u = source([bs, n])
+        x = run_graph(u)
+        assert x.shape == (bs, k)
+
+        # Execute the graph twice to exercise the cached compiled artifact
+        x = run_graph(u)
+        assert x.shape == (bs, k)
 
 
 class TestPolarBPDecoder:
@@ -506,6 +498,17 @@ class TestPolarBPDecoder:
         frozen_pos, _ = generate_5g_ranking(k, n)
         with pytest.raises(BaseException):
             PolarBPDecoder(frozen_pos, n + 1)
+
+    def test_num_iter_setter(self, device):
+        """Setter must reject the same invalid values as the constructor."""
+        frozen_pos, _ = generate_5g_ranking(12, 32)
+        dec = PolarBPDecoder(frozen_pos, 32, num_iter=1, device=device)
+        with pytest.raises(ValueError, match="positive"):
+            dec.num_iter = 0
+        with pytest.raises(TypeError, match="integer"):
+            dec.num_iter = 1.5
+        dec.num_iter = 4
+        assert dec.num_iter == 4
 
     def test_valid_inputs(self):
         """Test that valid shapes are accepted."""
@@ -764,7 +767,7 @@ class TestPolar5GDecoder:
     @pytest.mark.parametrize(
         "k,n", [(12, 20), (20, 44), (100, 257), (123, 897)]
     )
-    @pytest.mark.parametrize("dec_type", ["SC", "SCL", "hybSCL", "BP"])
+    @pytest.mark.parametrize("dec_type", ["SC", "SCL", "BP"])
     def test_identity_uplink(self, device, k, n, dec_type):
         """Test that info bits can be recovered for uplink scenario."""
         bs = 10
@@ -782,7 +785,7 @@ class TestPolar5GDecoder:
         assert torch.equal(u, u_hat)
 
     @pytest.mark.parametrize("k,n", [(1, 25), (20, 44), (140, 576)])
-    @pytest.mark.parametrize("dec_type", ["SC", "SCL", "hybSCL", "BP"])
+    @pytest.mark.parametrize("dec_type", ["SC", "SCL", "BP"])
     def test_identity_downlink(self, device, k, n, dec_type):
         """Test that info bits can be recovered for downlink scenario."""
         bs = 10
@@ -844,18 +847,14 @@ class TestPolar5GDecoder:
                 assert torch.equal(c[0, :, :], c[i, :, :])
 
     def test_torch_compile(self, device):
-        """Test that torch.compile works for supported decoders.
-
-        Note: SCL decoder uses numpy-based implementation internally and
-        is not compatible with torch.compile, so it is skipped here.
-        """
+        """Test that torch.compile works for the supported decoders."""
         bs = 10
         k = 45
         n = 67
         enc = Polar5GEncoder(k, n, device=device)
         source = GaussianPriorSource(device=device)
 
-        for dec_type in ["SC", "BP"]:  # SCL uses numpy internally
+        for dec_type in ["SC", "SCL", "BP"]:
             dec = Polar5GDecoder(enc, dec_type=dec_type, device=device)
 
             @torch.compile

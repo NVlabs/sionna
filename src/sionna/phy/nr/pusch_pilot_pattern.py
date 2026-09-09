@@ -32,6 +32,8 @@ class PUSCHPilotPattern(PilotPattern):
         Precision used for internal calculations and outputs.
         If set to `None`,
         :attr:`~sionna.phy.config.Config.precision` is used.
+    :param device: Device for tensor operations. If `None`,
+        :attr:`~sionna.phy.config.Config.device` is used.
 
     .. rubric:: Examples
 
@@ -48,6 +50,7 @@ class PUSCHPilotPattern(PilotPattern):
         self,
         pusch_configs: Union[PUSCHConfig, List[PUSCHConfig]],
         precision: Optional[str] = None,
+        device: Optional[str] = None,
     ):
         # Check correct type of pusch_configs
         if isinstance(pusch_configs, PUSCHConfig):
@@ -92,7 +95,7 @@ class PUSCHPilotPattern(PilotPattern):
                 for port in pusch_config.dmrs.dmrs_port_set:
                     if port in dmrs_ports:
                         msg = f"DMRS port {port} used by multiple transmitters"
-                        warnings.warn(msg)
+                        warnings.warn(msg, UserWarning, stacklevel=2)
             dmrs_ports += pusch_config.dmrs.dmrs_port_set
 
         # Create mask and pilots tensors
@@ -111,5 +114,7 @@ class PUSCHPilotPattern(PilotPattern):
                 pilots[i, j] = dmrs_grid[np.where(mask[i, j])]
 
         # Init PilotPattern class
-        super().__init__(mask, pilots, normalize=False, precision=precision)
+        super().__init__(
+            mask, pilots, normalize=False, precision=precision, device=device
+        )
 

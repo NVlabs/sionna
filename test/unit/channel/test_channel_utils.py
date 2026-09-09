@@ -14,6 +14,7 @@ from sionna.phy.channel import (
     subcarrier_frequencies,
     time_frequency_vector,
     time_lag_discrete_time_channel,
+    time_to_ofdm_channel,
     cir_to_ofdm_channel,
     cir_to_time_channel,
     deg_2_rad,
@@ -27,6 +28,7 @@ from sionna.phy.channel import (
     exp_corr_mat,
     one_ring_corr_mat,
 )
+from sionna.phy.ofdm import ResourceGrid
 
 # Import test utilities
 import sys
@@ -330,6 +332,23 @@ class TestDropUtsInSector:
 
 class TestSet3gppScenarioParameters:
     """Tests for set_3gpp_scenario_parameters function"""
+
+    @pytest.mark.parametrize(
+        ("scenario", "expected_min_bs_ut_dist"),
+        [
+            ("umi", 10.0),
+            ("umi-calibration", 10.0),
+            ("uma", 35.0),
+            ("uma-calibration", 35.0),
+        ],
+    )
+    def test_umi_uma_default_min_bs_ut_dist(
+        self, scenario, expected_min_bs_ut_dist, device
+    ):
+        """Test Table 7.8-1 minimum BS-UT distance defaults."""
+        min_bs_ut_dist, *_ = set_3gpp_scenario_parameters(scenario, device=device)
+
+        assert min_bs_ut_dist.item() == expected_min_bs_ut_dist
 
     @pytest.mark.parametrize(
         "scenario", ["umi", "uma", "rma", "umi-calibration", "uma-calibration"]
@@ -700,3 +719,29 @@ class TestOneRingCorrMat:
 
         R = one_ring_corr_mat(torch.rand(2, 3) * 180 - 90, 4, device=device)
         assert R.shape == torch.Size([2, 3, 4, 4])
+
+
+class TestTimeToOfdmChannel:
+    """Regression tests for time_to_ofdm_channel output contract."""
+
+    def test_output_fft_size_when_padded(self, device):
+        """Shorter impulse responses are zero-padded to fft_size."""
+        rg = ResourceGrid(
+            num_ofdm_symbols=1, fft_size=8, subcarrier_spacing=15e3, device=device
+        )
+        h_t = torch.randn(
+            1, rg.num_time_samples, 5, dtype=torch.complex64, device=device
+        )
+        h_f = time_to_ofdm_channel(h_t, rg, l_min=0)
+        assert h_f.shape[-1] == rg.fft_size
+
+    def test_rejects_impulse_longer_than_fft(self, device):
+        """Longer impulse responses must raise instead of returning wrong shape."""
+        rg = ResourceGrid(
+            num_ofdm_symbols=1, fft_size=4, subcarrier_spacing=15e3, device=device
+        )
+        h_t = torch.randn(
+            1, rg.num_time_samples, 6, dtype=torch.complex64, device=device
+        )
+        with pytest.raises(ValueError, match="must not exceed rg.fft_size"):
+            time_to_ofdm_channel(h_t, rg, l_min=0)

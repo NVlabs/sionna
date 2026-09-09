@@ -79,7 +79,8 @@ class TimeChannel(Block):
 
     :input no: `None` (default) | `torch.Tensor`, `torch.float`.
         Tensor whose shape can be broadcast to the shape of the
-        channel outputs: [batch size, num_rx, num_rx_ant, num_time_samples].
+        channel outputs: [batch size, num_rx, num_rx_ant,
+        num_time_samples + l_max - l_min].
         The (optional) noise power ``no`` is per complex dimension. If ``no`` is a scalar,
         noise of the same variance will be added to the outputs.
         If ``no`` is a tensor, it must have a shape that can be broadcast to

@@ -85,18 +85,17 @@ class TestLDPC5GEncoder:
         assert torch.equal(u[:, 2 * z :], c[:, : k - 2 * z])
 
     def test_non_binary_input_raises(self, device):
-        """Test that encoder raises error for non-binary input."""
-        k = 100
-        n = 200
-        bs = 20
-        u = torch.zeros(bs, k, device=device)
-
+        """Binary checks stay enabled after a valid call; check_input=False skips them."""
+        k, n, bs = 100, 200, 20
         enc = LDPC5GEncoder(k, n, device=device)
-
-        # Add single invalid (non-binary) value
+        u = torch.zeros(bs, k, device=device)
+        enc(u)
         u[13, 37] = 2
         with pytest.raises(ValueError, match="Input must be binary"):
             enc(u)
+
+        enc_off = LDPC5GEncoder(k, n, device=device, check_input=False)
+        assert enc_off(u).shape[-1] == n
 
     def test_dim_mismatch(self, device):
         """Test that encoder raises error for inconsistent input dimensions."""
@@ -142,7 +141,7 @@ class TestLDPC5GEncoder:
         u = source([bs, k])
 
         # Test with torch.compile
-        compiled_enc = torch.compile(enc)
+        compiled_enc = torch.compile(enc, fullgraph=True)
         c = compiled_enc(u)
         assert c.shape == (bs, n)
 

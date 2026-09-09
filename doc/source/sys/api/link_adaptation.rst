@@ -41,7 +41,7 @@ It is assumed that:
 
 - Each MCS category has multiple table indices, each defining the mapping
   between MCS indices and their corresponding modulation orders and coding rates.
-  Such relationships are defined by ``sinr_effective_fun``;
+  Such relationships are defined by ``mcs_decoder_fun``;
 
 - The transport block, which serves as main data unit, is divided into multiple
   code blocks. The number and size of these code blocks are computed by
@@ -51,5 +51,9 @@ Yet, if neither ``sinr_effective_fun`` nor ``transport_block_fun`` is provided,
 this class aligns with 3GPP TS 38.214 (:cite:p:`3GPPTS38214`),
 specifically Section 5.1.3 (PUSCH) and Section 6.1.4 (PDSCH).
 In this case, the MCS category refers to PDSCH (category = 1) and PUSCH (0).
-Valid table `indices` are {1, 2} for PUSCH and {1, 2, 3, 4} for PDSCH.
+Valid MCS table indices for the MCS decoder and built-in BLER tables are
+{1, 2} for PUSCH and {1, 2, 3, 4} for PDSCH. The default EESM beta parameters
+cover indices {1, 2} only; using PDSCH tables 3 or 4 through the SINR path
+requires a custom beta table, or bypassing EESM by passing ``sinr_eff`` and
+``num_allocated_re`` directly to :class:`~sionna.sys.PHYAbstraction`.
 For more information, refer to :class:`~sionna.phy.nr.TBConfig`.

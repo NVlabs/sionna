@@ -170,7 +170,10 @@ class ViterbiDecoder(Block):
                 "Due to termination, the true coderate is lower "
                 "than the returned design rate. "
                 "The exact true rate is dependent on the value of n and "
-                "hence cannot be computed before the first call().")
+                "hence cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             self._coderate = self._coderate_desired
         elif self.terminate and self._n is not None:
             k = self._coderate_desired * self._n - self._mu
@@ -193,16 +196,22 @@ class ViterbiDecoder(Block):
     def k(self) -> Optional[int]:
         """Number of information bits per codeword."""
         if self._k is None:
-            warnings.warn("The value of k cannot be computed before the "
-                          "first call().")
+            warnings.warn(
+                "The value of k cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self._k
 
     @property
     def n(self) -> Optional[int]:
         """Number of codeword bits."""
         if self._n is None:
-            warnings.warn("The value of n cannot be computed before the "
-                          "first call().")
+            warnings.warn(
+                "The value of n cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self._n
 
     def _mask_by_tonode(self) -> torch.Tensor:
@@ -423,8 +432,8 @@ class ViterbiDecoder(Block):
         """
         LARGEDIST = 2.**20
 
-        # Ensure build() has been called
-        if self._n is None:
+        # Allow different codeword lengths in eager mode
+        if self._n is None or inputs.shape[-1] != self._n:
             self.build(inputs.shape)
 
         if self._method == 'hard':
@@ -624,7 +633,10 @@ class BCJRDecoder(Block):
                 "Due to termination, the true coderate is lower "
                 "than the returned design rate. "
                 "The exact true rate is dependent on the value of n and "
-                "hence cannot be computed before the first call().")
+                "hence cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
             self._coderate = self._coderate_desired
         elif self.terminate and self._n is not None:
             k = self._coderate_desired * self._n - self._mu
@@ -647,16 +659,22 @@ class BCJRDecoder(Block):
     def k(self) -> Optional[int]:
         """Number of information bits per codeword."""
         if self._k is None:
-            warnings.warn("The value of k cannot be computed before the "
-                          "first call().")
+            warnings.warn(
+                "The value of k cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self._k
 
     @property
     def n(self) -> Optional[int]:
         """Number of codeword bits."""
         if self._n is None:
-            warnings.warn("The value of n cannot be computed before the "
-                          "first call().")
+            warnings.warn(
+                "The value of n cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self._n
 
     def _mask_by_tonode(self) -> Tuple[torch.Tensor, torch.Tensor]:

@@ -10,6 +10,7 @@ Utils
    generate_prng_seq
    decode_mcs_index
    calculate_num_coded_bits
+   calculate_codeword_bits
    TransportBlockNR
    CodedAWGNChannelNR
    MCSDecoderNR

@@ -8,6 +8,8 @@ from collections.abc import Sequence
 from typing import List, Optional, Tuple, Union
 import numpy as np
 
+from sionna._validation import check_one_of
+
 from .config import Config
 
 
@@ -55,8 +57,12 @@ class PUSCHDMRSConfig(Config):
 
     @config_type.setter
     def config_type(self, value: int) -> None:
-        if value not in [1, 2]:
-            raise ValueError("config_type must be in [1,2]")
+        check_one_of(
+            value,
+            (1, 2),
+            name="config_type",
+            message="config_type must be in [1,2]",
+        )
         self._config_type = value
 
     @property
@@ -73,8 +79,12 @@ class PUSCHDMRSConfig(Config):
 
     @type_a_position.setter
     def type_a_position(self, value: int) -> None:
-        if value not in [2, 3]:
-            raise ValueError("type_a_position must be in [2,3]")
+        check_one_of(
+            value,
+            (2, 3),
+            name="type_a_position",
+            message="type_a_position must be in [2,3]",
+        )
         self._type_a_position = value
 
     @property
@@ -90,8 +100,12 @@ class PUSCHDMRSConfig(Config):
 
     @additional_position.setter
     def additional_position(self, value: int) -> None:
-        if value not in [0, 1, 2, 3]:
-            raise ValueError("additional_position must be in [0,1,2,3]")
+        check_one_of(
+            value,
+            (0, 1, 2, 3),
+            name="additional_position",
+            message="additional_position must be in [0,1,2,3]",
+        )
         self._additional_position = value
 
     @property
@@ -106,8 +120,12 @@ class PUSCHDMRSConfig(Config):
 
     @length.setter
     def length(self, value: int) -> None:
-        if value not in [1, 2]:
-            raise ValueError("Invalid DMRS length")
+        check_one_of(
+            value,
+            (1, 2),
+            name="length",
+            message="Invalid DMRS length",
+        )
         self._length = value
 
     @property
@@ -152,15 +170,23 @@ class PUSCHDMRSConfig(Config):
         if value is None:
             self._n_id = None
         elif isinstance(value, int):
-            if value not in list(range(65536)):
-                raise ValueError("n_id must be in [0, 65535]")
+            check_one_of(
+                value,
+                range(65536),
+                name="n_id",
+                message="n_id must be in [0, 65535]",
+            )
             self._n_id = [value, value]
         else:
             if len(value) != 2:
                 raise ValueError("n_id must be either None or a two-tuple")
             for e in value:
-                if e not in list(range(65536)):
-                    raise ValueError("Each element of n_id must be in [0, 65535]")
+                check_one_of(
+                    e,
+                    range(65536),
+                    name="n_id",
+                    message="Each element of n_id must be in [0, 65535]",
+                )
             self._n_id = list(value)
 
     @property
@@ -172,8 +198,12 @@ class PUSCHDMRSConfig(Config):
 
     @n_scid.setter
     def n_scid(self, value: int) -> None:
-        if value not in [0, 1]:
-            raise ValueError("n_scid must be 0 or 1")
+        check_one_of(
+            value,
+            (0, 1),
+            name="n_scid",
+            message="n_scid must be 0 or 1",
+        )
         self._n_scid = value
 
     @property
@@ -192,8 +222,12 @@ class PUSCHDMRSConfig(Config):
 
     @num_cdm_groups_without_data.setter
     def num_cdm_groups_without_data(self, value: int) -> None:
-        if value not in [1, 2, 3]:
-            raise ValueError("num_cdm_groups_without_data must be in [1,2,3]")
+        check_one_of(
+            value,
+            (1, 2, 3),
+            name="num_cdm_groups_without_data",
+            message="num_cdm_groups_without_data must be in [1,2,3]",
+        )
         self._num_cdm_groups_without_data = value
 
     # -----------------------------
@@ -301,9 +335,14 @@ class PUSCHDMRSConfig(Config):
 
     @property
     def beta(self) -> float:
-        r"""`float`, read-only : Ratio of PUSCH energy per resource element
-        (EPRE) to DMRS EPRE :math:`\beta^{\text{DMRS}}_\text{PUSCH}`.
-        Table 6.2.2-1 :cite:p:`3GPPTS38214`."""
+        r"""`float`, read-only : Linear amplitude scaling applied to DMRS
+        symbols.
+
+        The squared value is the ratio of DMRS EPRE to PUSCH EPRE. Values
+        :math:`1`, :math:`\sqrt{2}`, and :math:`\sqrt{3}` correspond to
+        PUSCH-to-DMRS EPRE ratios of 0 dB, -3 dB, and -4.77 dB, respectively,
+        as specified in Table 6.2.2-1 :cite:p:`3GPPTS38214`.
+        """
         if self.num_cdm_groups_without_data == 1:
             return 1.0
         elif self.num_cdm_groups_without_data == 2:
@@ -320,20 +359,36 @@ class PUSCHDMRSConfig(Config):
     def check_config(self) -> None:
         """Test if configuration is valid."""
         if self.length == 2:
-            if self.additional_position not in [0, 1]:
-                raise ValueError("additional_position must be in [0, 1] for length==2")
+            check_one_of(
+                self.additional_position,
+                (0, 1),
+                name="additional_position",
+                message=(
+                    "additional_position must be in [0, 1] for length==2"
+                ),
+            )
 
         for p in self.dmrs_port_set:
-            if p not in self.allowed_dmrs_ports:
-                raise ValueError(
-                    f"Unallowed DMRS port {p}. Not in {self.allowed_dmrs_ports}."
-                )
+            check_one_of(
+                p,
+                tuple(self.allowed_dmrs_ports),
+                name="dmrs_port",
+                message=(
+                    f"Unallowed DMRS port {p}. "
+                    f"Not in {self.allowed_dmrs_ports}."
+                ),
+            )
 
         if self.config_type == 1:
-            if self.num_cdm_groups_without_data not in [1, 2]:
-                raise ValueError(
-                    "num_cdm_groups_without_data must be in [1,2] for config_type 1"
-                )
+            check_one_of(
+                self.num_cdm_groups_without_data,
+                (1, 2),
+                name="num_cdm_groups_without_data",
+                message=(
+                    "num_cdm_groups_without_data must be in [1,2] for "
+                    "config_type 1"
+                ),
+            )
 
         attr_list = [
             "config_type",

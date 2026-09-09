@@ -4,7 +4,7 @@
 #
 """Custom pybtex styles that use the BibTeX key as the label.
 
-This ensures that citations display as [Kouyoumjian74], [TR38901], etc.,
+This ensures that citations display as [Kouyoumjian74], [TR38901V160100], etc.,
 and that labels are inherently unique (since BibTeX keys are unique).
 """
 

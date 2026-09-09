@@ -119,21 +119,21 @@ class TestStreamManagement:
     def test_invalid_binary_association(self):
         """Test that non-binary association raises error."""
         rx_tx_association = np.array([[1, 2], [0, 1]])
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             StreamManagement(rx_tx_association, num_streams_per_tx=1)
 
     def test_asymmetric_rx_association_raises(self):
         """Test that asymmetric RX association raises error."""
         # RX 0 has 2 TXs, RX 1 has 1 TX - should fail
         rx_tx_association = np.array([[1, 1], [1, 0]])
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             StreamManagement(rx_tx_association, num_streams_per_tx=1)
 
     def test_asymmetric_tx_association_raises(self):
         """Test that asymmetric TX association raises error."""
         # TX 0 has 2 RXs, TX 1 has 1 RX - should fail
         rx_tx_association = np.array([[1, 0], [1, 1]])
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             StreamManagement(rx_tx_association, num_streams_per_tx=1)
 
     def test_broadcast_configuration(self):
@@ -147,6 +147,53 @@ class TestStreamManagement:
         assert sm.num_streams_per_tx == 3
         assert sm.num_streams_per_rx == 1  # 1*3/3 = 1
         assert sm.num_rx_per_tx == 3
+
+    def test_many_to_many_stream_mapping(self):
+        """Streams are uniformly and uniquely assigned on active links."""
+        sm = StreamManagement(
+            np.ones((2, 2), dtype=np.int32), num_streams_per_tx=4
+        )
+
+        expected_association = np.array(
+            [
+                [[1, 1, 0, 0], [1, 1, 0, 0]],
+                [[0, 0, 1, 1], [0, 0, 1, 1]],
+            ],
+            dtype=np.int32,
+        )
+        np.testing.assert_array_equal(
+            sm.stream_association, expected_association
+        )
+        np.testing.assert_array_equal(
+            sm.rx_stream_ids,
+            np.array([[0, 1, 4, 5], [2, 3, 6, 7]], dtype=np.int32),
+        )
+        np.testing.assert_array_equal(
+            sm.detection_desired_ind,
+            np.array([0, 1, 4, 5, 10, 11, 14, 15]),
+        )
+        np.testing.assert_array_equal(
+            sm.detection_undesired_ind,
+            np.array([2, 3, 6, 7, 8, 9, 12, 13]),
+        )
+
+        # Every TX stream has exactly one RX owner and reordering recovers
+        # transmitter-major stream order.
+        np.testing.assert_array_equal(
+            sm.stream_association.sum(axis=0),
+            np.ones((2, 4), dtype=np.int32),
+        )
+        np.testing.assert_array_equal(
+            sm.rx_stream_ids.ravel()[sm.stream_ind],
+            sm.tx_stream_ids.ravel(),
+        )
+
+    def test_many_to_many_requires_integral_stream_split(self):
+        """Streams must divide evenly over a transmitter's receivers."""
+        with pytest.raises(ValueError, match="must be divisible"):
+            StreamManagement(
+                np.ones((2, 2), dtype=np.int32), num_streams_per_tx=3
+            )
 
     def test_interfering_streams(self):
         """Test number of interfering streams calculation."""

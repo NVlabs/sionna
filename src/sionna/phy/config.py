@@ -6,11 +6,14 @@
 
 from __future__ import annotations
 import random
+from numbers import Integral
 from typing import Literal
 import numpy as np
 import torch
 
 __all__ = ["Config", "config", "dtypes", "Precision"]
+
+_SEED_MODULUS = 1 << 64
 
 # Type aliases
 Precision = Literal["single", "double"]
@@ -119,11 +122,16 @@ class Config:
 
         .. code-block:: python
 
+            import torch
             from sionna.phy import config
             config.seed = 42 # Set seed for deterministic results
 
-            # Use generator instead of torch.randn
-            noise = torch.randn([4], generator=config.torch_rng())
+            # Explicit generators must match the output device
+            noise = torch.randn(
+                [4],
+                device=config.device,
+                generator=config.torch_rng(config.device),
+            )
         """
         if device is None:
             device = self.device
@@ -162,7 +170,7 @@ class Config:
             else:
                 # Deterministic seeding with device-specific offset
                 # This ensures different devices produce different streams
-                device_seed = self._seed + i
+                device_seed = (self._seed + i) % _SEED_MODULUS
                 self._torch_rngs[device].manual_seed(device_seed)
                 # Also seed default generators for compiled mode
                 if device == "cpu":
@@ -184,7 +192,8 @@ class Config:
         All random number generators used internally by Sionna
         can be configured with a common seed to ensure reproducibility
         of results. It defaults to `None` which implies that a random
-        seed will be used and results are non-deterministic.
+        seed will be used and results are non-deterministic. Integer seeds
+        must be in the interval :math:`[0, 2^{64}-1]`.
 
         Example
         -------
@@ -201,6 +210,13 @@ class Config:
 
     @seed.setter
     def seed(self, seed: int | None) -> None:
+        if seed is not None:
+            if isinstance(seed, bool) or not isinstance(seed, Integral):
+                raise TypeError("seed must be an integer or None")
+            seed = int(seed)
+            if not 0 <= seed < _SEED_MODULUS:
+                raise ValueError("seed must be in the range [0, 2**64 - 1]")
+
         self._seed = seed
         self._reset_rngs()
 

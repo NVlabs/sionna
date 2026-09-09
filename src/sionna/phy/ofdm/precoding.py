@@ -111,8 +111,12 @@ class RZFPrecoder(Block):
         **kwargs,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
-        assert isinstance(resource_grid, sionna.phy.ofdm.ResourceGrid)
-        assert isinstance(stream_management, sionna.phy.mimo.StreamManagement)
+        if not isinstance(resource_grid, sionna.phy.ofdm.ResourceGrid):
+            raise TypeError("`resource_grid` must be an instance of ResourceGrid.")
+        if not isinstance(stream_management, sionna.phy.mimo.StreamManagement):
+            raise TypeError(
+                "`stream_management` must be an instance of StreamManagement."
+            )
         self._resource_grid = resource_grid
         self._stream_management = stream_management
         self._return_effective_channel = return_effective_channel
@@ -142,13 +146,9 @@ class RZFPrecoder(Block):
         # [batch_size, num_rx, num_tx, num_ofdm_symbols, fft_size, num_rx_ant, num_tx_ant]
         h = h.permute(0, 1, 3, 5, 6, 2, 4).to(dtype=g.dtype)
 
-        # Add one dummy dimension to g to be broadcastable to h:
-        # [batch_size, 1, num_tx, num_ofdm_symbols, fft_size, num_tx_ant, num_streams_per_tx]
-        g = g.unsqueeze(1)
-
-        # Compute post precoding channel:
+        # Compute post-precoding channel without materializing broadcasted g:
         # [batch_size, num_rx, num_tx, num_ofdm_symbols, fft_size, num_rx_ant, num_streams_per_tx]
-        h_eff = h @ g
+        h_eff = torch.einsum("brtofxy,btofys->brtofxs", h, g)
 
         # Permute dimensions to common format of channel tensors:
         # [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size]
@@ -274,8 +274,12 @@ class PrecodedChannel(Block):
         **kwargs,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
-        assert isinstance(resource_grid, sionna.phy.ofdm.ResourceGrid)
-        assert isinstance(stream_management, sionna.phy.mimo.StreamManagement)
+        if not isinstance(resource_grid, sionna.phy.ofdm.ResourceGrid):
+            raise TypeError("`resource_grid` must be an instance of ResourceGrid.")
+        if not isinstance(stream_management, sionna.phy.mimo.StreamManagement):
+            raise TypeError(
+                "`stream_management` must be an instance of StreamManagement."
+            )
         self._resource_grid = resource_grid
         self._stream_management = stream_management
         self._remove_nulled_scs = RemoveNulledSubcarriers(
@@ -343,13 +347,9 @@ class PrecodedChannel(Block):
         # [batch_size, num_rx, num_tx, num_ofdm_symbols, fft_size, num_rx_ant, num_tx_ant]
         h = h.permute(0, 1, 3, 5, 6, 2, 4).to(dtype=g.dtype)
 
-        # Add one dummy dimension to g to be broadcastable to h:
-        # [batch_size, 1, num_tx, num_ofdm_symbols, fft_size, num_tx_ant, num_streams_per_tx]
-        g = g.unsqueeze(1)
-
-        # Compute post precoding channel:
+        # Compute post-precoding channel without materializing broadcasted g:
         # [batch_size, num_rx, num_tx, num_ofdm_symbols, fft_size, num_rx_ant, num_streams_per_tx]
-        h_eff = h @ g
+        h_eff = torch.einsum("brtofxy,btofys->brtofxs", h, g)
 
         # Permute dimensions to common format of channel tensors:
         # [batch_size, num_rx, num_rx_ant, num_tx, num_streams_per_tx, num_ofdm_symbols, fft_size]

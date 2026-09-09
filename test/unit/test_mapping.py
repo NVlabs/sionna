@@ -163,6 +163,11 @@ class TestQam:
         with pytest.raises(ValueError):
             qam(5)  # Must be even
 
+    def test_invalid_normalize(self):
+        """Verify error is raised for a non-boolean normalize."""
+        with pytest.raises(TypeError, match="normalize"):
+            qam(4, normalize=1)
+
     def test_docstring_example(self):
         """Verify the docstring example works correctly."""
         constellation = qam(4)
@@ -336,6 +341,29 @@ class TestMapper:
         expected_dtype = dtypes[precision]["torch"]["cdtype"]
         assert x.dtype == expected_dtype
 
+    @pytest.mark.parametrize("shape", [(), (5,)])
+    def test_invalid_input_length(self, device, shape):
+        """Reject inputs without a complete final constellation label."""
+        mapper = Mapper("qam", 4, device=device)
+        bits = torch.zeros(shape, device=device)
+
+        with pytest.raises(ValueError, match="last dimension"):
+            mapper(bits)
+
+    def test_input_length_check_under_compilation(self, device):
+        """Keep the shape contract for valid and invalid compiled inputs."""
+        torch._dynamo.reset()
+        mapper = torch.compile(Mapper("qam", 4, device=device), fullgraph=True)
+        bits = torch.randint(0, 2, (8, 40), device=device).float()
+        assert mapper(bits).shape == (8, 10)
+
+        # Python exceptions cannot be represented in a full graph. Verify the
+        # ordinary compiled path falls back and preserves the public error.
+        torch._dynamo.reset()
+        checked_mapper = torch.compile(Mapper("qam", 4, device=device))
+        with pytest.raises(ValueError, match="last dimension"):
+            checked_mapper(torch.zeros(8, 41, device=device))
+
     def test_docstring_example(self):
         """Verify the docstring example works correctly."""
         mapper = Mapper("qam", 4)
@@ -354,7 +382,7 @@ class TestDemapper:
 
     def test_invalid_method(self, device):
         """Verify error for invalid demapping method."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             Demapper("invalid_method", "qam", 4, device=device)
 
     def test_output_dimensions(self, device):
@@ -588,6 +616,35 @@ class TestSymbolDemapper:
 
         assert hard.dtype == torch.int32
 
+# =============================================================================
+# Tests shared by Demapper and SymbolDemapper
+# =============================================================================
+
+
+@pytest.mark.parametrize(
+    "demapper_class, args",
+    [(Demapper, ("app",)), (SymbolDemapper, ())],
+)
+def test_zero_and_sub_tiny_noise_are_clamped(
+    demapper_class, args, precision, device
+):
+    """Clamp both demappers without introducing device-bound module state."""
+    rdtype = dtypes[precision]["torch"]["dtype"]
+    constellation = Constellation(
+        "qam", 6, precision=precision, device=device
+    )
+    demapper = demapper_class(
+        *args, constellation=constellation, precision=precision, device=device
+    )
+    y = constellation()[:1]
+    tiny = torch.finfo(rdtype).tiny
+    expected = demapper(y, torch.tensor(tiny, dtype=rdtype, device=device))
+
+    for no in (0.0, tiny / 2):
+        actual = demapper(y, torch.tensor(no, dtype=rdtype, device=device))
+        assert not torch.isnan(actual).any()
+        assert torch.equal(actual, expected)
+
 
 # =============================================================================
 # Tests for SymbolLogits2LLRs class
@@ -599,7 +656,7 @@ class TestSymbolLogits2LLRs:
 
     def test_invalid_method(self):
         """Verify error for invalid method."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             SymbolLogits2LLRs("invalid", 4)
 
     def test_output_dimensions(self, device):
@@ -824,6 +881,33 @@ class TestSymbolInds2Bits:
 
 
 # =============================================================================
+# Tests shared by QAM2PAM and PAM2QAM
+# =============================================================================
+
+
+@pytest.mark.parametrize("converter", [QAM2PAM, PAM2QAM])
+class TestSquareQamBitWidth:
+    """Tests for the bit-width contract shared by QAM2PAM and PAM2QAM."""
+
+    @pytest.mark.parametrize("num_bits_per_symbol", [0, -2, 1, 3])
+    def test_invalid_qam_width(self, converter, num_bits_per_symbol):
+        """Reject non-positive and odd square-QAM widths."""
+        with pytest.raises(ValueError, match="positive even integer"):
+            converter(num_bits_per_symbol)
+
+    @pytest.mark.parametrize("num_bits_per_symbol", [True, 4.0, "4"])
+    def test_non_integer_qam_width(self, converter, num_bits_per_symbol):
+        """Reject values that are not integer bit widths."""
+        with pytest.raises(TypeError, match="must be an integer"):
+            converter(num_bits_per_symbol)
+
+    @pytest.mark.parametrize("num_bits_per_symbol", [np.int32(2), np.int64(4)])
+    def test_numpy_integer_qam_width(self, converter, num_bits_per_symbol):
+        """Preserve support for NumPy integer widths."""
+        converter(num_bits_per_symbol)
+
+
+# =============================================================================
 # Tests for QAM2PAM class
 # =============================================================================
 
@@ -953,7 +1037,7 @@ class TestSymbolSource:
 
         assert len(result) == 2
         assert result[0].shape == torch.Size([10, 100])
-        assert result[1].shape == torch.Size([10, 100, 4])
+        assert result[1].shape == torch.Size([10, 400])
 
     def test_return_indices_and_bits(self, device):
         """Verify both indices and bits can be returned."""
@@ -965,7 +1049,62 @@ class TestSymbolSource:
         assert len(result) == 3
         assert result[0].shape == torch.Size([10, 100])  # symbols
         assert result[1].shape == torch.Size([10, 100])  # indices
-        assert result[2].shape == torch.Size([10, 100, 4])  # bits
+        assert result[2].shape == torch.Size([10, 400])  # bits
+
+    def test_tensor_shape_is_not_mutated(self, device):
+        """A tensor-valued shape must remain unchanged after a call."""
+        shape = torch.tensor([10, 100], device=device)
+        expected_shape = shape.clone()
+        source = SymbolSource("qam", 4, return_bits=True, device=device)
+
+        symbols, bits = source(shape)
+
+        assert torch.equal(shape, expected_shape)
+        assert symbols.shape == torch.Size([10, 100])
+        assert bits.shape == torch.Size([10, 400])
+
+    @pytest.mark.parametrize("shape", [[], (), torch.Size([])])
+    def test_empty_shape_is_rejected(self, shape, device):
+        """An empty shape has no symbol dimension and must be rejected."""
+        source = SymbolSource("qam", 4, return_bits=True, device=device)
+
+        with pytest.raises(ValueError, match="at least one dimension"):
+            source(shape)
+
+    @pytest.mark.parametrize("shape", [[10, 100], [10, 1], [100]])
+    @pytest.mark.parametrize(
+        "source, constellation_type, num_bits_per_symbol",
+        [
+            (QAMSource, "qam", 4),
+            (PAMSource, "pam", 2),
+        ],
+    )
+    def test_returned_bits_match_demapper(
+        self, source, constellation_type, num_bits_per_symbol, shape, device
+    ):
+        """Returned bits have the demapper's shape and ordering."""
+        symbol_source = source(
+            num_bits_per_symbol, return_bits=True, device=device
+        )
+        demapper = Demapper(
+            "app",
+            constellation_type,
+            num_bits_per_symbol,
+            hard_out=True,
+            device=device,
+        )
+
+        symbols, bits = symbol_source(shape)
+        recovered_bits = demapper(
+            symbols, torch.tensor(1e-7, device=device)
+        )
+
+        assert symbols.shape == torch.Size(shape)
+        assert bits.shape == torch.Size(
+            shape[:-1] + [shape[-1] * num_bits_per_symbol]
+        )
+        assert bits.shape == recovered_bits.shape
+        assert torch.equal(bits, recovered_bits)
 
     def test_docstring_example(self):
         """Verify the docstring example works correctly."""

@@ -4,13 +4,15 @@
 #
 """3GPP TR38.901 rural macrocell (RMa) channel scenario"""
 
-from typing import Optional
+from typing import Optional, Union
 
 import torch
 
+from sionna._validation import check_tensor_all
 from sionna.phy import SPEED_OF_LIGHT, PI
+from sionna.phy.channel.utils import rad_2_deg
 from .system_level_scenario import SystemLevelScenario
-from .antenna import PanelArray
+from .antenna import HandheldUTArray, PanelArray
 
 __all__ = ["RMaScenario"]
 
@@ -20,10 +22,12 @@ class RMaScenario(SystemLevelScenario):
     3GPP TR 38.901 rural macrocell (RMa) channel model scenario.
 
     :param carrier_frequency: Carrier frequency [Hz]
-    :param ut_array: Panel array used by the UTs. All UTs share the same
-        antenna array configuration.
-    :param bs_array: Panel array used by the BSs. All BSs share the same
-        antenna array configuration.
+    :param ut_array: Antenna array used by UTs. This can be a
+        :class:`~sionna.phy.channel.tr38901.PanelArray` or
+        :class:`~sionna.phy.channel.tr38901.HandheldUTArray`.
+    :param bs_array: Antenna array used by base stations. This can be a
+        :class:`~sionna.phy.channel.tr38901.PanelArray` or
+        :class:`~sionna.phy.channel.tr38901.HandheldUTArray`.
     :param direction: Link direction. Either ``"uplink"`` or ``"downlink"``.
     :param enable_pathloss: If `True`, apply pathloss. Otherwise don't.
         Defaults to `True`.
@@ -36,6 +40,14 @@ class RMaScenario(SystemLevelScenario):
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param spec_version: Version of the TR 38.901 parameter tables to use.
+        Supported values are ``"16.1"`` and ``"19.2"``. Defaults to
+        ``"19.2"``.
+    :param car_window_type: Car-window type for the car penetration model of
+        Section 7.4.3.2. Must be ``"ordinary"`` (9 dB mean) or
+        ``"metallized"`` (20 dB mean). Defaults to ``"ordinary"``. The car
+        penetration loss is sampled once per in-car UT and shared by all of its
+        BS links.
 
     .. rubric:: Examples
 
@@ -62,8 +74,8 @@ class RMaScenario(SystemLevelScenario):
     def __init__(
         self,
         carrier_frequency: float,
-        ut_array: PanelArray,
-        bs_array: PanelArray,
+        ut_array: PanelArray | HandheldUTArray,
+        bs_array: PanelArray | HandheldUTArray,
         direction: str,
         enable_pathloss: bool = True,
         enable_shadow_fading: bool = True,
@@ -71,6 +83,8 @@ class RMaScenario(SystemLevelScenario):
         average_building_height: float = 5.0,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        spec_version: str = "19.2",
+        car_window_type: str = "ordinary",
     ) -> None:
         # Only the low-loss O2I model is available for RMa.
         super().__init__(
@@ -81,9 +95,27 @@ class RMaScenario(SystemLevelScenario):
             direction,
             enable_pathloss,
             enable_shadow_fading,
+            spec_version=spec_version,
             precision=precision,
             device=device,
         )
+
+        if not isinstance(car_window_type, str):
+            raise TypeError("car_window_type must be a string")
+        car_window_type = car_window_type.lower()
+        if car_window_type not in ("ordinary", "metallized"):
+            raise ValueError(
+                "car_window_type must be 'ordinary' or 'metallized'"
+            )
+        self._car_window_type = car_window_type
+        car_loss_mean = 9.0 if car_window_type == "ordinary" else 20.0
+        self.register_buffer(
+            "_car_penetration_loss_mean",
+            torch.tensor(car_loss_mean, dtype=self.dtype, device=self.device),
+        )
+        self._in_car: Optional[torch.Tensor] = None
+        self._in_car_initialized = False
+        self._in_car_explicit = False
 
         # Average street width [m]
         # Register as buffers for CUDAGraph compatibility
@@ -131,6 +163,195 @@ class RMaScenario(SystemLevelScenario):
     def average_building_height(self) -> torch.Tensor:
         """Average building height [m]"""
         return self._average_building_height
+
+    @property
+    def car_window_type(self) -> str:
+        """Car-window type used by the car penetration model."""
+        return self._car_window_type
+
+    @property
+    def car_penetration_loss_mean(self) -> torch.Tensor:
+        """Mean car penetration loss [dB]."""
+        return self._car_penetration_loss_mean
+
+    @property
+    def in_car(self) -> torch.Tensor:
+        """In-car state of UTs. Shape [batch size, number of UTs]."""
+        return self._in_car
+
+    def set_topology(
+        self,
+        ut_loc: Optional[torch.Tensor] = None,
+        bs_loc: Optional[torch.Tensor] = None,
+        ut_orientations: Optional[torch.Tensor] = None,
+        bs_orientations: Optional[torch.Tensor] = None,
+        ut_velocities: Optional[torch.Tensor] = None,
+        in_state: Optional[torch.Tensor] = None,
+        los: Optional[Union[bool, str, torch.Tensor]] = None,
+        bs_virtual_loc: Optional[torch.Tensor] = None,
+        bs_site_ids: Optional[torch.Tensor] = None,
+        spatial_consistency_track_ids: Optional[torch.Tensor] = None,
+        distance_2d_in: Optional[torch.Tensor] = None,
+        ut_spatial_region_ids: Optional[torch.Tensor] = None,
+        in_car: Optional[torch.Tensor] = None,
+    ) -> bool:
+        r"""Set the RMa topology and optional UT-specific in-car state.
+
+        Unspecified parameters reuse their value from the previous call.
+        Parameters that have never been set must be provided on the first
+        call.
+
+        If ``in_car`` is omitted on the first call, every non-indoor UT is
+        treated as in-car, matching the default population in Table 7.2-3 of
+        :cite:p:`TR38901V1920`. This inferred mask follows later
+        ``in_state`` updates. Once ``in_car`` is supplied explicitly, omission
+        on later calls reuses that explicit mask. Set ``in_car=False`` for
+        pedestrian or otherwise unprotected outdoor UTs.
+
+        :param ut_loc: Locations of the UTs [m].
+            Shape [batch size, number of UTs, 3].
+        :param bs_loc: Locations of the base stations [m].
+            Shape [batch size, number of base stations, 3].
+        :param ut_orientations: Orientations of the UT arrays [radian].
+            Shape [batch size, number of UTs, 3].
+        :param bs_orientations: Orientations of the BS arrays [radian].
+            Shape [batch size, number of base stations, 3].
+        :param ut_velocities: Velocity vectors of the UTs [m/s].
+            Shape [batch size, number of UTs, 3].
+        :param in_state: Indoor state of every UT. `True` means indoor and
+            `False` means non-indoor. Shape [batch size, number of UTs].
+        :param los: LoS/NLoS state control. A scalar boolean forces that state
+            for every outdoor link. A boolean tensor specifies each link with
+            shape [batch size, number of base stations, number of UTs] or
+            [number of base stations, number of UTs]. ``"random"`` draws fresh states
+            following Section 7.4.2; `None` reuses the previous setting and is
+            equivalent to ``"random"`` on the first call.
+        :param bs_virtual_loc: Virtual BS locations for each UT [m], used for
+            wraparound distances and angles. If omitted while ``bs_loc`` is
+            supplied, the physical BS locations are used.
+            Shape [batch size, number of base stations, number of UTs, 3].
+        :param bs_site_ids: Site identifier of each BS. Co-sited base stations share
+            site-level random quantities. If omitted, exact duplicate BS
+            locations are treated as co-sited. Shape [number of base stations] or
+            [batch size, number of base stations].
+        :param spatial_consistency_track_ids: Optional grouping identifiers
+            for UT entries representing positions on the same track in the
+            current topology snapshot. Equal identifiers share
+            cluster-specific angle signs and random ray-coupling permutations.
+            Shape [number of UTs] or [batch size, number of UTs].
+        :param distance_2d_in: Optional pre-sampled indoor 2D distance [m] for
+            every UT. Values for non-indoor UTs are ignored.
+            Shape [batch size, number of UTs].
+        :param ut_spatial_region_ids: Optional correlation-region identifier
+            for every UT. Unequal identifiers decorrelate supported spatial
+            random fields without changing pathloss or geometry.
+            Shape [number of UTs] or [batch size, number of UTs].
+        :param in_car: In-car state of every UT. In-car and indoor states are
+            mutually exclusive. Shape [batch size, number of UTs].
+
+        :output updated: `True` if the topology was updated, `False` otherwise.
+        """
+        in_car_tensor = None
+        if in_car is not None:
+            in_car_tensor = torch.as_tensor(in_car, device=self.device)
+            if in_car_tensor.dtype != torch.bool:
+                raise TypeError("`in_car` must have dtype torch.bool")
+            prospective_ut_loc = ut_loc if ut_loc is not None else self._ut_loc
+            if (
+                prospective_ut_loc is not None
+                and in_car_tensor.shape != prospective_ut_loc.shape[:2]
+            ):
+                raise ValueError(
+                    "`in_car` must have shape [batch size, number of UTs]"
+                )
+
+        prospective_indoor = (
+            torch.as_tensor(in_state, device=self.device)
+            if in_state is not None
+            else self._in_state
+        )
+        if (
+            prospective_indoor is not None
+            and prospective_indoor.dtype == torch.bool
+        ):
+            if in_car_tensor is not None:
+                prospective_in_car = in_car_tensor
+            elif self._in_car_explicit:
+                prospective_in_car = self._in_car
+            elif in_state is not None or not self._in_car_initialized:
+                prospective_in_car = ~prospective_indoor
+            else:
+                prospective_in_car = self._in_car
+
+            if prospective_in_car.shape == prospective_indoor.shape:
+                check_tensor_all(
+                    ~(prospective_in_car & prospective_indoor),
+                    name="in_car",
+                    message="A UT cannot be both indoor and in-car",
+                )
+
+        updated = super().set_topology(
+            ut_loc,
+            bs_loc,
+            ut_orientations,
+            bs_orientations,
+            ut_velocities,
+            in_state,
+            los,
+            bs_virtual_loc,
+            bs_site_ids,
+            spatial_consistency_track_ids,
+            distance_2d_in,
+            ut_spatial_region_ids,
+        )
+
+        car_state_updated = False
+        if in_car_tensor is not None:
+            self._update_attr("_in_car", in_car_tensor)
+            self._in_car_initialized = True
+            self._in_car_explicit = True
+            car_state_updated = True
+        elif (
+            not self._in_car_initialized
+            or (in_state is not None and not self._in_car_explicit)
+        ):
+            self._update_attr("_in_car", ~self.indoor)
+            self._in_car_initialized = True
+            car_state_updated = True
+
+        return updated or car_state_updated
+
+    def reset_topology(self) -> None:
+        """Reset topology-dependent RMa state."""
+        super().reset_topology()
+        if hasattr(self, "_in_car"):
+            delattr(self, "_in_car")
+        self._in_car = None
+        self._in_car_initialized = False
+        self._in_car_explicit = False
+
+    def allocate_topology_tensors(
+        self, batch_size: int, num_bs: int, num_ut: int
+    ) -> None:
+        r"""Pre-allocate topology-dependent RMa tensors.
+
+        This is required before the first topology update inside a
+        :func:`torch.compile`-decorated function. Calling it again resets the
+        current topology and allocates tensors with the requested shapes.
+
+        :param batch_size: Batch size.
+        :param num_bs: Number of base stations.
+        :param num_ut: Number of user terminals.
+        """
+        super().allocate_topology_tensors(batch_size, num_bs, num_ut)
+        self._register_buffer_safe(
+            "_in_car",
+            torch.zeros(
+                batch_size, num_ut, dtype=torch.bool, device=self.device
+            ),
+        )
+        self._in_car_initialized = False
+        self._in_car_explicit = False
 
     @property
     def los_probability(self) -> torch.Tensor:
@@ -201,14 +422,17 @@ class RMaScenario(SystemLevelScenario):
         log_mean_k = self.get_param("muK") / 10.0
         # ZSA
         log_mean_zsa = self.get_param("muZSA")
-        # ZSD mean is of the form max(-1, A*d2D/1000 - 0.01*(hUT-1.5) + B)
-        log_mean_zsd = (
-            self.get_param("muZSDa") * (distance_2d / 1000.0)
-            - 0.01 * (h_ut - 1.5)
-            + self.get_param("muZSDb")
+        # ZSD mean from TR 38.901 Table 7.5-9.
+        log_mean_zsd_los = torch.maximum(
+            torch.tensor(-1.0, dtype=self.dtype, device=self.device),
+            -0.17*(distance_2d/1000.0) - 0.01*(h_ut - 1.5) + 0.22,
         )
-        log_mean_zsd = torch.maximum(
-            torch.tensor(-1.0, dtype=self.dtype, device=self.device), log_mean_zsd
+        log_mean_zsd_nlos = torch.maximum(
+            torch.tensor(-1.0, dtype=self.dtype, device=self.device),
+            -0.19*(distance_2d/1000.0) - 0.01*(h_ut - 1.5) + 0.28,
+        )
+        log_mean_zsd = torch.where(
+            self.los, log_mean_zsd_los, log_mean_zsd_nlos
         )
 
         lsp_log_mean = torch.stack(
@@ -269,8 +493,15 @@ class RMaScenario(SystemLevelScenario):
         self._update_attr("_lsp_log_std", lsp_log_std)
 
         # ZOD offset
-        zod_offset = torch.atan((35.0 - 3.5) / distance_2d) - torch.atan(
-            (35.0 - 1.5) / distance_2d
+        zod_offset = rad_2_deg(
+            torch.atan(
+                torch.tensor(31.5, dtype=self.dtype, device=self.device)
+                / distance_2d
+            )
+            - torch.atan(
+                torch.tensor(33.5, dtype=self.dtype, device=self.device)
+                / distance_2d
+            )
         )
         zod_offset = torch.where(
             self.los,
@@ -345,6 +576,6 @@ class RMaScenario(SystemLevelScenario):
         ## Set the basic pathloss according to UT state
 
         # LoS
-        pl_b = torch.where(self.los, pl_los, pl_nlos)
+        pl_b = torch.where(self.outdoor_los, pl_los, pl_nlos)
 
         self._update_attr("_pl_b", pl_b)

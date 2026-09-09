@@ -4,6 +4,7 @@
 #
 """Blocks for (de)mapping, constellation class, and utility functions"""
 
+from numbers import Integral
 from typing import Any, List, Optional, Tuple, Union
 
 import numpy as np
@@ -11,6 +12,7 @@ import torch
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
+from sionna._validation import check_instance, check_one_of
 from sionna.phy.block import Block
 from sionna.phy.object import Object
 from sionna.phy.config import config, dtypes, Precision
@@ -55,6 +57,24 @@ def _compute_binary_labels(num_bits: int) -> np.ndarray:
     indices = np.arange(num_points)[:, None]
     bit_positions = np.arange(num_bits - 1, -1, -1)
     return (indices >> bit_positions) & 1
+
+
+def _check_square_qam_bit_width(num_bits_per_symbol: Any) -> int:
+    """Validate a QAM bit width that must split evenly over both dimensions.
+
+    :param num_bits_per_symbol: Number of bits per QAM symbol.
+
+    :output num_bits_per_symbol: `int`.
+        The validated bit width.
+    """
+    if isinstance(num_bits_per_symbol, bool) or not isinstance(
+        num_bits_per_symbol, Integral
+    ):
+        raise TypeError("`num_bits_per_symbol` must be an integer")
+    num_bits_per_symbol = int(num_bits_per_symbol)
+    if num_bits_per_symbol <= 0 or num_bits_per_symbol % 2 != 0:
+        raise ValueError("`num_bits_per_symbol` must be a positive even integer")
+    return num_bits_per_symbol
 
 
 def pam_gray(b: np.ndarray) -> int:
@@ -142,12 +162,14 @@ def qam(
         print(constellation.shape)
         # (16,)
     """
-    try:
-        assert num_bits_per_symbol % 2 == 0  # is even
-        assert num_bits_per_symbol > 0  # is larger than zero
-    except AssertionError as error:
-        raise ValueError("num_bits_per_symbol must be a multiple of 2") from error
-    assert isinstance(normalize, bool), "normalize must be boolean"
+    if not (num_bits_per_symbol > 0 and num_bits_per_symbol % 2 == 0):
+        raise ValueError("num_bits_per_symbol must be a positive multiple of 2")
+    check_instance(
+        normalize,
+        bool,
+        name="normalize",
+        message="normalize must be boolean",
+    )
 
     if precision is None:
         rdtype = config.np_dtype
@@ -224,11 +246,14 @@ def pam(
         print(constellation.shape)
         # (4,)
     """
-    try:
-        assert num_bits_per_symbol > 0  # is larger than zero
-    except AssertionError as error:
-        raise ValueError("num_bits_per_symbol must be positive") from error
-    assert isinstance(normalize, bool), "normalize must be boolean"
+    if not num_bits_per_symbol > 0:
+        raise ValueError("num_bits_per_symbol must be positive")
+    check_instance(
+        normalize,
+        bool,
+        name="normalize",
+        message="normalize must be boolean",
+    )
 
     if precision is None:
         rdtype = config.np_dtype
@@ -311,8 +336,12 @@ class Constellation(Block):
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
 
-        if constellation_type not in ("qam", "pam", "custom"):
-            raise ValueError(f"Wrong `constellation_type` {constellation_type}")
+        check_one_of(
+            constellation_type,
+            ("qam", "pam", "custom"),
+            name="constellation_type",
+            message=f"Wrong `constellation_type` {constellation_type}",
+        )
         self._constellation_type = constellation_type
 
         if num_bits_per_symbol is None:
@@ -368,7 +397,12 @@ class Constellation(Block):
 
     @normalize.setter
     def normalize(self, value: bool) -> None:
-        assert isinstance(value, bool), "`normalize` must be boolean"
+        check_instance(
+            value,
+            bool,
+            name="normalize",
+            message="`normalize` must be boolean",
+        )
         self._normalize = value
 
     @property
@@ -378,7 +412,12 @@ class Constellation(Block):
 
     @center.setter
     def center(self, value: bool) -> None:
-        assert isinstance(value, bool), "`center` must be boolean"
+        check_instance(
+            value,
+            bool,
+            name="center",
+            message="`center` must be boolean",
+        )
         self._center = value
 
     @property
@@ -507,6 +546,10 @@ class Mapper(Block):
     The last input dimension must be an integer multiple of the
     number of bits per constellation symbol.
 
+    To avoid synchronizing accelerator devices in this performance-critical
+    path, input values are not checked at runtime. Every entry must be exactly
+    zero or one; passing non-binary values has undefined behavior.
+
     .. rubric:: Examples
 
     .. code-block:: python
@@ -553,12 +596,19 @@ class Mapper(Block):
     def call(
         self, bits: torch.Tensor
     ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
+        num_bits_per_symbol = self.constellation.num_bits_per_symbol
+        if bits.dim() == 0 or bits.shape[-1] % num_bits_per_symbol != 0:
+            raise ValueError(
+                "The last dimension of `bits` must be a multiple of "
+                "`num_bits_per_symbol`."
+            )
+
         # Convert to int32
         bits = bits.to(dtype=torch.int32)
 
         # Reshape last dimensions to the desired format
-        n1 = bits.shape[-1] // self.constellation.num_bits_per_symbol
-        new_shape = [n1, self.constellation.num_bits_per_symbol]
+        n1 = bits.shape[-1] // num_bits_per_symbol
+        new_shape = [n1, num_bits_per_symbol]
         bits = split_dim(bits, new_shape, axis=bits.dim() - 1)
 
         # Use bitwise left shift to compute powers of two
@@ -657,9 +707,9 @@ class Demapper(Block):
                 \max_{c\in\mathcal{C}_{i,0}} \Pr\left(c\lvert\mathbf{p}\right)
                     \exp\left(-\frac{1}{N_o}\left|y-c\right|^2\right)
                 }\right)\\
-                &= \max_{c\in\mathcal{C}_{i,0}}
+                &= \max_{c\in\mathcal{C}_{i,1}}
                     \left(\ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right)-\frac{|y-c|^2}{N_o}\right) -
-                 \max_{c\in\mathcal{C}_{i,1}}\left( \ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right) - \frac{|y-c|^2}{N_o}\right)
+                 \max_{c\in\mathcal{C}_{i,0}}\left( \ln\left(\Pr\left(c\lvert\mathbf{p}\right)\right) - \frac{|y-c|^2}{N_o}\right)
                 .
         \end{aligned}
 
@@ -719,8 +769,10 @@ class Demapper(Block):
             **kwargs,
         )
 
-        tiny = np.finfo(dtypes[self.precision]["np"]["dtype"]).tiny
-        self._no_threshold = torch.tensor(tiny, dtype=self.dtype, device=self.device)
+        # A Python scalar keeps the clamp tied to `no`'s dtype and device.
+        self._no_threshold = float(
+            np.finfo(dtypes[self.precision]["np"]["dtype"]).tiny
+        )
 
     @property
     def constellation(self) -> Constellation:
@@ -745,7 +797,7 @@ class Demapper(Block):
         # is a scalar, but also does not do any harm.
         no = no.unsqueeze(-1)
         # Deal with zero or very small values.
-        no = torch.maximum(no, self._no_threshold)
+        no = torch.clamp_min(no, self._no_threshold)
 
         # Compute exponents
         exponents = -squared_dist / no
@@ -857,6 +909,11 @@ class SymbolDemapper(Block):
             device=device,
         )
 
+        # A Python scalar keeps the clamp tied to `no`'s dtype and device.
+        self._no_threshold = float(
+            np.finfo(dtypes[self.precision]["np"]["dtype"]).tiny
+        )
+
     def call(
         self,
         y: torch.Tensor,
@@ -868,6 +925,7 @@ class SymbolDemapper(Block):
         squared_dist = (y - points).abs().square()
 
         no = expand_to_rank(no, squared_dist.dim(), axis=-1)
+        no = torch.clamp_min(no, self._no_threshold)
         exp = -squared_dist / no
 
         if prior is not None:
@@ -923,7 +981,7 @@ class SymbolLogits2LLRs(Block):
                 }\right)
 
     where :math:`\mathcal{C}_{i,1}` and :math:`\mathcal{C}_{i,0}` are the
-    sets of :math:`2^K` constellation points for which the :math:`i\text{th}` bit is
+    sets of :math:`2^{K-1}` constellation points for which the :math:`i\text{th}` bit is
     equal to 1 and 0, respectively. :math:`\mathbf{z} = \left[z_{c_0},\dots,z_{c_{2^K-1}}\right]` is the vector of logits on the constellation points, :math:`\mathbf{p} = \left[p_0,\dots,p_{K-1}\right]`
     is the vector of LLRs that serves as prior knowledge on the :math:`K` bits that are mapped to
     a constellation point and is set to :math:`\mathbf{0}` if no prior knowledge is assumed to be available,
@@ -980,7 +1038,12 @@ class SymbolLogits2LLRs(Block):
         **kwargs: Any,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
-        assert method in ("app", "maxlog"), "Unknown demapping method"
+        check_one_of(
+            method,
+            ("app", "maxlog"),
+            name="method",
+            message="method must be one of: 'app', 'maxlog'",
+        )
         self._method = method
         self._hard_out = hard_out
         self._num_bits_per_symbol = num_bits_per_symbol
@@ -1164,7 +1227,7 @@ class SymbolLogits2Moments(Block):
     .. math::
         \begin{aligned}
             \mu &= \sum_{n = 0}^{N-1} c_n \Pr \left(c_n \lvert \mathbf{\ell} \right)\\
-            \nu &= \sum_{n = 0}^{N-1} \left( c_n - \mu \right)^2 \Pr \left(c_n \lvert \mathbf{\ell} \right)
+            \nu &= \sum_{n = 0}^{N-1} \left| c_n - \mu \right|^2 \Pr \left(c_n \lvert \mathbf{\ell} \right)
         \end{aligned}
 
     where :math:`\mathbf{\ell} = \left[ \ell_0, \dots, \ell_{N-1} \right]` are the logits, and
@@ -1328,6 +1391,7 @@ class QAM2PAM(Object):
         **kwargs: Any,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
+        num_bits_per_symbol = _check_square_qam_bit_width(num_bits_per_symbol)
         half_bits = num_bits_per_symbol // 2
 
         # Binary representation of all QAM symbol indices
@@ -1394,6 +1458,7 @@ class PAM2QAM(Object):
         **kwargs: Any,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
+        num_bits_per_symbol = _check_square_qam_bit_width(num_bits_per_symbol)
         half_bits = num_bits_per_symbol // 2
         num_pam_symbols = 2**half_bits
 
@@ -1519,14 +1584,14 @@ class SymbolSource(Block):
         :attr:`~sionna.phy.config.Config.device` is used.
 
     :input shape: 1D tensor/array/list, `int`.
-        Desired shape of the output tensor.
+        Desired shape of the output tensor. Must not be empty.
 
     :output symbols: ``shape``, `torch.complex`.
         Tensor filled with random symbols of the chosen ``constellation_type``.
     :output symbol_indices: ``shape``, `torch.int32`.
         Tensor filled with the symbol indices.
         Only returned if ``return_indices`` is `True`.
-    :output bits: [``shape``, ``num_bits_per_symbol``], `torch.float`.
+    :output bits: [``shape[:-1]``, ``shape[-1] * num_bits_per_symbol``], `torch.float`.
         Tensor filled with the binary symbol representations (i.e., bit labels).
         Only returned if ``return_bits`` is `True`.
 
@@ -1576,18 +1641,25 @@ class SymbolSource(Block):
     def call(
         self, inputs: Union[List[int], Tuple[int, ...], torch.Size]
     ) -> Union[torch.Tensor, List[torch.Tensor]]:
-        shape = list(inputs) + [self._num_bits_per_symbol]
-        b = self._binary_source(shape)
+        shape = list(inputs)
+        if not shape:
+            raise ValueError("`shape` must have at least one dimension")
+
+        # Must not scale the last entry in place: for a tensor-valued
+        # ``inputs``, the entries alias the caller's tensor.
+        bits_shape = shape[:-1] + [shape[-1] * self._num_bits_per_symbol]
+
+        b = self._binary_source(bits_shape)
         if self._return_indices:
             x, ind = self._mapper(b)
         else:
             x = self._mapper(b)
 
-        result = x.squeeze(-1)
+        result = x
         if self._return_indices or self._return_bits:
             result = [result]
         if self._return_indices:
-            result.append(ind.squeeze(-1))
+            result.append(ind)
         if self._return_bits:
             result.append(b)
 
@@ -1613,14 +1685,14 @@ class QAMSource(SymbolSource):
         :attr:`~sionna.phy.config.Config.device` is used.
 
     :input shape: 1D tensor/array/list, `int`.
-        Desired shape of the output tensor.
+        Desired shape of the output tensor. Must not be empty.
 
     :output symbols: ``shape``, `torch.complex`.
         Tensor filled with random QAM symbols.
     :output symbol_indices: ``shape``, `torch.int32`.
         Tensor filled with the symbol indices.
         Only returned if ``return_indices`` is `True`.
-    :output bits: [``shape``, ``num_bits_per_symbol``], `torch.float`.
+    :output bits: [``shape[:-1]``, ``shape[-1] * num_bits_per_symbol``], `torch.float`.
         Tensor filled with the binary symbol representations (i.e., bit labels).
         Only returned if ``return_bits`` is `True`.
 
@@ -1676,14 +1748,14 @@ class PAMSource(SymbolSource):
         :attr:`~sionna.phy.config.Config.device` is used.
 
     :input shape: 1D tensor/array/list, `int`.
-        Desired shape of the output tensor.
+        Desired shape of the output tensor. Must not be empty.
 
     :output symbols: ``shape``, `torch.complex`.
         Tensor filled with random PAM symbols.
     :output symbol_indices: ``shape``, `torch.int32`.
         Tensor filled with the symbol indices.
         Only returned if ``return_indices`` is `True`.
-    :output bits: [``shape``, ``num_bits_per_symbol``], `torch.float`.
+    :output bits: [``shape[:-1]``, ``shape[-1] * num_bits_per_symbol``], `torch.float`.
         Tensor filled with the binary symbol representations (i.e., bit labels).
         Only returned if ``return_bits`` is `True`.
 

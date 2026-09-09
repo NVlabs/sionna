@@ -118,8 +118,8 @@ class TestSysUtils:
             device=device,
         )
 
-        # Diagonal association (each RX connected to one TX)
-        rx_tx_association = torch.eye(num_rx, num_tx, dtype=torch.int32, device=device)
+        # Keep the association on CPU to verify cross-device normalization.
+        rx_tx_association = torch.eye(num_rx, num_tx, dtype=torch.int32)
 
         pathloss_all, pathloss_serving = get_pathloss(
             h_freq, rx_tx_association=rx_tx_association, precision=precision
@@ -128,6 +128,161 @@ class TestSysUtils:
         # Check shapes
         assert pathloss_all.shape == (batch_size, num_rx, num_tx, num_ofdm_sym)
         assert pathloss_serving.shape == (batch_size, num_rx, num_ofdm_sym)
+        expected = torch.diagonal(
+            pathloss_all, dim1=-3, dim2=-2
+        ).movedim(-1, -2)
+        torch.testing.assert_close(pathloss_serving, expected)
+        assert pathloss_serving.device == h_freq.device
+
+        invalid_association = rx_tx_association.clone()
+        invalid_association[0, 0] = 2
+        with pytest.raises(ValueError, match="binary"):
+            get_pathloss(
+                h_freq,
+                rx_tx_association=invalid_association,
+                precision=precision,
+            )
+
+        incomplete_association = rx_tx_association.clone()
+        incomplete_association[0, 0] = 0
+        with pytest.raises(ValueError, match="one serving link per user"):
+            get_pathloss(
+                h_freq,
+                rx_tx_association=incomplete_association,
+                precision=precision,
+            )
+
+    @pytest.mark.parametrize(
+        "association",
+        [
+            torch.tensor(
+                [[1, 1, 0, 0], [0, 0, 1, 1]], dtype=torch.int32
+            ),
+            torch.tensor(
+                [[1, 0], [1, 0], [0, 1], [0, 1]], dtype=torch.int32
+            ),
+        ],
+        ids=["uplink", "downlink"],
+    )
+    def test_get_pathloss_rectangular_association(
+        self, device, precision, association
+    ):
+        """All serving links are selected for uplink and downlink layouts."""
+        num_rx, num_tx = association.shape
+        num_ofdm_sym = 4
+        cdtype = (
+            torch.complex64 if precision == "single" else torch.complex128
+        )
+        h_freq = torch.randn(
+            2,
+            num_rx,
+            1,
+            num_tx,
+            2,
+            num_ofdm_sym,
+            8,
+            dtype=cdtype,
+            device=device,
+        )
+
+        pathloss_all, pathloss_serving = get_pathloss(
+            h_freq,
+            rx_tx_association=association,
+            precision=precision,
+        )
+
+        mask = association.to(device=device, dtype=torch.bool)
+        expected = pathloss_all[..., mask, :]
+        assert pathloss_serving.shape == (2, 4, num_ofdm_sym)
+        assert pathloss_serving.device == h_freq.device
+        torch.testing.assert_close(pathloss_serving, expected)
+
+    @pytest.mark.parametrize("batch_shape", [(), (2,)])
+    def test_get_pathloss_batched_and_unbatched_association(
+        self, device, precision, batch_shape
+    ):
+        """Association supports channels with or without batch dimensions."""
+        num_rx = 3
+        num_tx = 3
+        num_ofdm_sym = 4
+        cdtype = (
+            torch.complex64 if precision == "single" else torch.complex128
+        )
+        h_freq = torch.randn(
+            *batch_shape,
+            num_rx,
+            2,
+            num_tx,
+            2,
+            num_ofdm_sym,
+            8,
+            dtype=cdtype,
+            device=device,
+        )
+        association = torch.eye(
+            num_rx, num_tx, dtype=torch.int32, device=device
+        )
+
+        pathloss_without, serving_without = get_pathloss(
+            h_freq, precision=precision
+        )
+        pathloss_with, pathloss_serving = get_pathloss(
+            h_freq,
+            rx_tx_association=association,
+            precision=precision,
+        )
+
+        assert serving_without is None
+        assert pathloss_with.shape == batch_shape + (
+            num_rx,
+            num_tx,
+            num_ofdm_sym,
+        )
+        assert pathloss_serving.shape == batch_shape + (
+            num_rx,
+            num_ofdm_sym,
+        )
+        torch.testing.assert_close(pathloss_with, pathloss_without)
+        expected_serving = torch.diagonal(
+            pathloss_with, dim1=-3, dim2=-2
+        ).movedim(-1, -2)
+        torch.testing.assert_close(pathloss_serving, expected_serving)
+
+    def test_get_pathloss_compiles_fullgraph(self, device, precision):
+        """Association validation and selection must remain in one graph."""
+        cdtype = torch.complex64 if precision == "single" else torch.complex128
+        association = torch.tensor(
+            [[1, 1, 0, 0], [0, 0, 1, 1]], dtype=torch.int32
+        )
+
+        @torch.compile(fullgraph=True, dynamic=True)
+        def compiled_get_pathloss(h_freq):
+            return get_pathloss(
+                h_freq,
+                rx_tx_association=association,
+                precision=precision,
+            )
+
+        for batch_size in (2, 3):
+            h_freq = torch.randn(
+                batch_size,
+                2,
+                1,
+                4,
+                2,
+                4,
+                12,
+                dtype=cdtype,
+                device=device,
+            )
+            actual = compiled_get_pathloss(h_freq)
+            expected = get_pathloss(
+                h_freq,
+                rx_tx_association=association,
+                precision=precision,
+            )
+            torch.testing.assert_close(actual, expected)
+            assert actual[1].device == h_freq.device
 
     def test_spread_across_subcarriers(self, device, precision):
         """Test spread_across_subcarriers function."""
@@ -186,11 +341,7 @@ class TestSysUtils:
             device=device,
         )
 
-        # Compile the function
-        if mode != "default":
-            compiled_fn = torch.compile(is_scheduled_in_slot, mode=mode)
-        else:
-            compiled_fn = is_scheduled_in_slot
+        compiled_fn = torch.compile(is_scheduled_in_slot, mode=mode)
 
         is_sched = compiled_fn(sinr=sinr)
 

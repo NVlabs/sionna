@@ -217,6 +217,19 @@ class TestLDPC5GDecoderHARQ:
 
     # --- Error handling --------------------------------------------------
 
+    def test_invalid_rv_raises(self, device):
+        """Decoder must reject the same invalid RV values as the encoder."""
+        enc = LDPC5GEncoder(k=100, n=200, device=device)
+        dec = LDPC5GDecoder(enc, harq_mode=True, device=device)
+        llr = torch.zeros(1, 200, device=device)
+
+        with pytest.raises(ValueError, match="Invalid RV index"):
+            dec(llr, rv=[-1])
+        with pytest.raises(ValueError, match="Invalid RV index"):
+            dec(llr, rv=[4])
+        with pytest.raises(ValueError, match="non-empty"):
+            dec(llr, rv=[])
+
     def test_rv_dim_mismatch_raises(self, device):
         """Mismatched rv dimension must raise ValueError."""
         k, n = 100, 200

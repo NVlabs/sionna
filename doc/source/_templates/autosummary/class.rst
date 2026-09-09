@@ -6,5 +6,5 @@
    :members:
    :undoc-members:
    :show-inheritance:
-   :member-order: bysource
-   :exclude-members: call, forward
+   :member-order: alphabetical
+   :exclude-members: call, forward, build

@@ -4,17 +4,19 @@
 #
 """Tests for TBEncoder and TBDecoder."""
 
+import os
+
 import pytest
 import numpy as np
 import torch
-from os import walk
 
 from sionna.phy.nr import TBEncoder, TBDecoder
 from sionna.phy.mapping import BinarySource
 
 
-# Path to reference data
-REF_PATH = 'test/unit/nr/tb_refs/'
+# Module-relative path: CI runs pytest from test/, so a repo-root-relative
+# path like test/unit/nr/tb_refs/ never resolves there.
+REF_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tb_refs")
 
 
 class TestTBEncoder:
@@ -22,21 +24,18 @@ class TestTBEncoder:
 
     def test_reference(self):
         """Test against reference implementation."""
-        # Load reference files
-        f = []
-        try:
-            for (_, _, filenames) in walk(REF_PATH):
-                files = [fi for fi in filenames if fi.endswith(".npz")]
-                f.extend(files)
-        except Exception:
+        if not os.path.isdir(REF_PATH):
             pytest.skip("Reference files not found")
 
-        if len(f) == 0:
+        files = sorted(
+            fi for fi in os.listdir(REF_PATH) if fi.endswith(".npz")
+        )
+        if not files:
             pytest.skip("No reference files found")
 
         # Test all reference files
-        for fn in f:
-            data = np.load(REF_PATH + fn)
+        for fn in files:
+            data = np.load(os.path.join(REF_PATH, fn))
             u_ref = data["u_ref"]
             c_ref = data["c_ref"]
             n_id = data["n_id"]

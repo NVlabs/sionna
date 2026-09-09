@@ -20,6 +20,12 @@ def inv_cholesky(tensor: torch.Tensor) -> torch.Tensor:
     the Cholesky decomposition, such that
     :math:`\mathbf{A}=\mathbf{L}\mathbf{L}^{\textsf{H}}`.
 
+    .. note::
+        This function assumes that every input matrix is Hermitian positive
+        definite. Factorization errors are deliberately not checked because
+        doing so synchronizes CUDA execution and prevents CUDA graph capture.
+        Results are undefined when the precondition is violated.
+
     :param tensor: [..., M, M], `torch.float` | `torch.complex`.
         Input tensor of rank greater than one.
 
@@ -53,6 +59,13 @@ def matrix_pinv(tensor: torch.Tensor) -> torch.Tensor:
 
     The two inner dimensions are assumed to correspond to the matrix rows
     and columns, respectively.
+
+    .. note::
+        This is a Cholesky-based fast path for tall or square matrices with
+        full column rank, not a rank-revealing general pseudoinverse.
+        Factorization errors are deliberately not checked because doing so
+        synchronizes CUDA execution and prevents CUDA graph capture. Results
+        are undefined for rank-deficient or otherwise invalid inputs.
 
     :param tensor: [..., M, K], `torch.float` | `torch.complex`.
         Input tensor of rank greater than or equal to two.

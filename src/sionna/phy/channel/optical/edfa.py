@@ -118,9 +118,8 @@ class EDFA(Block):
         self.register_buffer("_f_c", torch.tensor(f_c, dtype=self.dtype, device=self.device))
         self.register_buffer("_dt", torch.tensor(dt, dtype=self.dtype, device=self.device))
 
-        assert isinstance(
-            with_dual_polarization, bool
-        ), "with_dual_polarization must be bool."
+        if not isinstance(with_dual_polarization, bool):
+            raise TypeError("with_dual_polarization must be bool.")
         self._with_dual_polarization = with_dual_polarization
 
         # Spontaneous emission factor
@@ -146,9 +145,10 @@ class EDFA(Block):
         :output y: Amplified signal with ASE noise
         """
         if self._with_dual_polarization:
-            assert (
-                inputs.shape[-2] == 2
-            ), "For dual polarization, second to last dimension must be 2."
+            if inputs.dim() < 2 or inputs.shape[-2] != 2:
+                raise ValueError(
+                    "For dual polarization, second to last dimension must be 2."
+                )
 
         x = inputs.to(dtype=self.cdtype, device=self.device)
 

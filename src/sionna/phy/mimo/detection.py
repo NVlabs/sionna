@@ -127,7 +127,10 @@ class LinearDetector(Block):
 
         # Determine the equalizer to use
         if isinstance(equalizer, str):
-            assert equalizer in ["lmmse", "zf", "mf"], "Unknown equalizer."
+            if equalizer not in ("lmmse", "zf", "mf"):
+                raise ValueError(
+                    "equalizer must be one of: 'lmmse', 'zf', 'mf'"
+                )
             if equalizer == "lmmse":
                 self._equalizer = lmmse_equalizer
             elif equalizer == "zf":
@@ -137,8 +140,12 @@ class LinearDetector(Block):
         else:
             self._equalizer = equalizer
 
-        assert output in ("bit", "symbol"), "Unknown output"
-        assert demapping_method in ("app", "maxlog"), "Unknown demapping method"
+        if output not in ("bit", "symbol"):
+            raise ValueError("output must be one of: 'bit', 'symbol'")
+        if demapping_method not in ("app", "maxlog"):
+            raise ValueError(
+                "demapping_method must be one of: 'app', 'maxlog'"
+            )
 
         self._constellation = Constellation.check_or_create(
             constellation_type=constellation_type,
@@ -376,8 +383,12 @@ class MaximumLikelihoodDetector(Block):
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
 
-        assert output in ("bit", "symbol"), "Unknown output"
-        assert demapping_method in ("app", "maxlog"), "Unknown demapping method"
+        if output not in ("bit", "symbol"):
+            raise ValueError("output must be one of: 'bit', 'symbol'")
+        if demapping_method not in ("app", "maxlog"):
+            raise ValueError(
+                "demapping_method must be one of: 'app', 'maxlog'"
+            )
 
         self._output = output
         self._demapping_method = demapping_method
@@ -685,20 +696,20 @@ class KBestDetector(Block):
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
 
-        assert output in ("bit", "symbol"), "Unknown output"
+        if output not in ("bit", "symbol"):
+            raise ValueError("output must be one of: 'bit', 'symbol'")
 
         err_msg = "You must provide either constellation or constellation_type and num_bits_per_symbol."
         if constellation is None:
-            assert (
-                constellation_type is not None and num_bits_per_symbol is not None
-            ), err_msg
+            if constellation_type is None or num_bits_per_symbol is None:
+                raise ValueError(err_msg)
         else:
-            assert constellation_type is None and num_bits_per_symbol is None, err_msg
+            if constellation_type is not None or num_bits_per_symbol is not None:
+                raise ValueError(err_msg)
 
         if constellation is not None:
-            assert (
-                constellation.precision == self.precision
-            ), "Constellation has wrong precision."
+            if constellation.precision != self.precision:
+                raise ValueError("Constellation has wrong precision.")
 
         self._output = output
         self._hard_out = hard_out
@@ -707,9 +718,11 @@ class KBestDetector(Block):
         if self._use_real_rep:
             err_msg = "Only QAM can be used for the real-valued representation"
             if constellation_type is not None:
-                assert constellation_type == "qam", err_msg
+                if constellation_type != "qam":
+                    raise ValueError(err_msg)
             else:
-                assert constellation._constellation_type == "qam", err_msg
+                if constellation._constellation_type != "qam":
+                    raise ValueError(err_msg)
 
             self._num_streams = 2 * num_streams
 
@@ -749,7 +762,7 @@ class KBestDetector(Block):
         self._k = min(k, self._num_symbols**self._num_streams)
         if self._k < k:
             msg = f"KBestDetector: The provided value of k={k} is larger than the possible maximum. It has been set to k={self._k}."
-            warnings.warn(msg)
+            warnings.warn(msg, UserWarning, stacklevel=2)
 
         # Compute the number of previous paths each layer needs to consider
         num_paths = [1]
@@ -794,7 +807,10 @@ class KBestDetector(Block):
                     n, precision=precision, device=device
                 )
         else:
-            assert self._hard_out, "Soft-symbols are not supported for this detector."
+            if not self._hard_out:
+                raise ValueError(
+                    "Soft-symbols are not supported for this detector."
+                )
 
     @property
     def list2llr(self) -> List2LLR:
@@ -803,7 +819,8 @@ class KBestDetector(Block):
 
     @list2llr.setter
     def list2llr(self, value: List2LLR) -> None:
-        assert isinstance(value, List2LLR)
+        if not isinstance(value, List2LLR):
+            raise TypeError("`list2llr` must be an instance of List2LLR.")
         self._list2llr = value
 
     def _preprocessing(self, y, h, s):
@@ -825,8 +842,10 @@ class KBestDetector(Block):
         g = h.mH @ h  # Gram matrix [batch, K, K]
         hty = (h.mH @ y.unsqueeze(-1)).squeeze(-1)  # [batch, K]
 
-        # Cholesky decomposition (lower triangular L such that L L^H = G)
-        L = torch.linalg.cholesky(g)
+        # Avoid the checked Cholesky operation, which cannot be captured by
+        # CUDA graphs. As in other Sionna linear-algebra paths, the status is
+        # intentionally ignored.
+        L, _ = torch.linalg.cholesky_ex(g, check_errors=False)
 
         # R = L^H (upper triangular, same structure as QR's R)
         r = L.mH
@@ -963,15 +982,32 @@ class KBestDetector(Block):
         return tensor
 
     def build(self, *input_shapes):
-        assert (
-            input_shapes[1][-2] >= input_shapes[1][-1]
-        ), "The number of receive antennas cannot be smaller than the number of streams"
+        if not (input_shapes[1][-2] >= input_shapes[1][-1]):
+            raise ValueError(
+                "The number of receive antennas cannot be smaller than the "
+                "number of streams"
+            )
+
+    @staticmethod
+    def _restore_batch_dims(
+        tensor: torch.Tensor, batch_shape: list[int]
+    ) -> torch.Tensor:
+        """Restore the leading dimensions flattened or added by ``call``."""
+        if len(batch_shape) == 0:
+            return tensor.squeeze(0)
+        if len(batch_shape) > 1:
+            return split_dim(tensor, batch_shape, 0)
+        return tensor
 
     def call(self, y: torch.Tensor, h: torch.Tensor, s: torch.Tensor) -> torch.Tensor:
         # Flatten batch dimensions
         batch_shape = list(y.shape[:-1])
         num_batch_dims = len(batch_shape)
-        if num_batch_dims > 1:
+        if num_batch_dims == 0:
+            y = y.unsqueeze(0)
+            h = h.unsqueeze(0)
+            s = s.unsqueeze(0)
+        elif num_batch_dims > 1:
             y = flatten_dims(y, num_batch_dims, 0)
             h = flatten_dims(h, num_batch_dims, 0)
             s = flatten_dims(s, num_batch_dims, 0)
@@ -1019,10 +1055,7 @@ class KBestDetector(Block):
             if self._output == "bit":
                 hard_dec = self._symbolinds2bits(hard_dec)
 
-            if num_batch_dims > 1:
-                hard_dec = split_dim(hard_dec, batch_shape, 0)
-
-            return hard_dec
+            return self._restore_batch_dims(hard_dec, batch_shape)
 
         else:
             if self._use_real_rep:
@@ -1041,10 +1074,7 @@ class KBestDetector(Block):
                 llr = self.list2llr(y, r, dists, path_inds.to(torch.int32), path_syms)
                 llr = self._unsort(column_order, llr, transpose=False)
 
-            if num_batch_dims > 1:
-                llr = split_dim(llr, batch_shape, 0)
-
-            return llr
+            return self._restore_batch_dims(llr, batch_shape)
 
 
 class EPDetector(Block):
@@ -1141,7 +1171,8 @@ class EPDetector(Block):
         else:
             self._prec = 1e-12
 
-        assert output in ("bit", "symbol"), "Unknown output"
+        if output not in ("bit", "symbol"):
+            raise ValueError("output must be one of: 'bit', 'symbol'")
         self._output = output
         self._hard_out = hard_out
 
@@ -1158,10 +1189,12 @@ class EPDetector(Block):
                 device=device,
             )
 
-        assert l >= 1, "l must be a positive integer"
+        if not (l >= 1):
+            raise ValueError("l must be a positive integer")
         self._l = l
 
-        assert 0.0 <= beta <= 1.0, "beta must be in [0,1]"
+        if not 0.0 <= beta <= 1.0:
+            raise ValueError("beta must be in [0,1]")
         self._beta = beta
 
         self._num_bits_per_symbol = num_bits_per_symbol // 2
@@ -1177,7 +1210,7 @@ class EPDetector(Block):
         self._no = torch.tensor(0.5, dtype=self.dtype, device=self.device)
 
     def compute_sigma_mu(self, h_t_h, h_t_y, no, lam, gam):
-        """Equations (28) and (29)."""
+        """Eq. (28) and Eq. (29)."""
         lam = torch.diag_embed(lam)
         gam = gam.unsqueeze(-1)
 
@@ -1190,13 +1223,13 @@ class EPDetector(Block):
         return sigma, mu
 
     def compute_v_x_obs(self, sigma, mu, lam, gam):
-        """Equations (31) and (32)."""
+        """Eq. (31) and Eq. (32)."""
         v_obs = torch.clamp(1 / (1 / sigma - lam), min=self._prec)
         x_obs = v_obs * (mu / sigma - gam)
         return v_obs, x_obs
 
     def compute_v_x(self, v_obs, x_obs):
-        """Equation (33)."""
+        """Eq. (33)."""
         x_obs = x_obs.unsqueeze(-1)
         v_obs = v_obs.unsqueeze(-1)
 
@@ -1212,7 +1245,7 @@ class EPDetector(Block):
         return v, x, logits
 
     def update_lam_gam(self, v, v_obs, x, x_obs, lam, gam):
-        """Equations (35), (36), (37), (38)."""
+        """Eq. (35), Eq. (36), Eq. (37), and Eq. (38)."""
         lam_old = lam
         gam_old = gam
 
@@ -1438,9 +1471,14 @@ class MMSEPICDetector(Block):
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
 
-        assert isinstance(num_iter, int), "num_iter must be an integer"
-        assert output in ("bit", "symbol"), "Unknown output"
-        assert demapping_method in ("app", "maxlog"), "Unknown demapping method"
+        if not isinstance(num_iter, int):
+            raise TypeError("num_iter must be an integer")
+        if output not in ("bit", "symbol"):
+            raise ValueError("output must be one of: 'bit', 'symbol'")
+        if demapping_method not in ("app", "maxlog"):
+            raise ValueError(
+                "demapping_method must be one of: 'app', 'maxlog'"
+            )
 
         self._num_iter = num_iter
         self._output = output

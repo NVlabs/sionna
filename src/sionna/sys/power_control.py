@@ -11,6 +11,7 @@ from typing import Optional, Tuple, Union
 
 import torch
 
+from sionna._validation import check_scalar_range, check_tensor_range
 from sionna.phy import dtypes, config
 from sionna.phy.config import Precision
 from sionna.phy.utils import (
@@ -124,8 +125,11 @@ def open_loop_uplink_power_control(
         rdtype = dtypes[precision]["torch"]["dtype"]
 
     # Ensure shapes match
-    assert pathloss.shape == num_allocated_subcarriers.shape, \
-        "Inconsistent input shapes"
+    if pathloss.shape != num_allocated_subcarriers.shape:
+        raise ValueError(
+            "Inconsistent input shapes: 'pathloss' and "
+            "'num_allocated_subcarriers' must have the same shape"
+        )
 
     # [..., num_ut]
     pathloss_db = lin_to_db(pathloss, precision=precision)
@@ -265,8 +269,8 @@ def downlink_fair_power_control(
         ``step_expand``.
 
     :output tx_power: [..., num_ut], `torch.float`.
-        Optimal downlink power allocation :math:`p_u^*` [Watt] for each user
-        :math:`u`.
+        Optimal total downlink power allocation :math:`r_u p_u^*` [Watt] for
+        each user :math:`u`.
     :output utility: [..., num_ut], `torch.float`.
         Optimal utility for each user, computed as :math:`r_u \log( 1 + p^*_u
         q_u)` for user :math:`u`.
@@ -438,6 +442,22 @@ def downlink_fair_power_control(
         fairness = float(fairness.item())
     else:
         fairness = float(fairness)
+    if isinstance(guaranteed_power_ratio, torch.Tensor):
+        check_tensor_range(
+            guaranteed_power_ratio,
+            name="guaranteed_power_ratio",
+            minimum=0,
+            maximum=1,
+            message="guaranteed_power_ratio must be in [0, 1]",
+        )
+    else:
+        check_scalar_range(
+            guaranteed_power_ratio,
+            name="guaranteed_power_ratio",
+            minimum=0,
+            maximum=1,
+            message="guaranteed_power_ratio must be in [0, 1]",
+        )
     pathloss = pathloss.to(dtype=rdtype)
     num_allocated_re = scalar_to_shaped_tensor(
         num_allocated_re, rdtype, batch_shape + [num_ut], device=pathloss.device)
@@ -458,9 +478,8 @@ def downlink_fair_power_control(
     # ------------ #
     # Check inputs #
     # ------------ #
-    assert fairness >= 0, "fairness parameter must be non-negative"
-    assert guaranteed_power_ratio >= 0, "guaranteed_power_ratio must be in [0;1]"
-    assert guaranteed_power_ratio <= 1, "guaranteed_power_ratio must be in [0;1]"
+    if not (fairness >= 0):
+        raise ValueError("fairness parameter must be non-negative")
 
     # ----------------- #
     # Search boundaries #
@@ -517,15 +536,19 @@ def downlink_fair_power_control(
     # Optimal transmit power #
     # ---------------------- #
     # [..., num_ut]
-    tx_power = get_p_star_mu(mu_inv_star, fairness, cq, num_allocated_re)
+    tx_power_per_re = get_p_star_mu(
+        mu_inv_star, fairness, cq, num_allocated_re
+    )
 
     # Compute total power across resources
-    tx_power = tx_power * num_allocated_re
+    tx_power = tx_power_per_re * num_allocated_re
 
     # ---------------- #
     # Achieved utility #
     # ---------------- #
-    utility = num_allocated_re * torch.log(_scalar(1.0) + tx_power * cq)
+    utility = num_allocated_re * torch.log(
+        _scalar(1.0) + tx_power_per_re * cq
+    )
 
     if return_lagrangian:
         return tx_power, utility, mu_inv_star

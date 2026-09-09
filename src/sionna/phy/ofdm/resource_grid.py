@@ -130,8 +130,8 @@ class ResourceGrid(Object):
         self._dc_null = dc_null
         self._pilot_ofdm_symbol_indices = pilot_ofdm_symbol_indices
         self._pilot_pattern: Optional[PilotPattern] = None
-        self.pilot_pattern = pilot_pattern
         self._check_settings()
+        self.pilot_pattern = pilot_pattern
 
     @property
     def cyclic_prefix_length(self) -> int:
@@ -271,7 +271,8 @@ class ResourceGrid(Object):
         elif isinstance(value, PilotPattern):
             pass
         elif isinstance(value, str):
-            assert value in ["kronecker", "empty"], "Unknown pilot pattern"
+            if value not in ["kronecker", "empty"]:
+                raise ValueError("Unknown pilot pattern")
             if value == "empty":
                 value = EmptyPilotPattern(
                     self._num_tx,
@@ -282,8 +283,10 @@ class ResourceGrid(Object):
                     device=self.device,
                 )
             elif value == "kronecker":
-                assert self._pilot_ofdm_symbol_indices is not None, \
-                    "You must provide pilot_ofdm_symbol_indices."
+                if self._pilot_ofdm_symbol_indices is None:
+                    raise ValueError(
+                        "You must provide pilot_ofdm_symbol_indices."
+                    )
                 value = KroneckerPilotPattern(
                     self,
                     self._pilot_ofdm_symbol_indices,
@@ -301,24 +304,47 @@ class ResourceGrid(Object):
 
     def _check_settings(self) -> bool:
         """Validate that all properties define a valid resource grid."""
-        assert self._num_ofdm_symbols > 0, \
-            "`num_ofdm_symbols` must be positive."
-        assert self._fft_size > 0, \
-            "`fft_size` must be positive."
-        assert self._cyclic_prefix_length >= 0, \
-            "`cyclic_prefix_length` must be nonnegative."
-        assert self._cyclic_prefix_length <= self._fft_size, \
-            "`cyclic_prefix_length` cannot be longer than `fft_size`."
-        assert self._num_tx > 0, \
-            "`num_tx` must be positive."
-        assert self._num_streams_per_tx > 0, \
-            "`num_streams_per_tx` must be positive."
-        assert len(self._num_guard_carriers) == 2, \
-            "`num_guard_carriers` must have two elements."
-        assert np.all(np.greater_equal(self._num_guard_carriers, 0)), \
-            "`num_guard_carriers` must have nonnegative entries."
-        assert self._num_guard_carriers_sum <= self._fft_size - self._dc_null, \
-            "Total number of guard carriers cannot be larger than `fft_size`."
+        if not (self._num_ofdm_symbols > 0):
+            raise ValueError("`num_ofdm_symbols` must be positive.")
+        if not (self._fft_size > 0):
+            raise ValueError("`fft_size` must be positive.")
+        if not (self._cyclic_prefix_length >= 0):
+            raise ValueError("`cyclic_prefix_length` must be nonnegative.")
+        if not (self._cyclic_prefix_length <= self._fft_size):
+            raise ValueError(
+                "`cyclic_prefix_length` cannot be longer than `fft_size`."
+            )
+        if not (self._num_tx > 0):
+            raise ValueError("`num_tx` must be positive.")
+        if not (self._num_streams_per_tx > 0):
+            raise ValueError("`num_streams_per_tx` must be positive.")
+        if len(self._num_guard_carriers) != 2:
+            raise ValueError("`num_guard_carriers` must have two elements.")
+        if not np.all(np.greater_equal(self._num_guard_carriers, 0)):
+            raise ValueError(
+                "`num_guard_carriers` must have nonnegative entries."
+            )
+        if not (
+            self._num_guard_carriers_sum <= self._fft_size - self._dc_null
+        ):
+            raise ValueError(
+                "Total number of guard carriers cannot be larger than "
+                "`fft_size`."
+            )
+        if self._dc_null:
+            if self._num_guard_carriers[0] > self.dc_ind:
+                raise ValueError(
+                    "Left guard carriers cannot include the DC subcarrier."
+                )
+            if self._num_guard_carriers[1] > self._fft_size - self.dc_ind - 1:
+                raise ValueError(
+                    "Right guard carriers cannot include the DC subcarrier."
+                )
+        if self.num_effective_subcarriers <= 0:
+            raise ValueError(
+                "The resource grid must contain at least one effective "
+                "subcarrier."
+            )
         return True
 
     def build_type_grid(self) -> torch.Tensor:
@@ -463,8 +489,16 @@ class ResourceGridMapper(Block):
         # which is prefilled with pilots and stores indices
         # to scatter data symbols.
         self._rg_type = self._resource_grid.build_type_grid()
-        self.register_buffer("_pilot_ind", torch.nonzero(self._rg_type == 1, as_tuple=False))
-        self.register_buffer("_data_ind", torch.nonzero(self._rg_type == 0, as_tuple=False))
+        self.register_buffer(
+            "_pilot_ind_flat",
+            torch.nonzero(self._rg_type.flatten() == 1, as_tuple=False).squeeze(-1),
+            persistent=False,
+        )
+        self.register_buffer(
+            "_data_ind_flat",
+            torch.nonzero(self._rg_type.flatten() == 0, as_tuple=False).squeeze(-1),
+            persistent=False,
+        )
 
     def call(self, inputs: torch.Tensor) -> torch.Tensor:
         """Map data symbols to resource grid.
@@ -476,37 +510,29 @@ class ResourceGridMapper(Block):
         """
         batch_size = inputs.shape[0]
 
-        # Create empty resource grid
+        # Create a flattened resource-grid template
         rg_shape = list(self._rg_type.shape)
-        template = torch.zeros(
-            [batch_size] + rg_shape,
-            dtype=inputs.dtype, device=inputs.device
+        pilot_template = torch.zeros(
+            self._rg_type.numel(), dtype=inputs.dtype, device=inputs.device
         )
 
         # Map pilots onto resource grid (if any)
-        if self._pilot_ind.shape[0] > 0:
+        if self._pilot_ind_flat.shape[0] > 0:
             pilots = flatten_last_dims(
                 self._resource_grid.pilot_pattern.pilots, 3
             ).to(inputs.dtype)
-            # Use broadcasting: expand pilots to batch dimension
-            # pilot_ind has shape [num_pilots, 4]: [tx, stream, ofdm_sym, subcarrier]
-            template[:,
-                     self._pilot_ind[:, 0],
-                     self._pilot_ind[:, 1],
-                     self._pilot_ind[:, 2],
-                     self._pilot_ind[:, 3]] = pilots
+            pilot_template = pilot_template.scatter(
+                0, self._pilot_ind_flat, pilots
+            )
 
         # Map data symbols onto resource grid
         # data_flat has shape [batch_size, num_tx * num_streams * num_data_symbols]
         data_flat = flatten_last_dims(inputs, 3)
-        # Use broadcasting: assign data_flat[batch, :] at data positions
-        template[:,
-                 self._data_ind[:, 0],
-                 self._data_ind[:, 1],
-                 self._data_ind[:, 2],
-                 self._data_ind[:, 3]] = data_flat
+        template = pilot_template.unsqueeze(0).expand(batch_size, -1)
+        data_ind = self._data_ind_flat.unsqueeze(0).expand(batch_size, -1)
+        template = template.scatter(1, data_ind, data_flat)
 
-        return template
+        return template.reshape([batch_size] + rg_shape)
 
 
 class ResourceGridDemapper(Block):
@@ -580,7 +606,7 @@ class ResourceGridDemapper(Block):
         num_data_symbols = resource_grid.pilot_pattern.num_data_symbols
         # Use stable=True to maintain relative order for equal elements
         data_ind = torch.argsort(
-            flatten_last_dims(mask.to(torch.float32)), dim=-1, stable=True
+            flatten_last_dims(mask), dim=-1, stable=True
         )
         self.register_buffer("_data_ind", data_ind[..., :num_data_symbols])
 

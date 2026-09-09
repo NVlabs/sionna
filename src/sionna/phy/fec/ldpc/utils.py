@@ -12,7 +12,6 @@ import scipy.sparse as sp
 import torch
 
 from sionna.phy.object import Object
-from sionna.phy.fec.utils import llr2mi
 
 
 __all__ = [
@@ -68,15 +67,21 @@ class EXITCallback(Object):
         device: Optional[str] = None,
     ):
         super().__init__(device=device)
-        self.register_buffer("_mi", torch.zeros(num_iter + 1, dtype=torch.float32, device=self.device))
-        self.register_buffer("_num_samples", torch.zeros(
-            num_iter + 1, dtype=torch.float32, device=self.device
-        ))
+        # Accumulators are sized for the accumulation, not for the simulation
+        # precision, matching DecoderStatisticsCallback below.
+        self.register_buffer(
+            "_mi",
+            torch.zeros(num_iter + 1, dtype=torch.float64, device=self.device),
+        )
+        self.register_buffer(
+            "_num_samples",
+            torch.zeros(num_iter + 1, dtype=torch.int64, device=self.device),
+        )
 
     @property
     def mi(self) -> torch.Tensor:
         """Mutual information after each iteration"""
-        return self._mi / self._num_samples
+        return self._mi / self._num_samples.to(torch.float64)
 
     def __call__(
         self,
@@ -89,10 +94,20 @@ class EXITCallback(Object):
         # Flatten messages and compute MI (exclude padded values)
         msg_flat = msg.reshape(-1)
         nonzero_mask = msg_flat != 0
-        if nonzero_mask.any():
-            mi_val = llr2mi(-1 * msg_flat[nonzero_mask])
-            self._mi[it] = self._mi[it] + mi_val
-        self._num_samples[it] = self._num_samples[it] + 1.0
+        log_term = torch.log2(
+            1.0 + torch.exp(torch.clamp(-msg_flat, min=-100.0, max=100.0))
+        )
+        num_values = nonzero_mask.sum()
+        mean_term = (
+            log_term * nonzero_mask.to(log_term.dtype)
+        ).sum() / num_values.clamp_min(1).to(log_term.dtype)
+        mi_val = torch.where(
+            num_values > 0,
+            1.0 - mean_term,
+            torch.zeros((), dtype=log_term.dtype, device=log_term.device),
+        )
+        self._mi[it] = self._mi[it] + mi_val
+        self._num_samples[it] = self._num_samples[it] + 1
         return msg
 
 

@@ -146,6 +146,28 @@ class TestOFDMDemodulator:
 class TestOFDMDemodulatorCompile:
     """Tests for torch.compile compatibility"""
 
+    def test_trailing_samples_compile_without_graph_breaks(
+        self, device, precision
+    ):
+        """Test trailing-sample removal compiles as a single graph."""
+        fft_size = 64
+        cp_length = 16
+        modulator = OFDMModulator(
+            cp_length, precision=precision, device=device
+        )
+        demodulator = OFDMDemodulator(
+            fft_size, 0, cp_length, precision=precision, device=device
+        )
+        compiled_demodulator = torch.compile(demodulator, fullgraph=True)
+
+        qam_source = QAMSource(4, precision=precision, device=device)
+        x = qam_source([4, 14, fft_size])
+        x_time = modulator(x)
+        x_time = torch.cat([x_time, torch.zeros_like(x_time[..., :1])], dim=-1)
+
+        x_hat = compiled_demodulator(x_time)
+        torch.testing.assert_close(x_hat, x)
+
     def test_demodulator_compile(self, device, precision, mode):
         """Test that OFDMDemodulator works with torch.compile"""
         if device == "cpu" and mode != "default":
@@ -237,4 +259,3 @@ class TestOFDMModDemod:
             assert x_f.shape == torch.Size(
                 [32, 1, 1, num_ofdm_symbols, fft_size]
             )
-

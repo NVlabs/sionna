@@ -153,7 +153,10 @@ class ConvEncoder(Block):
                 "Due to termination, the true coderate is lower "
                 "than the returned design rate. "
                 "The exact true rate is dependent on the value of k and "
-                "hence cannot be computed before the first call().")
+                "hence cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         elif self.terminate and self._k is not None:
             term_factor = self._k / (self._k + self._mu)
             self._coderate = self._coderate_desired * term_factor
@@ -173,16 +176,22 @@ class ConvEncoder(Block):
     def k(self) -> Optional[int]:
         """Number of information bits per codeword"""
         if self._k is None:
-            warnings.warn("The value of k cannot be computed before the "
-                          "first call().")
+            warnings.warn(
+                "The value of k cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self._k
 
     @property
     def n(self) -> Optional[int]:
         """Number of codeword bits"""
         if self._n is None:
-            warnings.warn("The value of n cannot be computed before the "
-                          "first call().")
+            warnings.warn(
+                "The value of n cannot be computed before the first call().",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return self._n
 
     def build(self, input_shape: torch.Size):

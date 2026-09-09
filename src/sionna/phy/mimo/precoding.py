@@ -8,6 +8,7 @@ import math
 from typing import Optional, Tuple, Union, List
 import torch
 
+from sionna._validation import check_tensor_all
 from sionna.phy.config import config, dtypes, Precision
 from sionna.phy.constants import PI
 from sionna.phy.utils import expand_to_rank
@@ -265,6 +266,7 @@ def grid_of_beams_dft_ula(
     num_ant: int,
     oversmpl: int = 1,
     precision: Optional[Precision] = None,
+    device: Optional[str] = None,
 ) -> torch.Tensor:
     r"""Computes the Discrete Fourier Transform (DFT) Grid of Beam (GoB)
     coefficients for a uniform linear array (ULA).
@@ -273,21 +275,25 @@ def grid_of_beams_dft_ula(
     as:
 
     .. math::
-        c_n^m = e^{\frac{2\pi n m}{N O}}, \quad n=0,\dots,N-1, \ m=0,\dots,NO
+        c_n^m = \frac{1}{\sqrt{N}}e^{j\frac{2\pi n m}{N O}},
+        \quad n=0,\dots,N-1,\quad m=0,\dots,NO-1
 
     where :math:`N` is the number of antennas ``num_ant`` and :math:`O` is the oversampling
     factor ``oversmpl``.
 
-    Note that the main lobe of beam :math:`m` points in the azimuth direction
-    :math:`\theta = \mathrm{arc sin} \left( 2\frac{m}{N} \right)` if :math:`m\le
-    N/2` and :math:`\theta = \mathrm{arc sin} \left( 2\frac{m-N}{N} \right)` if
-    :math:`m\ge N/2`, where :math:`\theta=0` defines the perpendicular to the
-    antenna array.
+    For a half-wavelength-spaced ULA, define the wrapped spatial frequency
+    :math:`\nu_m=m/(NO)` for :math:`m\le\lfloor NO/2\rfloor` and
+    :math:`\nu_m=(m-NO)/(NO)` otherwise. With positive phase progression
+    corresponding to positive azimuth, the main lobe points towards
+    :math:`\theta_m=\arcsin(2\nu_m)`, where :math:`\theta_m=0` is perpendicular
+    to the antenna array.
 
     :param num_ant: Number of antennas
     :param oversmpl: Oversampling factor
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
+    :param device: Device for computation. If `None`,
+        :attr:`~sionna.phy.config.Config.device` is used.
 
     :output gob: [num_ant x oversmpl, num_ant], `torch.complex`.
         The :math:`m`-th row contains the `num_ant` antenna coefficients for
@@ -305,13 +311,16 @@ def grid_of_beams_dft_ula(
     else:
         rdtype = dtypes[precision]["torch"]["dtype"]
 
+    if device is None:
+        device = config.device
+
     oversmpl = int(oversmpl)
 
     # Beam indices: [0, .., num_ant * oversmpl - 1]
-    beam_ind = torch.arange(num_ant * oversmpl, dtype=rdtype, device=config.device).unsqueeze(-1)
+    beam_ind = torch.arange(num_ant * oversmpl, dtype=rdtype, device=device).unsqueeze(-1)
 
     # Antenna indices: [0, .., num_ant - 1]
-    antenna_ind = torch.arange(num_ant, dtype=rdtype, device=config.device).unsqueeze(0)
+    antenna_ind = torch.arange(num_ant, dtype=rdtype, device=device).unsqueeze(0)
 
     # Compute phases and combine to complex coefficients
     phases = 2 * PI * beam_ind * antenna_ind / (num_ant * oversmpl)
@@ -326,6 +335,7 @@ def grid_of_beams_dft(
     oversmpl_v: int = 1,
     oversmpl_h: int = 1,
     precision: Optional[Precision] = None,
+    device: Optional[str] = None,
 ) -> torch.Tensor:
     r"""Computes the Discrete Fourier Transform (DFT) Grid of Beam (GoB)
     coefficients for a uniform rectangular array (URA).
@@ -336,23 +346,29 @@ def grid_of_beams_dft(
     array is expressed as:
 
     .. math::
-        c_{n_v,n_h}^{m_v,m_h} = e^{\frac{2\pi n_h m_v}{N_h O_h}} e^{\frac{2\pi n_h m_h}{N_v O_v}}
+        c_{n_v,n_h}^{m_v,m_h}
+        = \frac{1}{\sqrt{N_vN_h}}
+          e^{j\frac{2\pi n_v m_v}{N_v O_v}}
+          e^{j\frac{2\pi n_h m_h}{N_h O_h}}
 
     where :math:`n_v=0,\dots,N_v-1`, :math:`n_h=0,\dots,N_h-1`,
-    :math:`m_v=0,\dots,N_v O_v`, :math:`m_h=0,\dots,N_h O_h`, :math:`N` is the
-    number of antennas ``num_ant`` and :math:`O_v,O_h` are the oversampling
-    factor ``oversmpl_v``, ``oversmpl_h`` in the vertical and
+    :math:`m_v=0,\dots,N_v O_v-1`, :math:`m_h=0,\dots,N_h O_h-1`,
+    :math:`N_v,N_h` are the numbers of antennas ``num_ant_v``, ``num_ant_h``,
+    and :math:`O_v,O_h` are the oversampling factors ``oversmpl_v``,
+    ``oversmpl_h`` in the vertical and
     horizontal direction, respectively.
 
     We can rewrite more concisely the matrix coefficients
     :math:`c^{m_v,m_h}` as follows:
 
     .. math::
-        c^{m_v,m_h} = c^{m_v} \otimes c^{m_h}
+        \mathbf{c}^{m_v,m_h}
+        = \mathbf{c}_h^{m_h} \otimes \mathbf{c}_v^{m_v}
 
-    where :math:`\otimes` denotes the Kronecker product and
-    :math:`c^{m_v},c^{m_h}` are the ULA DFT beams computed as in
-    :func:`~sionna.phy.mimo.grid_of_beams_dft_ula`.
+    where :math:`\otimes` denotes the Kronecker product,
+    :math:`\mathbf{c}_v^{m_v}` and :math:`\mathbf{c}_h^{m_h}` are the vertical
+    and horizontal ULA DFT beams, respectively, and the ordering follows
+    column-wise flattening of the rectangular array.
 
     Such a DFT GoB is, e.g., defined in Section 5.2.2.2.1 :cite:p:`3GPPTS38214`.
 
@@ -362,6 +378,8 @@ def grid_of_beams_dft(
     :param oversmpl_h: Oversampling factor in horizontal direction
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
+    :param device: Device for computation. If `None`,
+        :attr:`~sionna.phy.config.Config.device` is used.
 
     :output gob: [num_ant_v x oversmpl_v, num_ant_h x oversmpl_h, num_ant_v x num_ant_h], `torch.complex`.
         The elements :math:`[m_v,m_h,:]` contain the antenna coefficients of the
@@ -375,10 +393,14 @@ def grid_of_beams_dft(
         # gob.shape = torch.Size([4, 8, 32])
     """
     # Compute the DFT coefficients for vertical and horizontal directions
-    gob_v = grid_of_beams_dft_ula(num_ant_v, oversmpl=oversmpl_v, precision=precision)
+    gob_v = grid_of_beams_dft_ula(
+        num_ant_v, oversmpl=oversmpl_v, precision=precision, device=device
+    )
     gob_v = gob_v[:, None, :, None]
 
-    gob_h = grid_of_beams_dft_ula(num_ant_h, oversmpl=oversmpl_h, precision=precision)
+    gob_h = grid_of_beams_dft_ula(
+        num_ant_h, oversmpl=oversmpl_h, precision=precision, device=device
+    )
     gob_h = gob_h[None, :, None, :]
 
     # Kronecker product
@@ -468,12 +490,24 @@ def normalize_precoding_power(
 
     if tx_power_list is None:
         tx_power_list = [1.0] * precoding_vec.shape[0]
+    if any(power < 0 for power in tx_power_list):
+        raise ValueError("Transmit powers must be nonnegative.")
 
     precoding_vec_norm = torch.norm(precoding_vec, dim=1, keepdim=True)
+
+    check_tensor_all(
+        precoding_vec_norm != 0,
+        name="precoding_vec",
+        message=(
+            "Precoding vectors with zero norm cannot be normalized to a given "
+            "power."
+        ),
+    )
+
     tx_power = torch.tensor(tx_power_list, dtype=rdtype, device=precoding_vec.device).unsqueeze(-1)
 
     # Normalize the power of each row
-    precoding_vec = (precoding_vec / precoding_vec_norm) * tx_power
+    precoding_vec = (precoding_vec / precoding_vec_norm) * torch.sqrt(tx_power)
 
     return precoding_vec
 

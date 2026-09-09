@@ -8,6 +8,7 @@ from typing import Optional, Sequence, Union
 import warnings
 import torch
 
+from sionna._validation import check_binary
 from sionna.phy import config, Block
 from sionna.phy.utils import expand_to_rank
 
@@ -58,7 +59,7 @@ class Scrambler(Block):
 
     .. rubric:: Notes
 
-    For inverse scrambling, the same scrambler can be re-used (as the values
+    For inverse scrambling, the same scrambler can be reused (as the values
     are flipped again, i.e., result in the original state). However,
     ``keep_state`` must be set to `True` as a new sequence would be generated
     otherwise.
@@ -112,7 +113,9 @@ class Scrambler(Block):
             if sequence is not None:
                 warnings.warn(
                     "Explicit scrambling sequence provided. "
-                    "Seed will be ignored."
+                    "Seed will be ignored.",
+                    UserWarning,
+                    stacklevel=2,
                 )
             if not isinstance(seed, int):
                 raise TypeError("seed must be int.")
@@ -134,10 +137,11 @@ class Scrambler(Block):
         self._sequence: Optional[torch.Tensor] = None
         if sequence is not None:
             sequence = sequence.to(dtype=self.dtype, device=self.device)
-            # Check that sequence is binary
-            is_binary = ((sequence == 0) | (sequence == 1)).all()
-            if not is_binary:
-                raise ValueError("Scrambling sequence must be binary.")
+            check_binary(
+                sequence,
+                name="sequence",
+                message="Scrambling sequence must be binary.",
+            )
             self._sequence = sequence
 
     @property
@@ -296,7 +300,7 @@ class TB5GScrambler(Block):
     the datascrambling ID ``n_id`` are usually provided by the higher layer
     protocols.
 
-    For inverse scrambling, the same scrambler can be re-used (as the values
+    For inverse scrambling, the same scrambler can be reused (as the values
     are flipped again, i.e., result in the original state).
 
     .. rubric:: Examples
@@ -536,13 +540,17 @@ class Descrambler(Block):
             warnings.warn(
                 "Scrambler uses random sequences that cannot be "
                 "accessed by descrambler. Please use keep_state=True and "
-                "provide explicit random seed as input to call function."
+                "provide explicit random seed as input to call function.",
+                UserWarning,
+                stacklevel=2,
             )
 
         if self._scrambler.precision != self.precision:
             warnings.warn(
                 "Scrambler and descrambler are using different precision. "
-                "This will cause an internal implicit cast."
+                "This will cause an internal implicit cast.",
+                UserWarning,
+                stacklevel=2,
             )
 
     @property

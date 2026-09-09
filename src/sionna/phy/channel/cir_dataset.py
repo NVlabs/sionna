@@ -5,12 +5,12 @@
 """Class for creating a CIR sampler, usable as a channel model, from a CIR
 generator."""
 
-import random
 from typing import Callable, Iterator, Optional, Tuple
 
 import torch
 from torch.utils.data import DataLoader, IterableDataset
 
+from sionna.phy import config
 from .channel_model import ChannelModel
 
 __all__ = ["CIRDataset"]
@@ -38,11 +38,11 @@ class _CIRIterableDataset(IterableDataset):
         for item in self._cir_generator():
             buffer.append(item)
             if len(buffer) >= self._buffer_size:
-                random.shuffle(buffer)
+                config.py_rng.shuffle(buffer)
                 while buffer:
                     yield buffer.pop()
         # Yield remaining items
-        random.shuffle(buffer)
+        config.py_rng.shuffle(buffer)
         while buffer:
             yield buffer.pop()
 
@@ -70,11 +70,11 @@ class _InfiniteCIRIterableDataset(IterableDataset):
             for item in self._cir_generator():
                 buffer.append(item)
                 if len(buffer) >= self._buffer_size:
-                    random.shuffle(buffer)
+                    config.py_rng.shuffle(buffer)
                     while buffer:
                         yield buffer.pop()
             # Yield remaining items before restarting
-            random.shuffle(buffer)
+            config.py_rng.shuffle(buffer)
             while buffer:
                 yield buffer.pop()
 

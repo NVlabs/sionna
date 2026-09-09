@@ -189,20 +189,28 @@ class PilotPattern(Object):
 
     def _check_settings(self) -> bool:
         """Validate that all properties define a valid pilot pattern."""
-        assert self._mask.dim() == 4, "`mask` must have four dimensions."
-        assert self._pilots.dim() == 3, "`pilots` must have three dimensions."
-        assert list(self._mask.shape[:2]) == list(self._pilots.shape[:2]), \
-            "The first two dimensions of `mask` and `pilots` must be equal."
+        if self._mask.dim() != 4:
+            raise ValueError("`mask` must have four dimensions.")
+        if self._pilots.dim() != 3:
+            raise ValueError("`pilots` must have three dimensions.")
+        if list(self._mask.shape[:2]) != list(self._pilots.shape[:2]):
+            raise ValueError(
+                "The first two dimensions of `mask` and `pilots` must be equal."
+            )
 
         num_pilots = self._mask.sum(dim=(-2, -1))
-        assert num_pilots.min() == num_pilots.max(), \
-            """The number of nonzero elements in the masks for all transmitters
-            and streams must be identical."""
+        if num_pilots.min() != num_pilots.max():
+            raise ValueError(
+                "The number of nonzero elements in the masks for all "
+                "transmitters and streams must be identical."
+            )
 
-        assert self.num_pilot_symbols == num_pilots.max().item(), \
-            """The shape of the last dimension of `pilots` must equal
-            the number of non-zero entries within the last two
-            dimensions of `mask`."""
+        if self.num_pilot_symbols != num_pilots.max().item():
+            raise ValueError(
+                "The shape of the last dimension of `pilots` must equal "
+                "the number of non-zero entries within the last two "
+                "dimensions of `mask`."
+            )
 
         return True
 
@@ -303,11 +311,14 @@ class EmptyPilotPattern(PilotPattern):
         precision: Optional[Precision] = None,
         device: Optional[str] = None,
     ) -> None:
-        assert num_tx > 0, "`num_tx` must be positive."
-        assert num_streams_per_tx > 0, "`num_streams_per_tx` must be positive."
-        assert num_ofdm_symbols > 0, "`num_ofdm_symbols` must be positive."
-        assert num_effective_subcarriers > 0, \
-            "`num_effective_subcarriers` must be positive."
+        if not (num_tx > 0):
+            raise ValueError("`num_tx` must be positive.")
+        if not (num_streams_per_tx > 0):
+            raise ValueError("`num_streams_per_tx` must be positive.")
+        if not (num_ofdm_symbols > 0):
+            raise ValueError("`num_ofdm_symbols` must be positive.")
+        if not (num_effective_subcarriers > 0):
+            raise ValueError("`num_effective_subcarriers` must be positive.")
 
         shape = [num_tx, num_streams_per_tx, num_ofdm_symbols,
                  num_effective_subcarriers]
@@ -335,8 +346,6 @@ class KroneckerPilotPattern(PilotPattern):
         symbol indices that are reserved for pilots
     :param normalize: If `True`, the ``pilots`` are normalized to an average
         energy of one across the last dimension. Defaults to `True`.
-    :param seed: Seed for the generation of the pilot sequence. Different
-        seed values lead to different sequences. Defaults to `0`.
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for tensor operations. If `None`,
@@ -372,7 +381,6 @@ class KroneckerPilotPattern(PilotPattern):
         resource_grid: "ResourceGrid",  # noqa: F821
         pilot_ofdm_symbol_indices: List[int],
         normalize: bool = True,
-        seed: int = 0,
         precision: Optional[Precision] = None,
         device: Optional[str] = None,
     ) -> None:
@@ -389,9 +397,11 @@ class KroneckerPilotPattern(PilotPattern):
 
         # Compute the length of a pilot sequence
         num_pilots = num_pilot_symbols * num_effective_subcarriers / num_seq
-        assert (num_pilots / num_pilot_symbols) % 1 == 0, \
-            """`num_effective_subcarriers` must be an integer multiple of
-            `num_tx`*`num_streams_per_tx`."""
+        if (num_pilots / num_pilot_symbols) % 1 != 0:
+            raise ValueError(
+                "`num_effective_subcarriers` must be an integer multiple of "
+                "`num_tx`*`num_streams_per_tx`."
+            )
 
         # Number of pilots per OFDM symbol
         num_pilots_per_symbol = int(num_pilots / num_pilot_symbols)

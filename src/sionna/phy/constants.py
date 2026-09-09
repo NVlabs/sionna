@@ -4,11 +4,20 @@
 #
 """Constants for the Sionna PHY Package."""
 
-import scipy
+from scipy.constants import Boltzmann, Planck, epsilon_0, pi, speed_of_light
+
+__all__ = [
+    "ALPHA_MAX",
+    "BOLTZMANN_CONSTANT",
+    "DIELECTRIC_PERMITTIVITY_VACUUM",
+    "H",
+    "PI",
+    "SPEED_OF_LIGHT",
+]
 
 ALPHA_MAX = 32  # Maximum value
-BOLTZMANN_CONSTANT = scipy.constants.Boltzmann  # J/K
-DIELECTRIC_PERMITTIVITY_VACUUM = scipy.constants.epsilon_0  # F/m
-H = scipy.constants.Planck  # J/Hz
-PI = scipy.constants.pi
-SPEED_OF_LIGHT = scipy.constants.speed_of_light  # m/s
+BOLTZMANN_CONSTANT = Boltzmann  # J/K
+DIELECTRIC_PERMITTIVITY_VACUUM = epsilon_0  # F/m
+H = Planck  # J/Hz
+PI = pi
+SPEED_OF_LIGHT = speed_of_light  # m/s

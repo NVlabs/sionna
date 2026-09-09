@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 import torch
 
+from sionna.phy import config
 from sionna.phy.ofdm import (
     EmptyPilotPattern,
     KroneckerPilotPattern,
@@ -69,7 +70,7 @@ class TestPilotPattern:
         # Wrong shape for pilots
         pilots = np.ones([1, 1, 8], dtype=np.complex64)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             PilotPattern(mask, pilots, precision=precision, device=device)
 
     def test_check_settings_mask_wrong_rank(self, device, precision):
@@ -78,7 +79,7 @@ class TestPilotPattern:
         mask = np.zeros([1, 10], bool)
         pilots = np.zeros([1, 10, 20], np.complex64)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             PilotPattern(mask, pilots, precision=precision, device=device)
 
     def test_check_settings_pilots_wrong_rank(self, device, precision):
@@ -87,7 +88,7 @@ class TestPilotPattern:
         mask = np.zeros([4, 2, 10, 46], bool)
         pilots = np.zeros([1, 10, 20, 2], np.complex64)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             PilotPattern(mask, pilots, precision=precision, device=device)
 
     def test_check_settings_dimension_mismatch(self, device, precision):
@@ -99,7 +100,7 @@ class TestPilotPattern:
         # Wrong second dimension (3 instead of 2)
         pilots = np.zeros([1, 3, num_pilots], np.complex64)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             PilotPattern(mask, pilots, precision=precision, device=device)
 
     def test_check_settings_inconsistent_true_counts(self, device, precision):
@@ -110,7 +111,7 @@ class TestPilotPattern:
         num_pilots = int(np.max(np.sum(mask, (-2, -1))))
         pilots = np.zeros([1, 2, num_pilots], np.complex64)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             PilotPattern(mask, pilots, precision=precision, device=device)
 
     def test_check_settings_wrong_pilots_last_dim(self, device, precision):
@@ -122,7 +123,7 @@ class TestPilotPattern:
         # Wrong last dimension (num_pilots+1 instead of num_pilots)
         pilots = np.zeros([1, 2, num_pilots + 1], np.complex64)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             PilotPattern(mask, pilots, precision=precision, device=device)
 
     def test_properties_basic(self, device, precision):
@@ -175,11 +176,18 @@ class TestEmptyPilotPattern:
 
     def test_empty_pattern_invalid_params(self, device, precision):
         """Test EmptyPilotPattern with invalid parameters"""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             EmptyPilotPattern(0, 1, 14, 64, precision=precision, device=device)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             EmptyPilotPattern(1, 0, 14, 64, precision=precision, device=device)
+
+    def test_empty_pattern_nan_dimension(self, device, precision):
+        """Test EmptyPilotPattern rejects a NaN dimension"""
+        with pytest.raises(ValueError, match="positive"):
+            EmptyPilotPattern(
+                float("nan"), 1, 14, 64, precision=precision, device=device
+            )
 
 
 class TestKroneckerPilotPattern:
@@ -254,6 +262,37 @@ class TestKroneckerPilotPattern:
 
         assert isinstance(rg.pilot_pattern, KroneckerPilotPattern)
         assert rg.num_pilot_symbols > 0
+
+    def test_kronecker_uses_sionna_rng(self, device, precision):
+        """The global Sionna seed controls random pilot generation."""
+        rg = ResourceGrid(
+            num_ofdm_symbols=14,
+            fft_size=64,
+            subcarrier_spacing=30e3,
+            num_tx=2,
+            num_streams_per_tx=2,
+            precision=precision,
+            device=device,
+        )
+        previous_seed = config.seed
+        try:
+            config.seed = 123
+            pilots_a = KroneckerPilotPattern(
+                rg, [2, 11], precision=precision, device=device
+            ).pilots
+            config.seed = 123
+            pilots_b = KroneckerPilotPattern(
+                rg, [2, 11], precision=precision, device=device
+            ).pilots
+            config.seed = 456
+            pilots_c = KroneckerPilotPattern(
+                rg, [2, 11], precision=precision, device=device
+            ).pilots
+        finally:
+            config.seed = previous_seed
+
+        assert torch.equal(pilots_a, pilots_b)
+        assert not torch.equal(pilots_a, pilots_c)
 
 
 class TestPilotPatternCompile:

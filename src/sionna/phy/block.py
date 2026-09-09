@@ -7,7 +7,6 @@
 from typing import Any, Optional
 from .object import Object
 from .config import Precision
-import torch
 
 __all__ = ["Block"]
 
@@ -26,6 +25,22 @@ class Block(Object):
     :param device: Device for computation (e.g., ``'cpu'``, ``'cuda:0'``).
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
         Defaults to `None`.
+
+    .. rubric:: Notes
+
+    Input conversion and lazy building happen on every call, so a block
+    behaves the same in eager mode and under ``torch.compile``.
+
+    Compiling a block with a traceable :meth:`build` before its first call costs
+    one additional trace, because :attr:`built` changes during that call.
+    Calling the block once eagerly beforehand avoids the additional trace.
+
+    With ``fullgraph=True``, :meth:`build` must itself be traceable. Call the
+    block once eagerly first if :meth:`build` creates
+    :class:`torch.nn.Parameter` instances or uses unsupported Python or NumPy
+    operations. Otherwise, compilation raises
+    ``torch._dynamo.exc.Unsupported``. Without ``fullgraph=True``, unsupported
+    build operations cause graph breaks instead.
     """
 
     def __init__(
@@ -58,29 +73,15 @@ class Block(Object):
         """
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        """Call the block, with setup code skipped during ``torch.compile`` tracing.
+        """Convert inputs, build the block if needed, and run its forward pass."""
+        args = self._convert(args)
+        kwargs = self._convert(kwargs)
 
-        When using ``torch.compile``, Dynamo traces this method and creates
-        guards on state like ``_built``. To avoid recompilation when ``_built``
-        changes from `False` to `True` after the first call, the setup code
-        (input conversion and lazy build) is skipped when being traced. This
-        is detected using ``torch.compiler.is_compiling()``.
-
-        The setup code runs in eager mode (when ``is_compiling()`` is `False`),
-        ensuring inputs are properly converted and blocks are built before the
-        compiled ``forward()`` executes.
-        """
-        # Skip setup during Dynamo tracing to avoid guards on _built
-        # Setup runs in eager mode on actual execution
-        if not torch.compiler.is_compiling():
-            args = self._convert(args)
-            kwargs = self._convert(kwargs)
-
-            if not self._built:
-                arg_shapes = self._get_shape(args)
-                kwarg_shapes = self._get_shape(kwargs)
-                self.build(*arg_shapes, **kwarg_shapes)
-                self._built = True
+        if not self._built:
+            arg_shapes = self._get_shape(args)
+            kwarg_shapes = self._get_shape(kwargs)
+            self.build(*arg_shapes, **kwarg_shapes)
+            self._built = True
 
         return super().__call__(*args, **kwargs)
 

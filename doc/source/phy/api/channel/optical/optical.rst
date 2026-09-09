@@ -23,7 +23,7 @@ over a single-mode fiber (SMF) by using the split-step Fourier method.
                                     with_attenuation=True,
                                     with_dispersion=True,
                                     with_nonlinearity=True,
-                                    dtype=torch.complex64)
+                                    precision="single")
       # init amplifier
       amplifier = sionna.phy.channel.optical.EDFA(
                                     g=4.0,
@@ -100,7 +100,7 @@ For the purpose of the present document, the following symbols apply:
 
 See :cite:p:`A2012` for the definition of the linear and non-linear SSFM operators.
 
-**Remark:** Depending on the exact simulation parameters, the SSFM algorithm may require ``dtype=torch.complex128`` for accurate simulation results. However, this may increase the simulation complexity significantly.
+**Remark:** Depending on the exact simulation parameters, the SSFM algorithm may require ``precision="double"`` for accurate simulation results. However, this may increase the simulation complexity significantly.
 
 .. currentmodule:: sionna.phy.channel
 

@@ -8,7 +8,14 @@ import pytest
 import numpy as np
 import torch
 
-from sionna.phy.nr.utils import decode_mcs_index, generate_prng_seq, calculate_tb_size
+from sionna.phy.nr.utils import (
+    decode_mcs_index,
+    generate_prng_seq,
+    calculate_tb_size,
+    calculate_num_coded_bits,
+    calculate_codeword_bits,
+    MCSDecoderNR,
+)
 from .utils import calculate_tb_size_numpy, decode_mcs_index_numpy
 
 
@@ -26,9 +33,18 @@ class TestGeneratePrngSeq:
             generate_prng_seq(10, -1)
 
     def test_invalid_c_init_too_large(self):
-        """Test rejection of c_init >= 2^32."""
-        with pytest.raises(ValueError):
-            generate_prng_seq(100, 2**32)
+        """Test rejection of c_init >= 2^31."""
+        with pytest.raises(ValueError, match=r"2\^31"):
+            generate_prng_seq(100, 2**31)
+        with pytest.raises(ValueError, match=r"2\^31"):
+            generate_prng_seq(100, 2**32 - 1)
+
+    def test_c_init_max_accepted(self):
+        """Boundary: 2^31-1 is accepted and differs from 0."""
+        s_max = generate_prng_seq(64, 2**31 - 1)
+        s0 = generate_prng_seq(64, 0)
+        assert s_max.shape == (64,)
+        assert not np.array_equal(s_max, s0)
 
     def test_reference_sequence(self):
         """Test against reference example from 3GPP."""
@@ -140,7 +156,7 @@ class TestDecodeMcsIndex:
 
     def test_invalid_mcs_index_raises(self):
         """Test that invalid MCS index raises error."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             decode_mcs_index(mcs_index=29, table_index=1)
 
 
@@ -267,4 +283,163 @@ class TestDecodeMcsIndexAgainstNumpy:
 
         assert m_torch.item() == m_np
         assert r_torch.item() == pytest.approx(r_np)
+
+
+class TestMCSDecoderNRDefaultsAndValidation:
+    """MCSDecoderNR default alignment and category/index contracts."""
+
+    def test_default_matches_decode_mcs_index(self):
+        """Block default transform_precoding matches the function default."""
+        decoder = MCSDecoderNR()
+        mo_b, r_b = decoder(mcs_index=17, mcs_table_index=1, mcs_category=0)
+        mo_f, r_f = decode_mcs_index(
+            17, table_index=1, is_pusch=True, transform_precoding=False
+        )
+        assert mo_b.item() == mo_f.item()
+        assert r_b.item() == pytest.approx(r_f.item())
+
+    def test_explicit_transform_precoding_true(self):
+        decoder = MCSDecoderNR()
+        mo_b, r_b = decoder(
+            mcs_index=17,
+            mcs_table_index=1,
+            mcs_category=0,
+            transform_precoding=True,
+        )
+        mo_f, r_f = decode_mcs_index(
+            17, table_index=1, is_pusch=True, transform_precoding=True
+        )
+        assert mo_b.item() == mo_f.item()
+        assert r_b.item() == pytest.approx(r_f.item())
+
+    def test_invalid_category_raises(self):
+        decoder = MCSDecoderNR()
+        for cat in (-1, 2):
+            with pytest.raises(ValueError, match="mcs_category"):
+                decoder(mcs_index=10, mcs_table_index=1, mcs_category=cat)
+
+    def test_non_integer_mcs_index_raises(self):
+        with pytest.raises(ValueError, match="integer"):
+            decode_mcs_index(1.9, table_index=1)
+        with pytest.raises(ValueError, match="integer"):
+            decode_mcs_index(np.float64(1.9), table_index=1)
+        with pytest.raises(ValueError, match="integer"):
+            decode_mcs_index(torch.tensor([1.2, 2.0]), table_index=1)
+
+    def test_integer_valued_float_accepted(self):
+        mo, r = decode_mcs_index(1.0, table_index=1)
+        mo_i, r_i = decode_mcs_index(1, table_index=1)
+        assert mo.item() == mo_i.item()
+        assert r.item() == pytest.approx(r_i.item())
+
+    def test_numpy_integer_scalar_accepted(self):
+        mo, r = decode_mcs_index(np.int64(5), table_index=1)
+        mo_i, r_i = decode_mcs_index(5, table_index=1)
+        assert mo.item() == mo_i.item()
+        assert r.item() == pytest.approx(r_i.item())
+
+    def test_compiled_fullgraph(self, device):
+        """Tensor category and index checks must not break the compiled graph."""
+        decoder = MCSDecoderNR(device=device)
+
+        @torch.compile(fullgraph=True)
+        def decode(mcs_index, table_index, category):
+            return decoder(mcs_index, table_index, category)
+
+        mcs_index = torch.tensor(
+            [[3.0, 8.0, 14.0]], dtype=torch.float32, device=device
+        )
+        table_index = torch.tensor(1, device=device)
+        category = torch.tensor(0, device=device)
+        actual = decode(mcs_index, table_index, category)
+        expected = decoder(mcs_index, table_index, category)
+        torch.testing.assert_close(actual, expected)
+
+
+class TestCalculateTbSizeVectorized:
+    """Vectorized calculate_tb_size without precomputed num_coded_bits."""
+
+    def test_vector_without_num_coded_bits(self):
+        result = calculate_tb_size(
+            modulation_order=torch.tensor([4, 4]),
+            target_coderate=torch.tensor([0.5, 0.5]),
+            num_prbs=torch.tensor([10, 20]),
+            num_ofdm_symbols=torch.tensor([14, 14]),
+            num_dmrs_per_prb=torch.tensor([12, 12]),
+        )
+        tb_size = result[0]
+        assert tb_size.shape == (2,)
+
+        # Match scalar path elementwise
+        for i, n_prb in enumerate([10, 20]):
+            scalar = calculate_tb_size(
+                modulation_order=4,
+                target_coderate=0.5,
+                num_prbs=n_prb,
+                num_ofdm_symbols=14,
+                num_dmrs_per_prb=12,
+            )
+            assert int(tb_size[i]) == int(scalar[0])
+
+    def test_broadcast_scalar_layers(self):
+        result = calculate_tb_size(
+            modulation_order=torch.tensor([4, 6]),
+            target_coderate=torch.tensor([0.5, 0.6]),
+            num_prbs=torch.tensor([8, 16]),
+            num_ofdm_symbols=14,
+            num_dmrs_per_prb=12,
+            num_layers=2,
+        )
+        assert result[0].shape == (2,)
+
+    def test_compiled_fullgraph(self, device):
+        """Grid-parameter validation must not break the compiled graph."""
+
+        @torch.compile(fullgraph=True)
+        def calculate(q, rate, num_prbs, num_symbols, num_dmrs):
+            return calculate_tb_size(
+                modulation_order=q,
+                target_coderate=rate,
+                num_prbs=num_prbs,
+                num_ofdm_symbols=num_symbols,
+                num_dmrs_per_prb=num_dmrs,
+                return_cw_length=False,
+            )
+
+        args = (
+            torch.tensor([4, 6], device=device),
+            torch.tensor([0.5, 0.6], device=device),
+            torch.tensor([8, 16], device=device),
+            torch.tensor([14, 14], device=device),
+            torch.tensor([12, 12], device=device),
+        )
+        actual = calculate(*args)
+        expected = calculate_tb_size(
+            modulation_order=args[0],
+            target_coderate=args[1],
+            num_prbs=args[2],
+            num_ofdm_symbols=args[3],
+            num_dmrs_per_prb=args[4],
+            return_cw_length=False,
+        )
+        torch.testing.assert_close(actual, expected)
+
+
+class TestCodedBitHelpers:
+    """TBS-capped vs uncapped rate-matching bit budgets."""
+
+    def test_cap_distinguishes_tbs_and_codeword(self):
+        # 14 symbols, 0 DMRS, 0 overhead -> 168 REs/PRB (> 156)
+        capped = calculate_num_coded_bits(4, 1, 14, 0, 1)
+        uncapped = calculate_codeword_bits(4, 1, 14, 0, 1)
+        assert capped == 4 * 156
+        assert uncapped == 4 * 168
+        assert uncapped > capped
+
+    def test_below_cap_helpers_agree(self):
+        # 14 symbols, 12 DMRS -> 156 REs exactly at the cap boundary after
+        # overhead; with more DMRS the helpers must match.
+        capped = calculate_num_coded_bits(4, 10, 14, 24, 1)
+        uncapped = calculate_codeword_bits(4, 10, 14, 24, 1)
+        assert capped == uncapped
 

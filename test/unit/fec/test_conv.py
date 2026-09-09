@@ -314,6 +314,16 @@ class TestViterbiDecoder:
         u_hat = torch.zeros(bs, k, device=device)
         assert torch.equal(u, u_hat)
 
+    def test_dynamic_shapes(self, device):
+        """A reused decoder must rebuild when the codeword length changes."""
+        dec = ViterbiDecoder(
+            rate=1/2, constraint_length=5, terminate=False, device=device
+        )
+        u20 = dec(torch.zeros(2, 20, device=device))
+        u40 = dec(torch.zeros(2, 40, device=device))
+        assert u20.shape == (2, 10)
+        assert u40.shape == (2, 20)
+
     @pytest.mark.parametrize("rate", [1/2, 1/3])
     @pytest.mark.parametrize("k", [10, 20, 60])
     def test_numerical_stability(self, device, rate, k):

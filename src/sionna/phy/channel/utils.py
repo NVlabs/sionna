@@ -9,6 +9,7 @@ from typing import Optional, Tuple
 
 import torch
 
+from sionna._validation import check_tensor_all
 from sionna.phy import PI, config, dtypes
 from sionna.phy.utils import expand_to_rank, sample_bernoulli
 from sionna.phy.utils.random import rand, randint
@@ -79,8 +80,6 @@ def subcarrier_frequencies(
 
     if device is None:
         device = config.device
-    generator = config.torch_rng(device)
-    generator = config.torch_rng(device)
 
     start = -(num_subcarriers // 2)
     if num_subcarriers % 2 == 0:
@@ -281,7 +280,6 @@ def cir_to_ofdm_channel(
 
     # Bring all tensors to broadcastable shapes
     tau = tau.unsqueeze(-1)
-    h = a.unsqueeze(-1)
     # Ensure frequencies is on the same device as tau
     frequencies = frequencies.to(device=tau.device, dtype=tau.dtype)
     frequencies = expand_to_rank(frequencies, tau.dim(), axis=0)
@@ -294,9 +292,8 @@ def cir_to_ofdm_channel(
             -2 * PI * frequencies * tau,
         )
     )
-    h_f = h * e
-    # Sum over all clusters to get the channel frequency responses
-    h_f = h_f.sum(dim=-3)
+    # Multiply and sum over all paths without materializing the broadcast product
+    h_f = torch.einsum("...pn,...puf->...nf", a, e)
 
     if normalize:
         # Normalization is performed such that for each batch example and
@@ -485,8 +482,16 @@ def time_to_ofdm_channel(
     # Downsample the impulse response to one sample per OFDM symbol
     h_t = h_t[..., rg.cyclic_prefix_length : rg.num_time_samples : ofdm_length, :]
 
-    # Pad channel impulse response with zeros to the FFT size
+    # Pad channel impulse response with zeros to the FFT size.
+    # A longer impulse response cannot produce an fft_size frequency response
+    # without truncation; reject instead of silently returning the wrong shape.
     pad_dims = rg.fft_size - h_t.shape[-1]
+    if pad_dims < 0:
+        raise ValueError(
+            "The last dimension of h_t "
+            f"(got {h_t.shape[-1]}) must not exceed rg.fft_size "
+            f"({rg.fft_size})."
+        )
     if pad_dims > 0:
         pad_shape = list(h_t.shape[:-1]) + [pad_dims]
         h_t = torch.cat(
@@ -603,7 +608,7 @@ def drop_uts_in_sector(
     :param num_ut: Number of UTs to sample per batch example
     :param min_bs_ut_dist: Minimum BS-UT distance [m]
     :param isd: Inter-site distance, i.e., the distance between two adjacent
-        BSs [m]
+        base stations [m]
     :param bs_height: BS height, i.e., distance between the BS and the X-Y
         plane [m]. Defaults to 0.0.
     :param ut_height: UT height, i.e., distance between the UT and the X-Y
@@ -726,7 +731,10 @@ def set_3gpp_scenario_parameters(
 
     If a parameter is given, then it is returned. If it is set to `None`,
     then a parameter valid according to the chosen scenario is returned
-    (see :cite:p:`TR38901`).
+    (see :cite:p:`TR38901V1920`).
+    The default minimum BS-UT distances for the UMi and UMa scenarios,
+    including their calibration variants, are 10 m and 35 m, respectively,
+    as specified in Table 7.8-1 of :cite:p:`TR38901V160100`.
 
     :param scenario: System level model scenario. One of ``"uma"``,
         ``"umi"``, ``"rma"``, ``"uma-calibration"``, or
@@ -736,7 +744,11 @@ def set_3gpp_scenario_parameters(
     :param bs_height: BS elevation [m]
     :param min_ut_height: Minimum UT elevation [m]
     :param max_ut_height: Maximum UT elevation [m]
-    :param indoor_probability: Probability of a UT to be indoor
+    :param indoor_probability: Probability of a UT to be indoor. For RMa, the
+        remaining UTs are interpreted as in-car by
+        :class:`~sionna.phy.channel.tr38901.RMa` unless an explicit ``in_car``
+        mask is passed to
+        :meth:`~sionna.phy.channel.tr38901.RMa.set_topology`.
     :param min_ut_velocity: Minimum UT velocity [m/s]
     :param max_ut_velocity: Maximum UT velocity [m/s]
     :param precision: Precision used for internal calculations and outputs.
@@ -767,14 +779,49 @@ def set_3gpp_scenario_parameters(
 
     :output max_ut_velocity: `torch.float`.
         Maximum UT velocity [m/s].
+
+    .. rubric:: Examples
+
+    The returned tensors can be passed to topology-generation helpers that
+    require scenario-dependent defaults.
+
+    .. code-block:: python
+
+        import torch
+        from sionna.phy.channel import (
+            generate_uts_topology,
+            set_3gpp_scenario_parameters,
+        )
+
+        params = set_3gpp_scenario_parameters("umi")
+        (min_bs_ut_dist, isd, bs_height, min_ut_height, max_ut_height,
+         indoor_probability, min_ut_velocity, max_ut_velocity) = params
+
+        ut_loc, ut_orientations, ut_velocities, in_state = generate_uts_topology(
+            batch_size=1,
+            num_ut=4,
+            drop_area="sector",
+            cell_loc_xy=torch.zeros(1, 1, 2),
+            min_bs_ut_dist=min_bs_ut_dist,
+            isd=isd,
+            min_ut_height=min_ut_height,
+            max_ut_height=max_ut_height,
+            indoor_probability=indoor_probability,
+            min_ut_velocity=min_ut_velocity,
+            max_ut_velocity=max_ut_velocity,
+        )
     """
-    assert scenario in (
+    if scenario not in (
         "umi",
         "uma",
         "rma",
         "umi-calibration",
         "uma-calibration",
-    ), "`scenario` must be one of 'umi', 'uma', 'rma', 'umi-calibration', 'uma-calibration'"
+    ):
+        raise ValueError(
+            "`scenario` must be one of 'umi', 'uma', 'rma', "
+            "'umi-calibration', 'uma-calibration'"
+        )
 
     if precision is None:
         dtype = config.dtype
@@ -799,7 +846,7 @@ def set_3gpp_scenario_parameters(
             "max_ut_velocity": 0.0,
         },
         "umi-calibration": {
-            "min_bs_ut_dist": 0.0,
+            "min_bs_ut_dist": 10.0,
             "isd": 200.0,
             "bs_height": 10.0,
             "min_ut_height": 1.5,
@@ -819,7 +866,7 @@ def set_3gpp_scenario_parameters(
             "max_ut_velocity": 0.0,
         },
         "uma-calibration": {
-            "min_bs_ut_dist": 0.0,
+            "min_bs_ut_dist": 35.0,
             "isd": 500.0,
             "bs_height": 25.0,
             "min_ut_height": 1.5,
@@ -988,10 +1035,8 @@ def generate_uts_topology(
         Indoor/outdoor state of UTs. `True` means indoor, `False` means
         outdoor.
     """
-    assert drop_area in (
-        "sector",
-        "cell",
-    ), "Drop area must be either 'sector' or 'cell'"
+    if drop_area not in ("sector", "cell"):
+        raise ValueError("Drop area must be either 'sector' or 'cell'")
 
     if precision is None:
         dtype = config.dtype
@@ -1218,7 +1263,7 @@ def gen_single_sector_topology(
 
     The drop configuration can be controlled through the optional parameters.
     Parameters set to `None` are set to valid values according to the chosen
-    ``scenario`` (see :cite:p:`TR38901`).
+    ``scenario`` (see :cite:p:`TR38901V1920`).
 
     The returned batch of topologies can be used as-is with the
     :meth:`set_topology` method of the system level models, i.e.
@@ -1236,7 +1281,11 @@ def gen_single_sector_topology(
     :param bs_height: BS elevation [m]
     :param min_ut_height: Minimum UT elevation [m]
     :param max_ut_height: Maximum UT elevation [m]
-    :param indoor_probability: Probability of a UT to be indoor
+    :param indoor_probability: Probability of a UT to be indoor. For RMa, the
+        remaining UTs are interpreted as in-car by
+        :class:`~sionna.phy.channel.tr38901.RMa` unless an explicit ``in_car``
+        mask is passed to
+        :meth:`~sionna.phy.channel.tr38901.RMa.set_topology`.
     :param min_ut_velocity: Minimum UT velocity [m/s]
     :param max_ut_velocity: Maximum UT velocity [m/s]
     :param precision: Precision used for internal calculations and outputs.
@@ -1261,7 +1310,10 @@ def gen_single_sector_topology(
 
     :output in_state: [batch_size, num_ut], `torch.bool`.
         Indoor/outdoor state of UTs. `True` means indoor, `False` means
-        outdoor.
+        outdoor. For RMa, the initial
+        :meth:`~sionna.phy.channel.tr38901.RMa.set_topology` call interprets
+        every `False` entry as in-car per Table 7.2-3 unless ``in_car`` is
+        supplied explicitly.
 
     .. rubric:: Examples
 
@@ -1420,7 +1472,7 @@ def gen_single_sector_topology_interferers(
 
     The drop configuration can be controlled through the optional parameters.
     Parameters set to `None` are set to valid values according to the chosen
-    ``scenario`` (see :cite:p:`TR38901`).
+    ``scenario`` (see :cite:p:`TR38901V1920`).
 
     The returned batch of topologies can be used as-is with the
     :meth:`set_topology` method of the system level models, i.e.
@@ -1444,7 +1496,11 @@ def gen_single_sector_topology_interferers(
     :param bs_height: BS elevation [m]
     :param min_ut_height: Minimum UT elevation [m]
     :param max_ut_height: Maximum UT elevation [m]
-    :param indoor_probability: Probability of a UT to be indoor
+    :param indoor_probability: Probability of a UT to be indoor. For RMa, the
+        remaining UTs are interpreted as in-car by
+        :class:`~sionna.phy.channel.tr38901.RMa` unless an explicit ``in_car``
+        mask is passed to
+        :meth:`~sionna.phy.channel.tr38901.RMa.set_topology`.
     :param min_ut_velocity: Minimum UT velocity [m/s]
     :param max_ut_velocity: Maximum UT velocity [m/s]
     :param precision: Precision used for internal calculations and outputs.
@@ -1476,7 +1532,10 @@ def gen_single_sector_topology_interferers(
 
     :output in_state: [batch_size, num_ut + num_interferer], `torch.bool`.
         Indoor/outdoor state of UTs. `True` means indoor, `False` means
-        outdoor. The first ``num_ut`` items along the axis with
+        outdoor. For RMa, the initial
+        :meth:`~sionna.phy.channel.tr38901.RMa.set_topology` call interprets
+        every `False` entry as in-car per Table 7.2-3 unless ``in_car`` is
+        supplied explicitly. The first ``num_ut`` items along the axis with
         index 1 correspond to the served UTs, whereas the remaining
         ``num_interferer`` items correspond to the interfering UTs.
 
@@ -1761,12 +1820,13 @@ def exp_corr_mat(
         a = a.to(dtype=cdtype, device=device)
     a = a.unsqueeze(-1)
 
-    # Check that a is valid (skip in compiled mode to avoid graph breaks)
-    if not torch.compiler.is_compiling():
-        if torch.any(torch.abs(a) >= 1):
-            raise ValueError(
-                "The absolute value of the elements of `a` must be smaller than one"
-            )
+    check_tensor_all(
+        torch.abs(a) < 1,
+        name="a",
+        message=(
+            "The absolute value of the elements of `a` must be smaller than one"
+        ),
+    )
 
     # Vector of exponents, adapt dtype and dimensions for broadcasting
     exp = torch.arange(0, n, device=device)
@@ -1858,7 +1918,11 @@ def one_ring_corr_mat(
         device = config.device
 
     if sigma_phi_deg > 15:
-        warnings.warn("sigma_phi_deg should be smaller than 15.")
+        warnings.warn(
+            "sigma_phi_deg should be smaller than 15.",
+            UserWarning,
+            stacklevel=2,
+        )
 
     # Convert all inputs to radians
     if not isinstance(phi_deg, torch.Tensor):

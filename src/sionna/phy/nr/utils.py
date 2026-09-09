@@ -8,6 +8,11 @@ from typing import Optional, Tuple, Union
 import numpy as np
 import torch
 
+from sionna._validation import (
+    check_tensor_all,
+    check_tensor_range,
+    check_tensor_values_in,
+)
 from sionna.phy import config
 from sionna.phy.utils import (
     MCSDecoder,
@@ -23,6 +28,7 @@ __all__ = [
     "generate_prng_seq",
     "decode_mcs_index",
     "calculate_num_coded_bits",
+    "calculate_codeword_bits",
     "calculate_tb_size",
     "MCSDecoderNR",
     "TransportBlockNR",
@@ -36,7 +42,9 @@ def generate_prng_seq(length: int, c_init: int) -> np.ndarray:
 
     :param length: Desired output sequence length.
     :param c_init: Initialization sequence of the PRNG. Must be in the range
-        of 0 to :math:`2^{32}-1`.
+        of 0 to :math:`2^{31}-1`, matching the length-31 Gold-sequence state.
+        TS 38.211 initializers typically already apply
+        :math:`c_{\text{init}} \bmod 2^{31}`.
 
     :output seq: [``length``], `ndarray` of 0s and 1s.
         Containing the scrambling sequence.
@@ -66,10 +74,10 @@ def generate_prng_seq(length: int, c_init: int) -> np.ndarray:
     if c_init % 1 != 0:
         raise ValueError("c_init must be integer.")
     c_init = int(c_init)
-    if c_init >= 2**32:
-        raise ValueError("c_init must be in [0, 2^32-1].")
+    if c_init >= 2**31:
+        raise ValueError("c_init must be in [0, 2^31-1].")
     if c_init < 0:
-        raise ValueError("c_init must be in [0, 2^32-1].")
+        raise ValueError("c_init must be in [0, 2^31-1].")
 
     # Internal parameters
     n_seq = 31  # Length of gold sequence
@@ -159,11 +167,30 @@ def decode_mcs_index(
     if device is None:
         device = config.device
 
-    # Convert mcs_index to tensor
-    if isinstance(mcs_index, (int, float)):
-        mcs_index = torch.tensor(mcs_index, dtype=torch.int32, device=device)
-    else:
+    # Reject non-integer MCS indices before the int32 cast truncates them.
+    # Cover Python and NumPy scalars; torch tensors are handled below.
+    if isinstance(mcs_index, torch.Tensor):
+        if mcs_index.dtype.is_floating_point:
+            check_tensor_all(
+                mcs_index == torch.round(mcs_index),
+                name="mcs_index",
+                message="MCS index must contain integer values",
+            )
         mcs_index = mcs_index.to(dtype=torch.int32, device=device)
+    else:
+        if isinstance(mcs_index, (float, np.floating)):
+            if not float(mcs_index).is_integer():
+                raise ValueError("MCS index must be an integer")
+            mcs_index = int(mcs_index)
+        elif isinstance(mcs_index, (bool, np.bool_)):
+            raise ValueError("MCS index must be an integer")
+        elif isinstance(mcs_index, (int, np.integer)):
+            mcs_index = int(mcs_index)
+        else:
+            raise TypeError(
+                "mcs_index must be an int, float, NumPy scalar, or torch.Tensor"
+            )
+        mcs_index = torch.tensor(mcs_index, dtype=torch.int32, device=device)
 
     shape = list(mcs_index.shape)
 
@@ -175,12 +202,23 @@ def decode_mcs_index(
     )
     pi2bpsk = scalar_to_shaped_tensor(pi2bpsk, torch.bool, shape, device)
 
-    # Input validation
     if check_index_validity:
-        assert (mcs_index >= 0).all(), "MCS index cannot be negative"
-        assert (mcs_index <= 28).all(), "MCS index cannot be higher than 28"
+        check_tensor_all(
+            mcs_index >= 0,
+            name="mcs_index",
+            message="MCS index cannot be negative",
+        )
+        check_tensor_all(
+            mcs_index <= 28,
+            name="mcs_index",
+            message="MCS index cannot be higher than 28",
+        )
         valid_tables = (table_index >= 1) & (table_index <= 4)
-        assert valid_tables.all(), "table_index must contain values in [1,2,3,4]"
+        check_tensor_all(
+            valid_tables,
+            name="table_index",
+            message="table_index must contain values in [1, 2, 3, 4]",
+        )
 
     # Modulation orders lookup table
     # [2, 4, 29]: [channel_type, table_index, mcs_index]
@@ -276,9 +314,14 @@ def decode_mcs_index(
         mod_orders_sel = mod_orders_sel.reshape(orig_shape)
         target_rates_sel = target_rates_sel.reshape(orig_shape)
 
-    # Check that the selected indices are valid
     if check_index_validity:
-        assert (mod_orders_sel >= 0).all(), "Invalid MCS index"
+        check_tensor_all(
+            mod_orders_sel >= 0,
+            name="mcs_index",
+            message=(
+                "Invalid MCS index for the selected table and configuration"
+            ),
+        )
 
     #######################
     # Account for pi2BPSK #
@@ -315,6 +358,34 @@ def decode_mcs_index(
     return mod_orders_sel, target_rates_sel
 
 
+def _num_coded_bits_from_grid(
+    modulation_order: int,
+    num_prbs: int,
+    num_ofdm_symbols: int,
+    num_dmrs_per_prb: int,
+    num_layers: int = 1,
+    num_ov: int = 0,
+    tb_scaling: float = 1.0,
+    apply_tbs_re_limit: bool = True,
+) -> int:
+    """Shared RE/bit budget for TBS and rate-matching helpers."""
+    if num_ofdm_symbols < 1 or num_ofdm_symbols > 14:
+        raise ValueError("num_ofdm_symbols must be in [1, 14]")
+    if num_prbs < 1 or num_prbs > 275:
+        raise ValueError("num_prbs must be in [1, 275]")
+    if tb_scaling not in (0.25, 0.5, 1.0):
+        raise ValueError("tb_scaling must be 0.25, 0.5, or 1.0")
+
+    n_re_per_prb = 12 * num_ofdm_symbols - num_dmrs_per_prb - num_ov
+    # TS 38.214 caps N_RE at 156 only for transport-block size derivation
+    if apply_tbs_re_limit:
+        n_re_per_prb = min(156, n_re_per_prb)
+
+    return int(
+        tb_scaling * n_re_per_prb * num_prbs * modulation_order * num_layers
+    )
+
+
 def calculate_num_coded_bits(
     modulation_order: int,
     num_prbs: int,
@@ -324,8 +395,13 @@ def calculate_num_coded_bits(
     num_ov: int = 0,
     tb_scaling: float = 1.0,
 ) -> int:
-    r"""Computes the number of coded bits that fit in a slot for the given
-    resource grid structure.
+    r"""Computes the coded-bit budget used as the TBS intermediate in
+    TS 38.214 Sec. 5.1.3.2 / 6.1.4.2.
+
+    Resource elements per PRB are capped at 156, as required for transport-
+    block size derivation. For the uncapped rate-matching codeword budget
+    :math:`G`, use :func:`~sionna.phy.nr.utils.calculate_codeword_bits`
+    instead (see also :attr:`~sionna.phy.nr.PUSCHConfig.num_coded_bits`).
 
     :param modulation_order: Modulation order, i.e., number of bits per QAM
         symbol.
@@ -343,8 +419,7 @@ def calculate_num_coded_bits(
         Tab. 5.1.3.2-2. Must contain values in {0.25, 0.5, 1.0}.
 
     :output num_coded_bits: `int`.
-        Number of coded bits that can be fit into a given slot for the given
-        configuration.
+        Capped coded-bit budget used when deriving the transport block size.
 
     .. rubric:: Examples
 
@@ -355,24 +430,72 @@ def calculate_num_coded_bits(
         num_bits = calculate_num_coded_bits(4, 50, 14, 12, 2)
         print(num_bits)
     """
-    # Validate inputs
-    if num_ofdm_symbols < 1 or num_ofdm_symbols > 14:
-        raise ValueError("num_ofdm_symbols must be in [1, 14]")
-    if num_prbs < 1 or num_prbs > 275:
-        raise ValueError("num_prbs must be in [1, 275]")
-    if tb_scaling not in (0.25, 0.5, 1.0):
-        raise ValueError("tb_scaling must be 0.25, 0.5, or 1.0")
+    return _num_coded_bits_from_grid(
+        modulation_order,
+        num_prbs,
+        num_ofdm_symbols,
+        num_dmrs_per_prb,
+        num_layers,
+        num_ov,
+        tb_scaling,
+        apply_tbs_re_limit=True,
+    )
 
-    # Compute number of Resource Elements (RE) per PRB
-    n_re_per_prb = 12 * num_ofdm_symbols - num_dmrs_per_prb - num_ov
-    # Max REs per PRB is limited to 156 in 38.214
-    n_re_per_prb = min(156, n_re_per_prb)
 
-    # Compute number of coded bits
-    num_coded_bits = int(tb_scaling * n_re_per_prb * num_prbs *
-                         modulation_order * num_layers)
+def calculate_codeword_bits(
+    modulation_order: int,
+    num_prbs: int,
+    num_ofdm_symbols: int,
+    num_dmrs_per_prb: int,
+    num_layers: int = 1,
+    num_ov: int = 0,
+    tb_scaling: float = 1.0,
+) -> int:
+    r"""Computes the uncapped rate-matching codeword bit budget :math:`G`.
 
-    return num_coded_bits
+    Unlike :func:`~sionna.phy.nr.utils.calculate_num_coded_bits`, this helper
+    does **not** apply the TS 38.214 156-RE-per-PRB cap. That cap applies only
+    when deriving the transport block size; the actual number of coded bits
+    available for rate matching can be larger. This matches
+    :attr:`~sionna.phy.nr.PUSCHConfig.num_coded_bits`.
+
+    :param modulation_order: Modulation order, i.e., number of bits per QAM
+        symbol.
+    :param num_prbs: Total number of allocated PRBs per OFDM symbol, where
+        1 PRB equals 12 subcarriers. Must not exceed 275.
+    :param num_ofdm_symbols: Number of OFDM symbols allocated for
+        transmission. Cannot be larger than 14.
+    :param num_dmrs_per_prb: Number of DMRS (i.e., pilot) symbols per PRB
+        that are `not` used for data transmission, across all
+        ``num_ofdm_symbols`` OFDM symbols.
+    :param num_layers: Number of MIMO layers.
+    :param num_ov: Number of unused resource elements due to additional
+        overhead as specified by higher layer.
+    :param tb_scaling: TB scaling factor for PDSCH as defined in TS 38.214
+        Tab. 5.1.3.2-2. Must contain values in {0.25, 0.5, 1.0}.
+
+    :output num_coded_bits: `int`.
+        Uncapped number of coded bits available for rate matching.
+
+    .. rubric:: Examples
+
+    .. code-block:: python
+
+        from sionna.phy.nr.utils import calculate_codeword_bits
+
+        g = calculate_codeword_bits(4, 1, 14, 0, 1)
+        print(g)  # 672 (= 4 * 168), not capped to 156 REs
+    """
+    return _num_coded_bits_from_grid(
+        modulation_order,
+        num_prbs,
+        num_ofdm_symbols,
+        num_dmrs_per_prb,
+        num_layers,
+        num_ov,
+        tb_scaling,
+        apply_tbs_re_limit=False,
+    )
 
 
 def calculate_tb_size(
@@ -499,20 +622,56 @@ def calculate_tb_size(
         else:
             num_coded_bits = num_coded_bits.to(dtype=torch.int32, device=device)
     else:
-        assert num_prbs is not None and num_ofdm_symbols is not None and num_dmrs_per_prb is not None, \
-            "If num_coded_bits is None then num_prbs, num_ofdm_symbols, num_dmrs_per_prb must be specified."
-        # calculate_num_coded_bits returns int, need to convert to tensor
-        num_coded_bits_val = calculate_num_coded_bits(
-            modulation_order.item() if isinstance(modulation_order, torch.Tensor) else modulation_order,
-            num_prbs.item() if isinstance(num_prbs, torch.Tensor) else num_prbs,
-            num_ofdm_symbols.item() if isinstance(num_ofdm_symbols, torch.Tensor) else num_ofdm_symbols,
-            num_dmrs_per_prb.item() if isinstance(num_dmrs_per_prb, torch.Tensor) else num_dmrs_per_prb,
-            num_layers.item() if isinstance(num_layers, torch.Tensor) else num_layers,
-            num_ov.item() if isinstance(num_ov, torch.Tensor) else num_ov,
-            tb_scaling.item() if isinstance(tb_scaling, torch.Tensor) else tb_scaling)
-        num_coded_bits = torch.tensor(num_coded_bits_val, dtype=torch.int32, device=device)
-        if shape:
-            num_coded_bits = num_coded_bits.expand(shape)
+        if (
+            num_prbs is None
+            or num_ofdm_symbols is None
+            or num_dmrs_per_prb is None
+        ):
+            raise ValueError(
+                "If num_coded_bits is None, then num_prbs, num_ofdm_symbols, "
+                "and num_dmrs_per_prb must be specified"
+            )
+        # Vectorized TBS coded-bit budget (applies the 156-RE-per-PRB cap)
+        num_prbs_t = scalar_to_shaped_tensor(num_prbs, torch.int32, shape, device)
+        num_ofdm_symbols_t = scalar_to_shaped_tensor(
+            num_ofdm_symbols, torch.int32, shape, device
+        )
+        num_dmrs_per_prb_t = scalar_to_shaped_tensor(
+            num_dmrs_per_prb, torch.int32, shape, device
+        )
+        num_ov_t = scalar_to_shaped_tensor(num_ov, torch.int32, shape, device)
+
+        check_tensor_range(
+            num_ofdm_symbols_t,
+            name="num_ofdm_symbols",
+            minimum=1,
+            maximum=14,
+            message="num_ofdm_symbols must be in [1, 14]",
+        )
+        check_tensor_range(
+            num_prbs_t,
+            name="num_prbs",
+            minimum=1,
+            maximum=275,
+            message="num_prbs must be in [1, 275]",
+        )
+        check_tensor_values_in(
+            tb_scaling,
+            (0.25, 0.5, 1.0),
+            name="tb_scaling",
+            message="tb_scaling must be 0.25, 0.5, or 1.0",
+        )
+
+        n_re_per_prb = 12 * num_ofdm_symbols_t - num_dmrs_per_prb_t - num_ov_t
+        n_re_cap = torch.tensor(156, dtype=n_re_per_prb.dtype, device=device)
+        n_re_per_prb = torch.minimum(n_re_per_prb, n_re_cap)
+        num_coded_bits = (
+            tb_scaling
+            * n_re_per_prb.to(torch.float32)
+            * num_prbs_t.to(torch.float32)
+            * modulation_order.to(torch.float32)
+            * num_layers.to(torch.float32)
+        ).to(torch.int32)
 
     # --------------#
     # Target TB size #
@@ -745,7 +904,7 @@ class MCSDecoderNR(MCSDecoder):
         mcs_table_index: Union[int, torch.Tensor],
         mcs_category: Union[int, torch.Tensor],
         check_index_validity: bool = True,
-        transform_precoding: Union[bool, torch.Tensor] = True,
+        transform_precoding: Union[bool, torch.Tensor] = False,
         pi2bpsk: Union[bool, torch.Tensor] = False,
         verbose: bool = False,
         **kwargs,
@@ -753,8 +912,18 @@ class MCSDecoderNR(MCSDecoder):
         """Process MCS index to return modulation order and coderate."""
         # Convert mcs_category to is_pusch: 0 -> True (PUSCH), 1 -> False (PDSCH)
         if isinstance(mcs_category, torch.Tensor):
+            check_tensor_values_in(
+                mcs_category,
+                (0, 1),
+                name="mcs_category",
+                message="mcs_category must contain values in {0, 1}",
+            )
             is_pusch = mcs_category == 0
         else:
+            if mcs_category not in (0, 1):
+                raise ValueError(
+                    "mcs_category must be 0 (PUSCH) or 1 (PDSCH)"
+                )
             is_pusch = mcs_category == 0
 
         modulation_order, target_coderate = decode_mcs_index(
@@ -789,8 +958,9 @@ class TransportBlockNR(TransportBlock):
         Total number of coded bits across all codewords.
 
     :output cb_size: [...], `torch.int32`.
-        Code block (CB) size, i.e., the number of information bits
-        per code block.
+        Code block (CB) size after 3GPP segmentation, including CRC bits that
+        are part of the FEC code-block payload. This is not the transport-block
+        information-bit count; see :meth:`transport_block_size`.
 
     :output num_cb: [...], `torch.int32`.
         Number of code blocks that the transport block is segmented into.
@@ -815,6 +985,31 @@ class TransportBlockNR(TransportBlock):
         cb_sizes, num_cbs = tb(mod_orders, rates, coded_bits)
     """
 
+    def transport_block_size(
+        self,
+        modulation_order: Union[int, torch.Tensor],
+        target_coderate: Union[float, torch.Tensor],
+        num_coded_bits: Union[int, torch.Tensor],
+        **kwargs,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Return transport-block info bits, code-block size, and block count.
+
+        ``cb_size`` follows 3GPP segmentation and includes CRC bits that are
+        part of the FEC code-block payload. ``tb_size`` is the transport-block
+        information-bit count used for system-level throughput accounting.
+        """
+        _ = kwargs
+        tb_size, cb_size, num_cb, *_ = calculate_tb_size(
+            modulation_order,
+            target_coderate,
+            num_coded_bits=num_coded_bits,
+            tb_scaling=1.0,
+            return_cw_length=False,
+            verbose=False,
+            device=self.device,
+        )
+        return tb_size, cb_size, num_cb
+
     def call(
         self,
         modulation_order: Union[int, torch.Tensor],
@@ -823,14 +1018,8 @@ class TransportBlockNR(TransportBlock):
         **kwargs,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Compute code block size and count."""
-        _, cb_size, num_cb, *_ = calculate_tb_size(
-            modulation_order,
-            target_coderate,
-            num_coded_bits=num_coded_bits,
-            tb_scaling=1.0,
-            return_cw_length=False,
-            verbose=False,
-            device=self.device,
+        _, cb_size, num_cb = self.transport_block_size(
+            modulation_order, target_coderate, num_coded_bits, **kwargs
         )
         return cb_size, num_cb
 

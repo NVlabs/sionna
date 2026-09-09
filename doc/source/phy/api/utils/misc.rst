@@ -6,7 +6,6 @@ Misc
 .. autosummary::
    :toctree: .
 
-   complex_normal
    db_to_lin
    dbm_to_watt
    DeepUpdateDict

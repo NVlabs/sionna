@@ -3,7 +3,7 @@ Interleaving
 
 The interleaver module allows to permute tensors with either pseudo-random permutations or by row/column swapping.
 
-To simplify distributed graph execution (e.g., by running interleaver and deinterleaver in a different sub-graph/device), the interleavers are implemented stateless. Thus, the internal seed cannot be updated on runtime and does not change after the initialization. However, if required, an explicit random seed can be passed as additional input to the interleaver/deinterleaver pair when calling the layer.
+To simplify distributed graph execution (e.g., by running interleaver and deinterleaver in a different sub-graph/device), the interleavers are implemented stateless. Thus, the internal seed cannot be updated at runtime and does not change after the initialization. However, if required, an explicit random seed can be passed as additional input to the interleaver/deinterleaver pair when calling the layer.
 
 The following code snippet shows how to setup and use an instance of the interleaver:
 
@@ -24,10 +24,10 @@ The following code snippet shows how to setup and use an instance of the interle
 
    # --- advanced usage ---
    # provide explicit seed if a new random seed should be used for each call
-   s = tf.random.uniform((), minval=0, maxval=12345678, dtype=tf.int32)
+   s = torch.randint(0, 12345678, ())
 
-   c_int = interleaver([c, s])
-   c_deint = deinterleaver([c_int, s])
+   c_int = interleaver(c, seed=s)
+   c_deint = deinterleaver(c_int, seed=s)
 
 .. currentmodule:: sionna.phy.fec.interleaving
 

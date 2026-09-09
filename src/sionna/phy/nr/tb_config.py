@@ -6,6 +6,8 @@
 
 from typing import Optional
 
+from sionna._validation import check_one_of
+
 from .config import Config
 from .utils import decode_mcs_index
 
@@ -217,7 +219,7 @@ class TBConfig(Config):
         +-------------------+--------------------+-------------------------+-----------------------+
         | 20                | 4                  | 616                     | 2.4063                |
         +-------------------+--------------------+-------------------------+-----------------------+
-        | 21                | 6                  | 438                     | 2.5564                |
+        | 21                | 6                  | 438                     | 2.5664                |
         +-------------------+--------------------+-------------------------+-----------------------+
         | 22                | 6                  | 466                     | 2.7305                |
         +-------------------+--------------------+-------------------------+-----------------------+
@@ -235,7 +237,9 @@ class TBConfig(Config):
         +-------------------+--------------------+-------------------------+-----------------------+
 
 
-    .. table:: MCS Index Table 4 (Table 5.1.3.1-4 in :cite:p:`3GPPTS38214`)
+    .. table:: MCS Index Table 4 (Table 5.1.3.1-4 in :cite:p:`3GPPTS38214`;
+        introduced in Release 17 / 1024QAM; tables 1--3 match the Rel-16
+        revision cited in the bibliography)
         :align: center
 
         +-------------------+--------------------+-------------------------+-----------------------+
@@ -268,7 +272,7 @@ class TBConfig(Config):
         +-------------------+--------------------+-------------------------+-----------------------+
         | 12                | 6                  | 772                     | 4.5234                |
         +-------------------+--------------------+-------------------------+-----------------------+
-        | 13                | 6                  | 822                     | 4.8154                |
+        | 13                | 6                  | 822                     | 4.8164                |
         +-------------------+--------------------+-------------------------+-----------------------+
         | 14                | 6                  | 873                     | 5.1152                |
         +-------------------+--------------------+-------------------------+-----------------------+
@@ -317,8 +321,12 @@ class TBConfig(Config):
 
     @mcs_index.setter
     def mcs_index(self, value: int) -> None:
-        if value not in range(29):
-            raise ValueError("mcs_index must be in range from 0 to 28.")
+        check_one_of(
+            value,
+            range(29),
+            name="mcs_index",
+            message="mcs_index must be in range from 0 to 28.",
+        )
         self._mcs_index = value
 
     @property
@@ -329,8 +337,12 @@ class TBConfig(Config):
 
     @mcs_table.setter
     def mcs_table(self, value: int) -> None:
-        if value not in range(1, 5):
-            raise ValueError("mcs_table must be in range from 1 to 4")
+        check_one_of(
+            value,
+            range(1, 5),
+            name="mcs_table",
+            message="mcs_table must be in range from 1 to 4",
+        )
         self._mcs_table = value
 
     @property
@@ -341,8 +353,12 @@ class TBConfig(Config):
 
     @channel_type.setter
     def channel_type(self, value: str) -> None:
-        if value not in ("PUSCH", "PDSCH"):
-            raise ValueError('Only "PUSCH" and "PDSCH" are supported')
+        check_one_of(
+            value,
+            ("PUSCH", "PDSCH"),
+            name="channel_type",
+            message='Only "PUSCH" and "PDSCH" are supported',
+        )
         self._channel_type = value
 
     @property
@@ -361,8 +377,12 @@ class TBConfig(Config):
         if value is None:
             self._n_id = None
         else:
-            if value not in range(1024):
-                raise ValueError("n_id must be in range from 0 to 1023")
+            check_one_of(
+                value,
+                range(1024),
+                name="n_id",
+                message="n_id must be in range from 0 to 1023",
+            )
             self._n_id = value
 
     # --------------------------

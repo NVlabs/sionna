@@ -21,8 +21,7 @@ class Upsampling(Block):
 
     :param samples_per_symbol: Upsampling factor. If ``samples_per_symbol``
         is equal to `n`, then the upsampled axis will be `n`-times longer.
-    :param axis: Dimension to be up-sampled. Must not be the first dimension.
-        Defaults to -1.
+    :param axis: Dimension to be up-sampled. Defaults to -1.
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is
         used.
@@ -58,6 +57,13 @@ class Upsampling(Block):
         **kwargs,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
+
+        if samples_per_symbol < 1:
+            raise ValueError(
+                "samples_per_symbol must be a positive integer, "
+                f"got {samples_per_symbol}"
+            )
+
         self._samples_per_symbol = samples_per_symbol
         self._axis = axis
 

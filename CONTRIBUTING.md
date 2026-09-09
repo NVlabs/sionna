@@ -18,6 +18,39 @@ Creating a pull request requires the following steps:
 5. Include a license at the topf of new files.
 5. Make sure that all commits are "signed-off" as described below.
 
+### Validation and warning contracts
+
+Checks on public arguments and mutable public properties must remain active
+under optimized Python (`python -O`). Do not use `assert` for these checks.
+Use:
+
+* `TypeError` when an argument has the wrong Python type or is not callable.
+* `ValueError` when an argument has an invalid value, shape, rank, dtype, or
+  combination with another argument.
+* `RuntimeError` when valid public input encounters invalid or unavailable
+  internal state.
+
+Bare `assert` is reserved for debug-only invariants that may safely disappear
+under optimization. The validation-contract policy test rejects every `assert`
+in `src/sionna`, so an exception to this rule requires extending that test.
+
+Tensor-valued validation on a path supported by `torch.compile` needs an
+additional carve-out. Python branches such as
+`if not torch.all(condition): raise ...`, including `bool(tensor)` and
+`tensor.item()`, break the Dynamo graph. Use the private helpers in
+`sionna._validation`: they preserve the documented eager exception and lower
+the condition to a device assertion while compiling. Compiled failures are
+backend-dependent and do not preserve the eager exception class. Do not call
+PyTorch's private assertion APIs directly outside that module. Constructor and
+configuration checks that run before compilation can remain unconditional. Add
+a `fullgraph=True` regression test when changing validation on a compiled path.
+
+Every `warnings.warn()` call must specify a category and a `stacklevel` that
+points to the caller that can act on the warning. Use `UserWarning` for
+configuration, data, and API-usage notices; `RuntimeWarning` for numerical
+fallbacks and unavailable runtime state; and `DeprecationWarning` or
+`FutureWarning` for API transitions.
+
 ### Signing your contributions
 
 * We require that all contributors "sign-off" on their commits with the [Developer Certificate of Origin (DCO)](https://developercertificate.org). This certifies that the contribution is your original work, or that you have rights to submit it under the same license, or a compatible license.

@@ -158,3 +158,64 @@ def test_get_shape(precision, device):
     nested = {"x": [torch.randn(2, 2), torch.randn(3, 3)], "y": torch.randn(4, 4)}
     nested_shapes = obj._get_shape(nested)
     assert nested_shapes == {"x": [(2, 2), (3, 3)], "y": (4, 4)}
+
+
+def test_composed_objects_accept_matching_devices(device):
+    """Objects on the same device can be composed normally."""
+    parent = Object(device=device)
+    child = Object(device=device)
+
+    parent.child = child
+
+    assert parent.child is child
+    assert parent._modules["child"] is child
+
+
+def test_composed_objects_reject_mismatched_devices(device):
+    """A device mismatch is reported when the child is assigned."""
+    child_device = next(
+        (candidate for candidate in config.available_devices if candidate != device),
+        None,
+    )
+    if child_device is None:
+        pytest.skip("Test requires two available devices")
+    parent = Object(device=device)
+    child = Object(device=child_device)
+
+    with pytest.raises(
+        ValueError,
+        match=r"Object is on device .* but its child \(Object\) is on device",
+    ):
+        parent.child = child
+
+
+def test_composed_objects_check_children_in_containers(device):
+    """Container-held child objects follow the same device invariant."""
+    child_device = next(
+        (candidate for candidate in config.available_devices if candidate != device),
+        None,
+    )
+    if child_device is None:
+        pytest.skip("Test requires two available devices")
+    parent = Object(device=device)
+    child = Object(device=child_device)
+
+    with pytest.raises(
+        ValueError,
+        match=r"Object is on device .* but its callbacks\[0\] "
+        r"\(Object\) is on device",
+    ):
+        parent.callbacks = [child]
+
+
+def test_device_check_skips_non_container_values(device, monkeypatch):
+    """Leaf assignments must not require Python object identity."""
+    parent = Object(device=device)
+
+    def unexpected_id(_):
+        pytest.fail("id() must only be called for container cycle detection")
+
+    monkeypatch.setattr("sionna.phy.object.id", unexpected_id, raising=False)
+    parent.flag = True
+    parent.count = 1
+    parent.tensor = torch.ones(1, device=device)

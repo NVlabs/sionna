@@ -13,6 +13,7 @@ import scipy as sp
 import torch
 from importlib_resources import files, as_file
 
+from sionna._validation import check_binary
 from sionna.phy import Block
 from sionna.phy.fec.utils import int_mod_2
 from . import codes
@@ -39,6 +40,8 @@ class LDPC5GEncoder(Block):
         If `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param check_input: If `True` (default), check that inputs are binary
+        on every call. Set to `False` to skip the check and reduce overhead.
 
     :input bits: [..., k], `torch.float`.
         Binary tensor containing the information bits to be encoded.
@@ -95,6 +98,7 @@ class LDPC5GEncoder(Block):
         bg: Optional[str] = None,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        check_input: bool = True,
         **kwargs,
     ):
         super().__init__(precision=precision, device=device, **kwargs)
@@ -120,13 +124,18 @@ class LDPC5GEncoder(Block):
         self._k = k  # number of input bits (= input shape)
         self._n = n  # the desired length (= output shape)
         self._coderate = k / n
-        self._check_input = True  # check input for consistency (i.e., binary)
+        if not isinstance(check_input, bool):
+            raise TypeError("check_input must be bool.")
+        self._check_input = check_input
 
         # Allow actual code rates slightly larger than 948/1024
         # to account for the quantization procedure in 38.214 5.1.3.1
         if self._coderate > (948 / 1024):  # as specified in 38.212 5.4.2.1
             warnings.warn(
-                f"Effective coderate r>948/1024 for n={n}, k={k}.")
+                f"Effective coderate r>948/1024 for n={n}, k={k}.",
+                UserWarning,
+                stacklevel=2,
+            )
         if self._coderate > 0.95:  # as specified in 38.212 5.4.2.1
             raise ValueError(f"Unsupported coderate (r>0.95) for n={n}, k={k}.")
         if self._coderate < (1 / 5):
@@ -297,8 +306,18 @@ class LDPC5GEncoder(Block):
 
         :output: Corresponding start positions in the compressed RM buffer.
         """
+        self._check_rv(rv_list)
         rv_start_map = self.rv_starts
         return [self._k0_comp(rv_start_map[rv_id]) for rv_id in rv_list]
+
+    @staticmethod
+    def _check_rv(rv: List[int]) -> None:
+        """Reject an empty RV list or indices outside ``{0, 1, 2, 3}``."""
+        if not rv:
+            raise ValueError("rv must be a non-empty list of RV indices.")
+        for v in rv:
+            if v not in (0, 1, 2, 3):
+                raise ValueError(f"Invalid RV index {v}; must be 0–3.")
 
     def generate_out_int(
         self, n: int, num_bits_per_symbol: int
@@ -703,19 +722,14 @@ class LDPC5GEncoder(Block):
         if input_shape[-1] != self._k:
             raise ValueError(f"Last dimension must be of length k={self._k}.")
 
-    @torch.compiler.disable
     def _validate_input(self, u: torch.Tensor) -> None:
-        """Validate input tensor for binary values (disabled from compilation).
-
-        This method is excluded from torch.compile to avoid recompilation
-        issues caused by the mutable _check_input flag.
-        """
+        """Validate binary inputs when ``check_input`` is enabled."""
         if self._check_input:
-            is_binary = ((u == 0) | (u == 1)).all()
-            if not is_binary:
-                raise ValueError("Input must be binary.")
-            # Input datatype consistency should only be evaluated once
-            self._check_input = False
+            check_binary(
+                u,
+                name="bits",
+                message="Input must be binary.",
+            )
 
     def call(
         self,
@@ -735,11 +749,7 @@ class LDPC5GEncoder(Block):
         # Validate rv early
         if rv is not None:
             rv = list(rv)
-            if not rv:
-                raise ValueError("rv must be a non-empty list of RV indices.")
-            for v in rv:
-                if v not in (0, 1, 2, 3):
-                    raise ValueError(f"Invalid RV index {v}; must be 0–3.")
+            self._check_rv(rv)
 
         input_shape = list(bits.shape)
         u = bits.reshape(-1, input_shape[-1])

@@ -75,6 +75,7 @@ html:
 
 # Serve documentation locally with BASE_PATH simulation (no copying required)
 # Usage: make serve [PORT=8000]
+# Open http://localhost:8000/sionna in your browser to view the documentation
 PORT ?= 8000
 serve:
 	@python3 serve.py --port $(PORT) --base-path "$(BASE_PATH)" --directory "$(BUILDDIR)/html"

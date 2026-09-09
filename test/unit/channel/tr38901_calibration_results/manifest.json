@@ -1,0 +1,1538 @@
+{
+  "standard": "3GPP TR 38.901 V16.1 calibration",
+  "baseline_reference_standard": "3GPP TR 38.901 v14.0.0 Section 7.8 baseline calibration",
+  "additional_feature_reference_standard": "3GPP TR 38.901 v14.0.0 Tables 7.8-5 and 7.8-6 additional-feature calibration workbooks",
+  "normative_indoor_factory_standard": "3GPP TR 38.901 v16.1.0 Table 7.8-7 indoor-factory calibration",
+  "indoor_factory_reference_note": "The public R1-1909704 InF curves use 15/25 m halls and pre-final delay-spread assumptions, so they are not bundled or overlaid as direct references for the normative V16.1 10 m geometry.",
+  "indoor_hotspot_reference_note": "The bundled InH reference curves come from the Release-14-era calibration campaign. The final V16.1 Indoor-Office ASA, ASD, ZSA, and related cluster parameters differ significantly, so offsets in those curves are expected.",
+  "reference_standard_by_phase": {
+    "phase1": "3GPP TR 38.901 v14.0.0 Section 7.8 baseline calibration",
+    "config1": "3GPP TR 38.901 v14.0.0 Section 7.8 baseline calibration",
+    "config2": "3GPP TR 38.901 v14.0.0 Section 7.8 baseline calibration",
+    "blockage_model_a": "3GPP TR 38.901 v14.0.0 Table 7.8-6 additional-feature calibration",
+    "blockage_model_b": "3GPP TR 38.901 v14.0.0 Table 7.8-6 additional-feature calibration",
+    "spatial_consistency_metric1_2": "3GPP TR 38.901 v14.0.0 Table 7.8-5 additional-feature calibration",
+    "spatial_consistency_metric3_6": "3GPP TR 38.901 v14.0.0 Table 7.8-5 additional-feature calibration",
+    "spatial_consistency_config2_metric1_2": "3GPP TR 38.901 v14.0.0 Table 7.8-5 Config2 contribution workbook"
+  },
+  "reference_provenance": {
+    "recorded_evidence": "contribution identifiers and source workbook filenames",
+    "source_workbook_filenames_by_phase": {
+      "phase1": "Phase1Calibration_v42_CMCC.xlsx",
+      "config1": "Phase2Config1Calibration_v35_CMCC.xlsx",
+      "config2": "Phase2Config2Calibration_v28_CMCC.xlsx",
+      "blockage_model_a": "Phase3Blockage_v13_Ericsson.xlsx",
+      "blockage_model_b": "Phase3Blockage_v13_Ericsson.xlsx",
+      "spatial_consistency_metric1_2": "Phase3SpatialConsistency_v15_Ericsson.xlsx",
+      "spatial_consistency_metric3_6": "Phase3SpatialConsistency_v15_Ericsson.xlsx"
+    },
+    "source_contribution_ids": [
+      "R1-165974",
+      "R1-165975",
+      "R1-1700990"
+    ],
+    "source_workbook_binaries_bundled": false,
+    "retrieval_urls_bundled": false,
+    "source_checksums_bundled": false,
+    "extraction_tooling_bundled": false
+  },
+  "reference_value_conventions": {
+    "historical_path_gain": "Workbook curves historically labelled Coupling Loss contain negative dB x-values; the values are preserved without sign transformation under the truthful historical_path_gain key.",
+    "historical_wideband_sir": "The Table 7.8-5 Config2 workbook curve is interference-only SIR and is not a noise-inclusive SINR reference."
+  },
+  "generator": "test/unit/channel/tr38901_calibration.py",
+  "scenarios": [
+    "UMi",
+    "UMa",
+    "InH"
+  ],
+  "frequencies_ghz": null,
+  "default_frequencies_by_phase": {
+    "phase1": [
+      6.0,
+      30.0,
+      70.0
+    ],
+    "config1": [
+      6.0,
+      30.0,
+      60.0,
+      70.0
+    ],
+    "config2": [
+      6.0,
+      30.0,
+      60.0,
+      70.0
+    ],
+    "inf": [
+      3.5,
+      28.0
+    ],
+    "blockage_model_a": [
+      30.0
+    ],
+    "blockage_model_b": [
+      30.0
+    ],
+    "spatial_consistency_metric1_2": [
+      30.0
+    ],
+    "spatial_consistency_metric3_6": [
+      30.0
+    ],
+    "spatial_consistency_config2_metric1_2": [
+      30.0
+    ]
+  },
+  "phases": [
+    "phase1",
+    "config1",
+    "config2",
+    "inf",
+    "blockage_model_a",
+    "blockage_model_b",
+    "spatial_consistency_metric1_2",
+    "spatial_consistency_metric3_6",
+    "spatial_consistency_config2_metric1_2"
+  ],
+  "spec_version": "16.1",
+  "calibration_schema_version": 2,
+  "phase1_num_batches": 100,
+  "phase2_num_batches": 100,
+  "batch_size": 1,
+  "phase1_uts_per_sector": 16,
+  "phase2_uts_per_sector": 1,
+  "spatial_metric1_2_num_ut_per_sector": 20,
+  "spatial_metric1_2_num_drops": 100,
+  "spatial_metric1_2_ut_chunk_size": 128,
+  "spatial_metric3_6_num_ut_per_sector": 200,
+  "spatial_metric3_6_num_drops": 20,
+  "spatial_metric3_6_distances_m": [
+    0.0,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    15.0,
+    16.0,
+    17.0,
+    18.0,
+    19.0,
+    20.0,
+    21.0,
+    22.0,
+    23.0,
+    24.0,
+    25.0,
+    26.0,
+    27.0,
+    28.0,
+    29.0,
+    30.0,
+    31.0,
+    32.0,
+    33.0,
+    34.0,
+    35.0,
+    36.0,
+    37.0,
+    38.0,
+    39.0,
+    40.0,
+    41.0,
+    42.0,
+    43.0,
+    44.0,
+    45.0,
+    46.0,
+    47.0,
+    48.0,
+    49.0,
+    50.0,
+    51.0,
+    52.0,
+    53.0,
+    54.0,
+    55.0,
+    56.0,
+    57.0,
+    58.0,
+    59.0,
+    60.0,
+    61.0,
+    62.0,
+    63.0,
+    64.0,
+    65.0,
+    66.0,
+    67.0,
+    68.0,
+    69.0,
+    70.0,
+    71.0,
+    72.0,
+    73.0,
+    74.0,
+    75.0,
+    76.0,
+    77.0,
+    78.0,
+    79.0,
+    80.0,
+    81.0,
+    82.0,
+    83.0,
+    84.0,
+    85.0,
+    86.0,
+    87.0,
+    88.0,
+    89.0,
+    90.0,
+    91.0,
+    92.0,
+    93.0,
+    94.0,
+    95.0,
+    96.0,
+    97.0,
+    98.0,
+    99.0,
+    100.0,
+    101.0,
+    102.0,
+    103.0,
+    104.0,
+    105.0,
+    106.0,
+    107.0,
+    108.0,
+    109.0,
+    110.0,
+    111.0,
+    112.0,
+    113.0,
+    114.0,
+    115.0,
+    116.0,
+    117.0,
+    118.0,
+    119.0,
+    120.0,
+    121.0,
+    122.0,
+    123.0,
+    124.0,
+    125.0,
+    126.0,
+    127.0,
+    128.0,
+    129.0,
+    130.0
+  ],
+  "inf_num_batches": 5,
+  "inf_uts_per_bs": 90,
+  "inf_ut_chunk_size": 256,
+  "seed": 1234,
+  "precision": "single",
+  "devices": [
+    "cuda:0",
+    "cuda:1"
+  ],
+  "device_assignment": "static_request_index_modulo_device_count",
+  "cdf_percentiles": [
+    0.0,
+    1.0,
+    2.0,
+    3.0,
+    4.0,
+    5.0,
+    6.0,
+    7.0,
+    8.0,
+    9.0,
+    10.0,
+    11.0,
+    12.0,
+    13.0,
+    14.0,
+    15.0,
+    16.0,
+    17.0,
+    18.0,
+    19.0,
+    20.0,
+    21.0,
+    22.0,
+    23.0,
+    24.0,
+    25.0,
+    26.0,
+    27.0,
+    28.0,
+    29.0,
+    30.0,
+    31.0,
+    32.0,
+    33.0,
+    34.0,
+    35.0,
+    36.0,
+    37.0,
+    38.0,
+    39.0,
+    40.0,
+    41.0,
+    42.0,
+    43.0,
+    44.0,
+    45.0,
+    46.0,
+    47.0,
+    48.0,
+    49.0,
+    50.0,
+    51.0,
+    52.0,
+    53.0,
+    54.0,
+    55.0,
+    56.0,
+    57.0,
+    58.0,
+    59.0,
+    60.0,
+    61.0,
+    62.0,
+    63.0,
+    64.0,
+    65.0,
+    66.0,
+    67.0,
+    68.0,
+    69.0,
+    70.0,
+    71.0,
+    72.0,
+    73.0,
+    74.0,
+    75.0,
+    76.0,
+    77.0,
+    78.0,
+    79.0,
+    80.0,
+    81.0,
+    82.0,
+    83.0,
+    84.0,
+    85.0,
+    86.0,
+    87.0,
+    88.0,
+    89.0,
+    90.0,
+    91.0,
+    92.0,
+    93.0,
+    94.0,
+    95.0,
+    96.0,
+    97.0,
+    98.0,
+    99.0,
+    100.0
+  ],
+  "reference_json": "reference_curves.json",
+  "figures_dir": "figures",
+  "plot": true,
+  "runs": {
+    "UMi_6GHz_phase1": {
+      "scenario": "UMi",
+      "frequency_ghz": 6.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 91200,
+      "file": "cdfs/UMi_6GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "UMi_30GHz_phase1": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 91200,
+      "file": "cdfs/UMi_30GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "UMi_70GHz_phase1": {
+      "scenario": "UMi",
+      "frequency_ghz": 70.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 91200,
+      "file": "cdfs/UMi_70GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "UMa_6GHz_phase1": {
+      "scenario": "UMa",
+      "frequency_ghz": 6.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 91200,
+      "file": "cdfs/UMa_6GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "UMa_30GHz_phase1": {
+      "scenario": "UMa",
+      "frequency_ghz": 30.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 91200,
+      "file": "cdfs/UMa_30GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "UMa_70GHz_phase1": {
+      "scenario": "UMa",
+      "frequency_ghz": 70.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 91200,
+      "file": "cdfs/UMa_70GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "InH_6GHz_phase1": {
+      "scenario": "InH",
+      "frequency_ghz": 6.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 57600,
+      "file": "cdfs/InH_6GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "InH_30GHz_phase1": {
+      "scenario": "InH",
+      "frequency_ghz": 30.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 57600,
+      "file": "cdfs/InH_30GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "InH_70GHz_phase1": {
+      "scenario": "InH",
+      "frequency_ghz": 70.0,
+      "phase": "phase1",
+      "curve_type": "cdf",
+      "num_samples": 57600,
+      "file": "cdfs/InH_70GHz_phase1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 16
+      }
+    },
+    "UMi_6GHz_config1": {
+      "scenario": "UMi",
+      "frequency_ghz": 6.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_6GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_30GHz_config1": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_30GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_60GHz_config1": {
+      "scenario": "UMi",
+      "frequency_ghz": 60.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_60GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_70GHz_config1": {
+      "scenario": "UMi",
+      "frequency_ghz": 70.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_70GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_6GHz_config1": {
+      "scenario": "UMa",
+      "frequency_ghz": 6.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_6GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_30GHz_config1": {
+      "scenario": "UMa",
+      "frequency_ghz": 30.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_30GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_60GHz_config1": {
+      "scenario": "UMa",
+      "frequency_ghz": 60.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_60GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_70GHz_config1": {
+      "scenario": "UMa",
+      "frequency_ghz": 70.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_70GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_6GHz_config1": {
+      "scenario": "InH",
+      "frequency_ghz": 6.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_6GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_30GHz_config1": {
+      "scenario": "InH",
+      "frequency_ghz": 30.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_30GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_60GHz_config1": {
+      "scenario": "InH",
+      "frequency_ghz": 60.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_60GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_70GHz_config1": {
+      "scenario": "InH",
+      "frequency_ghz": 70.0,
+      "phase": "config1",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_70GHz_config1.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_6GHz_config2": {
+      "scenario": "UMi",
+      "frequency_ghz": 6.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_6GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_30GHz_config2": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_30GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_60GHz_config2": {
+      "scenario": "UMi",
+      "frequency_ghz": 60.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_60GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_70GHz_config2": {
+      "scenario": "UMi",
+      "frequency_ghz": 70.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_70GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_6GHz_config2": {
+      "scenario": "UMa",
+      "frequency_ghz": 6.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_6GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_30GHz_config2": {
+      "scenario": "UMa",
+      "frequency_ghz": 30.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_30GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_60GHz_config2": {
+      "scenario": "UMa",
+      "frequency_ghz": 60.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_60GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMa_70GHz_config2": {
+      "scenario": "UMa",
+      "frequency_ghz": 70.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMa_70GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_6GHz_config2": {
+      "scenario": "InH",
+      "frequency_ghz": 6.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_6GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_30GHz_config2": {
+      "scenario": "InH",
+      "frequency_ghz": 30.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_30GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_60GHz_config2": {
+      "scenario": "InH",
+      "frequency_ghz": 60.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_60GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InH_70GHz_config2": {
+      "scenario": "InH",
+      "frequency_ghz": 70.0,
+      "phase": "config2",
+      "curve_type": "cdf",
+      "num_samples": 3600,
+      "file": "cdfs/InH_70GHz_config2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sir",
+        "sv1_db",
+        "sv2_db",
+        "sv_ratio_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "InF-SL_3.5GHz_inf": {
+      "scenario": "InF-SL",
+      "frequency_ghz": 3.5,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-SL_3.5GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-SL_28GHz_inf": {
+      "scenario": "InF-SL",
+      "frequency_ghz": 28.0,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-SL_28GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-DL_3.5GHz_inf": {
+      "scenario": "InF-DL",
+      "frequency_ghz": 3.5,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-DL_3.5GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-DL_28GHz_inf": {
+      "scenario": "InF-DL",
+      "frequency_ghz": 28.0,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-DL_28GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-SH_3.5GHz_inf": {
+      "scenario": "InF-SH",
+      "frequency_ghz": 3.5,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-SH_3.5GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-SH_28GHz_inf": {
+      "scenario": "InF-SH",
+      "frequency_ghz": 28.0,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-SH_28GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-DH_3.5GHz_inf": {
+      "scenario": "InF-DH",
+      "frequency_ghz": 3.5,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-DH_3.5GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "InF-DH_28GHz_inf": {
+      "scenario": "InF-DH",
+      "frequency_ghz": 28.0,
+      "phase": "inf",
+      "curve_type": "cdf",
+      "num_samples": 8100,
+      "file": "cdfs/InF-DH_28GHz_inf.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "geometry_sinr",
+        "geometry_sir",
+        "delay_spread_ns",
+        "asd_deg",
+        "zsd_deg",
+        "asa_deg",
+        "zsa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_batches": 5,
+        "batch_size": 1,
+        "effective_num_topology_drops": 5,
+        "num_ut_per_bs": 90,
+        "num_bs": 18,
+        "ut_chunk_size": 256
+      }
+    },
+    "UMi_30GHz_blockage_model_a": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "blockage_model_a",
+      "curve_type": "cdf",
+      "num_samples": 5700,
+      "file": "cdfs/UMi_30GHz_blockage_model_a.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sinr",
+        "asa_deg"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_batches": 100,
+        "batch_size": 1,
+        "effective_num_topology_drops": 100,
+        "num_ut_per_sector": 1
+      }
+    },
+    "UMi_30GHz_blockage_model_b": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "blockage_model_b",
+      "curve_type": "line",
+      "num_samples": 21,
+      "file": "cdfs/UMi_30GHz_blockage_model_b.json",
+      "metrics": [
+        "rsrp_db",
+        "relative_rsrp_db"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_cdl_e_realizations": 100
+      }
+    },
+    "UMi_30GHz_spatial_consistency_metric1_2": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "spatial_consistency_metric1_2",
+      "curve_type": "cdf",
+      "num_samples": 5758,
+      "file": "cdfs/UMi_30GHz_spatial_consistency_metric1_2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sinr"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_ut_per_sector": 20,
+        "num_drops": 100,
+        "ut_chunk_size": 128
+      }
+    },
+    "UMi_30GHz_spatial_consistency_metric3_6": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "spatial_consistency_metric3_6",
+      "curve_type": "line",
+      "num_samples": 131,
+      "file": "cdfs/UMi_30GHz_spatial_consistency_metric3_6.json",
+      "metrics": [
+        "third_cluster_delay_corr",
+        "third_cluster_aoa_corr",
+        "los_state_corr",
+        "channel_response_corr"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:0",
+      "workload": {
+        "num_ut_per_sector": 200,
+        "num_drops": 20
+      }
+    },
+    "UMi_30GHz_spatial_consistency_config2_metric1_2": {
+      "scenario": "UMi",
+      "frequency_ghz": 30.0,
+      "phase": "spatial_consistency_config2_metric1_2",
+      "curve_type": "cdf",
+      "num_samples": 6000,
+      "file": "cdfs/UMi_30GHz_spatial_consistency_config2_metric1_2.json",
+      "metrics": [
+        "coupling_loss",
+        "historical_path_gain",
+        "wideband_sinr",
+        "historical_wideband_sir"
+      ],
+      "spec_version": "16.1",
+      "calibration_schema_version": 2,
+      "device": "cuda:1",
+      "workload": {
+        "num_ut_per_sector": 20,
+        "num_drops": 100,
+        "ut_chunk_size": 128
+      }
+    }
+  }
+}

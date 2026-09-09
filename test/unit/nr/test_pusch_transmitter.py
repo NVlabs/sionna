@@ -8,11 +8,35 @@ import pytest
 import numpy as np
 import torch
 
+from sionna.phy import config as phy_config
 from sionna.phy.nr import PUSCHConfig, PUSCHTransmitter
 
 
 class TestPUSCHTransmitter:
     """Tests for PUSCHTransmitter."""
+
+    def test_device_override_propagates_to_pilot_pattern(self, device):
+        """An explicit transmitter device overrides the global configuration."""
+        global_device = next(
+            (candidate for candidate in phy_config.available_devices
+             if candidate != device),
+            None,
+        )
+        if global_device is None:
+            pytest.skip("Test requires two available devices")
+        phy_config.device = global_device
+
+        config = PUSCHConfig()
+        config.n_size_bwp = 12
+        transmitter = PUSCHTransmitter(config, device=device)
+        x, b = transmitter(1)
+
+        assert transmitter.device == device
+        assert transmitter.pilot_pattern.device == device
+        assert transmitter.pilot_pattern.mask.device == torch.device(device)
+        assert transmitter.pilot_pattern.pilots.device == torch.device(device)
+        assert x.device == torch.device(device)
+        assert b.device == torch.device(device)
 
     def test_basic_initialization(self):
         """Test basic transmitter initialization."""

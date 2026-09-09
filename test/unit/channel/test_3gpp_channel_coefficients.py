@@ -11,7 +11,6 @@ from sionna.phy import PI
 from sionna.phy.channel.tr38901 import (
     Topology,
     ChannelCoefficientsGenerator,
-    Rays,
     PanelArray,
 )
 
@@ -258,7 +257,7 @@ class TestChannelCoefficientsGenerator:
 
         batch_size = 5
         shape = (batch_size, 2, 3, 10, 4)  # batch, tx, rx, clusters, rays
-        phi = ccg._step_10(shape, batch_size)
+        phi = ccg._step_10(shape)
 
         # Check shape (adds 4 for polarization combinations)
         assert phi.shape == (*shape, 4)
@@ -266,6 +265,110 @@ class TestChannelCoefficientsGenerator:
         # Check phases are in valid range (-pi, pi)
         assert torch.all(phi >= -PI)
         assert torch.all(phi <= PI)
+
+    def test_los_delay_phase_sign(self, device, precision):
+        """Pin the TR 38.901 Eq. 7.5-29 LoS propagation phase sign."""
+        dtype = torch.float64 if precision == "double" else torch.float32
+        tx_array = PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            precision=precision,
+            device=device,
+        )
+        rx_array = PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            precision=precision,
+            device=device,
+        )
+        ccg = ChannelCoefficientsGenerator(
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            tx_array=tx_array,
+            rx_array=rx_array,
+            subclustering=False,
+            precision=precision,
+            device=device,
+        )
+        distance = torch.stack(
+            [
+                torch.zeros((), dtype=dtype, device=device),
+                ccg._lambda_0.to(dtype) / 4.0,
+            ]
+        ).reshape(1, 1, 2)
+        angles = torch.full((1, 1, 2), PI / 2, dtype=dtype, device=device)
+        topology = Topology(
+            velocities=torch.zeros(1, 2, 3, dtype=dtype, device=device),
+            moving_end="rx",
+            los_aoa=angles,
+            los_aod=angles,
+            los_zoa=angles,
+            los_zod=angles,
+            los=torch.ones(1, 1, 2, dtype=torch.bool, device=device),
+            distance_3d=distance,
+            tx_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            rx_orientations=torch.zeros(1, 2, 3, dtype=dtype, device=device),
+        )
+        h_los = ccg._step_11_los(
+            topology,
+            torch.zeros(1, dtype=dtype, device=device),
+        )
+        ratio = h_los[0, 0, 1, 0, 0, 0, 0] / h_los[0, 0, 0, 0, 0, 0, 0]
+        expected = torch.exp(
+            torch.tensor(-0.5j*np.pi, dtype=ratio.dtype, device=device)
+        )
+        torch.testing.assert_close(ratio, expected)
+
+    def test_doppler_uses_direction_at_moving_end(self, device, precision):
+        """Check Eqs. 7.6-45/46 use arrival or departure consistently."""
+        ccg, _, _ = self._create_generator(device, precision)
+        dtype = ccg.dtype
+        shape = (1, 1, 1, 1, 1)
+        aoa = torch.full(shape, PI / 2, dtype=dtype, device=device)
+        aod = torch.zeros(shape, dtype=dtype, device=device)
+        zoa = torch.full(shape, PI / 2, dtype=dtype, device=device)
+        zod = torch.full(shape, PI / 2, dtype=dtype, device=device)
+        sample_time = (ccg._lambda_0 / 4.0).reshape(1)
+
+        common = dict(
+            los_aoa=aoa.squeeze(-1).squeeze(-1),
+            los_aod=aod.squeeze(-1).squeeze(-1),
+            los_zoa=zoa.squeeze(-1).squeeze(-1),
+            los_zod=zod.squeeze(-1).squeeze(-1),
+            los=torch.ones(1, 1, 1, dtype=torch.bool, device=device),
+            distance_3d=torch.ones(1, 1, 1, dtype=dtype, device=device),
+            tx_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            rx_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+        )
+        velocity_x = torch.tensor(
+            [[[1.0, 0.0, 0.0]]], dtype=dtype, device=device
+        )
+        tx_topology = Topology(
+            velocities=velocity_x, moving_end="tx", **common
+        )
+        tx_doppler = ccg._step_11_doppler_matrix(
+            tx_topology, aoa, aod, zoa, zod, sample_time
+        )
+        expected_tx = torch.tensor(1j, dtype=ccg.cdtype, device=device)
+        torch.testing.assert_close(tx_doppler.squeeze(), expected_tx)
+
+        rx_topology = Topology(
+            velocities=velocity_x, moving_end="rx", **common
+        )
+        rx_doppler = ccg._step_11_doppler_matrix(
+            rx_topology, aoa, aod, zoa, zod, sample_time
+        )
+        torch.testing.assert_close(
+            rx_doppler.squeeze(),
+            torch.ones((), dtype=ccg.cdtype, device=device),
+        )
 
     def test_step_11_get_tx_antenna_positions(self, device, precision):
         """Test TX antenna position computation"""
@@ -378,7 +481,7 @@ class TestSystemLevelChannelCompiled:
 
         @torch.compile
         def generate_channel():
-            return channel_model(10, 1e6)
+            return channel_model(99, 10, 1e6)
 
         h, tau = generate_channel()
         assert h.shape[0] == 4  # batch size
@@ -401,15 +504,17 @@ class TestSystemLevelChannelCompiled:
         assert h.shape[0] == 32  # batch size
         assert h.shape[-1] == 100  # num time steps
 
-    def test_cdl_compiled(self, device):
-        """Verify CDL channel model works with torch.compile"""
+    def test_cdl_reduce_overhead_compiled(self, device):
+        """Verify CDL works with CUDA graphs and no pre-allocation API."""
         if device == "cpu":
             import pytest
             pytest.skip("Inductor/Triton tests only relevant on GPU")
+        import torch._dynamo as dynamo
+        from torch._dynamo.utils import counters
         from sionna.phy.channel.tr38901 import CDL, PanelArray
 
         bs_array = PanelArray(
-            num_rows_per_panel=2, num_cols_per_panel=2,
+            num_rows_per_panel=1, num_cols_per_panel=1,
             polarization='single', polarization_type='V',
             antenna_pattern='omni', carrier_frequency=3.5e9
         )
@@ -425,10 +530,20 @@ class TestSystemLevelChannelCompiled:
             min_speed=0.0, max_speed=10.0, direction='uplink', device=device
         )
 
-        @torch.compile
         def generate_channel():
-            return cdl(batch_size=32, num_time_steps=100, sampling_frequency=1e6)
+            return cdl(batch_size=2, num_time_steps=10,
+                       sampling_frequency=1e6)
 
-        h, delays = generate_channel()
-        assert h.shape[0] == 32  # batch size
-        assert h.shape[-1] == 100  # num time steps
+        dynamo.reset()
+        counters.clear()
+        compiled_generate_channel = torch.compile(
+            generate_channel, mode="reduce-overhead"
+        )
+        h, delays = compiled_generate_channel()
+        h, delays = compiled_generate_channel()
+        torch.cuda.synchronize(torch.device(device))
+
+        assert h.shape[0] == 2
+        assert h.shape[-1] == 10
+        assert not dict(counters.get("graph_break", {}))
+        assert counters["inductor"]["cudagraph_skips"] == 0

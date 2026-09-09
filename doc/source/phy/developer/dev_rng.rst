@@ -44,5 +44,59 @@ code. All of Sionna PHY's built-in functions rely on these RNGs.
 
 For code that uses :torch:`torch.compile`, use the compile-aware utilities in the
 :doc:`utility functions <../api/utils/index>` section of the PHY API (e.g. :func:`~sionna.phy.utils.randint`,
-:func:`~sionna.phy.utils.normal`) and pass ``generator=config.torch_rng()``
-in eager mode; they automatically switch to the global RNG when compiled.
+:func:`~sionna.phy.utils.normal`). Their output defaults to ``config.device``.
+When passing an explicit generator in eager mode, pass the matching device as
+well:
+
+.. code-block:: python
+
+    from sionna.phy.utils import normal
+
+    noise = normal(
+        [4],
+        device=config.device,
+        generator=config.torch_rng(config.device),
+    )
+
+The compile-aware helpers automatically switch to the seeded global RNG when
+compiled because explicit generators cannot be captured in the graph.
+
+What ``config.seed`` guarantees
+-------------------------------
+
+Setting :attr:`~sionna.phy.config.Config.seed` reinitializes Sionna's configured
+Python, NumPy, and per-device PyTorch generators. Public stochastic behaviour in
+**Sionna PHY** and **Sionna SYS** that goes through those generators is then
+reproducible across runs that:
+
+- use the same seed,
+- use the same code path (eager vs compiled; see below),
+- and do not draw from other process-global RNGs
+  (``random``, ``np.random``, or unseeded ``torch.*`` calls without a
+  ``generator``).
+
+Typical examples that follow this contract include AWGN / Rayleigh channel
+draws, discrete-channel bit flips, OFDM Kronecker pilot symbols,
+:class:`~sionna.phy.channel.CIRDataset` shuffle order,
+:class:`~sionna.sys.HexGrid` UT placement, and FEC scramblers /
+interleavers that take a seed or use the configured generators.
+
+What it does **not** guarantee
+------------------------------
+
+- **Eager vs compiled equality.** In eager mode the compile-aware helpers use
+  ``config.torch_rng(device)``. Under ``torch.compile`` they fall back to the
+  seeded *global* device RNG. Each mode is individually reproducible after
+  ``config.seed = ...``, but the two modes are not required to produce
+  bitwise-identical samples for the same seed.
+- **Multi-worker ``DataLoader``s.** Sharing one ``config.py_rng`` across
+  worker processes is not a supported reproducibility model. Keep
+  ``num_workers=0`` (the Sionna default for :class:`~sionna.phy.channel.CIRDataset`)
+  or give each worker an explicit local generator.
+- **Sionna RT preview cosmetics.** Default radio-material colours and other
+  preview-only randomness in the RT submodule are outside
+  ``sionna.phy.config.seed``. Electromagnetic sampling in RT uses Mitsuba
+  samplers with their own explicit seeds.
+- **Unrelated global Torch state.** Code that calls ``torch.rand`` /
+  ``torch.randn`` without passing ``generator=config.torch_rng(...)`` (or the
+  compile-aware wrappers) is not controlled by ``config.seed`` in eager mode.

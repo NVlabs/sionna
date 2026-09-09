@@ -660,13 +660,14 @@ class TestCompileMode:
             device=device,
         )
 
-        @torch.compile
+        @torch.compile(fullgraph=True, dynamic=True)
         def run_channel(x, pb):
             return channel(x, pb)
 
-        x = source((100, 50))
-        y = run_channel(x, 0.1)
-        assert y.shape == x.shape
+        for shape in ((100, 50), (80, 40)):
+            x = source(shape)
+            y = run_channel(x, 0.1)
+            assert y.shape == x.shape
 
     @pytest.mark.skipif(
         not hasattr(torch, "compile"), reason="torch.compile not available"
@@ -679,10 +680,78 @@ class TestCompileMode:
             device=device,
         )
 
-        @torch.compile
+        @torch.compile(fullgraph=True, dynamic=True)
         def run_channel(x, pb):
             return channel(x, pb)
 
-        x = source((100, 50))
-        y = run_channel(x, 0.1)
+        for shape in ((100, 50), (80, 40)):
+            x = source(shape)
+            y = run_channel(x, 0.1)
+            assert y.shape == x.shape
+
+
+class TestBinaryMemorylessChannelContracts:
+    """Regression tests for BMC pb validation and LLR endpoint numerics."""
+
+    def test_pb_shape_vector_of_length_2(self, device):
+        """Documented pb shape [2] must be accepted."""
+        channel = BinaryMemorylessChannel(device=device)
+        x = torch.zeros(8, device=device)
+        pb = torch.tensor([0.1, 0.2], device=device)
+        y = channel(x, pb)
         assert y.shape == x.shape
+
+    def test_pb_shape_batch_n_2(self, device):
+        """Broadcastable pb with trailing dim 2 must be accepted."""
+        channel = BinaryMemorylessChannel(device=device)
+        x = torch.zeros(2, 4, device=device)
+        pb = torch.tensor(
+            [[[0.1, 0.2], [0.05, 0.15], [0.2, 0.1], [0.0, 0.3]],
+             [[0.3, 0.1], [0.1, 0.1], [0.25, 0.25], [0.4, 0.05]]],
+            device=device,
+        )
+        y = channel(x, pb)
+        assert y.shape == x.shape
+
+    def test_pb_rejects_wrong_last_dim(self, device):
+        """Malformed pb with last dim != 2 must raise ValueError."""
+        channel = BinaryMemorylessChannel(device=device)
+        x = torch.zeros(2, device=device)
+        pb = torch.tensor([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]], device=device)
+        with pytest.raises(ValueError, match="Last dimension of pb"):
+            channel(x, pb)
+
+    def test_pb_rejects_trailing_singleton(self, device):
+        """pb ending in a singleton last dim must raise ValueError."""
+        channel = BinaryMemorylessChannel(device=device)
+        x = torch.zeros(2, device=device)
+        pb = torch.tensor([[[0.1], [0.2]]], device=device)
+        with pytest.raises(ValueError, match="Last dimension of pb"):
+            channel(x, pb)
+
+    def test_llr_endpoints_are_finite(self, device, precision):
+        """LLRs at pb endpoints must be finite and clipped to llr_max."""
+        llr_max = 20.0
+        channel = BinaryMemorylessChannel(
+            return_llrs=True,
+            llr_max=llr_max,
+            precision=precision,
+            device=device,
+        )
+        x = torch.tensor(
+            [0.0, 1.0], dtype=channel.dtype, device=device
+        )
+        for pb in (
+            (0.0, 0.0),
+            (1.0, 1.0),
+            (0.0, 1.0),
+            (1.0, 0.0),
+            torch.tensor([0.0, 1.0], dtype=channel.dtype, device=device),
+            torch.tensor([1.0, 0.0], dtype=channel.dtype, device=device),
+        ):
+            y = channel(x, pb)
+            assert torch.isfinite(y).all(), f"non-finite LLRs for pb={pb}"
+            assert (y.abs() <= llr_max + 1e-5).all()
+            # Intermediate logs must also stay finite; finiteness must not
+            # rely only on the final +/- llr_max clip.
+            assert not torch.isinf(y).any()

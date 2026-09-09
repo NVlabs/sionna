@@ -10,7 +10,7 @@ import torch
 
 from sionna.phy import SPEED_OF_LIGHT
 from .system_level_scenario import SystemLevelScenario
-from .antenna import PanelArray
+from .antenna import HandheldUTArray, PanelArray
 
 __all__ = ["UMiScenario"]
 
@@ -23,8 +23,12 @@ class UMiScenario(SystemLevelScenario):
     :param o2i_model: Outdoor to indoor (O2I) pathloss model, used for indoor UTs.
         Must be ``"low"`` or ``"high"``.
         See section 7.4.3 from 38.901 specification.
-    :param ut_array: Panel array configuration used by UTs
-    :param bs_array: Panel array configuration used by BSs
+    :param ut_array: Antenna array used by UTs. This can be a
+        :class:`~sionna.phy.channel.tr38901.PanelArray` or
+        :class:`~sionna.phy.channel.tr38901.HandheldUTArray`.
+    :param bs_array: Antenna array used by base stations. This can be a
+        :class:`~sionna.phy.channel.tr38901.PanelArray` or
+        :class:`~sionna.phy.channel.tr38901.HandheldUTArray`.
     :param direction: Link direction. Must be ``"uplink"`` or ``"downlink"``.
     :param enable_pathloss: If `True`, apply pathloss. Otherwise doesn't.
         Defaults to `True`.
@@ -35,19 +39,23 @@ class UMiScenario(SystemLevelScenario):
         :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., ``"cpu"``, ``"cuda:0"``).
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param spec_version: Version of the TR 38.901 parameter tables to use.
+        Supported values are ``"16.1"`` and ``"19.2"``. Defaults to
+        ``"19.2"``.
     """
 
     def __init__(
         self,
         carrier_frequency: float,
         o2i_model: str,
-        ut_array: PanelArray,
-        bs_array: PanelArray,
+        ut_array: PanelArray | HandheldUTArray,
+        bs_array: PanelArray | HandheldUTArray,
         direction: str,
         enable_pathloss: bool = True,
         enable_shadow_fading: bool = True,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        spec_version: str = "19.2",
     ) -> None:
         super().__init__(
             carrier_frequency,
@@ -57,6 +65,7 @@ class UMiScenario(SystemLevelScenario):
             direction,
             enable_pathloss,
             enable_shadow_fading,
+            spec_version=spec_version,
             precision=precision,
             device=device,
         )
@@ -160,7 +169,9 @@ class UMiScenario(SystemLevelScenario):
         # ZSD
         log_mean_zsd_los = torch.maximum(
             torch.tensor(-0.21, dtype=self.dtype, device=self.device),
-            -14.8 * (distance_2d / 1000.0) + 0.01 * torch.abs(h_ut - h_bs) + 0.83,
+            -14.8 * (distance_2d / 1000.0)
+            + 0.01 * torch.abs(h_ut - h_bs)
+            + 0.83,
         )
         log_mean_zsd_nlos = torch.maximum(
             torch.tensor(-0.5, dtype=self.dtype, device=self.device),
@@ -171,7 +182,9 @@ class UMiScenario(SystemLevelScenario):
             )
             + 0.2,
         )
-        log_mean_zsd = torch.where(self.los, log_mean_zsd_los, log_mean_zsd_nlos)
+        log_mean_zsd = torch.where(
+            self.outdoor_los, log_mean_zsd_los, log_mean_zsd_nlos
+        )
 
         lsp_log_mean = torch.stack(
             [
@@ -231,7 +244,7 @@ class UMiScenario(SystemLevelScenario):
             + 3.3,
         )
         zod_offset = torch.where(
-            self.los,
+            self.outdoor_los,
             torch.tensor(0.0, dtype=self.dtype, device=self.device),
             zod_offset,
         )
@@ -279,6 +292,6 @@ class UMiScenario(SystemLevelScenario):
         ## Set the basic pathloss according to UT state
 
         # LoS
-        pl_b = torch.where(self.los, pl_los, pl_nlos)
+        pl_b = torch.where(self.outdoor_los, pl_los, pl_nlos)
 
         self._update_attr("_pl_b", pl_b)

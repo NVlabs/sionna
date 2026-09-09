@@ -11,7 +11,7 @@ import torch
 from sionna.phy import SPEED_OF_LIGHT
 from sionna.phy.utils import rand
 from .system_level_scenario import SystemLevelScenario
-from .antenna import PanelArray
+from .antenna import HandheldUTArray, PanelArray
 
 __all__ = ["UMaScenario"]
 
@@ -23,10 +23,12 @@ class UMaScenario(SystemLevelScenario):
     :param carrier_frequency: Carrier frequency [Hz]
     :param o2i_model: Outdoor to indoor (O2I) pathloss model, used for indoor UTs.
         Must be 'low' or 'high'. See section 7.4.3 from 38.901 specification.
-    :param ut_array: Panel array used by the UTs. All UTs share the same
-        antenna array configuration.
-    :param bs_array: Panel array used by the BSs. All BSs share the same
-        antenna array configuration.
+    :param ut_array: Antenna array used by UTs. This can be a
+        :class:`~sionna.phy.channel.tr38901.PanelArray` or
+        :class:`~sionna.phy.channel.tr38901.HandheldUTArray`.
+    :param bs_array: Antenna array used by base stations. This can be a
+        :class:`~sionna.phy.channel.tr38901.PanelArray` or
+        :class:`~sionna.phy.channel.tr38901.HandheldUTArray`.
     :param direction: Link direction. Either 'uplink' or 'downlink'.
     :param enable_pathloss: If `True`, apply pathloss. Defaults to `True`.
     :param enable_shadow_fading: If `True`, apply shadow fading. Defaults to `True`.
@@ -34,19 +36,23 @@ class UMaScenario(SystemLevelScenario):
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param spec_version: Version of the TR 38.901 parameter tables to use.
+        Supported values are ``"16.1"`` and ``"19.2"``. Defaults to
+        ``"19.2"``.
     """
 
     def __init__(
         self,
         carrier_frequency: float,
         o2i_model: str,
-        ut_array: PanelArray,
-        bs_array: PanelArray,
+        ut_array: PanelArray | HandheldUTArray,
+        bs_array: PanelArray | HandheldUTArray,
         direction: str,
         enable_pathloss: bool = True,
         enable_shadow_fading: bool = True,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        spec_version: str = "19.2",
     ) -> None:
         super().__init__(
             carrier_frequency,
@@ -56,6 +62,7 @@ class UMaScenario(SystemLevelScenario):
             direction,
             enable_pathloss,
             enable_shadow_fading,
+            spec_version=spec_version,
             precision=precision,
             device=device,
         )
@@ -175,13 +182,19 @@ class UMaScenario(SystemLevelScenario):
         # ZSD
         log_mean_zsd_los = torch.maximum(
             torch.tensor(-0.5, dtype=self.dtype, device=self.device),
-            -2.1 * (distance_2d / 1000.0) - 0.01 * torch.abs(h_ut - 1.5) + 0.75,
+            -2.1 * (distance_2d / 1000.0)
+            - 0.01 * torch.abs(h_ut - 1.5)
+            + 0.75,
         )
         log_mean_zsd_nlos = torch.maximum(
             torch.tensor(-0.5, dtype=self.dtype, device=self.device),
-            -2.1 * (distance_2d / 1000.0) - 0.01 * torch.abs(h_ut - 1.5) + 0.9,
+            -2.1 * (distance_2d / 1000.0)
+            - 0.01 * torch.abs(h_ut - 1.5)
+            + 0.9,
         )
-        log_mean_zsd = torch.where(self.los, log_mean_zsd_los, log_mean_zsd_nlos)
+        log_mean_zsd = torch.where(
+            self.outdoor_los, log_mean_zsd_los, log_mean_zsd_nlos
+        )
 
         lsp_log_mean = torch.stack(
             [
@@ -210,7 +223,11 @@ class UMaScenario(SystemLevelScenario):
         # ZSA
         log_std_zsa = self.get_param("sigmaZSA")
         # ZSD
-        log_std_zsd = self.get_param("sigmaZSD")
+        log_std_zsd = torch.where(
+            self.outdoor_los,
+            self._params_los["sigmaZSD"],
+            self._params_nlos["sigmaZSD"],
+        )
 
         lsp_log_std = torch.stack(
             [
@@ -229,39 +246,34 @@ class UMaScenario(SystemLevelScenario):
         self._update_attr("_lsp_log_std", lsp_log_std)
 
         # ZOD offset
-        fc = self.carrier_frequency / 1e9
-        if fc < 6.0:
-            fc = torch.tensor(6.0, dtype=self.dtype, device=self.device)
+        fc = self.clip_carrier_frequency_lsp(self.carrier_frequency / 1e9)
         a = 0.208 * torch.log10(fc) - 0.782
         b = torch.tensor(25.0, dtype=self.dtype, device=self.device)
         c = -0.13 * torch.log10(fc) + 2.03
         e = 7.66 * torch.log10(fc) - 5.96
         zod_offset = e - torch.pow(
             torch.tensor(10.0, dtype=self.dtype, device=self.device),
-            a * torch.log10(torch.maximum(b, distance_2d)) + c - 0.07 * (h_ut - 1.5),
+            a * torch.log10(torch.maximum(b, distance_2d))
+            + c
+            - 0.07 * (h_ut - 1.5),
         )
         zod_offset = torch.where(
-            self.los,
+            self.outdoor_los,
             torch.tensor(0.0, dtype=self.dtype, device=self.device),
             zod_offset,
         )
         self._update_attr("_zod_offset", zod_offset)
 
-    def _compute_pathloss_basic(self) -> None:
-        r"""Computes the basic component of the pathloss [dB]"""
+    def _sample_environment_height(
+        self,
+        distance_2d: torch.Tensor,
+        h_ut: torch.Tensor,
+    ) -> torch.Tensor:
+        """Sample the effective environment height from Table 7.4.1-1."""
 
         batch_size = self.batch_size
         num_bs = self.num_bs
         num_ut = self.num_ut
-        distance_2d = self.distance_2d
-        distance_3d = self.distance_3d
-        fc = self.carrier_frequency  # Carrier frequency (Hz)
-        h_bs = self.h_bs
-        h_bs = h_bs.unsqueeze(2)  # For broadcasting
-        h_ut = self.h_ut
-        h_ut = h_ut.unsqueeze(1)  # For broadcasting
-
-        # Break point distance
         g = (
             (5.0 / 4.0)
             * torch.pow(distance_2d / 100.0, 3.0)
@@ -292,27 +304,38 @@ class UMaScenario(SystemLevelScenario):
         )
 
         max_value = h_ut - 1.5
-        # Random uniform integer generation is not supported when maxval and
-        # minval are not scalar. Therefore, we sample from a continuous
-        # distribution.
-        s = (
-            rand(
-                (batch_size, num_bs, num_ut),
-                dtype=self.dtype,
-                device=self.device,
-                generator=self.torch_rng,
-            )
-            * (max_value - 12.0)
-            + 12.0
+        # TR 38.901 Table 7.4.1-1 Note 1 uses a discrete uniform draw from
+        # {12, 15, ..., hUT - 1.5} when hE is not 1 m.
+        num_values = torch.floor((max_value - 12.0) / 3.0) + 1.0
+        num_values = torch.maximum(
+            num_values, torch.tensor(1.0, dtype=self.dtype, device=self.device)
         )
-        # It could happen that h_ut = 13m, and therefore max_value < 13m
-        s = torch.where(
-            s < 12.0,
-            torch.tensor(12.0, dtype=self.dtype, device=self.device),
-            s,
+        u = rand(
+            (batch_size, num_bs, num_ut),
+            dtype=self.dtype,
+            device=self.device,
+            generator=self.torch_rng,
         )
+        s_idx = torch.floor(u * num_values)
+        s_idx = torch.minimum(s_idx, num_values - 1.0)
+        s = 12.0 + 3.0 * s_idx
 
         h_e = r + (1.0 - r) * s
+        return self.share_by_bs_site(h_e)
+
+    def _compute_pathloss_basic(self) -> None:
+        r"""Computes the basic component of the pathloss [dB]"""
+
+        distance_2d = self.distance_2d
+        distance_3d = self.distance_3d
+        fc = self.carrier_frequency  # Carrier frequency (Hz)
+        h_bs = self.h_bs
+        h_bs = h_bs.unsqueeze(2)  # For broadcasting
+        h_ut = self.h_ut
+        h_ut = h_ut.unsqueeze(1)  # For broadcasting
+
+        # Break point distance
+        h_e = self._sample_environment_height(distance_2d, h_ut)
         h_bs_prime = h_bs - h_e
         h_ut_prime = h_ut - h_e
         distance_breakpoint = 4 * h_bs_prime * h_ut_prime * fc / SPEED_OF_LIGHT
@@ -342,6 +365,6 @@ class UMaScenario(SystemLevelScenario):
         ## Set the basic pathloss according to UT state
 
         # LoS
-        pl_b = torch.where(self.los, pl_los, pl_nlos)
+        pl_b = torch.where(self.outdoor_los, pl_los, pl_nlos)
 
         self._update_attr("_pl_b", pl_b)

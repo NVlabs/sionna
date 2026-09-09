@@ -365,6 +365,34 @@ class TestApplyTimeChannel:
         assert apply_channel.num_time_samples == num_time_samples
         assert apply_channel.l_tot == l_tot
 
+    @pytest.mark.parametrize(
+        "num_time_samples,l_tot",
+        [(1, 1), (2, 3), (10, 4), (17, 7), (64, 1), (127, 16), (1000, 33)],
+    )
+    def test_gather_matrix(self, device, num_time_samples, l_tot):
+        """Verify the gather matrix has the expected Toeplitz structure.
+
+        ``_g`` indexes a zero-padded input, so entry ``num_time_samples``
+        addresses the padding element. Row ``i`` must read
+        ``[i, i-1, ..., i-l_tot+1]``, clamped to the padding index wherever the
+        index would be negative.
+        """
+        apply_channel = ApplyTimeChannel(
+            num_time_samples=num_time_samples, l_tot=l_tot, device=device
+        )
+        g = apply_channel._g
+
+        assert g.dtype == torch.int64
+        assert tuple(g.shape) == (num_time_samples + l_tot - 1, l_tot)
+
+        i = torch.arange(num_time_samples + l_tot - 1, device=g.device).unsqueeze(1)
+        j = torch.arange(l_tot, device=g.device).unsqueeze(0)
+        expected = torch.where(i - j < 0, num_time_samples, i - j)
+        expected = torch.minimum(
+            expected, torch.tensor(num_time_samples, device=g.device)
+        )
+        assert torch.equal(g.cpu(), expected.cpu())
+
     def test_impulse_response(self, device):
         """Verify impulse response produces expected output"""
         num_time_samples = 10

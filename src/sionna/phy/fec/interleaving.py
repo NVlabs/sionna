@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from importlib_resources import files, as_file
 
+from sionna._validation import check_instance
 from sionna.phy import config, Block
 
 __all__ = [
@@ -71,16 +72,23 @@ class RowColumnInterleaver(Block):
     ):
         super().__init__(precision=precision, device=device, **kwargs)
 
-        if not isinstance(axis, int):
-            raise TypeError("axis must be int.")
+        check_instance(axis, int, name="axis", message="axis must be int.")
         self._axis = axis
 
-        if not isinstance(row_depth, int):
-            raise TypeError("row_depth must be int.")
+        check_instance(
+            row_depth,
+            int,
+            name="row_depth",
+            message="row_depth must be int.",
+        )
         self._row_depth = row_depth
 
-        if not isinstance(inverse, bool):
-            raise TypeError("inverse must be bool.")
+        check_instance(
+            inverse,
+            bool,
+            name="inverse",
+            message="inverse must be bool.",
+        )
         self._inverse = inverse
 
         # Permutation sequences initialized during build
@@ -276,29 +284,39 @@ class RandomInterleaver(Block):
     ):
         super().__init__(precision=precision, device=device, **kwargs)
 
-        if not isinstance(keep_batch_constant, bool):
-            raise TypeError("keep_batch_constant must be bool.")
+        check_instance(
+            keep_batch_constant,
+            bool,
+            name="keep_batch_constant",
+            message="keep_batch_constant must be bool.",
+        )
         self._keep_batch_constant = keep_batch_constant
 
-        if not isinstance(axis, int):
-            raise TypeError("axis must be int.")
+        check_instance(axis, int, name="axis", message="axis must be int.")
         self._axis = axis
 
         if seed is not None:
-            if not isinstance(seed, int):
-                raise TypeError("seed must be int.")
+            check_instance(seed, int, name="seed", message="seed must be int.")
         else:
             # Generate random seed if no value is provided
             seed = self.py_rng.randint(0, 2**31 - 1)
 
         self._seed = seed
 
-        if not isinstance(inverse, bool):
-            raise TypeError("inverse must be boolean.")
+        check_instance(
+            inverse,
+            bool,
+            name="inverse",
+            message="inverse must be boolean.",
+        )
         self._inverse = inverse
 
-        if not isinstance(keep_state, bool):
-            raise TypeError("keep_state must be boolean.")
+        check_instance(
+            keep_state,
+            bool,
+            name="keep_state",
+            message="keep_state must be boolean.",
+        )
         self._keep_state = keep_state
 
         if self._keep_state is False and self._inverse is True:
@@ -306,7 +324,9 @@ class RandomInterleaver(Block):
                 "keep_state=False and, thus, a new realization of "
                 "the interleaver is generated during each call. Thus, "
                 "the inverse interleaver does not correspond to a previous "
-                "interleaver call."
+                "interleaver call.",
+                UserWarning,
+                stacklevel=2,
             )
 
     @property
@@ -340,12 +360,19 @@ class RandomInterleaver(Block):
 
         :output s_min: The S-parameter for the given ``seed``.
         """
-        if not isinstance(seed, int):
-            raise TypeError("seed must be int.")
-        if not isinstance(seq_length, int):
-            raise TypeError("seq_length must be int.")
-        if not isinstance(s_min_stop, int):
-            raise TypeError("s_min_stop must be int.")
+        check_instance(seed, int, name="seed", message="seed must be int.")
+        check_instance(
+            seq_length,
+            int,
+            name="seq_length",
+            message="seq_length must be int.",
+        )
+        check_instance(
+            s_min_stop,
+            int,
+            name="s_min_stop",
+            message="s_min_stop must be int.",
+        )
 
         perm_seq = self._generate_perm_full(seed, seq_length, batch_size=1)
         perm_seq = perm_seq.squeeze(0).cpu().numpy()
@@ -457,8 +484,12 @@ class RandomInterleaver(Block):
         if inverse is None:
             inverse = self._inverse
         else:
-            if not isinstance(inverse, bool):
-                raise TypeError("inverse must be bool.")
+            check_instance(
+                inverse,
+                bool,
+                name="inverse",
+                message="inverse must be bool.",
+            )
 
         # Determine seed to use
         if seed is not None:
@@ -572,13 +603,16 @@ class Turbo3GPPInterleaver(Block):
     ):
         super().__init__(precision=precision, device=device, **kwargs)
 
-        if not isinstance(axis, int):
-            raise TypeError("axis must be int.")
+        check_instance(axis, int, name="axis", message="axis must be int.")
         self._axis = axis
         self._keep_state = True  # Required for deinterleaver
 
-        if not isinstance(inverse, bool):
-            raise TypeError("inverse must be boolean.")
+        check_instance(
+            inverse,
+            bool,
+            name="inverse",
+            message="inverse must be boolean.",
+        )
         self._inverse = inverse
 
         # Load interleaver patterns as defined in the 3GPP standard
@@ -768,7 +802,9 @@ class Deinterleaver(Block):
         if self._interleaver.keep_state is False:
             warnings.warn(
                 "Deinterleaver requires interleaver to have "
-                "keep_state=True or to explicitly provide the seed as inputs."
+                "keep_state=True or to explicitly provide the seed as inputs.",
+                UserWarning,
+                stacklevel=2,
             )
 
     @property

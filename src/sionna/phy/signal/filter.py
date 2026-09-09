@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
+from sionna._validation import check_one_of, check_scalar_range
 from sionna.phy import Block
 from sionna.phy.config import Precision
 from .utils import convolve, empirical_aclr
@@ -98,15 +99,22 @@ class Filter(Block):
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
 
-        assert span_in_symbols > 0, "span_in_symbols must be positive"
+        if span_in_symbols <= 0:
+            raise ValueError(
+                f"span_in_symbols must be positive, got {span_in_symbols}"
+            )
         self._span_in_symbols = span_in_symbols
 
-        assert samples_per_symbol > 0, "samples_per_symbol must be positive"
+        if samples_per_symbol <= 0:
+            raise ValueError(
+                f"samples_per_symbol must be positive, got {samples_per_symbol}"
+            )
         self._samples_per_symbol = samples_per_symbol
 
         self.window = window
 
-        assert isinstance(normalize, bool), "normalize must be bool"
+        if not isinstance(normalize, bool):
+            raise ValueError(f"normalize must be bool, got {type(normalize)}")
         self._normalize = normalize
 
         self._coefficients: Optional[torch.Tensor] = None
@@ -136,27 +144,39 @@ class Filter(Block):
     @window.setter
     def window(self, value: Optional[Union[Window, str]]) -> None:
         if isinstance(value, str):
+            check_one_of(
+                value,
+                ("hann", "hamming", "blackman"),
+                name="window",
+                message=(
+                    "window must be one of 'hann', 'hamming' or 'blackman', "
+                    f"got {value!r}"
+                ),
+            )
             if value == "hann":
                 self._window = HannWindow(precision=self.precision, device=self.device)
             elif value == "hamming":
                 self._window = HammingWindow(
                     precision=self.precision, device=self.device
                 )
-            elif value == "blackman":
+            else:
                 self._window = BlackmanWindow(
                     precision=self.precision, device=self.device
                 )
-            else:
-                raise AssertionError("Invalid window type")
         elif isinstance(value, Window) or value is None:
             self._window = value
         else:
-            raise AssertionError("Invalid window type")
+            raise ValueError(
+                "window must be a Window instance, one of 'hann', 'hamming' "
+                f"or 'blackman', or None, got {type(value)}"
+            )
 
         if value is not None:
-            assert (
-                self._window.precision == self.precision
-            ), "Window and Filter must have the same precision."
+            if self._window.precision != self.precision:
+                raise ValueError(
+                    "Window and Filter must have the same precision, got "
+                    f"{self._window.precision} and {self.precision}"
+                )
             # Run window once to initialize coefficients
             self._window(
                 torch.ones([self.length], dtype=self.cdtype, device=self.device)
@@ -169,7 +189,12 @@ class Filter(Block):
 
     @property
     def coefficients(self) -> torch.Tensor:
-        """Set/get raw filter coefficients"""
+        """Set/get raw filter coefficients.
+
+        The coefficient length cannot be changed while a window is active.
+        Remove the window first, change the coefficients, and then install a
+        matching window.
+        """
         return self._coefficients
 
     @coefficients.setter
@@ -182,6 +207,15 @@ class Filter(Block):
             target_dtype = self.cdtype if v.is_complex() else self.dtype
             if v.dtype != target_dtype or str(v.device) != self.device:
                 v = v.to(dtype=target_dtype, device=self.device)
+
+        if self.window is not None and v.shape[-1] != self.window.length:
+            raise ValueError(
+                "Cannot change coefficient length while a window is active: "
+                f"got {v.shape[-1]} coefficients and a window of length "
+                f"{self.window.length}. Set window to None before changing "
+                "coefficient length, then install a matching window."
+            )
+
         self._coefficients = v
 
     @property
@@ -212,7 +246,14 @@ class Filter(Block):
         :param scale: y-scale of the magnitude response.
             Can be ``"lin"`` (i.e., linear) or ``"db"`` (i.e., Decibel).
         """
-        assert response in ["impulse", "magnitude"], "Invalid response"
+        check_one_of(
+            response,
+            ("impulse", "magnitude"),
+            name="response",
+            message=(
+                f"response must be 'impulse' or 'magnitude', got {response!r}"
+            ),
+        )
 
         h = self.coefficients
 
@@ -239,7 +280,12 @@ class Filter(Block):
             plt.ylabel(r"$h(t)$")
             plt.xlim(self.sampling_times[0], self.sampling_times[-1])
         else:
-            assert scale in ["lin", "db"], "Invalid scale"
+            check_one_of(
+                scale,
+                ("lin", "db"),
+                name="scale",
+                message=f"scale must be 'lin' or 'db', got {scale!r}",
+            )
             fft_size = max(1024, h.shape[-1])
             h_fft = np.fft.fft(h_np, fft_size)
             h_fft = np.fft.fftshift(h_fft)
@@ -280,7 +326,7 @@ class Filter(Block):
             energy = torch.sum(torch.abs(h) ** 2)
             h = h / torch.sqrt(energy)
 
-        fft_size = 1024
+        fft_size = max(1024, h.shape[-1])
         n = fft_size - h.shape[-1]
         z = torch.zeros([n], dtype=h.dtype, device=h.device)
         c = torch.cat([h, z], dim=-1).to(self.cdtype)
@@ -414,7 +460,13 @@ class RaisedCosineFilter(Filter):
             **kwargs,
         )
 
-        assert 0 <= beta <= 1, "beta must be from the interval [0, 1]"
+        check_scalar_range(
+            beta,
+            name="beta",
+            minimum=0,
+            maximum=1,
+            message=f"beta must be in the interval [0, 1], got {beta}",
+        )
         self._beta = beta
         self.coefficients = self._raised_cosine(self.sampling_times, 1.0, self.beta)
 
@@ -545,7 +597,13 @@ class RootRaisedCosineFilter(Filter):
             **kwargs,
         )
 
-        assert 0 <= beta <= 1, "beta must be from the interval [0, 1]"
+        check_scalar_range(
+            beta,
+            name="beta",
+            minimum=0,
+            maximum=1,
+            message=f"beta must be in the interval [0, 1], got {beta}",
+        )
         self._beta = beta
         self.coefficients = self._root_raised_cosine(
             self.sampling_times, 1.0, self.beta
@@ -701,10 +759,13 @@ class SincFilter(Filter):
 class CustomFilter(Filter):
     r"""Block for applying a custom filter of ``length`` K to an input ``x`` of length N.
 
-    The filter length K is equal to the filter span in symbols
-    (``span_in_symbols``) multiplied by the oversampling factor
-    (``samples_per_symbol``). If this product is even, a value of one will
-    be added.
+    Unlike the built-in pulse-shaping filters, the filter length K is taken
+    directly from the number of supplied ``coefficients``; it is not derived
+    from a symbol span. Any odd number of coefficients is accepted.
+    :attr:`~sionna.phy.signal.Filter.span_in_symbols` is consequently only an
+    approximation for this filter, computed as
+    ``max(1, len(coefficients) // samples_per_symbol)``, and the filter need
+    not cover a whole number of symbols.
 
     The filter is applied through discrete convolution.
 
@@ -776,15 +837,27 @@ class CustomFilter(Filter):
         device: Optional[str] = None,
         **kwargs,
     ) -> None:
-        assert samples_per_symbol > 0, "samples_per_symbol must be positive"
+        if samples_per_symbol <= 0:
+            raise ValueError(
+                f"samples_per_symbol must be positive, got {samples_per_symbol}"
+            )
 
-        if isinstance(coefficients, np.ndarray):
-            coeff_len = coefficients.shape[-1]
-        else:
-            coeff_len = coefficients.shape[-1]
+        coeff_len = coefficients.shape[-1]
 
-        assert coeff_len % 2 == 1, "The number of coefficients must be odd"
-        span_in_symbols = coeff_len // samples_per_symbol
+        if coeff_len % 2 != 1:
+            raise ValueError(
+                "The number of coefficients must be odd, "
+                f"got {coeff_len}"
+            )
+
+        # The filter length is the number of supplied coefficients. Seed it
+        # here because the base class reads `self.length` while installing the
+        # default window, before `self.coefficients` is assigned; afterwards
+        # `length` tracks the coefficients themselves. The span is only an
+        # approximation, since a custom filter need not cover a whole number of
+        # symbols.
+        self._length = coeff_len
+        span_in_symbols = max(1, coeff_len // samples_per_symbol)
 
         super().__init__(
             span_in_symbols,
@@ -797,6 +870,19 @@ class CustomFilter(Filter):
         )
 
         self.coefficients = coefficients
-        assert (
-            self.length == coeff_len
-        ), f"`coefficients` must have length {self.length}"
+
+    @property
+    def span_in_symbols(self) -> int:
+        """Approximate filter span based on the current coefficient length"""
+        return max(1, self.length // self.samples_per_symbol)
+
+    @property
+    def length(self) -> int:
+        """Filter length in samples, i.e. the number of coefficients"""
+        # `Filter.__init__()` assigns `self.window`, which reads `self.length`,
+        # before it creates `self._coefficients`, so fall back to the seeded
+        # value while the base class is still constructing.
+        coefficients = getattr(self, "_coefficients", None)
+        if coefficients is None:
+            return self._length
+        return coefficients.shape[-1]

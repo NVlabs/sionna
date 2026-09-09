@@ -85,6 +85,30 @@ class TestLinearDetector:
         assert z.shape == (batch_size, num_streams, num_bits_per_symbol)
         assert ((z == 0) | (z == 1)).all()
 
+    def test_invalid_equalizer(self, device):
+        """Test that an unsupported equalizer is rejected."""
+        with pytest.raises(ValueError, match="equalizer"):
+            LinearDetector(
+                equalizer="invalid",
+                output="bit",
+                demapping_method="app",
+                constellation_type="qam",
+                num_bits_per_symbol=2,
+                device=device,
+            )
+
+    def test_invalid_output(self, device):
+        """Test that an unsupported output is rejected."""
+        with pytest.raises(ValueError, match="output"):
+            LinearDetector(
+                equalizer="lmmse",
+                output=1,
+                demapping_method="app",
+                constellation_type="qam",
+                num_bits_per_symbol=2,
+                device=device,
+            )
+
 
 class TestMaximumLikelihoodDetector:
     """Tests for MaximumLikelihoodDetector class."""
@@ -157,15 +181,15 @@ class TestKBestDetector:
 
     def test_kbest_wrong_parameters(self, device, precision):
         """Test that wrong parameters raise errors."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             # Neither constellation nor constellation_type
             KBestDetector("bit", 4, 16, precision=precision, device=device)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             # Missing num_bits_per_symbol
             KBestDetector("bit", 4, 16, constellation_type="qam", precision=precision, device=device)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             # Missing constellation_type
             KBestDetector("bit", 4, 16, num_bits_per_symbol=4, precision=precision, device=device)
 
@@ -228,6 +252,103 @@ class TestKBestDetector:
 
         assert bits.shape == (batch_size, num_streams, num_bits_per_symbol)
         assert ((bits == 0) | (bits == 1)).all()
+
+    @pytest.mark.parametrize("use_real_rep", [True, False])
+    @pytest.mark.parametrize(
+        ("output", "hard_out", "expected_shape"),
+        [
+            ("bit", False, (2, 2)),
+            ("bit", True, (2, 2)),
+            ("symbol", True, (2,)),
+        ],
+    )
+    def test_kbest_detector_unbatched(
+        self,
+        device,
+        precision,
+        use_real_rep,
+        output,
+        hard_out,
+        expected_shape,
+    ):
+        """KBest supports the documented input shapes without a batch axis."""
+        cdtype = torch.complex64 if precision == "single" else torch.complex128
+        detector = KBestDetector(
+            output=output,
+            num_streams=2,
+            k=16,
+            constellation_type="qam",
+            num_bits_per_symbol=2,
+            hard_out=hard_out,
+            use_real_rep=use_real_rep,
+            precision=precision,
+            device=device,
+        )
+        y = complex_normal((4,), precision=precision, device=device)
+        h = complex_normal((4, 2), precision=precision, device=device)
+        s = torch.eye(4, dtype=cdtype, device=device)
+
+        result = detector(y, h, s)
+
+        assert result.shape == expected_shape
+
+    @pytest.mark.gpu
+    def test_kbest_detector_unbatched_compiles(self, device):
+        """Compiled KBest preserves unbatched output rank and values."""
+        if not device.startswith("cuda"):
+            pytest.skip("This compile regression requires a CUDA device")
+
+        detector = KBestDetector(
+            output="bit",
+            num_streams=2,
+            k=4,
+            constellation_type="qam",
+            num_bits_per_symbol=2,
+            device=device,
+        )
+        y = complex_normal((4,), device=device)
+        h = complex_normal((4, 2), device=device)
+        s = torch.eye(4, dtype=torch.complex64, device=device)
+        expected = detector(y, h, s)
+
+        actual = torch.compile(detector)(y, h, s)
+
+        assert actual.shape == (2, 2)
+        torch.testing.assert_close(actual, expected)
+
+    @pytest.mark.gpu
+    def test_kbest_reduce_overhead_cuda_graph(self, device):
+        """Test KBest through CUDA graph recording and replay."""
+        if not device.startswith("cuda"):
+            pytest.skip("CUDA graph capture requires a CUDA device")
+
+        batch_size = 4
+        num_rx = 6
+        num_streams = 2
+
+        detector = KBestDetector(
+            output="bit",
+            num_streams=num_streams,
+            k=16,
+            constellation_type="qam",
+            num_bits_per_symbol=4,
+            device=device,
+        )
+
+        y = complex_normal((batch_size, num_rx), device=device)
+        h = complex_normal((batch_size, num_rx, num_streams), device=device)
+        s = torch.eye(num_rx, dtype=torch.complex64, device=device)
+        s = s.unsqueeze(0).expand(batch_size, -1, -1)
+
+        compiled_detector = torch.compile(detector, mode="reduce-overhead")
+        outputs = []
+        for _ in range(3):
+            outputs.append(compiled_detector(y, h, s).clone())
+            torch.cuda.synchronize(device)
+
+        for output in outputs:
+            assert torch.isfinite(output).all()
+            torch.testing.assert_close(output, outputs[0])
 
     def test_kbest_detector_k_warning(self, device, precision):
         """Test that a warning is issued when k is too large."""

@@ -46,6 +46,20 @@ def _to_python_float(value: Union[float, int, torch.Tensor]) -> float:
         return float(value)
 
 
+def _validate_bler_target(value: float) -> float:
+    """Require a BLER target strictly inside (0, 1)."""
+    value = _to_python_float(value)
+    if not 0.0 < value < 1.0:
+        raise ValueError("'bler_target' must satisfy 0 < bler_target < 1")
+    return value
+
+
+def _validate_offset_bounds(offset_min: float, offset_max: float) -> None:
+    """Require offset_min <= offset_max."""
+    if offset_min > offset_max:
+        raise ValueError("'offset_min' must not exceed 'offset_max'")
+
+
 class InnerLoopLinkAdaptation(Block):
     r"""Inner loop link adaptation (ILLA).
 
@@ -139,8 +153,14 @@ class InnerLoopLinkAdaptation(Block):
             phy_abstraction = PHYAbstraction(precision=precision, device=device)
 
         self._phy_abstraction = phy_abstraction
-        self._fill_mcs_value = torch.tensor(fill_mcs_value, dtype=torch.int32, device=self.device)
-        self._bler_target = torch.tensor(bler_target, dtype=self.dtype, device=self.device)
+        self._fill_mcs_value = torch.tensor(
+            fill_mcs_value, dtype=torch.int32, device=self.device
+        )
+        self._bler_target = torch.tensor(
+            _validate_bler_target(bler_target),
+            dtype=self.dtype,
+            device=self.device,
+        )
 
     @property
     def phy_abstraction(self) -> PHYAbstraction:
@@ -154,10 +174,9 @@ class InnerLoopLinkAdaptation(Block):
 
     @bler_target.setter
     def bler_target(self, value: Union[float, torch.Tensor]) -> None:
-        if isinstance(value, torch.Tensor):
-            self._bler_target = value.to(dtype=self.dtype, device=self.device)
-        else:
-            self._bler_target = torch.tensor(value, dtype=self.dtype, device=self.device)
+        self._bler_target = torch.tensor(
+            _validate_bler_target(value), dtype=self.dtype, device=self.device
+        )
 
     def call(
         self,
@@ -171,9 +190,14 @@ class InnerLoopLinkAdaptation(Block):
     ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
         """Select optimal MCS index for each user."""
         # Validate inputs
-        assert (sinr is not None) ^ (
-            (sinr_eff is not None) and (num_allocated_re is not None)
-        ), "Either 'sinr' or ('sinr_eff', 'num_allocated_re') is required as input"
+        if not (
+            (sinr is not None)
+            ^ ((sinr_eff is not None) and (num_allocated_re is not None))
+        ):
+            raise ValueError(
+                "Exactly one of 'sinr' or the pair "
+                "('sinr_eff', 'num_allocated_re') is required as input"
+            )
 
         # Number of available MCS indices
         num_mcs = self._phy_abstraction.bler_table_interp.shape[2]
@@ -261,8 +285,8 @@ class InnerLoopLinkAdaptation(Block):
         # ---------- #
         # Find the highest MCS with TBLER <= bler_target
         # If no such MCS is found, returns -1
-        # Note: TBLER can be -inf for MCS indices without BLER data in the table,
-        # which should still be considered valid (as -inf <= bler_target is True)
+        # TBLER is +inf for MCS indices without BLER data, so unavailable
+        # candidates do not satisfy the target.
         # [..., num_ut]
         mcs_index = find_true_position(
             tbler_per_mcs <= self._bler_target,
@@ -414,6 +438,14 @@ class OuterLoopLinkAdaptation(Block):
         elif not isinstance(batch_size, list):
             batch_size = [batch_size]
 
+        bler_target = _validate_bler_target(bler_target)
+        delta_up = _to_python_float(delta_up)
+        if delta_up <= 0:
+            raise ValueError("'delta_up' must be positive")
+        offset_min = _to_python_float(offset_min)
+        offset_max = _to_python_float(offset_max)
+        _validate_offset_bounds(offset_min, offset_max)
+
         self._batch_size = batch_size
         self._num_ut = num_ut
         self._phy_abstraction = phy_abstraction
@@ -421,11 +453,11 @@ class OuterLoopLinkAdaptation(Block):
                                              precision=precision, device=device)
 
         # Store scalar parameters as Python floats to avoid device issues with torch.compile
-        self._bler_target_value = _to_python_float(bler_target)
-        self._delta_up_value = _to_python_float(delta_up)
+        self._bler_target_value = bler_target
+        self._delta_up_value = delta_up
         self._delta_down_value = self._get_delta_down_value()
-        self._offset_min_value = _to_python_float(offset_min)
-        self._offset_max_value = _to_python_float(offset_max)
+        self._offset_min_value = offset_min
+        self._offset_max_value = offset_max
 
         # Initialize effective SINR [dB]
         sinr_eff_init_tensor = scalar_to_shaped_tensor(
@@ -491,7 +523,9 @@ class OuterLoopLinkAdaptation(Block):
 
     @offset_max.setter
     def offset_max(self, value: float) -> None:
-        self._offset_max_value = _to_python_float(value)
+        value = _to_python_float(value)
+        _validate_offset_bounds(self._offset_min_value, value)
+        self._offset_max_value = value
 
     @property
     def offset_min(self) -> float:
@@ -500,7 +534,9 @@ class OuterLoopLinkAdaptation(Block):
 
     @offset_min.setter
     def offset_min(self, value: float) -> None:
-        self._offset_min_value = _to_python_float(value)
+        value = _to_python_float(value)
+        _validate_offset_bounds(value, self._offset_max_value)
+        self._offset_min_value = value
 
     @property
     def bler_target(self) -> float:
@@ -509,7 +545,7 @@ class OuterLoopLinkAdaptation(Block):
 
     @bler_target.setter
     def bler_target(self, value: float) -> None:
-        self._bler_target_value = _to_python_float(value)
+        self._bler_target_value = _validate_bler_target(value)
         self._delta_down_value = self._get_delta_down_value()
         self._illa.bler_target = self._bler_target_value
 

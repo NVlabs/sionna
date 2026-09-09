@@ -5,12 +5,11 @@
 """Classes and functions related to stream management in MIMO systems."""
 
 import numpy as np
-from sionna.phy.object import Object
 
 __all__ = ["StreamManagement"]
 
 
-class StreamManagement(Object):
+class StreamManagement:
     r"""Class for management of streams in multi-cell MIMO networks.
 
     Stream management determines which transmitter is sending which stream to
@@ -35,7 +34,11 @@ class StreamManagement(Object):
     must be equal, i.e., all receivers have the same number of associated
     transmitters and all transmitters have the same number of associated
     receivers. It is also assumed that all transmitters send the same
-    number of streams ``num_streams_per_tx``.
+    number of streams ``num_streams_per_tx``. Every transmitted stream is
+    assigned to exactly one receiver. A transmitter's streams are divided
+    uniformly among its associated receivers in increasing receiver-index
+    order. Therefore, ``num_streams_per_tx`` must be divisible by the number
+    of receivers associated with each transmitter.
     :class:`~sionna.phy.mimo.StreamManagement` is independent of the actual
     number of antennas at the transmitters and receivers.
 
@@ -71,7 +74,6 @@ class StreamManagement(Object):
         rx_tx_association: np.ndarray,
         num_streams_per_tx: int,
     ) -> None:
-        super().__init__()
         self._num_streams_per_tx = int(num_streams_per_tx)
         self.rx_tx_association = rx_tx_association
 
@@ -158,7 +160,8 @@ class StreamManagement(Object):
     def detection_undesired_ind(self) -> np.ndarray:
         """Indices needed to gather undesired channels for receive processing.
 
-        A NumPy array of shape `[num_rx*num_streams_per_rx]` that
+        A NumPy array of shape
+        `[num_rx*num_interfering_streams_per_rx]` that
         can be used to gather undesired channels from the flattened
         channel tensor of shape `[...,num_rx, num_tx, num_streams_per_tx,...]`.
         The result of the gather operation can be reshaped to
@@ -206,23 +209,42 @@ class StreamManagement(Object):
 
         # Make sure that rx_tx_association is a binary NumPy array
         rx_tx_association = np.array(rx_tx_association, np.int32)
-        assert all(x in [0, 1] for x in np.nditer(rx_tx_association)), \
-            "All elements of `rx_tx_association` must be 0 or 1"
+        if not all(x in [0, 1] for x in np.nditer(rx_tx_association)):
+            raise ValueError(
+                "All elements of `rx_tx_association` must be 0 or 1"
+            )
 
         # Obtain num_rx, num_tx from rx_tx_association shape
         self._num_rx, self._num_tx = np.shape(rx_tx_association)
 
         # Each receiver must be associated with the same number of transmitters
         num_tx_per_rx = np.sum(rx_tx_association, 1)
-        assert np.min(num_tx_per_rx) == np.max(num_tx_per_rx), \
-            "Each receiver needs to be associated with the same number of transmitters."
+        if np.min(num_tx_per_rx) != np.max(num_tx_per_rx):
+            raise ValueError(
+                "Each receiver needs to be associated with the same number "
+                "of transmitters."
+            )
         self._num_tx_per_rx = num_tx_per_rx[0]
 
         # Each transmitter must be associated with the same number of receivers
         num_rx_per_tx = np.sum(rx_tx_association, 0)
-        assert np.min(num_rx_per_tx) == np.max(num_rx_per_tx), \
-            "Each transmitter needs to be associated with the same number of receivers."
+        if np.min(num_rx_per_tx) != np.max(num_rx_per_tx):
+            raise ValueError(
+                "Each transmitter needs to be associated with the same "
+                "number of receivers."
+            )
         self._num_rx_per_tx = num_rx_per_tx[0]
+        if self._num_rx_per_tx == 0:
+            raise ValueError(
+                "Each transmitter must be associated with at least one "
+                "receiver."
+            )
+        if self.num_streams_per_tx % self.num_rx_per_tx != 0:
+            raise ValueError(
+                "`num_streams_per_tx` must be divisible by the number of "
+                "receivers associated with each transmitter."
+            )
+        num_streams_per_link = self.num_streams_per_tx // self.num_rx_per_tx
 
         self._rx_tx_association = rx_tx_association
 
@@ -239,15 +261,16 @@ class StreamManagement(Object):
         stream_association = np.zeros(
             [self.num_rx, self.num_tx, self.num_streams_per_tx], np.int32
         )
-        n_streams = np.min([self.num_streams_per_rx, self.num_streams_per_tx])
-        tmp = np.ones([n_streams])
+        tmp = np.ones([num_streams_per_link], np.int32)
         for j in range(self.num_tx):
             c = 0
             for i in range(self.num_rx):
                 # If receiver i gets anything from transmitter j
                 if rx_tx_association[i, j]:
-                    stream_association[i, j, c : c + self.num_streams_per_rx] = tmp
-                    c += self.num_streams_per_rx
+                    stream_association[
+                        i, j, c : c + num_streams_per_link
+                    ] = tmp
+                    c += num_streams_per_link
         self._stream_association = stream_association
 
         # Get indices of desired and undesired channel coefficients from

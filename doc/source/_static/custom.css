@@ -109,11 +109,18 @@ div.citation > p.cite-backrefs {
     margin-bottom: 0.3em !important;
 }
 
+/* MathJax 4 (CommonHTML) math sizing.
+   matchFontHeight is disabled in conf.py so MathJax renders math at its natural
+   size relative to the text; this rule sets the final visual size. Using CSS
+   makes the size deterministic and immune to MathJax's persisted contextual
+   menu "Scale All Math" setting (stored in localStorage), which otherwise
+   overrides the config scale. Adjust the percentage to taste. */
 /* MathJax v4 (Sphinx 9): the pydata theme sets `overflow: auto` on
    `div.math mjx-container`, which adds a spurious vertical scrollbar to every
    display equation. Match that selector to keep horizontal scroll for wide
    equations while suppressing the vertical scrollbar. */
 div.math mjx-container {
+    font-size: 118% !important;
     overflow-x: auto;
     overflow-y: hidden;
 }

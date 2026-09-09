@@ -1,8 +1,20 @@
 Wireless
 ========
 
-This module provides blocks and functions that implement wireless channel models.
-Models currently available include :class:`~sionna.phy.channel.AWGN`, :ref:`flat-fading <flat-fading>` with (optional) :class:`~sionna.phy.channel.SpatialCorrelation`, :class:`~sionna.phy.channel.RayleighBlockFading`, as well as models from the 3rd Generation Partnership Project (3GPP) :cite:p:`TR38901`: :ref:`TDL <tdl>`, :ref:`CDL <cdl>`, :ref:`UMi <umi>`, :ref:`UMa <uma>`, and :ref:`RMa <rma>`. It is also possible to :ref:`use externally generated CIRs <external-datasets>`.
+This module provides blocks and functions that implement wireless channel
+models. Models currently available include
+:class:`~sionna.phy.channel.AWGN`, :ref:`flat-fading <flat-fading>` with
+optional :class:`~sionna.phy.channel.SpatialCorrelation`, and
+:class:`~sionna.phy.channel.RayleighBlockFading`. The standardized 3GPP models
+from :cite:p:`TR38901V1920` are
+:class:`~sionna.phy.channel.tr38901.TDL`,
+:class:`~sionna.phy.channel.tr38901.CDL`,
+:class:`~sionna.phy.channel.tr38901.UMi`,
+:class:`~sionna.phy.channel.tr38901.UMa`,
+:class:`~sionna.phy.channel.tr38901.RMa`,
+:class:`~sionna.phy.channel.tr38901.InH`, and
+:class:`~sionna.phy.channel.tr38901.InF`. It is also possible to
+:ref:`use externally generated CIRs <external-datasets>`.
 
 Apart from :ref:`flat-fading <flat-fading>`, all of these models generate channel impulse responses (CIRs) that can then be used to
 implement a channel transfer function in the :ref:`time domain <time-domain>` or
@@ -192,7 +204,7 @@ time-invariant and such that for every link :math:`(u, k, v, l)`
       a_{u, k, v, l, 0}     &\sim \mathcal{CN}(0,1).
    \end{aligned}
 
-3GPP channel models use the procedure depicted in :cite:p:`TR38901` to generate power
+3GPP channel models use the procedure depicted in :cite:p:`TR38901V1920` to generate power
 delay profiles. With these models, the power delay profiles are time-*variant*
 in the event of mobility.
 

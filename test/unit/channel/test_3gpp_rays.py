@@ -4,6 +4,8 @@
 #
 """Tests for 3GPP TR 38.901 Rays classes"""
 
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
 import torch
@@ -14,13 +16,11 @@ from sionna.phy.channel import tr38901
 from sionna.phy.channel.tr38901 import LSP, Rays, RaysGenerator
 
 from channel_test_utils import (
-    channel_test_on_models,
     delays_ref,
     generate_random_bool,
     generate_random_loc,
     powers_ref,
     xpr_ref,
-    zod_offset,
 )
 
 
@@ -214,10 +214,227 @@ class TestRaysGenerator:
         "uma": {"los": 12, "nlos": 20, "o2i": 12},
     }
 
+    def test_ray_offset_negative_1_1481_is_exact(self, device, precision):
+        """Pin the negative Table 7.5-3 offset at its production index."""
+
+        scenario = SimpleNamespace(precision=precision, device=device)
+        ray_sampler = RaysGenerator(scenario)
+        expected = torch.tensor(-1.1481, dtype=ray_sampler.dtype, device=device)
+
+        assert ray_sampler._ray_offsets.shape == (20,)
+        assert torch.equal(ray_sampler._ray_offsets[15], expected)
+
+    def test_cluster_power_pruning_keeps_fixed_shape(self, device, precision, monkeypatch):
+        """Test Step 6 pruning zeros weak clusters without changing shape."""
+        import sionna.phy.channel.tr38901.rays as rays_module
+
+        fc = self.CARRIER_FREQUENCY
+        dtype = torch.float32 if precision == "single" else torch.float64
+        bs_array = tr38901.PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=fc,
+            precision=precision,
+            device=device,
+        )
+        ut_array = tr38901.PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=fc,
+            precision=precision,
+            device=device,
+        )
+        scenario = tr38901.UMiScenario(
+            fc, "low", ut_array, bs_array, "downlink", precision=precision, device=device
+        )
+        scenario.set_topology(
+            ut_loc=torch.tensor([[[100.0, 0.0, 1.5]]], dtype=dtype, device=device),
+            bs_loc=torch.tensor([[[0.0, 0.0, 10.0]]], dtype=dtype, device=device),
+            ut_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            bs_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            ut_velocities=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            in_state=torch.tensor([[False]], device=device),
+            los=False,
+        )
+
+        def fake_normal(shape, dtype, device, generator=None):
+            del generator
+            return torch.zeros(shape, dtype=dtype, device=device)
+
+        monkeypatch.setattr(rays_module, "normal", fake_normal)
+
+        ray_sampler = RaysGenerator(scenario)
+        ray_sampler.topology_updated_callback()
+        weights = torch.full(
+            (scenario.num_clusters_max,), 1e-9, dtype=dtype, device=device
+        )
+        weights[:3] = torch.tensor(
+            [1.0, 0.5, 0.003], dtype=dtype, device=device
+        )
+        r_tau = scenario.get_param("rTau")[0, 0, 0]
+        delay_spread = torch.tensor(1e-7, dtype=dtype, device=device)
+        unscaled_delays = (
+            -torch.log(weights)
+            * r_tau
+            * delay_spread
+            / (r_tau - 1.0)
+        ).reshape(1, 1, 1, -1)
+        powers, powers_for_angles = ray_sampler._cluster_powers(
+            delay_spread.reshape(1, 1, 1),
+            torch.ones(1, 1, 1, dtype=dtype, device=device),
+            unscaled_delays,
+        )
+
+        assert powers.shape == (1, 1, 1, scenario.num_clusters_max)
+        normalized = weights / weights.sum()
+        expected = torch.where(
+            normalized >= normalized.max() * 10.0**-2.5,
+            normalized,
+            torch.zeros_like(normalized),
+        )
+        torch.testing.assert_close(powers[0, 0, 0], expected)
+        assert powers.sum() < 1.0
+        assert torch.count_nonzero(powers) == 2
+        torch.testing.assert_close(powers, powers_for_angles)
+
+    def test_los_cluster_pruning_uses_pre_k_powers(self, device, precision, monkeypatch):
+        """Test LoS Step 6 pruning follows Eq. 7.5-6, before K-factor power."""
+        import sionna.phy.channel.tr38901.rays as rays_module
+
+        fc = self.CARRIER_FREQUENCY
+        dtype = torch.float32 if precision == "single" else torch.float64
+        bs_array = tr38901.PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=fc,
+            precision=precision,
+            device=device,
+        )
+        ut_array = tr38901.PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=fc,
+            precision=precision,
+            device=device,
+        )
+        scenario = tr38901.UMiScenario(
+            fc, "low", ut_array, bs_array, "downlink", precision=precision, device=device
+        )
+        scenario.set_topology(
+            ut_loc=torch.tensor([[[100.0, 0.0, 1.5]]], dtype=dtype, device=device),
+            bs_loc=torch.tensor([[[0.0, 0.0, 10.0]]], dtype=dtype, device=device),
+            ut_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            bs_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            ut_velocities=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            in_state=torch.tensor([[False]], device=device),
+            los=True,
+        )
+
+        def fake_normal(shape, dtype, device, generator=None):
+            del generator
+            return torch.zeros(shape, dtype=dtype, device=device)
+
+        monkeypatch.setattr(rays_module, "normal", fake_normal)
+
+        ray_sampler = RaysGenerator(scenario)
+        ray_sampler.topology_updated_callback()
+        unscaled_delays = torch.full(
+            (1, 1, 1, scenario.num_clusters_max),
+            3e-6,
+            dtype=dtype,
+            device=device,
+        )
+        unscaled_delays[:, :, :, :2] = 0.0
+        powers, powers_for_angles = ray_sampler._cluster_powers(
+            torch.full((1, 1, 1), 1e-7, dtype=dtype, device=device),
+            torch.full((1, 1, 1), 1000.0, dtype=dtype, device=device),
+            unscaled_delays,
+        )
+
+        assert torch.count_nonzero(powers) == 2
+        assert powers[0, 0, 0, 0].item() == pytest.approx(0.5)
+        assert powers[0, 0, 0, 1].item() == pytest.approx(0.5)
+        assert powers_for_angles[0, 0, 0, 1] > 0.0
+
+    @pytest.mark.parametrize("spec_version", ["16.1", "19.2"])
+    def test_rma_o2i_cluster_mask_uses_indoor_parameters(
+        self, device, precision, spec_version
+    ):
+        """Test supported RMa releases use the dedicated O2I cluster count."""
+        fc = self.CARRIER_FREQUENCY
+        dtype = torch.float32 if precision == "single" else torch.float64
+        bs_array = tr38901.PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=fc,
+            precision=precision,
+            device=device,
+        )
+        ut_array = tr38901.PanelArray(
+            num_rows_per_panel=1,
+            num_cols_per_panel=1,
+            polarization="single",
+            polarization_type="V",
+            antenna_pattern="omni",
+            carrier_frequency=fc,
+            precision=precision,
+            device=device,
+        )
+        scenario = tr38901.RMaScenario(
+            fc,
+            ut_array,
+            bs_array,
+            "downlink",
+            precision=precision,
+            device=device,
+            spec_version=spec_version,
+        )
+        scenario.set_topology(
+            ut_loc=torch.tensor([[[100.0, 0.0, 1.5]]], dtype=dtype, device=device),
+            bs_loc=torch.tensor([[[0.0, 0.0, 35.0]]], dtype=dtype, device=device),
+            ut_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            bs_orientations=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            ut_velocities=torch.zeros(1, 1, 3, dtype=dtype, device=device),
+            in_state=torch.tensor([[True]], device=device),
+            los=True,
+        )
+        ray_sampler = RaysGenerator(scenario)
+        ray_sampler.topology_updated_callback()
+
+        expected = torch.cat(
+            [
+                torch.zeros(
+                    scenario.num_clusters_indoor, dtype=dtype, device=device
+                ),
+                torch.ones(
+                    scenario.num_clusters_max - scenario.num_clusters_indoor,
+                    dtype=dtype,
+                    device=device,
+                ),
+            ]
+        ).reshape(1, 1, 1, scenario.num_clusters_max)
+        torch.testing.assert_close(ray_sampler._cluster_mask, expected)
+
     @pytest.fixture(scope="class")
-    def ray_samples(self, request):
+    @classmethod
+    def ray_samples(cls, request):
         """Sample rays from all channel models for testing.
-        
+
         Uses the device specified by --device flag.
         """
         device_option = request.config.getoption("--device", default="gpu")
@@ -229,8 +446,8 @@ class TestRaysGenerator:
             device = "cuda:0"  # Use GPU for class-scoped fixture when "all"
         else:
             device = "cpu"
-        batch_size = self.BATCH_SIZE
-        fc = self.CARRIER_FREQUENCY
+        batch_size = cls.BATCH_SIZE
+        fc = cls.CARRIER_FREQUENCY
         dtype = torch.float64
 
         # Create antenna arrays
@@ -325,7 +542,7 @@ class TestRaysGenerator:
             for submodel, los_val, in_state_p in [
                 ("los", True, 0.0),
                 ("nlos", False, 0.0),
-                ("o2i", None, 1.0),
+                ("o2i", False, 1.0),
             ]:
                 in_state = generate_random_bool(batch_size, 1, in_state_p, device=device)
                 if los_val is not None:
@@ -421,14 +638,16 @@ class TestRaysGenerator:
 
     @pytest.mark.parametrize("model", ["rma", "umi", "uma"])
     @pytest.mark.parametrize("submodel", ["los", "nlos", "o2i"])
-    def test_powers_normalized(self, ray_samples, model, submodel):
-        """Test that powers are normalized (sum to 1)."""
+    def test_power_removed_by_pruning_is_not_renormalized(
+        self, ray_samples, model, submodel
+    ):
+        """Check Step 6 retains the power loss from eliminated clusters."""
         powers = ray_samples[model][submodel]["powers"]
         num_clusters = self.NUM_CLUSTERS[model][submodel]
         power_sum = powers[:, :num_clusters].sum(axis=-1)
-        assert np.allclose(power_sum, 1.0, atol=1e-4), (
-            f"{model}:{submodel} powers should sum to 1"
-        )
+        max_removed_power = (num_clusters - 1) * 10.0**-2.5
+        assert np.all(power_sum <= 1.0 + 1e-6)
+        assert np.all(power_sum >= 1.0 - max_removed_power - 1e-6)
 
     @pytest.mark.parametrize("model", ["rma", "umi", "uma"])
     @pytest.mark.parametrize("submodel", ["los", "nlos", "o2i"])

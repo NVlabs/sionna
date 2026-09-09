@@ -9,6 +9,7 @@ from typing import Optional, Union
 import numpy as np
 import torch
 
+from sionna._validation import check_tensor_all
 from sionna.phy import Block, PI
 from sionna.phy.config import Precision
 from sionna.phy.signal import fft
@@ -107,8 +108,6 @@ class OFDMDemodulator(Block):
         # Register tensors as buffers for CUDA graph compatibility
         self.register_buffer("_cyclic_prefix_length", None)
         self.register_buffer("_phase_compensation", None)
-        # Store symbol_length as buffer for torch.compile compatibility
-        self.register_buffer("_symbol_length", None)
         self.register_buffer("_ind", None)
 
         self.fft_size = fft_size
@@ -138,7 +137,8 @@ class OFDMDemodulator(Block):
 
     @fft_size.setter
     def fft_size(self, value: int) -> None:
-        assert value > 0, "`fft_size` must be positive."
+        if not (value > 0):
+            raise ValueError("`fft_size` must be positive.")
         self._fft_size = int(value)
 
     @property
@@ -148,7 +148,8 @@ class OFDMDemodulator(Block):
 
     @l_min.setter
     def l_min(self, value: int) -> None:
-        assert value <= 0, "`l_min` must be nonpositive."
+        if not (value <= 0):
+            raise ValueError("`l_min` must be nonpositive.")
         self._l_min = int(value)
 
     @property
@@ -165,8 +166,11 @@ class OFDMDemodulator(Block):
         else:
             value = value.to(dtype=torch.int32, device=self.device)
 
-        if not torch.all(value >= 0):
-            raise ValueError("`cyclic_prefix_length` must be nonnegative.")
+        check_tensor_all(
+            value >= 0,
+            name="cyclic_prefix_length",
+            message="`cyclic_prefix_length` must be nonnegative.",
+        )
         if not 0 <= value.dim() <= 1:
             raise ValueError("`cyclic_prefix_length` must be of rank 0 or 1.")
 
@@ -176,16 +180,9 @@ class OFDMDemodulator(Block):
             self.register_buffer("_cyclic_prefix_length", value.squeeze())
             # Cache scalar value to avoid .item() during tracing
             self._cp_length_scalar = int(value.item())
-            # Store symbol_length as buffer for torch.compile compatibility
-            symbol_length = self.fft_size + self._cp_length_scalar
-            self.register_buffer(
-                "_symbol_length",
-                torch.tensor(symbol_length, dtype=torch.int64, device=self.device),
-            )
         else:
             self.register_buffer("_cyclic_prefix_length", value)
             self._cp_length_scalar = None
-            self.register_buffer("_symbol_length", None)
 
     def build(self, input_shape: tuple) -> None:
         """Build the demodulator based on input shape."""
@@ -232,14 +229,12 @@ class OFDMDemodulator(Block):
 
         if cp_len.dim() == 0:
             # Same CP length for all OFDM symbols
-            # Use cached scalar for CP length
             cp_length = self._cp_length_scalar
-            symbol_length = self._symbol_length  # fft_size + cp_length as tensor
+            # A tensor-valued length makes trailing-sample slicing break
+            # full-graph capture; Python/SymInt arithmetic remains traceable.
+            symbol_length = self.fft_size + cp_length
 
-            # Compute number of full OFDM symbols dynamically for torch.compile
-            # Use integer division on tensor to make it traceable
             input_length = inputs.shape[-1]
-            num_ofdm_symbols = input_length // symbol_length
             rest = input_length % symbol_length
 
             # Cut last samples that do not fit into an OFDM symbol

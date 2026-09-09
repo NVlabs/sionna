@@ -166,6 +166,7 @@ class PUSCHTransmitter(Block):
         self._pilot_pattern = PUSCHPilotPattern(
             self._pusch_configs,
             precision=self.precision,
+            device=self.device,
         )
 
         # Create ResourceGrid

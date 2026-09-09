@@ -67,7 +67,10 @@ class PHYAbstraction(Block):
     :param transport_block_fun: Function computing the number and size (measured
         in bits) of code blocks within a transport block.
         If `None`, it is set to an instance of
-        :class:`~sionna.phy.nr.utils.TransportBlockNR`.
+        :class:`~sionna.phy.nr.utils.TransportBlockNR`. Custom implementations
+        retain the legacy ``(cb_size, num_cb)`` contract; because they do not
+        expose ``tb_size``, decoded-bit accounting falls back to
+        ``cb_size * num_cb`` for those hooks.
     :param sinr_effective_fun: Function computing the effective SINR.
         If `None`, it is set to an instance of
         :class:`~sionna.sys.EESM`.
@@ -81,6 +84,10 @@ class PHYAbstraction(Block):
     :param cbs_interp_min_max_delta: Tuple of (`min`, `max`, `delta`) values
         defining the list of code block size values at which the BLER and
         SINR are interpolated, as `min, min+delta, min+2*delta,...,max`.
+        The default grid extends to the full 5G-NR CBS range, but the built-in
+        BLER tables are only simulated up to CBS 2000. With the default
+        interpolator, requests above the largest simulated CBS use that
+        boundary curve (clamp-to-edge); custom interpolators may differ.
     :param bler_interp_delta: Spacing of the BLER grid at which SINR is
         interpolated.
     :param precision: Precision used for internal calculations and outputs.
@@ -112,7 +119,13 @@ class PHYAbstraction(Block):
         valid for the given configuration. Defaults to `True`.
 
     :output num_decoded_bits: [..., num_ut], `torch.int32`.
-        Number of successfully decoded bits for each user.
+        Number of successfully delivered transport-block information bits for
+        each user (``tb_size`` on ACK, else 0). This excludes TB/CB CRC bits:
+        those CRCs are part of the FEC code-block payload but are not counted
+        here, because this output is intended for system-level throughput
+        accounting. For a custom ``transport_block_fun`` that only implements
+        the legacy two-value return contract, it falls back to
+        ``cb_size * num_cb``.
     :output harq_feedback: [..., num_ut], -1 | 0 | 1.
         If 0 (1, resp.), then a NACK (ACK, resp.) is received. If -1, feedback
         is missing since the user is not scheduled for transmission.
@@ -129,6 +142,11 @@ class PHYAbstraction(Block):
     (signal-to-interference-plus-noise ratio) can be used interchangeably.
     This is because the equivalent AWGN model used for BLER mapping does not
     explicitly account for interference.
+
+    When a requested (category, table index, MCS, CBS, SINR) combination has no
+    calibrated BLER entry, :meth:`get_bler` returns ``inf``. That value
+    propagates to TBLER and yields a deterministic NACK. Link adaptation relies
+    on the same convention to skip unavailable MCS candidates.
 
     .. rubric:: Examples
 
@@ -252,6 +270,21 @@ class PHYAbstraction(Block):
         self._mcs_decoder_fun = mcs_decoder_fun
         # Function computing number and size of code blocks
         self._transport_block_fun = transport_block_fun
+        # Resolve TB information-bit accounting once so the compiled call path
+        # does not need an isinstance guard.
+        if isinstance(transport_block_fun, TransportBlockNR):
+            self._transport_block_info = transport_block_fun.transport_block_size
+        else:
+
+            def _transport_block_info(
+                modulation_order, target_coderate, num_coded_bits, **tb_kwargs
+            ):
+                cb_size, num_cb = transport_block_fun(
+                    modulation_order, target_coderate, num_coded_bits, **tb_kwargs
+                )
+                return num_cb * cb_size, cb_size, num_cb
+
+            self._transport_block_info = _transport_block_info
         # Function computing the effective SINR
         self._sinr_effective_fun = sinr_effective_fun
 
@@ -317,11 +350,17 @@ class PHYAbstraction(Block):
                         bler_subtable, stop_at_keys=("CBS", "SNR_db")
                     )
             except FileNotFoundError:
-                warnings.warn(f"BLER table file '{f}' does not exist. Skipping...")
+                warnings.warn(
+                    f"BLER table file '{f}' does not exist. Skipping...",
+                    UserWarning,
+                    stacklevel=2,
+                )
         if self._bler_table == {}:
             warnings.warn(
                 "No BLER table found. You can generate them via "
-                "PHYAbstraction.new_bler_table method."
+                "PHYAbstraction.new_bler_table method.",
+                UserWarning,
+                stacklevel=2,
             )
         # Check table validity
         self.validate_bler_table()
@@ -461,7 +500,8 @@ class PHYAbstraction(Block):
 
         :output idx: Index of the values in the interpolation grid
         """
-        assert which in ["snr", "cbs"], "which must be 'snr' or 'cbs'"
+        if which not in ("snr", "cbs"):
+            raise ValueError("which must be 'snr' or 'cbs'")
         if which == "snr":
             len_grid = len(self._snr_dbs_interp)
             min_max_delta = self._snr_db_interp_min_max_delta
@@ -470,8 +510,7 @@ class PHYAbstraction(Block):
             min_max_delta = self._cbs_interp_min_max_delta
         min_grid = min_max_delta[0]
         delta_grid = min_max_delta[2]
-        if not isinstance(val, torch.Tensor):
-            val = torch.tensor(val, dtype=torch.float32)
+        val = torch.as_tensor(val, dtype=self.dtype, device=self.device)
         idx = torch.round((val - min_grid) / delta_grid).to(torch.int32)
         idx = torch.clamp(idx, 0, len_grid - 1)
         return idx
@@ -501,7 +540,8 @@ class PHYAbstraction(Block):
         :param snr_eff: Effective SINR for each user
 
         :output bler: BLER corresponding to the input channel type, table index,
-            MCS, CB size and SINR, retrieved from internal interpolation tables
+            MCS, CB size and SINR, retrieved from internal interpolation tables.
+            Missing table entries are returned as ``inf``.
         """
         # Cast inputs to appropriate type and shape
         if not isinstance(snr_eff, torch.Tensor):
@@ -552,9 +592,14 @@ class PHYAbstraction(Block):
 
         Refer to the class docstring for the Input/Output specification.
         """
-        assert (sinr is not None) ^ (
-            (sinr_eff is not None) and (num_allocated_re is not None)
-        ), "Either 'sinr' or ('sinr_eff','num_allocated_re') is required as input"
+        if not (
+            (sinr is not None)
+            ^ ((sinr_eff is not None) and (num_allocated_re is not None))
+        ):
+            raise ValueError(
+                "Exactly one of 'sinr' or the pair "
+                "('sinr_eff', 'num_allocated_re') is required as input"
+            )
 
         if sinr is not None:
             # Total number of allocated streams across all resource elements
@@ -592,14 +637,18 @@ class PHYAbstraction(Block):
         # Compute the number of coded bits
         num_coded_bits = modulation_order * num_allocated_re
 
-        # Compute n. and size of Code Blocks (CBs) in a Transport Block
+        # Compute the transport-block information bits and its CB segmentation
         # [..., num_ut]
-        cb_size, num_cb = self._transport_block_fun(
+        # Custom TransportBlock hooks retain the abstract (cb_size, num_cb)
+        # contract and fall back to CRC-inclusive accounting (see __init__).
+        tb_size, cb_size, num_cb = self._transport_block_info(
             modulation_order, target_coderate, num_coded_bits, **kwargs
         )
 
         # Retrieve the BLER from the stored tables
         # [..., num_ut]
+        # Missing rows are +inf. This propagates to TBLER=+inf and therefore
+        # yields a deterministic NACK below.
         bler = self.get_bler(
             mcs_index, mcs_table_index, mcs_category, cb_size, sinr_eff
         )
@@ -607,7 +656,9 @@ class PHYAbstraction(Block):
         # Compute TBLER = Pr(at least a CB is incorrectly received)
         # [..., num_ut]
         one = torch.tensor(1.0, dtype=bler.dtype, device=self.device)
-        tbler = one - torch.pow(one - bler, num_cb.to(bler.dtype))
+        tbler_finite = one - torch.pow(one - bler, num_cb.to(bler.dtype))
+        # Preserve the missing-row +inf sentinel for every num_cb parity.
+        tbler = torch.where(torch.isinf(bler), bler, tbler_finite)
 
         # Set BLER=-1 and TBLER=-1 for non-scheduled UTs
         minus_one = torch.tensor(-1.0, dtype=bler.dtype, device=self.device)
@@ -615,19 +666,26 @@ class PHYAbstraction(Block):
         tbler = torch.where(ut_is_scheduled, tbler, minus_one)
 
         # HARQ feedback
-        generator = None if torch.compiler.is_compiling() else self.torch_rng
-        rnd = torch.rand(
-            tbler.shape, dtype=self.dtype, device=self.device, generator=generator
-        )
+        # Prefer rand_like under torch.compile: torch.rand(symbolic_size) fails
+        # fake-tensor propagation (SymIntArrayRef) after Dynamo graph breaks.
+        if torch.compiler.is_compiling():
+            rnd = torch.rand_like(tbler)
+        else:
+            rnd = torch.rand(
+                tbler.shape,
+                dtype=self.dtype,
+                device=self.device,
+                generator=self.torch_rng,
+            )
         harq_feedback = torch.where(
             rnd < tbler,
             torch.tensor(0, dtype=torch.int32, device=self.device),
             torch.tensor(1, dtype=torch.int32, device=self.device),
         )
 
-        # Successfully decoded bits for each user
+        # Successfully delivered TB information bits for each user
         # [..., num_ut]
-        num_decoded_bits = harq_feedback * num_cb * cb_size
+        num_decoded_bits = harq_feedback * tb_size
         num_decoded_bits = torch.where(
             ut_is_scheduled,
             num_decoded_bits,
@@ -694,7 +752,9 @@ class PHYAbstraction(Block):
                         warnings.warn(
                             f"SINR-to-BLER interpolation failed for "
                             f"category {category}, "
-                            f"index {table_idx}, MCS {mcs}.\nError: {e}"
+                            f"index {table_idx}, MCS {mcs}.\nError: {e}",
+                            RuntimeWarning,
+                            stacklevel=2,
                         )
                         continue
 
@@ -759,7 +819,9 @@ class PHYAbstraction(Block):
                             f"BLER-to-SINR interpolation failed for "
                             f"category {category}, "
                             f"index {table_index}, MCS {mcs}.\n"
-                            f"Error message: {e}"
+                            f"Error message: {e}",
+                            RuntimeWarning,
+                            stacklevel=2,
                         )
                         continue
                     self._snr_table_interp_np[
@@ -1063,7 +1125,7 @@ class PHYAbstraction(Block):
         time_start = time.time()
 
         for category, sim_set_cat in sim_set["category"].items():
-            if category not in new_table.keys():
+            if category not in new_table["category"]:
                 new_table["category"][category] = {"index": {}}
 
             for table_index, sim_set_tab in sim_set_cat["index"].items():

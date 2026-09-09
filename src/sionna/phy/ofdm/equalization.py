@@ -120,7 +120,8 @@ class OFDMEqualizer(Block):
         **kwargs,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
-        assert callable(equalizer)
+        if not callable(equalizer):
+            raise TypeError("`equalizer` must be callable.")
         self._equalizer = equalizer
         self._resource_grid = resource_grid
         self._stream_management = stream_management
@@ -133,7 +134,7 @@ class OFDMEqualizer(Block):
         mask = resource_grid.pilot_pattern.mask
         num_data_symbols = resource_grid.pilot_pattern.num_data_symbols
         data_ind = torch.argsort(
-            flatten_last_dims(mask.to(torch.float32)), dim=-1, descending=False,
+            flatten_last_dims(mask), dim=-1, descending=False,
             stable=True
         )
         self._data_ind = data_ind[..., :num_data_symbols].to(device=self.device)
@@ -262,6 +263,8 @@ class OFDMEqualizer(Block):
         # [batch_size, num_rx, num_ofdm_symbols, num_effective_subcarriers,
         #  num_stream_per_rx]
         x_hat, no_eff = self._equalizer(y_dt, h_dt_desired, s)
+        x_hat = x_hat.to(self.cdtype)
+        no_eff = no_eff.to(self.dtype)
 
         # Extract data symbols for all detected TX
         # Transpose tensor to shape
@@ -360,7 +363,13 @@ class LMMSEEqualizer(OFDMEqualizer):
         **kwargs,
     ) -> None:
         def equalizer(y, h, s):
-            return lmmse_equalizer(y, h, s, whiten_interference)
+            return lmmse_equalizer(
+                y,
+                h,
+                s,
+                whiten_interference=whiten_interference,
+                precision=self.precision,
+            )
 
         super().__init__(
             equalizer=equalizer,
@@ -414,8 +423,11 @@ class ZFEqualizer(OFDMEqualizer):
         device: Optional[str] = None,
         **kwargs,
     ) -> None:
+        def equalizer(y, h, s):
+            return zf_equalizer(y, h, s, precision=self.precision)
+
         super().__init__(
-            equalizer=zf_equalizer,
+            equalizer=equalizer,
             resource_grid=resource_grid,
             stream_management=stream_management,
             precision=precision,
@@ -466,8 +478,11 @@ class MFEqualizer(OFDMEqualizer):
         device: Optional[str] = None,
         **kwargs,
     ) -> None:
+        def equalizer(y, h, s):
+            return mf_equalizer(y, h, s, precision=self.precision)
+
         super().__init__(
-            equalizer=mf_equalizer,
+            equalizer=equalizer,
             resource_grid=resource_grid,
             stream_management=stream_management,
             precision=precision,

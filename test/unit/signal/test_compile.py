@@ -82,16 +82,17 @@ class TestCompileWindows:
         """Test that built-in window classes work with torch.compile"""
         rdtype = dtypes[precision]["torch"]["dtype"]
         window = window_class(precision=precision, device=device)
+        reference_window = window_class(precision=precision, device=device)
 
-        # Compile the block
+        # Compile and invoke this instance while it is still cold.
         compiled_window = torch.compile(window, mode=mode)
 
         x = torch.randn(32, 64, dtype=rdtype, device=device)
 
-        # Run both versions
-        y_eager = window(x)
         y_compiled = compiled_window(x)
+        y_eager = reference_window(x)
 
+        assert window.built
         assert y_compiled.shape == y_eager.shape
         assert torch.allclose(y_compiled, y_eager, atol=1e-5)
 

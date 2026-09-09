@@ -20,7 +20,7 @@ format, i.e., `10011`, for the generator polynomial which corresponds to the
 polynomial :math:`1 + D^3 + D^4`.
 
 The following code snippet shows how to set-up a rate-1/3, constraint-length-4 :class:`~sionna.phy.fec.turbo.encoding.TurboEncoder` and the corresponding :class:`~sionna.phy.fec.turbo.decoding.TurboDecoder`.
-You can find further examples in the `Channel Coding Tutorial Notebook <../tutorials/5G_Channel_Coding_Polar_vs_LDPC_Codes.html>`_.
+You can find further examples in the :doc:`Channel Coding Tutorial Notebook </phy/tutorials/notebooks/5G_Channel_Coding_Polar_vs_LDPC_Codes>`.
 
 Setting-up:
 

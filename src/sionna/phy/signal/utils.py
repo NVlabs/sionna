@@ -6,6 +6,7 @@
 
 from typing import Literal, Optional, Tuple
 
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -69,7 +70,11 @@ def convolve(
     """
     # We don't want to be sensitive to case
     padding = padding.lower()
-    assert padding in ("valid", "same", "full"), "Invalid padding method"
+    if padding not in ("valid", "same", "full"):
+        raise ValueError(
+            "padding must be one of 'valid', 'same' or 'full', "
+            f"got {padding!r}"
+        )
 
     # Ensure we process along the axis requested by the user
     inp = torch.swapaxes(inp, axis, -1)
@@ -385,11 +390,59 @@ def empirical_aclr(
         print(aclr.shape)
         # torch.Size([])
     """
+    if oversampling <= 0:
+        raise ValueError(f"oversampling must be positive, got {oversampling}")
+
+    if f_min >= f_max:
+        raise ValueError(
+            f"f_min ({f_min}) must be smaller than f_max ({f_max})"
+        )
+
+    # The spectrum returned by `empirical_psd()` spans this range.
+    spectrum_min = -0.5 * oversampling
+    spectrum_max = -spectrum_min
+    if f_min >= spectrum_max or f_max <= spectrum_min:
+        raise ValueError(
+            f"The in-band ({f_min}, {f_max}) lies outside the spectrum "
+            f"[{spectrum_min}, {spectrum_max}] produced with "
+            f"oversampling={oversampling}"
+        )
+
+    # Determine from the scalar grid parameters whether the open interval
+    # (f_min, f_max) contains a frequency bin. Doing this before creating the
+    # tensor mask avoids synchronizing a CUDA result back to Python and keeps
+    # the valid path compatible with `torch.compile(fullgraph=True)`.
+    num_bins = x.shape[-1]
+    if num_bins == 1:
+        has_in_band_bin = f_min < spectrum_min < f_max
+    else:
+        if f_min < spectrum_min:
+            first_in_band_bin = 0
+        else:
+            frequency_spacing = oversampling / (num_bins - 1)
+            first_in_band_bin = (
+                math.floor((f_min - spectrum_min) / frequency_spacing) + 1
+            )
+        has_in_band_bin = (
+            first_in_band_bin < num_bins
+            and spectrum_min
+            + first_in_band_bin * oversampling / (num_bins - 1)
+            < f_max
+        )
+
+    if not has_in_band_bin:
+        raise ValueError(
+            f"The in-band ({f_min}, {f_max}) contains no frequency bin of "
+            f"the {num_bins}-point spectrum; it is narrower than the "
+            "resolution of the frequency grid"
+        )
+
     freqs, psd = empirical_psd(
         x, oversampling=oversampling, precision=precision, show=False
     )
     ind_out = (freqs < f_min) | (freqs > f_max)
     ind_in = (freqs > f_min) & (freqs < f_max)
+
     p_out = psd[ind_out].sum()
     p_in = psd[ind_in].sum()
     aclr = p_out / p_in

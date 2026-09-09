@@ -44,6 +44,52 @@ def bisection_method_compile(
 bisection_method_compiled = torch.compile(bisection_method_compile)
 
 
+def test_tensor_contracts_compile_as_fullgraph(device):
+    """Tensor contracts must not add graph breaks to the numerical helpers."""
+
+    def f(x):
+        return 1.0 - x
+
+    @torch.compile(fullgraph=True)
+    def compiled(bound, left, right, step_expand):
+        expanded = expand_bound(
+            f,
+            bound,
+            "left",
+            step_expand=step_expand,
+            max_n_iter=0,
+        )
+        root, _ = bisection_method(
+            f,
+            left,
+            right,
+            expand_to_left=False,
+            expand_to_right=False,
+            max_n_iter=0,
+        )
+        return expanded, root
+
+    args = (
+        torch.tensor(0.5, device=device),
+        torch.tensor(0.0, device=device),
+        torch.tensor(2.0, device=device),
+        torch.tensor(2.0, device=device),
+    )
+    actual = compiled(*args)
+    expected = (
+        expand_bound(f, args[0], "left", step_expand=args[3], max_n_iter=0),
+        bisection_method(
+            f,
+            args[1],
+            args[2],
+            expand_to_left=False,
+            expand_to_right=False,
+            max_n_iter=0,
+        )[0],
+    )
+    torch.testing.assert_close(actual, expected)
+
+
 def test_bisection_method(device, precision):
     """
     Validate bisection_method with batched inputs, testing both compiled and
@@ -308,6 +354,30 @@ def test_bisection_scalar_inputs(device, precision):
 
     finally:
         config.device = old_device
+
+
+def test_explicit_device_overrides_input_device(device, precision):
+    """Explicit placement moves tensor bounds and all returned values."""
+    def f(x):
+        return 1.0 - x
+
+    bound = expand_bound(
+        f,
+        torch.tensor(0.0, device="cpu"),
+        side="right",
+        precision=precision,
+        device=device,
+    )
+    x_opt, f_opt = bisection_method(
+        f,
+        torch.tensor(0.0, device="cpu"),
+        torch.tensor(2.0, device="cpu"),
+        precision=precision,
+        device=device,
+    )
+
+    for value in (bound, x_opt, f_opt):
+        assert value.device == torch.device(device)
 
 
 def test_bisection_return_brackets_false(device, precision):

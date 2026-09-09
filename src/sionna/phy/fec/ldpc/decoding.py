@@ -1342,7 +1342,8 @@ class LDPC5GDecoder(LDPCBPDecoder):
     :param num_iter: Defining the number of decoder iterations (due to
         batching, no early stopping used at the moment!).
     :param llr_max: Internal clipping value for all internal messages. If
-        `None`, no clipping is applied.
+        `None`, no clipping is applied. Filler bits from 5G shortening
+        still use a finite LLR of ``1e4``.
     :param v2c_callbacks: Each callable will be executed after each VN update
         with the following arguments ``msg_vn``, ``it``, ``x_hat``, where
         ``msg_vn`` are the v2c messages as tensor of shape
@@ -1433,6 +1434,9 @@ class LDPC5GDecoder(LDPCBPDecoder):
         u_hat = dec_harq(llr_rvs, rv=[0, 2])       # [10, 100]
     """
 
+    # Known-zero filler LLR when ``llr_max`` is None (no message clipping).
+    _FILLER_LLR = 1e4
+
     def __init__(
         self,
         encoder: LDPC5GEncoder,
@@ -1509,13 +1513,13 @@ class LDPC5GDecoder(LDPCBPDecoder):
             self._n_pruned = int(np.maximum(last_pos, encoder._n_ldpc - nb_punc_bits))
             self._nb_pruned_nodes = encoder._n_ldpc - self._n_pruned
 
-            # Remove last CNs and VNs from pcm
-            pcm = pcm[: -self._nb_pruned_nodes, : -self._nb_pruned_nodes]
-
             if self._nb_pruned_nodes < 0:
                 raise ArithmeticError(
                     "Internal error: number of pruned nodes must be positive."
                 )
+            # Remove last CNs and VNs from pcm
+            if self._nb_pruned_nodes > 0:
+                pcm = pcm[: -self._nb_pruned_nodes, : -self._nb_pruned_nodes]
         else:
             self._nb_pruned_nodes = 0
             self._n_pruned = encoder._n_ldpc
@@ -1653,12 +1657,15 @@ class LDPC5GDecoder(LDPCBPDecoder):
 
         # --- Reassemble full n_ldpc vector ---------------------------------
         n_sys_rm = k - 2 * z
+        filler_llr = (
+            self._FILLER_LLR if self._llr_max is None else self._llr_max
+        )
         llr_5g = torch.cat(
             [
                 torch.zeros(batch_size, 2 * z,
                             dtype=self.dtype, device=input_device),
                 llr_buf[:, :n_sys_rm],
-                -self._llr_max * torch.ones(batch_size, k_filler,
+                -filler_llr * torch.ones(batch_size, k_filler,
                                             dtype=self.dtype,
                                             device=input_device),
                 llr_buf[:, n_sys_rm:],

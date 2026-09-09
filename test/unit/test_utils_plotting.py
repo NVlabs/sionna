@@ -29,6 +29,19 @@ class TestPlotBer:
         assert ax.get_title() == "BER vs SNR"
         plt.close(fig)
 
+    def test_no_legend_box_without_labels(self):
+        """An omitted legend leaves no empty legend box behind."""
+        snr = np.array([0, 2, 4, 6, 8, 10])
+        ber = np.array([0.2, 0.1, 0.05, 0.01, 0.001, 0.0001])
+
+        fig, ax = plot_ber(snr, ber)
+        assert ax.get_legend() is None
+
+        fig_labeled, ax_labeled = plot_ber(snr, ber, legend="AWGN")
+        assert ax_labeled.get_legend() is not None
+        plt.close(fig)
+        plt.close(fig_labeled)
+
     def test_multiple_curves(self):
         """Test plotting multiple BER curves."""
         snr1 = np.array([0, 2, 4, 6, 8])
@@ -72,6 +85,26 @@ class TestPlotBer:
         assert len(lines) == 1
         # Dashed lines have non-empty dash pattern
         assert lines[0].get_linestyle() == "--"
+        plt.close(fig)
+
+    @pytest.mark.parametrize(
+        ("is_bler", "expected_style"),
+        [([True], "--"), ([False], "-"), (False, "-")],
+    )
+    def test_single_curve_is_bler_normalization(self, is_bler, expected_style):
+        """Single curves accept scalar or one-element BLER flags."""
+        snr = np.array([0, 1, 2])
+        ber = np.array([0.1, 0.01, 0.001])
+        fig, ax = plot_ber(snr, ber, is_bler=is_bler)
+        assert ax.get_lines()[0].get_linestyle() == expected_style
+        plt.close(fig)
+
+    def test_scalar_is_bler_broadcasts_to_multiple_curves(self):
+        """A scalar BLER flag applies to every curve."""
+        snr = np.array([0, 1, 2])
+        ber = np.array([0.1, 0.01, 0.001])
+        fig, ax = plot_ber(snr, [ber, ber], is_bler=True)
+        assert [line.get_linestyle() for line in ax.get_lines()] == ["--", "--"]
         plt.close(fig)
 
     def test_esno_xlabel(self):
@@ -129,6 +162,27 @@ class TestPlotBer:
 
         with pytest.raises(ValueError, match="is_bler has invalid size"):
             plot_ber([snr, snr], [ber1, ber2], is_bler=[True])  # Wrong length
+
+    def test_is_bler_elements_must_be_bool(self):
+        """List-valued BLER flags are type checked element-by-element."""
+        snr = np.array([0, 1, 2])
+        ber = np.array([0.1, 0.01, 0.001])
+        with pytest.raises(TypeError, match="list of bool"):
+            plot_ber(snr, ber, is_bler=[1])
+
+    def test_curve_counts_must_match(self):
+        """SNR, BER, and legend curve counts are validated."""
+        snr = np.array([0, 1, 2])
+        ber = np.array([0.1, 0.01, 0.001])
+        with pytest.raises(ValueError, match="snr_db has invalid size"):
+            plot_ber([snr], [ber, ber])
+        with pytest.raises(ValueError, match="legend has invalid size"):
+            plot_ber(snr, [ber, ber], legend=["one"])
+
+    def test_curve_lengths_must_match(self):
+        """Each SNR vector must match its corresponding error-rate vector."""
+        with pytest.raises(ValueError, match="curve length"):
+            plot_ber(np.arange(3), np.arange(4))
 
 
 class TestPlotBERClass:
@@ -269,25 +323,59 @@ class TestPlotBERClass:
         with pytest.raises(TypeError, match="title must be string"):
             ber_plot.title = 123
 
-    def test_call_empty(self):
-        """Test calling PlotBER with no data does not raise errors."""
-        ber_plot = PlotBER()
-        # Should not raise any errors
-        ber_plot()
+    def test_call_empty(self, tmp_path):
+        """An empty PlotBER creates no figure and writes no file."""
         plt.close("all")
+        out = tmp_path / "empty.png"
+        ber_plot = PlotBER()
+        ber_plot(save_fig=True, path=str(out))
+
+        assert not out.exists()
+        assert plt.get_fignums() == []
 
     def test_call_with_curves(self):
-        """Test calling PlotBER displays the plot."""
+        """Calling PlotBER plots the stored curves."""
         ber_plot = PlotBER(title="Test Plot")
         snr = np.array([0, 2, 4, 6, 8])
         ber = np.array([0.2, 0.1, 0.05, 0.01, 0.001])
 
         ber_plot.add(snr, ber, legend="Test")
         ber_plot()
+
+        ax = plt.gca()
+        assert ax.get_title() == "Test Plot"
+        assert len(ax.get_lines()) == 1
+        legend = ax.get_legend()
+        assert legend is not None
+        assert [t.get_text() for t in legend.get_texts()] == ["Test"]
         plt.close("all")
 
+    @pytest.mark.parametrize(
+        "kwargs",
+        [{}, {"legend": "new"}, {"is_bler": True}, {"legend": "new", "is_bler": True}],
+    )
+    def test_call_with_new_data_defaults(self, kwargs):
+        """New curves may omit their label or BER/BLER flag."""
+        ber_plot = PlotBER()
+        snr = np.array([0, 2, 4])
+        ber = np.array([0.2, 0.1, 0.01])
+
+        ber_plot.add(snr, ber, legend="stored")
+        ber_plot(snr_db=snr, ber=ber, **kwargs)
+        plt.close("all")
+
+    def test_call_rejects_oversized_legend(self):
+        """A legend longer than the curve count is still an error."""
+        ber_plot = PlotBER()
+        snr = np.array([0, 2, 4])
+        ber = np.array([0.2, 0.1, 0.01])
+
+        ber_plot.add(snr, ber, legend="stored")
+        with pytest.raises(ValueError, match="legend has invalid size"):
+            ber_plot(snr_db=snr, ber=ber, legend=["a", "b", "c"])
+
     def test_call_show_ber_false(self):
-        """Test that show_ber=False filters BER curves."""
+        """show_ber=False keeps only BLER curves."""
         ber_plot = PlotBER()
         snr = np.array([0, 2, 4])
         ber = np.array([0.1, 0.05, 0.01])
@@ -296,12 +384,20 @@ class TestPlotBERClass:
         ber_plot.add(snr, ber, legend="BER", is_bler=False)
         ber_plot.add(snr, bler, legend="BLER", is_bler=True)
 
-        # Should only plot BLER when show_ber=False
         ber_plot(show_ber=False)
+
+        ax = plt.gca()
+        lines = ax.get_lines()
+        assert len(lines) == 1
+        assert lines[0].get_linestyle() == "--"
+        legend = ax.get_legend()
+        assert legend is not None
+        assert [t.get_text() for t in legend.get_texts()] == ["BLER"]
+        assert ax.get_ylabel() == "BLER"
         plt.close("all")
 
     def test_call_show_bler_false(self):
-        """Test that show_bler=False filters BLER curves."""
+        """show_bler=False keeps only BER curves."""
         ber_plot = PlotBER()
         snr = np.array([0, 2, 4])
         ber = np.array([0.1, 0.05, 0.01])
@@ -310,8 +406,16 @@ class TestPlotBERClass:
         ber_plot.add(snr, ber, legend="BER", is_bler=False)
         ber_plot.add(snr, bler, legend="BLER", is_bler=True)
 
-        # Should only plot BER when show_bler=False
         ber_plot(show_bler=False)
+
+        ax = plt.gca()
+        lines = ax.get_lines()
+        assert len(lines) == 1
+        assert lines[0].get_linestyle() == "-"
+        legend = ax.get_legend()
+        assert legend is not None
+        assert [t.get_text() for t in legend.get_texts()] == ["BER"]
+        assert ax.get_ylabel() == "BER"
         plt.close("all")
 
     def test_call_invalid_path_type(self):

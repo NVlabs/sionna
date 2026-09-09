@@ -16,6 +16,16 @@ __all__ = [
 ]
 
 
+def _validate_metric_inputs(
+    values: torch.Tensor, estimates: torch.Tensor
+) -> None:
+    """Validate the shared shape contract of error metrics."""
+    if values.shape != estimates.shape:
+        raise ValueError("Inputs must have the same shape.")
+    if values.numel() == 0:
+        raise ValueError("Inputs must not be empty.")
+
+
 def compute_ber(
     b: torch.Tensor, b_hat: torch.Tensor, precision: Precision = "double"
 ) -> torch.Tensor:
@@ -41,6 +51,7 @@ def compute_ber(
         print(compute_ber(b, b_hat).item())
         # 0.5
     """
+    _validate_metric_inputs(b, b_hat)
     b_hat = b_hat.to(b.dtype)
     rdtype = dtypes[precision]["torch"]["dtype"]
     ber = torch.ne(b, b_hat)
@@ -83,7 +94,7 @@ def compute_bler(
 
     A block error happens if at least one element of ``b`` and ``b_hat``
     differ in one block. The BLER is evaluated over the last dimension of
-    the input, i. e., all elements of the last dimension are considered to
+    the input, i.e., all elements of the last dimension are considered to
     define a block.
 
     This is also sometimes referred to as `word error rate` or `frame error
@@ -110,6 +121,7 @@ def compute_bler(
         print(compute_bler(b, b_hat).item())
         # 0.5
     """
+    _validate_metric_inputs(b, b_hat)
     b_hat = b_hat.to(b.dtype)
     rdtype = dtypes[precision]["torch"]["dtype"]
     bler = torch.any(torch.ne(b, b_hat), dim=-1)
@@ -138,6 +150,7 @@ def count_errors(b: torch.Tensor, b_hat: torch.Tensor) -> torch.Tensor:
         print(count_errors(b, b_hat).item())
         # 2
     """
+    _validate_metric_inputs(b, b_hat)
     b_hat = b_hat.to(b.dtype)
     errors = torch.ne(b, b_hat)
     errors = errors.to(torch.int64)
@@ -149,7 +162,7 @@ def count_block_errors(b: torch.Tensor, b_hat: torch.Tensor) -> torch.Tensor:
 
     A block error happens if at least one element of ``b`` and ``b_hat``
     differ in one block. The BLER is evaluated over the last dimension of
-    the input, i. e., all elements of the last dimension are considered to
+    the input, i.e., all elements of the last dimension are considered to
     define a block.
 
     This is also sometimes referred to as `word error rate` or `frame error
@@ -173,6 +186,7 @@ def count_block_errors(b: torch.Tensor, b_hat: torch.Tensor) -> torch.Tensor:
         print(count_block_errors(b, b_hat).item())
         # 1
     """
+    _validate_metric_inputs(b, b_hat)
     b_hat = b_hat.to(b.dtype)
     errors = torch.any(torch.ne(b, b_hat), dim=-1)
     errors = errors.to(torch.int64)

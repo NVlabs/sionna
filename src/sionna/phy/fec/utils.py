@@ -76,6 +76,14 @@ class GaussianPriorSource(Block):
 
     where :math:`\sigma_\text{ch}^2` is the noise variance specified by ``no``.
 
+    .. note::
+        ``no`` is the variance of the real-valued noise in the Bi-AWGN channel.
+        This differs from :class:`~sionna.phy.channel.AWGN`, where ``no`` is the
+        total variance of a complex-valued noise sample and each real dimension
+        has variance ``no/2``. To match the LLR distribution obtained from
+        BPSK transmission over :class:`~sionna.phy.channel.AWGN` with noise
+        variance ``no``, use ``no/2`` for this source.
+
     If the mutual information is provided as input, the J-function as described
     in :cite:p:`Brannstrom` is used to relate the mutual information to the
     corresponding LLR distribution.
@@ -89,7 +97,8 @@ class GaussianPriorSource(Block):
         Shape of the generated LLR tensor.
 
     :input no: `None` (default) | `float`.
-        Scalar defining the noise variance for the synthetic AWGN channel.
+        Scalar defining the real-valued noise variance for the synthetic
+        Bi-AWGN channel.
 
     :input mi: `None` (default) | `float`.
         Scalar defining the mutual information for the synthetic AWGN channel.

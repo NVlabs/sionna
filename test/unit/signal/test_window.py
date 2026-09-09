@@ -48,6 +48,31 @@ class TestCustomWindow:
         out = window(inp)
         assert list(out.shape) == input_shape
 
+    @pytest.mark.parametrize("window_length", [1, 2, 3, 8, 200])
+    def test_length_mismatch_rejected(self, device, window_length):
+        """A window must match the input length it is applied to.
+
+        Length one is the important case: it is the only length that
+        broadcasts, so it used to pass silently and return the input
+        unchanged instead of reporting the mismatch.
+        """
+        inp = torch.randn([4, 100], device=device)
+        window = CustomWindow(
+            torch.ones(window_length, device=device), device=device
+        )
+
+        with pytest.raises(ValueError, match="must match the window length"):
+            window(inp)
+
+    def test_matching_length_accepted(self, device):
+        """The documented case must keep working, including length one."""
+        for length in [1, 8, 100]:
+            window = CustomWindow(
+                torch.ones(length, device=device), normalize=False, device=device
+            )
+            inp = torch.randn([4, length], device=device)
+            assert list(window(inp).shape) == [4, length]
+
     @pytest.mark.parametrize("inp_complex", [False, True])
     def test_computation(self, device, inp_complex):
         """Test the calculation"""

@@ -70,7 +70,8 @@ class Window(Block):
         **kwargs,
     ) -> None:
         super().__init__(precision=precision, device=device, **kwargs)
-        assert isinstance(normalize, bool), "normalize must be bool"
+        if not isinstance(normalize, bool):
+            raise ValueError(f"normalize must be bool, got {type(normalize)}")
         self._normalize = normalize
         self._coefficients: Optional[torch.Tensor] = None
 
@@ -120,7 +121,10 @@ class Window(Block):
             Can be "lin" (i.e., linear) or "db" (i.e., Decibel).
             Defaults to "lin".
         """
-        assert domain in ["time", "frequency"], "Invalid domain"
+        if domain not in ("time", "frequency"):
+            raise ValueError(
+                f"domain must be 'time' or 'frequency', got {domain!r}"
+            )
 
         # Normalize if requested
         w = self.coefficients
@@ -145,7 +149,10 @@ class Window(Block):
             plt.ylabel(r"$w(t)$")
             plt.xlim(sampling_times[0], sampling_times[-1])
         else:
-            assert scale in ["lin", "db"], "Invalid scale"
+            if scale not in ("lin", "db"):
+                raise ValueError(
+                    f"scale must be 'lin' or 'db', got {scale!r}"
+                )
             fft_size = max(1024, w.shape[-1])
             h = np.fft.fft(w_np, fft_size)
             h = np.fft.fftshift(h)
@@ -166,6 +173,17 @@ class Window(Block):
 
     def call(self, x: torch.Tensor) -> torch.Tensor:
         w = self.coefficients
+
+        # A window is defined sample-by-sample, so its length must match the
+        # input. Without this check a length-one window broadcasts silently and
+        # returns the input unchanged, and any other mismatch surfaces as a
+        # low-level broadcasting error that names neither the window nor the
+        # input.
+        if x.shape[-1] != w.shape[-1]:
+            raise ValueError(
+                f"Input length ({x.shape[-1]}) must match the window length "
+                f"({w.shape[-1]})"
+            )
 
         # Normalize if requested
         if self.normalize:

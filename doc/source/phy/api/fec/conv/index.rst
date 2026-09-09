@@ -15,7 +15,7 @@ This module supports encoding of convolutional codes and provides layers for Vit
 
 While the :class:`~sionna.phy.fec.conv.decoding.ViterbiDecoder` decoding algorithm produces maximum likelihood *sequence* estimates, the :class:`~sionna.phy.fec.conv.decoding.BCJRDecoder` produces the maximum a posterior (MAP) bit-estimates.
 
-The following code snippet shows how to set up a rate-1/2, constraint-length-3 :class:`~sionna.phy.fec.conv.encoding.ConvEncoder` in two alternate ways and a corresponding :class:`~sionna.phy.fec.conv.decoding.ViterbiDecoder` or :class:`~sionna.phy.fec.conv.decoding.BCJRDecoder`. You can find further examples in the `Channel Coding Tutorial Notebook <../tutorials/5G_Channel_Coding_Polar_vs_LDPC_Codes.html>`_.
+The following code snippet shows how to set up a rate-1/2, constraint-length-3 :class:`~sionna.phy.fec.conv.encoding.ConvEncoder` in two alternate ways and a corresponding :class:`~sionna.phy.fec.conv.decoding.ViterbiDecoder` or :class:`~sionna.phy.fec.conv.decoding.BCJRDecoder`. You can find further examples in the :doc:`Channel Coding Tutorial Notebook </phy/tutorials/notebooks/5G_Channel_Coding_Polar_vs_LDPC_Codes>`.
 
 Setting-up:
 

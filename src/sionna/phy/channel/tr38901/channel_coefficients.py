@@ -11,7 +11,7 @@ from typing import Optional, Tuple
 
 import torch
 
-from sionna.phy import PI, SPEED_OF_LIGHT, config
+from sionna.phy import PI, SPEED_OF_LIGHT
 from sionna.phy.object import Object
 from sionna.phy.utils import rand
 from .rays import Rays
@@ -29,23 +29,23 @@ class Topology:
     :param moving_end: Indicated which end of the channel (TX or RX) is
         moving. One of ``"tx"`` or ``"rx"``.
     :param los_aoa: Azimuth angle of arrival of LoS path [radian],
-        shape [batch size, number of BSs, number of UTs], `torch.float`
+        shape [batch size, number of base stations, number of UTs], `torch.float`
     :param los_aod: Azimuth angle of departure of LoS path [radian],
-        shape [batch size, number of BSs, number of UTs], `torch.float`
+        shape [batch size, number of base stations, number of UTs], `torch.float`
     :param los_zoa: Zenith angle of arrival for LoS path [radian],
-        shape [batch size, number of BSs, number of UTs], `torch.float`
+        shape [batch size, number of base stations, number of UTs], `torch.float`
     :param los_zod: Zenith angle of departure for LoS path [radian],
-        shape [batch size, number of BSs, number of UTs], `torch.float`
+        shape [batch size, number of base stations, number of UTs], `torch.float`
     :param los: Indicate for each BS-UT link if it is in LoS,
-        shape [batch size, number of BSs, number of UTs], `torch.bool`
+        shape [batch size, number of base stations, number of UTs], `torch.bool`
     :param distance_3d: Distance between the UTs in X-Y-Z space
         (not only X-Y plane),
-        shape [batch size, number of BSs, number of UTs], `torch.float`
+        shape [batch size, number of base stations, number of UTs], `torch.float`
     :param tx_orientations: Orientations of the transmitters, which are
-        either BSs or UTs depending on the link direction [radian],
+        either base stations or UTs depending on the link direction [radian],
         shape [batch size, number of TXs, 3], `torch.float`
     :param rx_orientations: Orientations of the receivers, which are
-        either BSs or UTs depending on the link direction [radian],
+        either base stations or UTs depending on the link direction [radian],
         shape [batch size, number of RXs, 3], `torch.float`
     """
 
@@ -107,7 +107,7 @@ class ChannelCoefficientsGenerator(Object):
     :input rays: :class:`~sionna.phy.channel.tr38901.Rays`.
         Rays from which to compute the CIR.
 
-    :input topology: :class:`~sionna.phy.channel.tr38901.channel_coefficients.Topology`.
+    :input topology: :class:`~sionna.phy.channel.tr38901.Topology`.
         Topology of the network.
 
     :input c_ds: [batch size, number of TX, number of RX], `torch.float`.
@@ -128,7 +128,7 @@ class ChannelCoefficientsGenerator(Object):
     :output delays: [batch size, num TX, num RX, num paths], `torch.float`.
         Paths delays [s].
 
-    :output phi: [batch size, number of BSs, number of UTs, 4], `torch.float`.
+    :output phi: [batch size, number of base stations, number of UTs, 4], `torch.float`.
         Initial phases (see step 10 of section 7.5 in TR 38.901 specification).
         Last dimension corresponds to the four polarization combinations.
 
@@ -175,6 +175,12 @@ class ChannelCoefficientsGenerator(Object):
         self._tx_array = tx_array
         self._rx_array = rx_array
         self._subclustering = subclustering
+        self._tx_array_has_element_field = callable(
+            getattr(tx_array, "element_field", None)
+        )
+        self._rx_array_has_element_field = callable(
+            getattr(rx_array, "element_field", None)
+        )
 
         # Sub-cluster information for intra cluster delay spread clusters
         # This is hardcoded from Table 7.5-5
@@ -224,61 +230,6 @@ class ChannelCoefficientsGenerator(Object):
         else:
             self.register_buffer("_gather_ind_rx", None)
 
-        # Pre-allocated buffers for CUDA graph compatibility
-        self._allocated_batch_size: int = 0
-        self._allocated_num_time_steps: int = 0
-        self._allocated_num_clusters: int = 0
-        self._allocated_rays_per_cluster: int = 0
-
-        # Sample times buffer
-        self.register_buffer("_sample_times", None)
-
-        # Step 10 buffer (random phases)
-        self.register_buffer("_phi_buffer", None)
-
-        # Intermediate buffers for step 11
-        self.register_buffer("_zeros_buffer_small", None)
-        self.register_buffer("_zeros_buffer_time", None)
-
-    def allocate_for_batch_size(
-        self,
-        batch_size: int,
-        num_time_steps: int,
-        num_clusters: int,
-        rays_per_cluster: int,
-    ) -> None:
-        """Pre-allocate all tensors for CUDA graph compatibility.
-
-        :param batch_size: Batch size
-        :param num_time_steps: Number of time steps
-        :param num_clusters: Number of clusters
-        :param rays_per_cluster: Number of rays per cluster
-        """
-        if (self._allocated_batch_size == batch_size and
-            self._allocated_num_time_steps == num_time_steps and
-            self._allocated_num_clusters == num_clusters and
-            self._allocated_rays_per_cluster == rays_per_cluster):
-            return  # Already allocated
-
-        self._allocated_batch_size = batch_size
-        self._allocated_num_time_steps = num_time_steps
-        self._allocated_num_clusters = num_clusters
-        self._allocated_rays_per_cluster = rays_per_cluster
-
-        # Sample times buffer
-        self.register_buffer("_sample_times",
-            torch.zeros(num_time_steps, dtype=self.dtype, device=self.device))
-
-        # Step 10 buffer: random phases
-        # Shape: [batch_size, 1, 1, num_clusters, rays_per_cluster, 4]
-        self.register_buffer("_phi_buffer",
-            torch.zeros(batch_size, 1, 1, num_clusters, rays_per_cluster, 4,
-                       dtype=self.dtype, device=self.device))
-
-        # Small zeros buffer for creating complex numbers
-        self.register_buffer("_zeros_buffer_small",
-            torch.zeros(1, dtype=self.dtype, device=self.device))
-
     def __call__(
         self,
         num_time_samples: int,
@@ -290,22 +241,15 @@ class ChannelCoefficientsGenerator(Object):
         debug: bool = False,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Generate channel impulse responses."""
-        batch_size = k_factor.shape[0]
-
-        # Sample times - use pre-allocated buffer if available
-        if (self._allocated_num_time_steps == num_time_samples and
-            self._sample_times is not None):
-            # Fill in-place
-            torch.arange(num_time_samples, out=self._sample_times,
-                        dtype=self.dtype, device=self.device)
-            sample_times = self._sample_times / sampling_frequency
-        else:
-            sample_times = torch.arange(
-                num_time_samples, dtype=self.dtype, device=self.device
-            ) / sampling_frequency
+        sample_times = torch.arange(
+            num_time_samples, dtype=self.dtype, device=self.device
+        ) / sampling_frequency
 
         # Step 10
-        phi = self._step_10(rays.aoa.shape, batch_size)
+        if getattr(rays, "phases", None) is None:
+            phi = self._step_10(rays.aoa.shape)
+        else:
+            phi = rays.phases.to(dtype=self.dtype, device=self.device)
 
         # Step 11
         h, delays = self._step_11(phi, topology, k_factor, rays, sample_times, c_ds)
@@ -541,27 +485,14 @@ class ChannelCoefficientsGenerator(Object):
 
         return d_bar_rx
 
-    def _step_10(self, shape: torch.Size, batch_size: int) -> torch.Tensor:
+    def _step_10(self, shape: torch.Size) -> torch.Tensor:
         r"""
         Generate random and uniformly distributed phases for all rays and
         polarization combinations
 
         :param shape: Shape of the leading dimensions for the tensor of phases to generate
-        :param batch_size: Batch size (for buffer lookup)
-
         :output phi: Phases for all polarization combinations, shape [shape] + [4]
         """
-        # Use pre-allocated buffer if available (CUDA graph compatible)
-        if (self._allocated_batch_size == batch_size and
-            self._phi_buffer is not None and
-            self._phi_buffer.shape[:-1] == shape):
-            # In-place random generation
-            # Note: generator argument removed for CUDA graph compatibility
-            self._phi_buffer.uniform_()
-            phi = self._phi_buffer * 2 * PI - PI
-            return phi
-
-        # Fallback: create new tensor
         phi = (
             rand(
                 (*shape, 4),
@@ -611,7 +542,9 @@ class ChannelCoefficientsGenerator(Object):
         self,
         topology: Topology,
         aoa: torch.Tensor,
+        aod: torch.Tensor,
         zoa: torch.Tensor,
+        zod: torch.Tensor,
         t: torch.Tensor,
     ) -> torch.Tensor:
         r"""
@@ -620,7 +553,11 @@ class ChannelCoefficientsGenerator(Object):
         :param topology: Topology of the network
         :param aoa: Azimuth angles of arrivals [radian],
             shape [batch size, num TXs, num RXs, num clusters, num rays]
+        :param aod: Azimuth angles of departure [radian],
+            shape [batch size, num TXs, num RXs, num clusters, num rays]
         :param zoa: Zenith angles of arrivals [radian],
+            shape [batch size, num TXs, num RXs, num clusters, num rays]
+        :param zod: Zenith angles of departure [radian],
             shape [batch size, num TXs, num RXs, num clusters, num rays]
         :param t: Time steps at which the channel is sampled, shape [number of time steps]
 
@@ -648,12 +585,14 @@ class ChannelCoefficientsGenerator(Object):
         # or    [batch size, num tx, 1, 1, 1, 3, 1]
         v_bar = v_bar.unsqueeze(-3).unsqueeze(-3)
 
-        # r_hat_rx [batch size, num_tx, num rx, num clusters, num rays, 3, 1]
-        r_hat_rx = self._unit_sphere_vector(zoa, aoa)
+        if topology.moving_end == "rx":
+            direction = self._unit_sphere_vector(zoa, aoa)
+        else:
+            direction = self._unit_sphere_vector(zod, aod)
 
         # Compute phase shift due to doppler
         # [batch size, num_tx, num rx, num clusters, num rays, num time steps]
-        exponent = 2 * PI / lambda_0 * (r_hat_rx * v_bar).sum(dim=-2) * t
+        exponent = 2 * PI / lambda_0 * (direction * v_bar).sum(dim=-2) * t
         h_doppler = torch.exp(torch.complex(torch.zeros_like(exponent), exponent))
 
         # [batch size, num_tx, num rx, num clusters, num rays, num time steps]
@@ -777,58 +716,83 @@ class ChannelCoefficientsGenerator(Object):
         zoa_prime, aoa_prime = self._gcs_to_lcs(rx_orientations, zoa, aoa)
 
         # Compute transmitted and received field strength for all antennas
-        # in the LCS and convert to GCS
-        f_tx_pol1_prime = torch.stack(
-            self._tx_array.ant_pol1.field(zod_prime, aod_prime), dim=-1
-        )
-        f_rx_pol1_prime = torch.stack(
-            self._rx_array.ant_pol1.field(zoa_prime, aoa_prime), dim=-1
-        )
-
-        f_tx_pol1 = self._l2g_response(f_tx_pol1_prime, tx_orientations, zod, aod)
-        f_rx_pol1 = self._l2g_response(f_rx_pol1_prime, rx_orientations, zoa, aoa)
-
-        if self._tx_array.polarization == "dual":
-            f_tx_pol2_prime = torch.stack(
-                self._tx_array.ant_pol2.field(zod_prime, aod_prime), dim=-1
-            )
-            f_tx_pol2 = self._l2g_response(f_tx_pol2_prime, tx_orientations, zod, aod)
-
-        if self._rx_array.polarization == "dual":
-            f_rx_pol2_prime = torch.stack(
-                self._rx_array.ant_pol2.field(zoa_prime, aoa_prime), dim=-1
-            )
-            f_rx_pol2 = self._l2g_response(f_rx_pol2_prime, rx_orientations, zoa, aoa)
-
-        # Fill the full channel matrix with field responses
-        pol1_tx = torch.matmul(
-            h_phase, torch.complex(f_tx_pol1, torch.zeros_like(f_tx_pol1))
-        )
-        if self._tx_array.polarization == "dual":
-            pol2_tx = torch.matmul(
-                h_phase, torch.complex(f_tx_pol2, torch.zeros_like(f_tx_pol2))
-            )
-
-        num_ant_tx = self._tx_array.num_ant
-        if self._tx_array.polarization == "single":
-            # Each BS antenna gets the polarization 1 response
-            f_tx_array = pol1_tx.unsqueeze(0).expand(num_ant_tx, *pol1_tx.shape)
+        # in the LCS and convert to GCS. Standard panel arrays use one shared
+        # element pattern per polarization. Handheld arrays can provide
+        # per-port field vectors through element_field().
+        if self._tx_array_has_element_field:
+            f_tx_prime = self._tx_array.element_field(zod_prime, aod_prime)
+            f_tx = self._l2g_response(f_tx_prime, tx_orientations, zod, aod)
+            f_tx = torch.complex(f_tx, torch.zeros_like(f_tx))
+            f_tx_array = torch.matmul(h_phase, f_tx)
         else:
-            # Assign polarization response according to polarization to each
-            # antenna using pre-computed gather indices (CUDA graph compatible)
-            pol_tx = torch.stack([pol1_tx, pol2_tx], dim=0)
-            f_tx_array = pol_tx[self._gather_ind_tx]
+            f_tx_pol1_prime = torch.stack(
+                self._tx_array.ant_pol1.field(zod_prime, aod_prime), dim=-1
+            )
+            f_tx_pol1 = self._l2g_response(
+                f_tx_pol1_prime, tx_orientations, zod, aod
+            )
+            pol1_tx = torch.matmul(
+                h_phase, torch.complex(f_tx_pol1, torch.zeros_like(f_tx_pol1))
+            )
 
-        num_ant_rx = self._rx_array.num_ant
-        if self._rx_array.polarization == "single":
-            # Each UT antenna gets the polarization 1 response
-            f_rx_array = f_rx_pol1.unsqueeze(0).expand(num_ant_rx, *f_rx_pol1.shape)
-            f_rx_array = torch.complex(f_rx_array, torch.zeros_like(f_rx_array))
+            if self._tx_array.polarization == "dual":
+                f_tx_pol2_prime = torch.stack(
+                    self._tx_array.ant_pol2.field(zod_prime, aod_prime), dim=-1
+                )
+                f_tx_pol2 = self._l2g_response(
+                    f_tx_pol2_prime, tx_orientations, zod, aod
+                )
+                pol2_tx = torch.matmul(
+                    h_phase, torch.complex(f_tx_pol2, torch.zeros_like(f_tx_pol2))
+                )
+
+            num_ant_tx = self._tx_array.num_ant
+            if self._tx_array.polarization == "single":
+                # Each BS antenna gets the polarization 1 response
+                f_tx_array = pol1_tx.unsqueeze(0).expand(num_ant_tx,
+                                                         *pol1_tx.shape)
+            else:
+                # Assign polarization response according to polarization to
+                # each antenna using pre-computed gather indices (CUDA graph
+                # compatible)
+                pol_tx = torch.stack([pol1_tx, pol2_tx], dim=0)
+                f_tx_array = pol_tx[self._gather_ind_tx]
+
+        if self._rx_array_has_element_field:
+            f_rx_prime = self._rx_array.element_field(zoa_prime, aoa_prime)
+            f_rx = self._l2g_response(f_rx_prime, rx_orientations, zoa, aoa)
+            f_rx_array = torch.complex(f_rx, torch.zeros_like(f_rx))
         else:
-            # Assign polarization response according to polarization to each
-            # antenna using pre-computed gather indices (CUDA graph compatible)
-            pol_rx = torch.stack([f_rx_pol1, f_rx_pol2], dim=0)
-            f_rx_array = torch.complex(pol_rx[self._gather_ind_rx], torch.zeros_like(pol_rx[self._gather_ind_rx]))
+            f_rx_pol1_prime = torch.stack(
+                self._rx_array.ant_pol1.field(zoa_prime, aoa_prime), dim=-1
+            )
+            f_rx_pol1 = self._l2g_response(
+                f_rx_pol1_prime, rx_orientations, zoa, aoa
+            )
+
+            if self._rx_array.polarization == "dual":
+                f_rx_pol2_prime = torch.stack(
+                    self._rx_array.ant_pol2.field(zoa_prime, aoa_prime), dim=-1
+                )
+                f_rx_pol2 = self._l2g_response(
+                    f_rx_pol2_prime, rx_orientations, zoa, aoa
+                )
+
+            num_ant_rx = self._rx_array.num_ant
+            if self._rx_array.polarization == "single":
+                # Each UT antenna gets the polarization 1 response
+                f_rx_array = f_rx_pol1.unsqueeze(0).expand(num_ant_rx,
+                                                           *f_rx_pol1.shape)
+                f_rx_array = torch.complex(f_rx_array,
+                                           torch.zeros_like(f_rx_array))
+            else:
+                # Assign polarization response according to polarization to
+                # each antenna using pre-computed gather indices (CUDA graph
+                # compatible)
+                pol_rx = torch.stack([f_rx_pol1, f_rx_pol2], dim=0)
+                f_rx_array = torch.complex(
+                    pol_rx[self._gather_ind_rx],
+                    torch.zeros_like(pol_rx[self._gather_ind_rx]))
 
         # Compute the scalar product between the field vectors through
         # reduce_sum and transpose to put antenna dimensions last
@@ -862,8 +826,26 @@ class ChannelCoefficientsGenerator(Object):
         h_array = self._step_11_array_offsets(
             topology, rays.aoa, rays.aod, rays.zoa, rays.zod
         )
-        h_doppler = self._step_11_doppler_matrix(topology, rays.aoa, rays.zoa, t)
+        h_doppler = self._step_11_doppler_matrix(
+            topology, rays.aoa, rays.aod, rays.zoa, rays.zod, t
+        )
         h_full = (h_field * h_array).unsqueeze(-1) * h_doppler.unsqueeze(-2).unsqueeze(-2)
+
+        blockage_loss = getattr(rays, "blockage_loss_db", None)
+        if (
+            blockage_loss is not None
+            and not getattr(rays, "blockage_loss_applied_to_powers", False)
+        ):
+            blockage_scale = torch.pow(
+                torch.tensor(10.0, dtype=self.dtype, device=self.device),
+                -blockage_loss / 20.0,
+            )
+            blockage_scale = torch.complex(
+                blockage_scale, torch.zeros_like(blockage_scale)
+            )
+            for _ in range(h_full.dim() - blockage_scale.dim()):
+                blockage_scale = blockage_scale.unsqueeze(-1)
+            h_full = h_full * blockage_scale
 
         power_scaling = torch.complex(
             torch.sqrt(rays.powers / h_full.shape[4]),
@@ -900,8 +882,24 @@ class ChannelCoefficientsGenerator(Object):
             powers = rays.powers
             delays = rays.delays
 
-            # Sort all clusters along their power
-            strongest_clusters = torch.argsort(powers, dim=-1, descending=True)
+            strongest_2 = getattr(rays, "strongest_cluster_indices", None)
+            if strongest_2 is None:
+                strongest_clusters = torch.argsort(
+                    powers, dim=-1, descending=True
+                )
+                strongest_2 = strongest_clusters[..., :2]
+            else:
+                remaining_powers = powers.scatter(
+                    -1,
+                    strongest_2,
+                    torch.full_like(strongest_2, -torch.inf, dtype=powers.dtype),
+                )
+                strongest_rest = torch.argsort(
+                    remaining_powers, dim=-1, descending=True
+                )[..., : powers.shape[-1] - 2]
+                strongest_clusters = torch.cat(
+                    [strongest_2, strongest_rest], dim=-1
+                )
 
             # Sort delays according to the same ordering
             delays_sorted = torch.gather(delays, dim=3, index=strongest_clusters)
@@ -918,7 +916,6 @@ class ChannelCoefficientsGenerator(Object):
             delays_sub_cl = delays_sub_cl.reshape(*delays_sub_cl.shape[:-2], -1)
 
             # Select the strongest two clusters for sub-cluster splitting
-            strongest_2 = strongest_clusters[..., :2]
             # Expand indices for gather
             idx = strongest_2.unsqueeze(-1).unsqueeze(-1).unsqueeze(-1).unsqueeze(-1)
             idx = idx.expand(-1, -1, -1, -1, h_full.shape[4], h_full.shape[5], h_full.shape[6], h_full.shape[7])
@@ -988,14 +985,16 @@ class ChannelCoefficientsGenerator(Object):
         h_array = self._step_11_array_offsets(topology, aoa, aod, zoa, zod)
 
         # Doppler matrix
-        h_doppler = self._step_11_doppler_matrix(topology, aoa, zoa, t)
+        h_doppler = self._step_11_doppler_matrix(
+            topology, aoa, aod, zoa, zod, t
+        )
 
         # Phase shift due to propagation delay
         d3d = topology.distance_3d
         lambda_0 = self._lambda_0
         h_delay = torch.exp(
             torch.complex(
-                torch.zeros_like(d3d), 2 * PI * d3d / lambda_0
+                torch.zeros_like(d3d), -2 * PI * d3d / lambda_0
             )
         )
 
@@ -1037,6 +1036,19 @@ class ChannelCoefficientsGenerator(Object):
 
         # LoS scenario
         h_los_los_comp = self._step_11_los(topology, t)
+        los_blockage = getattr(rays, "los_blockage_loss_db", None)
+        if los_blockage is not None:
+            los_blockage = torch.pow(
+                torch.tensor(10.0, dtype=self.dtype, device=self.device),
+                -los_blockage / 20.0,
+            )
+            los_blockage = torch.complex(
+                los_blockage, torch.zeros_like(los_blockage)
+            )
+            for _ in range(h_los_los_comp.dim() - los_blockage.dim()):
+                los_blockage = los_blockage.unsqueeze(-1)
+            h_los_los_comp = h_los_los_comp * los_blockage
+
         k_factor_expanded = k_factor
         for _ in range(h_los_los_comp.dim() - k_factor.dim()):
             k_factor_expanded = k_factor_expanded.unsqueeze(-1)
@@ -1059,4 +1071,3 @@ class ChannelCoefficientsGenerator(Object):
         h = torch.where(los_indicator, h_los, h_nlos)
 
         return h, delays_nlos
-

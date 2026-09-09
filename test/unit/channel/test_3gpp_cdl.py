@@ -106,6 +106,20 @@ class TestCDL:
                 device=device,
             )
             assert cdl._model == model
+            assert cdl.spec_version == "19.2"
+
+        cdl = CDL(
+            model="A",
+            delay_spread=self.DELAY_SPREAD,
+            carrier_frequency=self.CARRIER_FREQUENCY,
+            ut_array=rx_array,
+            bs_array=tx_array,
+            direction="downlink",
+            precision=precision,
+            device=device,
+            spec_version="16.1",
+        )
+        assert cdl.spec_version == "16.1"
 
     def test_cdl_output_shape(self, device, precision):
         """Test that CDL output has correct shape"""
@@ -704,4 +718,3 @@ class TestCDL:
             device=device,
         )
         assert cdl_a._has_los is False
-

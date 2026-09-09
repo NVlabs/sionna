@@ -598,6 +598,118 @@ class TestSSFM:
         except (RuntimeError, TypeError) as e:
             pytest.skip(f"torch.compile not available: {e}")
 
+    def test_ssfm_compiled_has_no_graph_breaks(self, precision):
+        """Check that SSFM captures as a single graph.
+
+        Reading a scalar constant back out of a buffer with ``.item()`` inside
+        ``call()`` splits the graph at every invocation, so the frequency-vector
+        setup must not depend on a tensor-to-Python conversion.
+        """
+        if not hasattr(torch, "compile"):
+            pytest.skip("torch.compile is not available")
+
+        import torch._dynamo as dynamo
+        from torch._dynamo.utils import counters
+
+        dtype = torch.float64 if precision == "double" else torch.float32
+        n = 2**8
+        dt = 100.0 / n
+
+        ssfm = SSFM(
+            alpha=0.0,
+            beta_2=1.0,
+            f_c=193.55e12,
+            gamma=1.0,
+            half_window_length=0,
+            length=5.0,
+            n_ssfm=4,
+            sample_duration=dt,
+            with_amplification=False,
+            with_attenuation=False,
+            with_dispersion=True,
+            with_nonlinearity=True,
+            precision=precision,
+            t_norm=1e-12,
+            n_sp=1.0,
+        )
+
+        x = torch.complex(torch.zeros(n, dtype=dtype), torch.zeros(n, dtype=dtype))
+        x[n // 2] = 1.0
+
+        dynamo.reset()
+        counters.clear()
+        try:
+            u = torch.compile(ssfm)(x)
+        except (RuntimeError, TypeError) as e:
+            pytest.skip(f"torch.compile not available: {e}")
+
+        assert u.shape == x.shape
+        assert not dict(counters.get("graph_break", {}))
+
+    def test_cached_sample_duration_matches_buffer(self, precision):
+        """Check the cached sample duration agrees with the buffer.
+
+        ``call()`` passes the cached scalar to ``time_frequency_vector()``,
+        which derives the frequency spacing from it in double arithmetic. A
+        cache taken from the constructor argument rather than from the buffer
+        therefore shifts the frequency grid at single precision, where the
+        buffer holds a rounded value. ``0.337095`` is not exactly representable
+        in `float32`, so the two disagree unless the cache is read off the
+        buffer.
+        """
+        ssfm = SSFM(sample_duration=0.337095, precision=precision)
+        assert ssfm._sample_duration_value == ssfm._sample_duration.item()
+
+    def test_derived_state_updated_after_state_load(self, precision):
+        """Check state loading refreshes values derived from buffers."""
+        source = torch.nn.Sequential(
+            SSFM(
+                alpha=0.03,
+                length=5.0,
+                n_sp=2.0,
+                sample_duration=0.337095,
+                t_norm=2e-12,
+                n_ssfm=1,
+                with_attenuation=False,
+                with_nonlinearity=False,
+                precision=precision,
+            )
+        )
+        target = torch.nn.Sequential(
+            SSFM(
+                alpha=0.07,
+                length=8.0,
+                n_sp=3.0,
+                sample_duration=0.5,
+                t_norm=1e-12,
+                n_ssfm=1,
+                with_attenuation=False,
+                with_nonlinearity=False,
+                precision=precision,
+            )
+        )
+
+        target.load_state_dict(source.state_dict())
+
+        source_ssfm = source[0]
+        target_ssfm = target[0]
+        assert (
+            getattr(target_ssfm, "_sample_duration_value")
+            == getattr(source_ssfm, "_sample_duration_value")
+        )
+        for name in ("_dz", "_rho_n", "_p_n_ase"):
+            torch.testing.assert_close(
+                getattr(target_ssfm, name),
+                getattr(source_ssfm, name),
+                rtol=0.0,
+                atol=0.0,
+            )
+
+        dtype = torch.float64 if precision == "double" else torch.float32
+        x = torch.complex(torch.zeros(256, dtype=dtype), torch.zeros(256, dtype=dtype))
+        x[128] = 1.0
+        torch.testing.assert_close(target(x), source(x), rtol=0.0, atol=0.0)
+
 
 class TestDocstringExamples:
     """Test that docstring examples work correctly."""

@@ -148,10 +148,10 @@ class TestFlattenLastDims:
             r = flatten_last_dims(x, num_dims)
             assert r.shape[-1] == int(np.prod(shape[-num_dims:]))
 
-    def test_assertion_num_dims_too_small(self, device):
-        """Test that num_dims < 2 raises assertion error."""
+    def test_error_num_dims_too_small(self, device):
+        """Test that num_dims < 2 raises a value error."""
         x = torch.ones([2, 3, 4], device=device)
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             flatten_last_dims(x, 1)
 
 
@@ -286,6 +286,19 @@ class TestFlattenMultiIndex:
 
         assert result.item() == result_compiled.item()
 
+    def test_compiled_no_graph_break_on_validation(self, device):
+        """Bounds checks must not graph-break Dynamo (SYS End-to-End regression)."""
+
+        @torch.compile(fullgraph=True)
+        def flatten_multi_index_compiled(indices, shape):
+            return flatten_multi_index(indices, shape)
+
+        indices = torch.tensor([[2, 3], [1, 4]], device=device)
+        shape = [5, 6]
+        result = flatten_multi_index_compiled(indices, shape)
+        expected = flatten_multi_index(indices, shape)
+        assert torch.equal(result, expected)
+
 
 class TestGatherFromBatchedIndices:
     """Tests for the gather_from_batched_indices function."""
@@ -411,6 +424,42 @@ class TestRandomTensorFromValues:
         finally:
             config.device = old_device
 
+    def test_tensor_input_owns_device(self, device):
+        """Tensor values own output placement even when config differs."""
+        values = torch.tensor([0, 10, 20], device="cpu")
+        result = random_tensor_from_values(values, [32])
+        assert result.device.type == "cpu"
+
+        old_device = config.device
+        config.device = "cpu"
+        try:
+            values = values.to(device)
+            result = random_tensor_from_values(values, [32])
+            assert result.device == torch.device(device)
+        finally:
+            config.device = old_device
+
+    def test_tensor_input_reproducible(self, device):
+        """Sampling uses the configured generator for the input device."""
+        values = torch.tensor([0, 10, 20], device=device)
+        config.seed = 123
+        first = random_tensor_from_values(values, [64])
+        config.seed = 123
+        second = random_tensor_from_values(values, [64])
+        assert torch.equal(first, second)
+
+    def test_compiled(self, device):
+        """Tensor-owned random sampling remains compile-aware."""
+
+        @torch.compile(fullgraph=True)
+        def sample(values):
+            return random_tensor_from_values(values, [16])
+
+        values = torch.tensor([0, 10, 20], device=device)
+        result = sample(values)
+        assert result.device == values.device
+        assert tensor_values_are_in_set(result, values)
+
 
 class TestEnumerateIndices:
     """Tests for the enumerate_indices function."""
@@ -455,6 +504,21 @@ class TestEnumerateIndices:
             result = enumerate_indices(bounds)
 
             assert result.shape == torch.Size([6, 2])
+        finally:
+            config.device = old_device
+
+    def test_tensor_input_owns_device(self, device):
+        """Tensor bounds own output placement even when config differs."""
+        bounds = torch.tensor([2, 3], device="cpu")
+        result = enumerate_indices(bounds)
+        assert result.device.type == "cpu"
+
+        old_device = config.device
+        config.device = "cpu"
+        try:
+            bounds = bounds.to(device)
+            result = enumerate_indices(bounds)
+            assert result.device == torch.device(device)
         finally:
             config.device = old_device
 
@@ -549,7 +613,7 @@ class TestFindTruePosition:
 
     def test_invalid_side(self, tensors):
         """Test that invalid side parameter raises error."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             find_true_position(tensors["tensor_1d"], side="middle")
 
     def test_positive_negative_axis_equivalence(self, device):

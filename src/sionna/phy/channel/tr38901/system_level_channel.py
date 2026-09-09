@@ -15,6 +15,7 @@ from sionna.phy.channel import ChannelModel
 from sionna.phy.channel.utils import deg_2_rad
 
 from .channel_coefficients import ChannelCoefficientsGenerator, Topology
+from .blockage import BlockageModelA, BlockageModelB
 from .lsp import LSP, LSPGenerator
 from .rays import Rays, RaysGenerator
 from .system_level_scenario import SystemLevelScenario
@@ -25,7 +26,7 @@ __all__ = ["SystemLevelChannel"]
 class SystemLevelChannel(ChannelModel):
     r"""
     Base class for implementing 3GPP system level channel models, such as UMi,
-    UMa, and RMa.
+    UMa, RMa, InH, and InF.
 
     :param scenario: Scenario for the channel simulation
     :param always_generate_lsp: If `True`, new large scale parameters (LSPs)
@@ -36,6 +37,35 @@ class SystemLevelChannel(ChannelModel):
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
     :param device: Device for computation (e.g., 'cpu', 'cuda:0').
         If `None`, :attr:`~sionna.phy.config.Config.device` is used.
+    :param enable_spatial_consistency: If `True`, additionally generate
+        LoS/NLoS states, applicable O2I terms, and small-scale random variables
+        from spatially correlated fields for the current topology snapshot.
+        LSP spatial correlation is applied independently of this flag. Random
+        fields are not retained across topology updates; the stateful mobility
+        procedure of Section 7.6.3.2 is not implemented. See
+        :ref:`tr38901-spatial-consistency`. Defaults to `False`.
+    :param enable_blockage: If `True`, apply the selected blockage model
+        according to Section 7.6.4 of :cite:p:`TR38901V1920`.
+        Blockage is disabled by default for backwards compatibility. The
+        optional, on-demand temporal variability of blockage is currently not
+        supported.
+    :param blockage_self_blocking: Self-blocking mode for blockage model A.
+        Must explicitly be ``"portrait"`` or ``"landscape"`` when model A is
+        enabled. The explicit value ``"none"`` disables self-blocking as a
+        non-standard extension. `None` is valid only when blockage is disabled
+        or model B is selected.
+    :param blockage_num_non_self_blockers: Number of non-self-blocking regions
+        for blockage model A. Defaults to 4 as specified by
+        :cite:p:`TR38901V1920`.
+    :param blockage_model: Blockage model variant. Must be ``"A"`` or ``"B"``.
+        Defaults to ``"A"``.
+    :param blockage_screen_centers: Blockage model B screen centres [m].
+        Required if ``blockage_model`` is ``"B"``. Shape ``[num_blockers, 3]``
+        or ``[batch size, num_blockers, 3]``.
+    :param blockage_screen_widths: Blockage model B screen widths [m]. Shape
+        ``[num_blockers]`` or ``[batch size, num_blockers]``.
+    :param blockage_screen_heights: Blockage model B screen heights [m]. Shape
+        ``[num_blockers]`` or ``[batch size, num_blockers]``.
 
     :input num_time_samples: `int`.
         Number of time samples.
@@ -77,12 +107,64 @@ class SystemLevelChannel(ChannelModel):
         always_generate_lsp: bool = False,
         precision: Optional[str] = None,
         device: Optional[str] = None,
+        enable_spatial_consistency: bool = False,
+        enable_blockage: bool = False,
+        blockage_self_blocking: Optional[str] = None,
+        blockage_num_non_self_blockers: int = 4,
+        blockage_model: str = "A",
+        blockage_screen_centers: Optional[torch.Tensor] = None,
+        blockage_screen_widths: Optional[torch.Tensor] = None,
+        blockage_screen_heights: Optional[torch.Tensor] = None,
     ) -> None:
         super().__init__(precision=scenario.precision, device=scenario.device)
 
         self._scenario = scenario
+        self._scenario.set_spatial_consistency_enabled(enable_spatial_consistency)
         self._lsp_sampler = LSPGenerator(scenario)
-        self._ray_sampler = RaysGenerator(scenario)
+        self._blockage_model = None
+        if enable_blockage:
+            blockage_model = blockage_model.upper()
+            if blockage_model == "A":
+                if blockage_self_blocking is None:
+                    raise ValueError(
+                        "blockage_self_blocking must explicitly select "
+                        "'portrait' or 'landscape' when blockage model A is "
+                        "enabled; use 'none' only for the non-standard no-self "
+                        "variant"
+                    )
+                self._blockage_model = BlockageModelA(
+                    scenario,
+                    self_blocking=blockage_self_blocking,
+                    num_non_self_blockers=blockage_num_non_self_blockers,
+                    precision=self.precision,
+                    device=self.device,
+                )
+            elif blockage_model == "B":
+                if (
+                    blockage_screen_centers is None
+                    or blockage_screen_widths is None
+                    or blockage_screen_heights is None
+                ):
+                    raise ValueError(
+                        "blockage_screen_centers, blockage_screen_widths, "
+                        "and blockage_screen_heights are required for "
+                        "blockage model B"
+                    )
+                self._blockage_model = BlockageModelB(
+                    scenario,
+                    blockage_screen_centers,
+                    blockage_screen_widths,
+                    blockage_screen_heights,
+                    precision=self.precision,
+                    device=self.device,
+                )
+            else:
+                raise ValueError("blockage_model must be 'A' or 'B'")
+        self._ray_sampler = RaysGenerator(
+            scenario,
+            enable_spatial_consistency=enable_spatial_consistency,
+            blockage_model=self._blockage_model,
+        )
         self._set_topology_called = False
         self._return_rays = False
         self._lsp: Optional[LSP] = None
@@ -117,6 +199,23 @@ class SystemLevelChannel(ChannelModel):
             raise TypeError("return_rays must be bool")
         self._return_rays = value
 
+    def sample_lsp(self) -> LSP:
+        r"""Sample large-scale parameters for the current topology.
+
+        This method returns a fresh realization of the TR 38.901 large-scale
+        parameters (LSPs) for the topology configured with
+        :meth:`set_topology`. It is useful for diagnostics and calibration
+        plots, e.g., to inspect the spatial correlation of shadow fading,
+        delay spread, or angular spreads. The returned sample is not cached by
+        the channel.
+
+        :output lsp: :class:`~sionna.phy.channel.tr38901.LSP`.
+            Fresh LSP realization.
+        """
+        if not self._set_topology_called:
+            raise RuntimeError("set_topology must be called before sample_lsp()")
+        return self._lsp_sampler()
+
     def set_topology(
         self,
         ut_loc: Optional[torch.Tensor] = None,
@@ -125,8 +224,13 @@ class SystemLevelChannel(ChannelModel):
         bs_orientations: Optional[torch.Tensor] = None,
         ut_velocities: Optional[torch.Tensor] = None,
         in_state: Optional[torch.Tensor] = None,
-        los: Optional[bool] = None,
+        los: Optional[Union[bool, str, torch.Tensor]] = None,
         bs_virtual_loc: Optional[torch.Tensor] = None,
+        bs_site_ids: Optional[torch.Tensor] = None,
+        spatial_consistency_track_ids: Optional[torch.Tensor] = None,
+        distance_2d_in: Optional[torch.Tensor] = None,
+        ut_spatial_region_ids: Optional[torch.Tensor] = None,
+        in_car: Optional[torch.Tensor] = None,
     ) -> None:
         r"""
         Set the network topology.
@@ -140,30 +244,65 @@ class SystemLevelChannel(ChannelModel):
         set at a former call raises an error.
 
         :param ut_loc: Locations of the UTs [m].
-            Shape [batch size, num_ut, 3]
-        :param bs_loc: Locations of BSs [m].
-            Shape [batch size, num_bs, 3]
-        :param ut_orientations: Orientations of the UTs arrays [radian].
-            Shape [batch size, num_ut, 3]
-        :param bs_orientations: Orientations of the BSs arrays [radian].
-            Shape [batch size, num_bs, 3]
-        :param ut_velocities: Velocity vectors of UTs [m/s].
-            Shape [batch size, num_ut, 3]
-        :param in_state: Indoor/outdoor state of UTs. `True` means indoor and
-            `False` means outdoor. Shape [batch size, num_ut]
-        :param los: If not `None`, all UTs located outdoor are forced to be
-            in LoS if ``los`` is set to `True`, or in NLoS if it is set to
-            `False`. If set to `None`, the LoS/NLoS states of UTs is set
-            following 3GPP specification :cite:p:`TR38901`.
-        :param bs_virtual_loc: Virtual locations of BSs for each UT [m].
+            Shape [batch size, num_ut, 3].
+        :param bs_loc: Locations of the base stations [m].
+            Shape [batch size, num_bs, 3].
+        :param ut_orientations: Orientations of the UT arrays [radian].
+            Shape [batch size, num_ut, 3].
+        :param bs_orientations: Orientations of the BS arrays [radian].
+            Shape [batch size, num_bs, 3].
+        :param ut_velocities: Velocity vectors of the UTs [m/s].
+            Shape [batch size, num_ut, 3].
+        :param in_state: Indoor/outdoor state of the UTs. `True` means indoor
+            and `False` means outdoor. Shape [batch size, num_ut].
+        :param los: LoS/NLoS state control. If set to `True`, all outdoor UTs
+            are forced to be in LoS. If set to `False`, all outdoor UTs are
+            forced to be in NLoS. If a boolean tensor is provided, it specifies
+            the requested LoS/NLoS state for each BS-UT link with shape
+            [batch size, num_bs, num_ut] or [num_bs, num_ut]. If set to
+            ``"random"``, fresh
+            stochastic LoS/NLoS states are sampled following Section 7.4.2 of
+            :cite:p:`TR38901V1920`. If set to `None`, the
+            previous setting is reused; on the first call this is equivalent
+            to ``"random"``.
+        :param bs_virtual_loc: Virtual locations of the base stations for each UT [m].
             Used to compute BS-UT relative distance and angles.
             If `None` while ``bs_loc`` is specified, then it is set to
             ``bs_loc`` upon reshaping.
-            Shape [batch size, number of BSs, number of UTs, 3]
+            Shape [batch size, num_bs, num_ut, 3].
+        :param bs_site_ids: Site identifier of each BS. Co-sited base stations share the
+            same site identifier and use common site-level random quantities,
+            such as co-sited LSPs. If `None`, exact duplicate BS locations are
+            treated as co-sited; near duplicates remain separate and emit a
+            warning. Shape [num_bs] or [batch size, num_bs].
+        :param spatial_consistency_track_ids: Optional grouping identifiers for
+            UT entries representing positions on the same track in the current
+            topology snapshot. When spatial consistency is enabled, equal IDs
+            share cluster-angle signs and random ray-coupling permutations.
+            They do not retain random variables across topology updates. Shape
+            [num_ut] or [batch size, num_ut].
+        :param distance_2d_in: Optional pre-sampled indoor 2D distance [m] for
+            every UT. Values for outdoor UTs are ignored.
+            Shape [batch size, num_ut] for the current O2I model, or
+            [batch size, num_bs, num_ut] for the legacy below-6-GHz UMi/UMa
+            model.
+        :param ut_spatial_region_ids: Optional integer correlation-region
+            identifier for every UT. Unequal IDs decorrelate LSP fields and
+            the additional fields controlled by ``enable_spatial_consistency``;
+            correlation within a region uses 2D distance. IDs do not add floor
+            penetration loss or change pathloss or geometry. Blockage model A
+            uses the same partition when enabled. If omitted initially,
+            UMi/UMa/RMa infer a 3 m floor grid for indoor UTs, while InH/InF
+            use one common region. The inferred IDs do not distinguish
+            buildings. Shape [num_ut] or
+            [batch size, num_ut].
+        :param in_car: RMa-only in-car state of every UT. If omitted for the
+            first RMa topology, all non-indoor UTs are treated as in-car per
+            Table 7.2-3. Shape [batch size, num_ut].
         """
 
         # Update the scenario topology
-        need_for_update = self._scenario.set_topology(
+        topology_args = (
             ut_loc,
             bs_loc,
             ut_orientations,
@@ -172,7 +311,19 @@ class SystemLevelChannel(ChannelModel):
             in_state,
             los,
             bs_virtual_loc,
+            bs_site_ids,
+            spatial_consistency_track_ids,
+            distance_2d_in,
+            ut_spatial_region_ids,
         )
+        if self._scenario.scenario_kind == "rma":
+            need_for_update = self._scenario.set_topology(
+                *topology_args, in_car=in_car
+            )
+        else:
+            if in_car is not None:
+                raise ValueError("`in_car` is only supported by RMa")
+            need_for_update = self._scenario.set_topology(*topology_args)
 
         if need_for_update:
             # Update the LSP sampler
@@ -214,6 +365,7 @@ class SystemLevelChannel(ChannelModel):
         """
         self._scenario.allocate_topology_tensors(batch_size, num_bs, num_ut)
         self._lsp_sampler.allocate_topology_tensors(batch_size, num_bs, num_ut)
+        self._ray_sampler.allocate_topology_tensors(batch_size, num_bs, num_ut)
 
     def reset_topology(self) -> None:
         """Reset the topology to allow different batch_size/num_ut/num_bs.
@@ -230,12 +382,15 @@ class SystemLevelChannel(ChannelModel):
         """
         self._scenario.reset_topology()
         self._lsp_sampler.reset_topology()
+        self._ray_sampler.reset_topology()
+        self._set_topology_called = False
+        self._lsp = None
 
     def __call__(
         self,
         num_time_samples: int,
         sampling_frequency: float,
-        foo: Optional[float] = None,
+        batch_size_compat: Optional[float] = None,
     ) -> Union[
         Tuple[torch.Tensor, torch.Tensor],
         Tuple[torch.Tensor, torch.Tensor, Rays],
@@ -244,7 +399,11 @@ class SystemLevelChannel(ChannelModel):
 
         :param num_time_samples: Number of time samples
         :param sampling_frequency: Sampling frequency [Hz]
-        :param foo: Unused parameter for compatibility with some channel layers
+        :param batch_size_compat: Optional third argument passed by generic
+            channel layers. For a compatibility call of the form
+            ``(batch_size, num_time_samples, sampling_frequency)``, the first
+            argument is ignored, the second is used as ``num_time_samples``,
+            and this argument is used as ``sampling_frequency``.
         """
         # Some channel layers (GenerateOFDMChannel and GenerateTimeChannel)
         # give as input (batch_size, num_time_samples, sampling_frequency)
@@ -252,10 +411,10 @@ class SystemLevelChannel(ChannelModel):
         # in the ChannelModel interface.
         # With this model, the batch size is ignored, and only the required
         # parameters are kept.
-        if foo is not None:
+        if batch_size_compat is not None:
             # batch_size = num_time_samples
             num_time_samples = int(sampling_frequency)
-            sampling_frequency = foo
+            sampling_frequency = batch_size_compat
 
         # Sample LSPs if required
         if self._always_generate_lsp:
@@ -296,9 +455,10 @@ class SystemLevelChannel(ChannelModel):
 
         # According to the link direction, we need to specify which from BS
         # and UT is uplink, and which is downlink.
-        # Default is downlink, so we need to do some transpose to switch tx and
-        # rx and to switch angle of arrivals and departure if direction is set
-        # to uplink. Nothing needs to be done if direction is downlink
+        # Default is downlink, so for uplink we create the TX/RX view expected
+        # by the coefficient generator by transposing BS and UT dimensions and
+        # swapping angles of arrival/departure. The returned rays follow this
+        # TX/RX view when ``return_rays`` is enabled.
         if self._scenario.direction == "uplink":
             aoa = rays.aoa
             zoa = rays.zoa
@@ -310,7 +470,25 @@ class SystemLevelChannel(ChannelModel):
             rays.zoa = zod.permute(0, 2, 1, 3, 4)
             rays.powers = rays.powers.permute(0, 2, 1, 3)
             rays.delays = rays.delays.permute(0, 2, 1, 3)
+            if rays.cluster_sort_indices is not None:
+                rays.cluster_sort_indices = rays.cluster_sort_indices.permute(
+                    0, 2, 1, 3
+                )
+            if rays.strongest_cluster_indices is not None:
+                rays.strongest_cluster_indices = (
+                    rays.strongest_cluster_indices.permute(0, 2, 1, 3)
+                )
             rays.xpr = rays.xpr.permute(0, 2, 1, 3, 4)
+            if rays.phases is not None:
+                rays.phases = rays.phases.permute(0, 2, 1, 3, 4, 5)
+            if rays.blockage_loss_db is not None:
+                rays.blockage_loss_db = rays.blockage_loss_db.permute(
+                    0, 2, 1, 3, 4
+                )
+            if rays.los_blockage_loss_db is not None:
+                rays.los_blockage_loss_db = rays.los_blockage_loss_db.permute(
+                    0, 2, 1
+                )
 
             los_aod = topology.los_aod
             los_aoa = topology.los_aoa
@@ -337,7 +515,7 @@ class SystemLevelChannel(ChannelModel):
         )
 
         # Step 12
-        h = self._step_12(h, sf)
+        h = self._step_12(h, sf, lsp.pathloss)
 
         # Reshaping to match the expected output
         h = h.permute(0, 2, 4, 1, 5, 3, 6)
@@ -505,16 +683,25 @@ class SystemLevelChannel(ChannelModel):
     # Internal utility methods
     #####################################################
 
-    def _step_12(self, h: torch.Tensor, sf: torch.Tensor) -> torch.Tensor:
+    def _step_12(
+        self,
+        h: torch.Tensor,
+        sf: torch.Tensor,
+        pathloss: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         """Apply path loss and shadow fading ``sf`` to paths coefficients ``h``.
 
         :param h: Paths coefficients.
             Shape [batch size, num_tx, num_rx, num_paths, num_rx_ant, num_tx_ant, num_time_samples].
         :param sf: Shadow fading.
             Shape [batch size, num_tx, num_rx].
+        :param pathloss: Path loss [dB] sampled with ``sf`` and the other LSPs.
+            Shape [batch size, num_bs, num_ut].
         """
         if self._scenario.pathloss_enabled:
-            pl_db = self._lsp_sampler.sample_pathloss()
+            if pathloss is None:
+                raise RuntimeError("Path loss was not sampled with the LSPs")
+            pl_db = pathloss
             if self._scenario.direction == "uplink":
                 pl_db = pl_db.permute(0, 2, 1)
         else:

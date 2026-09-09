@@ -24,7 +24,8 @@ that automatically generates orthogonal pilot transmissions for all transmitters
 and streams.
 
 Additionally, the module contains blocks for channel estimation, precoding,
-equalization, and detection, such as the :class:`~sionna.phy.ofdm.LSChannelEstimator`,
+equalization, and detection, such as the :class:`~sionna.phy.ofdm.LSChannelEstimator`
+or the :class:`~sionna.phy.ofdm.LMMSEChannelEstimator`,
 the :class:`~sionna.phy.ofdm.RZFPrecoder`, and the
 :class:`~sionna.phy.ofdm.LMMSEEqualizer` and :class:`~sionna.phy.ofdm.LinearDetector`.
 These are good starting points for the development of more advanced algorithms

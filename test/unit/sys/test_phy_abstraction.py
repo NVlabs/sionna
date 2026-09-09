@@ -5,7 +5,6 @@
 """Unit tests for sionna.sys.phy_abstraction"""
 
 import numpy as np
-import os
 import pytest
 import torch
 
@@ -17,7 +16,26 @@ from sionna.sys import PHYAbstraction
 class TestPHYAbstraction:
     """Tests for the PHYAbstraction class."""
 
-    def test_write_and_load(self, device):
+    def test_get_idx_from_grid_uses_object_device(self, device):
+        """Direct helper calls follow the owning object's device and precision."""
+        with pytest.warns(UserWarning):
+            phy_abs = PHYAbstraction(
+                load_bler_tables_from="",
+                precision="double",
+                device=device,
+            )
+
+        scalar_idx = phy_abs.get_idx_from_grid(5.0, "snr")
+        tensor_idx = phy_abs.get_idx_from_grid(
+            torch.tensor(5.0, dtype=torch.float32, device="cpu"), "snr"
+        )
+
+        for idx in (scalar_idx, tensor_idx):
+            assert idx.dtype == torch.int32
+            assert idx.device == torch.device(device)
+        torch.testing.assert_close(scalar_idx, tensor_idx)
+
+    def test_write_and_load(self, device, tmp_path):
         """Test the SNR to BER/BLER table generation."""
         sim_set_1 = {
             "category": {
@@ -26,7 +44,8 @@ class TestPHYAbstraction:
         }
         snr_dbs_1 = [0, 20]
         cb_sizes_1 = [50, 100, 150]
-        filename = "test.json"
+        path = tmp_path / "test.json"
+        filename = str(path)
 
         # Start from no loaded table
         with pytest.warns(UserWarning):
@@ -44,8 +63,8 @@ class TestPHYAbstraction:
         )
 
         # Check that results have been written to file
-        assert os.path.isfile(filename), "File was not created"
-        assert os.path.getsize(filename) > 0, "File is empty"
+        assert path.is_file(), "File was not created"
+        assert path.stat().st_size > 0, "File is empty"
 
         # Load tables
         table_loaded = PHYAbstraction.load_table(filename)
@@ -71,9 +90,38 @@ class TestPHYAbstraction:
                         for a, b in zip(res["BLER"], res1["BLER"]):
                             assert a == b, "BLER mismatch"
 
-        # Remove the file
-        if os.path.isfile(filename):
-            os.remove(filename)
+        # Append another MCS to the existing category and table index.
+        sim_set_2 = {
+            "category": {0: {"index": {1: {"MCS": [11]}}}}
+        }
+        phy_abs.new_bler_table(
+            snr_dbs_1,
+            cb_sizes_1,
+            sim_set_2,
+            filename=filename,
+            write_mode="a",
+            max_mc_iter=15,
+            batch_size=10,
+            verbose=False,
+        )
+        table_appended = PHYAbstraction.load_table(filename)
+
+        # Existing table-index and MCS subtrees must survive the append.
+        assert set(table_appended["category"][0]["index"]) == {1, 2}
+        assert set(
+            table_appended["category"][0]["index"][1]["MCS"]
+        ) == {10, 11, 24}
+        assert set(
+            table_appended["category"][0]["index"][2]["MCS"]
+        ) == {12}
+        for table_index, table in table_loaded["category"][0]["index"].items():
+            for mcs, result in table["MCS"].items():
+                assert (
+                    table_appended["category"][0]["index"][table_index][
+                        "MCS"
+                    ][mcs]
+                    == result
+                )
 
     def test_bler_interpolation(self, device):
         """Validate the (CBS, SNR) -> BLER interpolation."""
@@ -102,7 +150,7 @@ class TestPHYAbstraction:
                 cb_sizes_sim[-1],
                 (cb_sizes_sim[1] - cb_sizes_sim[0]) // 10,
             )
-            phy_abs._snr_db_interp_min_max_delta = (
+            phy_abs.snr_db_interp_min_max_delta = (
                 snr_dbs_sim[0],
                 snr_dbs_sim[-1],
                 (snr_dbs_sim[1] - snr_dbs_sim[0]) / 10,
@@ -257,11 +305,7 @@ class TestPHYAbstraction:
 
         phy_abs = PHYAbstraction(device=device)
 
-        # Compile the call method
-        if mode != "default":
-            compiled_call = torch.compile(phy_abs.call, mode=mode)
-        else:
-            compiled_call = phy_abs.call
+        compiled_call = torch.compile(phy_abs.call, mode=mode)
 
         # Run compiled version
         num_decoded_bits, harq_feedback, sinr_eff, tbler, bler = compiled_call(
@@ -270,3 +314,99 @@ class TestPHYAbstraction:
 
         # Basic shape checks
         assert num_decoded_bits.shape == (batch_size, num_ut)
+
+    def test_compiled_dynamic_num_ut(self, device):
+        """Compiled PHYAbstraction must tolerate a changing num_ut (SymInt sizes).
+
+        Regression: torch.rand(tbler.shape) failed fake-tensor propagation when
+        Dynamo introduced symbolic shapes after graph breaks in gather/MCS paths.
+        """
+        phy_abs = PHYAbstraction(device=device)
+
+        @torch.compile
+        def step(mcs, sinr):
+            return phy_abs(mcs, sinr=sinr, mcs_table_index=1, mcs_category=0)
+
+        for num_ut in (4, 3, 5):
+            sinr = torch.rand(1, 2, 12, num_ut, 1, device=device) * 100
+            mcs = torch.randint(3, 10, (1, num_ut), dtype=torch.int32, device=device)
+            num_decoded_bits, harq_feedback, *_ = step(mcs, sinr)
+            assert num_decoded_bits.shape == (1, num_ut)
+            assert harq_feedback.shape == (1, num_ut)
+
+    def test_num_decoded_bits_matches_tb_size(self, device, monkeypatch):
+        """Decoded bits on ACK equal transport-block information bits."""
+        from sionna.phy.nr.utils import MCSDecoderNR, calculate_tb_size
+
+        phy_abs = PHYAbstraction(device=device, precision="double")
+        mcs_decoder = MCSDecoderNR(device=device)
+
+        # First user has one CB; second user has many CBs.
+        mcs_index = torch.tensor([3, 27], dtype=torch.int32, device=device)
+        num_allocated_re = torch.tensor(
+            [[256, 50000]], dtype=torch.int32, device=device
+        )
+        sinr_eff = torch.full(
+            (1, 2),
+            1e6,
+            dtype=torch.float64,
+            device=device,
+        )
+        # This test covers decoded-bit accounting, not stochastic HARQ. Force
+        # successful decoding independently of the finite BLER-table SNR range.
+        monkeypatch.setattr(
+            phy_abs,
+            "get_bler",
+            lambda *args, **kwargs: torch.zeros_like(sinr_eff),
+        )
+
+        num_decoded_bits, harq, *_ = phy_abs(
+            mcs_index.unsqueeze(0),
+            sinr_eff=sinr_eff,
+            num_allocated_re=num_allocated_re,
+            mcs_table_index=1,
+            mcs_category=0,
+        )
+        assert (harq == 1).all()
+
+        mod_order, coderate = mcs_decoder(
+            mcs_index, torch.ones_like(mcs_index), torch.zeros_like(mcs_index)
+        )
+        num_coded_bits = mod_order * num_allocated_re[0]
+        tb_size, cb_size, num_cb, *_ = calculate_tb_size(
+            mod_order,
+            coderate,
+            num_coded_bits=num_coded_bits,
+            return_cw_length=False,
+            device=device,
+        )
+        assert num_cb[0] == 1
+        assert num_cb[1] > 1
+        assert torch.equal(num_decoded_bits[0], tb_size)
+        assert (num_decoded_bits[0] < num_cb * cb_size).all()
+
+    def test_missing_bler_row_is_inf_and_nack(self, device):
+        """Unavailable BLER rows stay inf and produce a deterministic NACK."""
+        phy_abs = PHYAbstraction(device=device)
+        num_decoded_bits, harq, _, tbler, bler = phy_abs(
+            torch.tensor([0], dtype=torch.int32, device=device),
+            sinr_eff=torch.tensor([1.0], device=device),
+            # Produces four code blocks, catching parity-dependent inf
+            # propagation through 1 - (1 - BLER) ** num_cb.
+            num_allocated_re=torch.tensor(
+                [50000], dtype=torch.int32, device=device
+            ),
+            mcs_table_index=1,
+            mcs_category=0,
+        )
+        assert torch.isinf(bler).item()
+        assert torch.isinf(tbler).item()
+        assert harq.item() == 0
+        assert num_decoded_bits.item() == 0
+
+    def test_cbs_above_simulated_range_matches_boundary(self, device):
+        """CBS above the largest simulated point uses the boundary curve."""
+        phy_abs = PHYAbstraction(device=device)
+        bler_2000 = phy_abs.get_bler(10, 1, 0, 2000, 2.0)
+        bler_8448 = phy_abs.get_bler(10, 1, 0, 8448, 2.0)
+        assert torch.isclose(bler_2000, bler_8448).item()

@@ -188,3 +188,23 @@ class TestOFDMModulatorCompile:
 
         assert torch.allclose(x_time, x_time_compiled, atol=1e-5)
 
+    def test_first_call_compiles_as_fullgraph(self, device, precision):
+        """Lazy-build CP validation must not split the first compiled call."""
+        fft_size = 64
+        num_ofdm_symbols = 14
+        cp_length = 16
+        x = QAMSource(4, precision=precision, device=device)(
+            [4, num_ofdm_symbols, fft_size]
+        )
+
+        modulator = OFDMModulator(
+            cp_length, precision=precision, device=device
+        )
+        compiled_modulator = torch.compile(modulator, fullgraph=True)
+        actual = compiled_modulator(x)
+
+        expected = OFDMModulator(
+            cp_length, precision=precision, device=device
+        )(x)
+        torch.testing.assert_close(actual, expected)
+

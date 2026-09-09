@@ -8,9 +8,10 @@ from typing import Optional, Tuple
 
 import torch
 
+from sionna._validation import check_binary, check_tensor_all
 from sionna.phy import config, dtypes
 from sionna.phy.config import Precision
-from sionna.phy.utils import insert_dims, tensor_values_are_in_set
+from sionna.phy.utils import insert_dims
 
 __all__ = [
     "is_scheduled_in_slot",
@@ -53,9 +54,10 @@ def is_scheduled_in_slot(
         print(is_sched)
         # tensor([ True, False,  True,  True])
     """
-    assert (sinr is not None) ^ (num_allocated_re is not None), (
-        "Either 'sinr' or 'num_allocated_re' is required as input"
-    )
+    if not ((sinr is not None) ^ (num_allocated_re is not None)):
+        raise ValueError(
+            "Exactly one of 'sinr' or 'num_allocated_re' is required as input"
+        )
 
     if sinr is not None:
         return sinr.sum(dim=(-4, -3, -1)) > 0
@@ -74,7 +76,8 @@ def get_pathloss(
 
     :param h_freq: OFDM channel matrix.
     :param rx_tx_association: Its :math:`(i,j)` element is 1 if receiver
-        :math:`i` is attached to transmitter :math:`j`, 0 otherwise.
+        :math:`i` is attached to transmitter :math:`j`, 0 otherwise. It must
+        define exactly one serving link per user.
     :param precision: Precision used for internal calculations and outputs.
         If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.
 
@@ -102,10 +105,6 @@ def get_pathloss(
     else:
         dtype = dtypes[precision]["torch"]["dtype"]
 
-    batch_size = h_freq.shape[:-6]
-    lbs = len(batch_size)
-    num_ofdm_symbols = h_freq.shape[-2]
-
     # Compute RX power
     # [..., num_rx, num_rx_ant, num_tx, num_tx_ant, num_ofdm_symbols, num_subcarriers]
     rx_power = torch.abs(h_freq).pow(2).to(dtype)
@@ -121,32 +120,49 @@ def get_pathloss(
     if rx_tx_association is None:
         pathloss_serving_tx = None
     else:
-        assert tensor_values_are_in_set(rx_tx_association, [0, 1]), (
-            "rx_tx_association must contain binary values"
+        rx_tx_association = rx_tx_association.to(
+            device=pathloss_all_pairs.device
+        )
+        check_binary(
+            rx_tx_association,
+            name="rx_tx_association",
+            message="rx_tx_association must contain binary values",
         )
 
-        # Extract pathloss for serving TX only, for each RX
-        rx_tx_association_bool = rx_tx_association == 1
-        # [batch_size, num_rx, num_tx]
-        rx_tx_association_expanded = rx_tx_association_bool.unsqueeze(0)
-        for _ in range(lbs - 1):
-            rx_tx_association_expanded = rx_tx_association_expanded.unsqueeze(0)
-        rx_tx_association_expanded = rx_tx_association_expanded.expand(
-            *batch_size, -1, -1
+        # Each user has exactly one serving link. Depending on the direction,
+        # users are represented by either the RX or TX dimension.
+        num_ut = max(rx_tx_association.shape)
+        check_tensor_all(
+            rx_tx_association.sum() == num_ut,
+            name="rx_tx_association",
+            message=(
+                "rx_tx_association must define exactly one serving link "
+                "per user"
+            ),
         )
 
-        # [batch_size, num_rx, num_tx, num_ofdm_symbols]
-        rx_tx_association_expanded = rx_tx_association_expanded.unsqueeze(-1).expand(
-            *[-1] * (lbs + 2), num_ofdm_symbols
+        # Extract all marked links in the same receiver-major order as Boolean
+        # indexing, without introducing a data-dependent output shape.
+        association_flat = rx_tx_association.reshape(-1).to(torch.bool)
+        flat_indices = torch.arange(
+            association_flat.numel(), device=pathloss_all_pairs.device
         )
+        sort_keys = torch.where(
+            association_flat,
+            flat_indices,
+            flat_indices + association_flat.numel(),
+        )
+        serving_indices = torch.argsort(sort_keys)[:num_ut]
 
-        # [num_ut*prod(batch_size), num_ofdm_symbols]
-        pathloss_serving_tx = pathloss_all_pairs[rx_tx_association_expanded]
-
-        # [batch_size, num_ut, num_ofdm_symbols]
-        # Use -1 to let PyTorch infer num_ut, avoiding .item() graph break
-        pathloss_serving_tx = pathloss_serving_tx.reshape(
-            *batch_size, -1, num_ofdm_symbols
+        pathloss_flat = pathloss_all_pairs.flatten(start_dim=-3, end_dim=-2)
+        serving_indices = insert_dims(
+            serving_indices, num_dims=pathloss_flat.dim() - 2, axis=0
+        )
+        serving_indices = serving_indices.unsqueeze(-1).expand(
+            *pathloss_flat.shape[:-2], num_ut, pathloss_flat.shape[-1]
+        )
+        pathloss_serving_tx = torch.gather(
+            pathloss_flat, dim=-2, index=serving_indices
         )
 
     return pathloss_all_pairs, pathloss_serving_tx
@@ -161,7 +177,10 @@ def spread_across_subcarriers(
     r"""Distributes the power uniformly across all allocated subcarriers
     and streams for each user.
 
-    :param tx_power_per_ut: Transmit power [W] for each user.
+    :param tx_power_per_ut: Transmit power [W] for each user across OFDM
+        symbols. Expected shape ``[..., num_ofdm_sym, num_ut]``. The power of
+        each OFDM symbol is distributed uniformly across that user's allocated
+        subcarriers and streams.
     :param is_scheduled: Whether a user is scheduled on a given subcarrier
         and stream.
     :param num_tx: Number of transmitters. If `None`, it is set to
