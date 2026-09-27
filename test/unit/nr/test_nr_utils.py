@@ -16,6 +16,7 @@ from sionna.phy.nr.utils import (
     calculate_codeword_bits,
     MCSDecoderNR,
 )
+from sionna.phy.nr import PUSCHConfig
 from .utils import calculate_tb_size_numpy, decode_mcs_index_numpy
 
 
@@ -210,6 +211,37 @@ class TestCalculateTbSize:
             assert tb_crc_length == 24
         else:
             assert tb_crc_length == 16
+
+    @pytest.mark.parametrize(
+        "target_tb_size, expected",
+        [
+            (4184, 4224),  # (4184-24)/2^7 = 32.5 -> 33
+            (3896, 3904),  # (3896-24)/2^6 = 60.5 -> 61
+            (4312, 4352),  # (4312-24)/2^7 = 33.5 -> 34
+            (4180, 4096),  # (4180-24)/2^7 = 32.47 -> 32
+        ],
+    )
+    def test_round_ties_up(self, target_tb_size, expected):
+        """TS 38.214 Sec. 5.1.3.2 Step 4 breaks rounding ties upwards."""
+        tb_size = calculate_tb_size(
+            modulation_order=4,
+            target_coderate=0.5,
+            target_tb_size=target_tb_size,
+            num_coded_bits=20000,
+            return_cw_length=False,
+        )[0]
+        assert int(tb_size) == expected
+
+    def test_pusch_config_tb_size_round_tie(self):
+        """PUSCH TBS for a configuration that hits a rounding tie."""
+        pusch_config = PUSCHConfig()
+        pusch_config.carrier.n_size_grid = 27
+        pusch_config.tb.mcs_table = 1
+        pusch_config.tb.mcs_index = 8  # QPSK, R=602/1024
+        # N_info = 156*27*2*602/1024 = 4952.34 and (N_info-24)/2^7 = 38.503,
+        # so TBS = 39*2^7 = 4992. With N_info truncated to 4952 (as done in
+        # PUSCHConfig.tb_size), this is an exact tie 38.5 that must round up.
+        assert pusch_config.tb_size == 4992
 
     def test_tb_size_vs_numpy(self):
         """Validate calculate_tb_size against NumPy reference."""
