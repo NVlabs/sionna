@@ -785,9 +785,11 @@ class Demapper(Block):
         no: torch.Tensor,
         prior: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        # Reshape constellation points to [1,...1,num_points]
-        points_shape = [1] * y.dim() + list(self.constellation.points.shape)
-        points = self.constellation.points.reshape(points_shape)
+        # Reshape constellation points to [1,...1,num_points]. Call the
+        # constellation to use the same (possibly centered and normalized)
+        # points as the Mapper.
+        points = self.constellation()
+        points = points.reshape([1] * y.dim() + list(points.shape))
 
         # Compute squared distances from y to all points
         # shape [...,n,num_points]
@@ -920,7 +922,8 @@ class SymbolDemapper(Block):
         no: torch.Tensor,
         prior: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        points = expand_to_rank(self._constellation.points, y.dim() + 1, axis=0)
+        # Use the same (possibly centered and normalized) points as the Mapper
+        points = expand_to_rank(self._constellation(), y.dim() + 1, axis=0)
         y = y.unsqueeze(-1)
         squared_dist = (y - points).abs().square()
 

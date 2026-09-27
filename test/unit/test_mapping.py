@@ -646,6 +646,38 @@ def test_zero_and_sub_tiny_noise_are_clamped(
         assert torch.equal(actual, expected)
 
 
+@pytest.mark.parametrize("normalize, center", [(True, False), (False, True),
+                                               (True, True)])
+def test_demappers_use_centered_normalized_custom_points(
+    normalize, center, device
+):
+    """Demappers must use the same custom points as the Mapper."""
+    points = np.array([0.5, 1.5, 2.5, 3.5 + 1j], dtype=np.complex64)
+    constellation = Constellation(
+        "custom", 2, points=points, normalize=normalize, center=center,
+        device=device,
+    )
+    mapper = Mapper(constellation=constellation, return_indices=True,
+                    device=device)
+    bits = torch.randint(0, 2, (4, 200), device=device).float()
+    x, ind = mapper(bits)
+    no = torch.tensor(1e-3, device=device)
+
+    demapper = Demapper("app", constellation=constellation, hard_out=True,
+                        device=device)
+    assert torch.equal(demapper(x, no), bits)
+
+    sym_demapper = SymbolDemapper(constellation=constellation, hard_out=True,
+                                  device=device)
+    assert torch.equal(sym_demapper(x, no), ind)
+
+    # Soft output must match the reference computed on the effective points
+    logits = SymbolDemapper(constellation=constellation, device=device)(x, no)
+    c = constellation()
+    ref = torch.log_softmax(-(x.unsqueeze(-1) - c).abs().square() / no, -1)
+    assert torch.allclose(logits, ref, atol=1e-4)
+
+
 # =============================================================================
 # Tests for SymbolLogits2LLRs class
 # =============================================================================
