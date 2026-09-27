@@ -483,7 +483,9 @@ class RaisedCosineFilter(Filter):
         h = np.zeros([len(t)], np.float32)
         for i, tt in enumerate(t):
             tt = np.abs(tt)
-            if beta > 0 and (tt - np.abs(symbol_duration / 2 / beta) == 0):
+            # Use a tolerance: `t` is float32, so an exact comparison can
+            # miss the removable singularity and divide by (almost) zero.
+            if beta > 0 and np.isclose(tt, symbol_duration / 2 / beta):
                 h[i] = np.pi / 4 / symbol_duration * np.sinc(1 / 2 / beta)
             else:
                 h[i] = (
@@ -624,7 +626,9 @@ class RootRaisedCosineFilter(Filter):
             tt = np.abs(tt)
             if tt == 0:
                 h[i] = 1 / symbol_duration * (1 + beta * (4 / np.pi - 1))
-            elif beta > 0 and (tt - np.abs(symbol_duration / 4 / beta) == 0):
+            # Use a tolerance: `t` is float32, so an exact comparison can
+            # miss the removable singularity and divide by (almost) zero.
+            elif beta > 0 and np.isclose(tt, symbol_duration / 4 / beta):
                 h[i] = (
                     beta
                     / symbol_duration

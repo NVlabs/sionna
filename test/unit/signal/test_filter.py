@@ -493,6 +493,54 @@ class TestRootRaisedCosineFilter:
         assert abs(peak_idx - 50) <= 1  # Peak should be near the center
 
 
+def _rc_limit(beta):
+    """Value of the raised-cosine pulse at t = +-T/(2*beta)"""
+    return np.pi / 4 * np.sinc(1 / (2 * beta))
+
+
+def _rrc_limit(beta):
+    """Value of the root-raised-cosine pulse at t = +-T/(4*beta)"""
+    return beta / np.sqrt(2) * (
+        (1 + 2 / np.pi) * np.sin(np.pi / 4 / beta)
+        + (1 - 2 / np.pi) * np.cos(np.pi / 4 / beta)
+    )
+
+
+@pytest.mark.parametrize(
+    "filter_class, samples_per_symbol, beta, t_sing, limit",
+    [
+        (RaisedCosineFilter, 7, 0.35, 10 / 7, _rc_limit(0.35)),
+        (RaisedCosineFilter, 6, 0.75, 4 / 6, _rc_limit(0.75)),
+        (RaisedCosineFilter, 11, 0.22, 25 / 11, _rc_limit(0.22)),
+        (RootRaisedCosineFilter, 7, 0.35, 5 / 7, _rrc_limit(0.35)),
+        (RootRaisedCosineFilter, 12, 0.3, 10 / 12, _rrc_limit(0.3)),
+        (RootRaisedCosineFilter, 6, 0.75, 2 / 6, _rrc_limit(0.75)),
+    ],
+)
+def test_singular_sampling_times_are_finite(
+    filter_class, samples_per_symbol, beta, t_sing, limit, device
+):
+    """Sampling times that hit the removable singularity must use its limit"""
+    filt = filter_class(
+        span_in_symbols=8,
+        samples_per_symbol=samples_per_symbol,
+        beta=beta,
+        normalize=False,
+        device=device,
+    )
+    h = filt.coefficients.cpu().numpy()
+    assert np.all(np.isfinite(h))
+    ind = np.argmin(np.abs(filt.sampling_times - t_sing))
+    assert np.isclose(h[ind], limit, atol=1e-6)
+    ind = np.argmin(np.abs(filt.sampling_times + t_sing))
+    assert np.isclose(h[ind], limit, atol=1e-6)
+
+    # The normalized filter must not produce NaNs either
+    filt = filter_class(8, samples_per_symbol, beta, device=device)
+    y = filt(torch.randn(4, 64, device=device), padding="same")
+    assert torch.all(torch.isfinite(y))
+
+
 class TestSincFilter:
     """Tests for the SincFilter class"""
 
