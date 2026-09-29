@@ -191,7 +191,8 @@ def calculate_tb_size_numpy(
         n_info_q = max(24, 2**n * np.floor(n_info / 2**n))
     else:
         n = np.floor(np.log2(n_info - 24)) - 5
-        n_info_q = max(3840, 2**n * np.round((n_info - 24) / 2**n))
+        # Ties are rounded up, whereas np.round rounds half to even
+        n_info_q = max(3840, 2**n * np.floor((n_info - 24) / 2**n + 0.5))
 
     if n_info_q <= 3824:
         c = 1

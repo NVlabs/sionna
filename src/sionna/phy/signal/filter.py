@@ -480,10 +480,18 @@ class RaisedCosineFilter(Filter):
     ) -> np.ndarray:
         """Raised-cosine filter from Wikipedia
         https://en.wikipedia.org/wiki/Raised-cosine_filter"""
-        h = np.zeros([len(t)], np.float32)
-        for i, tt in enumerate(t):
+        # The generic formula cancels catastrophically near the removable
+        # singularity and must be evaluated in float64. The float32 sampling
+        # times only match the singularity up to float32 precision.
+        h = np.zeros([len(t)], np.float64)
+        for i, tt in enumerate(np.asarray(t, np.float64)):
             tt = np.abs(tt)
-            if beta > 0 and (tt - np.abs(symbol_duration / 2 / beta) == 0):
+            if beta > 0 and np.isclose(
+                tt,
+                np.abs(symbol_duration / 2 / beta),
+                rtol=np.finfo(np.float32).eps,
+                atol=0,
+            ):
                 h[i] = np.pi / 4 / symbol_duration * np.sinc(1 / 2 / beta)
             else:
                 h[i] = (
@@ -619,12 +627,20 @@ class RootRaisedCosineFilter(Filter):
     ) -> np.ndarray:
         """Root-raised-cosine filter from Wikipedia
         https://en.wikipedia.org/wiki/Root-raised-cosine_filter"""
-        h = np.zeros([len(t)], np.float32)
-        for i, tt in enumerate(t):
+        # The generic formula cancels catastrophically near the removable
+        # singularity and must be evaluated in float64. The float32 sampling
+        # times only match the singularity up to float32 precision.
+        h = np.zeros([len(t)], np.float64)
+        for i, tt in enumerate(np.asarray(t, np.float64)):
             tt = np.abs(tt)
             if tt == 0:
                 h[i] = 1 / symbol_duration * (1 + beta * (4 / np.pi - 1))
-            elif beta > 0 and (tt - np.abs(symbol_duration / 4 / beta) == 0):
+            elif beta > 0 and np.isclose(
+                tt,
+                np.abs(symbol_duration / 4 / beta),
+                rtol=np.finfo(np.float32).eps,
+                atol=0,
+            ):
                 h[i] = (
                     beta
                     / symbol_duration

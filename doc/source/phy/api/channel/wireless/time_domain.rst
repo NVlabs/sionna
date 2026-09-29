@@ -55,3 +55,4 @@ at time step :math:`b` and for time-lag :math:`\ell`, which is given by
    ApplyTimeChannel
    cir_to_time_channel
    time_to_ofdm_channel
+   time_to_doppler_channel

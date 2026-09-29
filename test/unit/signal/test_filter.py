@@ -383,6 +383,29 @@ class TestCustomFilter:
             assert fil_coeff.grad.sum().item() != 0
 
 
+def _rc_pulse(t, beta):
+    """Generic raised-cosine formula without special-casing"""
+    return np.sinc(t) * np.cos(np.pi * beta * t) / (1 - (2 * beta * t) ** 2)
+
+
+def _rrc_pulse(t, beta):
+    """Generic root-raised-cosine formula without special-casing"""
+    return (
+        np.sin(np.pi * t * (1 - beta)) + 4 * beta * t * np.cos(np.pi * t * (1 + beta))
+    ) / (np.pi * t * (1 - (4 * beta * t) ** 2))
+
+
+def _pulse_reference(pulse, filt, eps=1e-5):
+    """Float64 reference coefficients of ``filt`` for the given ``pulse``.
+
+    Averages the generic formula at ``t - eps`` and ``t + eps``, which avoids
+    the removable singularities without relying on the closed-form limits.
+    The error is O(eps**2).
+    """
+    t = (np.arange(filt.length) - filt.length // 2) / filt.samples_per_symbol
+    return 0.5 * (pulse(t - eps, filt.beta) + pulse(t + eps, filt.beta))
+
+
 class TestRaisedCosineFilter:
     """Tests for the RaisedCosineFilter class"""
 
@@ -425,6 +448,37 @@ class TestRaisedCosineFilter:
         x = torch.randn(32, 100, dtype=rdtype, device=device)
         y = rc(x, padding="same")
         assert y.shape == x.shape
+
+    @pytest.mark.parametrize(
+        "samples_per_symbol, beta",
+        [
+            # Singularity t = T/(2*beta) at t = 1, exact in float32
+            (4, 0.5),
+            # Singularity on a tap, but not representable in float32
+            (6, 0.75),
+            (7, 0.35),
+            (12, 0.3),
+            # Singularity on a tap that exact comparison misses even in float64
+            (32, 32 / 186),
+        ],
+    )
+    def test_coefficients(self, device, precision, samples_per_symbol, beta):
+        """Coefficients must be finite and match the pulse on every tap, and
+        the normalized impulse response must be finite"""
+        rc = RaisedCosineFilter(
+            span_in_symbols=8,
+            samples_per_symbol=samples_per_symbol,
+            beta=beta,
+            precision=precision,
+            device=device,
+        )
+        h = rc.coefficients.cpu().numpy()
+        assert np.all(np.isfinite(h))
+        np.testing.assert_allclose(
+            h, _pulse_reference(_rc_pulse, rc), rtol=0, atol=1e-6
+        )
+        y = rc(torch.ones(1, dtype=rc.dtype, device=device))
+        assert torch.all(torch.isfinite(y))
 
 
 class TestRootRaisedCosineFilter:
@@ -491,6 +545,38 @@ class TestRootRaisedCosineFilter:
         # Check that the output has the expected peak at the center
         peak_idx = torch.argmax(torch.abs(y2)).item()
         assert abs(peak_idx - 50) <= 1  # Peak should be near the center
+
+    @pytest.mark.parametrize(
+        "samples_per_symbol, beta",
+        [
+            # Singularity t = T/(4*beta) at t = 1, exact in float32
+            (4, 0.25),
+            # Singularity on a tap, but not representable in float32
+            (7, 0.35),
+            (12, 0.3),
+            # Tap close to, but not on, the singularity
+            (15, 0.22),
+            # Singularity on a tap that exact comparison misses even in float64
+            (32, 32 / 372),
+        ],
+    )
+    def test_coefficients(self, device, precision, samples_per_symbol, beta):
+        """Coefficients must be finite and match the pulse on every tap, and
+        the normalized impulse response must be finite"""
+        rrc = RootRaisedCosineFilter(
+            span_in_symbols=8,
+            samples_per_symbol=samples_per_symbol,
+            beta=beta,
+            precision=precision,
+            device=device,
+        )
+        h = rrc.coefficients.cpu().numpy()
+        assert np.all(np.isfinite(h))
+        np.testing.assert_allclose(
+            h, _pulse_reference(_rrc_pulse, rrc), rtol=0, atol=1e-6
+        )
+        y = rrc(torch.ones(1, dtype=rrc.dtype, device=device))
+        assert torch.all(torch.isfinite(y))
 
 
 class TestSincFilter:

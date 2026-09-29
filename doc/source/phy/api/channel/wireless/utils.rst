@@ -7,6 +7,7 @@ Utility Functions
    :toctree: .
 
    subcarrier_frequencies
+   time_frequency_vector
    time_lag_discrete_time_channel
    deg_2_rad
    rad_2_deg

@@ -646,6 +646,45 @@ def test_zero_and_sub_tiny_noise_are_clamped(
         assert torch.equal(actual, expected)
 
 
+@pytest.mark.parametrize(
+    "demapper_class, args",
+    [(Demapper, ("app",)), (Demapper, ("maxlog",)), (SymbolDemapper, ())],
+)
+@pytest.mark.parametrize(
+    "normalize, center", [(True, False), (False, True), (True, True)]
+)
+def test_custom_constellation_normalization_and_centering(
+    demapper_class, args, normalize, center, device
+):
+    """Demap against the centered and/or normalized points sent by the mapper."""
+    points = torch.tensor([0.5, 1.5, 2.5, 3.5 + 1j], dtype=torch.complex64)
+    constellation = Constellation(
+        "custom",
+        2,
+        points=points,
+        normalize=normalize,
+        center=center,
+        device=device,
+    )
+    reference = Constellation("custom", 2, points=constellation(), device=device)
+    demapper = demapper_class(*args, constellation=constellation, device=device)
+    reference_demapper = demapper_class(*args, constellation=reference, device=device)
+
+    y = torch.randn(10, 20, dtype=torch.complex64, device=device)
+    no = torch.tensor(1e-2, device=device)
+    assert torch.allclose(demapper(y, no), reference_demapper(y, no))
+
+    # Noiseless transmission must be demapped without errors
+    mapper = Mapper(constellation=constellation, return_indices=True, device=device)
+    bits = torch.randint(0, 2, (10, 40), device=device).float()
+    x, ind = mapper(bits)
+    hard_demapper = demapper_class(
+        *args, constellation=constellation, hard_out=True, device=device
+    )
+    target = ind if demapper_class is SymbolDemapper else bits
+    assert torch.equal(hard_demapper(x, no).to(target.dtype), target)
+
+
 # =============================================================================
 # Tests for SymbolLogits2LLRs class
 # =============================================================================

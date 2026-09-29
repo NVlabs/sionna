@@ -14,5 +14,6 @@ from . import signal
 from . import channel
 from . import mimo
 from . import ofdm
+from . import isac
 from . import fec
 from . import nr

@@ -698,10 +698,11 @@ def calculate_tb_size(
     )
 
     # For target_tb_size > 3824
+    # Ties must be rounded up, whereas torch.round rounds half to even
     log2_n_info_minus_24 = torch.log2(torch.clamp(target_tb_size - 24, min=1.0))
     n_large = torch.floor(log2_n_info_minus_24) - 5.0
     n_info_q_large = torch.clamp(
-        2**n_large * torch.round((target_tb_size - 24) / 2**n_large),
+        2**n_large * torch.floor((target_tb_size - 24) / 2**n_large + 0.5),
         min=3840.0
     )
 

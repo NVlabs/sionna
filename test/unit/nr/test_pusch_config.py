@@ -142,6 +142,17 @@ class TestPUSCHConfig:
 
         assert config.num_subcarriers == 52 * 12
 
+    def test_tb_size_rounding_tie(self):
+        """Test TB size for an exact rounding tie in TS 38.214 Sec. 5.1.3.2."""
+        # MCS 8 (Q_m=2, R=602/1024), 27 PRBs with 156 REs each, which gives
+        # N_info = 4952 and (N_info - 24) / 2^7 = 38.5
+        config = PUSCHConfig(n_size_bwp=27)
+        config.tb.mcs_index = 8
+        config.tb.mcs_table = 1
+
+        assert config.num_res_per_prb == 156
+        assert config.tb_size == 4992
+
     def test_dmrs_symbol_indices(self):
         """Test DMRS symbol indices calculation."""
         config = PUSCHConfig()

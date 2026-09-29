@@ -443,7 +443,9 @@ def empirical_aclr(
     ind_out = (freqs < f_min) | (freqs > f_max)
     ind_in = (freqs > f_min) & (freqs < f_max)
 
-    p_out = psd[ind_out].sum()
-    p_in = psd[ind_in].sum()
+    # Keep reductions static-shaped for torch.compile(fullgraph=True)
+    zero = torch.zeros((), dtype=psd.dtype, device=psd.device)
+    p_out = torch.where(ind_out, psd, zero).sum()
+    p_in = torch.where(ind_in, psd, zero).sum()
     aclr = p_out / p_in
     return aclr

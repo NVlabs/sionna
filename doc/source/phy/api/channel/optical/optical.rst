@@ -109,5 +109,4 @@ See :cite:p:`A2012` for the definition of the linear and non-linear SSFM operato
 
    SSFM
    EDFA
-   utils.time_frequency_vector
 

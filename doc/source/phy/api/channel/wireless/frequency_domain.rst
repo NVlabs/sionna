@@ -70,3 +70,5 @@ Gaussian noise.
     GenerateOFDMChannel
     ApplyOFDMChannel
     cir_to_ofdm_channel
+    ofdm_to_time_channel
+    ofdm_to_delay_doppler_channel

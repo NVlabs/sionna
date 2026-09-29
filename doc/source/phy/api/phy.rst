@@ -8,6 +8,7 @@ API Documentation
     config
     channel/channel
     fec/fec
+    isac/index
     mapping/index
     mimo/index
     nr/index

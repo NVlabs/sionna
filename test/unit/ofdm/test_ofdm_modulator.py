@@ -200,6 +200,9 @@ class TestOFDMModulatorCompile:
         modulator = OFDMModulator(
             cp_length, precision=precision, device=device
         )
+        # Earlier compiled calls in this class share the recompile budget of
+        # `Block.__call__`, and exceeding it is a hard error with fullgraph.
+        torch._dynamo.reset()
         compiled_modulator = torch.compile(modulator, fullgraph=True)
         actual = compiled_modulator(x)
 

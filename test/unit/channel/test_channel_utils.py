@@ -15,6 +15,9 @@ from sionna.phy.channel import (
     time_frequency_vector,
     time_lag_discrete_time_channel,
     time_to_ofdm_channel,
+    ofdm_to_time_channel,
+    time_to_doppler_channel,
+    ofdm_to_delay_doppler_channel,
     cir_to_ofdm_channel,
     cir_to_time_channel,
     deg_2_rad,
@@ -601,6 +604,26 @@ class TestCompileCompatibility:
         expected = cir_to_time_channel(20e6, a, tau, -6, 20)
         assert torch.allclose(result, expected, rtol=1e-4, atol=1e-6)
 
+    def test_ofdm_to_time_channel_compile(self, device):
+        """Test that ofdm_to_time_channel can be fully compiled"""
+        compiled_fn = torch.compile(
+            ofdm_to_time_channel, backend="inductor", fullgraph=True
+        )
+        h_f = torch.randn(2, 4, 16, dtype=torch.complex64, device=device)
+        result = compiled_fn(h_f)
+        expected = ofdm_to_time_channel(h_f)
+        assert torch.allclose(result, expected, rtol=1e-4, atol=1e-6)
+
+    def test_time_to_doppler_channel_compile(self, device):
+        """Test that time_to_doppler_channel can be fully compiled"""
+        compiled_fn = torch.compile(
+            time_to_doppler_channel, backend="inductor", fullgraph=True
+        )
+        h_t = torch.randn(2, 8, 5, dtype=torch.complex64, device=device)
+        result = compiled_fn(h_t)
+        expected = time_to_doppler_channel(h_t)
+        assert torch.allclose(result, expected, rtol=1e-4, atol=1e-6)
+
     @pytest.mark.parametrize("backend", ["inductor", "eager"])
     def test_exp_corr_mat_compile(self, device, backend):
         """Test that exp_corr_mat can be compiled"""
@@ -745,3 +768,196 @@ class TestTimeToOfdmChannel:
         )
         with pytest.raises(ValueError, match="must not exceed rg.fft_size"):
             time_to_ofdm_channel(h_t, rg, l_min=0)
+
+
+class TestOfdmToTimeChannel:
+    """Tests for ofdm_to_time_channel."""
+
+    def test_default_lag_interval(self, device):
+        """By default, all canonical circular time lags are returned."""
+        h_f = torch.randn(2, 4, 16, dtype=torch.complex64, device=device)
+        expected = torch.fft.ifft(torch.fft.ifftshift(h_f, dim=-1), dim=-1)
+
+        h_t = ofdm_to_time_channel(h_f)
+        h_t_shifted = ofdm_to_time_channel(h_f, l_min=-2)
+
+        assert torch.allclose(h_t, expected, rtol=1e-5, atol=1e-6)
+        assert torch.allclose(
+            h_t_shifted,
+            torch.roll(expected, shifts=2, dims=-1),
+            rtol=1e-5,
+            atol=1e-6,
+        )
+
+    def test_shape_dtype_and_device(self, device):
+        """Leading dimensions, dtype, and device are preserved."""
+        h_f = torch.randn(
+            2, 3, 2, 4, 3, 5, 16, dtype=torch.complex64, device=device
+        )
+        h_t = ofdm_to_time_channel(h_f, l_min=-2, l_max=4)
+
+        assert h_t.shape == (2, 3, 2, 4, 3, 5, 7)
+        assert h_t.dtype == h_f.dtype
+        assert h_t.device == h_f.device
+
+    # One even and one odd size: `fftshift` and `ifftshift` coincide for even
+    # sizes, so only an odd size detects the two being confused
+    @pytest.mark.parametrize("fft_size", [8, 15])
+    def test_round_trip_with_time_to_ofdm_channel(self, device, fft_size):
+        """The inverse recovers the time samples selected for OFDM symbols.
+
+        Odd FFT sizes are covered because `fftshift` and `ifftshift` are not
+        the same operation for them.
+        """
+        rg = ResourceGrid(
+            num_ofdm_symbols=3,
+            fft_size=fft_size,
+            subcarrier_spacing=15e3,
+            cyclic_prefix_length=2,
+            device=device,
+        )
+        l_min, l_max = -2, 3
+        h_t = torch.randn(
+            2,
+            3,
+            rg.num_time_samples,
+            l_max - l_min + 1,
+            dtype=torch.complex64,
+            device=device,
+        )
+
+        h_f = time_to_ofdm_channel(h_t, rg, l_min)
+        h_t_hat = ofdm_to_time_channel(h_f, l_min, l_max)
+
+        ofdm_length = rg.fft_size + rg.cyclic_prefix_length
+        sample_indices = torch.arange(
+            rg.cyclic_prefix_length,
+            rg.num_time_samples,
+            ofdm_length,
+            device=device,
+        )
+        expected = h_t.index_select(-2, sample_indices)
+        assert torch.allclose(h_t_hat, expected, rtol=1e-5, atol=1e-6)
+
+    def test_consistency_with_cir_to_ofdm_channel(self, device):
+        """On-grid path delays reproduce cir_to_time_channel."""
+        fft_size, subcarrier_spacing = 32, 15e3
+        bandwidth = fft_size * subcarrier_spacing
+        l_min, l_max = -4, 10
+
+        # Delays aligned with the sampling grid, for which the sampled sinc
+        # response and the periodic inverse DFT coincide
+        lags = torch.tensor([0.0, 3.0, 7.0], device=device)
+        tau = (lags / bandwidth).reshape(1, 1, 1, 3)
+        a = torch.randn(
+            1, 1, 1, 1, 1, 3, 5, dtype=torch.complex64, device=device
+        )
+
+        frequencies = subcarrier_frequencies(
+            fft_size, subcarrier_spacing, device=device
+        )
+        h_f = cir_to_ofdm_channel(frequencies, a, tau)
+        h_t = ofdm_to_time_channel(h_f, l_min, l_max)
+
+        expected = cir_to_time_channel(bandwidth, a, tau, l_min, l_max)
+        assert torch.allclose(h_t, expected, rtol=1e-4, atol=1e-6)
+
+    def test_invalid_time_lags(self, device):
+        """Inconsistent or aliased time-lag intervals are rejected."""
+        fft_size = 16
+        h_f = torch.randn(2, 4, fft_size, dtype=torch.complex64, device=device)
+
+        with pytest.raises(ValueError, match="must be greater than or equal"):
+            ofdm_to_time_channel(h_f, l_min=5, l_max=4)
+
+        with pytest.raises(ValueError, match="must not exceed fft_size"):
+            ofdm_to_time_channel(h_f, l_min=-10, l_max=10)
+
+        # l_min is only determined modulo fft_size
+        with pytest.raises(ValueError, match="must satisfy"):
+            ofdm_to_time_channel(h_f, l_min=-fft_size, l_max=-fft_size + 2)
+
+        with pytest.raises(ValueError, match="must satisfy"):
+            ofdm_to_time_channel(h_f, l_min=fft_size)
+
+        with pytest.raises(TypeError, match="`l_min`"):
+            ofdm_to_time_channel(h_f, l_min=1.5)
+
+        with pytest.raises(TypeError, match="`l_max`"):
+            ofdm_to_time_channel(h_f, l_min=0, l_max=4.0)
+
+        # A full period starting at any valid l_min stays unambiguous
+        ofdm_to_time_channel(h_f, l_min=1)
+
+
+class TestTimeToDopplerChannel:
+    """Tests for time_to_doppler_channel."""
+
+    def test_complex_exponential(self, device):
+        """A temporal complex exponential maps to its centered Doppler bin
+        with unchanged amplitude."""
+        num_time_steps = 9
+        num_time_lags = 4
+        doppler_bin = -2
+        amplitude = torch.randn(
+            2, 3, 1, num_time_lags, dtype=torch.complex64, device=device
+        )
+        b = torch.arange(num_time_steps, dtype=torch.float32, device=device)
+        phase = 2 * PI * doppler_bin * b / num_time_steps
+        tone = torch.polar(torch.ones_like(phase), phase).reshape(1, 1, -1, 1)
+        h_t = amplitude * tone
+
+        h_dd = time_to_doppler_channel(h_t)
+        expected = torch.zeros_like(h_dd)
+        centered_bin = (doppler_bin + num_time_steps // 2) % num_time_steps
+        expected[..., centered_bin, :] = amplitude.squeeze(-2)
+
+        assert h_dd.shape == (2, 3, num_time_steps, num_time_lags)
+        assert torch.allclose(h_dd, expected, rtol=1e-5, atol=1e-5)
+
+
+class TestOfdmToDelayDopplerChannel:
+    """Tests for ofdm_to_delay_doppler_channel."""
+
+    def test_energy_conservation(self, device):
+        """No transform creates energy, also for off-grid paths."""
+        fft_size, subcarrier_spacing, num_time_steps = 32, 30e3, 16
+        bandwidth = fft_size * subcarrier_spacing
+        num_paths = 5
+
+        # Off-grid delays and Doppler shifts, one observation per 1/scs
+        tau = torch.rand(
+            1, 1, 1, num_paths, dtype=torch.float64, device=device
+        ) * 10 / bandwidth
+        doppler = (
+            torch.rand(num_paths, 1, dtype=torch.float64, device=device) - 0.5
+        ) * subcarrier_spacing
+        t = torch.arange(
+            num_time_steps, dtype=torch.float64, device=device
+        ) / subcarrier_spacing
+        gain = torch.randn(
+            num_paths, 1, dtype=torch.complex128, device=device
+        )
+        a = gain * torch.polar(torch.ones_like(doppler * t),
+                               2 * PI * doppler * t)
+        a = a.reshape(1, 1, 1, 1, 1, num_paths, num_time_steps)
+
+        frequencies = subcarrier_frequencies(
+            fft_size, subcarrier_spacing, precision="double", device=device
+        )
+        h_f = cir_to_ofdm_channel(frequencies, a, tau)
+        energy = h_f.abs().square().mean(dim=(-2, -1))
+
+        # Frequency samples are averaged, delay taps and Doppler bins summed
+        h_t = ofdm_to_time_channel(h_f)
+        h_dd = ofdm_to_delay_doppler_channel(h_f)
+        assert torch.allclose(
+            h_t.abs().square().sum(-1).mean(-1), energy, rtol=1e-10
+        )
+        assert torch.allclose(
+            h_dd.abs().square().sum(dim=(-2, -1)), energy, rtol=1e-10
+        )
+
+        # Truncating the lag interval can only lose energy
+        h_dd = ofdm_to_delay_doppler_channel(h_f, l_min=-2, l_max=8)
+        assert torch.all(h_dd.abs().square().sum(dim=(-2, -1)) < energy)

@@ -255,6 +255,45 @@ class TestCalculateTbSize:
         assert cb_crc_length == result_np[4]
         np.testing.assert_array_equal(cw_length, result_np[5])
 
+    @pytest.mark.parametrize(
+        ("target_tb_size", "target_coderate", "num_coded_bits", "expected"),
+        [
+            # (4184 - 24) / 2^7 = 32.5 -> 33
+            (4184, 0.5, 20000, 4224),
+            # (3896 - 24) / 2^6 = 60.5 -> 61, just above N_info = 3824
+            (3896, 0.5, 20000, 3904),
+            # (4312 - 24) / 2^7 = 33.5 -> 34
+            (4312, 0.5, 20000, 4352),
+            # (4180 - 24) / 2^7 = 32.47 -> 32, no tie
+            (4180, 0.5, 20000, 4096),
+            # (20760 - 24) / 2^9 = 40.5 -> 41, three code blocks
+            (20760, 0.5, 48000, 21000),
+            # (4184 - 24) / 2^7 = 32.5 -> 33, two code blocks as R <= 1/4
+            (4184, 0.25, 20000, 4232),
+        ],
+    )
+    def test_rounding_ties_broken_upwards(
+        self, target_tb_size, target_coderate, num_coded_bits, expected
+    ):
+        """Test rounding ties in Step 4 of TS 38.214 Sec. 5.1.3.2."""
+        tb_size = calculate_tb_size(
+            modulation_order=4,
+            target_coderate=target_coderate,
+            target_tb_size=target_tb_size,
+            num_coded_bits=num_coded_bits,
+            return_cw_length=False,
+        )[0]
+        tb_size_np = calculate_tb_size_numpy(
+            modulation_order=4,
+            target_coderate=target_coderate,
+            target_tb_size=target_tb_size,
+            num_coded_bits=num_coded_bits,
+            verbose=False,
+        )[0]
+
+        assert int(tb_size) == expected
+        assert tb_size_np == expected
+
 
 class TestDecodeMcsIndexAgainstNumpy:
     """Test decode_mcs_index against NumPy reference implementation."""
