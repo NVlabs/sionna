@@ -1,0 +1,1054 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.phy.isac.utils &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/phy/isac/utils';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/phy/isac/utils.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.phy.isac.utils</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.phy.isac.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">"""Utility functions for integrated sensing and communication."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna._validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_one_of</span><span class="p">,</span> <span class="n">check_tensor_all</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Precision</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">dtypes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">PI</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"steering_vectors"</span><span class="p">,</span>
+    <span class="s2">"angular_delay_doppler_spectrum"</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="steering_vectors">
+<a class="viewcode-back" href="../../../../phy/api/isac/sionna.phy.isac.steering_vectors.html#sionna.phy.isac.steering_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">steering_vectors</span><span class="p">(</span>
+    <span class="n">positions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">theta</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">phi</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="n">wavelength</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"cartesian"</span><span class="p">,</span>
+    <span class="n">precision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Precision</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Generate normalized steering vectors.</span>
+
+<span class="sd">    For an array with :math:`M` antennas at positions</span>
+<span class="sd">    :math:`\mathbf{d}_m\in\mathbb{R}^3`, this function computes the normalized</span>
+<span class="sd">    steering vector</span>
+<span class="sd">    :math:`\mathbf{a}(\theta,\varphi)\in\mathbb{C}^M` with elements</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        a_m(\theta,\varphi)</span>
+<span class="sd">        = \frac{1}{\sqrt{M}}</span>
+<span class="sd">          \exp\left(</span>
+<span class="sd">          j\frac{2\pi}{\lambda}</span>
+<span class="sd">          \mathbf{d}_m^{\mathsf{T}}</span>
+<span class="sd">          \widehat{\mathbf{r}}(\theta,\varphi)</span>
+<span class="sd">          \right),</span>
+<span class="sd">        \quad m=1,\dots,M,</span>
+
+<span class="sd">    where :math:`\lambda` is the carrier wavelength and</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \widehat{\mathbf{r}}(\theta,\varphi)</span>
+<span class="sd">        =</span>
+<span class="sd">        \begin{bmatrix}</span>
+<span class="sd">        \sin(\theta)\cos(\varphi)\\</span>
+<span class="sd">        \sin(\theta)\sin(\varphi)\\</span>
+<span class="sd">        \cos(\theta)</span>
+<span class="sd">        \end{bmatrix}.</span>
+
+<span class="sd">    This is the array response used by the Sionna channel models, normalized</span>
+<span class="sd">    to unit norm. Beamforming therefore conjugates it, as in</span>
+<span class="sd">    :func:`angular_delay_doppler_spectrum`, and the matched transmit precoder</span>
+<span class="sd">    for direction :math:`(\theta,\varphi)` is</span>
+<span class="sd">    :math:`\mathbf{a}(\theta,\varphi)^*`.</span>
+
+<span class="sd">    :param positions: Antenna positions :math:`\mathbf{d}_m=(x,y,z)` in</span>
+<span class="sd">        meters, shape [num_ant, 3].</span>
+<span class="sd">    :param theta: Zenith angles in radians. Values must lie in</span>
+<span class="sd">        :math:`[0,\pi]`.</span>
+<span class="sd">    :param phi: Azimuth angles in radians. Values conventionally lie in</span>
+<span class="sd">        :math:`[-\pi,\pi]`, but any finite value is accepted because the</span>
+<span class="sd">        steering vector is :math:`2\pi`-periodic in :math:`\varphi`.</span>
+<span class="sd">    :param wavelength: Scalar carrier wavelength in meters.</span>
+<span class="sd">    :param mode: If ``"cartesian"``, both inputs must be scalar or</span>
+<span class="sd">        one-dimensional and all combinations are generated. If ``"paired"``,</span>
+<span class="sd">        ``theta`` and ``phi`` are broadcast and interpreted as angle pairs.</span>
+<span class="sd">        Defaults to ``"cartesian"``.</span>
+<span class="sd">    :param precision: Precision used for internal calculations and outputs.</span>
+<span class="sd">        If set to `None`, :attr:`~sionna.phy.config.Config.precision` is used.</span>
+
+<span class="sd">    :output a: [..., num_ant], `torch.complex`. Unit-norm steering</span>
+<span class="sd">        vectors. For Cartesian mode, the shape is always</span>
+<span class="sd">        [num_theta, num_phi, num_ant], where scalar angles contribute an axis</span>
+<span class="sd">        of length one. For paired mode, the shape is the broadcast shape of</span>
+<span class="sd">        ``theta`` and ``phi`` followed by [num_ant].</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    This function only models the phase shifts caused by antenna positions.</span>
+<span class="sd">    Antenna patterns and polarization-dependent gains are not included.</span>
+<span class="sd">    Co-located polarization components therefore receive identical phases.</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        import torch</span>
+<span class="sd">        from sionna.phy.isac import steering_vectors</span>
+
+<span class="sd">        positions = torch.tensor([[0., -0.025, 0.],</span>
+<span class="sd">                                  [0.,  0.025, 0.]])</span>
+
+<span class="sd">        # By default, all combinations of the two angles are generated</span>
+<span class="sd">        theta = torch.tensor([torch.pi/3, torch.pi/2])</span>
+<span class="sd">        phi = torch.tensor([0., torch.pi/4, torch.pi/2])</span>
+<span class="sd">        w = steering_vectors(positions, theta, phi, wavelength=0.1)</span>
+<span class="sd">        # w.shape = torch.Size([2, 3, 2]) # [num_theta, num_phi, num_ant]</span>
+
+<span class="sd">        # Paired mode instead broadcasts the angles into direction pairs</span>
+<span class="sd">        w = steering_vectors(positions, theta, phi[:2], wavelength=0.1,</span>
+<span class="sd">                             mode="paired")</span>
+<span class="sd">        # w.shape = torch.Size([2, 2]) # [num_directions, num_ant]</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`positions` must be a torch.Tensor."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">positions</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`positions` must have shape [num_ant, 3]."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`positions` must contain at least one antenna."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">positions</span><span class="o">.</span><span class="n">is_complex</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`positions` must be real-valued."</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">((</span><span class="n">theta</span><span class="p">,</span> <span class="s2">"theta"</span><span class="p">),</span> <span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="s2">"phi"</span><span class="p">),</span>
+                        <span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="s2">"wavelength"</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">is_complex</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be real-valued."</span><span class="p">)</span>
+    <span class="n">check_one_of</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="p">(</span><span class="s2">"paired"</span><span class="p">,</span> <span class="s2">"cartesian"</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"mode"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">precision</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rdtype</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rdtype</span> <span class="o">=</span> <span class="n">dtypes</span><span class="p">[</span><span class="n">precision</span><span class="p">][</span><span class="s2">"torch"</span><span class="p">][</span><span class="s2">"dtype"</span><span class="p">]</span>
+
+    <span class="n">device</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">device</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">rdtype</span><span class="p">)</span>
+    <span class="c1"># Validate in the input dtype so a rounded pi endpoint remains valid</span>
+    <span class="c1"># when the requested computation precision is higher.</span>
+    <span class="n">theta_dtype</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">dtype</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="k">else</span> <span class="n">rdtype</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">theta_dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">rdtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">wavelength</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">wavelength</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">rdtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">theta</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">phi</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`theta` and `phi` must not be empty."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">wavelength</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`wavelength` must be scalar."</span><span class="p">)</span>
+    <span class="n">check_tensor_all</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">wavelength</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">wavelength</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"wavelength"</span><span class="p">,</span>
+        <span class="n">message</span><span class="o">=</span><span class="s2">"`wavelength` must be finite and strictly positive."</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">check_tensor_all</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">theta</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">theta</span> <span class="o">&lt;=</span> <span class="n">PI</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"theta"</span><span class="p">,</span>
+        <span class="n">message</span><span class="o">=</span><span class="s2">"`theta` must contain finite values in [0, pi]."</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">rdtype</span><span class="p">)</span>
+    <span class="n">check_tensor_all</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"phi"</span><span class="p">,</span>
+        <span class="n">message</span><span class="o">=</span><span class="s2">"`phi` must contain only finite values."</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"paired"</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">broadcast_tensors</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"`theta` and `phi` must have broadcast-compatible shapes in "</span>
+                <span class="s2">"paired mode."</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">theta</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">phi</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"`theta` and `phi` must be scalar or one-dimensional in "</span>
+                <span class="s2">"cartesian mode."</span>
+            <span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">direction</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">phase</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mi">2</span> <span class="o">*</span> <span class="n">PI</span> <span class="o">/</span> <span class="n">wavelength</span>
+        <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">"...c,mc-&gt;...m"</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">positions</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">complex</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">phase</span><span class="p">),</span> <span class="n">phase</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">rdtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span></div>
+
+
+
+<div class="viewcode-block" id="angular_delay_doppler_spectrum">
+<a class="viewcode-back" href="../../../../phy/api/isac/sionna.phy.isac.angular_delay_doppler_spectrum.html#sionna.phy.isac.angular_delay_doppler_spectrum">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">angular_delay_doppler_spectrum</span><span class="p">(</span>
+    <span class="n">h_dd</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">rx_steering_vectors</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">tx_steering_vectors</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"paired"</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Compute a Bartlett-type angular delay-Doppler spectrum.</span>
+
+<span class="sd">    Let</span>
+<span class="sd">    :math:`\mathbf{H}_{b,r,t,q,\ell}\in\mathbb{C}^{M_\text{R}\times</span>
+<span class="sd">    M_\text{T}}` denote the MIMO channel at Doppler bin :math:`q` and delay</span>
+<span class="sd">    bin :math:`\ell` for transmitter :math:`t`, receiver :math:`r`, and</span>
+<span class="sd">    arbitrary batch index :math:`b`. For receive and transmit steering vectors</span>
+<span class="sd">    :math:`\mathbf{a}_{\text{R},r,i}` and</span>
+<span class="sd">    :math:`\mathbf{a}_{\text{T},t,j}`, the Cartesian spectrum is</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        P_{b,r,i,t,j,q,\ell}</span>
+<span class="sd">        =</span>
+<span class="sd">        \left|</span>
+<span class="sd">        \mathbf{a}_{\text{R},r,i}^{\mathsf{H}}</span>
+<span class="sd">        \mathbf{H}_{b,r,t,q,\ell}</span>
+<span class="sd">        \mathbf{a}_{\text{T},t,j}^*</span>
+<span class="sd">        \right|^2.</span>
+
+<span class="sd">    Both array responses enter conjugated, which is most apparent in index</span>
+<span class="sd">    notation,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        P</span>
+<span class="sd">        =</span>
+<span class="sd">        \left|</span>
+<span class="sd">        \sum_{m=1}^{M_\text{R}}\sum_{n=1}^{M_\text{T}}</span>
+<span class="sd">        a_{\text{R},m}^*\,H_{mn}\,a_{\text{T},n}^*</span>
+<span class="sd">        \right|^2.</span>
+
+<span class="sd">    The Hermitian transpose above merely reflects that</span>
+<span class="sd">    :math:`\mathbf{a}_\text{R}` is contracted from the left, where a row</span>
+<span class="sd">    vector is required, whereas :math:`\mathbf{a}_\text{T}` must stay a</span>
+<span class="sd">    column.</span>
+
+<span class="sd">    This conjugation pattern differs from the classical Bartlett spectrum</span>
+<span class="sd">    :math:`\mathbf{a}^{\mathsf{H}}\mathbf{R}\mathbf{a}`, which is defined on a</span>
+<span class="sd">    covariance matrix and therefore already carries a conjugation in its own</span>
+<span class="sd">    outer product. A propagation channel does not: a target contributes</span>
+<span class="sd">    :math:`\mathbf{H}=\beta\mathbf{a}_\text{R}\mathbf{a}_\text{T}^{\mathsf{T}}`</span>
+<span class="sd">    with a plain transpose, so both scan vectors must be conjugated for the</span>
+<span class="sd">    phases to cancel. Scanning that target then gives</span>
+<span class="sd">    :math:`\beta\|\mathbf{a}_\text{R}\|^2\|\mathbf{a}_\text{T}\|^2` instead of</span>
+<span class="sd">    a sum of squared phasors.</span>
+
+<span class="sd">    :param h_dd: MIMO delay-Doppler channel, shape</span>
+<span class="sd">        [..., num_rx, num_rx_ant, num_tx, num_tx_ant, num_doppler_bins,</span>
+<span class="sd">        num_delay_bins]. The last dimension corresponds to the time lags</span>
+<span class="sd">        returned by</span>
+<span class="sd">        :func:`~sionna.phy.channel.ofdm_to_delay_doppler_channel`.</span>
+<span class="sd">    :param rx_steering_vectors: Shared receive steering vectors with shape</span>
+<span class="sd">        [num_rx_directions, num_rx_ant], or receiver-specific vectors with</span>
+<span class="sd">        shape [num_rx, num_rx_directions, num_rx_ant]. Array responses as</span>
+<span class="sd">        returned by :func:`steering_vectors`; they are conjugated internally.</span>
+<span class="sd">    :param tx_steering_vectors: Shared transmit steering vectors with shape</span>
+<span class="sd">        [num_tx_directions, num_tx_ant], or transmitter-specific vectors with</span>
+<span class="sd">        shape [num_tx, num_tx_directions, num_tx_ant]. Array responses as</span>
+<span class="sd">        returned by :func:`steering_vectors`; they are conjugated internally.</span>
+<span class="sd">    :param mode: If ``"paired"``, direction indices are paired. Their counts</span>
+<span class="sd">        must then match or one count must be one. If ``"cartesian"``, all</span>
+<span class="sd">        receive and transmit direction combinations are evaluated. Defaults to</span>
+<span class="sd">        ``"paired"``.</span>
+
+<span class="sd">    :output spectrum: `torch.float`. Linear power spectrum. Paired mode</span>
+<span class="sd">        returns [..., num_rx, num_tx, num_direction_pairs, num_doppler_bins,</span>
+<span class="sd">        num_delay_bins]. Cartesian mode returns</span>
+<span class="sd">        [..., num_rx, num_rx_directions, num_tx, num_tx_directions,</span>
+<span class="sd">        num_doppler_bins, num_delay_bins].</span>
+
+<span class="sd">    .. rubric:: Notes</span>
+
+<span class="sd">    The output is an angular delay-Doppler spectrum. Converting delay to range</span>
+<span class="sd">    depends on the sensing geometry. For a monostatic system,</span>
+<span class="sd">    :math:`R=c\tau/2`; for a bistatic system, delay represents the total</span>
+<span class="sd">    transmitter-target-receiver path length divided by :math:`c`.</span>
+
+<span class="sd">    For the unit-norm steering vectors returned by :func:`steering_vectors`,</span>
+<span class="sd">    no spectrum value exceeds the channel energy</span>
+<span class="sd">    :math:`\|\mathbf{H}_{b,r,t,q,\ell}\|_\text{F}^2`. If the receive and</span>
+<span class="sd">    transmit steering vectors each form an orthonormal basis, the spectrum</span>
+<span class="sd">    summed over all direction pairs equals this energy. For single-antenna</span>
+<span class="sd">    devices, the spectrum reduces to :math:`|H_{b,r,t,q,\ell}|^2`.</span>
+
+<span class="sd">    The channel and both steering banks are promoted to their common</span>
+<span class="sd">    :func:`torch.promote_types` data type, so the output precision follows the</span>
+<span class="sd">    widest input rather than that of ``h_dd``.</span>
+
+<span class="sd">    Cartesian mode carries a separate axis for the receive and transmit</span>
+<span class="sd">    directions and therefore scales with their product. Scanning the same</span>
+<span class="sd">    direction at both ends, as in a monostatic system, is much cheaper in</span>
+<span class="sd">    paired mode.</span>
+
+<span class="sd">    .. rubric:: Examples</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        import torch</span>
+<span class="sd">        from sionna.phy.isac import (angular_delay_doppler_spectrum,</span>
+<span class="sd">            steering_vectors)</span>
+
+<span class="sd">        # Half-wavelength uniform linear array with four antennas</span>
+<span class="sd">        wavelength = 0.1</span>
+<span class="sd">        positions = torch.zeros(4, 3)</span>
+<span class="sd">        positions[:, 1] = torch.arange(4)*wavelength/2</span>
+
+<span class="sd">        # Scan 25 azimuth directions in the horizontal plane, then flatten</span>
+<span class="sd">        # the grid into a list of directions</span>
+<span class="sd">        theta = torch.tensor([torch.pi/2])</span>
+<span class="sd">        phi = torch.deg2rad(torch.linspace(-60., 60., 25))</span>
+<span class="sd">        steering = steering_vectors(positions, theta, phi, wavelength)</span>
+<span class="sd">        steering = steering.reshape(-1, positions.shape[0])</span>
+
+<span class="sd">        # Delay-Doppler channel as returned by</span>
+<span class="sd">        # sionna.phy.channel.ofdm_to_delay_doppler_channel, with shape</span>
+<span class="sd">        # [batch, num_rx, num_rx_ant, num_tx, num_tx_ant, num_doppler_bins,</span>
+<span class="sd">        # num_delay_bins]</span>
+<span class="sd">        h_dd = torch.randn(1, 1, 4, 1, 4, 32, 64, dtype=torch.complex64)</span>
+
+<span class="sd">        # Monostatic scan: pair each RX direction with the same TX direction</span>
+<span class="sd">        spectrum = angular_delay_doppler_spectrum(h_dd, steering, steering)</span>
+<span class="sd">        print(spectrum.shape)</span>
+<span class="sd">        # torch.Size([1, 1, 1, 25, 32, 64])</span>
+
+<span class="sd">        # Cartesian mode evaluates all RX-TX direction combinations instead</span>
+<span class="sd">        spectrum = angular_delay_doppler_spectrum(h_dd, steering, steering,</span>
+<span class="sd">                                                  mode="cartesian")</span>
+<span class="sd">        print(spectrum.shape)</span>
+<span class="sd">        # torch.Size([1, 1, 25, 1, 25, 32, 64])</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h_dd</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`h_dd` must be a torch.Tensor."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"`h_dd` must have shape [..., num_rx, num_rx_ant, num_tx, "</span>
+            <span class="s2">"num_tx_ant, num_doppler_bins, num_delay_bins]."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">is_complex</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`h_dd` must be complex-valued."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rx_steering_vectors</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`rx_steering_vectors` must be a torch.Tensor."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tx_steering_vectors</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`tx_steering_vectors` must be a torch.Tensor."</span><span class="p">)</span>
+    <span class="n">check_one_of</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="p">(</span><span class="s2">"paired"</span><span class="p">,</span> <span class="s2">"cartesian"</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"mode"</span><span class="p">)</span>
+
+    <span class="n">num_rx</span> <span class="o">=</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span>
+    <span class="n">num_rx_ant</span> <span class="o">=</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+    <span class="n">num_tx</span> <span class="o">=</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">num_tx_ant</span> <span class="o">=</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># `einsum` requires matching data types, so promote to the widest input</span>
+    <span class="c1"># rather than casting the steering banks down to the channel data type</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="n">h_dd</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">rx_steering_vectors</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">tx_steering_vectors</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">h_dd</span> <span class="o">=</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="n">rx_steering_vectors</span> <span class="o">=</span> <span class="n">_prepare_steering_bank</span><span class="p">(</span>
+        <span class="n">rx_steering_vectors</span><span class="p">,</span>
+        <span class="n">num_devices</span><span class="o">=</span><span class="n">num_rx</span><span class="p">,</span>
+        <span class="n">num_ant</span><span class="o">=</span><span class="n">num_rx_ant</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"rx_steering_vectors"</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="n">h_dd</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">tx_steering_vectors</span> <span class="o">=</span> <span class="n">_prepare_steering_bank</span><span class="p">(</span>
+        <span class="n">tx_steering_vectors</span><span class="p">,</span>
+        <span class="n">num_devices</span><span class="o">=</span><span class="n">num_tx</span><span class="p">,</span>
+        <span class="n">num_ant</span><span class="o">=</span><span class="n">num_tx_ant</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"tx_steering_vectors"</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="n">h_dd</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Both banks hold array responses, so beamforming conjugates them</span>
+    <span class="n">rx_steering_vectors</span> <span class="o">=</span> <span class="n">rx_steering_vectors</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+    <span class="n">tx_steering_vectors</span> <span class="o">=</span> <span class="n">tx_steering_vectors</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"cartesian"</span><span class="p">:</span>
+        <span class="n">beamformed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+            <span class="s2">"rim,...rmtnql,tjn-&gt;...ritjql"</span><span class="p">,</span>
+            <span class="n">rx_steering_vectors</span><span class="p">,</span>
+            <span class="n">h_dd</span><span class="p">,</span>
+            <span class="n">tx_steering_vectors</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_rx_directions</span> <span class="o">=</span> <span class="n">rx_steering_vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">num_tx_directions</span> <span class="o">=</span> <span class="n">tx_steering_vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">num_rx_directions</span> <span class="o">!=</span> <span class="n">num_tx_directions</span>
+            <span class="ow">and</span> <span class="n">num_rx_directions</span> <span class="o">!=</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">num_tx_directions</span> <span class="o">!=</span> <span class="mi">1</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"In paired mode, the RX and TX direction counts must match "</span>
+                <span class="s2">"or one of them must be one."</span>
+            <span class="p">)</span>
+        <span class="n">num_directions</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">num_rx_directions</span><span class="p">,</span> <span class="n">num_tx_directions</span><span class="p">)</span>
+        <span class="n">rx_steering_vectors</span> <span class="o">=</span> <span class="n">rx_steering_vectors</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">num_rx</span><span class="p">,</span> <span class="n">num_directions</span><span class="p">,</span> <span class="n">num_rx_ant</span>
+        <span class="p">)</span>
+        <span class="n">tx_steering_vectors</span> <span class="o">=</span> <span class="n">tx_steering_vectors</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span>
+            <span class="n">num_tx</span><span class="p">,</span> <span class="n">num_directions</span><span class="p">,</span> <span class="n">num_tx_ant</span>
+        <span class="p">)</span>
+        <span class="c1"># Choose the smallest intermediate explicitly. Its common receiver,</span>
+        <span class="c1"># transmitter, and direction axes leave only the antenna counts and</span>
+        <span class="c1"># the number of delay-Doppler bins (including batches) to compare.</span>
+        <span class="n">num_bins</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">h_dd</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">])</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">h_dd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">if</span> <span class="n">num_bins</span> <span class="o">&gt;=</span> <span class="nb">max</span><span class="p">(</span><span class="n">num_rx_ant</span><span class="p">,</span> <span class="n">num_tx_ant</span><span class="p">):</span>
+            <span class="n">paired_vectors</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+                <span class="s2">"rdm,tdn-&gt;rtdmn"</span><span class="p">,</span> <span class="n">rx_steering_vectors</span><span class="p">,</span> <span class="n">tx_steering_vectors</span>
+            <span class="p">)</span>
+            <span class="n">beamformed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+                <span class="s2">"rtdmn,...rmtnql-&gt;...rtdql"</span><span class="p">,</span> <span class="n">paired_vectors</span><span class="p">,</span> <span class="n">h_dd</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">num_rx_ant</span> <span class="o">&gt;=</span> <span class="n">num_tx_ant</span><span class="p">:</span>
+            <span class="n">projected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+                <span class="s2">"rdm,...rmtnql-&gt;...rtdnql"</span><span class="p">,</span> <span class="n">rx_steering_vectors</span><span class="p">,</span> <span class="n">h_dd</span>
+            <span class="p">)</span>
+            <span class="n">beamformed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+                <span class="s2">"...rtdnql,tdn-&gt;...rtdql"</span><span class="p">,</span> <span class="n">projected</span><span class="p">,</span> <span class="n">tx_steering_vectors</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">projected</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+                <span class="s2">"...rmtnql,tdn-&gt;...rtdmql"</span><span class="p">,</span> <span class="n">h_dd</span><span class="p">,</span> <span class="n">tx_steering_vectors</span>
+            <span class="p">)</span>
+            <span class="n">beamformed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span>
+                <span class="s2">"rdm,...rtdmql-&gt;...rtdql"</span><span class="p">,</span> <span class="n">rx_steering_vectors</span><span class="p">,</span> <span class="n">projected</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">beamformed</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">square</span><span class="p">()</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_steering_bank</span><span class="p">(</span>
+    <span class="n">vectors</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">num_devices</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_ant</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Validate and expand a shared or device-specific steering bank."""</span>
+    <span class="k">if</span> <span class="n">vectors</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">num_ant</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must have </span><span class="si">{</span><span class="n">num_ant</span><span class="si">}</span><span class="s2"> antenna coefficients."</span>
+            <span class="p">)</span>
+        <span class="n">vectors</span> <span class="o">=</span> <span class="n">vectors</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">num_devices</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">vectors</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">num_devices</span> <span class="ow">or</span> <span class="n">vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">num_ant</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must have shape [</span><span class="si">{</span><span class="n">num_devices</span><span class="si">}</span><span class="s2">, "</span>
+                <span class="sa">f</span><span class="s2">"num_directions, </span><span class="si">{</span><span class="n">num_ant</span><span class="si">}</span><span class="s2">]."</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must have shape [num_directions, num_ant] or "</span>
+            <span class="sa">f</span><span class="s2">"[num_devices, num_directions, num_ant]."</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">vectors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must contain at least one direction."</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vectors</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

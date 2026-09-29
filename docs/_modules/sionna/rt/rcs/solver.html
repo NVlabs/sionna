@@ -1,0 +1,1276 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.rt.rcs.solver &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/rt/rcs/solver';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/rt/rcs/solver.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.rt.rcs.solver</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.rt.rcs.solver</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+<span class="sd">"""RCS solver: Compute propagation paths scattered by sensing targets"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Integral</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">drjit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mitsuba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">InteractionType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.path_solvers.field_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldCalculator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.path_solvers.image_method</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageMethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.path_solvers.paths</span><span class="w"> </span><span class="kn">import</span> <span class="n">Paths</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.path_solvers.paths_buffer</span><span class="w"> </span><span class="kn">import</span> <span class="n">PathsBuffer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.path_solvers.sb_candidate_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SBCandidateGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.path_solvers.sb_deterministic</span><span class="w"> </span><span class="kn">import</span> \
+    <span class="n">SBDeterministicCandidateGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">box_contains</span><span class="p">,</span> <span class="n">concat_points</span><span class="p">,</span> \
+    <span class="n">jones_matrix_from_real_imag</span><span class="p">,</span> <span class="n">SourceExclusionBoxes</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.scattering_points</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScatteringPoints</span>
+
+
+<div class="viewcode-block" id="RCSSolver">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.RCSSolver">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RCSSolver</span><span class="p">:</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Class implementing a radar cross-section (RCS) solver</span>
+
+<span class="sd">    This solver computes the propagation paths that connect the antennas of all</span>
+<span class="sd">    transmitters to the antennas of all receivers of a scene through the</span>
+<span class="sd">    scattering points of its sensing targets</span>
+<span class="sd">    (:class:`~sionna.rt.rcs.SensingTarget`). Every computed path therefore</span>
+<span class="sd">    consists of a transmitter-to-scattering-point leg, a scattering event, and</span>
+<span class="sd">    a scattering-point-to-receiver leg:</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \text{TX} \rightarrow \dots \rightarrow \text{SP} \rightarrow \dots \rightarrow \text{RX}</span>
+
+<span class="sd">    Both legs can undergo line-of-sight propagation, specular reflection, and</span>
+<span class="sd">    refraction, i.e., the same interaction types as</span>
+<span class="sd">    :class:`~sionna.rt.PathSolver` except for diffuse reflection and</span>
+<span class="sd">    diffraction which are not supported. The scattering event is described by</span>
+<span class="sd">    the radar cross-section (RCS) and the cross-polarization matrix (CPM) of</span>
+<span class="sd">    the scattering point, evaluated for the incident and scattered directions</span>
+<span class="sd">    of the path.</span>
+
+<span class="sd">    Paths that do not interact with a sensing target are not computed by this</span>
+<span class="sd">    solver; use :class:`~sionna.rt.PathSolver` to compute them.</span>
+
+<span class="sd">    The sensing targets are part of the environment through which the paths are</span>
+<span class="sd">    traced, and are seen as absorbers by the :class:`~sionna.rt.PathSolver`:</span>
+<span class="sd">    a target shadows the scattering points of the other targets and</span>
+<span class="sd">    blocks the legs of the computed paths. A target does however not occlude</span>
+<span class="sd">    the scattering points it contains, i.e., the ones which lie within its</span>
+<span class="sd">    bounding box. This is because the scattering response of a target is</span>
+<span class="sd">    entirely described</span>
+<span class="sd">    by its scattering model: a leg which starts from such a point is only</span>
+<span class="sd">    tested for occlusion once it has left that bounding box. A scattering</span>
+<span class="sd">    point placed outside of the bounding box of its target, on the other hand,</span>
+<span class="sd">    is occluded by that target as it is by any other object of the scene.</span>
+
+<span class="sd">    As with :class:`~sionna.rt.PathSolver`, if synthetic arrays are used</span>
+<span class="sd">    (``synthetic_array`` is `True`), transmitters and receivers are modelled as</span>
+<span class="sd">    if they had a single antenna located at their</span>
+<span class="sd">    :attr:`~sionna.rt.RadioDevice.position`, and the channel responses of the</span>
+<span class="sd">    individual antennas are computed "synthetically" by applying appropriate</span>
+<span class="sd">    phase shifts.</span>
+
+<span class="sd">    The Doppler shifts of the computed paths account for the mobility of the</span>
+<span class="sd">    transmitters, receivers, scene objects, and sensing targets. Only the</span>
+<span class="sd">    rigid translation of a sensing target is modelled: all its scattering</span>
+<span class="sd">    points move with its :attr:`~sionna.rt.SceneObject.velocity`, so the</span>
+<span class="sd">    Doppler shifts do not reflect the rotation of a target.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        import drjit as dr</span>
+<span class="sd">        import mitsuba as mi</span>
+<span class="sd">        import sionna</span>
+<span class="sd">        from sionna.rt import load_scene, Transmitter, Receiver, PlanarArray</span>
+<span class="sd">        from sionna.rt.rcs import (ConstantCPM, RCSSolver, ScatteringModel,</span>
+<span class="sd">                                   SensingTarget)</span>
+
+<span class="sd">        # Load example scene</span>
+<span class="sd">        scene = load_scene(sionna.rt.scene.simple_street_canyon)</span>
+
+<span class="sd">        # Configure antenna arrays for all transmitters and receivers</span>
+<span class="sd">        scene.tx_array = PlanarArray(num_rows=1, num_cols=1, pattern="iso",</span>
+<span class="sd">                                     polarization="V")</span>
+<span class="sd">        scene.rx_array = scene.tx_array</span>
+
+<span class="sd">        scene.add(Transmitter(name="tx", position=[-32,-9,25]))</span>
+<span class="sd">        scene.add(Receiver(name="rx", position=[-32,11,31]))</span>
+
+<span class="sd">        # Cross-section of 1 square meter, independent of the incident and</span>
+<span class="sd">        # scattered directions. The seed is only used by the models with</span>
+<span class="sd">        # random components.</span>
+<span class="sd">        def rcs(k_i, k_s, seed):</span>
+<span class="sd">            return dr.ones(mi.Float, dr.width(k_i))</span>
+
+<span class="sd">        # Sensing target shaped as a cuboid, with a single scattering point</span>
+<span class="sd">        # 2m below it which does not depolarize</span>
+<span class="sd">        model = ScatteringModel([0,0,-2], rcs=rcs,</span>
+<span class="sd">                                cpm=ConstantCPM())</span>
+<span class="sd">        target = SensingTarget(name="st", scattering_model=model,</span>
+<span class="sd">                               length=4., width=2., height=1.5,</span>
+<span class="sd">                               position=[-16,-10,60])</span>
+<span class="sd">        scene.add(target)</span>
+
+<span class="sd">        # Compute paths</span>
+<span class="sd">        solver = RCSSolver()</span>
+<span class="sd">        paths = solver(scene)</span>
+
+<span class="sd">        # Open preview showing paths</span>
+<span class="sd">        scene.preview(paths=paths)</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deterministic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Instantiates the RCS solver.</span>
+
+<span class="sd">        :param deterministic: Enable deterministic path generation. There should</span>
+<span class="sd">                              be little to no effect on latency, however memory</span>
+<span class="sd">                              usage will be increased.</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Instantiate the Candidate Generator</span>
+        <span class="k">if</span> <span class="n">deterministic</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_candidate_generator</span> <span class="o">=</span> <span class="n">SBDeterministicCandidateGenerator</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_candidate_generator</span> <span class="o">=</span> <span class="n">SBCandidateGenerator</span><span class="p">()</span>
+        <span class="c1"># Instantiate the Image Method solver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_method</span> <span class="o">=</span> <span class="n">ImageMethod</span><span class="p">()</span>
+        <span class="c1"># Instantiate the Field Calculator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_field_calculator</span> <span class="o">=</span> <span class="n">FieldCalculator</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loop_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Get/set the Dr.Jit mode used to evaluate the loops that implement</span>
+<span class="sd">        the solver. Should be one of "evaluated" or "symbolic". Symbolic mode</span>
+<span class="sd">        (default) is the fastest one but does not support automatic</span>
+<span class="sd">        differentiation.</span>
+<span class="sd">        For more details, see the `corresponding Dr.Jit documentation &lt;https://drjit.readthedocs.io/en/latest/cflow.html#sym-eval&gt;`_.</span>
+
+<span class="sd">        :type: "evaluated" | "symbolic"</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_field_calculator</span><span class="o">.</span><span class="n">loop_mode</span>
+
+    <span class="nd">@loop_mode</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loop_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"evaluated"</span><span class="p">,</span> <span class="s2">"symbolic"</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Invalid loop mode. Must be either 'evaluated'"</span> <span class="s2">" or 'symbolic'"</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_method</span><span class="o">.</span><span class="n">loop_mode</span> <span class="o">=</span> <span class="n">mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_field_calculator</span><span class="o">.</span><span class="n">loop_mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="RCSSolver.__call__">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.RCSSolver.__call__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">,</span>
+        <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">buffer_size_per_sp</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span>
+        <span class="n">samples_per_sp</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000000</span><span class="p">,</span>
+        <span class="n">synthetic_array</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">los</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">specular_reflection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">refraction</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Paths</span><span class="p">:</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Executes the solver</span>
+
+<span class="sd">        Paths are traced from the scattering points of the sensing targets,</span>
+<span class="sd">        which are therefore the sources of the underlying path tracing. The</span>
+<span class="sd">        ``buffer_size_per_sp`` and ``samples_per_sp`` parameters consequently</span>
+<span class="sd">        apply to each scattering point, and the legs of a scattering point</span>
+<span class="sd">        towards the transmitters and towards the receivers share these</span>
+<span class="sd">        budgets.</span>
+
+<span class="sd">        :param scene: Scene for which to compute paths</span>
+<span class="sd">        :param max_depth: Maximum depth of the paths, i.e., maximum</span>
+<span class="sd">            total number of interactions including the scattering event on the</span>
+<span class="sd">            sensing target. Each of the two legs can therefore undergo at most</span>
+<span class="sd">            ``max_depth - 1`` interactions with the scene, and a value of</span>
+<span class="sd">            ``1`` restricts the computed paths to those for which both legs</span>
+<span class="sd">            are unobstructed.</span>
+<span class="sd">        :param buffer_size_per_sp: Maximum number of legs stored per scattering point</span>
+<span class="sd">        :param samples_per_sp: Number of samples per scattering point</span>
+<span class="sd">        :param synthetic_array: If set to `True` (default), then the antenna arrays are applied synthetically</span>
+<span class="sd">        :param los: Enable unobstructed legs, i.e., legs without any interaction</span>
+<span class="sd">            with the scene</span>
+<span class="sd">        :param specular_reflection: Enables specular reflection</span>
+<span class="sd">        :param refraction: Enables refraction</span>
+<span class="sd">        :param seed: Non-negative seed. If set to :py:class:`None` (default),</span>
+<span class="sd">                     a seed is drawn at random, so that every call draws new</span>
+<span class="sd">                     random components. Reproducing a call therefore requires</span>
+<span class="sd">                     passing an explicit seed. A fixed seed does not guarantee</span>
+<span class="sd">                     deterministic results unless the solver is constructed with</span>
+<span class="sd">                     ``deterministic=True``. The seed is also given to the RCS</span>
+<span class="sd">                     and CPM of the scattering points, which the models with</span>
+<span class="sd">                     random components use to draw them, e.g.</span>
+<span class="sd">                     :class:`~sionna.rt.rcs.TR38901RCS` and</span>
+<span class="sd">                     :class:`~sionna.rt.rcs.TR38901CPM`.</span>
+
+<span class="sd">        :return: Computed paths, as an instance of :class:`~sionna.rt.Paths`</span>
+<span class="sd">        """</span>
+
+        <span class="c1"># Validate public arguments before any allocation or sampling</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">Scene</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`scene` must be an instance of Scene"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_depth</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`max_depth` must be an integer"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_depth</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`max_depth` must be greater than or equal to one"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">buffer_size_per_sp</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">buffer_size_per_sp</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`buffer_size_per_sp` must be an integer"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">buffer_size_per_sp</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"`buffer_size_per_sp` must be greater than or equal to one"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">samples_per_sp</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples_per_sp</span><span class="p">,</span> <span class="n">Integral</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`samples_per_sp` must be an integer"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">samples_per_sp</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"`samples_per_sp` must be greater than or equal to one"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synthetic_array</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`synthetic_array` must be a bool"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">los</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`los` must be a bool"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">specular_reflection</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`specular_reflection` must be a bool"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">refraction</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`refraction` must be a bool"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Drawn from the numpy global generator, so that seeding it makes</span>
+            <span class="c1"># the solver reproducible as well</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">Integral</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"`seed` must be an integer"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">seed</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`seed` must be greater than or equal to zero"</span><span class="p">)</span>
+
+        <span class="c1"># Check that the scene is all set for simulations</span>
+        <span class="n">scene</span><span class="o">.</span><span class="n">all_set</span><span class="p">(</span><span class="n">radio_map</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">sensing_targets</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Scene has no sensing targets"</span><span class="p">)</span>
+
+        <span class="c1"># Generates sources and targets positions and orientations.</span>
+        <span class="c1"># Note that the sources and targets of the traced paths are the</span>
+        <span class="c1"># scattering points and the radio devices, respectively, as paths are</span>
+        <span class="c1"># traced from the scattering points towards the radio devices.</span>
+        <span class="n">src_positions</span><span class="p">,</span> <span class="n">src_orientations</span><span class="p">,</span> <span class="n">rel_ant_positions_tx</span><span class="p">,</span> <span class="n">tx_velocities</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">sources</span><span class="p">(</span><span class="n">synthetic_array</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">tgt_positions</span><span class="p">,</span> <span class="n">tgt_orientations</span><span class="p">,</span> <span class="n">rel_ant_positions_rx</span><span class="p">,</span> <span class="n">rx_velocities</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">targets</span><span class="p">(</span><span class="n">synthetic_array</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">num_tx</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">src_positions</span><span class="p">)</span>
+
+        <span class="n">src_antenna_patterns</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span><span class="o">.</span><span class="n">antenna_pattern</span><span class="o">.</span><span class="n">patterns</span>
+        <span class="n">tgt_antenna_patterns</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span><span class="o">.</span><span class="n">antenna_pattern</span><span class="o">.</span><span class="n">patterns</span>
+
+        <span class="c1"># Scattering points of all the sensing targets, gathered in a single</span>
+        <span class="c1"># collection</span>
+        <span class="n">spst</span><span class="p">,</span> <span class="n">st_orientations</span><span class="p">,</span> <span class="n">st_velocities</span><span class="p">,</span> <span class="n">spst_st_indices</span><span class="p">,</span> \
+            <span class="n">spst_local_indices</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">,</span> <span class="n">spst_boxes</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sensing_geometry</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+
+        <span class="c1"># Transmitters and receivers are the targets of the traced paths.</span>
+        <span class="c1"># The first `num_tx` targets are the transmitters, the remaining ones</span>
+        <span class="c1"># the receivers.</span>
+        <span class="n">src_tgt_positions</span> <span class="o">=</span> <span class="n">concat_points</span><span class="p">([</span><span class="n">src_positions</span><span class="p">,</span> <span class="n">tgt_positions</span><span class="p">])</span>
+
+        <span class="n">dr</span><span class="o">.</span><span class="n">make_opaque</span><span class="p">(</span><span class="n">src_positions</span><span class="p">,</span> <span class="n">tgt_positions</span><span class="p">,</span> <span class="n">src_orientations</span><span class="p">,</span>
+                       <span class="n">tgt_orientations</span><span class="p">,</span> <span class="n">src_tgt_positions</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">,</span>
+                       <span class="n">st_orientations</span><span class="p">,</span> <span class="n">st_velocities</span><span class="p">,</span> <span class="n">spst_boxes</span><span class="o">.</span><span class="n">centers</span><span class="p">,</span>
+                       <span class="n">spst_boxes</span><span class="o">.</span><span class="n">half_extents</span><span class="p">,</span> <span class="n">spst_boxes</span><span class="o">.</span><span class="n">orientations</span><span class="p">,</span>
+                       <span class="n">spst_boxes</span><span class="o">.</span><span class="n">enabled</span><span class="p">)</span>
+
+        <span class="c1"># Generate candidates.</span>
+        <span class="c1"># The scattering event on the sensing target is one of the</span>
+        <span class="c1"># interactions counted by `max_depth`, leaving `max_depth - 1` for</span>
+        <span class="c1"># each leg.</span>
+        <span class="n">paths_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_candidate_generator</span><span class="p">(</span>
+            <span class="n">mi_scene</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span><span class="p">,</span>
+            <span class="n">src_positions</span><span class="o">=</span><span class="n">spst_positions</span><span class="p">,</span>
+            <span class="n">tgt_positions</span><span class="o">=</span><span class="n">src_tgt_positions</span><span class="p">,</span>
+            <span class="n">samples_per_src</span><span class="o">=</span><span class="n">samples_per_sp</span><span class="p">,</span>
+            <span class="n">max_num_paths_per_src</span><span class="o">=</span><span class="n">buffer_size_per_sp</span><span class="p">,</span>
+            <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="n">los</span><span class="o">=</span><span class="n">los</span><span class="p">,</span>
+            <span class="n">specular_reflection</span><span class="o">=</span><span class="n">specular_reflection</span><span class="p">,</span>
+            <span class="n">diffuse_reflection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">refraction</span><span class="o">=</span><span class="n">refraction</span><span class="p">,</span>
+            <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">edge_diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+            <span class="n">src_boxes</span><span class="o">=</span><span class="n">spst_boxes</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">paths_buffer</span><span class="o">.</span><span class="n">schedule</span><span class="p">()</span>
+        <span class="n">dr</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+        <span class="c1"># Shrink the paths buffer to fit the number of paths effectively found</span>
+        <span class="n">paths_buffer</span><span class="o">.</span><span class="n">shrink</span><span class="p">()</span>
+
+        <span class="c1"># Detach the paths geometry to avoid differentiation through the</span>
+        <span class="c1"># candidate generator</span>
+        <span class="n">paths_buffer</span><span class="o">.</span><span class="n">detach_geometry</span><span class="p">()</span>
+
+        <span class="c1"># Solve specular chains and suffixes</span>
+        <span class="n">paths_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_method</span><span class="p">(</span>
+            <span class="n">scene</span><span class="o">=</span><span class="n">scene</span><span class="o">.</span><span class="n">mi_scene</span><span class="p">,</span>
+            <span class="n">paths</span><span class="o">=</span><span class="n">paths_buffer</span><span class="p">,</span>
+            <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">diffraction_lit_region</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">src_positions</span><span class="o">=</span><span class="n">spst_positions</span><span class="p">,</span>
+            <span class="n">tgt_positions</span><span class="o">=</span><span class="n">src_tgt_positions</span><span class="p">,</span>
+            <span class="n">src_boxes</span><span class="o">=</span><span class="n">spst_boxes</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Discard invalid paths</span>
+        <span class="n">paths_buffer</span><span class="o">.</span><span class="n">discard_invalid</span><span class="p">()</span>
+
+        <span class="c1"># Split the paths buffer into the legs that connect the transmitters to</span>
+        <span class="c1"># the scattering points and the ones that connect the scattering points</span>
+        <span class="c1"># to the receivers</span>
+        <span class="n">from_tx_paths</span><span class="p">,</span> <span class="n">to_rx_paths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_at_devices</span><span class="p">(</span><span class="n">paths_buffer</span><span class="p">,</span>
+                                                            <span class="n">num_tx</span><span class="p">)</span>
+
+        <span class="c1"># Every path is the concatenation of a leg from a transmitter and a leg</span>
+        <span class="c1"># to a receiver that share the same scattering point</span>
+        <span class="n">from_tx_ind</span><span class="p">,</span> <span class="n">to_rx_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pair_legs</span><span class="p">(</span><span class="n">from_tx_paths</span><span class="p">,</span> <span class="n">to_rx_paths</span><span class="p">,</span>
+                                                 <span class="n">max_depth</span><span class="p">)</span>
+
+        <span class="c1"># Stop here if no path was found</span>
+        <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">from_tx_ind</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Paths</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">src_positions</span><span class="p">,</span> <span class="n">tgt_positions</span><span class="p">,</span> <span class="n">tx_velocities</span><span class="p">,</span>
+                         <span class="n">rx_velocities</span><span class="p">,</span> <span class="n">synthetic_array</span><span class="p">,</span>
+                         <span class="n">PathsBuffer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                         <span class="n">rel_ant_positions_tx</span><span class="p">,</span> <span class="n">rel_ant_positions_rx</span><span class="p">)</span>
+
+        <span class="n">field_calculator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_field_calculator</span>
+
+        <span class="c1"># Compute the channel impulse response</span>
+        <span class="k">with</span> <span class="n">dr</span><span class="o">.</span><span class="n">scoped_set_flag</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">JitFlag</span><span class="o">.</span><span class="n">OptimizeLoops</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+
+            <span class="c1"># Initialize the electric field.</span>
+            <span class="c1"># The targets of these legs are the scattering points.</span>
+            <span class="n">e_field</span> <span class="o">=</span> <span class="n">field_calculator</span><span class="o">.</span><span class="n">evaluate_transmitter_antenna_patterns</span><span class="p">(</span>
+                <span class="n">from_tx_paths</span><span class="p">,</span>
+                <span class="n">src_positions</span><span class="p">,</span>
+                <span class="n">spst_positions</span><span class="p">,</span>
+                <span class="n">src_orientations</span><span class="p">,</span>
+                <span class="n">src_antenna_patterns</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Transport the electric field from the transmitters to the</span>
+            <span class="c1"># scattering points</span>
+            <span class="n">e_field</span><span class="p">,</span> <span class="n">tau_from_tx</span><span class="p">,</span> <span class="n">doppler_from_tx</span><span class="p">,</span> <span class="n">ki_world_spst</span> <span class="o">=</span> \
+                <span class="n">field_calculator</span><span class="o">.</span><span class="n">transport_electric_field</span><span class="p">(</span>
+                    <span class="n">e_field</span><span class="p">,</span>
+                    <span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span><span class="p">,</span>
+                    <span class="n">from_tx_paths</span><span class="p">,</span>
+                    <span class="n">samples_per_sp</span><span class="p">,</span>
+                    <span class="n">diffraction_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">src_positions</span><span class="o">=</span><span class="n">src_positions</span><span class="p">,</span>
+                    <span class="n">tgt_positions</span><span class="o">=</span><span class="n">spst_positions</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Direction in which the legs leave the scattering points</span>
+            <span class="n">kr_world_spst</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">field_calculator</span><span class="o">.</span><span class="n">first_segment</span><span class="p">(</span>
+                <span class="n">to_rx_paths</span><span class="p">,</span>
+                <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">,</span>
+                          <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">source_indices</span><span class="p">),</span>
+                <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">tgt_positions</span><span class="p">,</span>
+                          <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">target_indices</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Pair the legs, i.e., build one sample per computed path</span>
+            <span class="n">from_tx_paths</span> <span class="o">=</span> <span class="n">from_tx_paths</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">from_tx_ind</span><span class="p">)</span>
+            <span class="n">to_rx_paths</span> <span class="o">=</span> <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">to_rx_ind</span><span class="p">)</span>
+            <span class="n">e_field</span> <span class="o">=</span> <span class="p">[</span><span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector4f</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">e_field</span><span class="p">]</span>
+            <span class="n">tau_from_tx</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span> <span class="n">tau_from_tx</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">)</span>
+            <span class="n">doppler_from_tx</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span> <span class="n">doppler_from_tx</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">)</span>
+            <span class="n">ki_world_spst</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">ki_world_spst</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">)</span>
+            <span class="n">kr_world_spst</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">kr_world_spst</span><span class="p">,</span> <span class="n">to_rx_ind</span><span class="p">)</span>
+
+            <span class="c1"># Sensing target and scattering point of every path</span>
+            <span class="n">spst_indices</span> <span class="o">=</span> <span class="n">from_tx_paths</span><span class="o">.</span><span class="n">target_indices</span>
+            <span class="n">st_indices</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">spst_st_indices</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">)</span>
+
+            <span class="c1"># Evaluate and apply the Jones matrices of the scattering points</span>
+            <span class="n">jones_real</span><span class="p">,</span> <span class="n">jones_imag</span> <span class="o">=</span> <span class="n">spst</span><span class="o">.</span><span class="n">eval_jones_matrix</span><span class="p">(</span><span class="n">ki_world_spst</span><span class="p">,</span>
+                                                            <span class="n">kr_world_spst</span><span class="p">,</span>
+                                                            <span class="n">st_orientations</span><span class="p">,</span>
+                                                            <span class="n">st_indices</span><span class="p">,</span>
+                                                            <span class="n">spst_indices</span><span class="p">,</span>
+                                                            <span class="n">seed</span><span class="p">)</span>
+            <span class="n">jones_mat</span> <span class="o">=</span> <span class="n">jones_matrix_from_real_imag</span><span class="p">(</span><span class="n">jones_real</span><span class="p">,</span> <span class="n">jones_imag</span><span class="p">)</span>
+            <span class="n">e_field</span> <span class="o">=</span> <span class="p">[</span><span class="n">jones_mat</span><span class="nd">@e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">e_field</span><span class="p">]</span>
+
+            <span class="c1"># Doppler shift due to the mobility of the sensing targets.</span>
+            <span class="c1"># The scattering event contributes the velocity of the target</span>
+            <span class="c1"># projected on the difference between the scattered and the</span>
+            <span class="c1"># incident directions of propagation.</span>
+            <span class="n">v_st</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">st_velocities</span><span class="p">,</span> <span class="n">st_indices</span><span class="p">)</span>
+            <span class="n">doppler_sts</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kr_world_spst</span> <span class="o">-</span> <span class="n">ki_world_spst</span><span class="p">,</span> <span class="n">v_st</span><span class="p">)</span> \
+                          <span class="o">/</span><span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span>
+
+            <span class="c1"># Transport the electric field from the scattering points to the</span>
+            <span class="c1"># receivers</span>
+            <span class="n">e_field</span><span class="p">,</span> <span class="n">tau_to_rx</span><span class="p">,</span> <span class="n">doppler_to_rx</span><span class="p">,</span> <span class="n">ki_world_rx</span> <span class="o">=</span> \
+                <span class="n">field_calculator</span><span class="o">.</span><span class="n">transport_electric_field</span><span class="p">(</span>
+                    <span class="n">e_field</span><span class="p">,</span>
+                    <span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span><span class="p">,</span>
+                    <span class="n">to_rx_paths</span><span class="p">,</span>
+                    <span class="n">samples_per_sp</span><span class="p">,</span>
+                    <span class="n">diffraction_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">src_positions</span><span class="o">=</span><span class="n">spst_positions</span><span class="p">,</span>
+                    <span class="n">tgt_positions</span><span class="o">=</span><span class="n">tgt_positions</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Chain the two legs of every path.</span>
+            <span class="c1"># First, build a paths buffer storing only the sensing</span>
+            <span class="c1"># interactions, as the endpoints shared by two chained buffers are</span>
+            <span class="c1"># not recorded as interactions.</span>
+            <span class="n">sensing_interactions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_sensing_paths_buffer</span><span class="p">(</span>
+                <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">),</span>
+                <span class="n">st_indices</span><span class="p">,</span>
+                <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">spst_local_indices</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="c1"># The paired legs were selected to form paths of depth at most</span>
+            <span class="c1"># `max_depth`, so this depth fits their interactions.</span>
+            <span class="n">paths_buffer</span> <span class="o">=</span> <span class="n">from_tx_paths</span><span class="o">.</span><span class="n">chain</span><span class="p">([</span><span class="n">sensing_interactions</span><span class="p">,</span>
+                                                <span class="n">to_rx_paths</span><span class="p">],</span>
+                                               <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span><span class="p">)</span>
+
+            <span class="c1"># Compute the paths coefficients</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">valid_a</span> <span class="o">=</span> <span class="n">field_calculator</span><span class="o">.</span><span class="n">compute_channel_coefficients</span><span class="p">(</span>
+                <span class="n">e_field</span><span class="p">,</span>
+                <span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span><span class="p">,</span>
+                <span class="n">ki_world_rx</span><span class="p">,</span>
+                <span class="n">paths_buffer</span><span class="p">,</span>
+                <span class="n">tgt_orientations</span><span class="p">,</span>
+                <span class="n">tgt_antenna_patterns</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Disable paths with 0 contribution</span>
+            <span class="n">paths_buffer</span><span class="o">.</span><span class="n">valid</span> <span class="o">&amp;=</span> <span class="n">valid_a</span>
+
+            <span class="n">paths_buffer</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+            <span class="c1"># The delay of a path is the sum of the contributions of its two</span>
+            <span class="c1"># legs, and its Doppler shift also includes the contribution of</span>
+            <span class="c1"># the scattering event on the sensing target.</span>
+            <span class="n">paths_buffer</span><span class="o">.</span><span class="n">tau</span> <span class="o">=</span> <span class="n">tau_from_tx</span> <span class="o">+</span> <span class="n">tau_to_rx</span>
+            <span class="n">paths_buffer</span><span class="o">.</span><span class="n">doppler</span> <span class="o">=</span> <span class="n">doppler_from_tx</span> <span class="o">+</span> <span class="n">doppler_to_rx</span> \
+                                   <span class="o">+</span> <span class="n">doppler_sts</span>
+
+        <span class="c1"># Discard invalid paths</span>
+        <span class="n">paths_buffer</span><span class="o">.</span><span class="n">discard_invalid</span><span class="p">()</span>
+
+        <span class="c1"># Build the path object</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="n">Paths</span><span class="p">(</span>
+            <span class="n">scene</span><span class="p">,</span>
+            <span class="n">src_positions</span><span class="p">,</span>
+            <span class="n">tgt_positions</span><span class="p">,</span>
+            <span class="n">tx_velocities</span><span class="p">,</span>
+            <span class="n">rx_velocities</span><span class="p">,</span>
+            <span class="n">synthetic_array</span><span class="p">,</span>
+            <span class="n">paths_buffer</span><span class="p">,</span>
+            <span class="n">rel_ant_positions_tx</span><span class="p">,</span>
+            <span class="n">rel_ant_positions_rx</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">paths</span></div>
+
+
+    <span class="c1">##################################################</span>
+    <span class="c1"># Internal methods</span>
+    <span class="c1">##################################################</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sensing_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">:</span> <span class="n">Scene</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ScatteringPoints</span><span class="p">,</span>
+                                                       <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                                       <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                                                       <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                                       <span class="n">SourceExclusionBoxes</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Gathers the scattering points of all the sensing targets of the scene</span>
+<span class="sd">        in a single collection</span>
+
+<span class="sd">        :param scene: Scene from which to read the sensing targets</span>
+
+<span class="sd">        :return: Scattering points of all the sensing targets, orientations of</span>
+<span class="sd">            the sensing targets, velocities of the sensing targets [m/s],</span>
+<span class="sd">            index of the sensing target of every scattering point, index of</span>
+<span class="sd">            every scattering point within its sensing target, positions of</span>
+<span class="sd">            the scattering points in the global coordinate system [m], and</span>
+<span class="sd">            bounding box of the sensing target of every scattering point</span>
+<span class="sd">        """</span>
+
+        <span class="n">sensing_targets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scene</span><span class="o">.</span><span class="n">sensing_targets</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="n">st_positions</span> <span class="o">=</span> <span class="n">concat_points</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">position</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">])</span>
+        <span class="n">st_orientations</span> <span class="o">=</span> <span class="n">concat_points</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">orientation</span>
+                                         <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">])</span>
+        <span class="n">st_velocities</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="n">concat_points</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">velocity</span>
+                                                   <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">]))</span>
+        <span class="n">st_scalings</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="n">concat_points</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">scaling</span>
+                                                 <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">]))</span>
+        <span class="n">st_half_extents</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span>
+            <span class="n">concat_points</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">lcs_half_extents</span> <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">]))</span>
+
+        <span class="c1"># Gathering the scattering points of all the sensing targets in a</span>
+        <span class="c1"># single collection enables evaluating all the Jones matrices at once</span>
+        <span class="n">spst</span> <span class="o">=</span> <span class="n">ScatteringPoints</span><span class="p">()</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">st</span><span class="o">.</span><span class="n">scattering_model</span><span class="o">.</span><span class="n">spst</span>
+                                          <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">spst</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The sensing targets of the scene have no"</span>
+                             <span class="s2">" scattering points"</span><span class="p">)</span>
+
+        <span class="c1"># Sensing target of every scattering point, and index of every</span>
+        <span class="c1"># scattering point within its sensing target</span>
+        <span class="n">num_spst</span> <span class="o">=</span> <span class="p">[</span><span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">st</span><span class="o">.</span><span class="n">scattering_model</span><span class="o">.</span><span class="n">spst</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">st</span> <span class="ow">in</span> <span class="n">sensing_targets</span><span class="p">]</span>
+        <span class="n">spst_st_indices</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sensing_targets</span><span class="p">)),</span>
+                                            <span class="n">num_spst</span><span class="p">))</span>
+        <span class="n">spst_local_indices</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                                                     <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">num_spst</span><span class="p">]))</span>
+
+        <span class="c1"># Scattering points are positioned in the local frame of their sensing</span>
+        <span class="c1"># target, and are scaled along with it</span>
+        <span class="n">spst_lcs_positions</span> <span class="o">=</span> <span class="n">spst</span><span class="o">.</span><span class="n">scaled_lcs_positions</span><span class="p">(</span><span class="n">st_scalings</span><span class="p">,</span>
+                                                       <span class="n">spst_st_indices</span><span class="p">)</span>
+        <span class="n">spst_positions</span> <span class="o">=</span> <span class="n">spst</span><span class="o">.</span><span class="n">gcs_positions</span><span class="p">(</span><span class="n">st_positions</span><span class="p">,</span> <span class="n">st_orientations</span><span class="p">,</span>
+                                            <span class="n">spst_st_indices</span><span class="p">,</span>
+                                            <span class="n">st_scalings</span><span class="o">=</span><span class="n">st_scalings</span><span class="p">)</span>
+
+        <span class="c1"># A sensing target does not occlude the scattering points it contains,</span>
+        <span class="c1"># as its scattering response is entirely described by its scattering</span>
+        <span class="c1"># model. The box of a point lying outside of its target is disabled, so</span>
+        <span class="c1"># that the target shadows it as any other geometry of the scene would.</span>
+        <span class="c1"># The half extents are scaled, so the positions they are tested against</span>
+        <span class="c1"># must be the scaled ones.</span>
+        <span class="n">spst_half_extents</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">st_half_extents</span><span class="p">,</span>
+                                      <span class="n">spst_st_indices</span><span class="p">)</span>
+        <span class="n">spst_boxes</span> <span class="o">=</span> <span class="n">SourceExclusionBoxes</span><span class="p">(</span>
+            <span class="n">centers</span><span class="o">=</span><span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">st_positions</span><span class="p">,</span> <span class="n">spst_st_indices</span><span class="p">),</span>
+            <span class="n">half_extents</span><span class="o">=</span><span class="n">spst_half_extents</span><span class="p">,</span>
+            <span class="n">orientations</span><span class="o">=</span><span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">st_orientations</span><span class="p">,</span>
+                                   <span class="n">spst_st_indices</span><span class="p">),</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="n">box_contains</span><span class="p">(</span><span class="n">spst_lcs_positions</span><span class="p">,</span> <span class="n">spst_half_extents</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">spst</span><span class="p">,</span> <span class="n">st_orientations</span><span class="p">,</span> <span class="n">st_velocities</span><span class="p">,</span> <span class="n">spst_st_indices</span><span class="p">,</span>
+                <span class="n">spst_local_indices</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">,</span> <span class="n">spst_boxes</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_split_at_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                          <span class="n">paths</span><span class="p">:</span> <span class="n">PathsBuffer</span><span class="p">,</span>
+                          <span class="n">num_tx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PathsBuffer</span><span class="p">,</span> <span class="n">PathsBuffer</span><span class="p">]:</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Splits the traced paths into the legs that connect the transmitters to</span>
+<span class="sd">        the scattering points and the legs that connect the scattering points</span>
+<span class="sd">        to the receivers</span>
+
+<span class="sd">        Paths are traced from the scattering points, so the legs that end on a</span>
+<span class="sd">        transmitter are reversed to make the transmitter their source. The</span>
+<span class="sd">        target indices of the legs that end on a receiver are rebased to index</span>
+<span class="sd">        the receivers only.</span>
+
+<span class="sd">        :param paths: Traced paths</span>
+<span class="sd">        :param num_tx: Number of transmitters or transmit antennas</span>
+
+<span class="sd">        :return: Legs from the transmitters to the scattering points, and legs</span>
+<span class="sd">            from the scattering points to the receivers</span>
+<span class="sd">        """</span>
+
+        <span class="k">if</span> <span class="n">paths</span><span class="o">.</span><span class="n">buffer_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># No leg was found, so both sets of legs are empty</span>
+            <span class="k">return</span> <span class="n">paths</span><span class="p">,</span> <span class="n">paths</span>
+
+        <span class="c1"># The targets with indices `0 ... num_tx-1` are the transmitters, and</span>
+        <span class="c1"># the ones with indices `num_tx ...` the receivers</span>
+        <span class="n">to_tx</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">target_indices</span> <span class="o">&lt;</span> <span class="n">num_tx</span>
+        <span class="n">to_rx</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">target_indices</span> <span class="o">&gt;=</span> <span class="n">num_tx</span>
+
+        <span class="n">from_tx_paths</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">to_tx</span><span class="p">))</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="n">to_rx_paths</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">to_rx</span><span class="p">))</span>
+        <span class="c1"># Rebasing is skipped if no leg reaches a receiver, as Dr.Jit does not</span>
+        <span class="c1"># broadcast a scalar to an empty array</span>
+        <span class="k">if</span> <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">buffer_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">_tgt_indices</span> <span class="o">=</span> <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">target_indices</span> <span class="o">-</span> <span class="n">num_tx</span>
+
+        <span class="k">return</span> <span class="n">from_tx_paths</span><span class="p">,</span> <span class="n">to_rx_paths</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_pair_legs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">from_tx_paths</span><span class="p">:</span> <span class="n">PathsBuffer</span><span class="p">,</span>
+                   <span class="n">to_rx_paths</span><span class="p">:</span> <span class="n">PathsBuffer</span><span class="p">,</span>
+                   <span class="n">max_depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Pairs every leg from a transmitter with every leg to a receiver that</span>
+<span class="sd">        shares the same scattering point and forms a path of depth at most</span>
+<span class="sd">        ``max_depth``</span>
+
+<span class="sd">        :param from_tx_paths: Legs from the transmitters to the scattering</span>
+<span class="sd">            points</span>
+<span class="sd">        :param to_rx_paths: Legs from the scattering points to the receivers</span>
+<span class="sd">        :param max_depth: Maximum number of interactions of a path, including</span>
+<span class="sd">            the scattering event on the sensing target</span>
+
+<span class="sd">        :return: Indices of the legs from the transmitters and indices of the</span>
+<span class="sd">            legs to the receivers forming the pairs</span>
+<span class="sd">        """</span>
+
+        <span class="n">num_from_tx</span> <span class="o">=</span> <span class="n">from_tx_paths</span><span class="o">.</span><span class="n">buffer_size</span>
+        <span class="n">num_to_rx</span> <span class="o">=</span> <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">buffer_size</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">num_from_tx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">num_to_rx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">num_inter_from_tx</span> <span class="o">=</span> <span class="n">from_tx_paths</span><span class="o">.</span><span class="n">num_interactions</span><span class="p">()</span>
+        <span class="n">num_inter_to_rx</span> <span class="o">=</span> <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">num_interactions</span><span class="p">()</span>
+
+        <span class="c1"># Candidate pairs, i.e., the Cartesian product of the two sets of legs</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_from_tx</span><span class="o">*</span><span class="n">num_to_rx</span><span class="p">)</span>
+        <span class="n">from_tx_ind</span> <span class="o">=</span> <span class="n">pair</span> <span class="o">%</span> <span class="n">num_from_tx</span>
+        <span class="n">to_rx_ind</span> <span class="o">=</span> <span class="n">pair</span> <span class="o">//</span> <span class="n">num_from_tx</span>
+
+        <span class="c1"># Only pairs of legs that share the same scattering point form a path.</span>
+        <span class="c1"># The scattering points are the targets of the reversed legs from the</span>
+        <span class="c1"># transmitters and the sources of the legs to the receivers.</span>
+        <span class="n">same_spst</span> <span class="o">=</span> \
+            <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">from_tx_paths</span><span class="o">.</span><span class="n">target_indices</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">)</span>
+             <span class="o">==</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">to_rx_paths</span><span class="o">.</span><span class="n">source_indices</span><span class="p">,</span> <span class="n">to_rx_ind</span><span class="p">))</span>
+
+        <span class="c1"># Depth of the paired paths. The scattering event on the sensing target</span>
+        <span class="c1"># adds one interaction to the ones of the two legs.</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_inter_from_tx</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">)</span>
+                 <span class="o">+</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_inter_to_rx</span><span class="p">,</span> <span class="n">to_rx_ind</span><span class="p">)</span>
+                 <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">pair</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">same_spst</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">depth</span> <span class="o">&lt;=</span> <span class="n">max_depth</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">from_tx_ind</span><span class="p">,</span> <span class="n">pair</span><span class="p">),</span>
+                <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">to_rx_ind</span><span class="p">,</span> <span class="n">pair</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_sensing_paths_buffer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                    <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                                    <span class="n">spst_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PathsBuffer</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Builds a paths buffer storing a single sensing interaction per path</span>
+
+<span class="sd">        This buffer is intended to be chained with the legs of the paths, as the</span>
+<span class="sd">        endpoints shared by two chained buffers are not recorded as interactions.</span>
+
+<span class="sd">        :param spst_positions: Positions of the scattering points in the global</span>
+<span class="sd">            coordinate system [m]</span>
+<span class="sd">        :param st_indices: Index of the sensing target of every path</span>
+<span class="sd">        :param spst_indices: Index of the scattering point of every path within its</span>
+<span class="sd">            sensing target</span>
+
+<span class="sd">        :return: Paths buffer storing one sensing interaction per path</span>
+<span class="sd">        """</span>
+
+        <span class="n">num_paths</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="n">st_indices</span><span class="p">)</span>
+
+        <span class="c1"># One interaction per path, no diffracting wedges</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="n">PathsBuffer</span><span class="p">(</span><span class="n">num_paths</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">active</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Bool</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">num_paths</span><span class="p">)</span>
+        <span class="n">depth</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">num_paths</span><span class="p">)</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="n">active</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">set_interaction_type</span><span class="p">(</span>
+            <span class="n">depth</span><span class="p">,</span> <span class="n">dr</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span> <span class="n">InteractionType</span><span class="o">.</span><span class="n">SENSING</span><span class="p">,</span> <span class="n">num_paths</span><span class="p">),</span> <span class="n">active</span><span class="p">)</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">spst_positions</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">set_prob</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">dr</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span> <span class="n">num_paths</span><span class="p">),</span> <span class="n">active</span><span class="p">)</span>
+        <span class="c1"># The sensing target and sensing point indices are stored in the shapes and</span>
+        <span class="c1"># primitives, respectively</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">set_shape</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">st_indices</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">set_primitive</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span>
+        <span class="n">buffer</span><span class="o">.</span><span class="n">advance_paths_counter</span><span class="p">(</span><span class="n">num_paths</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">buffer</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

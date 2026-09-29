@@ -1,0 +1,1024 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.rt.rcs.scattering_points &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/rt/rcs/scattering_points';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/rt/rcs/scattering_points.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.rt.rcs.scattering_points</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.rt.rcs.scattering_points</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+
+<span class="sd">"""Classes and functions related to Scattering Points"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">InitVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">drjit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mitsuba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mi</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">concat_points</span><span class="p">,</span> <span class="n">rotation_matrix</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cpm</span><span class="w"> </span><span class="kn">import</span> <span class="n">CPMCallable</span><span class="p">,</span> <span class="n">_resolve_cpm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.rcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">RCSCallable</span><span class="p">,</span> <span class="n">_resolve_rcs</span>
+
+
+<div class="viewcode-block" id="ScatteringPoints">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScatteringPoints</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Collection of scattering points of a sensing target</span>
+
+<span class="sd">    Positions and orientations are stored in the local coordinate system (LCS)</span>
+<span class="sd">    of the sensing target as Dr.Jit arrays.</span>
+
+<span class="sd">    Every scattering point has exactly one RCS callable and one CPM callable,</span>
+<span class="sd">    both of which are required. They are stored in ``rcs_callables`` and</span>
+<span class="sd">    ``cpm_callables``, in the same order as the points, so the index of a</span>
+<span class="sd">    point is also the index of its callables.</span>
+
+<span class="sd">    :param lcs_positions: Positions of the scattering points in the LCS [m]</span>
+<span class="sd">    :param lcs_orientations: Orientations of the scattering points in the LCS,</span>
+<span class="sd">        specified through three angles :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">    :param rcs: RCS of each scattering point, given as a list with one RCS</span>
+<span class="sd">        callable or registered RCS name per point. A single callable or name</span>
+<span class="sd">        is broadcast to all points.</span>
+<span class="sd">    :param cpm: CPM of each scattering point, given as a list with one CPM</span>
+<span class="sd">        callable or registered CPM name per point. A single callable or name</span>
+<span class="sd">        is broadcast to all points. Use</span>
+<span class="sd">        :class:`~sionna.rt.rcs.ConstantCPM` for points which do not</span>
+<span class="sd">        depolarize.</span>
+<span class="sd">    """</span>
+
+    <span class="n">lcs_positions</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">)</span>
+    <span class="n">lcs_orientations</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">)</span>
+    <span class="n">rcs</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">RCSCallable</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">RCSCallable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cpm</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">CPMCallable</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">CPMCallable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># RCS callable of each scattering point, in point order</span>
+    <span class="n">rcs_callables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RCSCallable</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># CPM callable of each scattering point, in point order</span>
+    <span class="n">cpm_callables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CPMCallable</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rcs</span><span class="p">,</span> <span class="n">cpm</span><span class="p">):</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_orientations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lcs_orientations</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num_points</span> <span class="o">!=</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_orientations</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`lcs_positions` and `lcs_orientations` must "</span>
+                             <span class="s2">"have the same width"</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rcs_callables</span> <span class="o">=</span> <span class="n">_resolve_callables</span><span class="p">(</span><span class="n">rcs</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s2">"rcs"</span><span class="p">,</span> <span class="s2">"RCS"</span><span class="p">,</span>
+                                                <span class="n">_resolve_rcs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cpm_callables</span> <span class="o">=</span> <span class="n">_resolve_callables</span><span class="p">(</span><span class="n">cpm</span><span class="p">,</span> <span class="n">num_points</span><span class="p">,</span> <span class="s2">"cpm"</span><span class="p">,</span> <span class="s2">"CPM"</span><span class="p">,</span>
+                                                <span class="n">_resolve_cpm</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScatteringPoints.concat">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.concat">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Self</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Self</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Returns a new collection that combines this one with ``other``</span>
+
+<span class="sd">        The points of ``other`` are appended to the ones of this collection,</span>
+<span class="sd">        and so are their callables. If ``other`` is a list, its collections</span>
+<span class="sd">        are appended in the order in which they are given.</span>
+
+<span class="sd">        :param other: Scattering points to be concatenated</span>
+<span class="sd">        :return: Concatenated scattering points</span>
+<span class="sd">        """</span>
+        <span class="n">others</span> <span class="o">=</span> <span class="n">other</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">other</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">other_</span> <span class="ow">in</span> <span class="n">others</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other_</span><span class="p">,</span> <span class="n">ScatteringPoints</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`other` must be a ScatteringPoints instance"</span>
+                                 <span class="s2">" or a list of ScatteringPoints instances"</span><span class="p">)</span>
+
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">+</span> <span class="n">others</span>
+        <span class="n">concatenated</span> <span class="o">=</span> <span class="n">ScatteringPoints</span><span class="p">()</span>
+        <span class="n">concatenated</span><span class="o">.</span><span class="n">lcs_positions</span> <span class="o">=</span> \
+            <span class="n">concat_points</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">lcs_positions</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">])</span>
+        <span class="n">concatenated</span><span class="o">.</span><span class="n">lcs_orientations</span> <span class="o">=</span> \
+            <span class="n">concat_points</span><span class="p">([</span><span class="n">c</span><span class="o">.</span><span class="n">lcs_orientations</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">])</span>
+        <span class="n">concatenated</span><span class="o">.</span><span class="n">rcs_callables</span> <span class="o">=</span> <span class="p">[</span><span class="n">rcs</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span>
+                                      <span class="k">for</span> <span class="n">rcs</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">rcs_callables</span><span class="p">]</span>
+        <span class="n">concatenated</span><span class="o">.</span><span class="n">cpm_callables</span> <span class="o">=</span> <span class="p">[</span><span class="n">cpm</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span>
+                                      <span class="k">for</span> <span class="n">cpm</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">cpm_callables</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">concatenated</span></div>
+
+
+<div class="viewcode-block" id="ScatteringPoints.scaled_lcs_positions">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.scaled_lcs_positions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scaled_lcs_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">st_scalings</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                             <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the positions of the scattering points in the local</span>
+<span class="sd">        coordinate system (LCS) of their sensing target, scaled by the scaling</span>
+<span class="sd">        of that target</span>
+
+<span class="sd">        The positions of this collection are given in the unscaled LCS of the</span>
+<span class="sd">        sensing targets, i.e., in the frame in which the scattering model was</span>
+<span class="sd">        defined, whereas scaling a target resizes its mesh. The positions are</span>
+<span class="sd">        therefore scaled along with it, so that a scattering point keeps its</span>
+<span class="sd">        place relative to the geometry of its target:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathbf{p} = \mathbf{s}_{\text{st}} \odot \mathbf{p}_{\text{lcs}}</span>
+
+<span class="sd">        where :math:`\odot` is the element-wise product.</span>
+
+<span class="sd">        :param st_scalings: Scalings of the sensing targets</span>
+<span class="sd">        :param st_indices: Index of the sensing target of each scattering point</span>
+<span class="sd">            of this collection</span>
+<span class="sd">        :return: Scaled positions of the scattering points in the LCS [m]</span>
+<span class="sd">        """</span>
+        <span class="n">st_scale</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">st_scalings</span><span class="p">,</span> <span class="n">st_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="n">st_scale</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScatteringPoints.gcs_positions">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.gcs_positions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gcs_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                      <span class="n">st_positions</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                      <span class="n">st_orientations</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                      <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                      <span class="n">st_scalings</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Returns the positions of the scattering points in the global</span>
+<span class="sd">        coordinate system (GCS)</span>
+
+<span class="sd">        The positions of this collection are given in the local frame of the</span>
+<span class="sd">        sensing targets, so they are scaled, rotated, and translated to the GCS</span>
+<span class="sd">        using the to-world transformation of the sensing target of every point:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathbf{p} = \mathbf{p}_{\text{st}}</span>
+<span class="sd">                + \mathbf{R}(\text{st\_orientation})</span>
+<span class="sd">                  \left( \mathbf{s}_{\text{st}}</span>
+<span class="sd">                         \odot \mathbf{p}_{\text{lcs}} \right)</span>
+
+<span class="sd">        where :math:`\mathbf{R}()` is defined in :eq:`rotation` and</span>
+<span class="sd">        :math:`\odot` is the element-wise product.</span>
+
+<span class="sd">        :param st_positions: Positions of the sensing targets in the GCS [m]</span>
+<span class="sd">        :param st_orientations: Orientations of the sensing targets in the GCS,</span>
+<span class="sd">            specified through three angles :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">        :param st_indices: Index of the sensing target of each scattering point</span>
+<span class="sd">            of this collection</span>
+<span class="sd">        :param st_scalings: Scalings of the sensing targets. If set to</span>
+<span class="sd">            :py:class:`None`, the targets are assumed to be unscaled.</span>
+<span class="sd">        :return: Positions of the scattering points in the GCS [m]</span>
+<span class="sd">        """</span>
+        <span class="n">st_pos</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">st_positions</span><span class="p">,</span> <span class="n">st_indices</span><span class="p">)</span>
+        <span class="n">st_ort</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">st_orientations</span><span class="p">,</span> <span class="n">st_indices</span><span class="p">)</span>
+        <span class="n">lcs_positions</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_positions</span> <span class="k">if</span> <span class="n">st_scalings</span> <span class="ow">is</span> <span class="kc">None</span>
+                         <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_lcs_positions</span><span class="p">(</span><span class="n">st_scalings</span><span class="p">,</span>
+                                                        <span class="n">st_indices</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="n">st_pos</span> <span class="o">+</span> <span class="n">rotation_matrix</span><span class="p">(</span><span class="n">st_ort</span><span class="p">)</span><span class="nd">@lcs_positions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScatteringPoints.remove">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.remove">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Returns a new collection without the points at ``indices``</span>
+
+<span class="sd">        The remaining points keep their relative order, and so do their</span>
+<span class="sd">        callables, which are re-indexed accordingly.</span>
+
+<span class="sd">        :param indices: Indices of the scattering points to remove</span>
+<span class="sd">        :return: Scattering points without the removed ones</span>
+<span class="sd">        """</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">width</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`indices` must be an integer or a list of "</span>
+                             <span class="s2">"integers"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`indices` must be an integer or a list of "</span>
+                             <span class="s2">"integers"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">((</span><span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">num_points</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`indices` must be in the range "</span>
+                             <span class="sa">f</span><span class="s2">"[0, </span><span class="si">{</span><span class="n">num_points</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_points</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">]</span>
+
+        <span class="n">reduced</span> <span class="o">=</span> <span class="n">ScatteringPoints</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">keep</span><span class="p">:</span>
+            <span class="n">keep_indices</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span>
+            <span class="n">reduced</span><span class="o">.</span><span class="n">lcs_positions</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcs_positions</span><span class="p">,</span>
+                                              <span class="n">keep_indices</span><span class="p">)</span>
+            <span class="n">reduced</span><span class="o">.</span><span class="n">lcs_orientations</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">lcs_orientations</span><span class="p">,</span>
+                                                 <span class="n">keep_indices</span><span class="p">)</span>
+        <span class="n">reduced</span><span class="o">.</span><span class="n">rcs_callables</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rcs_callables</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">keep</span><span class="p">]</span>
+        <span class="n">reduced</span><span class="o">.</span><span class="n">cpm_callables</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cpm_callables</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">keep</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">reduced</span></div>
+
+
+<div class="viewcode-block" id="ScatteringPoints.eval_rcs">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.eval_rcs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_rcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">k_i</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                 <span class="n">k_s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                 <span class="n">st_orientations</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                 <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                 <span class="n">spst_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                 <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Evaluates, for every sample, the RCS of the scattering point it is</span>
+<span class="sd">        associated with</span>
+
+<span class="sd">        The directions ``k_i`` and ``k_s`` are given in the global coordinate</span>
+<span class="sd">        system (GCS), whereas an RCS is defined in the local frame of its</span>
+<span class="sd">        scattering point. The directions are therefore rotated to that frame</span>
+<span class="sd">        before the RCS is evaluated, using the to-world transformation</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathbf{R}(\text{st\_orientation})</span>
+<span class="sd">            \mathbf{R}(\text{lcs\_orientation})</span>
+
+<span class="sd">        where :math:`\mathbf{R}()` is defined in :eq:`rotation`.</span>
+
+<span class="sd">        :param k_i: Incident directions in the GCS</span>
+<span class="sd">        :param k_s: Scattered directions in the GCS</span>
+<span class="sd">        :param st_orientations: Orientations of the sensing targets in the GCS,</span>
+<span class="sd">            specified through three angles :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">        :param st_indices: Index of the sensing target of each sample into</span>
+<span class="sd">            ``st_orientations``</span>
+<span class="sd">        :param spst_indices: Index of the scattering point of each sample into</span>
+<span class="sd">            this collection</span>
+<span class="sd">        :param seed: Seed given to the RCS callables, which the ones with</span>
+<span class="sd">            random components use to draw them</span>
+<span class="sd">        :return: Bistatic radar cross-section of each sample</span>
+<span class="sd">            [:math:`\text{m}^2`]</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rcs_callables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Float</span><span class="p">)</span>
+
+        <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_directions</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span>
+                                                      <span class="n">st_orientations</span><span class="p">,</span>
+                                                      <span class="n">st_indices</span><span class="p">,</span>
+                                                      <span class="n">spst_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_eval_callables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rcs_callables</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">,</span>
+                               <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScatteringPoints.eval_cpm">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.eval_cpm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_cpm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">k_i</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                 <span class="n">k_s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                 <span class="n">st_orientations</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+                 <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                 <span class="n">spst_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                 <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Evaluates, for every sample, the CPM of the scattering point it is</span>
+<span class="sd">        associated with</span>
+
+<span class="sd">        As with :meth:`~sionna.rt.rcs.ScatteringPoints.eval_rcs`, the</span>
+<span class="sd">        directions are given in the GCS and are rotated to the local frame of</span>
+<span class="sd">        the scattering point before the CPM is evaluated.</span>
+
+<span class="sd">        :param k_i: Incident directions in the GCS</span>
+<span class="sd">        :param k_s: Scattered directions in the GCS</span>
+<span class="sd">        :param st_orientations: Orientations of the sensing targets in the GCS,</span>
+<span class="sd">            specified through three angles :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">        :param st_indices: Index of the sensing target of each sample into</span>
+<span class="sd">            ``st_orientations``</span>
+<span class="sd">        :param spst_indices: Index of the scattering point of each sample into</span>
+<span class="sd">            this collection</span>
+<span class="sd">        :param seed: Seed given to the CPM callables, which the ones with</span>
+<span class="sd">            random components use to draw them</span>
+<span class="sd">        :return: Real part of the cross-polarization matrix of each sample</span>
+<span class="sd">        :return: Imaginary part of the cross-polarization matrix of each sample</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpm_callables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">),</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">)</span>
+
+        <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_directions</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span>
+                                                      <span class="n">st_orientations</span><span class="p">,</span>
+                                                      <span class="n">st_indices</span><span class="p">,</span>
+                                                      <span class="n">spst_indices</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_eval_callables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpm_callables</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">,</span>
+                               <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ScatteringPoints.eval_jones_matrix">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.ScatteringPoints.eval_jones_matrix">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">eval_jones_matrix</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">k_i</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+        <span class="n">k_s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+        <span class="n">st_orientations</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+        <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+        <span class="n">spst_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Evaluates, for every sample, the Jones matrix of the scattering</span>
+<span class="sd">        point it is associated with</span>
+
+<span class="sd">        The Jones matrix of the transfer function of a scattering point</span>
+<span class="sd">        combines its RCS :math:`\sigma` and its cross-polarization matrix</span>
+<span class="sd">        :math:`\mathbf{W}` as</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \mathbf{J} = \sqrt{\sigma}\,\mathbf{W}</span>
+
+<span class="sd">        so this returns the real and imaginary parts of a complex</span>
+<span class="sd">        :math:`2 \times 2` matrix, with one matrix per sample. As with</span>
+<span class="sd">        :meth:`~sionna.rt.rcs.ScatteringPoints.eval_rcs`, the directions are</span>
+<span class="sd">        given in the GCS and are rotated to the local frame of the scattering</span>
+<span class="sd">        point before the RCS and the CPM are evaluated.</span>
+
+<span class="sd">        :param k_i: Incident directions in the GCS</span>
+<span class="sd">        :param k_s: Scattered directions in the GCS</span>
+<span class="sd">        :param st_orientations: Orientations of the sensing targets in the GCS,</span>
+<span class="sd">            specified through three angles :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">        :param st_indices: Index of the sensing target of each sample into</span>
+<span class="sd">            ``st_orientations``</span>
+<span class="sd">        :param spst_indices: Index of the scattering point of each sample into</span>
+<span class="sd">            this collection</span>
+<span class="sd">        :param seed: Seed given to the RCS and CPM callables, which the ones</span>
+<span class="sd">            with random components use to draw them</span>
+<span class="sd">        :return: Real part of the Jones matrix of each sample</span>
+<span class="sd">        :return: Imaginary part of the Jones matrix of each sample</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rcs_callables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">),</span> <span class="n">dr</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Matrix2f</span><span class="p">)</span>
+
+        <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_directions</span><span class="p">(</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span>
+                                                      <span class="n">st_orientations</span><span class="p">,</span>
+                                                      <span class="n">st_indices</span><span class="p">,</span>
+                                                      <span class="n">spst_indices</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">_eval_callables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rcs_callables</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">,</span>
+                                <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+        <span class="n">cpm_real</span><span class="p">,</span> <span class="n">cpm_imag</span> <span class="o">=</span> <span class="n">_eval_callables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cpm_callables</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">,</span>
+                                             <span class="n">k_i_local</span><span class="p">,</span> <span class="n">k_s_local</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">amplitude</span><span class="o">*</span><span class="n">cpm_real</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">*</span><span class="n">cpm_imag</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_local_directions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">k_i</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+        <span class="n">k_s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+        <span class="n">st_orientations</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span>
+        <span class="n">st_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+        <span class="n">spst_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Rotates directions from the GCS to the local frames of the</span>
+<span class="sd">        scattering points</span>
+
+<span class="sd">        :param k_i: Incident directions in the GCS</span>
+<span class="sd">        :param k_s: Scattered directions in the GCS</span>
+<span class="sd">        :param st_orientations: Orientations of the sensing targets in the GCS,</span>
+<span class="sd">            specified through three angles :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">        :param st_indices: Index of the sensing target of each sample into</span>
+<span class="sd">            ``st_orientations``</span>
+<span class="sd">        :param spst_indices: Index of the scattering point of each sample into</span>
+<span class="sd">            this collection</span>
+<span class="sd">        :return: Incident directions in the local frames</span>
+<span class="sd">        :return: Scattered directions in the local frames</span>
+<span class="sd">        """</span>
+        <span class="c1"># World-to-local transformation of the scattering point of each sample</span>
+        <span class="n">st_ort</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="n">st_orientations</span><span class="p">,</span> <span class="n">st_indices</span><span class="p">)</span>
+        <span class="n">spst_ort</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lcs_orientations</span><span class="p">,</span> <span class="n">spst_indices</span><span class="p">)</span>
+        <span class="n">to_local</span> <span class="o">=</span> <span class="p">(</span><span class="n">rotation_matrix</span><span class="p">(</span><span class="n">st_ort</span><span class="p">)</span><span class="nd">@rotation_matrix</span><span class="p">(</span><span class="n">spst_ort</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="k">return</span> <span class="n">to_local</span><span class="nd">@mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="n">k_i</span><span class="p">),</span> <span class="n">to_local</span><span class="nd">@mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="n">k_s</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_callables</span><span class="p">(</span><span class="n">callables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">resolve</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Resolves the callables given for a collection of scattering points</span>
+
+<span class="sd">    A single callable or registered name is broadcast to every point, and one</span>
+<span class="sd">    callable per point is required, so a collection which holds points rejects</span>
+<span class="sd">    ``None``.</span>
+
+<span class="sd">    :param callables: Callables of the points, given as a list with one</span>
+<span class="sd">        callable or registered name per point, as a single callable or name,</span>
+<span class="sd">        or as :py:class:`None`</span>
+<span class="sd">    :param num_points: Number of scattering points of the collection</span>
+<span class="sd">    :param name: Name of the parameter, as it appears in error messages</span>
+<span class="sd">    :param kind: Kind of the callables, as it appears in error messages</span>
+<span class="sd">    :param resolve: Function resolving a name or callable to a callable</span>
+<span class="sd">    :return: Callable of every scattering point, in point order</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">callables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">callables</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">callables</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">callables</span><span class="p">):</span>
+        <span class="n">callables</span> <span class="o">=</span> <span class="p">[</span><span class="n">callables</span><span class="p">]</span><span class="o">*</span><span class="n">num_points</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">callables</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must be a list, a callable, or a "</span>
+                         <span class="sa">f</span><span class="s2">"registered </span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s2"> name"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">callables</span><span class="p">)</span> <span class="o">!=</span> <span class="n">num_points</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"`</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">` must provide one entry per scattering "</span>
+                         <span class="sa">f</span><span class="s2">"point (expected </span><span class="si">{</span><span class="n">num_points</span><span class="si">}</span><span class="s2">, got "</span>
+                         <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">callables</span><span class="p">)</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">resolve</span><span class="p">(</span><span class="n">callable_</span><span class="p">)</span> <span class="k">for</span> <span class="n">callable_</span> <span class="ow">in</span> <span class="n">callables</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_eval_callables</span><span class="p">(</span><span class="n">callables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">],</span>
+                    <span class="n">spst_indices</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">UInt</span><span class="p">,</span>
+                    <span class="n">k_i</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                    <span class="n">k_s</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+                    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Evaluates, for every sample, the callable of the scattering point it is</span>
+<span class="sd">    associated with</span>
+
+<span class="sd">    Every sample only evaluates the callable of its own scattering point. When</span>
+<span class="sd">    all the points share the same callable, as with a single point or with a</span>
+<span class="sd">    uniform CPM, that callable is evaluated directly rather than dispatched.</span>
+
+<span class="sd">    :param callables: Callable of every scattering point, in point order</span>
+<span class="sd">    :param spst_indices: Index of the scattering point of each sample</span>
+<span class="sd">    :param k_i: Incident directions in the local frames</span>
+<span class="sd">    :param k_s: Scattered directions in the local frames</span>
+<span class="sd">    :param seed: Seed given to the callables, which the ones with random</span>
+<span class="sd">        components use to draw them</span>
+<span class="sd">    :return: Value returned by the callable of every sample</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">callable_</span> <span class="ow">is</span> <span class="n">callables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">callable_</span> <span class="ow">in</span> <span class="n">callables</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+        <span class="k">return</span> <span class="n">callables</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dr</span><span class="o">.</span><span class="n">switch</span><span class="p">(</span><span class="n">spst_indices</span><span class="p">,</span> <span class="n">callables</span><span class="p">,</span> <span class="n">k_i</span><span class="p">,</span> <span class="n">k_s</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

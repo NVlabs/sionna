@@ -1,0 +1,1582 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tutorial on Radar Cross Section (RCS) &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"chtml": {"matchFontHeight": false}, "tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'rt/tutorials/RCS';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/rt/tutorials/RCS.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Primer on Electromagnetics" href="../em_primer.html" />
+    <link rel="prev" title="Tutorial on Loading and Editing of Scenes" href="Scene-Edit.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../tutorials.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Introduction.html">Introduction to Sionna RT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Diffraction.html">Tutorial on Diffraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Mobility.html">Tutorial on Mobility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Radio-Maps.html">Tutorial on Radio Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Scattering.html">Tutorial on Scattering</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Scene-Edit.html">Tutorial on Loading and Editing of Scenes</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Tutorial on Radar Cross Section (RCS)</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../em_primer.html">Primer on Electromagnetics</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/rt.html">API Documentation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/antenna_array.html">Antenna Arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/antenna_pattern.html">Antenna Patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/camera.html">Cameras</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/paths.html">Paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/paths_solvers.html">Path Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/radio_devices.html">Radio Devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/radio_maps.html">Radio Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/radio_map_solvers.html">Radio Map Solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/radio_materials.html">Radio Materials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/rcs.html">RCS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/scene.html">Scenes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/scene_object.html">Scene Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/utils.html">Utility Functions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../developer/developer.html">Developer Guides</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../developer/dev_compat_frameworks.html">Compatibility with other Frameworks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developer/dev_understanding_paths.html">Understanding the Paths Object</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developer/dev_custom_antenna_patterns.html">Custom Antenna Patterns</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developer/dev_custom_radio_materials.html">Understanding Radio Materials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../developer/dev_custom_scattering_patterns.html">Custom Scattering Patterns</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference external" href="https://nvlabs.github.io/sionna/rt/tech-report/index.html">Technical Report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rt_gui.html">Sionna RT GUI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NVlabs/sionna-rt">Get the Code</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Ray Tracing (RT)</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../tutorials.html" class="nav-link">Tutorials</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Tutorial on Radar Cross Section (RCS)</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; align-items:center; gap:28px; background:transparent;">
+    <a href="https://colab.research.google.com/github/NVlabs/sionna-rt/blob/v2.2.0/tutorials/RCS.ipynb" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <img alt="Colab logo" src="../../_static/colab_logo.svg" style="width:18px; height:18px; background:transparent;">
+        <span>Run in Google Colab</span>
+    </a>
+    <a href="https://github.com/NVlabs/sionna-rt/blob/v2.2.0/tutorials/RCS.ipynb" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <i class="fa-brands fa-github" aria-hidden="true"></i>
+        <span>View on GitHub</span>
+    </a>
+    <a href="RCS.ipynb" download target="_blank" style="vertical-align:text-bottom; display:inline-flex; align-items:center; gap:6px; text-decoration:none !important; border-bottom:none !important; color:inherit;">
+        <span aria-hidden="true">⬇</span>
+        <span>Download notebook</span>
+    </a>
+</div><section id="Tutorial-on-Radar-Cross-Section-(RCS)">
+<h1>Tutorial on Radar Cross Section (RCS)<a class="headerlink" href="#Tutorial-on-Radar-Cross-Section-(RCS)" title="Link to this heading">#</a></h1>
+<p>This notebook introduces the radar cross section (RCS) module of Sionna RT. Its central objects are sensing targets, i.e., scene objects whose scattering responses are described by scattering models rather than by radio materials. A scattering model consists of one or multiple scattering points, each with its own RCS. Besides integrated sensing and communication (ISAC), sensing targets are also useful to model objects with complex geometries for which ray tracing is ill-suited.</p>
+<p>This notebook requires the full Sionna package, and not only Sionna RT, as it relies on Sionna PHY utilities to process and visualize the radar channel. The corresponding API documentation can be found <a class="reference external" href="https://nvlabs.github.io/sionna/rt/api/rcs.html">here</a>.</p>
+<p>In this notebook, you will:</p>
+<ul class="simple">
+<li><p>Compute the radar channel of sensing targets with a constant RCS using the <code class="docutils literal notranslate"><span class="pre">RCSSolver</span></code></p></li>
+<li><p>Visualize the radar channel in the range-velocity and angular domains</p></li>
+<li><p>Use the 3GPP TR 38.901 sensing targets, modeled by one or multiple scattering points</p></li>
+<li><p>Combine the sensing channel with the background channel computed by the <code class="docutils literal notranslate"><span class="pre">PathSolver</span></code></p></li>
+<li><p>Apply basic radar processing in an urban scene with multiple moving cars</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import or install Sionna</span>
+<span class="c1"># The full Sionna package, and not only Sionna RT, is required, as Sionna PHY</span>
+<span class="c1"># utilities are used to process and visualize the radar channel.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sionna.phy</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Only auto-install when the package itself is missing, not when a</span>
+    <span class="c1"># transitive dependency fails to import.</span>
+    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"sionna"</span><span class="p">,</span> <span class="s2">"sionna.phy"</span><span class="p">):</span>
+        <span class="k">raise</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+    <span class="k">if</span> <span class="s2">"google.colab"</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+        <span class="c1"># Install Sionna in Google Colab</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Installing Sionna and restarting the runtime. Please run the cell again."</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">"pip install sionna"</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">(),</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">mitsuba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">drjit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dr</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">speed_of_light</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna</span><span class="w"> </span><span class="kn">import</span> <span class="n">rt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_scene</span><span class="p">,</span> <span class="n">Transmitter</span><span class="p">,</span> <span class="n">Receiver</span><span class="p">,</span> <span class="n">PlanarArray</span><span class="p">,</span> <span class="n">PathSolver</span><span class="p">,</span> <span class="n">Camera</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.rcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">RCSSolver</span><span class="p">,</span> <span class="n">TR38901SensingTarget</span><span class="p">,</span> <span class="n">ConstantRCSSensingTarget</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.channel</span><span class="w"> </span><span class="kn">import</span> <span class="n">cir_to_ofdm_channel</span><span class="p">,</span> <span class="n">ofdm_to_delay_doppler_channel</span><span class="p">,</span>\
+                               <span class="n">subcarrier_frequencies</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.isac</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_delay_doppler</span><span class="p">,</span> <span class="n">plot_angular_scan</span><span class="p">,</span> <span class="n">steering_vectors</span><span class="p">,</span>\
+                           <span class="n">angular_delay_doppler_spectrum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.phy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">HannWindow</span>
+
+<span class="n">no_preview</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1"># Toggle to False to use the preview widget</span>
+                  <span class="c1"># instead of rendering for scene visualization</span>
+</pre></div>
+</div>
+</div>
+<section id="Getting-started">
+<h2>Getting started<a class="headerlink" href="#Getting-started" title="Link to this heading">#</a></h2>
+<p>We consider an empty scene with co-located transmitter and receiver, i.e., a monostatic sensing setup. Both transmitter and receiver have a single isotropic antenna, and the sensing target has a constant RCS <span class="math notranslate nohighlight">\(\sigma\)</span> that preserves polarization.</p>
+<p>We compute the radar channel using the <code class="docutils literal notranslate"><span class="pre">RCSSolver</span></code>, compare the received power against the radar equation, and visualize the radar channel in the range-velocity domain.</p>
+<p>The general radar equation is given as follows:</p>
+<div class="math notranslate nohighlight">
+\[P_r = P_t \frac{G_t G_r \lambda^2 \sigma}{(4\pi)^3 R_t^2 R_r^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(G_t, G_r\)</span> are the gains of the transmit and receive antennas, <span class="math notranslate nohighlight">\(R_t, R_r\)</span> are the distances between the target and the transmitter and receiver, and <span class="math notranslate nohighlight">\(P_t, P_r\)</span> are the transmit and received powers, respectively.</p>
+<p>For a monostatic setup with unit-gain antennas, this simplifies to</p>
+<div class="math notranslate nohighlight">
+\[P_r = P_t \frac{\lambda^2 \sigma}{(4\pi)^3 R_t^4}.\]</div>
+<p>For a monostatic radar, the Doppler shift caused by a target moving with radial velocity <span class="math notranslate nohighlight">\(v_r\)</span> is</p>
+<div class="math notranslate nohighlight">
+\[f_D = -\frac{2v_r}{\lambda},\]</div>
+<p>where the radial velocity is the projection of the target velocity <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> onto the direction from the radar to the target:</p>
+<div class="math notranslate nohighlight">
+\[v_r = \mathbf{v}^\mathsf{T}\hat{\mathbf{r}}, \qquad
+\hat{\mathbf{r}} = \frac{\mathbf{p}_{\mathrm{target}}-\mathbf{p}_{\mathrm{radar}}}{\left\|\mathbf{p}_{\mathrm{target}}-\mathbf{p}_{\mathrm{radar}}\right\|}.\]</div>
+<p>With Sionna RT’s sign convention, a receding target (<span class="math notranslate nohighlight">\(v_r&gt;0\)</span>) produces a negative Doppler shift, while an approaching target produces a positive one. Following the radar convention, the range-velocity maps shown in this notebook display the velocity <span class="math notranslate nohighlight">\(-v_r\)</span>, which is positive for approaching targets.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">()</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">3.5e9</span>
+
+<span class="c1"># Create a monostatic sensing setup with co-located transmitter and receiver</span>
+<span class="n">radar_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">radar_position</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">"rx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">radar_position</span><span class="p">))</span>
+
+<span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">polarization</span><span class="o">=</span><span class="s2">"V"</span><span class="p">,</span>
+                             <span class="n">pattern</span><span class="o">=</span><span class="s2">"iso"</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span>
+
+<span class="c1"># Create a target with constant RCS, approaching the radar at 100 m/s</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="c1"># m^2</span>
+<span class="n">target1</span> <span class="o">=</span> <span class="n">ConstantRCSSensingTarget</span><span class="p">(</span><span class="s2">"st-1"</span><span class="p">,</span>
+                                   <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span>
+                                   <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                                   <span class="n">velocity</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">target1</span><span class="p">)</span>
+
+<span class="c1"># Compute the radar channel</span>
+<span class="n">rcs_solver</span> <span class="o">=</span> <span class="n">RCSSolver</span><span class="p">()</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Received power and distance of the target obtained with Sionna RT.</span>
+<span class="c1"># As the transmit power and the antenna gains are equal to one, the received</span>
+<span class="c1"># power is the squared magnitude of the path coefficient.</span>
+<span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">out_type</span><span class="o">=</span><span class="s2">"numpy"</span><span class="p">,</span> <span class="n">normalize_delays</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">rt_power</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">a</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">rt_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span><span class="o">*</span><span class="n">speed_of_light</span><span class="o">/</span><span class="mi">2</span>
+
+<span class="c1"># Expected received power and distance</span>
+<span class="n">wavelength</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">target1</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">radar_position</span><span class="p">)</span>
+<span class="n">expected_power</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">*</span><span class="n">wavelength</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">((</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">distance</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">''</span><span class="si">:</span><span class="s2">16</span><span class="si">}{</span><span class="s1">'Sionna RT'</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}{</span><span class="s1">'Expected'</span><span class="si">:</span><span class="s2">&gt;12</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Received power'</span><span class="si">:</span><span class="s2">16</span><span class="si">}{</span><span class="n">rt_power</span><span class="si">:</span><span class="s2">12.3E</span><span class="si">}{</span><span class="n">expected_power</span><span class="si">:</span><span class="s2">12.3E</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">'Distance [m]'</span><span class="si">:</span><span class="s2">16</span><span class="si">}{</span><span class="n">rt_distance</span><span class="si">:</span><span class="s2">12.2f</span><span class="si">}{</span><span class="n">distance</span><span class="si">:</span><span class="s2">12.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                   Sionna RT    Expected
+Received power     1.109E-13   1.109E-13
+Distance [m]          100.00      100.00
+</pre></div></div>
+</div>
+<p>Next, we visualize the target in the range-velocity domain. The function below generates a time sequence of channel impulse responses (CIRs) from the Doppler shifts of the paths, computes the corresponding OFDM channel frequency responses, and transforms them to the delay-Doppler domain. The helper <code class="docutils literal notranslate"><span class="pre">expected_range_velocity()</span></code> computes the expected range and radial velocity of the targets, which are shown as red markers.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">expected_range_velocity</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">radar_position</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute the range and radial velocity of targets seen by a monostatic radar.</span>
+
+<span class="sd">    :param targets: List of sensing targets.</span>
+<span class="sd">    :param radar_position: Position of the radar [m].</span>
+<span class="sd">    :return: List of ``(range_m, radial_velocity_mps)`` tuples. The radial</span>
+<span class="sd">        velocity is positive for a receding target.</span>
+<span class="sd">    """</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+        <span class="n">radial_vector</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">radar_position</span>
+        <span class="n">target_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">radial_vector</span><span class="p">)</span>
+        <span class="n">radial_velocity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">velocity</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">],</span>
+                                 <span class="n">radial_vector</span><span class="o">/</span><span class="n">target_range</span><span class="p">)</span>
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">target_range</span><span class="p">,</span> <span class="n">radial_velocity</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">points</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_range_velocity</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">expected_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Plot the channel power in the range-velocity domain.</span>
+
+<span class="sd">    :param paths: Paths for which to compute the range-velocity map.</span>
+<span class="sd">    :param wavelength: Carrier wavelength [m].</span>
+<span class="sd">    :param expected_points: Optional list of ``(range_m, radial_velocity_mps)``</span>
+<span class="sd">        points to display as red markers. The radial velocity is positive for</span>
+<span class="sd">        a receding target.</span>
+<span class="sd">    """</span>
+    <span class="n">subcarrier_spacing</span> <span class="o">=</span> <span class="mf">30e3</span>
+    <span class="n">num_subcarriers</span> <span class="o">=</span> <span class="mi">512</span>
+    <span class="n">num_time_steps</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">num_delay_bins</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># Only the first delay bins are shown</span>
+    <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">num_subcarriers</span><span class="o">*</span><span class="n">subcarrier_spacing</span>
+    <span class="n">sampling_frequency</span> <span class="o">=</span> <span class="n">subcarrier_spacing</span> <span class="c1"># One sample per OFDM symbol</span>
+
+    <span class="c1"># a: [num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps]</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">sampling_frequency</span><span class="o">=</span><span class="n">sampling_frequency</span><span class="p">,</span>
+                       <span class="n">num_time_steps</span><span class="o">=</span><span class="n">num_time_steps</span><span class="p">,</span>
+                       <span class="n">normalize_delays</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">out_type</span><span class="o">=</span><span class="s2">"torch"</span><span class="p">)</span>
+
+    <span class="c1"># Sionna PHY expects a leading batch dimension</span>
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">subcarrier_frequencies</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="p">,</span> <span class="n">subcarrier_spacing</span><span class="p">)</span>
+    <span class="n">h_f</span> <span class="o">=</span> <span class="n">cir_to_ofdm_channel</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">tau</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+    <span class="n">h_f</span> <span class="o">=</span> <span class="n">h_f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># [time, freq]</span>
+    <span class="n">h_dd</span> <span class="o">=</span> <span class="n">ofdm_to_delay_doppler_channel</span><span class="p">(</span><span class="n">h_f</span><span class="p">,</span> <span class="n">l_max</span><span class="o">=</span><span class="n">num_delay_bins</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># [doppler, delay]</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">plot_delay_doppler</span><span class="p">(</span><span class="n">h_dd</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">square</span><span class="p">(),</span>
+                       <span class="n">fast_time_sample_rate</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">,</span>
+                       <span class="n">slow_time_sample_rate</span><span class="o">=</span><span class="n">sampling_frequency</span><span class="p">,</span>
+                       <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+                       <span class="n">domain</span><span class="o">=</span><span class="s2">"range_velocity"</span><span class="p">,</span>
+                       <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">expected_points</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="c1"># The map shows the closing velocity, i.e., minus the radial velocity</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+                   <span class="n">marker</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Expected target"</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_range_velocity</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+                    <span class="n">expected_range_velocity</span><span class="p">([</span><span class="n">target1</span><span class="p">],</span> <span class="n">radar_position</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_7_0.png" src="../../_images/rt_tutorials_RCS_7_0.png" />
+</div>
+</div>
+</section>
+<section id="Sensing-with-multiple-targets">
+<h2>Sensing with multiple targets<a class="headerlink" href="#Sensing-with-multiple-targets" title="Link to this heading">#</a></h2>
+<p>We now extend the previous scenario with two more targets, cloned from the first one, and move all three targets so that they are observed at different ranges and velocities.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add new targets if they do not already exist</span>
+<span class="k">if</span> <span class="n">scene</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"st-2"</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">target2</span> <span class="o">=</span> <span class="n">target1</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s2">"st-2"</span><span class="p">)</span>
+    <span class="n">target3</span> <span class="o">=</span> <span class="n">target1</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s2">"st-3"</span><span class="p">)</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">([</span><span class="n">target2</span><span class="p">,</span> <span class="n">target3</span><span class="p">])</span> <span class="c1"># Batch add for efficiency</span>
+
+<span class="c1"># Set positions and velocities</span>
+<span class="n">target1</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">target1</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="n">target2</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">target2</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="n">target3</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">target3</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">paths</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">target1</span><span class="p">,</span> <span class="n">target2</span><span class="p">,</span> <span class="n">target3</span><span class="p">]</span>
+<span class="n">plot_range_velocity</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span>
+                    <span class="n">expected_range_velocity</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">radar_position</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_9_0.png" src="../../_images/rt_tutorials_RCS_9_0.png" />
+</div>
+</div>
+</section>
+<section id="Sensing-with-antenna-arrays">
+<h2>Sensing with antenna arrays<a class="headerlink" href="#Sensing-with-antenna-arrays" title="Link to this heading">#</a></h2>
+<p>In this section, we use multiple receive antennas to locate targets in the angular domain. The receiver is equipped with a <span class="math notranslate nohighlight">\(16\times 16\)</span> planar array, while the transmitter keeps a single antenna.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">()</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">3.5e9</span>
+
+<span class="c1"># Create a monostatic sensing setup with co-located transmitter and receiver</span>
+<span class="n">radar_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">radar_position</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">"rx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">radar_position</span><span class="p">))</span>
+
+<span class="c1"># The receiver array is a 16x16 grid of antennas</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">polarization</span><span class="o">=</span><span class="s2">"V"</span><span class="p">,</span>
+                             <span class="n">pattern</span><span class="o">=</span><span class="s2">"iso"</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                             <span class="n">num_cols</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+                             <span class="n">polarization</span><span class="o">=</span><span class="s2">"V"</span><span class="p">,</span>
+                             <span class="n">pattern</span><span class="o">=</span><span class="s2">"iso"</span><span class="p">)</span>
+
+<span class="c1"># Create two targets with constant RCS</span>
+<span class="n">target1</span> <span class="o">=</span> <span class="n">ConstantRCSSensingTarget</span><span class="p">(</span><span class="s2">"st-1"</span><span class="p">,</span>
+                                   <span class="n">sigma</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+                                   <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="n">target2</span> <span class="o">=</span> <span class="n">target1</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s2">"st-2"</span><span class="p">)</span>
+<span class="n">target2</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">([</span><span class="n">target1</span><span class="p">,</span> <span class="n">target2</span><span class="p">])</span>
+
+<span class="c1"># Compute the radar channel</span>
+<span class="n">rcs_solver</span> <span class="o">=</span> <span class="n">RCSSolver</span><span class="p">()</span>
+<span class="n">paths</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The function below computes an angular spectrum by correlating the channel observed across the receive antennas with steering vectors for a grid of azimuth and zenith angles. The peaks of the spectrum indicate the directions of the targets.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_angular_spectrum</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">rx_array</span><span class="p">,</span> <span class="n">expected_points</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Plot the channel power in the joint azimuth-zenith domain.</span>
+
+<span class="sd">    The channel is evaluated at the carrier frequency. The receiver array is</span>
+<span class="sd">    assumed to have its default orientation, with broadside along the positive</span>
+<span class="sd">    x-axis.</span>
+
+<span class="sd">    :param paths: Paths for which to compute the angular spectrum.</span>
+<span class="sd">    :param rx_array: Planar receiver antenna array.</span>
+<span class="sd">    :param expected_points: Optional list of ``(azimuth_deg, elevation_deg)``</span>
+<span class="sd">        points to display as red markers.</span>
+<span class="sd">    """</span>
+    <span class="n">num_angles</span> <span class="o">=</span> <span class="mi">181</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">180.</span><span class="p">,</span> <span class="n">num_angles</span><span class="p">))</span>   <span class="c1"># zenith</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">90.</span><span class="p">,</span> <span class="mf">90.</span><span class="p">,</span> <span class="n">num_angles</span><span class="p">))</span>    <span class="c1"># azimuth</span>
+
+    <span class="c1"># a: [num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, 1]</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">normalize_delays</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">out_type</span><span class="o">=</span><span class="s2">"torch"</span><span class="p">)</span>
+
+    <span class="c1"># At zero baseband frequency, delays do not affect the array response.</span>
+    <span class="c1"># Sionna PHY expects a leading batch dimension.</span>
+    <span class="c1"># [num_rx, num_rx_ant, num_tx, num_tx_ant, 1, 1]</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">cir_to_ofdm_channel</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">a</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">tau</span><span class="p">[</span><span class="kc">None</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Array positions are normalized by wavelength, hence wavelength=1</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">rx_array</span><span class="o">.</span><span class="n">normalized_positions</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">rx_steering</span> <span class="o">=</span> <span class="n">steering_vectors</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">wavelength</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+    <span class="n">rx_steering</span> <span class="o">=</span> <span class="n">rx_steering</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">tx_steering</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">rx_steering</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="c1"># Single TX antenna</span>
+
+    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">angular_delay_doppler_spectrum</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">rx_steering</span><span class="p">,</span> <span class="n">tx_steering</span><span class="p">)</span>
+    <span class="n">spectrum</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_angles</span><span class="p">,</span> <span class="n">num_angles</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">plot_angular_scan</span><span class="p">(</span><span class="n">spectrum</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span> <span class="c1"># Zenith 0 (straight up) at the top</span>
+    <span class="k">if</span> <span class="n">expected_points</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="c1"># The map shows the zenith angle, i.e., 90 deg minus the elevation</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="mi">90</span> <span class="o">-</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span>
+                   <span class="n">marker</span><span class="o">=</span><span class="s2">"x"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Expected target"</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Expected azimuth and elevation angles of the targets</span>
+<span class="n">expected_angles</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="p">[</span><span class="n">target1</span><span class="p">,</span> <span class="n">target2</span><span class="p">]:</span>
+    <span class="n">radial_vector</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">radar_position</span>
+    <span class="n">elevation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">radial_vector</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                      <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">radial_vector</span><span class="p">[:</span><span class="mi">2</span><span class="p">])))</span>
+    <span class="n">azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">radial_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">radial_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">expected_angles</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">azimuth</span><span class="p">,</span> <span class="n">elevation</span><span class="p">))</span>
+
+<span class="n">plot_angular_spectrum</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span><span class="p">,</span> <span class="n">expected_angles</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_14_0.png" src="../../_images/rt_tutorials_RCS_14_0.png" />
+</div>
+</div>
+</section>
+<section id="Sensing-with-multipath-and-background-channel">
+<h2>Sensing with multipath and background channel<a class="headerlink" href="#Sensing-with-multipath-and-background-channel" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">RCSSolver</span></code> only computes the paths that interact with a sensing target, i.e., the sensing channel. The paths that do not interact with any sensing target, i.e., the background channel, are computed with the <code class="docutils literal notranslate"><span class="pre">PathSolver</span></code>. Both sets of paths can be combined with <code class="docutils literal notranslate"><span class="pre">Paths.concat()</span></code>.</p>
+<p>We consider a bistatic setup in a street canyon with a large UAV target as defined in 3GPP TR 38.901. In contrast to the empty scene used above, the sensing channel can now have multipath components. The maximum number of interactions of a ray with the scene is controlled by the parameter <code class="docutils literal notranslate"><span class="pre">max_depth</span></code> (where a value of one corresponds to line-of-sight only). You can also configure which type of interactions are permitted, namely line-of-sight, reflection and refraction. Due to the high pathloss
+of the radar channel, diffraction is not considered as it would lead to many paths with very little energy.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_street_canyon</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">3.5e9</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">]))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">"rx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">34</span><span class="p">,</span> <span class="mf">11.5</span><span class="p">,</span> <span class="mf">22.5</span><span class="p">]))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">polarization</span><span class="o">=</span><span class="s2">"V"</span><span class="p">,</span>
+                             <span class="n">pattern</span><span class="o">=</span><span class="s2">"iso"</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span>
+
+<span class="c1"># Large UAV with a single scattering point, as defined in 3GPP TR 38.901</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">TR38901SensingTarget</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"target"</span><span class="p">,</span>
+                              <span class="n">object_type</span><span class="o">=</span><span class="s2">"uav-large-size"</span><span class="p">,</span>
+                              <span class="n">model_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                              <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span>
+                              <span class="n">velocity</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="c1"># Sensing channel computed by the RCS solver, and background channel</span>
+<span class="c1"># computed by the path solver</span>
+<span class="n">rcs_solver</span> <span class="o">=</span> <span class="n">RCSSolver</span><span class="p">()</span>
+<span class="n">background_solver</span> <span class="o">=</span> <span class="n">PathSolver</span><span class="p">()</span>
+
+<span class="n">sensing_paths</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                           <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                           <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">background_paths</span> <span class="o">=</span> <span class="n">background_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                                     <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                     <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">refraction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">diffraction</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">all_paths</span> <span class="o">=</span> <span class="n">background_paths</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">sensing_paths</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualize the scene and the sensing paths</span>
+<span class="k">if</span> <span class="n">no_preview</span><span class="p">:</span>
+    <span class="n">cam</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="n">look_at</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">camera</span><span class="o">=</span><span class="n">cam</span><span class="p">,</span> <span class="n">paths</span><span class="o">=</span><span class="n">sensing_paths</span><span class="p">);</span>
+    <span class="c1"># scene.render(camera=cam, paths=background_paths) # Uncomment to visualize the background paths</span>
+    <span class="c1"># scene.render(camera=cam, paths=all_paths) # Uncomment to visualize all paths</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">preview</span><span class="p">(</span><span class="n">paths</span><span class="o">=</span><span class="n">sensing_paths</span><span class="p">)</span>
+    <span class="c1"># scene.preview(paths=background_paths) # Uncomment to visualize the background paths</span>
+    <span class="c1"># scene.preview(paths=all_paths) # Uncomment to visualize all paths</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_17_0.png" src="../../_images/rt_tutorials_RCS_17_0.png" />
+</div>
+</div>
+<p>The next cell compares the channel impulse responses of the background and sensing channels.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a_bg</span><span class="p">,</span> <span class="n">tau_bg</span> <span class="o">=</span> <span class="n">background_paths</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">out_type</span><span class="o">=</span><span class="s2">"numpy"</span><span class="p">,</span> <span class="n">normalize_delays</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">a_bg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">a_bg</span><span class="p">)</span>
+<span class="n">tau_bg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tau_bg</span><span class="p">)</span>
+
+<span class="n">a_sens</span><span class="p">,</span> <span class="n">tau_sens</span> <span class="o">=</span> <span class="n">sensing_paths</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">out_type</span><span class="o">=</span><span class="s2">"numpy"</span><span class="p">,</span> <span class="n">normalize_delays</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">a_sens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">a_sens</span><span class="p">)</span>
+<span class="n">tau_sens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">tau_sens</span><span class="p">)</span>
+
+<span class="n">power_bg_db</span> <span class="o">=</span> <span class="mf">10.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a_bg</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">power_sens_db</span> <span class="o">=</span> <span class="mf">10.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a_sens</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">floor_db</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">power_bg_db</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">power_sens_db</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">-</span> <span class="mf">10.0</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">tau_bg</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">power_bg_db</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">floor_db</span><span class="p">,</span>
+         <span class="n">linefmt</span><span class="o">=</span><span class="s2">"C0-"</span><span class="p">,</span> <span class="n">markerfmt</span><span class="o">=</span><span class="s2">"C0o"</span><span class="p">,</span> <span class="n">basefmt</span><span class="o">=</span><span class="s2">" "</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Background"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">stem</span><span class="p">(</span><span class="n">tau_sens</span><span class="o">*</span><span class="mf">1e9</span><span class="p">,</span> <span class="n">power_sens_db</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="n">floor_db</span><span class="p">,</span>
+         <span class="n">linefmt</span><span class="o">=</span><span class="s2">"C1-"</span><span class="p">,</span> <span class="n">markerfmt</span><span class="o">=</span><span class="s2">"C1s"</span><span class="p">,</span> <span class="n">basefmt</span><span class="o">=</span><span class="s2">" "</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Sensing"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="n">floor_db</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"Delay [ns]"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"Power [dB]"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">"Channel impulse response"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_19_0.png" src="../../_images/rt_tutorials_RCS_19_0.png" />
+</div>
+</div>
+</section>
+<section id="Multiple-scattering-points-on-a-sensing-target">
+<h2>Multiple scattering points on a sensing target<a class="headerlink" href="#Multiple-scattering-points-on-a-sensing-target" title="Link to this heading">#</a></h2>
+<p>Sionna RT supports scattering models with multiple scattering points, as shown in the next cells for a vehicle modeled by five scattering points according to 3GPP TR 38.901.</p>
+<p>Note that sensing targets are scene objects with an associated mesh. The scattering response of a target is entirely determined by its scattering model, i.e., its own mesh does not affect it. However, the mesh acts as an absorber for all other paths: any ray of the background channel intersecting it is discarded, and it can shadow the scattering points of other targets or block the legs of their sensing paths.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">simple_street_canyon</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">3.5e9</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">"rx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">]))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">polarization</span><span class="o">=</span><span class="s2">"V"</span><span class="p">,</span>
+                             <span class="n">pattern</span><span class="o">=</span><span class="s2">"iso"</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span>
+
+<span class="c1"># Vehicle modeled by multiple scattering points, as defined in 3GPP TR 38.901.</span>
+<span class="c1"># As neither dimensions nor a mesh are specified, the target size defaults to</span>
+<span class="c1"># the one of the TR 38.901 specifications. Setting the dimensions overrides</span>
+<span class="c1"># these defaults, while providing a mesh uses the dimensions of its bounding box.</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">TR38901SensingTarget</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"target"</span><span class="p">,</span>
+                              <span class="n">fname</span><span class="o">=</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">low_poly_car</span><span class="p">,</span>
+                              <span class="n">object_type</span><span class="o">=</span><span class="s2">"vehicle-multi-sp"</span><span class="p">,</span>
+                              <span class="n">model_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                              <span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span>
+                              <span class="n">velocity</span><span class="o">=</span><span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">rcs_solver</span> <span class="o">=</span> <span class="n">RCSSolver</span><span class="p">()</span>
+<span class="n">background_solver</span> <span class="o">=</span> <span class="n">PathSolver</span><span class="p">()</span>
+
+<span class="n">sensing_paths</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                           <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                           <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">background_paths</span> <span class="o">=</span> <span class="n">background_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                                     <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                     <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">refraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">all_paths</span> <span class="o">=</span> <span class="n">background_paths</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">sensing_paths</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Before visualizing the computed paths, let’s first examine the multi-point scattering model applied to the sensing target. This can be done using the <code class="docutils literal notranslate"><span class="pre">show()</span></code> method of the <code class="docutils literal notranslate"><span class="pre">TR38901SensingTarget</span></code> object. Please note that this utility opens an interactive window, and can only be used when preview is enabled (<code class="docutils literal notranslate"><span class="pre">no_preview</span> <span class="pre">=</span> <span class="pre">False</span></code>).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">no_preview</span><span class="p">:</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">k_i</span> <span class="o">=</span> <span class="n">dr</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># No path of the background channel goes through the sensing target</span>
+<span class="k">if</span> <span class="n">no_preview</span><span class="p">:</span>
+    <span class="n">cam</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span> <span class="n">look_at</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">camera</span><span class="o">=</span><span class="n">cam</span><span class="p">,</span> <span class="n">paths</span><span class="o">=</span><span class="n">all_paths</span><span class="p">);</span>
+    <span class="c1"># scene.render(camera=cam, paths=sensing_paths) # Uncomment to visualize the sensing paths</span>
+    <span class="c1"># scene.render(camera=cam, paths=background_paths) # Uncomment to visualize the background paths</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">preview</span><span class="p">(</span><span class="n">paths</span><span class="o">=</span><span class="n">all_paths</span><span class="p">)</span>
+    <span class="c1"># scene.preview(paths=sensing_paths) # Uncomment to visualize the sensing paths</span>
+    <span class="c1"># scene.preview(paths=background_paths) # Uncomment to visualize the background paths</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_24_0.png" src="../../_images/rt_tutorials_RCS_24_0.png" />
+</div>
+</div>
+</section>
+<section id="Urban-scene-with-multiple-TR-38.901-sensing-targets">
+<h2>Urban scene with multiple TR 38.901 sensing targets<a class="headerlink" href="#Urban-scene-with-multiple-TR-38.901-sensing-targets" title="Link to this heading">#</a></h2>
+<p>We now consider a more realistic scenario in the Etoile scene. A monostatic radar operating at 28 GHz is mounted on an 8 m mast along one of the avenues and looks at the Arc de Triomphe. Twenty cars drive on the roundabout and along the avenue. Each car is a TR 38.901 vehicle with multiple scattering points, and uses a low-poly car mesh.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">load_scene</span><span class="p">(</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">etoile</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">frequency</span> <span class="o">=</span> <span class="mf">28e9</span>
+
+<span class="c1"># 'Etoile' scene: centre of the Arc de Triomphe and one of its avenues</span>
+<span class="n">arc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">127.4</span><span class="p">,</span> <span class="mf">38.1</span><span class="p">])</span>
+<span class="n">avenue_azimuth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">119.</span><span class="p">)</span>
+<span class="n">along</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">avenue_azimuth</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">avenue_azimuth</span><span class="p">)])</span> <span class="c1"># Away from the Arc</span>
+<span class="n">across</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">along</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">along</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+<span class="c1"># Monostatic radar on an 8 m mast, 210 m down the avenue, looking at the Arc</span>
+<span class="n">radar_distance</span> <span class="o">=</span> <span class="mf">210.</span> <span class="c1"># Distance from the Arc [m]</span>
+<span class="n">radar_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arc</span> <span class="o">+</span> <span class="n">radar_distance</span><span class="o">*</span><span class="n">along</span><span class="p">,</span> <span class="mf">8.</span><span class="p">)</span>
+<span class="n">boresight</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">arc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">arc</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Transmitter</span><span class="p">(</span><span class="s2">"tx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">radar_position</span><span class="p">,</span> <span class="n">look_at</span><span class="o">=</span><span class="n">boresight</span><span class="p">,</span>
+                      <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">display_radius</span><span class="o">=</span><span class="mf">1.2</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Receiver</span><span class="p">(</span><span class="s2">"rx"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">radar_position</span><span class="p">,</span> <span class="n">look_at</span><span class="o">=</span><span class="n">boresight</span><span class="p">,</span>
+                   <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span> <span class="n">display_radius</span><span class="o">=</span><span class="mf">1.2</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span> <span class="o">=</span> <span class="n">PlanarArray</span><span class="p">(</span><span class="n">num_rows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">num_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                             <span class="n">polarization</span><span class="o">=</span><span class="s2">"V"</span><span class="p">,</span>
+                             <span class="n">pattern</span><span class="o">=</span><span class="s2">"iso"</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">rx_array</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">tx_array</span>
+
+<span class="c1"># Traffic lanes: a ring on the roundabout, and a loop down the avenue made of</span>
+<span class="c1"># two opposing lanes closed by a U-turn at each end</span>
+<span class="n">ring_radius</span><span class="p">,</span> <span class="n">lane_offset</span> <span class="o">=</span> <span class="mf">62.</span><span class="p">,</span> <span class="mf">8.</span>
+<span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ring</span> <span class="o">=</span> <span class="n">arc</span> <span class="o">+</span> <span class="n">ring_radius</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">near</span><span class="p">,</span> <span class="n">far</span> <span class="o">=</span> <span class="n">ring_radius</span> <span class="o">+</span> <span class="mf">48.</span><span class="p">,</span> <span class="n">radar_distance</span> <span class="o">-</span> <span class="mf">6.</span>
+<span class="n">reach</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">near</span><span class="p">,</span> <span class="n">far</span><span class="p">,</span> <span class="mi">40</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">turn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">12</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="n">avenue</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
+    <span class="n">arc</span> <span class="o">+</span> <span class="n">along</span><span class="o">*</span><span class="n">reach</span> <span class="o">+</span> <span class="n">across</span><span class="o">*</span><span class="n">lane_offset</span><span class="p">,</span>
+    <span class="n">arc</span> <span class="o">+</span> <span class="n">along</span><span class="o">*</span><span class="n">far</span> <span class="o">+</span> <span class="n">lane_offset</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">turn</span><span class="p">)</span><span class="o">*</span><span class="n">across</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">turn</span><span class="p">)</span><span class="o">*</span><span class="n">along</span><span class="p">),</span>
+    <span class="n">arc</span> <span class="o">+</span> <span class="n">along</span><span class="o">*</span><span class="n">reach</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">across</span><span class="o">*</span><span class="n">lane_offset</span><span class="p">,</span>
+    <span class="n">arc</span> <span class="o">+</span> <span class="n">along</span><span class="o">*</span><span class="n">near</span> <span class="o">-</span> <span class="n">lane_offset</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">turn</span><span class="p">)</span><span class="o">*</span><span class="n">across</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">turn</span><span class="p">)</span><span class="o">*</span><span class="n">along</span><span class="p">)])</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">car_states</span><span class="p">(</span><span class="n">lane</span><span class="p">,</span> <span class="n">num_cars</span><span class="p">,</span> <span class="n">speed</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Spread cars evenly along a closed lane.</span>
+
+<span class="sd">    :param lane: Vertices of the closed lane, shape [num_vertices, 2].</span>
+<span class="sd">    :param num_cars: Number of cars on the lane.</span>
+<span class="sd">    :param speed: Speed of the cars [m/s].</span>
+<span class="sd">    :return: Iterator over the ``(position, heading, velocity)`` of each car,</span>
+<span class="sd">        where ``position`` and ``velocity`` are 2D vectors and ``heading`` is</span>
+<span class="sd">        the yaw angle [rad].</span>
+<span class="sd">    """</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">lane</span><span class="p">,</span> <span class="n">lane</span><span class="p">[:</span><span class="mi">1</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">steps</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cumulative</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([[</span><span class="mf">0.</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">lengths</span><span class="p">)])</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">cumulative</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">num_cars</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">cumulative</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">"right"</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">forward</span> <span class="o">=</span> <span class="n">steps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">lane</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">forward</span><span class="o">*</span><span class="p">(</span><span class="n">s</span> <span class="o">-</span> <span class="n">cumulative</span><span class="p">[</span><span class="n">i</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">headings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">forward</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">forward</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="n">headings</span><span class="p">,</span> <span class="n">forward</span><span class="o">*</span><span class="n">speed</span><span class="p">)</span>
+
+<span class="c1"># Cars modeled by multiple scattering points, driving at 12 m/s on the avenue</span>
+<span class="c1"># and at 9 m/s on the ring</span>
+<span class="n">num_cars_per_lane</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">fleet</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">lane_index</span><span class="p">,</span> <span class="p">(</span><span class="n">lane</span><span class="p">,</span> <span class="n">speed</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([(</span><span class="n">avenue</span><span class="p">,</span> <span class="mf">12.</span><span class="p">),</span> <span class="p">(</span><span class="n">ring</span><span class="p">,</span> <span class="mf">9.</span><span class="p">)]):</span>
+    <span class="k">for</span> <span class="n">car_index</span><span class="p">,</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">car_states</span><span class="p">(</span><span class="n">lane</span><span class="p">,</span> <span class="n">num_cars_per_lane</span><span class="p">,</span> <span class="n">speed</span><span class="p">)):</span>
+        <span class="n">car</span> <span class="o">=</span> <span class="n">TR38901SensingTarget</span><span class="p">(</span><span class="sa">f</span><span class="s2">"car-</span><span class="si">{</span><span class="n">lane_index</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">car_index</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                                   <span class="n">object_type</span><span class="o">=</span><span class="s2">"vehicle-multi-sp"</span><span class="p">,</span>
+                                   <span class="n">model_type</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                   <span class="n">fname</span><span class="o">=</span><span class="n">rt</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">low_poly_car</span><span class="p">,</span>
+                                   <span class="n">display_opacity</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="n">fleet</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">car</span><span class="p">,</span> <span class="n">state</span><span class="p">))</span>
+
+<span class="n">cars</span> <span class="o">=</span> <span class="p">[</span><span class="n">car</span> <span class="k">for</span> <span class="n">car</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">fleet</span><span class="p">]</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cars</span><span class="p">)</span> <span class="c1"># A single scene edit for the whole fleet</span>
+<span class="k">for</span> <span class="n">car</span><span class="p">,</span> <span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">velocity</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fleet</span><span class="p">:</span>
+    <span class="n">car</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mf">0.8</span><span class="p">)</span>
+    <span class="n">car</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">heading</span><span class="p">),</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+    <span class="n">car</span><span class="o">.</span><span class="n">velocity</span> <span class="o">=</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">velocity</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">velocity</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="mf">0.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualize the scene</span>
+<span class="k">if</span> <span class="n">no_preview</span><span class="p">:</span>
+    <span class="n">camera_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">radar_position</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mf">48.</span><span class="o">*</span><span class="n">along</span> <span class="o">-</span> <span class="mf">7.</span><span class="o">*</span><span class="n">across</span><span class="p">,</span> <span class="mf">19.</span><span class="p">)</span>
+    <span class="n">cam</span> <span class="o">=</span> <span class="n">Camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">camera_position</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                 <span class="n">look_at</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arc</span><span class="p">,</span> <span class="mf">8.</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">camera</span><span class="o">=</span><span class="n">cam</span><span class="p">,</span> <span class="n">fov</span><span class="o">=</span><span class="mi">50</span><span class="p">);</span> <span class="c1"># Paths are too many to render</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">preview</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_27_0.png" src="../../_images/rt_tutorials_RCS_27_0.png" />
+</div>
+</div>
+<p>We now compute three channels: the line-of-sight (LoS) only sensing channel, for which both legs of every sensing path are unobstructed (<code class="docutils literal notranslate"><span class="pre">max_depth=1</span></code>); the multi-bounce sensing channel, whose legs can also be reflected or refracted by the environment (<code class="docutils literal notranslate"><span class="pre">max_depth=5</span></code>); and the multi-bounce sensing channel combined with the background channel.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rcs_solver</span> <span class="o">=</span> <span class="n">RCSSolver</span><span class="p">()</span>
+<span class="n">background_solver</span> <span class="o">=</span> <span class="n">PathSolver</span><span class="p">()</span>
+
+<span class="n">sensing_paths_los_only</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                                    <span class="n">max_depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                    <span class="n">samples_per_sp</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span>
+                                    <span class="n">buffer_size_per_sp</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span>
+                                    <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">refraction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                    <span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span>
+
+<span class="n">sensing_paths_multi_bounce</span> <span class="o">=</span> <span class="n">rcs_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                                        <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                        <span class="n">samples_per_sp</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span>
+                                        <span class="n">buffer_size_per_sp</span><span class="o">=</span><span class="mi">200_000</span><span class="p">,</span>
+                                        <span class="n">los</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">refraction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                        <span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span>
+
+<span class="c1"># A monostatic radar does not hear itself, hence no LoS path</span>
+<span class="n">background_paths</span> <span class="o">=</span> <span class="n">background_solver</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
+                                     <span class="n">max_depth</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                                     <span class="n">samples_per_src</span><span class="o">=</span><span class="mi">2_000_000</span><span class="p">,</span>
+                                     <span class="n">max_num_paths_per_src</span><span class="o">=</span><span class="mi">2_000_000</span><span class="p">,</span>
+                                     <span class="n">los</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">specular_reflection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">diffuse_reflection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">refraction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">diffraction</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span>
+
+<span class="n">sensing_paths_with_background</span> <span class="o">=</span> <span class="n">background_paths</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">sensing_paths_multi_bounce</span><span class="p">)</span>
+
+<span class="c1"># Channels to visualize, keyed by the title of their range-velocity map</span>
+<span class="n">channels</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"LoS-only sensing channel"</span><span class="p">:</span> <span class="n">sensing_paths_los_only</span><span class="p">,</span>
+            <span class="s2">"Multi-bounce sensing channel"</span><span class="p">:</span> <span class="n">sensing_paths_multi_bounce</span><span class="p">,</span>
+            <span class="s2">"Sensing and background channel"</span><span class="p">:</span> <span class="n">sensing_paths_with_background</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>The function below plots the range-velocity maps of the three channels. Two optional processing steps, enabled through dedicated flags, improve the detectability of the targets:</p>
+<ul class="simple">
+<li><p><strong>Hann windowing</strong>: A Hann window is applied across subcarriers and across soundings before the transform to the delay-Doppler domain, which reduces the sidelobes of strong targets.</p></li>
+<li><p><strong>Path loss compensation</strong>: The power of each range bin is scaled by <span class="math notranslate nohighlight">\(R^4\)</span> to compensate for the two-way spreading loss, so that distant targets remain visible.</p></li>
+</ul>
+<p>The red squares indicate the expected range and velocity of each car, computed from the position and velocity of its center.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_range_velocity_maps</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">expected_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                             <span class="n">apply_hann_window</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="n">apply_pathloss_compensation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Plot the range-velocity maps of several channels side by side.</span>
+
+<span class="sd">    :param channels: Dictionary mapping the title of each map to the paths of</span>
+<span class="sd">        the corresponding channel.</span>
+<span class="sd">    :param wavelength: Carrier wavelength [m].</span>
+<span class="sd">    :param expected_points: Optional list of ``(range_m, radial_velocity_mps)``</span>
+<span class="sd">        points to display as red squares. The radial velocity is positive for</span>
+<span class="sd">        a receding target.</span>
+<span class="sd">    :param apply_hann_window: If `True`, a Hann window is applied across</span>
+<span class="sd">        subcarriers and soundings.</span>
+<span class="sd">    :param apply_pathloss_compensation: If `True`, the power of each range bin</span>
+<span class="sd">        is scaled by :math:`R^4` to compensate for the two-way spreading loss.</span>
+<span class="sd">    """</span>
+    <span class="n">subcarrier_spacing</span> <span class="o">=</span> <span class="mf">120e3</span>
+    <span class="n">num_subcarriers</span> <span class="o">=</span> <span class="mi">1024</span>
+    <span class="n">num_time_steps</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">prf</span> <span class="o">=</span> <span class="mf">10e3</span>         <span class="c1"># Soundings per second, sets the velocity span</span>
+    <span class="n">min_range</span> <span class="o">=</span> <span class="mf">20.</span>    <span class="c1"># Smallest range shown [m], hides the ground bounce below the mast</span>
+    <span class="n">max_range</span> <span class="o">=</span> <span class="mf">320.</span>   <span class="c1"># Largest range shown [m]</span>
+    <span class="n">max_velocity</span> <span class="o">=</span> <span class="mf">22.</span> <span class="c1"># Largest closing velocity shown [m/s]</span>
+    <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">num_subcarriers</span><span class="o">*</span><span class="n">subcarrier_spacing</span>
+    <span class="n">range_resolution</span> <span class="o">=</span> <span class="n">speed_of_light</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">bandwidth</span><span class="p">)</span>
+    <span class="n">l_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">min_range</span><span class="o">/</span><span class="n">range_resolution</span><span class="p">))</span>
+    <span class="n">l_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_range</span><span class="o">/</span><span class="n">range_resolution</span><span class="p">)</span>
+    <span class="n">frequencies</span> <span class="o">=</span> <span class="n">subcarrier_frequencies</span><span class="p">(</span><span class="n">num_subcarriers</span><span class="p">,</span> <span class="n">subcarrier_spacing</span><span class="p">)</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">),</span> <span class="mi">5</span><span class="p">),</span>
+                          <span class="n">squeeze</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">channels</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="c1"># a: [num_rx, num_rx_ant, num_tx, num_tx_ant, num_paths, num_time_steps]</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">cir</span><span class="p">(</span><span class="n">sampling_frequency</span><span class="o">=</span><span class="n">prf</span><span class="p">,</span>
+                           <span class="n">num_time_steps</span><span class="o">=</span><span class="n">num_time_steps</span><span class="p">,</span>
+                           <span class="n">normalize_delays</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                           <span class="n">out_type</span><span class="o">=</span><span class="s2">"torch"</span><span class="p">)</span>
+
+        <span class="c1"># Sionna PHY expects a leading batch dimension</span>
+        <span class="n">h_f</span> <span class="o">=</span> <span class="n">cir_to_ofdm_channel</span><span class="p">(</span><span class="n">frequencies</span><span class="p">,</span> <span class="n">a</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span> <span class="n">tau</span><span class="p">[</span><span class="kc">None</span><span class="p">])</span>
+        <span class="n">h_f</span> <span class="o">=</span> <span class="n">h_f</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="c1"># [time, freq]</span>
+
+        <span class="k">if</span> <span class="n">apply_hann_window</span><span class="p">:</span>
+            <span class="n">h_f</span> <span class="o">=</span> <span class="n">HannWindow</span><span class="p">()(</span><span class="n">h_f</span><span class="p">)</span>     <span class="c1"># Across subcarriers</span>
+            <span class="n">h_f</span> <span class="o">=</span> <span class="n">HannWindow</span><span class="p">()(</span><span class="n">h_f</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="c1"># Across soundings</span>
+
+        <span class="n">h_dd</span> <span class="o">=</span> <span class="n">ofdm_to_delay_doppler_channel</span><span class="p">(</span><span class="n">h_f</span><span class="p">,</span> <span class="n">l_min</span><span class="o">=</span><span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span><span class="o">=</span><span class="n">l_max</span><span class="p">)</span> <span class="c1"># [doppler, delay]</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="n">h_dd</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">square</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">apply_pathloss_compensation</span><span class="p">:</span>
+            <span class="n">ranges</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">l_min</span><span class="p">,</span> <span class="n">l_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">power</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">*</span><span class="n">range_resolution</span>
+            <span class="n">power</span> <span class="o">=</span> <span class="n">power</span><span class="o">*</span><span class="n">ranges</span><span class="o">**</span><span class="mi">4</span>
+
+        <span class="n">plot_delay_doppler</span><span class="p">(</span><span class="n">power</span><span class="p">,</span>
+                           <span class="n">l_min</span><span class="o">=</span><span class="n">l_min</span><span class="p">,</span>
+                           <span class="n">fast_time_sample_rate</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">,</span>
+                           <span class="n">slow_time_sample_rate</span><span class="o">=</span><span class="n">prf</span><span class="p">,</span>
+                           <span class="n">wavelength</span><span class="o">=</span><span class="n">wavelength</span><span class="p">,</span>
+                           <span class="n">domain</span><span class="o">=</span><span class="s2">"range_velocity"</span><span class="p">,</span>
+                           <span class="n">db_floor</span><span class="o">=-</span><span class="mf">45.</span><span class="p">,</span>
+                           <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">expected_points</span><span class="p">:</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">expected_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="c1"># The maps show the closing velocity, i.e., minus the radial velocity</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s2">"s"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                       <span class="n">facecolors</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s2">"red"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Car"</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
+        <span class="c1"># Markers outside of the displayed window must not extend the axes</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="n">min_range</span><span class="p">,</span> <span class="n">max_range</span><span class="p">),</span>
+               <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">max_velocity</span><span class="p">,</span> <span class="n">max_velocity</span><span class="p">),</span>
+               <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s first visualize the three channels without any additional processing:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wavelength</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">wavelength</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">car_points</span> <span class="o">=</span> <span class="n">expected_range_velocity</span><span class="p">(</span><span class="n">cars</span><span class="p">,</span> <span class="n">radar_position</span><span class="p">)</span>
+
+<span class="n">plot_range_velocity_maps</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">car_points</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_33_0.png" src="../../_images/rt_tutorials_RCS_33_0.png" />
+</div>
+</div>
+<p>Strong targets smear across the maps because of the high sidelobes of the implicit rectangular window of the Fourier transform. A Hann window reduces these sidelobes:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_range_velocity_maps</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">car_points</span><span class="p">,</span>
+                         <span class="n">apply_hann_window</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_35_0.png" src="../../_images/rt_tutorials_RCS_35_0.png" />
+</div>
+</div>
+<p>The smearing is reduced. However, distant targets appear much weaker than close ones, as the received power decays with <span class="math notranslate nohighlight">\(R^4\)</span>. Let’s compensate for this path loss:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_range_velocity_maps</span><span class="p">(</span><span class="n">channels</span><span class="p">,</span> <span class="n">wavelength</span><span class="p">,</span> <span class="n">car_points</span><span class="p">,</span>
+                         <span class="n">apply_hann_window</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                         <span class="n">apply_pathloss_compensation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../build/doctrees/nbsphinx/rt_tutorials_RCS_37_0.png" src="../../_images/rt_tutorials_RCS_37_0.png" />
+</div>
+</div>
+<p>Distant targets are now clearly visible. However, the multi-bounce sensing channel adds ghost targets, i.e., images of the cars created by reflections on the buildings, which do not match any red square. The background channel adds clutter from the static environment, which appears at zero velocity.</p>
+<p>Detecting and localizing the actual targets, e.g., through clutter removal and constant false alarm rate (CFAR) detection, is beyond the scope of this notebook.</p>
+</section>
+<section id="Summary">
+<h2>Summary<a class="headerlink" href="#Summary" title="Link to this heading">#</a></h2>
+<p>We have used the <code class="docutils literal notranslate"><span class="pre">RCSSolver</span></code> to compute the radar channel of sensing targets modeled by one or multiple scattering points, validated it against the radar equation, and visualized it in the range-velocity and angular domains. Combined with the background channel computed by the <code class="docutils literal notranslate"><span class="pre">PathSolver</span></code>, it enables the simulation of realistic sensing scenarios with multipath and clutter.</p>
+<p>We hope you enjoyed our dive into ISAC with Sionna RT. Don’t forget to check out our other <a class="reference external" href="https://nvlabs.github.io/sionna/rt/tutorials.html">tutorials</a>, too.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Scene-Edit.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tutorial on Loading and Editing of Scenes</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../em_primer.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Primer on Electromagnetics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Getting-started">Getting started</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Sensing-with-multiple-targets">Sensing with multiple targets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Sensing-with-antenna-arrays">Sensing with antenna arrays</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Sensing-with-multipath-and-background-channel">Sensing with multipath and background channel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Multiple-scattering-points-on-a-sensing-target">Multiple scattering points on a sensing target</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Urban-scene-with-multiple-TR-38.901-sensing-targets">Urban scene with multiple TR 38.901 sensing targets</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/rt/tutorials/RCS.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

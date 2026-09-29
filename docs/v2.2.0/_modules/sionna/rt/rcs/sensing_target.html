@@ -1,0 +1,932 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>sionna.rt.rcs.sensing_target &#8212; Sionna 2.2.0</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=ddcea216" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+
+    <script src="../../../../_static/documentation_options.js?v=b21de401"></script>
+    <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/sionna/rt/rcs/sensing_target';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/sionna/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '2.2.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script defer="defer" src="../../../../_static/custom-icons.js?v=787b2cb3"></script>
+    <link rel="canonical" href="/sionna/_modules/sionna/rt/rcs/sensing_target.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="2.2.0" />
+  
+    
+    <script src="../../../../_static/searchtools.js"></script>
+    <script src="../../../../_static/language_data.js"></script>
+    <script src="../../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Sionna</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rt/index.html">
+    Ray Tracing (RT)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../phy/index.html">
+    Physical Layer (PHY)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../sys/index.html">
+    System Level (SYS)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../rk/index.html">
+    Research Kit (RK)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../made_with_sionna.html">
+    “Made with Sionna”
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../citation.html">
+    Citation
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/sionna" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/sionna/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-custom fa-lg" data-prefix="fa-custom" data-icon="pypi" aria-hidden="true"></i><span class="visually-hidden">PyPI</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">sionna.rt.rcs.sensing_target</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for sionna.rt.rcs.sensing_target</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># SPDX-FileCopyrightText: Copyright (c) 2021-2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="c1">#</span>
+
+<span class="sd">"""Classes and functions related to Sensing Target"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mitsuba</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mi</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_SENSING_TARGET_COLOR</span><span class="p">,</span> \
+                                <span class="n">DEFAULT_SENSING_TARGET_OPACITY</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.radio_materials</span><span class="w"> </span><span class="kn">import</span> <span class="n">AbsorberRadioMaterial</span><span class="p">,</span> <span class="n">RadioMaterialBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.scene_object</span><span class="w"> </span><span class="kn">import</span> <span class="n">SceneObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.radio_devices</span><span class="w"> </span><span class="kn">import</span> <span class="n">RadioDevice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sionna.rt.utils.meshes</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.scattering_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScatteringModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.scattering_model_viewer</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScatteringModelViewer</span>
+
+
+<div class="viewcode-block" id="SensingTarget">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.SensingTarget">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SensingTarget</span><span class="p">(</span><span class="n">SceneObject</span><span class="p">):</span>
+    <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">    Class defining a sensing target</span>
+
+<span class="sd">    A sensing target is a scene object whose scattering response is described</span>
+<span class="sd">    by a scattering model, i.e., by a collection of scattering points in its</span>
+<span class="sd">    local coordinate system (LCS), rather than by a radio material. Its radio</span>
+<span class="sd">    material is therefore always an :class:`~sionna.rt.AbsorberRadioMaterial`,</span>
+<span class="sd">    which cannot be changed: no energy is scattered by the surface of the</span>
+<span class="sd">    target itself.</span>
+
+<span class="sd">    The shape of a sensing target can be specified in three mutually exclusive</span>
+<span class="sd">    ways: from a Mitsuba shape (``mi_mesh``), from a mesh file (``fname``), or</span>
+<span class="sd">    as a cuboid of the given dimensions (``length``, ``width``, and</span>
+<span class="sd">    ``height``).</span>
+
+<span class="sd">    To create a sensing target shaped as a cuboid of 4m x 2m x 1.5m, with a</span>
+<span class="sd">    single scattering point at the center of its roof, i.e., 0.75m above its</span>
+<span class="sd">    center:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        model = ScatteringModel([0, 0, 0.75], rcs="my_rcs",</span>
+<span class="sd">                                cpm="my_cpm")</span>
+<span class="sd">        target = SensingTarget(name="car", scattering_model=model,</span>
+<span class="sd">                               length=4., width=2., height=1.5)</span>
+
+<span class="sd">    As with any other scene object, a sensing target is added to a scene using</span>
+<span class="sd">    :meth:`~sionna.rt.Scene.add` or :meth:`~sionna.rt.Scene.edit`. Its position</span>
+<span class="sd">    and orientation can be set at construction, or through the corresponding</span>
+<span class="sd">    properties:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        target.position = [10, 0, 0]</span>
+<span class="sd">        scene.add(target)</span>
+<span class="sd">        target.orientation = [dr.pi/2, 0, 0]</span>
+
+<span class="sd">    The scattering points of a target are given in its unscaled LCS, and are</span>
+<span class="sd">    scaled along with its geometry by its</span>
+<span class="sd">    :attr:`~sionna.rt.SceneObject.scaling`, so that a point keeps its place</span>
+<span class="sd">    relative to the shape it describes.</span>
+
+<span class="sd">    Both :class:`~sionna.rt.rcs.RCSSolver` and</span>
+<span class="sd">    :class:`~sionna.rt.PathSolver` trace paths through the shapes of the</span>
+<span class="sd">    sensing targets and see them as absorbers, so that a target casts a radio</span>
+<span class="sd">    shadow. As the scattering response of a target is entirely described by its</span>
+<span class="sd">    scattering model, :class:`~sionna.rt.rcs.RCSSolver` makes an exception</span>
+<span class="sd">    for the scattering points a target contains, i.e., the ones which lie</span>
+<span class="sd">    within its bounding box: a leg which starts from such a point is only</span>
+<span class="sd">    tested for occlusion once it has left that bounding box. A scattering</span>
+<span class="sd">    point placed outside of that box, e.g., above the roof of a vehicle, is on</span>
+<span class="sd">    the other hand occluded by its own target as it is by any other object of</span>
+<span class="sd">    the scene.</span>
+
+<span class="sd">    The :attr:`~sionna.rt.SceneObject.velocity` of a target is accounted for</span>
+<span class="sd">    by :class:`~sionna.rt.rcs.RCSSolver` when computing the Doppler shifts</span>
+<span class="sd">    of the paths scattered by its scattering points. It must be set</span>
+<span class="sd">    explicitly, as moving a target by updating its</span>
+<span class="sd">    :attr:`~sionna.rt.SceneObject.position` does not set it:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        target.velocity = [10, 0, 0]</span>
+
+<span class="sd">    :param name: Name of the sensing target</span>
+
+<span class="sd">    :param scattering_model: Scattering model of the target</span>
+
+<span class="sd">    :param mi_mesh: Mitsuba shape.</span>
+<span class="sd">        Mutually exclusive with ``fname`` and the cuboid dimensions.</span>
+
+<span class="sd">    :param fname: Filename of a valid mesh ( "*.ply" | "*.obj").</span>
+<span class="sd">        Mutually exclusive with ``mi_mesh`` and the cuboid dimensions.</span>
+
+<span class="sd">    :param length: Length, i.e., size along the x-axis of the LCS, of the</span>
+<span class="sd">        cuboid representing the target [m]. Must be specified together with</span>
+<span class="sd">        ``width`` and ``height``, and is mutually exclusive with ``mi_mesh``</span>
+<span class="sd">        and ``fname``.</span>
+
+<span class="sd">    :param width: Width, i.e., size along the y-axis of the LCS, of the cuboid</span>
+<span class="sd">        representing the target [m]</span>
+
+<span class="sd">    :param height: Height, i.e., size along the z-axis of the LCS, of the</span>
+<span class="sd">        cuboid representing the target [m]</span>
+
+<span class="sd">    :param color: Defines the RGB (red, green, blue) ``color`` parameter for</span>
+<span class="sd">        the target as displayed in the previewer and renderer. Each RGB</span>
+<span class="sd">        component must have a value within the range :math:`\in [0,1]`.</span>
+
+<span class="sd">    :param display_opacity: Defines the opacity with which the target is</span>
+<span class="sd">        displayed in the previewer and renderer, within the range</span>
+<span class="sd">        :math:`\in [0,1]`. Targets are displayed as semi-transparent by</span>
+<span class="sd">        default, so that their scattering points remain visible.</span>
+
+<span class="sd">    :param position: Position :math:`(x,y,z)` [m] of the center of the target.</span>
+<span class="sd">        If set to :py:class:`None`, the target keeps the position of its mesh.</span>
+
+<span class="sd">    :param orientation: Orientation specified through three angles</span>
+<span class="sd">        :math:`(\alpha, \beta, \gamma)`</span>
+<span class="sd">        corresponding to a 3D rotation as defined in :eq:`rotation`.</span>
+<span class="sd">        Mutually exclusive with ``look_at``; specifying both raises</span>
+<span class="sd">        :py:class:`ValueError`. Defaults to :math:`(0,0,0)` if both</span>
+<span class="sd">        ``orientation`` and ``look_at`` are :py:class:`None`.</span>
+
+<span class="sd">    :param look_at: A position, or the instance of a</span>
+<span class="sd">        :class:`~sionna.rt.SceneObject` or :class:`~sionna.rt.RadioDevice` to</span>
+<span class="sd">        look at. Mutually exclusive with ``orientation``.</span>
+
+<span class="sd">    :param velocity: Velocity vector of the target [m/s]</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">scattering_model</span><span class="p">:</span> <span class="n">ScatteringModel</span><span class="p">,</span>
+                 <span class="n">mi_mesh</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Mesh</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">fname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">height</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">color</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+                        <span class="o">=</span> <span class="n">DEFAULT_SENSING_TARGET_COLOR</span><span class="p">,</span>
+                 <span class="n">display_opacity</span><span class="p">:</span> <span class="nb">float</span>
+                        <span class="o">=</span> <span class="n">DEFAULT_SENSING_TARGET_OPACITY</span><span class="p">,</span>
+                 <span class="n">position</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">orientation</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">look_at</span><span class="p">:</span> <span class="p">(</span><span class="n">mi</span><span class="o">.</span><span class="n">Point3f</span> <span class="o">|</span> <span class="n">SceneObject</span> <span class="o">|</span> <span class="n">RadioDevice</span> <span class="o">|</span>
+                           <span class="kc">None</span><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">velocity</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scattering_model</span><span class="p">,</span> <span class="n">ScatteringModel</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`scattering_model` must be a ScatteringModel "</span>
+                             <span class="s2">"instance"</span><span class="p">)</span>
+
+        <span class="n">dimensions</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+        <span class="n">cuboid</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">)</span>
+        <span class="n">num_shapes</span> <span class="o">=</span> <span class="p">(</span><span class="n">mi_mesh</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="o">+</span> <span class="n">cuboid</span>
+        <span class="k">if</span> <span class="n">num_shapes</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Exactly one of a Mitsuba shape (`mi_mesh`), a"</span>
+                             <span class="s2">" filename (`fname`), or the dimensions of a"</span>
+                             <span class="s2">" cuboid (`length`, `width`, and `height`) must be"</span>
+                             <span class="s2">" provided"</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cuboid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`length`, `width`, and `height` must all be"</span>
+                                 <span class="s2">" provided to build a cuboid"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="o">&lt;=</span> <span class="mf">0.</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dimensions</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`length`, `width`, and `height` must be"</span>
+                                 <span class="s2">" positive"</span><span class="p">)</span>
+            <span class="n">mi_mesh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cuboid</span><span class="p">(</span><span class="o">*</span><span class="n">dimensions</span><span class="p">)</span>
+
+        <span class="c1"># The surface of a sensing target scatters no energy, as its scattering</span>
+        <span class="c1"># response is entirely described by its scattering model</span>
+        <span class="n">radio_material</span> <span class="o">=</span> <span class="n">AbsorberRadioMaterial</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-material"</span><span class="p">,</span>
+                                               <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">mi_mesh</span><span class="o">=</span><span class="n">mi_mesh</span><span class="p">,</span>
+                         <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                         <span class="n">fname</span><span class="o">=</span><span class="n">fname</span><span class="p">,</span>
+                         <span class="n">radio_material</span><span class="o">=</span><span class="n">radio_material</span><span class="p">,</span>
+                         <span class="n">remove_duplicate_vertices</span><span class="o">=</span><span class="n">cuboid</span><span class="p">,</span>
+                         <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+                         <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+                         <span class="n">look_at</span><span class="o">=</span><span class="n">look_at</span><span class="p">,</span>
+                         <span class="n">velocity</span><span class="o">=</span><span class="n">velocity</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_model</span> <span class="o">=</span> <span class="n">scattering_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_opacity</span> <span class="o">=</span> <span class="n">display_opacity</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        :py:class:`float`: Get/set the opacity with which this target is</span>
+<span class="sd">        displayed in the previewer and renderer. A value of 1 makes the target</span>
+<span class="sd">        fully opaque, and a value of 0 makes it invisible.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_display_opacity</span>
+
+    <span class="nd">@display_opacity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">display_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opacity</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">opacity</span> <span class="o">&lt;</span> <span class="mf">0.</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">opacity</span> <span class="o">&gt;</span> <span class="mf">1.</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The display opacity must be in the range [0, 1]"</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_opacity</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scattering_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Scattering model of the sensing target</span>
+
+<span class="sd">        :type: :class:`~sionna.rt.rcs.ScatteringModel`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scattering_model</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radio_material</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""(read-only) Radio material of the sensing target</span>
+
+<span class="sd">        The surface of a sensing target absorbs all the incident energy, as its</span>
+<span class="sd">        scattering response is entirely described by its</span>
+<span class="sd">        :attr:`~sionna.rt.rcs.SensingTarget.scattering_model`. This material</span>
+<span class="sd">        can therefore not be changed.</span>
+
+<span class="sd">        :type: :class:`~sionna.rt.AbsorberRadioMaterial`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">SceneObject</span><span class="o">.</span><span class="n">radio_material</span><span class="o">.</span><span class="n">fget</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@radio_material</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radio_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">RadioMaterialBase</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"The radio material of a sensing target absorbs all"</span>
+                         <span class="s2">" the incident energy and cannot be changed"</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SensingTarget.show">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.SensingTarget.show">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">k_i</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Vector3f</span><span class="p">,</span>
+             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># pylint: disable=line-too-long</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        In an interactive notebook environment, opens an interactive 3D viewer</span>
+<span class="sd">        of the scattering model of this target</span>
+
+<span class="sd">        The target is shown in its local coordinate system (LCS), i.e., as it</span>
+<span class="sd">        is before being positioned and oriented, since that is the frame in</span>
+<span class="sd">        which its scattering points and their RCS and CPM are defined. The</span>
+<span class="sd">        viewer displays the mesh of the target, the bounding box of that mesh</span>
+<span class="sd">        as a wireframe, every scattering point with the triad of its local axes,</span>
+<span class="sd">        the incident direction, and, around every scattering point, a surface</span>
+<span class="sd">        showing the bistatic radar cross-section it scatters in every</span>
+<span class="sd">        direction [dBsm].</span>
+
+<span class="sd">        Controls:</span>
+
+<span class="sd">        * Mouse left: Rotate</span>
+<span class="sd">        * Scroll wheel: Zoom</span>
+<span class="sd">        * Mouse right: Move</span>
+
+<span class="sd">        :param k_i: Incident direction of propagation, **in the LCS of this</span>
+<span class="sd">            target**. As in</span>
+<span class="sd">            :meth:`~sionna.rt.rcs.ScatteringPoints.eval_rcs`, this is a</span>
+<span class="sd">            direction of propagation and therefore points *towards* the</span>
+<span class="sd">            scattering points. A direction :math:`\mathbf{k}` given in the</span>
+<span class="sd">            global coordinate system is brought to the LCS with</span>
+<span class="sd">            ``rotation_matrix(target.orientation).T @ k``.</span>
+
+<span class="sd">        :param kwargs: Additional display options, as accepted by</span>
+<span class="sd">            :class:`~sionna.rt.rcs.ScatteringModelViewer`</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            import drjit as dr</span>
+<span class="sd">            from sionna.rt.rcs import TR38901SensingTarget</span>
+<span class="sd">            from sionna.rt.utils import r_hat</span>
+
+<span class="sd">            target = TR38901SensingTarget(name="st",</span>
+<span class="sd">                                          object_type="vehicle-multi-sp")</span>
+
+<span class="sd">            # Wave incident from the front of the car, i.e., from the +x-axis</span>
+<span class="sd">            # side of its LCS, at a zenith and an azimuth angle of 45 deg</span>
+<span class="sd">            target.show(k_i=-r_hat(dr.pi/4, dr.pi/4))</span>
+<span class="sd">        """</span>
+        <span class="n">ScatteringModelViewer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k_i</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">display</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SensingTarget.clone">
+<a class="viewcode-back" href="../../../../rt/api/rcs.html#sionna.rt.rcs.SensingTarget.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">as_mesh</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">props</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">Properties</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SensingTarget</span> <span class="o">|</span> <span class="n">mi</span><span class="o">.</span><span class="n">Mesh</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Creates a clone of the current sensing target</span>
+
+<span class="sd">        The clone shares the scattering model of the original target and has</span>
+<span class="sd">        the same geometry, color, and display opacity, but is assigned a new</span>
+<span class="sd">        name.</span>
+
+<span class="sd">        :param name: Name (id) of the cloned target.</span>
+<span class="sd">            If :py:class:`None`, the clone will be named as</span>
+<span class="sd">            ``&lt;original_name&gt;-clone``.</span>
+
+<span class="sd">        :param as_mesh: If set to `True`, the clone will be returned as a</span>
+<span class="sd">            :py:class:`mitsuba.Mesh` object. Otherwise, a</span>
+<span class="sd">            :py:class:`sionna.rt.rcs.SensingTarget` will be returned.</span>
+
+<span class="sd">        :param props: Pre-populated properties to be used in the new Mitsuba</span>
+<span class="sd">            shape. Allows overriding the BSDF, emitter, etc.</span>
+
+<span class="sd">        :return: A clone of the current sensing target</span>
+<span class="sd">        """</span>
+        <span class="n">cloned_mesh</span> <span class="o">=</span> <span class="n">clone_mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mi_mesh</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">props</span><span class="o">=</span><span class="n">props</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">as_mesh</span><span class="p">:</span>
+            <span class="n">cloned_mesh</span><span class="o">.</span><span class="n">set_bsdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">radio_material</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cloned_mesh</span>
+
+        <span class="n">clone</span> <span class="o">=</span> <span class="n">SensingTarget</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">cloned_mesh</span><span class="o">.</span><span class="n">id</span><span class="p">(),</span>
+                              <span class="n">scattering_model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scattering_model</span><span class="p">,</span>
+                              <span class="n">mi_mesh</span><span class="o">=</span><span class="n">cloned_mesh</span><span class="p">,</span>
+                              <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radio_material</span><span class="o">.</span><span class="n">color</span><span class="p">,</span>
+                              <span class="n">display_opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">display_opacity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_carry_over_pose</span><span class="p">(</span><span class="n">clone</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">clone</span></div>
+
+
+    <span class="c1">##################################################</span>
+    <span class="c1"># Internal methods</span>
+    <span class="c1">##################################################</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cuboid</span><span class="p">(</span><span class="n">length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mi</span><span class="o">.</span><span class="n">Mesh</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
+<span class="sd">        Builds a cuboid mesh centered at the origin and aligned with the axes</span>
+
+<span class="sd">        :param length: Size of the cuboid along the x-axis [m]</span>
+<span class="sd">        :param width: Size of the cuboid along the y-axis [m]</span>
+<span class="sd">        :param height: Size of the cuboid along the z-axis [m]</span>
+
+<span class="sd">        :return: Cuboid mesh</span>
+<span class="sd">        """</span>
+        <span class="c1"># The Mitsuba cube spans [-1,1] along every axis</span>
+        <span class="n">scaling</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="o">*</span><span class="n">length</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">width</span><span class="p">,</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">height</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">mi</span><span class="o">.</span><span class="n">load_dict</span><span class="p">({</span>
+            <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"cube"</span><span class="p">,</span>
+            <span class="s2">"face_normals"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">"to_world"</span><span class="p">:</span> <span class="n">mi</span><span class="o">.</span><span class="n">ScalarTransform4f</span><span class="p">()</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">scaling</span><span class="p">),</span>
+        <span class="p">})</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2021-2026 NVIDIA CORPORATION.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
