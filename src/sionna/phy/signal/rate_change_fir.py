@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from math import prod
 from typing import Optional
 
 import torch
@@ -56,7 +57,7 @@ def _as_batched_1d(x: torch.Tensor) -> tuple[torch.Tensor, torch.Size]:
     # time].  Collapse all leading dimensions into one batch dimension and use a
     # single channel; restore the original batch shape after filtering.
     batch_shape = x.shape[:-1]
-    return x.reshape(-1, 1, x.shape[-1]), batch_shape
+    return x.reshape(prod(batch_shape), 1, x.shape[-1]), batch_shape
 
 
 def _coefficients_for_input(h: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
@@ -164,10 +165,11 @@ def _conv_transpose1d(x: torch.Tensor, h: torch.Tensor, *, stride: int) -> torch
 class InterpolatingFIR(Block):
     """FIR interpolation without explicitly inserting zero samples.
 
-    The input is filtered along ``axis``. For an input length ``N``, FIR length
-    ``K``, and interpolation factor ``L``, the output length is
-    ``(N-1)*L + K``. This is the useful nonzero part of explicit upsampling
-    followed by full convolution.
+    Each call emits ``N*L`` samples for a chunk of ``N`` input symbols and
+    retains the FIR overlap for the next call. Concatenating chunk outputs
+    therefore matches one call on the concatenated input. :meth:`flush`
+    returns the final ``K-1`` samples and resets the block. The combined
+    output matches explicit upsampling followed by full FIR convolution.
     """
 
     def __init__(
@@ -194,6 +196,7 @@ class InterpolatingFIR(Block):
             "coefficients",
             self._convert(_validate_coefficients(coefficients).detach().clone()),
         )
+        self.register_buffer("_overlap", None, persistent=False)
 
     @property
     def length(self) -> int:
@@ -201,17 +204,43 @@ class InterpolatingFIR(Block):
         return int(self.coefficients.shape[-1])
 
     def call(self, x: torch.Tensor) -> torch.Tensor:
-        """Apply FIR interpolation to ``x`` along the configured axis."""
+        """Process the next input chunk along the configured axis."""
         x, axis = _move_axis_to_last(x, self.axis)
-        x3, batch_shape = _as_batched_1d(x)
+        batch_shape = x.shape[:-1]
         h = _coefficients_for_input(self.coefficients, x)
-        # Output length is (N-1)*L + K. Compared to explicit upsampling to N*L
-        # followed by full convolution, this omits the final L-1 samples that
-        # can only come from trailing inserted zeros. Those samples are exactly
-        # zero for the explicit path and are not useful in rate-changing chains.
-        y = _conv_transpose1d(x3, h, stride=self.samples_per_symbol)
-        y = y.reshape(*batch_shape, y.shape[-1])
+        if x.shape[-1] == 0:
+            dtype = h.dtype if self._overlap is None else self._overlap.dtype
+            return _restore_axis_from_last(
+                x.new_empty((*batch_shape, 0), dtype=dtype), axis
+            )
+
+        if self._overlap is not None and (batch_shape != self._overlap.shape[:-1]):
+            raise ValueError("chunk batch shape must remain fixed until flush()")
+
+        x3, _ = _as_batched_1d(x)
+        part = _conv_transpose1d(x3, h, stride=self.samples_per_symbol)
+        part = part.reshape(*batch_shape, part.shape[-1])
+        # A transposed convolution omits the L-1 trailing inserted zeros.
+        # Restore them to produce exactly N*L stable samples on each call.
+        part = torch.nn.functional.pad(part, (0, self.samples_per_symbol - 1))
+        # Add the K-1 output samples retained from the previous chunk.
+        if self._overlap is not None:
+            part = part + torch.nn.functional.pad(
+                self._overlap, (0, part.shape[-1] - self._overlap.shape[-1])
+            )
+        split = x.shape[-1] * self.samples_per_symbol
+        y = part[..., :split]
+        self._overlap = part[..., split:].clone()
         return _restore_axis_from_last(y, axis)
+
+    def flush(self) -> torch.Tensor:
+        """Return the remaining FIR output and reset the stream state."""
+        if self._overlap is None:
+            dtype = self.cdtype if self.coefficients.is_complex() else self.dtype
+            return torch.empty(0, dtype=dtype, device=self.device)
+        y = _restore_axis_from_last(self._overlap, self.axis)
+        self._overlap = None
+        return y
 
 
 class DecimatingFIR(Block):
@@ -219,7 +248,9 @@ class DecimatingFIR(Block):
 
     This block is equivalent to full FIR convolution followed by
     ``Downsampling(samples_per_symbol, offset, num_symbols)``. It avoids
-    producing the discarded phases by using strided convolution.
+    producing the discarded phases by using strided convolution. Calls on
+    consecutive chunks share FIR history and decimation phase. :meth:`flush`
+    returns the remaining samples and resets the block.
     """
 
     def __init__(
@@ -256,6 +287,9 @@ class DecimatingFIR(Block):
             "coefficients",
             self._convert(_validate_coefficients(coefficients).detach().clone()),
         )
+        self.register_buffer("_history", None, persistent=False)
+        self._skip = self.offset
+        self._remaining = self.num_symbols
 
     @property
     def length(self) -> int:
@@ -263,35 +297,45 @@ class DecimatingFIR(Block):
         return int(self.coefficients.shape[-1])
 
     def call(self, x: torch.Tensor) -> torch.Tensor:
-        """Apply full-convolution FIR filtering and retain one phase."""
+        """Process the next input chunk and retain the configured phase."""
         x, axis = _move_axis_to_last(x, self.axis)
-        x3, batch_shape = _as_batched_1d(x)
+        batch_shape = x.shape[:-1]
         h = _coefficients_for_input(self.coefficients, x)
-        pad = self.length - 1
-        # Full convolution can be written as valid convolution after padding the
-        # input with K-1 zeros on both sides.  The downsampling phase is just an
-        # offset into this full-convolution output.  By slicing the padded input
-        # before the strided convolution, conv1d computes only samples
-        # offset, offset+L, offset+2L, ... rather than computing every output
-        # sample and discarding most of them.
-        xr = torch.nn.functional.pad(x3.real if x3.is_complex() else x3, (pad, pad))
-        if x3.is_complex():
-            xi = torch.nn.functional.pad(x3.imag, (pad, pad))
-            padded = torch.complex(xr, xi)
+        if self._history is None:
+            self._history = x.new_zeros((*batch_shape, self.length - 1))
+        elif batch_shape != self._history.shape[:-1]:
+            raise ValueError("chunk batch shape must remain fixed until flush()")
+
+        joined = torch.cat((self._history, x), dim=-1)
+        # _skip is the next retained sample's position within this chunk.
+        if self._skip >= x.shape[-1] or self._remaining == 0:
+            y = x[..., :0].to(h.dtype)
         else:
-            padded = xr
-        if self.offset:
-            padded = padded[..., self.offset :]
-        if self.offset >= x.shape[-1] + self.length - 1 or self.num_symbols == 0:
-            y = x3[..., :0]
-            if h.is_complex() and not y.is_complex():
-                y = y.to(h.dtype)
-        else:
-            y = _conv1d_valid(padded, h, stride=self.samples_per_symbol)
-        if self.num_symbols is not None:
-            y = y[..., : self.num_symbols]
-        y = y.reshape(*batch_shape, y.shape[-1])
+            windows, _ = _as_batched_1d(joined[..., self._skip :])
+            y = _conv1d_valid(windows, h, stride=self.samples_per_symbol)
+            y = y.reshape(*batch_shape, y.shape[-1])
+            if self._remaining is not None:
+                y = y[..., : self._remaining]
+                self._remaining -= y.shape[-1]
+
+        self._skip -= x.shape[-1]
+        if self._skip < 0:
+            self._skip %= self.samples_per_symbol
+        # Copy only the history so a short state does not retain a whole chunk.
+        self._history = joined[..., x.shape[-1] :].clone()
         return _restore_axis_from_last(y, axis)
+
+    def flush(self) -> torch.Tensor:
+        """Emit the full-convolution tail and reset FIR and phase state."""
+        if self._history is None:
+            dtype = self.cdtype if self.coefficients.is_complex() else self.dtype
+            return torch.empty(0, dtype=dtype, device=self.device)
+        tail = torch.zeros_like(self._history)
+        y = self.call(_restore_axis_from_last(tail, self.axis))
+        self._history = None
+        self._skip = self.offset
+        self._remaining = self.num_symbols
+        return y
 
 
 class UpFirDn(Block):
@@ -299,10 +343,10 @@ class UpFirDn(Block):
 
     This composes :class:`InterpolatingFIR` with a phase-selecting decimator,
     matching ``Upsampling -> FIR full convolution -> Downsampling`` for the
-    same FIR taps. The common pure-interpolation and pure-decimation cases use
-    the efficient specialized kernels. The general rational case is correct for
-    this reference ordering, but it is not a fully optimized polyphase
-    arbitrary-rational resampler.
+    same FIR taps. The general rational case is correct for this reference
+    ordering, but it is not a fully optimized polyphase arbitrary-rational
+    resampler. Calls on consecutive chunks share state;
+    :meth:`flush` emits the remaining samples and resets both stages.
     """
 
     def __init__(
@@ -356,16 +400,15 @@ class UpFirDn(Block):
         )
 
     def call(self, x: torch.Tensor) -> torch.Tensor:
-        """Apply the configured interpolation and optional decimation."""
-        # This wrapper is intentionally simple. It filters during interpolation
-        # and then keeps one phase of that filtered high-rate sequence. That
-        # matches the explicit reference chain but is not the minimum-arithmetic
-        # implementation for all rational up/down combinations.
+        """Process the next input chunk through both stages."""
         y = self.interpolator(x)
-        # Explicit upsampling includes up-1 trailing zeros. They matter when
-        # the selected decimation phase reaches the end of the full output.
-        if self.up > 1:
-            y, axis = _move_axis_to_last(y, self.axis)
-            y = torch.nn.functional.pad(y, (0, self.up - 1))
-            y = _restore_axis_from_last(y, axis)
         return self.decimator(y)
+
+    def flush(self) -> torch.Tensor:
+        """Emit the remaining samples and reset both stages."""
+        if self.interpolator._overlap is None:
+            return self.decimator.flush()
+        y = self.interpolator.flush()
+        final = self.decimator(y)
+        tail = self.decimator.flush()
+        return torch.cat((final, tail), dim=self.axis)

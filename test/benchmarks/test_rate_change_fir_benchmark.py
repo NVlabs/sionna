@@ -69,9 +69,14 @@ def run_benchmark(args: argparse.Namespace) -> None:
     new_up = InterpolatingFIR(args.sps, taps, device=args.device)
     new_down = DecimatingFIR(args.sps, taps, offset=args.sps - 1, device=args.device)
 
+    def stream_once(block):
+        head = block(x)
+        tail = block.flush()
+        return head, tail
+
     cases = (
-        ("interpolation", lambda: old_filter(old_up(x)), lambda: new_up(x)),
-        ("decimation", lambda: old_down(old_filter(x)), lambda: new_down(x)),
+        ("interpolation", lambda: old_filter(old_up(x)), lambda: stream_once(new_up)),
+        ("decimation", lambda: old_down(old_filter(x)), lambda: stream_once(new_down)),
     )
     print(
         f"device={device} batch={args.batch} length={args.length} "
