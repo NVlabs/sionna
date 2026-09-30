@@ -21,6 +21,6 @@ from .filter import (
 )
 from .upsampling import Upsampling
 from .downsampling import Downsampling
-
+from .rate_change_fir import InterpolatingFIR, DecimatingFIR, UpFirDn
 
 
