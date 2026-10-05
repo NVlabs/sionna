@@ -45,6 +45,30 @@ class Object(torch.nn.Module):
         # Use _device_str to avoid conflict with nn.Module internals
         self._device_str: str = config.device if device is None else device
 
+    def _apply(self, fn: Any, recurse: bool = True) -> "Object":
+        """Keep Sionna device state and tensors in sync on migration.
+
+        Syncs ``_device_str`` when ``fn`` changes the device and migrates
+        plain ``torch.Tensor`` attributes with ``fn``. Dtype-only
+        migrations leave the device unchanged.
+        """
+        try:
+            current = self.__dict__.get("_device_str", "cpu")
+            try:
+                probe = torch.empty((), dtype=torch.float32, device=current)
+            except RuntimeError:
+                probe = torch.empty((), dtype=torch.float32, device="cpu")
+            with torch.no_grad():
+                probe_target = fn(probe).device
+            if probe_target != probe.device:
+                self.__dict__["_device_str"] = str(probe_target)
+        except RuntimeError:
+            pass
+        for key, value in list(self.__dict__.items()):
+            if isinstance(value, torch.Tensor):
+                super().__setattr__(key, fn(value))
+        return super()._apply(fn, recurse)
+
     @property
     def dtype(self) -> torch.dtype:
         """Get the PyTorch real-valued dtype based on the current precision."""
