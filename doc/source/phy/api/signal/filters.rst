@@ -11,3 +11,6 @@ Filters
    RootRaisedCosineFilter
    SincFilter
    CustomFilter
+   InterpolatingFIR
+   DecimatingFIR
+   UpFirDn
