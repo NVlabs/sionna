@@ -176,6 +176,9 @@ Step 4: Deploy 5G Stack
    # Pull, patch and build OAI containers
    ./scripts/quickstart-oai.sh
 
+   # Or build from an existing OAI checkout
+   ./scripts/quickstart-oai.sh --use-existing --dest ./ext/openairinterface5g
+
    # Generate config files
    ./scripts/generate-configs.sh
 

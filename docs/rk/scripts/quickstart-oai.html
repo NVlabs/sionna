@@ -613,6 +613,7 @@
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>quickstart-oai.sh
 <span class="w">    </span><span class="o">[</span>-h<span class="p">|</span>--help<span class="o">]</span>
 <span class="w">    </span><span class="o">[</span>--clean<span class="o">]</span>
+<span class="w">    </span><span class="o">[</span>--use-existing<span class="o">]</span>
 <span class="w">    </span><span class="o">[</span>--debug<span class="o">]</span>
 <span class="w">    </span><span class="o">[</span>--no-build<span class="o">]</span>
 <span class="w">    </span><span class="o">[</span>--tag<span class="w"> </span>&lt;tagname&gt;<span class="o">]</span>
@@ -625,8 +626,8 @@
 </section>
 <section id="description">
 <h2>DESCRIPTION<a class="headerlink" href="#description" title="Link to this heading">#</a></h2>
-<p>Start from scratch and perform the steps needed to end with a set of working Docker images for OpenAirInterface. The images can then be started using one of the provided configurations using the start-system script.</p>
-<p>The script clones the OpenAirInterface repository at the specified version, applies patches from the Sionna Research Kit, and calls Docker to build the images.</p>
+<p>Perform the steps needed to end with a set of working Docker images for OpenAirInterface. The images can then be started using one of the provided configurations using the start-system script.</p>
+<p>By default, the script clones the OpenAirInterface repository at the specified version, applies patches from the Sionna Research Kit, and calls Docker to build the images. It can instead build from an existing OpenAirInterface checkout.</p>
 </section>
 <section id="options">
 <h2>OPTIONS<a class="headerlink" href="#options" title="Link to this heading">#</a></h2>
@@ -640,6 +641,12 @@
 <dt class="sig sig-object std" id="cmdoption-quickstart-oai.sh-dest">
 <span class="sig-name descname"><span class="pre">--dest</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;openairinterface5g_dir&gt;</span></span><a class="headerlink" href="#cmdoption-quickstart-oai.sh-dest" title="Link to this definition">#</a></dt>
 <dd><p>Specify the destination directory for the OpenAirInterface code. Code will be cloned and patched here. Default is <code class="docutils literal notranslate"><span class="pre">ext/openairinterface5g</span></code>.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-quickstart-oai.sh-use-existing">
+<span class="sig-name descname"><span class="pre">--use-existing</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-quickstart-oai.sh-use-existing" title="Link to this definition">#</a></dt>
+<dd><p>Use the existing OpenAirInterface checkout at <code class="docutils literal notranslate"><span class="pre">--dest</span></code> instead of cloning and patching a repository. The destination must be a valid OpenAirInterface Git checkout. This option cannot be used with <code class="docutils literal notranslate"><span class="pre">--clean</span></code>. The <code class="docutils literal notranslate"><span class="pre">--oai-version</span></code> option does not apply when using an existing checkout.</p>
 </dd></dl>
 
 <dl class="std option">
@@ -657,13 +664,13 @@
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-quickstart-oai.sh-clean">
 <span class="sig-name descname"><span class="pre">--clean</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-quickstart-oai.sh-clean" title="Link to this definition">#</a></dt>
-<dd><p>Remove the OpenAirInterface directory before proceeding. If the directory exists and the flag is not specified, the script will abort.</p>
+<dd><p>Remove the OpenAirInterface directory before proceeding, then clone and patch a fresh checkout. This option cannot be used with <code class="docutils literal notranslate"><span class="pre">--use-existing</span></code>. If the directory exists and neither option is specified, the script will abort.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-quickstart-oai.sh-no-build">
 <span class="sig-name descname"><span class="pre">--no-build</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-quickstart-oai.sh-no-build" title="Link to this definition">#</a></dt>
-<dd><p>Skip the build step of the Docker images. Only clone and patch the repository.</p>
+<dd><p>Skip the build step of the Docker images.</p>
 </dd></dl>
 
 <dl class="std option">
@@ -691,6 +698,7 @@
 ./quickstart-oai.sh<span class="w"> </span>--clean
 ./quickstart-oai.sh<span class="w"> </span>--clean<span class="w"> </span>--tag<span class="w"> </span>experimental
 ./quickstart-oai.sh<span class="w"> </span>--oai-version<span class="w"> </span><span class="m">2025</span>.w34<span class="w"> </span>--no-build
+./quickstart-oai.sh<span class="w"> </span>--use-existing<span class="w"> </span>--dest<span class="w"> </span>./ext/openairinterface5g
 </pre></div>
 </div>
 </section>

@@ -36,6 +36,9 @@ For further details, see the `OpenAirInterface Documentation <https://openairint
       # Pull, patch and build OAI containers
       ./scripts/quickstart-oai.sh
 
+      # Or build from an existing OAI checkout
+      ./scripts/quickstart-oai.sh --use-existing --dest ./ext/openairinterface5g
+
       # Generate configuration files
       ./scripts/generate-configs.sh
 
